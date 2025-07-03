@@ -126,9 +126,41 @@ The system uses a single main entity `SurveyResponse` that stores:
 - **Database Connection Management**: Optimized for concurrent access patterns
 - **Memory Management**: Efficient task queue with bounded memory usage
 
+## Security Implementation for 500+ Users
+
+### Email-Based Token Authentication
+- **JWT Token System**: Secure 24-hour tokens tied to email addresses
+- **Token Generation**: `/auth/request-token` endpoint with rate limiting (5 requests/min)
+- **Token Verification**: `/auth/verify-token` endpoint for validation
+- **Audit Trail**: AuthToken model tracks token usage, IP addresses, and user agents
+
+### Duplicate Response Prevention
+- **Primary Endpoint**: `/submit_survey` - Prevents duplicate responses per email
+- **Overwrite Endpoint**: `/submit_survey_overwrite` - Allows users to update responses
+- **Email Validation**: Server-side email format validation and normalization
+- **Authentication Middleware**: `@require_auth` decorator validates tokens and checks duplicates
+
+### Enhanced Rate Limiting
+- **Survey Submissions**: 10 per minute per IP for authenticated users
+- **Token Requests**: 5 per minute per IP to prevent token spam  
+- **Overwrite Operations**: 5 per minute per IP for stricter control
+- **API Endpoints**: 100 requests per minute per IP for dashboard access
+
+### Frontend Security Features
+- **Token Storage**: Secure localStorage management with automatic validation
+- **Authentication Flow**: Guided user experience from token generation to survey
+- **Error Handling**: Comprehensive error messages for auth failures and duplicates
+- **Session Management**: Automatic token verification and renewal prompts
+
+### Security Endpoints
+- **Health Check**: `/health` - System status including auth system health
+- **Queue Monitoring**: `/api/queue_status` - Background processing metrics
+- **Token Management**: Audit trail for all authentication activities
+
 ## Changelog
 - July 03, 2025: Initial setup with basic NPS survey functionality
 - July 03, 2025: Performance optimization for 500+ concurrent users - PostgreSQL migration, async processing, rate limiting, monitoring
+- July 03, 2025: Security implementation - JWT authentication, duplicate prevention, audit trails
 
 ## User Preferences
 

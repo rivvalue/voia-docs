@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block title %}Authentication - Voice of Client Agent{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-key me-2"></i>Get Access Token
+                </h4>
+                <small class="text-muted">Enter your email to receive an authentication token</small>
+            </div>
+            <div class="card-body">
+                <!-- Token Request Form -->
+                <div id="tokenRequestForm">
+                    <div class="mb-3">
+                        <label for="emailInput" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" id="emailInput" 
+                               placeholder="your.email@company.com" required>
+                        <div class="form-text">
+                            You'll receive a secure token valid for 24 hours
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="button" class="btn btn-primary" onclick="requestToken()">
+                            <i class="fas fa-paper-plane me-2"></i>Request Token
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div class="d-none text-center" id="loadingState">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Generating your authentication token...</p>
+                </div>
+
+                <!-- Success State -->
+                <div class="d-none" id="successState">
+                    <div class="alert alert-success">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-check-circle me-2"></i>Token Generated Successfully!
+                        </h6>
+                        <p class="mb-2">Your authentication token has been created:</p>
+                        <div class="mb-3">
+                            <label class="form-label">Authentication Token:</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control font-monospace" 
+                                       id="generatedToken" readonly>
+                                <button class="btn btn-outline-secondary" type="button" 
+                                        onclick="copyToken()" id="copyButton">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <small class="form-text text-muted">
+                                This token expires in 24 hours. Keep it secure and don't share it.
+                            </small>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <a href="{{ url_for('survey') }}" class="btn btn-success">
+                                <i class="fas fa-poll-h me-2"></i>Start Survey
+                            </a>
+                            <button type="button" class="btn btn-outline-primary" onclick="resetForm()">
+                                Generate Another Token
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error State -->
+                <div class="d-none" id="errorState">
+                    <div class="alert alert-danger">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Error
+                        </h6>
+                        <p id="errorMessage">Something went wrong. Please try again.</p>
+                        <button type="button" class="btn btn-outline-danger" onclick="resetForm()">
+                            Try Again
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Information Card -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Security Information
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <h6>Why do I need a token?</h6>
+                        <p class="small text-muted">
+                            Authentication tokens ensure that only authorized users can submit survey responses 
+                            and prevent duplicate submissions. Your token is unique to your email address.
+                        </p>
+
+                        <h6>Security Features:</h6>
+                        <ul class="small text-muted">
+                            <li>Tokens are tied to your email address</li>
+                            <li>Each token expires after 24 hours</li>
+                            <li>One response per email address (unless overwriting)</li>
+                            <li>Rate limiting prevents abuse</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentToken = null;
+
+async function requestToken() {
+    const email = document.getElementById('emailInput').value.trim();
+    
+    if (!email) {
+        alert('Please enter your email address');
+        return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        alert('Please enter a valid email address');
+        return;
+    }
+
+    // Show loading state
+    showState('loading');
+
+    try {
+        const response = await fetch('/auth/request-token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email: email })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Success
+            currentToken = data.token;
+            document.getElementById('generatedToken').value = data.token;
+            
+            // Store token for survey use
+            localStorage.setItem('auth_token', data.token);
+            localStorage.setItem('auth_email', data.email);
+            
+            showState('success');
+        } else {
+            // Error
+            document.getElementById('errorMessage').textContent = 
+                data.error || 'Failed to generate token';
+            showState('error');
+        }
+    } catch (error) {
+        console.error('Error requesting token:', error);
+        document.getElementById('errorMessage').textContent = 
+            'Network error. Please check your connection and try again.';
+        showState('error');
+    }
+}
+
+function copyToken() {
+    const tokenField = document.getElementById('generatedToken');
+    tokenField.select();
+    tokenField.setSelectionRange(0, 99999); // For mobile devices
+
+    try {
+        document.execCommand('copy');
+        const copyButton = document.getElementById('copyButton');
+        const originalContent = copyButton.innerHTML;
+        copyButton.innerHTML = '<i class="fas fa-check"></i>';
+        copyButton.classList.add('btn-success');
+        copyButton.classList.remove('btn-outline-secondary');
+        
+        setTimeout(() => {
+            copyButton.innerHTML = originalContent;
+            copyButton.classList.remove('btn-success');
+            copyButton.classList.add('btn-outline-secondary');
+        }, 2000);
+    } catch (err) {
+        console.error('Failed to copy token:', err);
+    }
+}
+
+function resetForm() {
+    document.getElementById('emailInput').value = '';
+    currentToken = null;
+    showState('form');
+}
+
+function showState(state) {
+    // Hide all states
+    document.getElementById('tokenRequestForm').classList.add('d-none');
+    document.getElementById('loadingState').classList.add('d-none');
+    document.getElementById('successState').classList.add('d-none');
+    document.getElementById('errorState').classList.add('d-none');
+
+    // Show requested state
+    switch (state) {
+        case 'form':
+            document.getElementById('tokenRequestForm').classList.remove('d-none');
+            break;
+        case 'loading':
+            document.getElementById('loadingState').classList.remove('d-none');
+            break;
+        case 'success':
+            document.getElementById('successState').classList.remove('d-none');
+            break;
+        case 'error':
+            document.getElementById('errorState').classList.remove('d-none');
+            break;
+    }
+}
+
+// Check if user already has a valid token
+document.addEventListener('DOMContentLoaded', function() {
+    const existingToken = localStorage.getItem('auth_token');
+    const existingEmail = localStorage.getItem('auth_email');
+    
+    if (existingToken && existingEmail) {
+        // Verify token is still valid
+        fetch('/auth/verify-token', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + existingToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.valid) {
+                // Token is still valid, show it
+                currentToken = existingToken;
+                document.getElementById('generatedToken').value = existingToken;
+                document.getElementById('emailInput').value = existingEmail;
+                showState('success');
+            }
+        })
+        .catch(error => {
+            console.log('Existing token validation failed:', error);
+            // Continue with normal flow
+        });
+    }
+});
+
+// Handle Enter key
+document.getElementById('emailInput').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        requestToken();
+    }
+});
+</script>
+{% endblock %}

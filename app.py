@@ -34,6 +34,7 @@ db.init_app(app)
 with app.app_context():
     # Import models and routes
     import models  # noqa: F401
+    import models_auth  # noqa: F401
     import routes  # noqa: F401
     from task_queue import start_task_queue
     

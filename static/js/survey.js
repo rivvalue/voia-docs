@@ -2,10 +2,12 @@
 
 let currentStep = 1;
 let selectedNpsScore = null;
+let authToken = null;
 
 // Initialize the survey
 document.addEventListener('DOMContentLoaded', function() {
     updateProgress();
+    checkAuthentication();
 });
 
 function nextStep(stepNumber) {
@@ -94,15 +96,21 @@ function handleNpsSelection() {
 }
 
 function submitSurvey() {
+    // Check authentication
+    if (!authToken) {
+        alert('Authentication required. Please get a token first.');
+        window.location.href = '/auth';
+        return;
+    }
+    
     // Show loading state
     document.getElementById('surveyForm').classList.add('d-none');
     document.getElementById('loadingState').classList.remove('d-none');
     
-    // Collect all form data
+    // Collect all form data (email will be overridden by authenticated email)
     const formData = {
         company_name: document.getElementById('companyName').value.trim(),
         respondent_name: document.getElementById('respondentName').value.trim(),
-        respondent_email: document.getElementById('respondentEmail').value.trim(),
         nps_score: selectedNpsScore,
         satisfaction_rating: document.getElementById('satisfactionRating').value || null,
         product_value_rating: document.getElementById('productValueRating').value || null,
@@ -113,23 +121,44 @@ function submitSurvey() {
         additional_comments: document.getElementById('additionalComments').value.trim() || null
     };
     
-    // Submit to server
+    // Submit to server with authentication
     fetch('/submit_survey', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + authToken
         },
         body: JSON.stringify(formData)
     })
     .then(response => response.json())
     .then(data => {
         if (data.error) {
+            // Handle specific error cases
+            if (data.code === 'AUTH_ERROR' || data.code === 'MISSING_AUTH') {
+                alert('Authentication failed. Please get a new token.');
+                window.location.href = '/auth';
+                return;
+            } else if (response.status === 409) {
+                // Duplicate response
+                const overwrite = confirm(
+                    'You have already submitted a response. Would you like to overwrite it?'
+                );
+                if (overwrite) {
+                    submitSurveyOverwrite(formData);
+                    return;
+                } else {
+                    throw new Error('You have already submitted a response.');
+                }
+            }
             throw new Error(data.error);
         }
         
         // Show success state
         document.getElementById('loadingState').classList.add('d-none');
         document.getElementById('successState').classList.remove('d-none');
+        
+        // Clear stored data
+        clearSavedData();
         
         console.log('Survey submitted successfully:', data);
     })
@@ -140,7 +169,7 @@ function submitSurvey() {
         document.getElementById('loadingState').classList.add('d-none');
         document.getElementById('surveyForm').classList.remove('d-none');
         
-        alert('There was an error submitting your survey. Please try again.');
+        alert('Error: ' + error.message);
     });
 }
 
@@ -195,6 +224,115 @@ document.getElementById('respondentEmail').addEventListener('input', autoSave);
 // Clear saved data on successful submission
 function clearSavedData() {
     localStorage.removeItem('surveyDraft');
+}
+
+// Authentication functions
+function checkAuthentication() {
+    // Get token from localStorage
+    const token = localStorage.getItem('auth_token');
+    const email = localStorage.getItem('auth_email');
+    
+    if (token && email) {
+        // Verify token is still valid
+        fetch('/auth/verify-token', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.valid) {
+                authToken = token;
+                // Pre-fill email field if available
+                if (document.getElementById('respondentEmail')) {
+                    document.getElementById('respondentEmail').value = email;
+                    document.getElementById('respondentEmail').readOnly = true;
+                }
+                console.log('Authenticated as:', email);
+            } else {
+                // Token is invalid, remove it
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('auth_email');
+                showAuthRequired();
+            }
+        })
+        .catch(error => {
+            console.error('Token verification failed:', error);
+            showAuthRequired();
+        });
+    } else {
+        showAuthRequired();
+    }
+}
+
+function showAuthRequired() {
+    // Show authentication requirement
+    const authAlert = document.createElement('div');
+    authAlert.className = 'alert alert-warning alert-dismissible fade show';
+    authAlert.innerHTML = `
+        <i class="fas fa-key me-2"></i>
+        <strong>Authentication Required:</strong> You need a valid token to submit surveys.
+        <a href="/auth" class="btn btn-sm btn-outline-warning ms-2">Get Token</a>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    // Insert at the top of the form
+    const formContainer = document.querySelector('.card-body');
+    formContainer.insertBefore(authAlert, formContainer.firstChild);
+}
+
+function submitSurveyOverwrite(formData) {
+    if (!authToken) {
+        alert('Authentication required. Please get a token first.');
+        window.location.href = '/auth';
+        return;
+    }
+    
+    // Show loading state again
+    document.getElementById('surveyForm').classList.add('d-none');
+    document.getElementById('loadingState').classList.remove('d-none');
+    
+    // Submit to overwrite endpoint
+    fetch('/submit_survey_overwrite', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + authToken
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        
+        // Show success state
+        document.getElementById('loadingState').classList.add('d-none');
+        document.getElementById('successState').classList.remove('d-none');
+        
+        // Update success message to indicate overwrite
+        const successDiv = document.getElementById('successState');
+        const heading = successDiv.querySelector('h5');
+        if (heading && data.action === 'updated') {
+            heading.textContent = 'Survey Updated Successfully!';
+        }
+        
+        // Clear stored data
+        clearSavedData();
+        
+        console.log('Survey overwritten successfully:', data);
+    })
+    .catch(error => {
+        console.error('Error overwriting survey:', error);
+        
+        // Hide loading state and show form again
+        document.getElementById('loadingState').classList.add('d-none');
+        document.getElementById('surveyForm').classList.remove('d-none');
+        
+        alert('Error: ' + error.message);
+    });
 }
 
 // Load saved data when page loads
