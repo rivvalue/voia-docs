@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Customer Survey - Voice of Client Agent{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">Customer Feedback Survey</h4>
+                <small class="text-muted">Help us improve by sharing your experience</small>
+            </div>
+            <div class="card-body">
+                <!-- Progress Bar -->
+                <div class="progress mb-4" style="height: 6px;">
+                    <div class="progress-bar" role="progressbar" style="width: 20%;" id="progressBar"></div>
+                </div>
+
+                <form id="surveyForm">
+                    <!-- Step 1: Basic Information -->
+                    <div class="survey-step" id="step1">
+                        <h5 class="mb-3">Basic Information</h5>
+                        <div class="mb-3">
+                            <label for="companyName" class="form-label">Company Name</label>
+                            <input type="text" class="form-control" id="companyName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="respondentName" class="form-label">Your Name</label>
+                            <input type="text" class="form-control" id="respondentName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="respondentEmail" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="respondentEmail" required>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="nextStep(2)">Next</button>
+                    </div>
+
+                    <!-- Step 2: NPS Score -->
+                    <div class="survey-step d-none" id="step2">
+                        <h5 class="mb-3">Net Promoter Score</h5>
+                        <p class="mb-3">On a scale of 0-10, how likely are you to recommend our services to a friend or colleague?</p>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <small class="text-muted">Not likely</small>
+                            <div class="nps-scale">
+                                <div class="btn-group" role="group">
+                                    <input type="radio" class="btn-check" name="npsScore" id="nps0" value="0">
+                                    <label class="btn btn-outline-danger" for="nps0">0</label>
+                                    <input type="radio" class="btn-check" name="npsScore" id="nps1" value="1">
+                                    <label class="btn btn-outline-danger" for="nps1">1</label>
+                                    <input type="radio" class="btn-check" name="npsScore" id="nps2" value="2">
+                                    <label class="btn btn-outline-danger" for="nps2">2</label>
+                                    <input type="radio" class="btn-check" name="npsScore" id="nps3" value="3">
+                                    <label class="btn btn-outline-danger" for="nps3">3</label>
+                                    <input type="radio" class="btn-check" name="npsScore" id="nps4" value="4">
+                                    <label class="btn btn-outline-danger" for="nps4">4</label>
+                                    <input type="radio" class="btn-check" name="npsScore" id="nps5" value="5">
+                                    <label class="btn btn-outline-danger" for="nps5">5</label>
+                                    <input type="radio" class="btn-check" name="npsScore" id="nps6" value="6">
+                                    <label class="btn btn-outline-danger" for="nps6">6</label>
+                                    <input type="radio" class="btn-check" name="npsScore" id="nps7" value="7">
+                                    <label class="btn btn-outline-warning" for="nps7">7</label>
+                                    <input type="radio" class="btn-check" name="npsScore" id="nps8" value="8">
+                                    <label class="btn btn-outline-warning" for="nps8">8</label>
+                                    <input type="radio" class="btn-check" name="npsScore" id="nps9" value="9">
+                                    <label class="btn btn-outline-success" for="nps9">9</label>
+                                    <input type="radio" class="btn-check" name="npsScore" id="nps10" value="10">
+                                    <label class="btn btn-outline-success" for="nps10">10</label>
+                                </div>
+                            </div>
+                            <small class="text-muted">Extremely likely</small>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" onclick="previousStep(1)">Previous</button>
+                            <button type="button" class="btn btn-primary" onclick="handleNpsSelection()">Next</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Follow-up Questions -->
+                    <div class="survey-step d-none" id="step3">
+                        <h5 class="mb-3">Tell us more about your experience</h5>
+                        
+                        <div class="mb-3">
+                            <label for="recommendationReason" class="form-label" id="reasonLabel">
+                                What is the main reason for your score?
+                            </label>
+                            <textarea class="form-control" id="recommendationReason" rows="3"></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="satisfactionRating" class="form-label">Overall Satisfaction (1-5)</label>
+                                    <select class="form-select" id="satisfactionRating">
+                                        <option value="">Select rating</option>
+                                        <option value="1">1 - Very Poor</option>
+                                        <option value="2">2 - Poor</option>
+                                        <option value="3">3 - Average</option>
+                                        <option value="4">4 - Good</option>
+                                        <option value="5">5 - Excellent</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="productValueRating" class="form-label">Product Value (1-5)</label>
+                                    <select class="form-select" id="productValueRating">
+                                        <option value="">Select rating</option>
+                                        <option value="1">1 - Very Poor</option>
+                                        <option value="2">2 - Poor</option>
+                                        <option value="3">3 - Average</option>
+                                        <option value="4">4 - Good</option>
+                                        <option value="5">5 - Excellent</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="serviceRating" class="form-label">Professional Services (1-5)</label>
+                                    <select class="form-select" id="serviceRating">
+                                        <option value="">Select rating</option>
+                                        <option value="1">1 - Very Poor</option>
+                                        <option value="2">2 - Poor</option>
+                                        <option value="3">3 - Average</option>
+                                        <option value="4">4 - Good</option>
+                                        <option value="5">5 - Excellent</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="pricingRating" class="form-label">Pricing (1-5)</label>
+                                    <select class="form-select" id="pricingRating">
+                                        <option value="">Select rating</option>
+                                        <option value="1">1 - Very Poor</option>
+                                        <option value="2">2 - Poor</option>
+                                        <option value="3">3 - Average</option>
+                                        <option value="4">4 - Good</option>
+                                        <option value="5">5 - Excellent</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" onclick="previousStep(2)">Previous</button>
+                            <button type="button" class="btn btn-primary" onclick="nextStep(4)">Next</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Additional Feedback -->
+                    <div class="survey-step d-none" id="step4">
+                        <h5 class="mb-3">Additional Feedback</h5>
+                        
+                        <div class="mb-3">
+                            <label for="improvementFeedback" class="form-label">What could we improve?</label>
+                            <textarea class="form-control" id="improvementFeedback" rows="3" placeholder="Please share your suggestions for improvement..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="additionalComments" class="form-label">Any additional comments?</label>
+                            <textarea class="form-control" id="additionalComments" rows="3" placeholder="Feel free to share any other thoughts or feedback..."></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" onclick="previousStep(3)">Previous</button>
+                            <button type="button" class="btn btn-success" onclick="submitSurvey()">
+                                <i class="fas fa-paper-plane me-2"></i>Submit Survey
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Loading state -->
+                <div class="d-none" id="loadingState">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Processing your feedback...</p>
+                    </div>
+                </div>
+
+                <!-- Success state -->
+                <div class="d-none" id="successState">
+                    <div class="text-center">
+                        <i class="fas fa-check-circle text-success fa-3x mb-3"></i>
+                        <h5>Thank you for your feedback!</h5>
+                        <p>Your response has been submitted and will be analyzed to help us improve our services.</p>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">View Dashboard</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/survey.js') }}"></script>
+{% endblock %}
