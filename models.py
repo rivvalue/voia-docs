@@ -4,11 +4,11 @@ import json
 
 class SurveyResponse(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    company_name = db.Column(db.String(200), nullable=False)
+    company_name = db.Column(db.String(200), nullable=False, index=True)
     respondent_name = db.Column(db.String(200), nullable=False)
-    respondent_email = db.Column(db.String(200), nullable=False)
-    nps_score = db.Column(db.Integer, nullable=False)
-    nps_category = db.Column(db.String(20), nullable=False)  # Promoter, Passive, Detractor
+    respondent_email = db.Column(db.String(200), nullable=False, index=True)
+    nps_score = db.Column(db.Integer, nullable=False, index=True)
+    nps_category = db.Column(db.String(20), nullable=False, index=True)  # Promoter, Passive, Detractor
     
     # Follow-up responses stored as JSON
     satisfaction_rating = db.Column(db.Integer)
@@ -30,8 +30,8 @@ class SurveyResponse(db.Model):
     growth_opportunities = db.Column(db.Text)  # JSON string
     
     # Metadata
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    analyzed_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    analyzed_at = db.Column(db.DateTime, index=True)
     
     def to_dict(self):
         return {

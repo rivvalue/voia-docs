@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import func
 from app import db
 from models import SurveyResponse
+from flask import request
 
 def get_dashboard_data():
     """Compile dashboard data for visualization"""

@@ -330,17 +330,18 @@ function populateGrowthOpportunities() {
 }
 
 function loadSurveyResponses() {
-    fetch('/api/survey_responses')
+    fetch('/api/survey_responses?per_page=10')
         .then(response => response.json())
-        .then(responses => {
+        .then(data => {
             const tbody = document.getElementById('responsesTable');
+            const responses = data.responses || data; // Handle both old and new format
             
             if (responses.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No survey responses yet.</td></tr>';
                 return;
             }
             
-            const html = responses.slice(0, 10).map(response => {
+            const html = responses.map(response => {
                 const riskClass = response.churn_risk_score > 0.6 ? 'risk-high' : 
                                  response.churn_risk_score > 0.3 ? 'risk-medium' : 'risk-low';
                 

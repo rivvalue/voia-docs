@@ -23,6 +23,9 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:/
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
+    "pool_size": 20,  # Increase pool size for concurrent connections
+    "max_overflow": 50,  # Allow overflow connections
+    "pool_timeout": 30,  # Connection timeout
 }
 
 # Initialize the app with the extension
@@ -32,8 +35,12 @@ with app.app_context():
     # Import models and routes
     import models  # noqa: F401
     import routes  # noqa: F401
+    from task_queue import start_task_queue
     
     db.create_all()
+    
+    # Start the background task queue for AI processing
+    start_task_queue()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

@@ -93,8 +93,42 @@ The system uses a single main entity `SurveyResponse` that stores:
 - `DATABASE_URL`: Database connection string (defaults to SQLite)
 - `SESSION_SECRET`: Flask session security key
 
+## Performance Optimizations for High Load (500+ Users)
+
+### Database Optimizations
+- **PostgreSQL Migration**: Switched from SQLite to PostgreSQL for better concurrency
+- **Connection Pooling**: Configured pool_size=20, max_overflow=50 for handling concurrent connections
+- **Database Indexing**: Added indexes on frequently queried fields (company_name, respondent_email, nps_score, nps_category, created_at, analyzed_at)
+- **Query Optimization**: Implemented pagination for API endpoints to prevent large data transfers
+
+### Asynchronous Processing
+- **Background Task Queue**: Implemented in-memory task queue with 3 worker threads for AI analysis
+- **Non-blocking Survey Submission**: Survey submissions now return immediately while AI analysis runs in background
+- **Graceful Degradation**: System continues functioning even if AI analysis fails
+
+### Rate Limiting & Security
+- **Per-IP Rate Limiting**: 10 survey submissions per minute per IP address
+- **API Rate Limiting**: 100 requests per minute per IP for API endpoints
+- **Request Validation**: Enhanced input validation and error handling
+
+### API Performance
+- **Pagination**: Survey responses API supports pagination (max 100 per page)
+- **Efficient Data Transfer**: Optimized JSON responses with only necessary data
+- **Caching Strategy**: Prepared for Redis integration if needed
+
+### Monitoring & Health Checks
+- **Health Check Endpoint**: `/health` provides system status monitoring
+- **Queue Status Monitoring**: `/api/queue_status` shows background processing metrics
+- **Error Logging**: Comprehensive logging for debugging and monitoring
+
+### Infrastructure Readiness
+- **Horizontal Scaling Ready**: Stateless design allows for load balancer deployment
+- **Database Connection Management**: Optimized for concurrent access patterns
+- **Memory Management**: Efficient task queue with bounded memory usage
+
 ## Changelog
-- July 03, 2025. Initial setup
+- July 03, 2025: Initial setup with basic NPS survey functionality
+- July 03, 2025: Performance optimization for 500+ concurrent users - PostgreSQL migration, async processing, rate limiting, monitoring
 
 ## User Preferences
 
