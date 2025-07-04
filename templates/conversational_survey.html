@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}AI-Powered Survey - Rivvalue Inc.{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Survey Header -->
+            <div class="card mb-4">
+                <div class="card-header text-center">
+                    <img src="{{ url_for('static', filename='rivvalue-logo.svg') }}" alt="Rivvalue Inc." height="50" class="mb-3">
+                    <h4>AI-Powered Customer Feedback</h4>
+                    <p class="text-muted">Have a natural conversation with our AI assistant to share your feedback</p>
+                </div>
+            </div>
+
+            <!-- Authentication Check -->
+            <div id="authCheck" class="card mb-4" style="display: none;">
+                <div class="card-body text-center">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-key me-2"></i>
+                        <strong>Authentication Required</strong>
+                        <p class="mb-3">You need a valid token to participate in this survey.</p>
+                        <a href="/auth" class="btn btn-primary">Get Authentication Token</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Survey Setup -->
+            <div id="surveySetup" class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-user-circle me-2"></i>Let's Get Started</h5>
+                </div>
+                <div class="card-body">
+                    <form id="setupForm">
+                        <div class="mb-3">
+                            <label for="companyName" class="form-label">Company Name</label>
+                            <input type="text" class="form-control" id="companyName" required 
+                                   placeholder="Enter your company name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="respondentName" class="form-label">Your Name</label>
+                            <input type="text" class="form-control" id="respondentName" required 
+                                   placeholder="Enter your full name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="respondentEmail" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="respondentEmail" required 
+                                   placeholder="Enter your email address">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-comments me-2"></i>Start Conversation
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Conversation Interface -->
+            <div id="conversationInterface" class="card" style="display: none;">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="fas fa-robot me-2"></i>AI Survey Assistant</h5>
+                    <div class="progress" style="width: 200px;">
+                        <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Chat Messages -->
+                    <div id="chatMessages" class="mb-4" style="height: 400px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.5rem; padding: 1rem;">
+                        <!-- Messages will be populated here -->
+                    </div>
+                    
+                    <!-- Input Area -->
+                    <div id="inputArea">
+                        <div class="input-group">
+                            <textarea id="userInput" class="form-control" rows="3" 
+                                      placeholder="Type your response here..."></textarea>
+                            <button id="sendButton" class="btn btn-primary" type="button">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div class="form-text">
+                            <i class="fas fa-lightbulb me-1"></i>
+                            Tip: Speak naturally! The AI understands conversational responses.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="card" style="display: none;">
+                <div class="card-body text-center">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h5>AI is processing your response...</h5>
+                    <p class="text-muted">Please wait while our AI analyzes your feedback</p>
+                </div>
+            </div>
+
+            <!-- Survey Complete -->
+            <div id="surveyComplete" class="card" style="display: none;">
+                <div class="card-body text-center">
+                    <div class="success-icon mb-3">
+                        <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                    </div>
+                    <h4 class="text-success">Thank You!</h4>
+                    <p class="lead">Your feedback has been submitted successfully and will be analyzed by our AI.</p>
+                    <p class="text-muted">We appreciate you taking the time to share your thoughts with us.</p>
+                    <div class="mt-4">
+                        <a href="{{ url_for('index') }}" class="btn btn-primary me-2">
+                            <i class="fas fa-home me-2"></i>Return Home
+                        </a>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-chart-bar me-2"></i>View Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/conversational_survey.js') }}"></script>
+{% endblock %}

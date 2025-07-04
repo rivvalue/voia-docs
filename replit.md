@@ -157,11 +157,47 @@ The system uses a single main entity `SurveyResponse` that stores:
 - **Queue Monitoring**: `/api/queue_status` - Background processing metrics
 - **Token Management**: Audit trail for all authentication activities
 
+## AI-Powered Conversational Surveys
+
+### Conversational Survey System
+- **Natural Language Interface**: AI-powered conversations replace traditional forms
+- **OpenAI Integration**: GPT-4o model for intelligent question generation and response analysis
+- **Real-time Processing**: Dynamic follow-up questions based on user responses
+- **Structured Data Extraction**: Automatic conversion of natural language to survey metrics
+
+### Key Features
+- **Personalized Experience**: AI adapts questions based on previous responses
+- **Multi-topic Coverage**: NPS scoring, satisfaction ratings, improvement suggestions
+- **Conversation History**: Complete chat logs stored for analysis
+- **Progress Tracking**: Visual progress indicator for survey completion
+- **Graceful Fallbacks**: System continues functioning even if AI analysis fails
+
+### Technical Implementation
+- **Frontend**: Chat-style interface with typing indicators and message bubbles
+- **Backend**: RESTful API endpoints for conversation management
+- **Data Flow**: Natural language → AI analysis → structured database storage
+- **Integration**: Seamless connection with existing analytics and dashboard
+
+## Rivvalue Inc. Branding
+
+### Visual Identity
+- **Logo Integration**: Rivvalue Inc. logo prominently displayed across all pages
+- **Brand Colors**: Professional blue color scheme with Rivvalue branding
+- **Consistent Styling**: Bootstrap dark theme customized for Rivvalue aesthetics
+
+### Deployment Package
+- **AWS EC2 Ready**: Complete deployment guide for Debian 12 x86_64
+- **Production Configuration**: Optimized for 500+ concurrent users
+- **Docker Support**: Containerization ready for scalable deployment
+- **Environment Variables**: Secure configuration management
+
 ## Changelog
 - July 03, 2025: Initial setup with basic NPS survey functionality
 - July 03, 2025: Performance optimization for 500+ concurrent users - PostgreSQL migration, async processing, rate limiting, monitoring
 - July 03, 2025: Security implementation - JWT authentication, duplicate prevention, audit trails
+- July 04, 2025: AI conversational surveys - OpenAI integration, natural language processing, Rivvalue branding
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Project customization: Rivvalue Inc. branding and conversational AI surveys for enhanced user experience.

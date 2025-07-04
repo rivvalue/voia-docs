@@ -6,10 +6,12 @@ from data_storage import get_dashboard_data
 from task_queue import add_analysis_task, get_queue_stats
 from rate_limiter import rate_limit
 from auth_system import require_auth, generate_user_token
+from conversational_survey import start_conversational_survey, process_conversation_response, finalize_conversational_survey
 from datetime import datetime, timedelta
 import json
 import logging
 import re
+import uuid
 
 logger = logging.getLogger(__name__)
 
@@ -377,3 +379,131 @@ def health_check():
             'timestamp': datetime.utcnow().isoformat(),
             'error': str(e)
         }), 500
+
+# Conversational Survey Routes
+@app.route('/conversational_survey')
+def conversational_survey():
+    """AI-powered conversational survey page"""
+    return render_template('conversational_survey.html')
+
+@app.route('/api/start_conversation', methods=['POST'])
+@rate_limit(limit=10)
+@require_auth()
+def start_conversation():
+    """Start a new conversational survey session"""
+    try:
+        data = request.get_json()
+        company_name = data.get('company_name', '').strip()
+        respondent_name = data.get('respondent_name', '').strip()
+        
+        if not company_name or not respondent_name:
+            return jsonify({'error': 'Company name and respondent name are required'}), 400
+        
+        # Start conversation with AI
+        conversation_response = start_conversational_survey(company_name, respondent_name)
+        
+        # Generate unique conversation ID
+        conversation_id = str(uuid.uuid4())
+        
+        return jsonify({
+            'conversation_id': conversation_id,
+            'message': conversation_response['message'],
+            'step': conversation_response['step'],
+            'progress': conversation_response['progress']
+        })
+        
+    except Exception as e:
+        logger.error(f"Error starting conversation: {e}")
+        return jsonify({'error': 'Failed to start conversation'}), 500
+
+@app.route('/api/conversation_response', methods=['POST'])
+@rate_limit(limit=50)
+@require_auth()
+def conversation_response():
+    """Process conversational survey response"""
+    try:
+        data = request.get_json()
+        conversation_id = data.get('conversation_id')
+        user_input = data.get('user_input', '').strip()
+        survey_data = data.get('survey_data', {})
+        
+        if not conversation_id or not user_input:
+            return jsonify({'error': 'Conversation ID and user input are required'}), 400
+        
+        # Add authenticated email to survey data
+        survey_data['respondent_email'] = g.authenticated_email
+        
+        # Process response with AI
+        ai_response = process_conversation_response(user_input, survey_data)
+        
+        return jsonify(ai_response)
+        
+    except Exception as e:
+        logger.error(f"Error processing conversation response: {e}")
+        return jsonify({'error': 'Failed to process response'}), 500
+
+@app.route('/api/finalize_conversation', methods=['POST'])
+@rate_limit(limit=5)
+@require_auth()
+def finalize_conversation():
+    """Finalize conversational survey and save to database"""
+    try:
+        data = request.get_json()
+        conversation_id = data.get('conversation_id')
+        survey_data = data.get('survey_data', {})
+        messages = data.get('messages', [])
+        
+        if not conversation_id:
+            return jsonify({'error': 'Conversation ID is required'}), 400
+        
+        # Add authenticated email to survey data
+        survey_data['respondent_email'] = g.authenticated_email
+        survey_data['conversation_history'] = json.dumps(messages)
+        
+        # Convert conversational data to structured survey format
+        structured_data = finalize_conversational_survey(survey_data)
+        
+        # Create survey response record
+        response = SurveyResponse(
+            company_name=structured_data.get('company_name'),
+            respondent_name=structured_data.get('respondent_name'),
+            respondent_email=g.authenticated_email,
+            nps_score=structured_data.get('nps_score'),
+            satisfaction_rating=structured_data.get('satisfaction_rating'),
+            product_value_rating=structured_data.get('product_value_rating'),
+            service_rating=structured_data.get('service_rating'),
+            pricing_rating=structured_data.get('pricing_rating'),
+            improvement_feedback=structured_data.get('improvement_feedback'),
+            recommendation_reason=structured_data.get('recommendation_reason'),
+            additional_comments=structured_data.get('additional_comments'),
+            conversation_history=structured_data.get('conversation_history')
+        )
+        
+        # Calculate NPS category
+        if response.nps_score is not None:
+            if response.nps_score >= 9:
+                response.nps_category = "Promoter"
+            elif response.nps_score >= 7:
+                response.nps_category = "Passive"
+            else:
+                response.nps_category = "Detractor"
+        
+        db.session.add(response)
+        db.session.commit()
+        
+        # Queue AI analysis
+        add_analysis_task(response.id)
+        
+        logger.info(f"Conversational survey completed by {g.authenticated_email}")
+        
+        return jsonify({
+            'message': 'Survey completed successfully',
+            'response_id': response.id,
+            'analysis_status': 'queued',
+            'authenticated_email': g.authenticated_email
+        })
+        
+    except Exception as e:
+        logger.error(f"Error finalizing conversation: {e}")
+        db.session.rollback()
+        return jsonify({'error': 'Failed to finalize survey'}), 500

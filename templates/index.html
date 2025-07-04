@@ -6,18 +6,30 @@
 <div class="row">
     <div class="col-lg-8 mx-auto">
         <div class="text-center mb-5">
+            <img src="{{ url_for('static', filename='rivvalue-logo.svg') }}" alt="Rivvalue Inc." height="80" class="mb-4">
             <h1 class="display-4 mb-3">Voice of Client Agent</h1>
-            <p class="lead">Gather customer feedback, analyze sentiment, and identify growth opportunities through AI-powered insights.</p>
+            <p class="lead">Experience next-generation customer feedback with AI-powered conversational surveys and deep analytics.</p>
+            
+            <!-- New AI Feature Highlight -->
+            <div class="alert alert-info d-inline-block">
+                <i class="fas fa-robot me-2"></i>
+                <strong>New!</strong> AI Conversational Surveys - Talk naturally instead of filling forms
+            </div>
         </div>
 
         <div class="row g-4">
             <div class="col-md-4">
-                <div class="card h-100">
+                <div class="card h-100 border-primary">
+                    <div class="card-header bg-primary text-white text-center">
+                        <i class="fas fa-robot me-2"></i><strong>NEW!</strong>
+                    </div>
                     <div class="card-body text-center">
-                        <i class="fas fa-poll-h fa-3x text-primary mb-3"></i>
-                        <h5 class="card-title">NPS Survey</h5>
-                        <p class="card-text">Collect Net Promoter Score feedback from your clients with intelligent follow-up questions.</p>
-                        <a href="{{ url_for('survey') }}" class="btn btn-primary">Start Survey</a>
+                        <i class="fas fa-comments fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">AI Conversation Survey</h5>
+                        <p class="card-text">Have a natural conversation with AI to share your feedback - no forms to fill!</p>
+                        <a href="{{ url_for('conversational_survey') }}" class="btn btn-primary mb-2">Try AI Survey</a>
+                        <br>
+                        <a href="{{ url_for('survey') }}" class="btn btn-outline-primary btn-sm">Traditional Form</a>
                     </div>
                 </div>
             </div>
