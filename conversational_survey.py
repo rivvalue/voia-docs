@@ -178,13 +178,34 @@ Return JSON with:
             
         except Exception as e:
             print(f"Error generating next question: {e}")
-            return {
-                'message': "Thank you for your feedback! Is there anything else you'd like to share about your experience?",
-                'message_type': 'ai_question',
-                'step': 'conclusion',
-                'progress': 90,
-                'is_complete': False
-            }
+            # Intelligent fallback based on conversation state
+            extracted = context.get('extracted_data', {})
+            
+            if not extracted.get('nps_score'):
+                return {
+                    'message': "On a scale of 0-10, how likely are you to recommend our service to a friend or colleague?",
+                    'message_type': 'ai_question',
+                    'step': 'nps_collection',
+                    'progress': 30,
+                    'is_complete': False
+                }
+            elif not extracted.get('satisfaction_rating'):
+                return {
+                    'message': "What would you say is your overall satisfaction with our service?",
+                    'message_type': 'ai_question',
+                    'step': 'satisfaction',
+                    'progress': 60,
+                    'is_complete': False
+                }
+            else:
+                # Survey appears complete, finalize
+                return {
+                    'message': "Thank you for sharing your valuable feedback! We appreciate your time and insights.",
+                    'message_type': 'conclusion',
+                    'step': 'conclusion',
+                    'progress': 100,
+                    'is_complete': True
+                }
     
     def _analyze_missing_information(self, context: Dict[str, Any]) -> List[str]:
         """Analyze what survey information is still missing"""

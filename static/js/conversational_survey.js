@@ -200,37 +200,8 @@ function sendMessage() {
 function addMessage(sender, message) {
     const chatMessages = document.getElementById('chatMessages');
     const messageElement = document.createElement('div');
-    messageElement.className = `message ${sender}-message mb-3`;
-    
-    if (sender === 'ai') {
-        messageElement.innerHTML = `
-            <div class="d-flex align-items-start">
-                <div class="avatar me-3">
-                    <i class="fas fa-robot text-primary"></i>
-                </div>
-                <div class="message-content">
-                    <div class="message-bubble ai-bubble p-3 rounded">
-                        ${formatMessage(message)}
-                    </div>
-                    <small class="text-muted">AI Assistant</small>
-                </div>
-            </div>
-        `;
-    } else {
-        messageElement.innerHTML = `
-            <div class="d-flex align-items-start justify-content-end">
-                <div class="message-content text-end">
-                    <div class="message-bubble user-bubble p-3 rounded">
-                        ${formatMessage(message)}
-                    </div>
-                    <small class="text-muted">You</small>
-                </div>
-                <div class="avatar ms-3">
-                    <i class="fas fa-user text-secondary"></i>
-                </div>
-            </div>
-        `;
-    }
+    messageElement.className = `chat-message ${sender === 'ai' ? 'assistant' : 'user'}`;
+    messageElement.innerHTML = formatMessage(message);
     
     chatMessages.appendChild(messageElement);
     chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -255,23 +226,12 @@ function showTypingIndicator() {
     const chatMessages = document.getElementById('chatMessages');
     const typingElement = document.createElement('div');
     typingElement.id = 'typingIndicator';
-    typingElement.className = 'message ai-message mb-3';
+    typingElement.className = 'typing-indicator';
     typingElement.innerHTML = `
-        <div class="d-flex align-items-start">
-            <div class="avatar me-3">
-                <i class="fas fa-robot text-primary"></i>
-            </div>
-            <div class="message-content">
-                <div class="message-bubble ai-bubble p-3 rounded">
-                    <div class="typing-indicator">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                </div>
-                <small class="text-muted">AI is typing...</small>
-            </div>
+        <div class="spinner-border spinner-border-sm" role="status">
+            <span class="visually-hidden">Loading...</span>
         </div>
+        VoC Agent is typing...
     `;
     
     chatMessages.appendChild(typingElement);

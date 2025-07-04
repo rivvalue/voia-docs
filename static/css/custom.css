@@ -167,3 +167,73 @@ canvas {
     border-radius: 0.5rem;
     text-align: center;
 }
+
+/* Conversational Chat Interface */
+.chat-message {
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    max-width: 80%;
+    word-wrap: break-word;
+}
+
+.chat-message.user {
+    background-color: var(--bs-primary);
+    color: white;
+    margin-left: auto;
+    text-align: right;
+}
+
+.chat-message.assistant {
+    background-color: var(--bs-secondary);
+    color: white;
+    margin-right: auto;
+    text-align: left;
+}
+
+.chat-message.system {
+    background-color: var(--bs-info);
+    color: white;
+    margin: 0 auto;
+    text-align: center;
+    font-style: italic;
+}
+
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    background-color: var(--bs-secondary);
+    color: white;
+    border-radius: 0.5rem;
+    margin-right: auto;
+    max-width: 80%;
+}
+
+.typing-indicator .spinner-border {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.5rem;
+}
+
+#chatMessages {
+    background-color: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+}
+
+#chatMessages::-webkit-scrollbar {
+    width: 8px;
+}
+
+#chatMessages::-webkit-scrollbar-track {
+    background: var(--bs-body-bg);
+}
+
+#chatMessages::-webkit-scrollbar-thumb {
+    background: var(--bs-border-color);
+    border-radius: 4px;
+}
+
+#chatMessages::-webkit-scrollbar-thumb:hover {
+    background: var(--bs-secondary);
+}
