@@ -53,21 +53,30 @@ class AIConversationalSurvey:
         # Extract data from user input
         extracted = self._extract_survey_data_with_ai(user_input, context)
         
-        # Update extracted data
-        self.extracted_data.update(extracted)
+        # Update extracted data - merge with existing data
+        for key, value in extracted.items():
+            if value is not None:  # Only update if we have actual data
+                self.extracted_data[key] = value
+        
         self.survey_data['extracted_data'] = self.extracted_data
         
-        # Generate next AI question
+        # Increment step count BEFORE generating next question
+        self.step_count += 1
+        
+        # Generate next AI question using updated data
         next_question = self._generate_ai_question(user_input, context)
         
         # Add AI response to conversation history
-        self.conversation_history.append({
-            'sender': 'VoC Agent',
-            'message': next_question['message'],
-            'timestamp': 'now'
-        })
+        if not next_question.get('is_complete', False):
+            self.conversation_history.append({
+                'sender': 'VoC Agent',
+                'message': next_question['message'],
+                'timestamp': 'now'
+            })
         
-        self.step_count += 1
+        # Debug logging
+        print(f"Step {self.step_count}: Extracted data: {self.extracted_data}")
+        print(f"Next question: {next_question.get('message', '')}")
         
         return next_question
     
@@ -147,12 +156,14 @@ Only include fields that are clearly present in the response. If a field is not 
         # Extract NPS score with improved detection
         import re
         
-        # Look for numbers 0-10 in various formats
+        # Look for numbers 0-10 in various formats - more comprehensive patterns
         nps_patterns = [
             r'(?:score|rating|give|rate).*?([0-9]|10)',
-            r'^([0-9]|10)(?:\s|$|/)',
+            r'^([0-9]|10)(?:\s|$|/|,|\.)',
             r'([0-9]|10)\s*(?:out of 10|/10)',
-            r'\b([0-9]|10)\b'
+            r'(?:i.*d.*say|i.*d.*give|i.*d.*rate).*?([0-9]|10)',
+            r'(?:probably|maybe|around|about).*?([0-9]|10)',
+            r'\b([0-9]|10)\b(?!\d)'  # Standalone number not part of larger number
         ]
         
         for pattern in nps_patterns:
@@ -295,12 +306,14 @@ Be conversational, empathetic, and adaptive to their communication style."""
         return "\n".join(formatted)
     
     def _generate_fallback_question(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
-        """Enhanced intelligent fallback question generation"""
+        """Enhanced intelligent fallback question generation with proper progression"""
         extracted = self.extracted_data
         company_name = context.get('company_name', 'our service')
         
-        # Step 1: Collect NPS if not available
-        if not extracted.get('nps_score'):
+        print(f"Fallback generation - Step: {self.step_count}, Extracted: {extracted}")
+        
+        # Priority 1: NPS score (most important)
+        if not extracted.get('nps_score') and self.step_count <= 2:
             return {
                 'message': f"On a scale of 0-10, how likely are you to recommend {company_name} to a friend or colleague?",
                 'message_type': 'ai_question',
@@ -309,8 +322,8 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 'is_complete': False
             }
         
-        # Step 2: Follow up on NPS score with adaptive messaging
-        elif extracted.get('nps_score') and not extracted.get('nps_reasoning'):
+        # Priority 2: NPS reasoning (understand the score)
+        elif extracted.get('nps_score') is not None and not extracted.get('nps_reasoning') and self.step_count <= 3:
             score = extracted['nps_score']
             if score >= 9:
                 return {
@@ -337,8 +350,8 @@ Be conversational, empathetic, and adaptive to their communication style."""
                     'is_complete': False
                 }
         
-        # Step 3: Collect satisfaction if not available
-        elif not extracted.get('satisfaction_rating'):
+        # Priority 3: Satisfaction rating
+        elif not extracted.get('satisfaction_rating') and self.step_count <= 4:
             return {
                 'message': "How would you describe your overall satisfaction with our service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
                 'message_type': 'ai_question',
@@ -347,8 +360,8 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 'is_complete': False
             }
         
-        # Step 4: Collect improvement feedback if not available
-        elif not extracted.get('improvement_feedback'):
+        # Priority 4: Improvement suggestions
+        elif not extracted.get('improvement_feedback') and self.step_count <= 5:
             if extracted.get('nps_score', 0) < 7:
                 return {
                     'message': "What specific changes would make the biggest difference in improving your experience?",
@@ -366,7 +379,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                     'is_complete': False
                 }
         
-        # Step 5: Wrap up
+        # Completion: We have enough data or reached max steps
         else:
             return {
                 'message': "Thank you so much for sharing your valuable feedback! Your insights help us improve our service for everyone.",
