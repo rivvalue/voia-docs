@@ -142,6 +142,9 @@ Feel free to explain your reasoning too!"""
         if 'nps_score' in extracted:
             extracted['nps_reasoning'] = user_input
         
+        # Debug logging
+        print(f"Extracted data from '{user_input}': {extracted}")
+        
         return extracted
     
     def _generate_next_question(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
@@ -156,6 +159,10 @@ Feel free to explain your reasoning too!"""
         
         # Determine what information we still need
         needed_info = self._analyze_missing_information(context)
+        
+        # Debug logging
+        print(f"Question generation - extracted data: {extracted}")
+        print(f"Step count: {step_count}")
         
         # Rule-based question generation
         if not extracted.get('nps_score'):
@@ -282,17 +289,49 @@ Feel free to explain your reasoning too!"""
         return " | ".join(feedback_parts)
 
 
-# Global instance for the conversational survey
-conversation_survey = ConversationalSurvey()
+# Global conversation instances (keyed by conversation_id)
+conversation_instances = {}
 
 def start_conversational_survey(company_name: str, respondent_name: str) -> Dict[str, Any]:
     """Start a new conversational survey session"""
-    return conversation_survey.start_conversation(company_name, respondent_name)
+    conversation_survey = ConversationalSurvey()
+    response = conversation_survey.start_conversation(company_name, respondent_name)
+    
+    # Store the instance with a unique ID for this session
+    import uuid
+    conversation_id = str(uuid.uuid4())
+    conversation_instances[conversation_id] = conversation_survey
+    
+    # Add conversation_id to response
+    response['conversation_id'] = conversation_id
+    return response
 
 def process_conversation_response(user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
     """Process user's conversational response"""
+    conversation_id = context.get('conversation_id')
+    
+    # Get or create conversation instance
+    if conversation_id and conversation_id in conversation_instances:
+        conversation_survey = conversation_instances[conversation_id]
+    else:
+        # Fallback: create new instance
+        conversation_survey = ConversationalSurvey()
+        if conversation_id:
+            conversation_instances[conversation_id] = conversation_survey
+    
     return conversation_survey.process_user_response(user_input, context)
 
 def finalize_conversational_survey(context: Dict[str, Any]) -> Dict[str, Any]:
     """Finalize and convert conversational survey to structured format"""
-    return conversation_survey.finalize_survey(context)
+    conversation_id = context.get('conversation_id')
+    
+    if conversation_id and conversation_id in conversation_instances:
+        conversation_survey = conversation_instances[conversation_id]
+        result = conversation_survey.finalize_survey(context)
+        # Clean up the instance
+        del conversation_instances[conversation_id]
+        return result
+    else:
+        # Fallback finalization
+        conversation_survey = ConversationalSurvey()
+        return conversation_survey.finalize_survey(context)

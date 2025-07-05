@@ -402,11 +402,8 @@ def start_conversation():
         # Start conversation with AI
         conversation_response = start_conversational_survey(company_name, respondent_name)
         
-        # Generate unique conversation ID
-        conversation_id = str(uuid.uuid4())
-        
         return jsonify({
-            'conversation_id': conversation_id,
+            'conversation_id': conversation_response['conversation_id'],
             'message': conversation_response['message'],
             'step': conversation_response['step'],
             'progress': conversation_response['progress']
@@ -430,8 +427,9 @@ def conversation_response():
         if not conversation_id or not user_input:
             return jsonify({'error': 'Conversation ID and user input are required'}), 400
         
-        # Add authenticated email to survey data
+        # Add authenticated email and conversation_id to survey data
         survey_data['respondent_email'] = g.authenticated_email
+        survey_data['conversation_id'] = conversation_id
         
         # Process response with AI
         ai_response = process_conversation_response(user_input, survey_data)
