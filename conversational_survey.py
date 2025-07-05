@@ -341,7 +341,20 @@ def finalize_conversational_survey(context: Dict[str, Any]) -> Dict[str, Any]:
     
     if conversation_id and conversation_id in conversation_instances:
         conversation_survey = conversation_instances[conversation_id]
-        result = conversation_survey.finalize_survey(context)
+        
+        # Use the extracted data from the conversation instance
+        finalization_context = {
+            'company_name': conversation_survey.survey_data.get('company_name'),
+            'respondent_name': conversation_survey.survey_data.get('respondent_name'),
+            'respondent_email': context.get('respondent_email'),
+            'extracted_data': conversation_survey.survey_data.get('extracted_data', {}),
+            'conversation_history': conversation_survey.conversation_history
+        }
+        
+        print(f"Finalizing survey with context: {finalization_context}")
+        result = conversation_survey.finalize_survey(finalization_context)
+        print(f"Finalized result: {result}")
+        
         # Clean up the instance
         del conversation_instances[conversation_id]
         return result
