@@ -48,12 +48,15 @@ class ConversationalSurvey:
             # Analyze the response and extract survey data
             extracted_data = self._extract_survey_data(user_input, conversation_context)
             
-            # Update survey data and conversation context
-            if 'extracted_data' not in conversation_context:
-                conversation_context['extracted_data'] = {}
-            conversation_context['extracted_data'].update(extracted_data)
+            # Ensure survey_data has extracted_data dict
+            if 'extracted_data' not in self.survey_data:
+                self.survey_data['extracted_data'] = {}
             
+            # Update the persistent survey data in the instance
             self.survey_data['extracted_data'].update(extracted_data)
+            
+            # Pass the accumulated data to question generation
+            conversation_context['extracted_data'] = self.survey_data['extracted_data'].copy()
             
             # Determine next question based on conversation flow
             next_response = self._generate_next_question(user_input, conversation_context)
@@ -151,18 +154,19 @@ Feel free to explain your reasoning too!"""
         """Generate the next conversational question using rule-based logic"""
         # Get extracted data and conversation state
         extracted = context.get('extracted_data', {})
-        step_count = context.get('step_count', 0)
         
-        # Update step count
-        step_count += 1
-        context['step_count'] = step_count
+        # Use instance-level step tracking
+        if not hasattr(self, 'step_count'):
+            self.step_count = 0
+        self.step_count += 1
         
         # Determine what information we still need
         needed_info = self._analyze_missing_information(context)
         
         # Debug logging
         print(f"Question generation - extracted data: {extracted}")
-        print(f"Step count: {step_count}")
+        print(f"Step count: {self.step_count}")
+        print(f"All survey data: {self.survey_data}")
         
         # Rule-based question generation
         if not extracted.get('nps_score'):
@@ -174,7 +178,7 @@ Feel free to explain your reasoning too!"""
                 'is_complete': False
             }
         
-        elif extracted.get('nps_score') and not extracted.get('nps_reasoning'):
+        elif extracted.get('nps_score') and self.step_count == 2:
             score = extracted['nps_score']
             if score >= 9:
                 return {
@@ -201,7 +205,7 @@ Feel free to explain your reasoning too!"""
                     'is_complete': False
                 }
         
-        elif not extracted.get('satisfaction_rating'):
+        elif self.step_count == 3:
             return {
                 'message': "How would you describe your overall satisfaction with our service? Are you very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
                 'message_type': 'ai_question',
@@ -210,7 +214,7 @@ Feel free to explain your reasoning too!"""
                 'is_complete': False
             }
         
-        elif not extracted.get('improvement_feedback'):
+        elif self.step_count == 4:
             return {
                 'message': "What's one thing we could improve to better serve you?",
                 'message_type': 'ai_question',
