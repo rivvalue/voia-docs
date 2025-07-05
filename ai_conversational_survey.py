@@ -1,0 +1,391 @@
+import os
+import json
+import uuid
+from typing import Dict, Any, List
+from openai import OpenAI
+
+class AIConversationalSurvey:
+    """OpenAI-powered conversational survey system with adaptive questioning"""
+    
+    def __init__(self):
+        self.openai_client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+        self.conversation_history = []
+        self.survey_data = {}
+        self.extracted_data = {}
+        self.step_count = 0
+        self.is_complete = False
+        
+    def start_conversation(self, company_name: str, respondent_name: str) -> Dict[str, Any]:
+        """Start a new AI-powered conversational survey"""
+        self.survey_data = {
+            'company_name': company_name,
+            'respondent_name': respondent_name,
+            'conversation_history': [],
+            'extracted_data': {}
+        }
+        
+        welcome_message = self._generate_welcome_message(company_name, respondent_name)
+        
+        self.conversation_history.append({
+            'sender': 'VoC Agent',
+            'message': welcome_message,
+            'timestamp': 'now'
+        })
+        
+        return {
+            'message': welcome_message,
+            'message_type': 'welcome',
+            'step': 'welcome',
+            'progress': 10,
+            'is_complete': False,
+            'conversation_id': str(uuid.uuid4())
+        }
+    
+    def process_user_response(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Process user response and generate next AI question"""
+        # Add user response to conversation history
+        self.conversation_history.append({
+            'sender': 'User',
+            'message': user_input,
+            'timestamp': 'now'
+        })
+        
+        # Extract data from user input
+        extracted = self._extract_survey_data_with_ai(user_input, context)
+        
+        # Update extracted data
+        self.extracted_data.update(extracted)
+        self.survey_data['extracted_data'] = self.extracted_data
+        
+        # Generate next AI question
+        next_question = self._generate_ai_question(user_input, context)
+        
+        # Add AI response to conversation history
+        self.conversation_history.append({
+            'sender': 'VoC Agent',
+            'message': next_question['message'],
+            'timestamp': 'now'
+        })
+        
+        self.step_count += 1
+        
+        return next_question
+    
+    def _generate_welcome_message(self, company_name: str, respondent_name: str) -> str:
+        """Generate personalized welcome message"""
+        return f"Hi {respondent_name}! I'm here to gather your feedback about {company_name}. This will be a quick conversation to understand your experience and help us improve our service. Let's start - on a scale of 0-10, how likely are you to recommend {company_name} to a friend or colleague?"
+    
+    def _extract_survey_data_with_ai(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Extract structured survey data from natural language using OpenAI"""
+        try:
+            prompt = f"""Extract survey data from this customer response: "{user_input}"
+
+Context of conversation:
+- Company: {context.get('company_name', 'Unknown')}
+- Current extracted data: {json.dumps(self.extracted_data, indent=2)}
+- Conversation step: {self.step_count}
+
+Extract any of the following data present in the response:
+- NPS score (0-10): Look for numbers, recommendations, likelihood scores
+- Satisfaction level (1-5): Look for satisfaction, happiness, contentment indicators
+- Improvement suggestions: Any feedback about what could be better
+- Compliments: What they liked or appreciated
+- Complaints: What they didn't like or found problematic
+- Reasons: Why they gave their rating or recommendation
+- Additional comments: Any other relevant feedback
+
+Return ONLY JSON in this format:
+{{
+    "nps_score": number or null,
+    "nps_category": "Promoter/Passive/Detractor" or null,
+    "satisfaction_rating": number or null,
+    "improvement_feedback": "text" or null,
+    "compliment_feedback": "text" or null,
+    "complaint_feedback": "text" or null,
+    "nps_reasoning": "text" or null,
+    "additional_comments": "text" or null
+}}
+
+Only include fields that are clearly present in the response. If a field is not mentioned, use null."""
+
+            response = self.openai_client.chat.completions.create(
+                model="gpt-4o",
+                messages=[{"role": "user", "content": prompt}],
+                response_format={"type": "json_object"},
+                max_tokens=400,
+                temperature=0.3
+            )
+            
+            content = response.choices[0].message.content
+            if content:
+                extracted = json.loads(content)
+            else:
+                extracted = {}
+            
+            # Add NPS category if score is provided
+            if extracted.get('nps_score') is not None:
+                score = extracted['nps_score']
+                if score >= 9:
+                    extracted['nps_category'] = 'Promoter'
+                elif score >= 7:
+                    extracted['nps_category'] = 'Passive'
+                else:
+                    extracted['nps_category'] = 'Detractor'
+            
+            return extracted
+            
+        except Exception as e:
+            print(f"AI extraction error: {e}")
+            return self._extract_survey_data_fallback(user_input)
+    
+    def _extract_survey_data_fallback(self, user_input: str) -> Dict[str, Any]:
+        """Fallback rule-based extraction"""
+        extracted = {}
+        text_lower = user_input.lower()
+        
+        # Extract NPS score
+        for i in range(11):
+            if str(i) in user_input:
+                extracted['nps_score'] = i
+                if i >= 9:
+                    extracted['nps_category'] = 'Promoter'
+                elif i >= 7:
+                    extracted['nps_category'] = 'Passive'
+                else:
+                    extracted['nps_category'] = 'Detractor'
+                break
+        
+        # Extract satisfaction keywords
+        if any(word in text_lower for word in ['very satisfied', 'extremely satisfied']):
+            extracted['satisfaction_rating'] = 5
+        elif any(word in text_lower for word in ['satisfied', 'happy', 'pleased']):
+            extracted['satisfaction_rating'] = 4
+        elif any(word in text_lower for word in ['neutral', 'okay', 'fine']):
+            extracted['satisfaction_rating'] = 3
+        elif any(word in text_lower for word in ['dissatisfied', 'unhappy', 'disappointed']):
+            extracted['satisfaction_rating'] = 2
+        elif any(word in text_lower for word in ['very dissatisfied', 'terrible', 'awful']):
+            extracted['satisfaction_rating'] = 1
+        
+        # Store as feedback
+        extracted['feedback_text'] = user_input
+        
+        return extracted
+    
+    def _generate_ai_question(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate next question using OpenAI"""
+        try:
+            # Format conversation history for context
+            history_text = self._format_conversation_history()
+            
+            prompt = f"""You are conducting a customer feedback survey for {context.get('company_name', 'our company')}. 
+
+CONVERSATION HISTORY:
+{history_text}
+
+CUSTOMER'S LATEST RESPONSE: "{user_input}"
+
+SURVEY DATA COLLECTED SO FAR:
+{json.dumps(self.extracted_data, indent=2)}
+
+CONVERSATION STEP: {self.step_count}
+
+YOUR ROLE: You are a helpful customer feedback specialist having a natural conversation. Your goal is to collect:
+1. NPS score (0-10) - How likely to recommend
+2. Reason for their NPS score
+3. Satisfaction level (1-5) - Overall satisfaction
+4. Improvement suggestions - What could be better
+5. Additional feedback - Any other comments
+
+GUIDELINES:
+- Keep the conversation natural and engaging
+- Ask ONE question at a time
+- Reference their previous responses to show you're listening
+- If they mention specific issues, ask thoughtful follow-ups
+- If they seem rushed, be more direct
+- If they're chatty, engage with their details
+- End gracefully when you have enough information (usually 4-6 exchanges)
+
+RESPONSE FORMAT - Return JSON:
+{{
+    "message": "Your next question or closing message",
+    "message_type": "ai_question",
+    "step": "descriptive_step_name",
+    "progress": 0-100,
+    "is_complete": true/false
+}}
+
+Be conversational, empathetic, and adaptive to their communication style."""
+
+            response = self.openai_client.chat.completions.create(
+                model="gpt-4o",
+                messages=[{"role": "user", "content": prompt}],
+                response_format={"type": "json_object"},
+                max_tokens=300,
+                temperature=0.8
+            )
+            
+            content = response.choices[0].message.content
+            if content:
+                result = json.loads(content)
+            else:
+                result = {'message': 'Thank you for your feedback!', 'is_complete': True, 'progress': 100}
+            
+            # Ensure progress is reasonable
+            if result.get('progress', 0) < self.step_count * 15:
+                result['progress'] = min(100, self.step_count * 15)
+            
+            self.is_complete = result.get('is_complete', False)
+            
+            return result
+            
+        except Exception as e:
+            print(f"AI question generation error: {e}")
+            return self._generate_fallback_question(user_input, context)
+    
+    def _format_conversation_history(self) -> str:
+        """Format conversation history for AI context"""
+        if not self.conversation_history:
+            return "This is the start of the conversation."
+        
+        formatted = []
+        for msg in self.conversation_history[-6:]:  # Last 6 messages for context
+            sender = msg.get('sender', 'Unknown')
+            message = msg.get('message', '')
+            formatted.append(f"{sender}: {message}")
+        
+        return "\n".join(formatted)
+    
+    def _generate_fallback_question(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Fallback question generation if AI fails"""
+        # Simple rule-based fallback
+        if self.step_count == 1 and not self.extracted_data.get('nps_score'):
+            return {
+                'message': "On a scale of 0-10, how likely are you to recommend us?",
+                'message_type': 'ai_question',
+                'step': 'nps_collection',
+                'progress': 20,
+                'is_complete': False
+            }
+        elif self.step_count == 2 and self.extracted_data.get('nps_score'):
+            return {
+                'message': "Thank you for that rating. Can you tell me more about your experience?",
+                'message_type': 'ai_question',
+                'step': 'experience_details',
+                'progress': 40,
+                'is_complete': False
+            }
+        elif self.step_count == 3:
+            return {
+                'message': "What would you suggest we improve?",
+                'message_type': 'ai_question',
+                'step': 'improvement',
+                'progress': 60,
+                'is_complete': False
+            }
+        elif self.step_count == 4:
+            return {
+                'message': "How satisfied are you overall? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
+                'message_type': 'ai_question',
+                'step': 'satisfaction',
+                'progress': 80,
+                'is_complete': False
+            }
+        else:
+            return {
+                'message': "Thank you for your valuable feedback! We really appreciate you taking the time to help us improve.",
+                'message_type': 'conclusion',
+                'step': 'conclusion',
+                'progress': 100,
+                'is_complete': True
+            }
+    
+    def finalize_survey(self, context: Dict[str, Any]) -> Dict[str, Any]:
+        """Convert conversational data to structured survey format"""
+        extracted = self.extracted_data
+        
+        # Combine all feedback text
+        feedback_parts = []
+        for key in ['nps_reasoning', 'improvement_feedback', 'compliment_feedback', 'complaint_feedback', 'additional_comments']:
+            if extracted.get(key):
+                feedback_parts.append(extracted[key])
+        
+        combined_feedback = ' '.join(feedback_parts)
+        
+        return {
+            'company_name': context.get('company_name'),
+            'respondent_name': context.get('respondent_name'),
+            'respondent_email': context.get('respondent_email'),
+            'nps_score': extracted.get('nps_score'),
+            'nps_category': extracted.get('nps_category'),
+            'satisfaction_rating': extracted.get('satisfaction_rating'),
+            'improvement_feedback': extracted.get('improvement_feedback'),
+            'recommendation_reason': extracted.get('nps_reasoning'),
+            'additional_comments': combined_feedback,
+            'conversation_history': json.dumps(self.conversation_history)
+        }
+
+
+# Global instances for session persistence
+ai_conversation_instances = {}
+
+def start_ai_conversational_survey(company_name: str, respondent_name: str) -> Dict[str, Any]:
+    """Start a new AI-powered conversational survey session"""
+    conversation_id = str(uuid.uuid4())
+    ai_survey = AIConversationalSurvey()
+    
+    result = ai_survey.start_conversation(company_name, respondent_name)
+    result['conversation_id'] = conversation_id
+    
+    # Store instance for session persistence
+    ai_conversation_instances[conversation_id] = ai_survey
+    
+    return result
+
+def process_ai_conversation_response(user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
+    """Process user's conversational response with AI"""
+    conversation_id = context.get('conversation_id')
+    
+    if conversation_id and conversation_id in ai_conversation_instances:
+        ai_survey = ai_conversation_instances[conversation_id]
+        return ai_survey.process_user_response(user_input, context)
+    else:
+        # Fallback - create new instance
+        ai_survey = AIConversationalSurvey()
+        ai_survey.survey_data = context
+        ai_conversation_instances[conversation_id] = ai_survey
+        return ai_survey.process_user_response(user_input, context)
+
+def finalize_ai_conversational_survey(context: Dict[str, Any]) -> Dict[str, Any]:
+    """Finalize and convert AI conversational survey to structured format"""
+    conversation_id = context.get('conversation_id')
+    
+    if conversation_id and conversation_id in ai_conversation_instances:
+        ai_survey = ai_conversation_instances[conversation_id]
+        
+        # Use the extracted data from the AI survey instance
+        finalization_context = {
+            'company_name': ai_survey.survey_data.get('company_name'),
+            'respondent_name': ai_survey.survey_data.get('respondent_name'),
+            'respondent_email': context.get('respondent_email')
+        }
+        
+        result = ai_survey.finalize_survey(finalization_context)
+        
+        # Clean up the instance
+        del ai_conversation_instances[conversation_id]
+        return result
+    else:
+        # Fallback finalization
+        return {
+            'company_name': context.get('company_name'),
+            'respondent_name': context.get('respondent_name'),
+            'respondent_email': context.get('respondent_email'),
+            'nps_score': None,
+            'nps_category': None,
+            'satisfaction_rating': None,
+            'improvement_feedback': None,
+            'recommendation_reason': None,
+            'additional_comments': None,
+            'conversation_history': json.dumps([])
+        }

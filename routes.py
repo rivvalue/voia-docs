@@ -7,6 +7,7 @@ from task_queue import add_analysis_task, get_queue_stats
 from rate_limiter import rate_limit
 from auth_system import require_auth, generate_user_token
 from conversational_survey import start_conversational_survey, process_conversation_response, finalize_conversational_survey
+from ai_conversational_survey import start_ai_conversational_survey, process_ai_conversation_response, finalize_ai_conversational_survey
 from datetime import datetime, timedelta
 import json
 import logging
@@ -400,7 +401,7 @@ def start_conversation():
             return jsonify({'error': 'Company name and respondent name are required'}), 400
         
         # Start conversation with AI
-        conversation_response = start_conversational_survey(company_name, respondent_name)
+        conversation_response = start_ai_conversational_survey(company_name, respondent_name)
         
         return jsonify({
             'conversation_id': conversation_response['conversation_id'],
@@ -432,7 +433,7 @@ def conversation_response():
         survey_data['conversation_id'] = conversation_id
         
         # Process response with AI
-        ai_response = process_conversation_response(user_input, survey_data)
+        ai_response = process_ai_conversation_response(user_input, survey_data)
         
         return jsonify(ai_response)
         
@@ -441,7 +442,7 @@ def conversation_response():
         return jsonify({'error': 'Failed to process response'}), 500
 
 @app.route('/api/finalize_conversation', methods=['POST'])
-@rate_limit(limit=5)
+@rate_limit(limit=20)
 @require_auth()
 def finalize_conversation():
     """Finalize conversational survey and save to database"""
@@ -459,7 +460,7 @@ def finalize_conversation():
         survey_data['conversation_history'] = json.dumps(messages)
         
         # Convert conversational data to structured survey format
-        structured_data = finalize_conversational_survey(survey_data)
+        structured_data = finalize_ai_conversational_survey(survey_data)
         
         # Create survey response record
         response = SurveyResponse(
