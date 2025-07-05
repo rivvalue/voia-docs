@@ -48,7 +48,11 @@ class ConversationalSurvey:
             # Analyze the response and extract survey data
             extracted_data = self._extract_survey_data(user_input, conversation_context)
             
-            # Update survey data
+            # Update survey data and conversation context
+            if 'extracted_data' not in conversation_context:
+                conversation_context['extracted_data'] = {}
+            conversation_context['extracted_data'].update(extracted_data)
+            
             self.survey_data['extracted_data'].update(extracted_data)
             
             # Determine next question based on conversation flow
@@ -57,11 +61,13 @@ class ConversationalSurvey:
             return next_response
             
         except Exception as e:
+            print(f"Error processing user response: {e}")
             return {
                 'message': "I apologize, but I'm having trouble processing your response. Could you please try again?",
                 'message_type': 'error',
                 'step': conversation_context.get('step', 'unknown'),
-                'progress': conversation_context.get('progress', 0)
+                'progress': conversation_context.get('progress', 0),
+                'is_complete': False
             }
     
     def _generate_welcome_message(self, company_name: str, respondent_name: str) -> str:
@@ -79,133 +85,142 @@ Let's start with the most important question: **On a scale of 0 to 10, how likel
 Feel free to explain your reasoning too!"""
     
     def _extract_survey_data(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
-        """Extract structured survey data from natural language response"""
-        try:
-            system_prompt = """You are a survey data extraction expert. Extract relevant survey information from the user's natural language response.
-
-Based on the conversation context and user input, extract and return JSON with any of these fields that can be determined:
-- nps_score: Integer 0-10 if mentioned
-- nps_reasoning: String explaining their NPS score
-- satisfaction_rating: Integer 1-5 if mentioned 
-- product_value_rating: Integer 1-5 if mentioned
-- service_rating: Integer 1-5 if mentioned
-- pricing_rating: Integer 1-5 if mentioned
-- improvement_feedback: String with suggestions for improvement
-- positive_aspects: String with things they like
-- negative_aspects: String with concerns or issues
-- additional_comments: String with any other feedback
-
-Only include fields that can be clearly determined from the input. Return empty object if no clear data can be extracted."""
-
-            response = openai_client.chat.completions.create(
-                model="gpt-4o",
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": f"Context: {json.dumps(context)}\nUser input: {user_input}"}
-                ],
-                response_format={"type": "json_object"},
-                temperature=0.1
-            )
-            
-            content = response.choices[0].message.content
-            if content:
-                return json.loads(content)
-            return {}
-            
-        except Exception as e:
-            print(f"Error extracting survey data: {e}")
-            return {}
+        """Extract structured survey data from natural language response using rule-based approach"""
+        extracted = {}
+        user_input_lower = user_input.lower().strip()
+        
+        # Extract NPS score (0-10)
+        import re
+        nps_patterns = [
+            r'\b([0-9]|10)\b',  # Direct number
+            r'score.*?([0-9]|10)',  # "score is 8"
+            r'rate.*?([0-9]|10)',   # "rate it 7"
+            r'([0-9]|10).*?out.*?10',  # "8 out of 10"
+            r'([0-9]|10)/10'  # "8/10"
+        ]
+        
+        for pattern in nps_patterns:
+            nps_match = re.search(pattern, user_input)
+            if nps_match:
+                try:
+                    score = int(nps_match.group(1))
+                    if 0 <= score <= 10:
+                        extracted['nps_score'] = score
+                        if score >= 9:
+                            extracted['nps_category'] = 'Promoter'
+                        elif score >= 7:
+                            extracted['nps_category'] = 'Passive'
+                        else:
+                            extracted['nps_category'] = 'Detractor'
+                        break
+                except ValueError:
+                    continue
+        
+        # Extract satisfaction rating (1-5)
+        satisfaction_keywords = {
+            'very satisfied': 5, 'extremely satisfied': 5, 'excellent': 5, 'outstanding': 5,
+            'satisfied': 4, 'good': 4, 'happy': 4, 'pleased': 4,
+            'neutral': 3, 'okay': 3, 'average': 3, 'fine': 3,
+            'dissatisfied': 2, 'poor': 2, 'bad': 2, 'unhappy': 2,
+            'very dissatisfied': 1, 'terrible': 1, 'awful': 1, 'horrible': 1
+        }
+        
+        for keyword, rating in satisfaction_keywords.items():
+            if keyword in user_input_lower:
+                extracted['satisfaction_rating'] = rating
+                break
+        
+        # Extract improvement feedback
+        improvement_indicators = ['improve', 'better', 'fix', 'change', 'enhance', 'suggest', 'wish', 'need', 'should']
+        if any(indicator in user_input_lower for indicator in improvement_indicators):
+            extracted['improvement_feedback'] = user_input
+        
+        # Store raw feedback
+        extracted['feedback_text'] = user_input
+        
+        # Extract reasoning if NPS score is provided
+        if 'nps_score' in extracted:
+            extracted['nps_reasoning'] = user_input
+        
+        return extracted
     
     def _generate_next_question(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
-        """Generate the next conversational question based on user response"""
-        try:
-            # Determine what information we still need
-            needed_info = self._analyze_missing_information(context)
-            
-            system_prompt = f"""You are a friendly, professional survey interviewer for Rivvalue Inc. Your goal is to gather customer feedback through natural conversation.
-
-Current conversation context: {json.dumps(context)}
-Information still needed: {needed_info}
-User's last response: {user_input}
-
-Generate the next question or response following these guidelines:
-1. Keep it conversational and friendly
-2. Ask about one main topic at a time
-3. If user gave an NPS score, ask for reasoning if not provided
-4. Explore satisfaction with different aspects (product, service, pricing, value)
-5. Ask about specific improvements they'd like to see
-6. Keep questions open-ended to encourage detailed responses
-7. If you have enough information, move toward conclusion
-
-Return JSON with:
-- message: The next question or response
-- message_type: "ai_question", "follow_up", "clarification", or "conclusion"
-- step: Current conversation step
-- progress: Percentage complete (0-100)
-- is_complete: Boolean if survey is done"""
-
-            response = openai_client.chat.completions.create(
-                model="gpt-4o",
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": f"Generate next question based on: {user_input}"}
-                ],
-                response_format={"type": "json_object"},
-                temperature=0.7
-            )
-            
-            content = response.choices[0].message.content
-            if content:
-                result = json.loads(content)
-                
-                # Add conversation history
-                self.conversation_history.append({
-                    'role': 'assistant',
-                    'content': result.get('message', ''),
-                    'timestamp': 'now'
-                })
-                
-                return result
-            
-            # Fallback response
+        """Generate the next conversational question using rule-based logic"""
+        # Get extracted data and conversation state
+        extracted = context.get('extracted_data', {})
+        step_count = context.get('step_count', 0)
+        
+        # Update step count
+        step_count += 1
+        context['step_count'] = step_count
+        
+        # Determine what information we still need
+        needed_info = self._analyze_missing_information(context)
+        
+        # Rule-based question generation
+        if not extracted.get('nps_score'):
             return {
-                'message': "Thank you for your feedback! Is there anything else you'd like to share?",
+                'message': "On a scale of 0-10, how likely are you to recommend our service to a friend or colleague?",
                 'message_type': 'ai_question',
-                'step': 'conclusion',
-                'progress': 90,
+                'step': 'nps_collection',
+                'progress': 20,
                 'is_complete': False
             }
-            
-        except Exception as e:
-            print(f"Error generating next question: {e}")
-            # Intelligent fallback based on conversation state
-            extracted = context.get('extracted_data', {})
-            
-            if not extracted.get('nps_score'):
+        
+        elif extracted.get('nps_score') and not extracted.get('nps_reasoning'):
+            score = extracted['nps_score']
+            if score >= 9:
                 return {
-                    'message': "On a scale of 0-10, how likely are you to recommend our service to a friend or colleague?",
-                    'message_type': 'ai_question',
-                    'step': 'nps_collection',
-                    'progress': 30,
+                    'message': f"Thank you for the {score}! That's wonderful to hear. What specifically makes you likely to recommend us?",
+                    'message_type': 'follow_up',
+                    'step': 'nps_reasoning',
+                    'progress': 40,
                     'is_complete': False
                 }
-            elif not extracted.get('satisfaction_rating'):
+            elif score >= 7:
                 return {
-                    'message': "What would you say is your overall satisfaction with our service?",
-                    'message_type': 'ai_question',
-                    'step': 'satisfaction',
-                    'progress': 60,
+                    'message': f"Thanks for the {score}. What would it take to make you more likely to recommend us?",
+                    'message_type': 'follow_up',
+                    'step': 'nps_reasoning',
+                    'progress': 40,
                     'is_complete': False
                 }
             else:
-                # Survey appears complete, finalize
                 return {
-                    'message': "Thank you for sharing your valuable feedback! We appreciate your time and insights.",
-                    'message_type': 'conclusion',
-                    'step': 'conclusion',
-                    'progress': 100,
-                    'is_complete': True
+                    'message': f"I appreciate your honesty with the {score}. Can you tell me what's holding you back from recommending us?",
+                    'message_type': 'follow_up',
+                    'step': 'nps_reasoning',
+                    'progress': 40,
+                    'is_complete': False
                 }
+        
+        elif not extracted.get('satisfaction_rating'):
+            return {
+                'message': "How would you describe your overall satisfaction with our service? Are you very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
+                'message_type': 'ai_question',
+                'step': 'satisfaction',
+                'progress': 60,
+                'is_complete': False
+            }
+        
+        elif not extracted.get('improvement_feedback'):
+            return {
+                'message': "What's one thing we could improve to better serve you?",
+                'message_type': 'ai_question',
+                'step': 'improvement',
+                'progress': 80,
+                'is_complete': False
+            }
+        
+        else:
+            # Survey is complete
+            return {
+                'message': "Thank you for sharing your valuable feedback! We really appreciate you taking the time to help us improve our service.",
+                'message_type': 'conclusion',
+                'step': 'conclusion',
+                'progress': 100,
+                'is_complete': True
+            }
     
     def _analyze_missing_information(self, context: Dict[str, Any]) -> List[str]:
         """Analyze what survey information is still missing"""
