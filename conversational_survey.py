@@ -169,7 +169,7 @@ Feel free to explain your reasoning too!"""
         print(f"All survey data: {self.survey_data}")
         
         # Rule-based question generation
-        if not extracted.get('nps_score'):
+        if self.step_count == 1 and not extracted.get('nps_score'):
             return {
                 'message': "On a scale of 0-10, how likely are you to recommend our service to a friend or colleague?",
                 'message_type': 'ai_question',
@@ -178,7 +178,7 @@ Feel free to explain your reasoning too!"""
                 'is_complete': False
             }
         
-        elif extracted.get('nps_score') and self.step_count == 2:
+        elif self.step_count == 2 and extracted.get('nps_score'):
             score = extracted['nps_score']
             if score >= 9:
                 return {
@@ -223,7 +223,7 @@ Feel free to explain your reasoning too!"""
                 'is_complete': False
             }
         
-        else:
+        elif self.step_count >= 5:
             # Survey is complete
             return {
                 'message': "Thank you for sharing your valuable feedback! We really appreciate you taking the time to help us improve our service.",
@@ -231,6 +231,16 @@ Feel free to explain your reasoning too!"""
                 'step': 'conclusion',
                 'progress': 100,
                 'is_complete': True
+            }
+        
+        else:
+            # Fallback - should not happen, but continue conversation
+            return {
+                'message': "Is there anything else you'd like to share about your experience?",
+                'message_type': 'ai_question',
+                'step': 'additional',
+                'progress': 90,
+                'is_complete': False
             }
     
     def _analyze_missing_information(self, context: Dict[str, Any]) -> List[str]:

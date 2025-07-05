@@ -473,8 +473,7 @@ def finalize_conversation():
             pricing_rating=structured_data.get('pricing_rating'),
             improvement_feedback=structured_data.get('improvement_feedback'),
             recommendation_reason=structured_data.get('recommendation_reason'),
-            additional_comments=structured_data.get('additional_comments'),
-            conversation_history=structured_data.get('conversation_history')
+            additional_comments=structured_data.get('additional_comments')
         )
         
         # Calculate NPS category
