@@ -306,52 +306,55 @@ Be conversational, empathetic, and adaptive to their communication style."""
         return "\n".join(formatted)
     
     def _generate_fallback_question(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
-        """Enhanced intelligent fallback question generation with proper progression"""
+        """Fixed progression logic based on step count and missing data"""
         extracted = self.extracted_data
         company_name = context.get('company_name', 'our service')
         
         print(f"Fallback generation - Step: {self.step_count}, Extracted: {extracted}")
         
-        # Priority 1: NPS score (most important)
-        if not extracted.get('nps_score') and self.step_count <= 2:
-            return {
-                'message': f"On a scale of 0-10, how likely are you to recommend {company_name} to a friend or colleague?",
-                'message_type': 'ai_question',
-                'step': 'nps_collection',
-                'progress': 20,
-                'is_complete': False
-            }
-        
-        # Priority 2: NPS reasoning (understand the score)
-        elif extracted.get('nps_score') is not None and not extracted.get('nps_reasoning') and self.step_count <= 3:
-            score = extracted['nps_score']
-            if score >= 9:
+        # Use step-based progression instead of data-based to avoid loops
+        if self.step_count == 1:
+            # First question: Always ask for NPS if we don't have it
+            if not extracted.get('nps_score'):
                 return {
-                    'message': f"Wonderful! A {score} is fantastic. What specifically about {company_name} made your experience so great?",
+                    'message': f"On a scale of 0-10, how likely are you to recommend {company_name} to a friend or colleague?",
                     'message_type': 'ai_question',
-                    'step': 'nps_reasoning',
-                    'progress': 40,
-                    'is_complete': False
-                }
-            elif score >= 7:
-                return {
-                    'message': f"Thanks for the {score}! What would it take to make you even more likely to recommend us?",
-                    'message_type': 'ai_question',
-                    'step': 'nps_reasoning',
-                    'progress': 40,
-                    'is_complete': False
-                }
-            else:
-                return {
-                    'message': f"I appreciate your honesty with the {score}. What are the main issues that are holding you back from recommending us?",
-                    'message_type': 'ai_question',
-                    'step': 'nps_reasoning',
-                    'progress': 40,
+                    'step': 'nps_collection',
+                    'progress': 20,
                     'is_complete': False
                 }
         
-        # Priority 3: Satisfaction rating
-        elif not extracted.get('satisfaction_rating') and self.step_count <= 4:
+        elif self.step_count == 2:
+            # Second question: NPS reasoning based on score
+            if extracted.get('nps_score') is not None:
+                score = extracted['nps_score']
+                if score >= 9:
+                    return {
+                        'message': f"Wonderful! A {score} is fantastic. What specifically about {company_name} made your experience so great?",
+                        'message_type': 'ai_question',
+                        'step': 'nps_reasoning',
+                        'progress': 40,
+                        'is_complete': False
+                    }
+                elif score >= 7:
+                    return {
+                        'message': f"Thanks for the {score}! What would it take to make you even more likely to recommend us?",
+                        'message_type': 'ai_question',
+                        'step': 'nps_reasoning',
+                        'progress': 40,
+                        'is_complete': False
+                    }
+                else:
+                    return {
+                        'message': f"I appreciate your honesty with the {score}. What are the main issues that are holding you back from recommending us?",
+                        'message_type': 'ai_question',
+                        'step': 'nps_reasoning',
+                        'progress': 40,
+                        'is_complete': False
+                    }
+        
+        elif self.step_count == 3:
+            # Third question: Satisfaction rating
             return {
                 'message': "How would you describe your overall satisfaction with our service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
                 'message_type': 'ai_question',
@@ -360,8 +363,8 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 'is_complete': False
             }
         
-        # Priority 4: Improvement suggestions
-        elif not extracted.get('improvement_feedback') and self.step_count <= 5:
+        elif self.step_count == 4:
+            # Fourth question: Improvement suggestions
             if extracted.get('nps_score', 0) < 7:
                 return {
                     'message': "What specific changes would make the biggest difference in improving your experience?",
@@ -379,7 +382,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                     'is_complete': False
                 }
         
-        # Completion: We have enough data or reached max steps
+        # Step 5 or higher: Complete the survey
         else:
             return {
                 'message': "Thank you so much for sharing your valuable feedback! Your insights help us improve our service for everyone.",
