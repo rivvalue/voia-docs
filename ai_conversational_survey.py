@@ -136,39 +136,77 @@ Only include fields that are clearly present in the response. If a field is not 
             
         except Exception as e:
             print(f"AI extraction error: {e}")
+            # Use robust fallback extraction
             return self._extract_survey_data_fallback(user_input)
     
     def _extract_survey_data_fallback(self, user_input: str) -> Dict[str, Any]:
-        """Fallback rule-based extraction"""
+        """Enhanced rule-based extraction with intelligent pattern matching"""
         extracted = {}
         text_lower = user_input.lower()
         
-        # Extract NPS score
-        for i in range(11):
-            if str(i) in user_input:
-                extracted['nps_score'] = i
-                if i >= 9:
-                    extracted['nps_category'] = 'Promoter'
-                elif i >= 7:
-                    extracted['nps_category'] = 'Passive'
-                else:
-                    extracted['nps_category'] = 'Detractor'
+        # Extract NPS score with improved detection
+        import re
+        
+        # Look for numbers 0-10 in various formats
+        nps_patterns = [
+            r'(?:score|rating|give|rate).*?([0-9]|10)',
+            r'^([0-9]|10)(?:\s|$|/)',
+            r'([0-9]|10)\s*(?:out of 10|/10)',
+            r'\b([0-9]|10)\b'
+        ]
+        
+        for pattern in nps_patterns:
+            matches = re.findall(pattern, user_input, re.IGNORECASE)
+            for match in matches:
+                score = int(match)
+                if 0 <= score <= 10:
+                    extracted['nps_score'] = score
+                    if score >= 9:
+                        extracted['nps_category'] = 'Promoter'
+                    elif score >= 7:
+                        extracted['nps_category'] = 'Passive'
+                    else:
+                        extracted['nps_category'] = 'Detractor'
+                    break
+            if 'nps_score' in extracted:
                 break
         
-        # Extract satisfaction keywords
-        if any(word in text_lower for word in ['very satisfied', 'extremely satisfied']):
-            extracted['satisfaction_rating'] = 5
-        elif any(word in text_lower for word in ['satisfied', 'happy', 'pleased']):
-            extracted['satisfaction_rating'] = 4
-        elif any(word in text_lower for word in ['neutral', 'okay', 'fine']):
-            extracted['satisfaction_rating'] = 3
-        elif any(word in text_lower for word in ['dissatisfied', 'unhappy', 'disappointed']):
-            extracted['satisfaction_rating'] = 2
-        elif any(word in text_lower for word in ['very dissatisfied', 'terrible', 'awful']):
-            extracted['satisfaction_rating'] = 1
+        # Enhanced satisfaction detection
+        satisfaction_keywords = {
+            5: ['very satisfied', 'extremely satisfied', 'absolutely satisfied', 'completely satisfied', 'love it', 'excellent', 'outstanding', 'perfect'],
+            4: ['satisfied', 'happy', 'pleased', 'good', 'great', 'positive', 'content'],
+            3: ['neutral', 'okay', 'fine', 'average', 'alright', 'so-so', 'mixed'],
+            2: ['dissatisfied', 'unhappy', 'disappointed', 'not good', 'poor', 'below average'],
+            1: ['very dissatisfied', 'extremely dissatisfied', 'terrible', 'awful', 'horrible', 'hate', 'worst']
+        }
         
-        # Store as feedback
-        extracted['feedback_text'] = user_input
+        for rating, keywords in satisfaction_keywords.items():
+            if any(keyword in text_lower for keyword in keywords):
+                extracted['satisfaction_rating'] = rating
+                break
+        
+        # Extract improvement suggestions
+        improvement_indicators = ['improve', 'better', 'fix', 'change', 'enhance', 'upgrade', 'should', 'could', 'need to', 'would like']
+        if any(indicator in text_lower for indicator in improvement_indicators):
+            extracted['improvement_feedback'] = user_input
+        
+        # Extract compliments
+        positive_indicators = ['love', 'great', 'excellent', 'amazing', 'wonderful', 'fantastic', 'good job', 'well done', 'appreciate']
+        if any(indicator in text_lower for indicator in positive_indicators):
+            extracted['compliment_feedback'] = user_input
+        
+        # Extract complaints
+        negative_indicators = ['problem', 'issue', 'difficult', 'hard', 'confusing', 'slow', 'expensive', 'bad', 'worst', 'hate']
+        if any(indicator in text_lower for indicator in negative_indicators):
+            extracted['complaint_feedback'] = user_input
+        
+        # Store reasoning if it seems like reasoning
+        reasoning_indicators = ['because', 'since', 'due to', 'reason', 'why', 'that\'s why']
+        if any(indicator in text_lower for indicator in reasoning_indicators):
+            extracted['nps_reasoning'] = user_input
+        
+        # Always store as additional comments for context
+        extracted['additional_comments'] = user_input
         
         return extracted
     
@@ -257,43 +295,81 @@ Be conversational, empathetic, and adaptive to their communication style."""
         return "\n".join(formatted)
     
     def _generate_fallback_question(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
-        """Fallback question generation if AI fails"""
-        # Simple rule-based fallback
-        if self.step_count == 1 and not self.extracted_data.get('nps_score'):
+        """Enhanced intelligent fallback question generation"""
+        extracted = self.extracted_data
+        company_name = context.get('company_name', 'our service')
+        
+        # Step 1: Collect NPS if not available
+        if not extracted.get('nps_score'):
             return {
-                'message': "On a scale of 0-10, how likely are you to recommend us?",
+                'message': f"On a scale of 0-10, how likely are you to recommend {company_name} to a friend or colleague?",
                 'message_type': 'ai_question',
                 'step': 'nps_collection',
                 'progress': 20,
                 'is_complete': False
             }
-        elif self.step_count == 2 and self.extracted_data.get('nps_score'):
+        
+        # Step 2: Follow up on NPS score with adaptive messaging
+        elif extracted.get('nps_score') and not extracted.get('nps_reasoning'):
+            score = extracted['nps_score']
+            if score >= 9:
+                return {
+                    'message': f"Wonderful! A {score} is fantastic. What specifically about {company_name} made your experience so great?",
+                    'message_type': 'ai_question',
+                    'step': 'nps_reasoning',
+                    'progress': 40,
+                    'is_complete': False
+                }
+            elif score >= 7:
+                return {
+                    'message': f"Thanks for the {score}! What would it take to make you even more likely to recommend us?",
+                    'message_type': 'ai_question',
+                    'step': 'nps_reasoning',
+                    'progress': 40,
+                    'is_complete': False
+                }
+            else:
+                return {
+                    'message': f"I appreciate your honesty with the {score}. What are the main issues that are holding you back from recommending us?",
+                    'message_type': 'ai_question',
+                    'step': 'nps_reasoning',
+                    'progress': 40,
+                    'is_complete': False
+                }
+        
+        # Step 3: Collect satisfaction if not available
+        elif not extracted.get('satisfaction_rating'):
             return {
-                'message': "Thank you for that rating. Can you tell me more about your experience?",
+                'message': "How would you describe your overall satisfaction with our service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
                 'message_type': 'ai_question',
-                'step': 'experience_details',
-                'progress': 40,
-                'is_complete': False
-            }
-        elif self.step_count == 3:
-            return {
-                'message': "What would you suggest we improve?",
-                'message_type': 'ai_question',
-                'step': 'improvement',
+                'step': 'satisfaction',
                 'progress': 60,
                 'is_complete': False
             }
-        elif self.step_count == 4:
-            return {
-                'message': "How satisfied are you overall? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
-                'message_type': 'ai_question',
-                'step': 'satisfaction',
-                'progress': 80,
-                'is_complete': False
-            }
+        
+        # Step 4: Collect improvement feedback if not available
+        elif not extracted.get('improvement_feedback'):
+            if extracted.get('nps_score', 0) < 7:
+                return {
+                    'message': "What specific changes would make the biggest difference in improving your experience?",
+                    'message_type': 'ai_question',
+                    'step': 'improvement',
+                    'progress': 80,
+                    'is_complete': False
+                }
+            else:
+                return {
+                    'message': "Is there anything we could do even better to enhance your experience?",
+                    'message_type': 'ai_question',
+                    'step': 'improvement',
+                    'progress': 80,
+                    'is_complete': False
+                }
+        
+        # Step 5: Wrap up
         else:
             return {
-                'message': "Thank you for your valuable feedback! We really appreciate you taking the time to help us improve.",
+                'message': "Thank you so much for sharing your valuable feedback! Your insights help us improve our service for everyone.",
                 'message_type': 'conclusion',
                 'step': 'conclusion',
                 'progress': 100,
@@ -304,26 +380,100 @@ Be conversational, empathetic, and adaptive to their communication style."""
         """Convert conversational data to structured survey format"""
         extracted = self.extracted_data
         
+        # Ensure we have at least minimum required data by analyzing conversation history
+        if not extracted.get('nps_score') and self.conversation_history:
+            self._extract_missing_data_from_history()
+        
         # Combine all feedback text
         feedback_parts = []
         for key in ['nps_reasoning', 'improvement_feedback', 'compliment_feedback', 'complaint_feedback', 'additional_comments']:
             if extracted.get(key):
                 feedback_parts.append(extracted[key])
         
-        combined_feedback = ' '.join(feedback_parts)
+        combined_feedback = ' '.join(feedback_parts) if feedback_parts else None
+        
+        # Ensure required fields have values or reasonable defaults
+        nps_score = extracted.get('nps_score')
+        if nps_score is None:
+            # Try to extract from conversation history as fallback
+            nps_score = self._extract_nps_from_history()
+        
+        # Set default NPS category if score exists
+        nps_category = extracted.get('nps_category')
+        if nps_score is not None and not nps_category:
+            if nps_score >= 9:
+                nps_category = 'Promoter'
+            elif nps_score >= 7:
+                nps_category = 'Passive'
+            else:
+                nps_category = 'Detractor'
         
         return {
             'company_name': context.get('company_name'),
             'respondent_name': context.get('respondent_name'),
             'respondent_email': context.get('respondent_email'),
-            'nps_score': extracted.get('nps_score'),
-            'nps_category': extracted.get('nps_category'),
+            'nps_score': nps_score,
+            'nps_category': nps_category,
             'satisfaction_rating': extracted.get('satisfaction_rating'),
             'improvement_feedback': extracted.get('improvement_feedback'),
             'recommendation_reason': extracted.get('nps_reasoning'),
             'additional_comments': combined_feedback,
             'conversation_history': json.dumps(self.conversation_history)
         }
+    
+    def _extract_missing_data_from_history(self):
+        """Extract missing survey data from conversation history as fallback"""
+        conversation_text = ' '.join([msg.get('message', '') for msg in self.conversation_history if msg.get('sender') == 'User'])
+        
+        # Try to extract NPS score using simple pattern matching
+        import re
+        
+        # Look for numbers 0-10 in user responses
+        for msg in self.conversation_history:
+            if msg.get('sender') == 'User':
+                message = msg.get('message', '')
+                # Look for standalone numbers 0-10
+                numbers = re.findall(r'\b([0-9]|10)\b', message)
+                for num_str in numbers:
+                    num = int(num_str)
+                    if 0 <= num <= 10:
+                        self.extracted_data['nps_score'] = num
+                        if num >= 9:
+                            self.extracted_data['nps_category'] = 'Promoter'
+                        elif num >= 7:
+                            self.extracted_data['nps_category'] = 'Passive'
+                        else:
+                            self.extracted_data['nps_category'] = 'Detractor'
+                        break
+        
+        # Extract satisfaction keywords
+        text_lower = conversation_text.lower()
+        if not self.extracted_data.get('satisfaction_rating'):
+            if any(word in text_lower for word in ['very satisfied', 'extremely satisfied']):
+                self.extracted_data['satisfaction_rating'] = 5
+            elif any(word in text_lower for word in ['satisfied', 'happy', 'pleased']):
+                self.extracted_data['satisfaction_rating'] = 4
+            elif any(word in text_lower for word in ['neutral', 'okay', 'fine']):
+                self.extracted_data['satisfaction_rating'] = 3
+            elif any(word in text_lower for word in ['dissatisfied', 'unhappy', 'disappointed']):
+                self.extracted_data['satisfaction_rating'] = 2
+            elif any(word in text_lower for word in ['very dissatisfied', 'terrible', 'awful']):
+                self.extracted_data['satisfaction_rating'] = 1
+    
+    def _extract_nps_from_history(self):
+        """Extract NPS score from conversation history using pattern matching"""
+        import re
+        
+        for msg in self.conversation_history:
+            if msg.get('sender') == 'User':
+                message = msg.get('message', '')
+                # Look for numbers 0-10 in context of recommendation
+                numbers = re.findall(r'\b([0-9]|10)\b', message)
+                for num_str in numbers:
+                    num = int(num_str)
+                    if 0 <= num <= 10:
+                        return num
+        return None
 
 
 # Global instances for session persistence
