@@ -315,14 +315,13 @@ Be conversational, empathetic, and adaptive to their communication style."""
         # Use step-based progression instead of data-based to avoid loops
         if self.step_count == 1:
             # First question: Always ask for NPS if we don't have it
-            if not extracted.get('nps_score'):
-                return {
-                    'message': f"On a scale of 0-10, how likely are you to recommend {company_name} to a friend or colleague?",
-                    'message_type': 'ai_question',
-                    'step': 'nps_collection',
-                    'progress': 20,
-                    'is_complete': False
-                }
+            return {
+                'message': f"On a scale of 0-10, how likely are you to recommend {company_name} to a friend or colleague?",
+                'message_type': 'ai_question',
+                'step': 'nps_collection',
+                'progress': 20,
+                'is_complete': False
+            }
         
         elif self.step_count == 2:
             # Second question: NPS reasoning based on score
@@ -352,6 +351,14 @@ Be conversational, empathetic, and adaptive to their communication style."""
                         'progress': 40,
                         'is_complete': False
                     }
+            else:
+                return {
+                    'message': f"Could you help me understand your experience better?",
+                    'message_type': 'ai_question',
+                    'step': 'experience_details',
+                    'progress': 40,
+                    'is_complete': False
+                }
         
         elif self.step_count == 3:
             # Third question: Satisfaction rating
@@ -526,8 +533,13 @@ def finalize_ai_conversational_survey(context: Dict[str, Any]) -> Dict[str, Any]
     """Finalize and convert AI conversational survey to structured format"""
     conversation_id = context.get('conversation_id')
     
+    print(f"Finalizing conversation {conversation_id}")
+    print(f"Available instances: {list(ai_conversation_instances.keys())}")
+    
     if conversation_id and conversation_id in ai_conversation_instances:
         ai_survey = ai_conversation_instances[conversation_id]
+        
+        print(f"Found AI survey instance with extracted data: {ai_survey.extracted_data}")
         
         # Use the extracted data from the AI survey instance
         finalization_context = {
@@ -537,21 +549,29 @@ def finalize_ai_conversational_survey(context: Dict[str, Any]) -> Dict[str, Any]
         }
         
         result = ai_survey.finalize_survey(finalization_context)
+        print(f"Finalized result: {result}")
         
         # Clean up the instance
         del ai_conversation_instances[conversation_id]
         return result
     else:
-        # Fallback finalization
+        print("No conversation instance found - using fallback")
+        # Enhanced fallback - try to extract from context
+        survey_data = context.get('survey_data', {})
+        extracted_data = survey_data.get('extracted_data', {})
+        
+        print(f"Fallback survey_data: {survey_data}")
+        print(f"Fallback extracted_data: {extracted_data}")
+        
         return {
-            'company_name': context.get('company_name'),
-            'respondent_name': context.get('respondent_name'),
+            'company_name': context.get('company_name') or survey_data.get('company_name'),
+            'respondent_name': context.get('respondent_name') or survey_data.get('respondent_name'),
             'respondent_email': context.get('respondent_email'),
-            'nps_score': None,
-            'nps_category': None,
-            'satisfaction_rating': None,
-            'improvement_feedback': None,
-            'recommendation_reason': None,
-            'additional_comments': None,
-            'conversation_history': json.dumps([])
+            'nps_score': extracted_data.get('nps_score'),
+            'nps_category': extracted_data.get('nps_category'),
+            'satisfaction_rating': extracted_data.get('satisfaction_rating'),
+            'improvement_feedback': extracted_data.get('improvement_feedback'),
+            'recommendation_reason': extracted_data.get('nps_reasoning'),
+            'additional_comments': extracted_data.get('additional_comments'),
+            'conversation_history': context.get('conversation_history', json.dumps([]))
         }
