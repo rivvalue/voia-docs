@@ -121,6 +121,10 @@ def submit_survey():
         if not data:
             return jsonify({'error': 'No JSON data provided'}), 400
         
+        # Debug logging to see what data is being received
+        logger.info(f"Received survey data: {data}")
+        logger.info(f"Tenure field value: {data.get('tenure_with_fc')}")
+        
         # Get authenticated email from Flask's g object
         authenticated_email = getattr(g, 'authenticated_email', None)
         existing_response = getattr(g, 'existing_response', None)
