@@ -48,6 +48,7 @@ def analyze_survey_response(response_id):
         response.sentiment_label = sentiment_data['label']
         response.key_themes = json.dumps(themes)
         response.churn_risk_score = churn_analysis['risk_score']
+        response.churn_risk_level = churn_analysis['risk_level']
         response.churn_risk_factors = json.dumps(churn_analysis['risk_factors'])
         response.growth_opportunities = json.dumps(growth_opportunities)
         response.analyzed_at = datetime.utcnow()
@@ -154,29 +155,29 @@ def extract_key_themes(text, nps_score):
 def assess_churn_risk(response, text):
     """Assess churn risk based on NPS score and feedback"""
     risk_factors = []
-    risk_score = 0.0
+    risk_points = 0
     
     # Base risk from NPS score
     if response.nps_score <= 6:
-        risk_score += 0.6
+        risk_points += 3
         risk_factors.append("Low NPS score indicating dissatisfaction")
     elif response.nps_score <= 8:
-        risk_score += 0.3
+        risk_points += 2
         risk_factors.append("Neutral NPS score indicating potential churn risk")
     
     # Risk from ratings
     low_ratings = []
     if response.satisfaction_rating and response.satisfaction_rating <= 3:
-        risk_score += 0.2
+        risk_points += 1
         low_ratings.append("satisfaction")
     if response.product_value_rating and response.product_value_rating <= 3:
-        risk_score += 0.2
+        risk_points += 1
         low_ratings.append("product value")
     if response.service_rating and response.service_rating <= 3:
-        risk_score += 0.2
-        low_ratings.append("service")
+        risk_points += 1
+        low_ratings.append("FC inc service delivery")
     if response.pricing_rating and response.pricing_rating <= 3:
-        risk_score += 0.2
+        risk_points += 1
         low_ratings.append("pricing")
     
     if low_ratings:
@@ -204,18 +205,26 @@ def assess_churn_risk(response, text):
             
             ai_result = json.loads(ai_response.choices[0].message.content)
             ai_risk_factors = ai_result.get('risk_factors', [])
-            ai_risk_score = float(ai_result.get('additional_risk_score', 0))
+            ai_risk_severity = ai_result.get('additional_risk_points', 0)
             
             risk_factors.extend(ai_risk_factors)
-            risk_score += ai_risk_score
+            risk_points += int(ai_risk_severity)
     except Exception as e:
         logger.warning(f"AI churn risk assessment failed: {e}")
     
-    # Normalize risk score
-    risk_score = max(0, min(1, risk_score))
+    # Convert risk points to categorical risk level
+    if risk_points >= 5:
+        risk_level = "High"
+    elif risk_points >= 3:
+        risk_level = "Medium"
+    elif risk_points >= 1:
+        risk_level = "Low"
+    else:
+        risk_level = "Minimal"
     
     return {
-        'risk_score': risk_score,
+        'risk_level': risk_level,
+        'risk_score': risk_points,  # Keep numerical for internal calculations
         'risk_factors': risk_factors
     }
 

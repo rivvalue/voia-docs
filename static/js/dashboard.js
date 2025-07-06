@@ -342,8 +342,10 @@ function loadSurveyResponses() {
             }
             
             const html = responses.map(response => {
-                const riskClass = response.churn_risk_score > 0.6 ? 'risk-high' : 
-                                 response.churn_risk_score > 0.3 ? 'risk-medium' : 'risk-low';
+                const riskLevel = response.churn_risk_level || 'Minimal';
+                const riskClass = riskLevel === 'High' ? 'risk-high' : 
+                                 riskLevel === 'Medium' ? 'risk-medium' : 
+                                 riskLevel === 'Low' ? 'risk-low' : 'risk-minimal';
                 
                 const sentimentClass = response.sentiment_label === 'positive' ? 'theme-positive' :
                                       response.sentiment_label === 'negative' ? 'theme-negative' : 'theme-neutral';
@@ -361,7 +363,7 @@ function loadSurveyResponses() {
                         <td>${response.nps_category}</td>
                         <td class="${sentimentClass}">${response.sentiment_label || 'N/A'}</td>
                         <td class="${riskClass}">
-                            ${response.churn_risk_score ? Math.round(response.churn_risk_score * 100) + '%' : 'N/A'}
+                            ${riskLevel}
                         </td>
                         <td>${response.created_at ? new Date(response.created_at).toLocaleDateString() : 'N/A'}</td>
                     </tr>

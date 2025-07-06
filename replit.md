@@ -200,6 +200,8 @@ The system uses a single main entity `SurveyResponse` that stores:
 - July 06, 2025: Updated survey questions to reference "FC inc" as supplier instead of participant's company
 - July 06, 2025: Redesigned visual interface with new color palette (#FFFFFF, #E9E8E4, #BDBDBD, #E13A44, #000000)
 - July 06, 2025: Added tenure dimension - captures business relationship duration with FC inc for enhanced analysis
+- July 06, 2025: Enhanced survey specificity - updated service questions to "FC inc Service Delivery & Support" for more relevant feedback
+- July 06, 2025: Improved churn risk display - replaced confusing percentages with clear categorical levels (Minimal, Low, Medium, High)
 
 ## User Preferences
 

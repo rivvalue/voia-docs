@@ -238,6 +238,11 @@ body {
     font-weight: 600;
 }
 
+.risk-minimal {
+    color: var(--medium-gray);
+    font-weight: 500;
+}
+
 .theme-positive {
     color: var(--gray-dark);
     font-weight: 500;

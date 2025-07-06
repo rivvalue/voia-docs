@@ -235,7 +235,7 @@ Only include fields that are clearly present in the response. If a field is not 
             # Format conversation history for context
             history_text = self._format_conversation_history()
             
-            prompt = f"""You are conducting a customer feedback survey about FC inc (the supplier company). 
+            prompt = f"""You are conducting a customer feedback survey about FC inc (the supplier company). Focus on FC inc's service delivery, support quality, and business relationship aspects.
 
 CONVERSATION HISTORY:
 {history_text}

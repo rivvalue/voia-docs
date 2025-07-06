@@ -27,6 +27,7 @@ class SurveyResponse(db.Model):
     sentiment_label = db.Column(db.String(50))
     key_themes = db.Column(db.Text)  # JSON string of themes
     churn_risk_score = db.Column(db.Float)
+    churn_risk_level = db.Column(db.String(20))  # Minimal, Low, Medium, High
     churn_risk_factors = db.Column(db.Text)  # JSON string
     growth_opportunities = db.Column(db.Text)  # JSON string
     
@@ -54,6 +55,7 @@ class SurveyResponse(db.Model):
             'sentiment_label': self.sentiment_label,
             'key_themes': json.loads(self.key_themes) if self.key_themes else [],
             'churn_risk_score': self.churn_risk_score,
+            'churn_risk_level': self.churn_risk_level,
             'churn_risk_factors': json.loads(self.churn_risk_factors) if self.churn_risk_factors else [],
             'growth_opportunities': json.loads(self.growth_opportunities) if self.growth_opportunities else [],
             'created_at': self.created_at.isoformat() if self.created_at else None,
