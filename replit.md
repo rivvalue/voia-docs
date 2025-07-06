@@ -198,6 +198,7 @@ The system uses a single main entity `SurveyResponse` that stores:
 - July 04, 2025: AI conversational surveys - OpenAI integration, natural language processing, Rivvalue branding
 - July 06, 2025: Fixed conversational survey loops and data transfer issues - now fully functional end-to-end
 - July 06, 2025: Updated survey questions to reference "FC inc" as supplier instead of participant's company
+- July 06, 2025: Redesigned visual interface with new color palette (#FFFFFF, #E9E8E4, #BDBDBD, #E13A44, #000000)
 
 ## User Preferences
 

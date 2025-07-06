@@ -1,5 +1,117 @@
 /* Custom styles for Voice of Client Agent */
+/* Color Palette: #FFFFFF (white), #E9E8E4 (light gray), #BDBDBD (medium gray), #E13A44 (red), #000000 (black) */
 
+:root {
+    --primary-red: #E13A44;
+    --primary-white: #FFFFFF;
+    --light-gray: #E9E8E4;
+    --medium-gray: #BDBDBD;
+    --primary-black: #000000;
+    --red-hover: #C52D36;
+    --red-light: #F5C6C7;
+    --gray-dark: #8A8A8A;
+}
+
+/* Global background and text colors */
+body {
+    background-color: var(--primary-white);
+    color: var(--primary-black);
+}
+
+/* Navigation and header styling */
+.navbar {
+    background-color: var(--primary-black) !important;
+    border-bottom: 2px solid var(--primary-red);
+}
+
+.navbar-brand, .navbar-nav .nav-link {
+    color: var(--primary-white) !important;
+}
+
+.navbar-nav .nav-link:hover {
+    color: var(--primary-red) !important;
+}
+
+/* Button styling */
+.btn-primary {
+    background-color: var(--primary-red);
+    border-color: var(--primary-red);
+    color: var(--primary-white);
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: var(--red-hover);
+    border-color: var(--red-hover);
+    color: var(--primary-white);
+}
+
+.btn-secondary {
+    background-color: var(--medium-gray);
+    border-color: var(--medium-gray);
+    color: var(--primary-black);
+}
+
+.btn-secondary:hover, .btn-secondary:focus {
+    background-color: var(--gray-dark);
+    border-color: var(--gray-dark);
+    color: var(--primary-white);
+}
+
+.btn-outline-primary {
+    color: var(--primary-red);
+    border-color: var(--primary-red);
+}
+
+.btn-outline-primary:hover, .btn-outline-primary:focus {
+    background-color: var(--primary-red);
+    border-color: var(--primary-red);
+    color: var(--primary-white);
+}
+
+/* Card styling */
+.card {
+    background-color: var(--primary-white);
+    border: 1px solid var(--light-gray);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.15s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    background-color: var(--light-gray);
+    border-bottom: 1px solid var(--medium-gray);
+    color: var(--primary-black);
+    font-weight: 600;
+}
+
+.card-body {
+    background-color: var(--primary-white);
+    color: var(--primary-black);
+}
+
+/* Form styling */
+.form-control {
+    background-color: var(--primary-white);
+    border: 1px solid var(--medium-gray);
+    color: var(--primary-black);
+}
+
+.form-control:focus {
+    background-color: var(--primary-white);
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 0.2rem rgba(225, 58, 68, 0.25);
+    color: var(--primary-black);
+}
+
+.form-label {
+    color: var(--primary-black);
+    font-weight: 500;
+}
+
+/* NPS Scale styling */
 .survey-step {
     min-height: 300px;
 }
@@ -12,109 +124,32 @@
     margin: 0 2px;
     font-size: 14px;
     font-weight: bold;
+    background-color: var(--light-gray);
+    border: 1px solid var(--medium-gray);
+    color: var(--primary-black);
+}
+
+.nps-scale .btn:hover {
+    background-color: var(--medium-gray);
+    border-color: var(--gray-dark);
 }
 
 .nps-scale .btn-check:checked + .btn {
+    background-color: var(--primary-red);
+    border-color: var(--primary-red);
+    color: var(--primary-white);
     transform: scale(1.1);
-    box-shadow: 0 0 0 3px rgba(var(--bs-primary-rgb), 0.25);
+    box-shadow: 0 0 0 3px rgba(225, 58, 68, 0.25);
 }
 
-.card {
-    border: 1px solid var(--bs-border-color);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.15s ease-in-out;
-}
-
-.card:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
+/* Progress bar styling */
 .progress {
-    background-color: var(--bs-gray-700);
+    background-color: var(--light-gray);
 }
 
 .progress-bar {
-    background-color: var(--bs-primary);
+    background-color: var(--primary-red);
     transition: width 0.3s ease;
-}
-
-.risk-high {
-    color: var(--bs-danger);
-}
-
-.risk-medium {
-    color: var(--bs-warning);
-}
-
-.risk-low {
-    color: var(--bs-success);
-}
-
-.theme-positive {
-    color: var(--bs-success);
-}
-
-.theme-negative {
-    color: var(--bs-danger);
-}
-
-.theme-neutral {
-    color: var(--bs-secondary);
-}
-
-.opportunity-card {
-    border-left: 4px solid var(--bs-primary);
-    background-color: var(--bs-gray-800);
-}
-
-.risk-card {
-    border-left: 4px solid var(--bs-danger);
-    background-color: var(--bs-gray-800);
-}
-
-.spinner-border {
-    animation: spinner-border 0.75s linear infinite;
-}
-
-@keyframes spinner-border {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .nps-scale .btn {
-        width: 30px;
-        height: 30px;
-        font-size: 12px;
-        margin: 0 1px;
-    }
-    
-    .card-body {
-        padding: 1rem;
-    }
-}
-
-/* Chart containers */
-canvas {
-    max-height: 400px;
-}
-
-/* Table styling */
-.table-responsive {
-    border-radius: 0.375rem;
-    border: 1px solid var(--bs-border-color);
-}
-
-.table th {
-    background-color: var(--bs-gray-800);
-    border-color: var(--bs-border-color);
-    font-weight: 600;
-}
-
-.table td {
-    border-color: var(--bs-border-color);
 }
 
 /* Alert styling */
@@ -124,27 +159,191 @@ canvas {
 }
 
 .alert-success {
-    background-color: rgba(var(--bs-success-rgb), 0.1);
-    border-color: var(--bs-success);
-    color: var(--bs-success);
+    background-color: var(--light-gray);
+    border-color: var(--medium-gray);
+    color: var(--primary-black);
 }
 
 .alert-danger {
-    background-color: rgba(var(--bs-danger-rgb), 0.1);
-    border-color: var(--bs-danger);
-    color: var(--bs-danger);
+    background-color: var(--red-light);
+    border-color: var(--primary-red);
+    color: var(--primary-red);
 }
 
 .alert-warning {
-    background-color: rgba(var(--bs-warning-rgb), 0.1);
-    border-color: var(--bs-warning);
-    color: var(--bs-warning);
+    background-color: var(--light-gray);
+    border-color: var(--medium-gray);
+    color: var(--primary-black);
+}
+
+.alert-info {
+    background-color: var(--light-gray);
+    border-color: var(--medium-gray);
+    color: var(--primary-black);
 }
 
 /* Badge styling */
 .badge {
     font-size: 0.75em;
     font-weight: 600;
+}
+
+.badge.bg-primary {
+    background-color: var(--primary-red) !important;
+}
+
+.badge.bg-secondary {
+    background-color: var(--medium-gray) !important;
+    color: var(--primary-black) !important;
+}
+
+.badge.bg-success {
+    background-color: var(--medium-gray) !important;
+    color: var(--primary-black) !important;
+}
+
+.badge.bg-danger {
+    background-color: var(--primary-red) !important;
+}
+
+.badge.bg-warning {
+    background-color: var(--medium-gray) !important;
+    color: var(--primary-black) !important;
+}
+
+/* Risk and theme indicators */
+.risk-high {
+    color: var(--primary-red);
+}
+
+.risk-medium {
+    color: var(--gray-dark);
+}
+
+.risk-low {
+    color: var(--medium-gray);
+}
+
+.theme-positive {
+    color: var(--medium-gray);
+}
+
+.theme-negative {
+    color: var(--primary-red);
+}
+
+.theme-neutral {
+    color: var(--gray-dark);
+}
+
+/* Special cards */
+.opportunity-card {
+    border-left: 4px solid var(--primary-red);
+    background-color: var(--primary-white);
+}
+
+.risk-card {
+    border-left: 4px solid var(--primary-red);
+    background-color: var(--red-light);
+}
+
+/* Table styling */
+.table-responsive {
+    border-radius: 0.375rem;
+    border: 1px solid var(--light-gray);
+}
+
+.table {
+    background-color: var(--primary-white);
+    color: var(--primary-black);
+}
+
+.table th {
+    background-color: var(--light-gray);
+    border-color: var(--medium-gray);
+    color: var(--primary-black);
+    font-weight: 600;
+}
+
+.table td {
+    border-color: var(--light-gray);
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(233, 232, 228, 0.3);
+}
+
+/* Conversational Chat Interface */
+.chat-message {
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    max-width: 80%;
+    word-wrap: break-word;
+}
+
+.chat-message.user {
+    background-color: var(--primary-red);
+    color: var(--primary-white);
+    margin-left: auto;
+    text-align: right;
+}
+
+.chat-message.assistant {
+    background-color: var(--light-gray);
+    color: var(--primary-black);
+    margin-right: auto;
+    text-align: left;
+    border: 1px solid var(--medium-gray);
+}
+
+.chat-message.system {
+    background-color: var(--medium-gray);
+    color: var(--primary-black);
+    margin: 0 auto;
+    text-align: center;
+    font-style: italic;
+}
+
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    background-color: var(--light-gray);
+    color: var(--primary-black);
+    border: 1px solid var(--medium-gray);
+    border-radius: 0.5rem;
+    margin-right: auto;
+    max-width: 80%;
+}
+
+.typing-indicator .spinner-border {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.5rem;
+    color: var(--primary-red);
+}
+
+#chatMessages {
+    background-color: var(--primary-white);
+    border: 1px solid var(--light-gray);
+}
+
+#chatMessages::-webkit-scrollbar {
+    width: 8px;
+}
+
+#chatMessages::-webkit-scrollbar-track {
+    background: var(--primary-white);
+}
+
+#chatMessages::-webkit-scrollbar-thumb {
+    background: var(--medium-gray);
+    border-radius: 4px;
+}
+
+#chatMessages::-webkit-scrollbar-thumb:hover {
+    background: var(--gray-dark);
 }
 
 /* Loading states */
@@ -162,78 +361,93 @@ canvas {
 }
 
 .loading-content {
-    background-color: var(--bs-body-bg);
+    background-color: var(--primary-white);
     padding: 2rem;
     border-radius: 0.5rem;
+    border: 1px solid var(--light-gray);
     text-align: center;
 }
 
-/* Conversational Chat Interface */
-.chat-message {
-    margin-bottom: 1rem;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    max-width: 80%;
-    word-wrap: break-word;
+.spinner-border {
+    animation: spinner-border 0.75s linear infinite;
+    color: var(--primary-red);
 }
 
-.chat-message.user {
-    background-color: var(--bs-primary);
-    color: white;
-    margin-left: auto;
-    text-align: right;
+@keyframes spinner-border {
+    to {
+        transform: rotate(360deg);
+    }
 }
 
-.chat-message.assistant {
-    background-color: var(--bs-secondary);
-    color: white;
-    margin-right: auto;
-    text-align: left;
+/* Text colors */
+.text-primary {
+    color: var(--primary-red) !important;
 }
 
-.chat-message.system {
-    background-color: var(--bs-info);
-    color: white;
-    margin: 0 auto;
-    text-align: center;
-    font-style: italic;
+.text-secondary {
+    color: var(--medium-gray) !important;
 }
 
-.typing-indicator {
-    display: flex;
-    align-items: center;
-    padding: 0.75rem;
-    background-color: var(--bs-secondary);
-    color: white;
-    border-radius: 0.5rem;
-    margin-right: auto;
-    max-width: 80%;
+.text-muted {
+    color: var(--gray-dark) !important;
 }
 
-.typing-indicator .spinner-border {
-    width: 1rem;
-    height: 1rem;
-    margin-right: 0.5rem;
+/* Background colors */
+.bg-primary {
+    background-color: var(--primary-red) !important;
 }
 
-#chatMessages {
-    background-color: var(--bs-body-bg);
-    border: 1px solid var(--bs-border-color);
+.bg-secondary {
+    background-color: var(--medium-gray) !important;
 }
 
-#chatMessages::-webkit-scrollbar {
-    width: 8px;
+.bg-light {
+    background-color: var(--light-gray) !important;
 }
 
-#chatMessages::-webkit-scrollbar-track {
-    background: var(--bs-body-bg);
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .nps-scale .btn {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+        margin: 0 1px;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .chat-message {
+        max-width: 90%;
+    }
 }
 
-#chatMessages::-webkit-scrollbar-thumb {
-    background: var(--bs-border-color);
-    border-radius: 4px;
+/* Chart containers */
+canvas {
+    max-height: 400px;
 }
 
-#chatMessages::-webkit-scrollbar-thumb:hover {
-    background: var(--bs-secondary);
+/* Links */
+a {
+    color: var(--primary-red);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--red-hover);
+    text-decoration: underline;
+}
+
+/* Border utilities */
+.border-primary {
+    border-color: var(--primary-red) !important;
+}
+
+.border-secondary {
+    border-color: var(--medium-gray) !important;
+}
+
+.border-light {
+    border-color: var(--light-gray) !important;
 }
