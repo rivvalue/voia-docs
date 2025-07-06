@@ -156,6 +156,7 @@ def submit_survey():
             company_name=data['company_name'],
             respondent_name=data['respondent_name'],
             respondent_email=authenticated_email,  # Use authenticated email
+            tenure_with_fc=data.get('tenure_with_fc'),
             nps_score=nps_score,
             nps_category=nps_category,
             satisfaction_rating=int(data['satisfaction_rating']) if data.get('satisfaction_rating') else None,
@@ -227,6 +228,7 @@ def submit_survey_overwrite():
             # Update existing response
             existing_response.company_name = data['company_name']
             existing_response.respondent_name = data['respondent_name']
+            existing_response.tenure_with_fc = data.get('tenure_with_fc')
             existing_response.nps_score = nps_score
             existing_response.nps_category = nps_category
             existing_response.satisfaction_rating = int(data['satisfaction_rating']) if data.get('satisfaction_rating') else None
@@ -247,6 +249,7 @@ def submit_survey_overwrite():
                 company_name=data['company_name'],
                 respondent_name=data['respondent_name'],
                 respondent_email=authenticated_email,
+                tenure_with_fc=data.get('tenure_with_fc'),
                 nps_score=nps_score,
                 nps_category=nps_category,
                 satisfaction_rating=int(data['satisfaction_rating']) if data.get('satisfaction_rating') else None,
@@ -396,9 +399,11 @@ def start_conversation():
         data = request.get_json()
         company_name = data.get('company_name', '').strip()
         respondent_name = data.get('respondent_name', '').strip()
+        respondent_email = data.get('respondent_email', '').strip()
+        tenure_with_fc = data.get('tenure_with_fc', '').strip()
         
-        if not company_name or not respondent_name:
-            return jsonify({'error': 'Company name and respondent name are required'}), 400
+        if not company_name or not respondent_name or not respondent_email or not tenure_with_fc:
+            return jsonify({'error': 'All fields are required'}), 400
         
         # Start conversation with AI
         conversation_response = start_ai_conversational_survey(company_name, respondent_name)
@@ -468,6 +473,7 @@ def finalize_conversation():
             company_name=structured_data.get('company_name'),
             respondent_name=structured_data.get('respondent_name'),
             respondent_email=g.authenticated_email,
+            tenure_with_fc=structured_data.get('tenure_with_fc'),
             nps_score=structured_data.get('nps_score'),
             satisfaction_rating=structured_data.get('satisfaction_rating'),
             product_value_rating=structured_data.get('product_value_rating'),

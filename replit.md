@@ -19,7 +19,7 @@ The Voice of Client Agent is a customer feedback collection and analysis system 
 
 ### Database Schema
 The system uses a single main entity `SurveyResponse` that stores:
-- Basic respondent information (company, name, email)
+- Basic respondent information (company, name, email, tenure with FC inc)
 - NPS score and category classification
 - Multiple rating dimensions (satisfaction, product value, service, pricing)
 - Text feedback (improvement suggestions, recommendation reasons, additional comments)
@@ -199,6 +199,7 @@ The system uses a single main entity `SurveyResponse` that stores:
 - July 06, 2025: Fixed conversational survey loops and data transfer issues - now fully functional end-to-end
 - July 06, 2025: Updated survey questions to reference "FC inc" as supplier instead of participant's company
 - July 06, 2025: Redesigned visual interface with new color palette (#FFFFFF, #E9E8E4, #BDBDBD, #E13A44, #000000)
+- July 06, 2025: Added tenure dimension - captures business relationship duration with FC inc for enhanced analysis
 
 ## User Preferences
 

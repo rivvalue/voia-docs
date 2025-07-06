@@ -111,6 +111,7 @@ function submitSurvey() {
     const formData = {
         company_name: document.getElementById('companyName').value.trim(),
         respondent_name: document.getElementById('respondentName').value.trim(),
+        tenure_with_fc: document.getElementById('tenureWithFc').value,
         nps_score: selectedNpsScore,
         satisfaction_rating: document.getElementById('satisfactionRating').value || null,
         product_value_rating: document.getElementById('productValueRating').value || null,
@@ -195,6 +196,7 @@ function autoSave() {
         company_name: document.getElementById('companyName').value,
         respondent_name: document.getElementById('respondentName').value,
         respondent_email: document.getElementById('respondentEmail').value,
+        tenure_with_fc: document.getElementById('tenureWithFc').value,
         current_step: currentStep
     };
     
@@ -210,6 +212,7 @@ function loadSavedData() {
         document.getElementById('companyName').value = data.company_name || '';
         document.getElementById('respondentName').value = data.respondent_name || '';
         document.getElementById('respondentEmail').value = data.respondent_email || '';
+        document.getElementById('tenureWithFc').value = data.tenure_with_fc || '';
         
         // Optionally restore to saved step
         // currentStep = data.current_step || 1;
@@ -220,6 +223,7 @@ function loadSavedData() {
 document.getElementById('companyName').addEventListener('input', autoSave);
 document.getElementById('respondentName').addEventListener('input', autoSave);
 document.getElementById('respondentEmail').addEventListener('input', autoSave);
+document.getElementById('tenureWithFc').addEventListener('change', autoSave);
 
 // Clear saved data on successful submission
 function clearSavedData() {

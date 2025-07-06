@@ -7,6 +7,7 @@ class SurveyResponse(db.Model):
     company_name = db.Column(db.String(200), nullable=False, index=True)
     respondent_name = db.Column(db.String(200), nullable=False)
     respondent_email = db.Column(db.String(200), nullable=False, index=True)
+    tenure_with_fc = db.Column(db.String(50), nullable=True, index=True)  # Business relationship duration with FC inc
     nps_score = db.Column(db.Integer, nullable=False, index=True)
     nps_category = db.Column(db.String(20), nullable=False, index=True)  # Promoter, Passive, Detractor
     
@@ -39,6 +40,7 @@ class SurveyResponse(db.Model):
             'company_name': self.company_name,
             'respondent_name': self.respondent_name,
             'respondent_email': self.respondent_email,
+            'tenure_with_fc': self.tenure_with_fc,
             'nps_score': self.nps_score,
             'nps_category': self.nps_category,
             'satisfaction_rating': self.satisfaction_rating,
