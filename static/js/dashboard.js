@@ -66,7 +66,7 @@ function createNpsChart() {
     const npsData = dashboardData.nps_distribution || [];
     const labels = npsData.map(item => item.category);
     const data = npsData.map(item => item.count);
-    const colors = ['#dc3545', '#ffc107', '#28a745']; // Red, Yellow, Green
+    const colors = ['#E13A44', '#BDBDBD', '#8A8A8A']; // Red (Detractor), Medium Gray (Passive), Dark Gray (Promoter)
     
     charts.npsChart = new Chart(ctx, {
         type: 'doughnut',
@@ -76,7 +76,7 @@ function createNpsChart() {
                 data: data,
                 backgroundColor: colors,
                 borderWidth: 2,
-                borderColor: '#1a1a1a'
+                borderColor: '#FFFFFF'
             }]
         },
         options: {
@@ -86,7 +86,7 @@ function createNpsChart() {
                 legend: {
                     position: 'bottom',
                     labels: {
-                        color: '#ffffff',
+                        color: '#000000',
                         usePointStyle: true,
                         padding: 20
                     }
@@ -107,7 +107,7 @@ function createSentimentChart() {
     const sentimentData = dashboardData.sentiment_distribution || [];
     const labels = sentimentData.map(item => item.sentiment);
     const data = sentimentData.map(item => item.count);
-    const colors = ['#28a745', '#6c757d', '#dc3545']; // Green, Gray, Red
+    const colors = ['#8A8A8A', '#BDBDBD', '#E13A44']; // Dark Gray (Positive), Medium Gray (Neutral), Red (Negative)
     
     charts.sentimentChart = new Chart(ctx, {
         type: 'bar',
@@ -118,7 +118,7 @@ function createSentimentChart() {
                 data: data,
                 backgroundColor: colors,
                 borderWidth: 1,
-                borderColor: '#1a1a1a'
+                borderColor: '#E9E8E4'
             }]
         },
         options: {
@@ -133,18 +133,18 @@ function createSentimentChart() {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        color: '#ffffff'
+                        color: '#000000'
                     },
                     grid: {
-                        color: '#333333'
+                        color: '#E9E8E4'
                     }
                 },
                 x: {
                     ticks: {
-                        color: '#ffffff'
+                        color: '#000000'
                     },
                     grid: {
-                        color: '#333333'
+                        color: '#E9E8E4'
                     }
                 }
             }
@@ -176,11 +176,11 @@ function createRatingsChart() {
             datasets: [{
                 label: 'Average Rating',
                 data: data,
-                borderColor: '#007bff',
-                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                borderColor: '#E13A44',
+                backgroundColor: 'rgba(225, 58, 68, 0.1)',
                 borderWidth: 2,
-                pointBackgroundColor: '#007bff',
-                pointBorderColor: '#ffffff',
+                pointBackgroundColor: '#E13A44',
+                pointBorderColor: '#FFFFFF',
                 pointBorderWidth: 2
             }]
         },
@@ -190,7 +190,7 @@ function createRatingsChart() {
             plugins: {
                 legend: {
                     labels: {
-                        color: '#ffffff'
+                        color: '#000000'
                     }
                 }
             },
@@ -199,14 +199,14 @@ function createRatingsChart() {
                     beginAtZero: true,
                     max: 5,
                     ticks: {
-                        color: '#ffffff',
+                        color: '#000000',
                         stepSize: 1
                     },
                     grid: {
-                        color: '#333333'
+                        color: '#BDBDBD'
                     },
                     pointLabels: {
-                        color: '#ffffff'
+                        color: '#000000'
                     }
                 }
             }
@@ -240,9 +240,9 @@ function createThemesChart() {
             datasets: [{
                 label: 'Mentions',
                 data: data,
-                backgroundColor: '#17a2b8',
+                backgroundColor: '#BDBDBD',
                 borderWidth: 1,
-                borderColor: '#1a1a1a'
+                borderColor: '#E9E8E4'
             }]
         },
         options: {
@@ -258,19 +258,19 @@ function createThemesChart() {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        color: '#ffffff'
+                        color: '#000000'
                     },
                     grid: {
-                        color: '#333333'
+                        color: '#E9E8E4'
                     }
                 },
                 x: {
                     beginAtZero: true,
                     ticks: {
-                        color: '#ffffff'
+                        color: '#000000'
                     },
                     grid: {
-                        color: '#333333'
+                        color: '#E9E8E4'
                     }
                 }
             }
