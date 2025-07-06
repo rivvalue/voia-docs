@@ -207,6 +207,7 @@ The system uses a single main entity `SurveyResponse` that stores:
 - July 06, 2025: Enhanced growth opportunities display by grouping them by company name for better organization and readability
 - July 06, 2025: Enhanced churn risk detection to include high-risk language like "burden", "caused us", "credits", "compensation" for more accurate risk assessment
 - July 06, 2025: Fixed Chart.js CDN source map error and cleaned up dashboard JavaScript debugging code
+- July 06, 2025: Fixed critical historical churn risk misclassification - updated 4 detractor responses to proper High/Medium risk levels
 
 ## User Preferences
 
