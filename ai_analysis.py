@@ -95,22 +95,74 @@ def analyze_sentiment(text):
     except Exception as e:
         logger.warning(f"OpenAI sentiment analysis failed: {e}")
     
-    # Fallback to TextBlob
+    # Fallback to business-aware sentiment analysis
     try:
-        blob = TextBlob(text)
-        polarity = blob.sentiment.polarity
-        
-        if polarity > 0.1:
-            label = 'positive'
-        elif polarity < -0.1:
-            label = 'negative'
-        else:
-            label = 'neutral'
-            
-        return {'score': polarity, 'label': label}
+        return analyze_business_sentiment(text)
     except Exception as e:
-        logger.warning(f"TextBlob sentiment analysis failed: {e}")
+        logger.warning(f"Business sentiment analysis failed: {e}")
         return {'score': 0.0, 'label': 'neutral'}
+
+def analyze_business_sentiment(text):
+    """Business-aware sentiment analysis for customer feedback"""
+    if not text.strip():
+        return {'score': 0.0, 'label': 'neutral'}
+    
+    text_lower = text.lower()
+    
+    # Strong negative indicators (customer complaints)
+    negative_strong = [
+        'disappointed', 'frustrated', 'terrible', 'horrible', 'awful', 'hate',
+        'worst', 'useless', 'broken', 'failed', 'failing', 'problem', 'problems',
+        'issue', 'issues', 'bug', 'bugs', 'error', 'errors', 'slow', 'expensive',
+        'overpriced', 'poor', 'bad', 'lacking', 'lacks', 'missing', 'difficulty',
+        'difficulties', 'hard', 'complicated', 'confusing', 'unhappy', 'dissatisfied',
+        'cancel', 'cancelled', 'refund', 'compensation', 'credit', 'credits',
+        'fix', 'broken', 'not working', 'doesnt work', "doesn't work",
+        'churn', 'churning', 'leave', 'leaving', 'switch', 'switching',
+        'burden', 'caused us', 'waste', 'wasted', 'delay', 'delayed'
+    ]
+    
+    # Moderate negative indicators (improvement requests)
+    negative_moderate = [
+        'improve', 'improvement', 'better', 'enhance', 'upgrade', 'update',
+        'should', 'need', 'needs', 'require', 'must', 'have to',
+        'consider', 'review', 'revise', 'change', 'modify', 'adjust',
+        'lower', 'reduce', 'decrease', 'more', 'less', 'faster'
+    ]
+    
+    # Positive indicators
+    positive_indicators = [
+        'good', 'great', 'excellent', 'amazing', 'awesome', 'love', 'like',
+        'satisfied', 'happy', 'pleased', 'impressed', 'recommend', 'perfect',
+        'fantastic', 'wonderful', 'outstanding', 'superb', 'brilliant'
+    ]
+    
+    # Count indicators
+    strong_negative_count = sum(1 for word in negative_strong if word in text_lower)
+    moderate_negative_count = sum(1 for word in negative_moderate if word in text_lower)
+    positive_count = sum(1 for word in positive_indicators if word in text_lower)
+    
+    # Calculate score based on business context
+    if strong_negative_count > 0:
+        score = -0.7 - (strong_negative_count * 0.1)  # Strong negative
+        label = 'negative'
+    elif moderate_negative_count > 2:
+        score = -0.4 - (moderate_negative_count * 0.05)  # Moderate negative
+        label = 'negative'
+    elif moderate_negative_count > 0 and positive_count == 0:
+        score = -0.2 - (moderate_negative_count * 0.05)  # Mild negative
+        label = 'negative'
+    elif positive_count > moderate_negative_count:
+        score = 0.3 + (positive_count * 0.1)  # Positive
+        label = 'positive'
+    else:
+        score = 0.0  # Neutral
+        label = 'neutral'
+    
+    # Ensure score is within bounds
+    score = max(-1.0, min(1.0, score))
+    
+    return {'score': score, 'label': label}
 
 def extract_key_themes(text, nps_score):
     """Extract key themes from customer feedback"""

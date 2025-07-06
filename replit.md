@@ -208,6 +208,7 @@ The system uses a single main entity `SurveyResponse` that stores:
 - July 06, 2025: Enhanced churn risk detection to include high-risk language like "burden", "caused us", "credits", "compensation" for more accurate risk assessment
 - July 06, 2025: Fixed Chart.js CDN source map error and cleaned up dashboard JavaScript debugging code
 - July 06, 2025: Fixed critical historical churn risk misclassification - updated 4 detractor responses to proper High/Medium risk levels
+- July 06, 2025: Fixed sentiment analysis accuracy issue - replaced unreliable TextBlob with business-aware analysis, corrected 14 historical responses
 
 ## User Preferences
 
