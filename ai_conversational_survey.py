@@ -320,16 +320,44 @@ Be conversational, empathetic, and adaptive to their communication style."""
         
         print(f"Fallback generation - Step: {self.step_count}, Extracted: {extracted}")
         
-        # Use step-based progression instead of data-based to avoid loops
+        # Use step-based progression but check if we already have NPS data
         if self.step_count == 1:
-            # First question: Always ask for NPS about FC inc (the supplier)
-            return {
-                'message': "On a scale of 0-10, how likely are you to recommend FC inc to a friend or colleague?",
-                'message_type': 'ai_question',
-                'step': 'nps_collection',
-                'progress': 20,
-                'is_complete': False
-            }
+            # First question: Ask for NPS about FC inc (the supplier) ONLY if we don't have it
+            if extracted.get('nps_score') is None:
+                return {
+                    'message': "On a scale of 0-10, how likely are you to recommend FC inc to a friend or colleague?",
+                    'message_type': 'ai_question',
+                    'step': 'nps_collection',
+                    'progress': 20,
+                    'is_complete': False
+                }
+            else:
+                # We already have NPS score from first response, move to step 2 logic
+                score = extracted['nps_score']
+                if score >= 9:
+                    return {
+                        'message': f"Wonderful! A {score} is fantastic. What specifically about FC inc made your experience so great?",
+                        'message_type': 'ai_question',
+                        'step': 'nps_reasoning',
+                        'progress': 40,
+                        'is_complete': False
+                    }
+                elif score >= 7:
+                    return {
+                        'message': f"Thanks for the {score}! What would it take to make you even more likely to recommend FC inc?",
+                        'message_type': 'ai_question',
+                        'step': 'nps_reasoning',
+                        'progress': 40,
+                        'is_complete': False
+                    }
+                else:
+                    return {
+                        'message': f"I appreciate your honesty with the {score}. What are the main issues that are holding you back from recommending FC inc?",
+                        'message_type': 'ai_question',
+                        'step': 'nps_reasoning',
+                        'progress': 40,
+                        'is_complete': False
+                    }
         
         elif self.step_count == 2:
             # Second question: NPS reasoning based on score
