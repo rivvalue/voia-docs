@@ -66,8 +66,8 @@ def get_dashboard_data():
             for row in high_risk_responses
         ]
         
-        # Growth opportunities summary
-        growth_opportunities = []
+        # Growth opportunities summary - grouped by company
+        growth_opportunities_by_company = {}
         responses_with_opportunities = SurveyResponse.query.filter(
             SurveyResponse.growth_opportunities.isnot(None)
         ).all()
@@ -76,15 +76,27 @@ def get_dashboard_data():
             if response.growth_opportunities:
                 try:
                     opportunities = json.loads(response.growth_opportunities)
+                    company_name = response.company_name
+                    
+                    if company_name not in growth_opportunities_by_company:
+                        growth_opportunities_by_company[company_name] = []
+                    
                     for opp in opportunities:
-                        growth_opportunities.append({
-                            'company_name': response.company_name,
+                        growth_opportunities_by_company[company_name].append({
                             'type': opp.get('type', 'unknown'),
                             'description': opp.get('description', ''),
                             'action': opp.get('action', '')
                         })
                 except json.JSONDecodeError:
                     continue
+        
+        # Convert to list format for frontend
+        growth_opportunities = []
+        for company_name, opportunities in growth_opportunities_by_company.items():
+            growth_opportunities.append({
+                'company_name': company_name,
+                'opportunities': opportunities
+            })
         
         # Key themes aggregation
         all_themes = {}

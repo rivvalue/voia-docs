@@ -203,6 +203,8 @@ The system uses a single main entity `SurveyResponse` that stores:
 - July 06, 2025: Enhanced survey specificity - updated service questions to "FC inc Service Delivery & Support" for more relevant feedback
 - July 06, 2025: Improved churn risk display - replaced confusing percentages with clear categorical levels (Minimal, Low, Medium, High)
 - July 06, 2025: Fixed survey form validation - added required validation for step 3 ratings to ensure service and satisfaction data is collected
+- July 06, 2025: Updated dashboard high-risk account filtering to use categorical risk levels instead of percentage thresholds for accurate classification
+- July 06, 2025: Enhanced growth opportunities display by grouping them by company name for better organization and readability
 
 ## User Preferences
 

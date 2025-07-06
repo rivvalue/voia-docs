@@ -306,23 +306,27 @@ function populateHighRiskAccounts() {
 
 function populateGrowthOpportunities() {
     const container = document.getElementById('growthOpportunities');
-    const opportunities = dashboardData.growth_opportunities || [];
+    const companiesWithOpportunities = dashboardData.growth_opportunities || [];
     
-    if (opportunities.length === 0) {
+    if (companiesWithOpportunities.length === 0) {
         container.innerHTML = '<p class="text-muted">No growth opportunities identified.</p>';
         return;
     }
     
-    const html = opportunities.map(opp => `
-        <div class="opportunity-card p-3 mb-3 rounded">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <h6 class="mb-1">${opp.company_name}</h6>
-                    <p class="mb-2">${opp.description}</p>
-                    <small class="text-muted">${opp.action}</small>
+    const html = companiesWithOpportunities.map(company => `
+        <div class="company-opportunities-card p-3 mb-4 rounded" style="border: 1px solid #BDBDBD;">
+            <h6 class="mb-3" style="color: #E13A44; font-weight: bold;">${company.company_name}</h6>
+            ${company.opportunities.map(opp => `
+                <div class="opportunity-card p-2 mb-2 rounded" style="background-color: #E9E8E4; border-left: 3px solid #E13A44;">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="mb-1" style="color: #000000;">${opp.description}</p>
+                            <small class="text-muted">${opp.action}</small>
+                        </div>
+                        <span class="badge bg-primary">${opp.type}</span>
+                    </div>
                 </div>
-                <span class="badge bg-primary">${opp.type}</span>
-            </div>
+            `).join('')}
         </div>
     `).join('');
     
