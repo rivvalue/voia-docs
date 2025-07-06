@@ -43,8 +43,9 @@ function validateCurrentStep() {
             const companyName = document.getElementById('companyName').value.trim();
             const respondentName = document.getElementById('respondentName').value.trim();
             const respondentEmail = document.getElementById('respondentEmail').value.trim();
+            const tenureWithFc = document.getElementById('tenureWithFc').value;
             
-            if (!companyName || !respondentName || !respondentEmail) {
+            if (!companyName || !respondentName || !respondentEmail || !tenureWithFc) {
                 alert('Please fill in all required fields.');
                 return false;
             }
