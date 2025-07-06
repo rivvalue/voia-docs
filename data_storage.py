@@ -135,6 +135,14 @@ def get_dashboard_data():
             SurveyResponse.pricing_rating.isnot(None)
         ).scalar() or 0
         
+        # Tenure distribution
+        tenure_distribution = db.session.query(
+            SurveyResponse.tenure_with_fc,
+            func.count(SurveyResponse.id).label('count')
+        ).filter(
+            SurveyResponse.tenure_with_fc.isnot(None)
+        ).group_by(SurveyResponse.tenure_with_fc).all()
+        
         return {
             'total_responses': total_responses,
             'nps_score': round(nps_score, 1),
@@ -158,7 +166,11 @@ def get_dashboard_data():
                 'product_value': round(avg_product_value, 1),
                 'service': round(avg_service, 1),
                 'pricing': round(avg_pricing, 1)
-            }
+            },
+            'tenure_distribution': [
+                {'tenure': row.tenure_with_fc, 'count': row.count}
+                for row in tenure_distribution
+            ]
         }
         
     except Exception as e:

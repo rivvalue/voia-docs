@@ -44,6 +44,7 @@ function populateDashboard() {
     createSentimentChart();
     createRatingsChart();
     createThemesChart();
+    createTenureChart();
     
     // Populate high risk accounts
     populateHighRiskAccounts();
@@ -271,6 +272,56 @@ function createThemesChart() {
                     },
                     grid: {
                         color: '#E9E8E4'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createTenureChart() {
+    const ctx = document.getElementById('tenureChart').getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (charts.tenure) {
+        charts.tenure.destroy();
+    }
+    
+    if (!dashboardData.tenure_distribution || dashboardData.tenure_distribution.length === 0) {
+        ctx.canvas.parentNode.innerHTML = '<div class="alert alert-info">No tenure data available yet. This will populate as surveys are completed.</div>';
+        return;
+    }
+    
+    const labels = dashboardData.tenure_distribution.map(item => item.tenure);
+    const data = dashboardData.tenure_distribution.map(item => item.count);
+    
+    charts.tenure = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Customers',
+                data: data,
+                backgroundColor: [
+                    '#E13A44',
+                    '#BDBDBD', 
+                    '#E9E8E4',
+                    '#000000',
+                    '#FFFFFF'
+                ],
+                borderColor: '#FFFFFF',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#000000',
+                        padding: 20
                     }
                 }
             }
