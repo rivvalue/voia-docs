@@ -90,13 +90,14 @@ def get_dashboard_data():
                 except json.JSONDecodeError:
                     continue
         
-        # Convert to list format for frontend
+        # Convert to list format for frontend - only include companies with actual opportunities
         growth_opportunities = []
         for company_name, opportunities in growth_opportunities_by_company.items():
-            growth_opportunities.append({
-                'company_name': company_name,
-                'opportunities': opportunities
-            })
+            if opportunities:  # Only add if there are actual opportunities
+                growth_opportunities.append({
+                    'company_name': company_name,
+                    'opportunities': opportunities
+                })
         
         # Key themes aggregation
         all_themes = {}

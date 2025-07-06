@@ -313,22 +313,37 @@ function populateGrowthOpportunities() {
         return;
     }
     
-    const html = companiesWithOpportunities.map(company => `
-        <div class="company-opportunities-card p-3 mb-4 rounded" style="border: 1px solid #BDBDBD;">
-            <h6 class="mb-3" style="color: #E13A44; font-weight: bold;">${company.company_name}</h6>
-            ${company.opportunities.map(opp => `
-                <div class="opportunity-card p-2 mb-2 rounded" style="background-color: #E9E8E4; border-left: 3px solid #E13A44;">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="mb-1" style="color: #000000;">${opp.description}</p>
-                            <small class="text-muted">${opp.action}</small>
+    const html = companiesWithOpportunities.map(company => {
+        // Ensure company has a name and opportunities array
+        const companyName = company.company_name || 'Unknown Company';
+        const opportunities = company.opportunities || [];
+        
+        if (opportunities.length === 0) {
+            return ''; // Skip companies with no opportunities
+        }
+        
+        return `
+            <div class="company-opportunities-card p-3 mb-4 rounded" style="border: 1px solid #BDBDBD;">
+                <h6 class="mb-3" style="color: #E13A44; font-weight: bold;">${companyName}</h6>
+                ${opportunities.map(opp => `
+                    <div class="opportunity-card p-2 mb-2 rounded" style="background-color: #E9E8E4; border-left: 3px solid #E13A44;">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="mb-1" style="color: #000000;">${opp.description || 'No description available'}</p>
+                                <small class="text-muted">${opp.action || 'No action specified'}</small>
+                            </div>
+                            <span class="badge bg-primary">${opp.type || 'unknown'}</span>
                         </div>
-                        <span class="badge bg-primary">${opp.type}</span>
                     </div>
-                </div>
-            `).join('')}
-        </div>
-    `).join('');
+                `).join('')}
+            </div>
+        `;
+    }).filter(html => html !== '').join(''); // Remove empty entries
+    
+    if (html === '') {
+        container.innerHTML = '<p class="text-muted">No growth opportunities identified.</p>';
+        return;
+    }
     
     container.innerHTML = html;
 }
