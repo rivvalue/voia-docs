@@ -202,6 +202,7 @@ The system uses a single main entity `SurveyResponse` that stores:
 - July 06, 2025: Added tenure dimension - captures business relationship duration with FC inc for enhanced analysis
 - July 06, 2025: Enhanced survey specificity - updated service questions to "FC inc Service Delivery & Support" for more relevant feedback
 - July 06, 2025: Improved churn risk display - replaced confusing percentages with clear categorical levels (Minimal, Low, Medium, High)
+- July 06, 2025: Fixed survey form validation - added required validation for step 3 ratings to ensure service and satisfaction data is collected
 
 ## User Preferences
 

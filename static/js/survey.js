@@ -66,6 +66,17 @@ function validateCurrentStep() {
             }
             selectedNpsScore = parseInt(npsScore.value);
             break;
+            
+        case 3:
+            // Validate that at least satisfaction and service ratings are filled
+            const satisfactionRating = document.getElementById('satisfactionRating').value;
+            const serviceRating = document.getElementById('serviceRating').value;
+            
+            if (!satisfactionRating || !serviceRating) {
+                alert('Please provide ratings for satisfaction and FC inc service delivery.');
+                return false;
+            }
+            break;
     }
     
     return true;
