@@ -63,6 +63,11 @@ class AIConversationalSurvey:
         # Increment step count BEFORE generating next question
         self.step_count += 1
         
+        # Debug print
+        print(f"Step {self.step_count}: User said: '{user_input}'")
+        print(f"Extracted data: {extracted}")
+        print(f"Full extracted data: {self.extracted_data}")
+        
         # Generate next AI question using updated data
         next_question = self._generate_ai_question(user_input, context)
         
@@ -163,7 +168,10 @@ Only include fields that are clearly present in the response. If a field is not 
             r'([0-9]|10)\s*(?:out of 10|/10)',
             r'(?:i.*d.*say|i.*d.*give|i.*d.*rate).*?([0-9]|10)',
             r'(?:probably|maybe|around|about).*?([0-9]|10)',
-            r'\b([0-9]|10)\b(?!\d)'  # Standalone number not part of larger number
+            r'\b([0-9]|10)\b(?!\d)',  # Standalone number not part of larger number
+            r'([0-9]|10)',  # Any single digit or 10 in the text
+            r'(?:is|was|would be|rating|score).*?([0-9]|10)',
+            r'([0-9]|10)(?:\s*(?:stars?|points?|rating))?'  # Number followed by optional unit
         ]
         
         for pattern in nps_patterns:
@@ -325,6 +333,21 @@ Be conversational, empathetic, and adaptive to their communication style."""
         
         elif self.step_count == 2:
             # Second question: NPS reasoning based on score
+            # First try to extract score from the most recent response again
+            if extracted.get('nps_score') is None:
+                # Try to find NPS score from the last user response 
+                last_response = self.conversation_history[-1].get('message', '') if self.conversation_history else ''
+                nps_found = self._extract_nps_from_history()
+                if nps_found is not None:
+                    extracted['nps_score'] = nps_found
+                    if nps_found >= 9:
+                        extracted['nps_category'] = 'Promoter'
+                    elif nps_found >= 7:
+                        extracted['nps_category'] = 'Passive'
+                    else:
+                        extracted['nps_category'] = 'Detractor'
+                    self.extracted_data.update(extracted)
+            
             if extracted.get('nps_score') is not None:
                 score = extracted['nps_score']
                 if score >= 9:
@@ -352,13 +375,25 @@ Be conversational, empathetic, and adaptive to their communication style."""
                         'is_complete': False
                     }
             else:
-                return {
-                    'message': f"Could you help me understand your experience better?",
-                    'message_type': 'ai_question',
-                    'step': 'experience_details',
-                    'progress': 40,
-                    'is_complete': False
-                }
+                # If no NPS score detected, ask for it once more, but don't repeat after this
+                if not hasattr(self, '_nps_asked_twice'):
+                    self._nps_asked_twice = True
+                    return {
+                        'message': "I'd like to get your recommendation score for FC inc. On a scale of 0-10, how likely are you to recommend them?",
+                        'message_type': 'ai_question',
+                        'step': 'nps_retry',
+                        'progress': 30,
+                        'is_complete': False
+                    }
+                else:
+                    # Move on even without NPS score
+                    return {
+                        'message': f"Could you help me understand your experience with FC inc better?",
+                        'message_type': 'ai_question',
+                        'step': 'experience_details',
+                        'progress': 40,
+                        'is_complete': False
+                    }
         
         elif self.step_count == 3:
             # Third question: Satisfaction rating
