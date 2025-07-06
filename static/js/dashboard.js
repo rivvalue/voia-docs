@@ -308,23 +308,15 @@ function populateGrowthOpportunities() {
     const container = document.getElementById('growthOpportunities');
     const companiesWithOpportunities = dashboardData.growth_opportunities || [];
     
-    // Debug logging
-    console.log('Growth opportunities data:', companiesWithOpportunities);
-    
     if (companiesWithOpportunities.length === 0) {
         container.innerHTML = '<p class="text-muted">No growth opportunities identified.</p>';
         return;
     }
     
     const html = companiesWithOpportunities.map(company => {
-        // Debug logging for each company
-        console.log('Processing company:', company);
-        
         // Ensure company has a name and opportunities array
         const companyName = company.company_name || 'Unknown Company';
         const opportunities = company.opportunities || [];
-        
-        console.log('Company name:', companyName, 'Opportunities count:', opportunities.length);
         
         if (opportunities.length === 0) {
             return ''; // Skip companies with no opportunities
@@ -333,20 +325,17 @@ function populateGrowthOpportunities() {
         return `
             <div class="company-opportunities-card p-3 mb-4 rounded" style="border: 1px solid #BDBDBD;">
                 <h6 class="mb-3" style="color: #E13A44; font-weight: bold;">${companyName}</h6>
-                ${opportunities.map(opp => {
-                    console.log('Processing opportunity:', opp);
-                    return `
-                        <div class="opportunity-card p-2 mb-2 rounded" style="background-color: #E9E8E4; border-left: 3px solid #E13A44;">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <p class="mb-1" style="color: #000000;">${opp.description || 'No description available'}</p>
-                                    <small class="text-muted">${opp.action || 'No action specified'}</small>
-                                </div>
-                                <span class="badge bg-primary">${opp.type || 'unknown'}</span>
+                ${opportunities.map(opp => `
+                    <div class="opportunity-card p-2 mb-2 rounded" style="background-color: #E9E8E4; border-left: 3px solid #E13A44;">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="mb-1" style="color: #000000;">${opp.description || 'No description available'}</p>
+                                <small class="text-muted">${opp.action || 'No action specified'}</small>
                             </div>
+                            <span class="badge bg-primary">${opp.type || 'unknown'}</span>
                         </div>
-                    `;
-                }).join('')}
+                    </div>
+                `).join('')}
             </div>
         `;
     }).filter(html => html !== '').join(''); // Remove empty entries

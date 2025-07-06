@@ -205,6 +205,8 @@ The system uses a single main entity `SurveyResponse` that stores:
 - July 06, 2025: Fixed survey form validation - added required validation for step 3 ratings to ensure service and satisfaction data is collected
 - July 06, 2025: Updated dashboard high-risk account filtering to use categorical risk levels instead of percentage thresholds for accurate classification
 - July 06, 2025: Enhanced growth opportunities display by grouping them by company name for better organization and readability
+- July 06, 2025: Enhanced churn risk detection to include high-risk language like "burden", "caused us", "credits", "compensation" for more accurate risk assessment
+- July 06, 2025: Fixed Chart.js CDN source map error and cleaned up dashboard JavaScript debugging code
 
 ## User Preferences
 

@@ -156,6 +156,27 @@ def assess_churn_risk(response, text):
     """Assess churn risk based on NPS score and feedback"""
     risk_factors = []
     risk_points = 0
+    text_lower = text.lower()
+    
+    # Check for explicit churn mentions first - these trigger immediate high risk
+    churn_keywords = ['churn', 'leave', 'switch', 'competitor', 'cancel', 'terminate', 'discontinue', 'end relationship', 'looking elsewhere', 'considering alternatives']
+    
+    # Additional high-risk indicators
+    high_risk_phrases = ['burden', 'caused us', 'issues caused', 'problems caused', 'damage', 'compensation', 'credits', 'refund', 'reimburse', 'waste of money', 'terrible experience', 'worst', 'useless', 'broken', 'unreliable', 'fed up', 'frustrated', 'disappointed', 'unacceptable']
+    
+    churn_detected = any(keyword in text_lower for keyword in churn_keywords)
+    high_risk_detected = any(phrase in text_lower for phrase in high_risk_phrases)
+    
+    if churn_detected or high_risk_detected:
+        risk_points += 5  # Immediately trigger high risk
+        if churn_detected:
+            risk_factors.append("Explicit churn indicators detected in feedback")
+        if high_risk_detected:
+            risk_factors.append("High-risk language indicating severe dissatisfaction")
+    
+    if churn_detected:
+        risk_points += 5  # Immediately trigger high risk
+        risk_factors.append("Explicit churn indicators detected in feedback")
     
     # Base risk from NPS score
     if response.nps_score <= 6:
