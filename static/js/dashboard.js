@@ -351,6 +351,7 @@ function loadSurveyResponses() {
                 return `
                     <tr>
                         <td>${response.company_name}</td>
+                        <td>${response.tenure_with_fc || 'N/A'}</td>
                         <td>
                             <span class="badge ${response.nps_score >= 9 ? 'bg-success' : 
                                                 response.nps_score >= 7 ? 'bg-warning' : 'bg-danger'}">
@@ -372,7 +373,7 @@ function loadSurveyResponses() {
         .catch(error => {
             console.error('Error loading survey responses:', error);
             document.getElementById('responsesTable').innerHTML = 
-                '<tr><td colspan="6" class="text-center text-danger">Error loading responses.</td></tr>';
+                '<tr><td colspan="7" class="text-center text-danger">Error loading responses.</td></tr>';
         });
 }
 
