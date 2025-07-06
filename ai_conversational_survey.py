@@ -82,7 +82,7 @@ class AIConversationalSurvey:
     
     def _generate_welcome_message(self, company_name: str, respondent_name: str) -> str:
         """Generate personalized welcome message"""
-        return f"Hi {respondent_name}! I'm here to gather your feedback about {company_name}. This will be a quick conversation to understand your experience and help us improve our service. Let's start - on a scale of 0-10, how likely are you to recommend {company_name} to a friend or colleague?"
+        return f"Hi {respondent_name}! I'm here to gather your feedback about FC inc. This will be a quick conversation to understand your experience and help improve their service. Let's start - on a scale of 0-10, how likely are you to recommend FC inc to a friend or colleague?"
     
     def _extract_survey_data_with_ai(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
         """Extract structured survey data from natural language using OpenAI"""
@@ -227,7 +227,7 @@ Only include fields that are clearly present in the response. If a field is not 
             # Format conversation history for context
             history_text = self._format_conversation_history()
             
-            prompt = f"""You are conducting a customer feedback survey for {context.get('company_name', 'our company')}. 
+            prompt = f"""You are conducting a customer feedback survey about FC inc (the supplier company). 
 
 CONVERSATION HISTORY:
 {history_text}
@@ -239,12 +239,12 @@ SURVEY DATA COLLECTED SO FAR:
 
 CONVERSATION STEP: {self.step_count}
 
-YOUR ROLE: You are a helpful customer feedback specialist having a natural conversation. Your goal is to collect:
-1. NPS score (0-10) - How likely to recommend
-2. Reason for their NPS score
-3. Satisfaction level (1-5) - Overall satisfaction
-4. Improvement suggestions - What could be better
-5. Additional feedback - Any other comments
+YOUR ROLE: You are a helpful customer feedback specialist having a natural conversation. Your goal is to collect feedback about FC inc:
+1. NPS score (0-10) - How likely to recommend FC inc
+2. Reason for their NPS score about FC inc
+3. Satisfaction level (1-5) - Overall satisfaction with FC inc
+4. Improvement suggestions - What could FC inc do better
+5. Additional feedback - Any other comments about FC inc
 
 GUIDELINES:
 - Keep the conversation natural and engaging
@@ -314,9 +314,9 @@ Be conversational, empathetic, and adaptive to their communication style."""
         
         # Use step-based progression instead of data-based to avoid loops
         if self.step_count == 1:
-            # First question: Always ask for NPS if we don't have it
+            # First question: Always ask for NPS about FC inc (the supplier)
             return {
-                'message': f"On a scale of 0-10, how likely are you to recommend {company_name} to a friend or colleague?",
+                'message': "On a scale of 0-10, how likely are you to recommend FC inc to a friend or colleague?",
                 'message_type': 'ai_question',
                 'step': 'nps_collection',
                 'progress': 20,
@@ -329,7 +329,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 score = extracted['nps_score']
                 if score >= 9:
                     return {
-                        'message': f"Wonderful! A {score} is fantastic. What specifically about {company_name} made your experience so great?",
+                        'message': f"Wonderful! A {score} is fantastic. What specifically about FC inc made your experience so great?",
                         'message_type': 'ai_question',
                         'step': 'nps_reasoning',
                         'progress': 40,
@@ -337,7 +337,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                     }
                 elif score >= 7:
                     return {
-                        'message': f"Thanks for the {score}! What would it take to make you even more likely to recommend us?",
+                        'message': f"Thanks for the {score}! What would it take to make you even more likely to recommend FC inc?",
                         'message_type': 'ai_question',
                         'step': 'nps_reasoning',
                         'progress': 40,
@@ -345,7 +345,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                     }
                 else:
                     return {
-                        'message': f"I appreciate your honesty with the {score}. What are the main issues that are holding you back from recommending us?",
+                        'message': f"I appreciate your honesty with the {score}. What are the main issues that are holding you back from recommending FC inc?",
                         'message_type': 'ai_question',
                         'step': 'nps_reasoning',
                         'progress': 40,
@@ -363,7 +363,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
         elif self.step_count == 3:
             # Third question: Satisfaction rating
             return {
-                'message': "How would you describe your overall satisfaction with our service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
+                'message': "How would you describe your overall satisfaction with FC inc's service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
                 'message_type': 'ai_question',
                 'step': 'satisfaction',
                 'progress': 60,
@@ -374,7 +374,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
             # Fourth question: Improvement suggestions
             if extracted.get('nps_score', 0) < 7:
                 return {
-                    'message': "What specific changes would make the biggest difference in improving your experience?",
+                    'message': "What specific changes would make the biggest difference in improving your experience with FC inc?",
                     'message_type': 'ai_question',
                     'step': 'improvement',
                     'progress': 80,
@@ -382,7 +382,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 }
             else:
                 return {
-                    'message': "Is there anything we could do even better to enhance your experience?",
+                    'message': "Is there anything FC inc could do even better to enhance your experience?",
                     'message_type': 'ai_question',
                     'step': 'improvement',
                     'progress': 80,
@@ -392,7 +392,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
         # Step 5 or higher: Complete the survey
         else:
             return {
-                'message': "Thank you so much for sharing your valuable feedback! Your insights help us improve our service for everyone.",
+                'message': "Thank you so much for sharing your valuable feedback about FC inc! Your insights help improve their service for everyone.",
                 'message_type': 'conclusion',
                 'step': 'conclusion',
                 'progress': 100,

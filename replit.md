@@ -196,6 +196,8 @@ The system uses a single main entity `SurveyResponse` that stores:
 - July 03, 2025: Performance optimization for 500+ concurrent users - PostgreSQL migration, async processing, rate limiting, monitoring
 - July 03, 2025: Security implementation - JWT authentication, duplicate prevention, audit trails
 - July 04, 2025: AI conversational surveys - OpenAI integration, natural language processing, Rivvalue branding
+- July 06, 2025: Fixed conversational survey loops and data transfer issues - now fully functional end-to-end
+- July 06, 2025: Updated survey questions to reference "FC inc" as supplier instead of participant's company
 
 ## User Preferences
 
