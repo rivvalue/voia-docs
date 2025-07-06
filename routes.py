@@ -455,8 +455,9 @@ def finalize_conversation():
         if not conversation_id:
             return jsonify({'error': 'Conversation ID is required'}), 400
         
-        # Add authenticated email to survey data
+        # Add authenticated email and conversation ID to survey data
         survey_data['respondent_email'] = g.authenticated_email
+        survey_data['conversation_id'] = conversation_id
         survey_data['conversation_history'] = json.dumps(messages)
         
         # Convert conversational data to structured survey format
