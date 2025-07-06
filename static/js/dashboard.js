@@ -295,7 +295,7 @@ function populateHighRiskAccounts() {
                     <small class="text-muted">NPS Score: ${account.nps_score}</small>
                 </div>
                 <div class="text-end">
-                    <span class="badge bg-danger">${Math.round(account.risk_score * 100)}% Risk</span>
+                    <span class="badge bg-danger">${account.risk_level || 'High'} Risk</span>
                 </div>
             </div>
         </div>

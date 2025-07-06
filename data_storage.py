@@ -51,14 +51,19 @@ def get_dashboard_data():
             SurveyResponse.churn_risk_score.isnot(None)
         ).order_by(SurveyResponse.churn_risk_score.desc()).all()
         
-        # High risk accounts (risk score > 0.6)
+        # High risk accounts - updated to use new categorical system
+        high_risk_responses = SurveyResponse.query.filter(
+            SurveyResponse.churn_risk_level.in_(['High'])
+        ).all()
+        
         high_risk_accounts = [
             {
                 'company_name': row.company_name,
+                'risk_level': row.churn_risk_level,
                 'risk_score': row.churn_risk_score,
                 'nps_score': row.nps_score
             }
-            for row in churn_risk_data if row.churn_risk_score > 0.6
+            for row in high_risk_responses
         ]
         
         # Growth opportunities summary
