@@ -333,6 +333,8 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 }
             else:
                 # We already have NPS score from first response, move to step 2 logic
+                # But increment step count to 2 so next time it goes to step 3 
+                self.step_count = 2
                 score = extracted['nps_score']
                 if score >= 9:
                     return {
@@ -360,68 +362,16 @@ Be conversational, empathetic, and adaptive to their communication style."""
                     }
         
         elif self.step_count == 2:
-            # Second question: NPS reasoning based on score
-            # First try to extract score from the most recent response again
-            if extracted.get('nps_score') is None:
-                # Try to find NPS score from the last user response 
-                last_response = self.conversation_history[-1].get('message', '') if self.conversation_history else ''
-                nps_found = self._extract_nps_from_history()
-                if nps_found is not None:
-                    extracted['nps_score'] = nps_found
-                    if nps_found >= 9:
-                        extracted['nps_category'] = 'Promoter'
-                    elif nps_found >= 7:
-                        extracted['nps_category'] = 'Passive'
-                    else:
-                        extracted['nps_category'] = 'Detractor'
-                    self.extracted_data.update(extracted)
-            
-            if extracted.get('nps_score') is not None:
-                score = extracted['nps_score']
-                if score >= 9:
-                    return {
-                        'message': f"Wonderful! A {score} is fantastic. What specifically about FC inc made your experience so great?",
-                        'message_type': 'ai_question',
-                        'step': 'nps_reasoning',
-                        'progress': 40,
-                        'is_complete': False
-                    }
-                elif score >= 7:
-                    return {
-                        'message': f"Thanks for the {score}! What would it take to make you even more likely to recommend FC inc?",
-                        'message_type': 'ai_question',
-                        'step': 'nps_reasoning',
-                        'progress': 40,
-                        'is_complete': False
-                    }
-                else:
-                    return {
-                        'message': f"I appreciate your honesty with the {score}. What are the main issues that are holding you back from recommending FC inc?",
-                        'message_type': 'ai_question',
-                        'step': 'nps_reasoning',
-                        'progress': 40,
-                        'is_complete': False
-                    }
-            else:
-                # If no NPS score detected, ask for it once more, but don't repeat after this
-                if not hasattr(self, '_nps_asked_twice'):
-                    self._nps_asked_twice = True
-                    return {
-                        'message': "I'd like to get your recommendation score for FC inc. On a scale of 0-10, how likely are you to recommend them?",
-                        'message_type': 'ai_question',
-                        'step': 'nps_retry',
-                        'progress': 30,
-                        'is_complete': False
-                    }
-                else:
-                    # Move on even without NPS score
-                    return {
-                        'message': f"Could you help me understand your experience with FC inc better?",
-                        'message_type': 'ai_question',
-                        'step': 'experience_details',
-                        'progress': 40,
-                        'is_complete': False
-                    }
+            # Second question: We should have already asked the NPS reasoning question
+            # This response is the user's answer to the NPS reasoning question
+            # Move to satisfaction question
+            return {
+                'message': "How would you describe your overall satisfaction with FC inc's service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
+                'message_type': 'ai_question',
+                'step': 'satisfaction',
+                'progress': 60,
+                'is_complete': False
+            }
         
         elif self.step_count == 3:
             # Third question: Satisfaction rating
