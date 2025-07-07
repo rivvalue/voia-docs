@@ -211,6 +211,7 @@ The system uses a single main entity `SurveyResponse` that stores:
 - July 06, 2025: Fixed sentiment analysis accuracy issue - replaced unreliable TextBlob with business-aware analysis, corrected 14 historical responses
 - July 06, 2025: Added tenure distribution visualization to dashboard - shows business relationship duration with FC inc for customer segmentation
 - July 07, 2025: Implemented NPS-based growth factor analysis using SaaS B2B lookup table - calculates organic growth potential from customer satisfaction
+- July 07, 2025: Enhanced conversational AI survey with separate questions for professional services quality, pricing appreciation, and support services following NPS and satisfaction questions
 
 ## User Preferences
 
