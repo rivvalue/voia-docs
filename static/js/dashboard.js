@@ -39,12 +39,17 @@ function populateDashboard() {
     document.getElementById('recentResponses').textContent = dashboardData.recent_responses || 0;
     document.getElementById('highRiskCount').textContent = dashboardData.high_risk_accounts?.length || 0;
     
+    // Growth potential as percentage
+    const growthPotential = dashboardData.growth_factor_analysis?.total_growth_potential || 0;
+    document.getElementById('growthPotential').textContent = Math.round(growthPotential * 100) + '%';
+    
     // Create charts
     createNpsChart();
     createSentimentChart();
     createRatingsChart();
     createThemesChart();
     createTenureChart();
+    createGrowthFactorChart();
     
     // Populate high risk accounts
     populateHighRiskAccounts();
@@ -322,6 +327,78 @@ function createTenureChart() {
                     labels: {
                         color: '#000000',
                         padding: 20
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createGrowthFactorChart() {
+    const ctx = document.getElementById('growthFactorChart').getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (charts.growthFactor) {
+        charts.growthFactor.destroy();
+    }
+    
+    if (!dashboardData.growth_factor_analysis || 
+        !dashboardData.growth_factor_analysis.distribution || 
+        dashboardData.growth_factor_analysis.distribution.length === 0) {
+        ctx.canvas.parentNode.innerHTML = '<div class="alert alert-info">No growth factor data available yet. This will populate as surveys are completed.</div>';
+        return;
+    }
+    
+    const distribution = dashboardData.growth_factor_analysis.distribution;
+    const labels = distribution.map(item => `${item.nps_range} (${item.growth_rate})`);
+    const data = distribution.map(item => item.count);
+    const colors = ['#E13A44', '#BDBDBD', '#E9E8E4', '#000000', '#FFFFFF'];
+    
+    charts.growthFactor = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Customers',
+                data: data,
+                backgroundColor: colors.slice(0, data.length),
+                borderColor: '#FFFFFF',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        afterLabel: function(context) {
+                            const item = distribution[context.dataIndex];
+                            return [`Growth Factor: ${item.avg_factor}`, `Expected Growth: ${item.growth_rate}`];
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#000000',
+                        stepSize: 1
+                    },
+                    grid: {
+                        color: '#E9E8E4'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: '#000000'
+                    },
+                    grid: {
+                        color: '#E9E8E4'
                     }
                 }
             }

@@ -1,5 +1,6 @@
 import json
 import os
+import csv
 from datetime import datetime
 from openai import OpenAI
 from textblob import TextBlob
@@ -43,6 +44,9 @@ def analyze_survey_response(response_id):
         # Identify growth opportunities
         growth_opportunities = identify_growth_opportunities(response, combined_text)
         
+        # Calculate growth factor based on NPS
+        growth_factor_data = calculate_growth_factor(response.nps_score)
+        
         # Update the response with analysis results
         response.sentiment_score = sentiment_data['score']
         response.sentiment_label = sentiment_data['label']
@@ -51,6 +55,9 @@ def analyze_survey_response(response_id):
         response.churn_risk_level = churn_analysis['risk_level']
         response.churn_risk_factors = json.dumps(churn_analysis['risk_factors'])
         response.growth_opportunities = json.dumps(growth_opportunities)
+        response.growth_factor = growth_factor_data['growth_factor']
+        response.growth_rate = growth_factor_data['growth_rate']
+        response.growth_range = growth_factor_data['range']
         response.analyzed_at = datetime.utcnow()
         
         db.session.commit()
@@ -358,3 +365,19 @@ def identify_growth_opportunities(response, text):
         logger.warning(f"AI growth opportunity identification failed: {e}")
     
     return opportunities
+
+def calculate_growth_factor(nps_score):
+    """Calculate growth factor based on NPS score using lookup table"""
+    if nps_score < 0:
+        return {'growth_rate': '0%', 'growth_factor': 0.0, 'range': '<0'}
+    elif 0 <= nps_score <= 29:
+        return {'growth_rate': '5%', 'growth_factor': 0.05, 'range': '0-29'}
+    elif 30 <= nps_score <= 49:
+        return {'growth_rate': '15%', 'growth_factor': 0.15, 'range': '30-49'}
+    elif 50 <= nps_score <= 69:
+        return {'growth_rate': '25%', 'growth_factor': 0.25, 'range': '50-69'}
+    elif 70 <= nps_score <= 100:
+        return {'growth_rate': '40%', 'growth_factor': 0.4, 'range': '70-100'}
+    else:
+        # Fallback for invalid scores
+        return {'growth_rate': '0%', 'growth_factor': 0.0, 'range': 'invalid'}

@@ -1,0 +1,6 @@
+NPS Range,Expected Organic Growth Rate (%),Growth Factor (for modeling)
+<0,0%,0.0
+0-29,5%,0.05
+30-49,15%,0.15
+50-69,25%,0.25
+70-100,40%,0.4

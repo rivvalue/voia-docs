@@ -143,6 +143,23 @@ def get_dashboard_data():
             SurveyResponse.tenure_with_fc.isnot(None)
         ).group_by(SurveyResponse.tenure_with_fc).all()
         
+        # Growth factor analysis
+        growth_factor_distribution = db.session.query(
+            SurveyResponse.growth_range,
+            SurveyResponse.growth_rate,
+            func.count(SurveyResponse.id).label('count'),
+            func.avg(SurveyResponse.growth_factor).label('avg_factor')
+        ).filter(
+            SurveyResponse.growth_factor.isnot(None)
+        ).group_by(SurveyResponse.growth_range, SurveyResponse.growth_rate).all()
+        
+        # Overall growth potential (weighted average)
+        total_growth_potential = db.session.query(
+            func.avg(SurveyResponse.growth_factor).label('avg_growth_factor')
+        ).filter(
+            SurveyResponse.growth_factor.isnot(None)
+        ).scalar() or 0
+        
         return {
             'total_responses': total_responses,
             'nps_score': round(nps_score, 1),
@@ -170,7 +187,19 @@ def get_dashboard_data():
             'tenure_distribution': [
                 {'tenure': row.tenure_with_fc, 'count': row.count}
                 for row in tenure_distribution
-            ]
+            ],
+            'growth_factor_analysis': {
+                'total_growth_potential': round(total_growth_potential, 2),
+                'distribution': [
+                    {
+                        'nps_range': row.growth_range, 
+                        'growth_rate': row.growth_rate,
+                        'count': row.count,
+                        'avg_factor': round(float(row.avg_factor), 2)
+                    }
+                    for row in growth_factor_distribution
+                ]
+            }
         }
         
     except Exception as e:
