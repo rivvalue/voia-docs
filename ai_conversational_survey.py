@@ -103,6 +103,7 @@ Extract any of the following data present in the response:
 - NPS score (0-10): Look for numbers, recommendations, likelihood scores
 - Satisfaction level (1-5): Look for satisfaction, happiness, contentment indicators
 - Service quality rating (1-5): Look for professional services, service delivery ratings
+- Product value rating (1-5): Look for product quality, solution value, deliverable satisfaction
 - Pricing rating (1-5): Look for pricing value, cost appreciation, pricing satisfaction
 - Support rating (1-5): Look for customer service, support quality, help desk ratings
 - Improvement suggestions: Any feedback about what could be better
@@ -117,6 +118,7 @@ Return ONLY JSON in this format:
     "nps_category": "Promoter/Passive/Detractor" or null,
     "satisfaction_rating": number or null,
     "service_rating": number or null,
+    "product_value_rating": number or null,
     "pricing_rating": number or null,
     "support_rating": number or null,
     "improvement_feedback": "text" or null,
@@ -214,6 +216,15 @@ Only include fields that are clearly present in the response. If a field is not 
             1: ['terrible service', 'awful service', 'horrible service', 'worst service', 'unacceptable service']
         }
         
+        # Product value keywords
+        product_keywords = {
+            5: ['excellent product', 'outstanding product', 'amazing product', 'perfect solution', 'superb deliverables'],
+            4: ['good product', 'quality product', 'solid solution', 'valuable deliverables', 'great outcome'],
+            3: ['average product', 'okay solution', 'standard deliverables', 'fair outcome', 'decent product'],
+            2: ['poor product', 'lacking solution', 'disappointing deliverables', 'subpar outcome', 'weak product'],
+            1: ['terrible product', 'awful solution', 'horrible deliverables', 'worst outcome', 'useless product']
+        }
+        
         # Pricing appreciation keywords
         pricing_keywords = {
             5: ['excellent value', 'outstanding value', 'great value', 'fantastic value', 'amazing value', 'perfect price'],
@@ -241,6 +252,12 @@ Only include fields that are clearly present in the response. If a field is not 
         for rating, keywords in service_keywords.items():
             if any(keyword in text_lower for keyword in keywords):
                 extracted['service_rating'] = rating
+                break
+        
+        # Extract product value ratings
+        for rating, keywords in product_keywords.items():
+            if any(keyword in text_lower for keyword in keywords):
+                extracted['product_value_rating'] = rating
                 break
         
         # Extract pricing ratings
@@ -303,10 +320,11 @@ YOUR ROLE: You are a helpful customer feedback specialist having a natural conve
 2. Reason for their NPS score about FC inc
 3. Satisfaction level (1-5) - Overall satisfaction with FC inc
 4. Professional services quality rating (1-5) - Quality of FC inc's professional services
-5. Pricing appreciation rating (1-5) - How they feel about FC inc's pricing value
-6. Support services rating (1-5) - Quality of FC inc's support and customer service
-7. Improvement suggestions - What could FC inc do better
-8. Additional feedback - Any other comments about FC inc
+5. Product value rating (1-5) - Value and quality of FC inc's products/solutions
+6. Pricing appreciation rating (1-5) - How they feel about FC inc's pricing value
+7. Support services rating (1-5) - Quality of FC inc's support and customer service
+8. Improvement suggestions - What could FC inc do better
+9. Additional feedback - Any other comments about FC inc
 
 GUIDELINES:
 - Keep the conversation natural and engaging
@@ -443,38 +461,48 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 'message': "How would you rate the quality of FC inc's professional services? Excellent, good, average, poor, or very poor?",
                 'message_type': 'ai_question',
                 'step': 'service_quality',
-                'progress': 55,
+                'progress': 50,
                 'is_complete': False
             }
         
         elif self.step_count == 5:
-            # Fifth question: Pricing appreciation rating
+            # Fifth question: Product value rating
             return {
-                'message': "How do you feel about FC inc's pricing? Do you find it excellent value, good value, fair, expensive, or very expensive?",
+                'message': "How would you rate the value and quality of FC inc's products or solutions? Excellent, good, average, poor, or very poor?",
                 'message_type': 'ai_question',
-                'step': 'pricing_value',
-                'progress': 65,
+                'step': 'product_value',
+                'progress': 60,
                 'is_complete': False
             }
         
         elif self.step_count == 6:
-            # Sixth question: Support services rating
+            # Sixth question: Pricing appreciation rating
             return {
-                'message': "How would you rate FC inc's support and customer service? Excellent, good, average, poor, or very poor?",
+                'message': "How do you feel about FC inc's pricing? Do you find it excellent value, good value, fair, expensive, or very expensive?",
                 'message_type': 'ai_question',
-                'step': 'support_quality',
-                'progress': 75,
+                'step': 'pricing_value',
+                'progress': 70,
                 'is_complete': False
             }
         
         elif self.step_count == 7:
-            # Seventh question: Improvement suggestions
+            # Seventh question: Support services rating
+            return {
+                'message': "How would you rate FC inc's support and customer service? Excellent, good, average, poor, or very poor?",
+                'message_type': 'ai_question',
+                'step': 'support_quality',
+                'progress': 80,
+                'is_complete': False
+            }
+        
+        elif self.step_count == 8:
+            # Eighth question: Improvement suggestions
             if extracted.get('nps_score', 0) < 7:
                 return {
                     'message': "What specific changes would make the biggest difference in improving your experience with FC inc?",
                     'message_type': 'ai_question',
                     'step': 'improvement',
-                    'progress': 85,
+                    'progress': 90,
                     'is_complete': False
                 }
             else:
@@ -482,11 +510,11 @@ Be conversational, empathetic, and adaptive to their communication style."""
                     'message': "Is there anything FC inc could do even better to enhance your experience?",
                     'message_type': 'ai_question',
                     'step': 'improvement',
-                    'progress': 85,
+                    'progress': 90,
                     'is_complete': False
                 }
         
-        # Step 8 or higher: Complete the survey
+        # Step 9 or higher: Complete the survey
         else:
             return {
                 'message': "Thank you so much for sharing your valuable feedback about FC inc! Your insights help improve their service for everyone.",
@@ -537,7 +565,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
             'satisfaction_rating': extracted.get('satisfaction_rating'),
             'service_rating': extracted.get('support_rating') or extracted.get('service_rating'),  # Support questions map to service_rating
             'pricing_rating': extracted.get('pricing_rating'),
-            'product_value_rating': extracted.get('pricing_rating'),  # Map pricing to product_value for DB compatibility
+            'product_value_rating': extracted.get('product_value_rating'),  # Product value rating
             'improvement_feedback': extracted.get('improvement_feedback'),
             'recommendation_reason': extracted.get('nps_reasoning'),
             'additional_comments': combined_feedback,
