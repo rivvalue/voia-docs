@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard Test</title>
+</head>
+<body>
+    <h1>Dashboard Test</h1>
+    <div id="test-result"></div>
+    
+    <script>
+        // Test the dashboard API
+        fetch('/api/dashboard_data')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('test-result').innerHTML = `
+                    <h2>✅ Dashboard API Working</h2>
+                    <p><strong>Total Responses:</strong> ${data.total_responses}</p>
+                    <p><strong>NPS Score:</strong> ${data.nps_score}</p>
+                    <p><strong>Growth Potential:</strong> ${data.growth_factor_analysis.total_growth_potential}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            })
+            .catch(error => {
+                document.getElementById('test-result').innerHTML = `
+                    <h2>❌ Dashboard API Error</h2>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                `;
+            });
+    </script>
+</body>
+</html>
