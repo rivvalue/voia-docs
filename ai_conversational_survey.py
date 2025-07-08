@@ -180,8 +180,9 @@ Only include fields that are clearly present in the response. If a field is not 
         # Extract NPS score - only if we're in the NPS collection step and don't have it yet
         import re
         
-        # Only extract NPS score if we're answering the NPS question (step_count will be 2 when processing NPS response)
-        if not self.extracted_data.get('nps_score') and self.step_count == 2:
+        # Only extract NPS score if we're answering the NPS question (step_count will be 2 or 3 when processing NPS response)
+        if not self.extracted_data.get('nps_score') and self.step_count in [2, 3]:
+            print(f"Attempting NPS extraction at step {self.step_count} for input: '{user_input}'")
             nps_patterns = [
                 r'(?:score|rating|give|rate).*?([0-9]|10)',
                 r'^([0-9]|10)(?:\s|$|/|,|\.)',
@@ -206,6 +207,7 @@ Only include fields that are clearly present in the response. If a field is not 
                             extracted['nps_category'] = 'Passive'
                         else:
                             extracted['nps_category'] = 'Detractor'
+                        print(f"Successfully extracted NPS score: {score}")
                         break
                 if 'nps_score' in extracted:
                     break
