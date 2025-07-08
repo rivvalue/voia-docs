@@ -534,7 +534,7 @@ function exportData() {
     // Check if user has admin token
     const token = localStorage.getItem('authToken');
     if (!token) {
-        alert('Admin authentication required. Please use the Admin Login button first.');
+        alert('Please log in as Admin first.');
         return;
     }
     
