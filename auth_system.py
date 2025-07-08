@@ -21,9 +21,9 @@ class AuthSystem:
         self.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key")
         self.token_expiry_hours = 24  # Tokens valid for 24 hours
         # Admin emails - can be set via environment variable or hardcoded
-        self.admin_emails = set(
-            os.environ.get("ADMIN_EMAILS", "admin@rivvalue.com").split(",")
-        )
+        admin_emails_str = os.environ.get("ADMIN_EMAILS", "admin@rivvalue.com")
+        self.admin_emails = set(email.strip().lower() for email in admin_emails_str.split(","))
+        logger.info(f"Admin emails configured: {self.admin_emails}")
     
     def generate_token(self, email, is_admin=False):
         """Generate a JWT token for an email address"""
@@ -32,6 +32,7 @@ class AuthSystem:
             # Check if email is in admin list
             if not is_admin:
                 is_admin = normalized_email in self.admin_emails
+                logger.info(f"Admin check for {normalized_email}: {is_admin} (admin_emails: {self.admin_emails})")
             
             payload = {
                 'email': normalized_email,
@@ -181,8 +182,15 @@ def require_admin_auth():
                     }), 401
                 
                 # Check if user is admin
-                if not payload.get('is_admin', False):
-                    email = payload.get('email', 'unknown')
+                email = payload.get('email', 'unknown')
+                is_admin_in_token = payload.get('is_admin', False)
+                
+                # Double-check admin status against current admin list
+                is_admin_verified = email in auth_system.admin_emails
+                
+                logger.info(f"Admin verification for {email}: token_admin={is_admin_in_token}, verified_admin={is_admin_verified}")
+                
+                if not is_admin_verified:
                     logger.warning(f"Non-admin access attempt to {request.endpoint} by {email}")
                     return jsonify({
                         'error': 'Admin access required',

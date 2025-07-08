@@ -548,10 +548,24 @@ function exportData() {
     .then(response => {
         if (response.status === 403) {
             alert('Admin access required. This feature is only available to administrators.');
+            // Clear invalid token
+            localStorage.removeItem('authToken');
+            // Reset admin button
+            const adminBtn = document.getElementById('adminLoginBtn');
+            adminBtn.innerHTML = '<i class="fas fa-key me-2"></i>Admin Login';
+            adminBtn.classList.remove('btn-success');
+            adminBtn.classList.add('btn-outline-secondary');
             return null;
         }
         if (response.status === 401) {
             alert('Authentication failed. Please log in with an admin account.');
+            // Clear invalid token
+            localStorage.removeItem('authToken');
+            // Reset admin button
+            const adminBtn = document.getElementById('adminLoginBtn');
+            adminBtn.innerHTML = '<i class="fas fa-key me-2"></i>Admin Login';
+            adminBtn.classList.remove('btn-success');
+            adminBtn.classList.add('btn-outline-secondary');
             return null;
         }
         if (!response.ok) {
