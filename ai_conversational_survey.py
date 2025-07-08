@@ -448,7 +448,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
 
         if self.step_count == 2:
             # Second question: Ask for NPS about FC inc (the supplier) ONLY if we don't have it
-            if extracted.get('nps_score') is None:
+            if self.extracted_data.get('nps_score') is None:
                 return {
                     'message': "On a scale of 0-10, how likely are you to recommend FC inc to a friend or colleague?",
                     'message_type': 'ai_question',
@@ -457,10 +457,14 @@ Be conversational, empathetic, and adaptive to their communication style."""
                     'is_complete': False
                 }
             else:
-                # We already have NPS score from first response, move to step 3 logic
-                # But increment step count to 3 so next time it goes to step 4
-                self.step_count = 3
-                score = extracted['nps_score']
+                # We already have NPS score from previous data, go to step 3 logic
+                pass  # Fall through to step 3 logic
+        
+        if self.step_count == 3:
+            # Check if we just got NPS score and need to ask reasoning question
+            if self.extracted_data.get('nps_score') is not None and extracted.get('nps_score') is not None:
+                # We just got the NPS score, ask for reasoning
+                score = self.extracted_data['nps_score']
                 if score >= 9:
                     return {
                         'message': f"Wonderful! A {score} is fantastic. What specifically about FC inc made your experience so great?",
@@ -485,41 +489,40 @@ Be conversational, empathetic, and adaptive to their communication style."""
                         'progress': 40,
                         'is_complete': False
                     }
-        
-        elif self.step_count == 3:
-            # Third question: We should have already asked the NPS reasoning question
-            # This response is the user's answer to the NPS reasoning question
-            # Move to satisfaction question
-            return {
-                'message': "How would you describe your overall satisfaction with FC inc's service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
-                'message_type': 'ai_question',
-                'step': 'satisfaction',
-                'progress': 40,
-                'is_complete': False
-            }
-        
-        elif self.step_count == 3:
-            # Third question: Overall satisfaction rating
-            return {
-                'message': "How would you describe your overall satisfaction with FC inc's service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
-                'message_type': 'ai_question',
-                'step': 'satisfaction',
-                'progress': 45,
-                'is_complete': False
-            }
+            else:
+                # Third question: We should have already asked the NPS reasoning question
+                # This response is the user's answer to the NPS reasoning question
+                # Move to satisfaction question
+                return {
+                    'message': "How would you describe your overall satisfaction with FC inc's service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
+                    'message_type': 'ai_question',
+                    'step': 'satisfaction',
+                    'progress': 40,
+                    'is_complete': False
+                }
         
         elif self.step_count == 4:
-            # Fourth question: Professional services quality rating
+            # Fourth question: Overall satisfaction rating
             return {
-                'message': "How would you rate the quality of FC inc's professional services? Excellent, good, average, poor, or very poor?",
+                'message': "How would you describe your overall satisfaction with FC inc's service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
                 'message_type': 'ai_question',
-                'step': 'service_quality',
+                'step': 'satisfaction',
                 'progress': 45,
                 'is_complete': False
             }
         
         elif self.step_count == 5:
-            # Fifth question: Product value rating
+            # Fifth question: Professional services quality rating
+            return {
+                'message': "How would you rate the quality of FC inc's professional services? Excellent, good, average, poor, or very poor?",
+                'message_type': 'ai_question',
+                'step': 'service_quality',
+                'progress': 50,
+                'is_complete': False
+            }
+        
+        elif self.step_count == 6:
+            # Sixth question: Product value rating
             return {
                 'message': "How would you rate the value and quality of FC inc's products or solutions? Excellent, good, average, poor, or very poor?",
                 'message_type': 'ai_question',
@@ -528,8 +531,8 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 'is_complete': False
             }
         
-        elif self.step_count == 6:
-            # Sixth question: Pricing appreciation rating
+        elif self.step_count == 7:
+            # Seventh question: Pricing appreciation rating
             return {
                 'message': "How do you feel about FC inc's pricing? Do you find it excellent value, good value, fair, expensive, or very expensive?",
                 'message_type': 'ai_question',
@@ -538,8 +541,8 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 'is_complete': False
             }
         
-        elif self.step_count == 7:
-            # Seventh question: Support services rating
+        elif self.step_count == 8:
+            # Eighth question: Support services rating
             return {
                 'message': "How would you rate FC inc's support and customer service? Excellent, good, average, poor, or very poor?",
                 'message_type': 'ai_question',
@@ -548,8 +551,8 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 'is_complete': False
             }
         
-        elif self.step_count == 8:
-            # Eighth question: Improvement suggestions
+        elif self.step_count == 9:
+            # Ninth question: Improvement suggestions
             if extracted.get('nps_score', 0) < 7:
                 return {
                     'message': "What specific changes would make the biggest difference in improving your experience with FC inc?",
@@ -567,7 +570,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                     'is_complete': False
                 }
         
-        # Step 9 or higher: Complete the survey
+        # Step 10 or higher: Complete the survey
         else:
             return {
                 'message': "Thank you so much for sharing your valuable feedback about FC inc! Your insights help improve their service for everyone.",
