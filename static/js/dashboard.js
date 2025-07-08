@@ -534,7 +534,7 @@ function exportData() {
     // Check if user has admin token
     const token = localStorage.getItem('authToken');
     if (!token) {
-        alert('Please log in as Admin first.');
+        alert('Download is only available to admin users. Please log in as Admin first.');
         return;
     }
     
