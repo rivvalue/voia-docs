@@ -17,12 +17,21 @@ class AIConversationalSurvey:
         
     def start_conversation(self, company_name: str, respondent_name: str) -> Dict[str, Any]:
         """Start a new AI-powered conversational survey"""
+        # Preserve any pre-populated extracted_data (like tenure from form)
+        existing_extracted_data = self.extracted_data.copy() if hasattr(self, 'extracted_data') else {}
+        
         self.survey_data = {
             'company_name': company_name,
             'respondent_name': respondent_name,
             'conversation_history': [],
-            'extracted_data': {}
+            'extracted_data': existing_extracted_data
         }
+        
+        # Update extracted_data reference to survey_data for consistency
+        self.extracted_data = self.survey_data['extracted_data']
+        
+        # Debug logging
+        print(f"Starting conversation with pre-populated data: {self.extracted_data}")
         
         welcome_message = self._generate_welcome_message(company_name, respondent_name)
         

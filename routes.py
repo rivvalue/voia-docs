@@ -405,6 +405,9 @@ def start_conversation():
         if not company_name or not respondent_name or not respondent_email or not tenure_with_fc:
             return jsonify({'error': 'All fields are required'}), 400
         
+        # Debug logging
+        logger.info(f"Starting conversation for {respondent_name} with tenure: {tenure_with_fc}")
+        
         # Start conversation with AI, passing the tenure data
         conversation_response = start_ai_conversational_survey(company_name, respondent_name, tenure_with_fc)
         
