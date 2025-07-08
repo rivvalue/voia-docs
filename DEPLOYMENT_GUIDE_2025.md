@@ -7,9 +7,10 @@ This deployment guide includes all recent enhancements and optimizations for the
 - **Voxa Conversational AI**: Advanced conversational surveys with natural language processing
 - **Complete Rating System**: NPS, satisfaction, professional services, product value, pricing, and support ratings
 - **Business Relationship Analysis**: Tenure tracking and growth factor analysis using SaaS B2B lookup tables
-- **Enhanced Security**: JWT-based authentication with duplicate prevention
+- **Enhanced Security**: JWT-based authentication with duplicate prevention and admin access control
 - **Performance Optimization**: Supports 500+ concurrent users with PostgreSQL and async processing
 - **Risk Assessment**: Advanced churn risk categorization with business-aware sentiment analysis
+- **Admin Authentication**: Secure export functionality with email-based admin verification
 
 ## System Requirements
 
@@ -36,6 +37,9 @@ SESSION_SECRET=your-secure-session-secret-key
 
 # AI Services
 OPENAI_API_KEY=your-openai-api-key
+
+# Admin Access Configuration
+ADMIN_EMAILS=admin@rivvalue.com,admin2@rivvalue.com
 
 # PostgreSQL (Auto-configured in production)
 PGHOST=localhost
@@ -229,12 +233,41 @@ Includes SaaS B2B lookup table for NPS-based growth calculations:
 - Rate limiting (10 submissions/min per IP)
 - Duplicate response prevention
 - Audit trails for all authentication activities
+- Admin access control with email verification
+- Secure export functionality with double authentication
 
 ### 4. Performance Optimization
 - PostgreSQL with connection pooling
 - Async background task queue (3 workers)
 - Database indexing on key fields
 - API pagination for large datasets
+
+## Admin Access Configuration
+
+### Setting Up Admin Users
+The platform includes secure admin authentication for export functionality:
+
+1. **Configure Admin Emails**: Set the `ADMIN_EMAILS` environment variable
+   ```bash
+   ADMIN_EMAILS=admin@rivvalue.com,admin2@rivvalue.com
+   ```
+
+2. **Admin Authentication Flow**:
+   - Admin users click "Admin Login" on the dashboard
+   - Enter their authorized email address
+   - System generates and verifies admin token
+   - Only verified admin emails can access export functionality
+
+3. **Security Features**:
+   - Double verification of admin status
+   - Automatic token cleanup for non-admin users
+   - Real-time admin status validation
+   - Audit logging of all admin actions
+
+### Default Admin Configuration
+- **Default Admin**: admin@rivvalue.com
+- **Token Expiry**: 24 hours
+- **Access Level**: Export data, system monitoring
 
 ## Monitoring and Maintenance
 
@@ -328,6 +361,9 @@ sudo -u postgres psql -d voc_agent -c "SELECT pg_size_pretty(pg_database_size('v
 - [ ] Rate limiting configured and tested
 - [ ] CORS headers properly configured
 - [ ] Session security validated
+- [ ] Admin emails configured in ADMIN_EMAILS environment variable
+- [ ] Admin authentication tested and verified
+- [ ] Export functionality restricted to admin users only
 
 ## Version History
 
