@@ -425,6 +425,38 @@ Be conversational, empathetic, and adaptive to their communication style."""
         print(f"Fallback generation - Step: {self.step_count}, Extracted: {extracted}")
         print(f"Current extracted data: {self.extracted_data}")
         print(f"Tenure from extracted_data: {self.extracted_data.get('tenure_with_fc')}")
+        print(f"NPS from extracted_data: {self.extracted_data.get('nps_score')}")
+        
+        # Special case: If we have tenure and just got NPS score, go directly to reasoning
+        if (self.extracted_data.get('tenure_with_fc') is not None and 
+            self.extracted_data.get('nps_score') is not None and 
+            self.step_count <= 3):
+            score = self.extracted_data['nps_score']
+            self.step_count = 4  # Set to next step to avoid re-asking
+            if score >= 9:
+                return {
+                    'message': f"Wonderful! A {score} is fantastic. What specifically about FC inc made your experience so great?",
+                    'message_type': 'ai_question',
+                    'step': 'nps_reasoning',
+                    'progress': 40,
+                    'is_complete': False
+                }
+            elif score >= 7:
+                return {
+                    'message': f"Thanks for the {score}! What would it take to make you even more likely to recommend FC inc?",
+                    'message_type': 'ai_question',
+                    'step': 'nps_reasoning',
+                    'progress': 40,
+                    'is_complete': False
+                }
+            else:
+                return {
+                    'message': f"I appreciate your honesty with the {score}. What are the main issues that are holding you back from recommending FC inc?",
+                    'message_type': 'ai_question',
+                    'step': 'nps_reasoning',
+                    'progress': 40,
+                    'is_complete': False
+                }
         
         # Use step-based progression but check if we already have tenure data
         if self.step_count == 1:
