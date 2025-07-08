@@ -168,37 +168,38 @@ Only include fields that are clearly present in the response. If a field is not 
         extracted = {}
         text_lower = user_input.lower()
         
-        # Extract NPS score with improved detection
+        # Extract NPS score - only if we're in the NPS collection step and don't have it yet
         import re
         
-        # Look for numbers 0-10 in various formats - more comprehensive patterns
-        nps_patterns = [
-            r'(?:score|rating|give|rate).*?([0-9]|10)',
-            r'^([0-9]|10)(?:\s|$|/|,|\.)',
-            r'([0-9]|10)\s*(?:out of 10|/10)',
-            r'(?:i.*d.*say|i.*d.*give|i.*d.*rate).*?([0-9]|10)',
-            r'(?:probably|maybe|around|about).*?([0-9]|10)',
-            r'\b([0-9]|10)\b(?!\d)',  # Standalone number not part of larger number
-            r'([0-9]|10)',  # Any single digit or 10 in the text
-            r'(?:is|was|would be|rating|score).*?([0-9]|10)',
-            r'([0-9]|10)(?:\s*(?:stars?|points?|rating))?'  # Number followed by optional unit
-        ]
-        
-        for pattern in nps_patterns:
-            matches = re.findall(pattern, user_input, re.IGNORECASE)
-            for match in matches:
-                score = int(match)
-                if 0 <= score <= 10:
-                    extracted['nps_score'] = score
-                    if score >= 9:
-                        extracted['nps_category'] = 'Promoter'
-                    elif score >= 7:
-                        extracted['nps_category'] = 'Passive'
-                    else:
-                        extracted['nps_category'] = 'Detractor'
+        # Only extract NPS score if we're answering the NPS question (step_count will be 2 when processing NPS response)
+        if not self.extracted_data.get('nps_score') and self.step_count == 2:
+            nps_patterns = [
+                r'(?:score|rating|give|rate).*?([0-9]|10)',
+                r'^([0-9]|10)(?:\s|$|/|,|\.)',
+                r'([0-9]|10)\s*(?:out of 10|/10)',
+                r'(?:i.*d.*say|i.*d.*give|i.*d.*rate).*?([0-9]|10)',
+                r'(?:probably|maybe|around|about).*?([0-9]|10)',
+                r'\b([0-9]|10)\b(?!\d)',  # Standalone number not part of larger number
+                r'([0-9]|10)',  # Any single digit or 10 in the text
+                r'(?:is|was|would be|rating|score).*?([0-9]|10)',
+                r'([0-9]|10)(?:\s*(?:stars?|points?|rating))?'  # Number followed by optional unit
+            ]
+            
+            for pattern in nps_patterns:
+                matches = re.findall(pattern, user_input, re.IGNORECASE)
+                for match in matches:
+                    score = int(match)
+                    if 0 <= score <= 10:
+                        extracted['nps_score'] = score
+                        if score >= 9:
+                            extracted['nps_category'] = 'Promoter'
+                        elif score >= 7:
+                            extracted['nps_category'] = 'Passive'
+                        else:
+                            extracted['nps_category'] = 'Detractor'
+                        break
+                if 'nps_score' in extracted:
                     break
-            if 'nps_score' in extracted:
-                break
         
         # Enhanced satisfaction detection
         satisfaction_keywords = {
@@ -274,21 +275,22 @@ Only include fields that are clearly present in the response. If a field is not 
                 extracted['support_rating'] = rating
                 break
         
-        # Extract tenure information
-        tenure_patterns = {
-            'Less than 6 months': ['less than 6 months', 'under 6 months', 'few months', '3 months', '4 months', '5 months'],
-            '6 months - 1 year': ['6 months', 'seven months', '8 months', '9 months', '10 months', '11 months', 'about a year'],
-            '1-2 years': ['1 year', '2 years', 'one year', 'two years', '18 months', 'year and half'],
-            '2-3 years': ['2 years', '3 years', 'two years', 'three years', '30 months'],
-            '3-5 years': ['3 years', '4 years', '5 years', 'three years', 'four years', 'five years'],
-            '5-10 years': ['5 years', '6 years', '7 years', '8 years', '9 years', '10 years', 'decade'],
-            'More than 10 years': ['more than 10 years', 'over 10 years', '11 years', '15 years', '20 years', 'decades']
-        }
-        
-        for tenure_option, patterns in tenure_patterns.items():
-            if any(pattern in text_lower for pattern in patterns):
-                extracted['tenure_with_fc'] = tenure_option
-                break
+        # Extract tenure information - only if we're answering the tenure question (step_count will be 1 when processing tenure response)
+        if not self.extracted_data.get('tenure_with_fc') and self.step_count == 1:
+            tenure_patterns = {
+                'Less than 6 months': ['less than 6 months', 'under 6 months', 'few months', '3 months', '4 months', '5 months'],
+                '6 months - 1 year': ['6 months', 'seven months', '8 months', '9 months', '10 months', '11 months', 'about a year'],
+                '1-2 years': ['1 year', '2 years', 'one year', 'two years', '18 months', 'year and half'],
+                '2-3 years': ['2 years', '3 years', 'two years', 'three years', '30 months'],
+                '3-5 years': ['3 years', '4 years', '5 years', 'three years', 'four years', 'five years'],
+                '5-10 years': ['5 years', '6 years', '7 years', '8 years', '9 years', '10 years', 'decade'],
+                'More than 10 years': ['more than 10 years', 'over 10 years', '11 years', '15 years', '20 years', 'decades']
+            }
+            
+            for tenure_option, patterns in tenure_patterns.items():
+                if any(pattern in text_lower for pattern in patterns):
+                    extracted['tenure_with_fc'] = tenure_option
+                    break
         
         # Extract improvement suggestions
         improvement_indicators = ['improve', 'better', 'fix', 'change', 'enhance', 'upgrade', 'should', 'could', 'need to', 'would like']
