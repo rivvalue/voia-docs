@@ -20,12 +20,22 @@ class AuthSystem:
     def __init__(self):
         self.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key")
         self.token_expiry_hours = 24  # Tokens valid for 24 hours
+        # Admin emails - can be set via environment variable or hardcoded
+        self.admin_emails = set(
+            os.environ.get("ADMIN_EMAILS", "admin@rivvalue.com").split(",")
+        )
     
-    def generate_token(self, email):
+    def generate_token(self, email, is_admin=False):
         """Generate a JWT token for an email address"""
         try:
+            normalized_email = email.lower().strip()
+            # Check if email is in admin list
+            if not is_admin:
+                is_admin = normalized_email in self.admin_emails
+            
             payload = {
-                'email': email.lower().strip(),
+                'email': normalized_email,
+                'is_admin': is_admin,
                 'iat': datetime.utcnow(),
                 'exp': datetime.utcnow() + timedelta(hours=self.token_expiry_hours),
                 'jti': secrets.token_hex(16)  # Unique token ID
@@ -39,7 +49,7 @@ class AuthSystem:
             logger.error(f"Error generating token for {email}: {e}")
             raise AuthenticationError("Failed to generate authentication token")
     
-    def verify_token(self, token):
+    def verify_token(self, token, return_payload=False):
         """Verify and decode a JWT token"""
         try:
             if not token:
@@ -56,7 +66,7 @@ class AuthSystem:
                 raise AuthenticationError("Invalid token payload")
             
             logger.debug(f"Token verified for email: {email}")
-            return email
+            return payload if return_payload else email
             
         except jwt.ExpiredSignatureError:
             logger.warning("Token has expired")
@@ -146,3 +156,52 @@ def generate_user_token(email):
 def verify_user_token(token):
     """Public function to verify token"""
     return auth_system.verify_token(token)
+
+def require_admin_auth():
+    """Decorator to require admin authentication for endpoints"""
+    def decorator(f):
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+            try:
+                # Get token from header
+                auth_header = request.headers.get('Authorization')
+                if not auth_header:
+                    return jsonify({
+                        'error': 'Missing authorization header',
+                        'code': 'MISSING_AUTH'
+                    }), 401
+                
+                # Verify token and get full payload
+                try:
+                    payload = auth_system.verify_token(auth_header, return_payload=True)
+                except AuthenticationError as e:
+                    return jsonify({
+                        'error': str(e),
+                        'code': 'AUTH_ERROR'
+                    }), 401
+                
+                # Check if user is admin
+                if not payload.get('is_admin', False):
+                    email = payload.get('email', 'unknown')
+                    logger.warning(f"Non-admin access attempt to {request.endpoint} by {email}")
+                    return jsonify({
+                        'error': 'Admin access required',
+                        'code': 'ADMIN_REQUIRED'
+                    }), 403
+                
+                # Add verified email and admin status to Flask's g object
+                g.authenticated_email = payload.get('email')
+                g.is_admin = True
+                
+                logger.debug(f"Admin authentication successful for {payload.get('email')}")
+                return f(*args, **kwargs)
+                
+            except Exception as e:
+                logger.error(f"Admin authentication error: {e}")
+                return jsonify({
+                    'error': 'Authentication failed',
+                    'code': 'AUTH_FAILED'
+                }), 500
+        
+        return wrapped
+    return decorator

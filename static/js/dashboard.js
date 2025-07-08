@@ -531,23 +531,57 @@ function refreshData() {
 }
 
 function exportData() {
-    fetch('/api/export_data')
-        .then(response => response.json())
-        .then(data => {
-            const dataStr = JSON.stringify(data, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
-            const exportFileDefaultName = `voc_survey_data_${new Date().toISOString().split('T')[0]}.json`;
-            
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            linkElement.click();
-        })
-        .catch(error => {
-            console.error('Error exporting data:', error);
-            alert('Error exporting data. Please try again.');
-        });
+    // Check if user has admin token
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        alert('Admin authentication required. Please log in with an admin account to export data.');
+        return;
+    }
+    
+    fetch('/api/export_data', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.status === 403) {
+            alert('Admin access required. This feature is only available to administrators.');
+            return null;
+        }
+        if (response.status === 401) {
+            alert('Authentication failed. Please log in with an admin account.');
+            return null;
+        }
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(result => {
+        if (!result) return; // Authentication failed
+        
+        const data = result.data || result; // Handle both old and new format
+        const dataStr = JSON.stringify(data, null, 2);
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        
+        const exportFileDefaultName = `voc_survey_data_${new Date().toISOString().split('T')[0]}.json`;
+        
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportFileDefaultName);
+        linkElement.click();
+        
+        // Show success message if we have export info
+        if (result.export_info) {
+            console.log(`Data exported successfully by ${result.export_info.exported_by}`);
+        }
+    })
+    .catch(error => {
+        console.error('Error exporting data:', error);
+        alert('Error exporting data. Please try again or contact administrator.');
+    });
 }
 
 // Auto-refresh dashboard every 5 minutes

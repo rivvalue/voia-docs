@@ -5,7 +5,7 @@ from models_auth import AuthToken
 from data_storage import get_dashboard_data
 from task_queue import add_analysis_task, get_queue_stats
 from rate_limiter import rate_limit
-from auth_system import require_auth, generate_user_token
+from auth_system import require_auth, generate_user_token, require_admin_auth
 from conversational_survey import start_conversational_survey, process_conversation_response, finalize_conversational_survey
 from ai_conversational_survey import start_ai_conversational_survey, process_ai_conversation_response, finalize_ai_conversational_survey
 from datetime import datetime, timedelta
@@ -334,12 +334,25 @@ def survey_responses():
         return jsonify({'error': 'Failed to fetch survey responses'}), 500
 
 @app.route('/api/export_data')
+@require_admin_auth()
 def export_data():
-    """Export survey data as JSON"""
+    """Export survey data as JSON - Admin access required"""
     try:
         responses = SurveyResponse.query.all()
         data = [response.to_dict() for response in responses]
-        return jsonify(data)
+        
+        # Log admin access
+        admin_email = g.authenticated_email
+        logger.info(f"Admin data export accessed by {admin_email}")
+        
+        return jsonify({
+            'data': data,
+            'export_info': {
+                'total_responses': len(data),
+                'exported_by': admin_email,
+                'export_timestamp': datetime.utcnow().isoformat()
+            }
+        })
     except Exception as e:
         logger.error(f"Error exporting data: {e}")
         return jsonify({'error': 'Failed to export data'}), 500
