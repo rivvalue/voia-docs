@@ -412,11 +412,13 @@ Be conversational, empathetic, and adaptive to their communication style."""
         company_name = context.get('company_name', 'our service')
         
         print(f"Fallback generation - Step: {self.step_count}, Extracted: {extracted}")
+        print(f"Current extracted data: {self.extracted_data}")
+        print(f"Tenure from extracted_data: {self.extracted_data.get('tenure_with_fc')}")
         
         # Use step-based progression but check if we already have tenure data
         if self.step_count == 1:
-            # First question: Ask for tenure with FC inc
-            if extracted.get('tenure_with_fc') is None:
+            # First question: Ask for tenure with FC inc ONLY if we don't have it
+            if self.extracted_data.get('tenure_with_fc') is None:
                 return {
                     'message': "How long have you been working with FC inc? Please choose from: Less than 6 months, 6 months - 1 year, 1-2 years, 2-3 years, 3-5 years, 5-10 years, or More than 10 years.",
                     'message_type': 'ai_question',
@@ -425,8 +427,15 @@ Be conversational, empathetic, and adaptive to their communication style."""
                     'is_complete': False
                 }
             else:
-                # We already have tenure, move to step 2 logic
+                # We already have tenure, skip to NPS question
                 self.step_count = 2
+                return {
+                    'message': "On a scale of 0-10, how likely are you to recommend FC inc to a friend or colleague?",
+                    'message_type': 'ai_question',
+                    'step': 'nps_collection',
+                    'progress': 25,
+                    'is_complete': False
+                }
 
         if self.step_count == 2:
             # Second question: Ask for NPS about FC inc (the supplier) ONLY if we don't have it
@@ -666,10 +675,15 @@ Be conversational, empathetic, and adaptive to their communication style."""
 # Global instances for session persistence
 ai_conversation_instances = {}
 
-def start_ai_conversational_survey(company_name: str, respondent_name: str) -> Dict[str, Any]:
+def start_ai_conversational_survey(company_name: str, respondent_name: str, tenure_with_fc: str = None) -> Dict[str, Any]:
     """Start a new AI-powered conversational survey session"""
     conversation_id = str(uuid.uuid4())
     ai_survey = AIConversationalSurvey()
+    
+    # If tenure data is provided from the form, pre-populate it
+    if tenure_with_fc:
+        ai_survey.extracted_data['tenure_with_fc'] = tenure_with_fc
+        print(f"Pre-populated tenure from form: {tenure_with_fc}")
     
     result = ai_survey.start_conversation(company_name, respondent_name)
     result['conversation_id'] = conversation_id
