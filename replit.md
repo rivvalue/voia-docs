@@ -218,6 +218,7 @@ The system uses a single main entity `SurveyResponse` that stores:
 - July 08, 2025: Updated branding to "Voxa - Voice Of Client Agent" across all pages, changed subtitle to "AI Powered Client Insights" and added tagline "Voxa: Hear what matters. Act on what counts."
 - July 08, 2025: Enhanced tagline styling with red color (#E13A44) and larger font size, removed robot icons from all pages for cleaner UI
 - July 08, 2025: Implemented admin authentication system for export data protection - JWT tokens with admin roles, configurable admin emails via ADMIN_EMAILS environment variable
+- July 08, 2025: Fixed critical admin authentication security vulnerabilities - added double verification, proper token management, and automatic logout for non-admin users
 
 ## User Preferences
 

@@ -614,13 +614,34 @@ function adminLogin() {
     .then(response => response.json())
     .then(data => {
         if (data.token) {
-            localStorage.setItem('authToken', data.token);
-            alert('Admin login successful! You can now export data.');
-            // Update button text
-            const adminBtn = document.getElementById('adminLoginBtn');
-            adminBtn.innerHTML = '<i class="fas fa-check me-2"></i>Admin Logged In';
-            adminBtn.classList.remove('btn-outline-secondary');
-            adminBtn.classList.add('btn-success');
+            // Clear any existing token first
+            localStorage.removeItem('authToken');
+            
+            // Verify this is actually an admin token before storing
+            fetch('/auth/verify-token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ token: data.token })
+            })
+            .then(response => response.json())
+            .then(verifyData => {
+                if (verifyData.valid && verifyData.is_admin) {
+                    localStorage.setItem('authToken', data.token);
+                    alert(`Admin login successful for ${email}! You can now export data.`);
+                    // Update button text
+                    const adminBtn = document.getElementById('adminLoginBtn');
+                    adminBtn.innerHTML = `<i class="fas fa-check me-2"></i>Admin: ${email}`;
+                    adminBtn.classList.remove('btn-outline-secondary');
+                    adminBtn.classList.add('btn-success');
+                } else {
+                    alert(`Access denied. ${email} is not an admin user.`);
+                }
+            })
+            .catch(error => {
+                alert('Token verification failed.');
+            });
         } else {
             alert('Failed to generate admin token: ' + (data.error || 'Unknown error'));
         }
@@ -635,11 +656,48 @@ function adminLogin() {
 function checkAdminStatus() {
     const token = localStorage.getItem('authToken');
     if (token) {
-        const adminBtn = document.getElementById('adminLoginBtn');
-        adminBtn.innerHTML = '<i class="fas fa-check me-2"></i>Admin Logged In';
-        adminBtn.classList.remove('btn-outline-secondary');
-        adminBtn.classList.add('btn-success');
+        // Verify the token is still valid and is admin
+        fetch('/auth/verify-token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token: token })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.valid && data.is_admin) {
+                const adminBtn = document.getElementById('adminLoginBtn');
+                adminBtn.innerHTML = `<i class="fas fa-check me-2"></i>Admin: ${data.email}`;
+                adminBtn.classList.remove('btn-outline-secondary');
+                adminBtn.classList.add('btn-success');
+                adminBtn.onclick = adminLogout; // Change to logout function
+            } else {
+                // Token is invalid or not admin, clear it
+                localStorage.removeItem('authToken');
+                resetAdminButton();
+            }
+        })
+        .catch(error => {
+            // Token verification failed, clear it
+            localStorage.removeItem('authToken');
+            resetAdminButton();
+        });
     }
+}
+
+function adminLogout() {
+    localStorage.removeItem('authToken');
+    resetAdminButton();
+    alert('Admin logged out successfully.');
+}
+
+function resetAdminButton() {
+    const adminBtn = document.getElementById('adminLoginBtn');
+    adminBtn.innerHTML = '<i class="fas fa-key me-2"></i>Admin Login';
+    adminBtn.classList.remove('btn-success');
+    adminBtn.classList.add('btn-outline-secondary');
+    adminBtn.onclick = adminLogin;
 }
 
 // Auto-refresh dashboard every 5 minutes

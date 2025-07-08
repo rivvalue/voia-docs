@@ -77,23 +77,43 @@ def request_token():
 
 @app.route('/auth/verify-token', methods=['POST'])
 def verify_token():
-    """Verify if a token is valid"""
+    """Verify if a token is valid and check admin status"""
     try:
-        auth_header = request.headers.get('Authorization')
-        if not auth_header:
+        # Support both Authorization header and JSON body
+        token = None
+        if request.headers.get('Authorization'):
+            token = request.headers.get('Authorization')
+        elif request.json and 'token' in request.json:
+            token = request.json['token']
+        
+        if not token:
             return jsonify({
                 'valid': False,
-                'error': 'No authorization header provided'
+                'error': 'No token provided'
             }), 400
         
-        from auth_system import verify_user_token
-        email = verify_user_token(auth_header)
+        from auth_system import auth_system
         
-        return jsonify({
-            'valid': True,
-            'email': email,
-            'message': 'Token is valid'
-        })
+        # Get full payload to check admin status
+        payload = auth_system.verify_token(token, return_payload=True)
+        
+        if payload:
+            email = payload.get('email')
+            is_admin = payload.get('is_admin', False)
+            # Double-check admin status against current admin list
+            is_admin_verified = email in auth_system.admin_emails
+            
+            return jsonify({
+                'valid': True,
+                'email': email,
+                'is_admin': is_admin_verified,
+                'message': 'Token is valid'
+            })
+        else:
+            return jsonify({
+                'valid': False,
+                'error': 'Invalid token'
+            }), 401
         
     except Exception as e:
         return jsonify({
