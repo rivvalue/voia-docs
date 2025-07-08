@@ -462,9 +462,9 @@ Be conversational, empathetic, and adaptive to their communication style."""
         
         if self.step_count == 3:
             # Check if we just got NPS score and need to ask reasoning question
-            if self.extracted_data.get('nps_score') is not None and extracted.get('nps_score') is not None:
+            if extracted.get('nps_score') is not None:
                 # We just got the NPS score, ask for reasoning
-                score = self.extracted_data['nps_score']
+                score = extracted['nps_score']
                 if score >= 9:
                     return {
                         'message': f"Wonderful! A {score} is fantastic. What specifically about FC inc made your experience so great?",
