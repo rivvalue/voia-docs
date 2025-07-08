@@ -100,6 +100,7 @@ Context of conversation:
 - Conversation step: {self.step_count}
 
 Extract any of the following data present in the response:
+- Tenure with FC inc: Look for duration mentions like "6 months", "2 years", "less than 6 months", etc.
 - NPS score (0-10): Look for numbers, recommendations, likelihood scores
 - Satisfaction level (1-5): Look for satisfaction, happiness, contentment indicators
 - Service quality rating (1-5): Look for professional services, service delivery ratings
@@ -114,6 +115,7 @@ Extract any of the following data present in the response:
 
 Return ONLY JSON in this format:
 {{
+    "tenure_with_fc": string or null,
     "nps_score": number or null,
     "nps_category": "Promoter/Passive/Detractor" or null,
     "satisfaction_rating": number or null,
@@ -272,6 +274,22 @@ Only include fields that are clearly present in the response. If a field is not 
                 extracted['support_rating'] = rating
                 break
         
+        # Extract tenure information
+        tenure_patterns = {
+            'Less than 6 months': ['less than 6 months', 'under 6 months', 'few months', '3 months', '4 months', '5 months'],
+            '6 months - 1 year': ['6 months', 'seven months', '8 months', '9 months', '10 months', '11 months', 'about a year'],
+            '1-2 years': ['1 year', '2 years', 'one year', 'two years', '18 months', 'year and half'],
+            '2-3 years': ['2 years', '3 years', 'two years', 'three years', '30 months'],
+            '3-5 years': ['3 years', '4 years', '5 years', 'three years', 'four years', 'five years'],
+            '5-10 years': ['5 years', '6 years', '7 years', '8 years', '9 years', '10 years', 'decade'],
+            'More than 10 years': ['more than 10 years', 'over 10 years', '11 years', '15 years', '20 years', 'decades']
+        }
+        
+        for tenure_option, patterns in tenure_patterns.items():
+            if any(pattern in text_lower for pattern in patterns):
+                extracted['tenure_with_fc'] = tenure_option
+                break
+        
         # Extract improvement suggestions
         improvement_indicators = ['improve', 'better', 'fix', 'change', 'enhance', 'upgrade', 'should', 'could', 'need to', 'would like']
         if any(indicator in text_lower for indicator in improvement_indicators):
@@ -316,15 +334,16 @@ SURVEY DATA COLLECTED SO FAR:
 CONVERSATION STEP: {self.step_count}
 
 YOUR ROLE: You are a helpful customer feedback specialist having a natural conversation. Your goal is to collect feedback about FC inc:
-1. NPS score (0-10) - How likely to recommend FC inc
-2. Reason for their NPS score about FC inc
-3. Satisfaction level (1-5) - Overall satisfaction with FC inc
-4. Professional services quality rating (1-5) - Quality of FC inc's professional services
-5. Product value rating (1-5) - Value and quality of FC inc's products/solutions
-6. Pricing appreciation rating (1-5) - How they feel about FC inc's pricing value
-7. Support services rating (1-5) - Quality of FC inc's support and customer service
-8. Improvement suggestions - What could FC inc do better
-9. Additional feedback - Any other comments about FC inc
+1. Business relationship tenure - How long working with FC inc
+2. NPS score (0-10) - How likely to recommend FC inc
+3. Reason for their NPS score about FC inc
+4. Satisfaction level (1-5) - Overall satisfaction with FC inc
+5. Professional services quality rating (1-5) - Quality of FC inc's professional services
+6. Product value rating (1-5) - Value and quality of FC inc's products/solutions
+7. Pricing appreciation rating (1-5) - How they feel about FC inc's pricing value
+8. Support services rating (1-5) - Quality of FC inc's support and customer service
+9. Improvement suggestions - What could FC inc do better
+10. Additional feedback - Any other comments about FC inc
 
 GUIDELINES:
 - Keep the conversation natural and engaging
@@ -392,21 +411,35 @@ Be conversational, empathetic, and adaptive to their communication style."""
         
         print(f"Fallback generation - Step: {self.step_count}, Extracted: {extracted}")
         
-        # Use step-based progression but check if we already have NPS data
+        # Use step-based progression but check if we already have tenure data
         if self.step_count == 1:
-            # First question: Ask for NPS about FC inc (the supplier) ONLY if we don't have it
+            # First question: Ask for tenure with FC inc
+            if extracted.get('tenure_with_fc') is None:
+                return {
+                    'message': "How long have you been working with FC inc? Please choose from: Less than 6 months, 6 months - 1 year, 1-2 years, 2-3 years, 3-5 years, 5-10 years, or More than 10 years.",
+                    'message_type': 'ai_question',
+                    'step': 'tenure_collection',
+                    'progress': 15,
+                    'is_complete': False
+                }
+            else:
+                # We already have tenure, move to step 2 logic
+                self.step_count = 2
+
+        if self.step_count == 2:
+            # Second question: Ask for NPS about FC inc (the supplier) ONLY if we don't have it
             if extracted.get('nps_score') is None:
                 return {
                     'message': "On a scale of 0-10, how likely are you to recommend FC inc to a friend or colleague?",
                     'message_type': 'ai_question',
                     'step': 'nps_collection',
-                    'progress': 20,
+                    'progress': 25,
                     'is_complete': False
                 }
             else:
-                # We already have NPS score from first response, move to step 2 logic
-                # But increment step count to 2 so next time it goes to step 3 
-                self.step_count = 2
+                # We already have NPS score from first response, move to step 3 logic
+                # But increment step count to 3 so next time it goes to step 4
+                self.step_count = 3
                 score = extracted['nps_score']
                 if score >= 9:
                     return {
@@ -433,15 +466,15 @@ Be conversational, empathetic, and adaptive to their communication style."""
                         'is_complete': False
                     }
         
-        elif self.step_count == 2:
-            # Second question: We should have already asked the NPS reasoning question
+        elif self.step_count == 3:
+            # Third question: We should have already asked the NPS reasoning question
             # This response is the user's answer to the NPS reasoning question
             # Move to satisfaction question
             return {
                 'message': "How would you describe your overall satisfaction with FC inc's service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
                 'message_type': 'ai_question',
                 'step': 'satisfaction',
-                'progress': 60,
+                'progress': 40,
                 'is_complete': False
             }
         
@@ -461,7 +494,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 'message': "How would you rate the quality of FC inc's professional services? Excellent, good, average, poor, or very poor?",
                 'message_type': 'ai_question',
                 'step': 'service_quality',
-                'progress': 50,
+                'progress': 45,
                 'is_complete': False
             }
         
@@ -471,7 +504,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 'message': "How would you rate the value and quality of FC inc's products or solutions? Excellent, good, average, poor, or very poor?",
                 'message_type': 'ai_question',
                 'step': 'product_value',
-                'progress': 60,
+                'progress': 55,
                 'is_complete': False
             }
         
@@ -481,7 +514,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 'message': "How do you feel about FC inc's pricing? Do you find it excellent value, good value, fair, expensive, or very expensive?",
                 'message_type': 'ai_question',
                 'step': 'pricing_value',
-                'progress': 70,
+                'progress': 65,
                 'is_complete': False
             }
         
@@ -491,7 +524,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 'message': "How would you rate FC inc's support and customer service? Excellent, good, average, poor, or very poor?",
                 'message_type': 'ai_question',
                 'step': 'support_quality',
-                'progress': 80,
+                'progress': 75,
                 'is_complete': False
             }
         
@@ -502,7 +535,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                     'message': "What specific changes would make the biggest difference in improving your experience with FC inc?",
                     'message_type': 'ai_question',
                     'step': 'improvement',
-                    'progress': 90,
+                    'progress': 85,
                     'is_complete': False
                 }
             else:
@@ -510,7 +543,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                     'message': "Is there anything FC inc could do even better to enhance your experience?",
                     'message_type': 'ai_question',
                     'step': 'improvement',
-                    'progress': 90,
+                    'progress': 85,
                     'is_complete': False
                 }
         
@@ -560,6 +593,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
             'company_name': context.get('company_name'),
             'respondent_name': context.get('respondent_name'),
             'respondent_email': context.get('respondent_email'),
+            'tenure_with_fc': extracted.get('tenure_with_fc'),
             'nps_score': nps_score,
             'nps_category': nps_category,
             'satisfaction_rating': extracted.get('satisfaction_rating'),
