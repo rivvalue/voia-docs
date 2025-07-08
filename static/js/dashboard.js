@@ -534,7 +534,7 @@ function exportData() {
     // Check if user has admin token
     const token = localStorage.getItem('authToken');
     if (!token) {
-        alert('Admin authentication required. Please log in with an admin account to export data.');
+        alert('Admin authentication required. Please use the Admin Login button first.');
         return;
     }
     
@@ -584,5 +584,52 @@ function exportData() {
     });
 }
 
+// Admin login function
+function adminLogin() {
+    const email = prompt('Enter admin email address:');
+    if (!email) return;
+    
+    // Generate admin token
+    fetch('/auth/request-token', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: email })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.token) {
+            localStorage.setItem('authToken', data.token);
+            alert('Admin login successful! You can now export data.');
+            // Update button text
+            const adminBtn = document.getElementById('adminLoginBtn');
+            adminBtn.innerHTML = '<i class="fas fa-check me-2"></i>Admin Logged In';
+            adminBtn.classList.remove('btn-outline-secondary');
+            adminBtn.classList.add('btn-success');
+        } else {
+            alert('Failed to generate admin token: ' + (data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error generating admin token:', error);
+        alert('Error generating admin token. Please try again.');
+    });
+}
+
+// Check admin login status on page load
+function checkAdminStatus() {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+        const adminBtn = document.getElementById('adminLoginBtn');
+        adminBtn.innerHTML = '<i class="fas fa-check me-2"></i>Admin Logged In';
+        adminBtn.classList.remove('btn-outline-secondary');
+        adminBtn.classList.add('btn-success');
+    }
+}
+
 // Auto-refresh dashboard every 5 minutes
 setInterval(refreshData, 5 * 60 * 1000);
+
+// Check admin status on page load
+document.addEventListener('DOMContentLoaded', checkAdminStatus);
