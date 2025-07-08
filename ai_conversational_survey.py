@@ -27,7 +27,7 @@ class AIConversationalSurvey:
         welcome_message = self._generate_welcome_message(company_name, respondent_name)
         
         self.conversation_history.append({
-            'sender': 'VoC Agent',
+            'sender': 'Voxa',
             'message': welcome_message,
             'timestamp': 'now'
         })
@@ -74,7 +74,7 @@ class AIConversationalSurvey:
         # Add AI response to conversation history
         if not next_question.get('is_complete', False):
             self.conversation_history.append({
-                'sender': 'VoC Agent',
+                'sender': 'Voxa',
                 'message': next_question['message'],
                 'timestamp': 'now'
             })

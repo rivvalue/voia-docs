@@ -234,7 +234,7 @@ function showTypingIndicator() {
         <div class="spinner-border spinner-border-sm" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
-        VoC Agent is typing...
+        Voxa is typing...
     `;
     
     chatMessages.appendChild(typingElement);

@@ -213,6 +213,7 @@ The system uses a single main entity `SurveyResponse` that stores:
 - July 07, 2025: Implemented NPS-based growth factor analysis using SaaS B2B lookup table - calculates organic growth potential from customer satisfaction
 - July 07, 2025: Enhanced conversational AI survey with separate questions for professional services quality, product value, pricing appreciation, and support services following NPS and satisfaction questions
 - July 07, 2025: Fixed Coka's missing tenure data and enhanced conversational survey to capture tenure - now includes tenure question as first step for complete business relationship analysis
+- July 07, 2025: Renamed conversational AI agent to "Voxa" throughout platform and created comprehensive deployment guide with all 2025 enhancements
 
 ## User Preferences
 
