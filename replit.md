@@ -215,6 +215,7 @@ The system uses a single main entity `SurveyResponse` that stores:
 - July 07, 2025: Fixed Coka's missing tenure data and enhanced conversational survey to capture tenure - now includes tenure question as first step for complete business relationship analysis
 - July 07, 2025: Renamed conversational AI agent to "Voxa" throughout platform and created comprehensive deployment guide with all 2025 enhancements
 - July 08, 2025: Updated branding to "Voxa - Voice Of Client Agent" across all pages, changed subtitle to "AI Powered Client Insights" and added tagline "Voxa: Hear what matters. Act on what counts."
+- July 08, 2025: Enhanced tagline styling with red color (#E13A44) and larger font size, removed robot icons from all pages for cleaner UI
 
 ## User Preferences
 
