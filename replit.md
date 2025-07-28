@@ -219,6 +219,7 @@ The system uses a single main entity `SurveyResponse` that stores:
 - July 08, 2025: Enhanced tagline styling with red color (#E13A44) and larger font size, removed robot icons from all pages for cleaner UI
 - July 08, 2025: Implemented admin authentication system for export data protection - JWT tokens with admin roles, configurable admin emails via ADMIN_EMAILS environment variable
 - July 08, 2025: Fixed critical admin authentication security vulnerabilities - added double verification, proper token management, and automatic logout for non-admin users
+- July 28, 2025: Fixed sentiment analysis accuracy issue for promoters - improved context-aware analysis to correctly identify positive feedback containing words like "needs" in positive contexts
 
 ## User Preferences
 

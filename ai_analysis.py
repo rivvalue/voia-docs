@@ -141,12 +141,28 @@ def analyze_business_sentiment(text):
     positive_indicators = [
         'good', 'great', 'excellent', 'amazing', 'awesome', 'love', 'like',
         'satisfied', 'happy', 'pleased', 'impressed', 'recommend', 'perfect',
-        'fantastic', 'wonderful', 'outstanding', 'superb', 'brilliant'
+        'fantastic', 'wonderful', 'outstanding', 'superb', 'brilliant',
+        'genuine', 'understand', 'understands', 'evolves', 'meets', 'meet',
+        'expectation', 'expectations', 'advanced', 'quality', 'reliable',
+        'effective', 'efficient', 'professional', 'responsive', 'helpful'
     ]
     
-    # Count indicators
+    # Count indicators with context awareness
     strong_negative_count = sum(1 for word in negative_strong if word in text_lower)
-    moderate_negative_count = sum(1 for word in negative_moderate if word in text_lower)
+    
+    # Context-aware moderate negative counting
+    moderate_negative_count = 0
+    for word in negative_moderate:
+        if word in text_lower:
+            # Check context for words like "needs", "require", etc.
+            if word in ['need', 'needs', 'require']:
+                # Skip if in positive context like "understand our needs"
+                positive_context = any(pos_word in text_lower for pos_word in ['understand', 'understands', 'meet', 'meets', 'fulfill', 'address', 'satisfy'])
+                if not positive_context:
+                    moderate_negative_count += 1
+            else:
+                moderate_negative_count += 1
+    
     positive_count = sum(1 for word in positive_indicators if word in text_lower)
     
     # Calculate score based on business context
