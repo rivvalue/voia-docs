@@ -62,9 +62,11 @@ class AIConversationalSurvey:
         # Extract data from user input
         extracted = self._extract_survey_data_with_ai(user_input, context)
         
-        # Update extracted data - merge with existing data
+        # Track what was just extracted for debugging
+        newly_extracted = {}
         for key, value in extracted.items():
-            if value is not None:  # Only update if we have actual data
+            if value is not None and self.extracted_data.get(key) != value:
+                newly_extracted[key] = value
                 self.extracted_data[key] = value
         
         self.survey_data['extracted_data'] = self.extracted_data
@@ -72,13 +74,27 @@ class AIConversationalSurvey:
         # Increment step count BEFORE generating next question
         self.step_count += 1
         
+        print(f"Step {self.step_count}: Extracted data: {newly_extracted}")
+        print(f"Total extracted so far: {self.extracted_data}")
+        
         # Debug print
         print(f"Step {self.step_count}: User said: '{user_input}'")
         print(f"Extracted data: {extracted}")
         print(f"Full extracted data: {self.extracted_data}")
         
-        # Generate next AI question using updated data
-        next_question = self._generate_ai_question(user_input, context)
+        # Check if we have enough data to complete
+        if self._check_completion_criteria():
+            next_question = {
+                'message': "Thank you so much for taking the time to share your detailed feedback about FC inc! Your insights are incredibly valuable and will help us improve our service delivery. Have a wonderful day!",
+                'message_type': 'completion',
+                'step': 'complete',
+                'progress': 100,
+                'is_complete': True
+            }
+            self.is_complete = True
+        else:
+            # Generate next AI question using updated data
+            next_question = self._generate_ai_question(user_input, context)
         
         # Add AI response to conversation history
         if not next_question.get('is_complete', False):
@@ -328,6 +344,22 @@ Only include fields that are clearly present in the response. If a field is not 
         
         return extracted
     
+    def _check_completion_criteria(self) -> bool:
+        """Check if we have enough data to complete the survey"""
+        required_fields = ['nps_score', 'nps_reasoning']
+        essential_fields = ['tenure_with_fc', 'satisfaction_rating']
+        
+        # Must have NPS score and reasoning
+        has_required = all(self.extracted_data.get(field) is not None for field in required_fields)
+        
+        # Should have at least some additional data
+        has_some_essential = any(self.extracted_data.get(field) is not None for field in essential_fields)
+        
+        # Or if we've gone through enough steps
+        enough_steps = self.step_count >= 6
+        
+        return has_required and (has_some_essential or enough_steps)
+    
     def _generate_ai_question(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
         """Generate next question using OpenAI"""
         try:
@@ -361,10 +393,12 @@ YOUR ROLE: You are a helpful customer feedback specialist having a natural conve
 GUIDELINES:
 - Keep the conversation natural and engaging
 - Ask ONE question at a time
+- DON'T ask for information you already have (check SURVEY DATA COLLECTED SO FAR)
 - Reference their previous responses to show you're listening
 - If they mention specific issues, ask thoughtful follow-ups
 - If they seem rushed, be more direct
 - If they're chatty, engage with their details
+- Move through the survey logically: tenure → NPS → reasoning → ratings → improvements
 - End gracefully when you have enough information (usually 4-6 exchanges)
 
 RESPONSE FORMAT - Return JSON:
