@@ -204,3 +204,107 @@ def get_dashboard_data():
         
     except Exception as e:
         raise Exception(f"Error compiling dashboard data: {e}")
+
+def get_company_nps_data():
+    """Get NPS data segregated by company"""
+    try:
+        # Get all responses grouped by company
+        company_stats = db.session.query(
+            SurveyResponse.company_name,
+            func.count(SurveyResponse.id).label('total_responses'),
+            func.avg(SurveyResponse.nps_score).label('avg_nps'),
+            func.max(SurveyResponse.created_at).label('latest_response'),
+            func.count(func.nullif(SurveyResponse.nps_score >= 9, False)).label('promoters'),
+            func.count(func.nullif(SurveyResponse.nps_score <= 6, False)).label('detractors')
+        ).group_by(SurveyResponse.company_name).all()
+        
+        company_nps_list = []
+        
+        for company in company_stats:
+            # Calculate company NPS score
+            total = company.total_responses
+            promoters = company.promoters or 0
+            detractors = company.detractors or 0
+            
+            if total > 0:
+                company_nps = round(((promoters - detractors) / total) * 100)
+            else:
+                company_nps = 0
+            
+            # Determine risk level based on NPS and recent feedback
+            if company_nps <= -50:
+                risk_level = "Critical"
+            elif company_nps <= -20:
+                risk_level = "High"
+            elif company_nps <= 20:
+                risk_level = "Medium"
+            else:
+                risk_level = "Low"
+            
+            # Get latest churn risk for this company
+            latest_response = SurveyResponse.query.filter_by(
+                company_name=company.company_name
+            ).order_by(SurveyResponse.created_at.desc()).first()
+            
+            latest_churn_risk = None
+            if latest_response and latest_response.churn_risk_level:
+                latest_churn_risk = latest_response.churn_risk_level
+            
+            company_nps_list.append({
+                'company_name': company.company_name,
+                'total_responses': total,
+                'avg_nps': round(company.avg_nps, 1) if company.avg_nps else 0,
+                'company_nps': company_nps,
+                'promoters': promoters,
+                'detractors': detractors,
+                'passives': total - promoters - detractors,
+                'risk_level': risk_level,
+                'latest_response': company.latest_response.strftime('%Y-%m-%d') if company.latest_response else None,
+                'latest_churn_risk': latest_churn_risk
+            })
+        
+        # Sort by risk level and then by NPS score
+        risk_order = {"Critical": 0, "High": 1, "Medium": 2, "Low": 3}
+        company_nps_list.sort(key=lambda x: (risk_order.get(x['risk_level'], 4), -x['company_nps']))
+        
+        return company_nps_list
+        
+    except Exception as e:
+        print(f"Error getting company NPS data: {e}")
+        return []
+
+def get_company_trends():
+    """Get NPS trends over time by company"""
+    try:
+        # Get monthly trends for each company
+        monthly_data = db.session.query(
+            SurveyResponse.company_name,
+            func.date_trunc('month', SurveyResponse.created_at).label('month'),
+            func.avg(SurveyResponse.nps_score).label('avg_nps'),
+            func.count(SurveyResponse.id).label('response_count')
+        ).group_by(
+            SurveyResponse.company_name,
+            func.date_trunc('month', SurveyResponse.created_at)
+        ).order_by(
+            SurveyResponse.company_name,
+            func.date_trunc('month', SurveyResponse.created_at)
+        ).all()
+        
+        # Organize by company
+        company_trends = {}
+        for data in monthly_data:
+            company = data.company_name
+            if company not in company_trends:
+                company_trends[company] = []
+            
+            company_trends[company].append({
+                'month': data.month.strftime('%Y-%m') if data.month else None,
+                'avg_nps': round(data.avg_nps, 1) if data.avg_nps else 0,
+                'response_count': data.response_count
+            })
+        
+        return company_trends
+        
+    except Exception as e:
+        print(f"Error getting company trends: {e}")
+        return {}

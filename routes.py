@@ -2,7 +2,7 @@ from flask import render_template, request, jsonify, flash, redirect, url_for, g
 from app import app, db
 from models import SurveyResponse
 from models_auth import AuthToken
-from data_storage import get_dashboard_data
+from data_storage import get_dashboard_data, get_company_nps_data, get_company_trends
 from task_queue import add_analysis_task, get_queue_stats
 from rate_limiter import rate_limit
 from auth_system import require_auth, generate_user_token, require_admin_auth
@@ -416,6 +416,35 @@ def health_check():
             'timestamp': datetime.utcnow().isoformat(),
             'error': str(e)
         }), 500
+
+@app.route('/api/company_nps')
+@rate_limit(limit=100)
+def api_company_nps():
+    """API endpoint for company-segregated NPS data"""
+    try:
+        company_nps_data = get_company_nps_data()
+        return jsonify({
+            'success': True,
+            'data': company_nps_data,
+            'total_companies': len(company_nps_data)
+        })
+    except Exception as e:
+        logger.error(f"Error getting company NPS data: {e}")
+        return jsonify({'error': 'Failed to get company NPS data'}), 500
+
+@app.route('/api/company_trends')
+@rate_limit(limit=100) 
+def api_company_trends():
+    """API endpoint for company NPS trends"""
+    try:
+        company_trends = get_company_trends()
+        return jsonify({
+            'success': True,
+            'data': company_trends
+        })
+    except Exception as e:
+        logger.error(f"Error getting company trends: {e}")
+        return jsonify({'error': 'Failed to get company trends'}), 500
 
 # Conversational Survey Routes
 @app.route('/conversational_survey')

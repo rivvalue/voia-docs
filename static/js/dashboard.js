@@ -59,6 +59,9 @@ function populateDashboard() {
     
     // Load survey responses table
     loadSurveyResponses();
+    
+    // Load company NPS data
+    loadCompanyNpsData();
 }
 
 function createNpsChart() {
@@ -526,8 +529,69 @@ function loadSurveyResponses() {
         });
 }
 
+function loadCompanyNpsData() {
+    fetch('/api/company_nps')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                populateCompanyNpsTable(data.data);
+            } else {
+                console.error('Error loading company NPS data:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching company NPS data:', error);
+            document.getElementById('companyNpsTable').innerHTML = 
+                '<tr><td colspan="8" class="text-center text-muted">Error loading company data</td></tr>';
+        });
+}
+
+function populateCompanyNpsTable(companyData) {
+    const tbody = document.getElementById('companyNpsTable');
+    
+    if (!companyData || companyData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No company data available yet</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = companyData.map(company => {
+        // Risk level badge styling
+        let riskBadgeClass = 'bg-secondary';
+        if (company.risk_level === 'Low') riskBadgeClass = 'bg-success';
+        else if (company.risk_level === 'Medium') riskBadgeClass = 'bg-warning';
+        else if (company.risk_level === 'High') riskBadgeClass = 'bg-danger';
+        else if (company.risk_level === 'Critical') riskBadgeClass = 'bg-dark';
+        
+        // Company NPS badge styling
+        let npsBadgeClass = 'bg-secondary';
+        if (company.company_nps > 20) npsBadgeClass = 'bg-success';
+        else if (company.company_nps >= -20) npsBadgeClass = 'bg-warning'; 
+        else npsBadgeClass = 'bg-danger';
+        
+        // Distribution breakdown
+        const distributionText = `${company.promoters}P / ${company.passives}Pa / ${company.detractors}D`;
+        
+        // Churn risk display
+        const churnRiskDisplay = company.latest_churn_risk || 'N/A';
+        
+        return `
+            <tr>
+                <td><strong>${company.company_name}</strong></td>
+                <td>${company.total_responses}</td>
+                <td>${company.avg_nps}</td>
+                <td><span class="badge ${npsBadgeClass}">${company.company_nps > 0 ? '+' : ''}${company.company_nps}</span></td>
+                <td><small>${distributionText}</small></td>
+                <td><span class="badge ${riskBadgeClass}">${company.risk_level}</span></td>
+                <td>${company.latest_response || 'N/A'}</td>
+                <td>${churnRiskDisplay}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
 function refreshData() {
     loadDashboardData();
+    loadCompanyNpsData();
 }
 
 function exportData() {
