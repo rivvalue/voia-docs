@@ -346,19 +346,46 @@ Only include fields that are clearly present in the response. If a field is not 
     
     def _check_completion_criteria(self) -> bool:
         """Check if we have enough data to complete the survey"""
-        required_fields = ['nps_score', 'nps_reasoning']
-        essential_fields = ['tenure_with_fc', 'satisfaction_rating']
+        # Core requirements
+        has_nps = self.extracted_data.get('nps_score') is not None
+        has_reasoning = self.extracted_data.get('nps_reasoning') is not None
+        has_tenure = self.extracted_data.get('tenure_with_fc') is not None
         
-        # Must have NPS score and reasoning
-        has_required = all(self.extracted_data.get(field) is not None for field in required_fields)
+        # Additional data points
+        has_satisfaction = self.extracted_data.get('satisfaction_rating') is not None
+        has_service = self.extracted_data.get('service_rating') is not None
+        has_improvement = self.extracted_data.get('improvement_feedback') is not None
         
-        # Should have at least some additional data
-        has_some_essential = any(self.extracted_data.get(field) is not None for field in essential_fields)
+        # Must have at least core data (NPS + reasoning + tenure)
+        has_core = has_nps and has_reasoning and has_tenure
         
-        # Or if we've gone through enough steps
-        enough_steps = self.step_count >= 6
+        # Should have at least one additional rating or feedback
+        has_additional = has_satisfaction or has_service or has_improvement
         
-        return has_required and (has_some_essential or enough_steps)
+        # Or if we've gone through many steps (safety valve)
+        enough_steps = self.step_count >= 8
+        
+        return has_core and (has_additional or enough_steps)
+    
+    def _get_next_question_priority(self) -> str:
+        """Determine what question should be asked next based on collected data"""
+        data = self.extracted_data
+        
+        # Check what we have and what we need
+        if not data.get('tenure_with_fc'):
+            return "Ask about business relationship tenure with FC inc (how long working together)"
+        elif not data.get('nps_score'):
+            return "Ask for NPS score (0-10 likelihood to recommend FC inc)"
+        elif not data.get('nps_reasoning'):
+            return "Ask WHY they gave that NPS score - what's their reasoning about FC inc"
+        elif not data.get('satisfaction_rating'):
+            return "Ask for overall satisfaction rating (1-5) with FC inc"
+        elif not data.get('service_rating'):
+            return "Ask for professional services quality rating (1-5) from FC inc"
+        elif not data.get('improvement_feedback'):
+            return "Ask what FC inc could do better or improve"
+        else:
+            return "Wrap up the conversation - you have enough information"
     
     def _generate_ai_question(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
         """Generate next question using OpenAI"""
@@ -378,6 +405,9 @@ SURVEY DATA COLLECTED SO FAR:
 
 CONVERSATION STEP: {self.step_count}
 
+NEXT LOGICAL QUESTION PRIORITY:
+{self._get_next_question_priority()}
+
 YOUR ROLE: You are a helpful customer feedback specialist having a natural conversation. Your goal is to collect feedback about FC inc:
 1. Business relationship tenure - How long working with FC inc
 2. NPS score (0-10) - How likely to recommend FC inc
@@ -393,7 +423,10 @@ YOUR ROLE: You are a helpful customer feedback specialist having a natural conve
 GUIDELINES:
 - Keep the conversation natural and engaging
 - Ask ONE question at a time
-- DON'T ask for information you already have (check SURVEY DATA COLLECTED SO FAR)
+- CRITICALLY IMPORTANT: DON'T ask for information you already have (check SURVEY DATA COLLECTED SO FAR)
+- Look at what you have already collected and ask for what's missing logically
+- If you have NPS score but no reasoning, ask WHY they gave that score
+- If you have tenure but no satisfaction rating, ask about satisfaction
 - Reference their previous responses to show you're listening
 - If they mention specific issues, ask thoughtful follow-ups
 - If they seem rushed, be more direct
