@@ -810,14 +810,21 @@ def process_ai_conversation_response(user_input: str, context: Dict[str, Any]) -
     """Process user's conversational response with AI"""
     conversation_id = context.get('conversation_id')
     
+    print(f"DEBUG: Processing conversation_id: {conversation_id}")
+    print(f"DEBUG: Available instances: {list(ai_conversation_instances.keys())}")
+    print(f"DEBUG: Context keys: {list(context.keys())}")
+    
     if conversation_id and conversation_id in ai_conversation_instances:
         ai_survey = ai_conversation_instances[conversation_id]
+        print(f"DEBUG: Found existing instance with step {ai_survey.step_count}, extracted data: {ai_survey.extracted_data}")
         return ai_survey.process_user_response(user_input, context)
     else:
+        print(f"DEBUG: No instance found for conversation_id {conversation_id}, creating new one")
         # Fallback - create new instance
         ai_survey = AIConversationalSurvey()
         ai_survey.survey_data = context
-        ai_conversation_instances[conversation_id] = ai_survey
+        if conversation_id:
+            ai_conversation_instances[conversation_id] = ai_survey
         return ai_survey.process_user_response(user_input, context)
 
 def finalize_ai_conversational_survey(context: Dict[str, Any]) -> Dict[str, Any]:
