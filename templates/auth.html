@@ -61,10 +61,30 @@
                             </small>
                         </div>
                         
+                        <!-- Survey Type Selection -->
+                        <div class="mb-3">
+                            <label class="form-label">Choose Survey Experience:</label>
+                            <div class="btn-group w-100" role="group" aria-label="Survey type selection">
+                                <input type="radio" class="btn-check" name="surveyType" id="conversationalOption" value="conversational" checked>
+                                <label class="btn btn-outline-primary" for="conversationalOption">
+                                    <i class="fas fa-comments me-2"></i>Conversational (AI)
+                                </label>
+                                
+                                <input type="radio" class="btn-check" name="surveyType" id="traditionalOption" value="traditional">
+                                <label class="btn btn-outline-secondary" for="traditionalOption">
+                                    <i class="fas fa-list-alt me-2"></i>Traditional Form
+                                </label>
+                            </div>
+                            <small class="form-text text-muted mt-1">
+                                <strong>Conversational:</strong> Chat with Voxa AI for a natural feedback experience<br>
+                                <strong>Traditional:</strong> Standard form-based survey
+                            </small>
+                        </div>
+                        
                         <div class="d-grid gap-2">
-                            <a href="{{ url_for('survey') }}" class="btn btn-success">
+                            <button type="button" class="btn btn-success" onclick="startSelectedSurvey()">
                                 <i class="fas fa-poll-h me-2"></i>Start Survey
-                            </a>
+                            </button>
                             <button type="button" class="btn btn-outline-primary" onclick="resetForm()">
                                 Generate Another Token
                             </button>
@@ -202,6 +222,31 @@ function resetForm() {
     document.getElementById('emailInput').value = '';
     currentToken = null;
     showState('form');
+}
+
+function startSelectedSurvey() {
+    // Get selected survey type
+    const conversationalSelected = document.getElementById('conversationalOption').checked;
+    const traditionalSelected = document.getElementById('traditionalOption').checked;
+    
+    // Determine the URL based on selection
+    let surveyUrl;
+    if (conversationalSelected) {
+        surveyUrl = "{{ url_for('conversational_survey') }}";
+    } else if (traditionalSelected) {
+        surveyUrl = "{{ url_for('survey') }}";
+    } else {
+        // Default to conversational if nothing selected
+        surveyUrl = "{{ url_for('conversational_survey') }}";
+    }
+    
+    // Store the token in localStorage before navigating
+    if (currentToken) {
+        localStorage.setItem('auth_token', currentToken);
+    }
+    
+    // Navigate to the selected survey type
+    window.location.href = surveyUrl;
 }
 
 function showState(state) {
