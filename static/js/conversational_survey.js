@@ -1,4 +1,5 @@
 // Conversational AI Survey JavaScript
+console.log('=== CONVERSATIONAL_SURVEY.JS LOADED SUCCESSFULLY ===');
 
 let conversationState = {
     authToken: null,
@@ -358,6 +359,7 @@ function finalizeSurvey() {
         
         // IMMEDIATE token invalidation test - removing timeout for debugging
         console.log('IMMEDIATE conversational token invalidation - no timeout');
+        alert('SUCCESS: Conversational survey completed! Token invalidation should happen now.');
         clearAuthenticationAndRedirect('Conversational survey completed successfully! Please get a new token for another survey.');
         
         console.log('Conversational survey finalized successfully:', data);

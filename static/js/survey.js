@@ -1,4 +1,5 @@
 // Survey JavaScript functionality
+console.log('=== SURVEY.JS LOADED SUCCESSFULLY ===');
 
 let currentStep = 1;
 let selectedNpsScore = null;
@@ -183,6 +184,7 @@ function submitSurvey() {
         
         // IMMEDIATE token invalidation test - removing timeout for debugging
         console.log('IMMEDIATE token invalidation - no timeout');
+        alert('SUCCESS: Survey completed! Token invalidation should happen now.');
         clearAuthenticationAndRedirect('Survey submitted successfully! Please get a new token for another survey.');
         
         console.log('Survey submitted successfully:', data);
