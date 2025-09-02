@@ -656,7 +656,7 @@ def finalize_conversation():
             return jsonify({'error': 'Conversation ID is required'}), 400
         
         # Add authenticated email and conversation ID to survey data
-        survey_data['respondent_email'] = g.authenticated_email
+        survey_data['respondent_email'] = authenticated_email
         survey_data['conversation_id'] = conversation_id
         survey_data['conversation_history'] = json.dumps(messages)
         
@@ -667,7 +667,7 @@ def finalize_conversation():
         response = SurveyResponse(
             company_name=structured_data.get('company_name'),
             respondent_name=structured_data.get('respondent_name'),
-            respondent_email=g.authenticated_email,
+            respondent_email=authenticated_email,
             tenure_with_fc=structured_data.get('tenure_with_fc'),
             nps_score=structured_data.get('nps_score'),
             satisfaction_rating=structured_data.get('satisfaction_rating'),
@@ -694,13 +694,13 @@ def finalize_conversation():
         # Queue AI analysis
         add_analysis_task(response.id)
         
-        logger.info(f"Conversational survey completed by {g.authenticated_email}")
+        logger.info(f"Conversational survey completed by {authenticated_email}")
         
         return jsonify({
             'message': 'Survey completed successfully',
             'response_id': response.id,
             'analysis_status': 'queued',
-            'authenticated_email': g.authenticated_email
+            'authenticated_email': authenticated_email
         })
         
     except Exception as e:
