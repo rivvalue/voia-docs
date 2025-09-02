@@ -21,21 +21,28 @@
             </div>
 
             <!-- Authentication Check -->
-            <div id="authCheck" class="card mb-4" style="display: none;">
+            {% if not authenticated %}
+            <div id="authCheck" class="card mb-4">
                 <div class="card-body text-center">
                     <div class="alert alert-warning">
                         <i class="fas fa-key me-2"></i>
                         <strong>Authentication Required</strong>
                         <p class="mb-3">You need a valid token to participate in this survey.</p>
+                        {% if error %}
+                        <p class="text-danger">{{ error }}</p>
+                        {% endif %}
                         <a href="/auth" class="btn btn-primary">Get Authentication Token</a>
                     </div>
                 </div>
             </div>
+            {% endif %}
 
             <!-- Survey Setup -->
+            {% if authenticated %}
             <div id="surveySetup" class="card mb-4">
                 <div class="card-header">
                     <h5><i class="fas fa-user-circle me-2"></i>Let's Get Started</h5>
+                    <small class="text-muted">Authenticated as: {{ email }}</small>
                 </div>
                 <div class="card-body">
                     <form id="setupForm">
@@ -52,7 +59,7 @@
                         <div class="mb-3">
                             <label for="respondentEmail" class="form-label">Email Address</label>
                             <input type="email" class="form-control" id="respondentEmail" required 
-                                   placeholder="Enter your email address">
+                                   placeholder="Enter your email address" value="{{ email or '' }}">
                         </div>
                         <div class="mb-3">
                             <label for="tenureWithFc" class="form-label">How long have you been working with FC inc?</label>
@@ -140,6 +147,12 @@
         </div>
     </div>
 </div>
+{% endif %}
 
+<script>
+// Pass authentication status to JavaScript
+window.isAuthenticated = {{ 'true' if authenticated else 'false' }};
+window.userEmail = '{{ email or '' }}';
+</script>
 <script src="{{ url_for('static', filename='js/conversational_survey.js') }}"></script>
 {% endblock %}
