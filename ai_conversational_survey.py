@@ -89,9 +89,10 @@ class AIConversationalSurvey:
         print(f"Extracted data: {extracted}")
         print(f"Full extracted data: {self.extracted_data}")
         
-        # ANTI-LOOP PROTECTION: Prevent infinite loops
-        if self.step_count > 12:
-            print("LOOP PROTECTION: Forcing completion after 12 steps")
+        # IMMEDIATE ANTI-LOOP PROTECTION: Prevent infinite loops
+        if self.step_count > 6:
+            print("IMMEDIATE LOOP PROTECTION: Forcing completion after 6 steps")
+            self.is_complete = True
             return {
                 'message': "Thank you so much for your detailed feedback about FC inc! Your insights are very valuable.",
                 'message_type': 'completion',
@@ -366,9 +367,9 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         if any(indicator in text_lower for indicator in negative_indicators):
             extracted['complaint_feedback'] = user_input
         
-        # Store reasoning if it seems like reasoning
-        reasoning_indicators = ['because', 'since', 'due to', 'reason', 'why', 'that\'s why']
-        if any(indicator in text_lower for indicator in reasoning_indicators):
+        # Store reasoning if it seems like reasoning OR if it's any substantive response
+        reasoning_indicators = ['because', 'since', 'due to', 'reason', 'why', 'that\'s why', 'good', 'bad', 'great', 'poor', 'like', 'dislike', 'satisfied', 'happy', 'disappointed']
+        if any(indicator in text_lower for indicator in reasoning_indicators) or len(user_input.strip()) > 5:
             extracted['nps_reasoning'] = user_input
         
         # Always store as additional comments for context
@@ -380,7 +381,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         """Check if we have enough data to complete the survey"""
         # Core requirements
         has_nps = self.extracted_data.get('nps_score') is not None
-        has_reasoning = self.extracted_data.get('nps_reasoning') is not None or self.extracted_data.get('compliment_feedback') is not None or self.extracted_data.get('complaint_feedback') is not None
+        has_reasoning = self.extracted_data.get('nps_reasoning') is not None or self.extracted_data.get('compliment_feedback') is not None or self.extracted_data.get('complaint_feedback') is not None or self.extracted_data.get('additional_comments') is not None
         has_tenure = self.extracted_data.get('tenure_with_fc') is not None
         
         # Additional data points
@@ -388,22 +389,18 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         has_service = self.extracted_data.get('service_rating') is not None
         has_improvement = self.extracted_data.get('improvement_feedback') is not None
         
-        # Must have at least core data (NPS + some reasoning + tenure)
-        has_core = has_nps and has_reasoning and has_tenure
+        # SIMPLIFIED COMPLETION LOGIC TO STOP LOOPS:
+        # Complete if we have basic data (NPS + tenure + any reasoning)
+        has_minimal = has_nps and has_tenure and has_reasoning
         
-        # Should have at least one additional rating or feedback
-        has_additional = has_satisfaction or has_service or has_improvement
+        # Force completion after fewer steps
+        enough_steps = self.step_count >= 4  # Reduced significantly to prevent loops
+        force_complete = self.step_count >= 6  # Force much earlier
         
-        # ENHANCED COMPLETION LOGIC:
-        # Complete if we have core data AND (additional data OR enough conversation steps)
-        enough_steps = self.step_count >= 6  # Reduced from 8 to prevent loops
+        # AGGRESSIVE COMPLETION: Complete much sooner to prevent loops
+        completion_ready = has_minimal or enough_steps or force_complete
         
-        # Force completion for loop prevention
-        force_complete = self.step_count >= 10
-        
-        completion_ready = has_core and (has_additional or enough_steps) or force_complete
-        
-        print(f"COMPLETION CHECK: Core={has_core}, Additional={has_additional}, Steps={self.step_count}, Ready={completion_ready}")
+        print(f"COMPLETION CHECK: NPS={has_nps}, Tenure={has_tenure}, Reasoning={has_reasoning}, Steps={self.step_count}, Ready={completion_ready}")
         
         return completion_ready
     
