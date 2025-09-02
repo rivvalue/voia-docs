@@ -17,4 +17,5 @@ dependencies = [
     "flask-login>=0.6.3",
     "oauthlib>=3.3.1",
     "pyjwt>=2.10.1",
+    "flask-cors>=6.0.1",
 ]
