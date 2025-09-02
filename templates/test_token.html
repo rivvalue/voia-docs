@@ -39,41 +39,82 @@
         try {
             // Test 1: Check current URL
             addResult(`Current URL: ${window.location.origin}`, 'info');
+            addResult(`Full URL: ${window.location.href}`, 'info');
             
             // Test 2: Construct token URL
             const baseUrl = window.location.origin;
             const tokenUrl = `${baseUrl}/auth/request-token`;
             addResult(`Token URL: ${tokenUrl}`, 'info');
             
-            // Test 3: Make the request
+            // Test 3: Test browser fetch support
+            if (typeof fetch === 'undefined') {
+                addResult('ERROR: fetch() not supported in this browser', 'error');
+                return;
+            }
+            addResult('fetch() is supported', 'success');
+            
+            // Test 4: Make the request with detailed error handling
             addResult('Making request...', 'info');
-            const response = await fetch(tokenUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({ email: email })
-            });
+            let response;
+            try {
+                response = await fetch(tokenUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email: email })
+                });
+                addResult('Request completed', 'success');
+            } catch (fetchError) {
+                addResult(`FETCH ERROR: ${fetchError.message}`, 'error');
+                addResult(`Fetch error type: ${fetchError.name}`, 'error');
+                addResult(`Fetch error stack: ${fetchError.stack}`, 'error');
+                return;
+            }
             
             addResult(`Response status: ${response.status}`, response.ok ? 'success' : 'error');
-            addResult(`Response headers: ${JSON.stringify([...response.headers])}`, 'info');
+            addResult(`Response status text: ${response.statusText}`, 'info');
+            addResult(`Response type: ${response.type}`, 'info');
+            addResult(`Response URL: ${response.url}`, 'info');
             
-            // Test 4: Parse response
-            const data = await response.json();
+            // Test 5: Check response headers
+            try {
+                const headerEntries = [...response.headers.entries()];
+                addResult(`Response headers count: ${headerEntries.length}`, 'info');
+                headerEntries.forEach(([key, value]) => {
+                    addResult(`Header ${key}: ${value}`, 'info');
+                });
+            } catch (headerError) {
+                addResult(`Header parsing error: ${headerError.message}`, 'error');
+            }
+            
+            // Test 6: Parse response
+            let data;
+            try {
+                const responseText = await response.text();
+                addResult(`Raw response: ${responseText}`, 'info');
+                data = JSON.parse(responseText);
+                addResult('JSON parsing successful', 'success');
+            } catch (parseError) {
+                addResult(`JSON PARSE ERROR: ${parseError.message}`, 'error');
+                return;
+            }
             
             if (response.ok) {
                 addResult(`SUCCESS: Token generated for ${data.email}`, 'success');
-                addResult(`Token: ${data.token}`, 'success');
+                addResult(`Token: ${data.token.substring(0, 50)}...`, 'success');
                 addResult(`Expires in: ${data.expires_in} seconds`, 'info');
+                addResult(`Message: ${data.message}`, 'success');
             } else {
                 addResult(`ERROR: ${data.error || 'Unknown error'}`, 'error');
                 addResult(`Error code: ${data.code || 'N/A'}`, 'error');
             }
             
         } catch (error) {
-            addResult(`NETWORK ERROR: ${error.message}`, 'error');
-            addResult(`Error details: ${error.toString()}`, 'error');
+            addResult(`UNEXPECTED ERROR: ${error.message}`, 'error');
+            addResult(`Error type: ${error.name}`, 'error');
+            addResult(`Error stack: ${error.stack}`, 'error');
         }
     }
     
