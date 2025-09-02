@@ -1,4 +1,4 @@
-from flask import render_template, request, jsonify, flash, redirect, url_for, g
+from flask import render_template, request, jsonify, flash, redirect, url_for, g, session
 from app import app, db
 from models import SurveyResponse
 from models_auth import AuthToken
