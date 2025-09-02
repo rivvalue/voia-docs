@@ -7,7 +7,10 @@ let authToken = null;
 // Initialize the survey
 document.addEventListener('DOMContentLoaded', function() {
     updateProgress();
-    checkAuthentication();
+    // Check if user is authenticated via server-side template
+    if (window.isAuthenticated === false) {
+        showAuthRequired();
+    }
 });
 
 function nextStep(stepNumber) {
@@ -108,10 +111,10 @@ function handleNpsSelection() {
 }
 
 function submitSurvey() {
-    // Check authentication
-    if (!authToken) {
+    // Check authentication via server-side status
+    if (window.isAuthenticated === false) {
         alert('Authentication required. Please get a token first.');
-        window.location.href = '/auth';
+        window.location.href = '/server-auth';
         return;
     }
     
@@ -134,12 +137,11 @@ function submitSurvey() {
         additional_comments: document.getElementById('additionalComments').value.trim() || null
     };
     
-    // Submit to server with authentication
+    // Submit to server with session-based authentication
     fetch('/submit_survey', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + authToken
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
     })

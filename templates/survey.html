@@ -212,5 +212,12 @@
 {% endblock %}
 
 {% block scripts %}
+<script>
+    // Pass authentication status to JavaScript
+    window.isAuthenticated = {% if authenticated %}true{% else %}false{% endif %};
+    {% if authenticated %}
+    window.userEmail = "{{ email }}";
+    {% endif %}
+</script>
 <script src="{{ url_for('static', filename='js/survey.js') }}"></script>
 {% endblock %}
