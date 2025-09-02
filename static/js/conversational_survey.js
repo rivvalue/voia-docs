@@ -11,41 +11,19 @@ let conversationState = {
 
 // Initialize the conversational survey
 document.addEventListener('DOMContentLoaded', function() {
-    checkAuthentication();
+    initializeAuthentication();
     setupEventListeners();
 });
 
-function checkAuthentication() {
-    const token = localStorage.getItem('auth_token');
-    const email = localStorage.getItem('auth_email');
-    
-    if (token && email) {
-        // Verify token is still valid
-        fetch('/auth/verify-token', {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + token
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.valid) {
-                conversationState.authToken = token;
-                // Pre-fill email if available
-                if (document.getElementById('respondentEmail')) {
-                    document.getElementById('respondentEmail').value = email;
-                }
-                showSurveySetup();
-            } else {
-                localStorage.removeItem('auth_token');
-                localStorage.removeItem('auth_email');
-                showAuthRequired();
-            }
-        })
-        .catch(error => {
-            console.error('Token verification failed:', error);
-            showAuthRequired();
-        });
+function initializeAuthentication() {
+    // Check if user is authenticated via server-side template
+    if (window.isAuthenticated) {
+        conversationState.authToken = 'server-authenticated'; // Flag for server-auth
+        // Pre-fill email if available
+        if (document.getElementById('respondentEmail') && window.userEmail) {
+            document.getElementById('respondentEmail').value = window.userEmail;
+        }
+        showSurveySetup();
     } else {
         showAuthRequired();
     }
@@ -108,8 +86,8 @@ function startConversation() {
     fetch('/api/start_conversation', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + conversationState.authToken
+            'Content-Type': 'application/json'
+            // No Authorization header needed - server uses session
         },
         body: JSON.stringify({
             company_name: companyName,
@@ -163,8 +141,8 @@ function sendMessage() {
     fetch('/api/conversation_response', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + conversationState.authToken
+            'Content-Type': 'application/json'
+            // No Authorization header needed - server uses session
         },
         body: JSON.stringify({
             conversation_id: conversationState.conversationId,

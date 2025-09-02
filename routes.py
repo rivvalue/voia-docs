@@ -551,10 +551,13 @@ def conversational_survey():
 
 @app.route('/api/start_conversation', methods=['POST'])
 @rate_limit(limit=10)
-@require_auth()
 def start_conversation():
     """Start a new conversational survey session"""
     try:
+        # Check if user is authenticated via session
+        if not session.get('auth_token'):
+            return jsonify({'error': 'Authentication required', 'code': 'AUTH_ERROR'}), 401
+            
         data = request.get_json()
         company_name = data.get('company_name', '').strip()
         respondent_name = data.get('respondent_name', '').strip()
@@ -583,10 +586,13 @@ def start_conversation():
 
 @app.route('/api/conversation_response', methods=['POST'])
 @rate_limit(limit=50)
-@require_auth()
 def conversation_response():
     """Process conversational survey response"""
     try:
+        # Check if user is authenticated via session
+        if not session.get('auth_token'):
+            return jsonify({'error': 'Authentication required', 'code': 'AUTH_ERROR'}), 401
+            
         data = request.get_json()
         conversation_id = data.get('conversation_id')
         user_input = data.get('user_input', '').strip()
