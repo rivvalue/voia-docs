@@ -16,31 +16,6 @@ import uuid
 
 logger = logging.getLogger(__name__)
 
-@app.route('/health')
-def health_check():
-    """Health check endpoint for deployment testing"""
-    try:
-        from auth_system import auth_system
-        
-        # Test database connection
-        db.session.execute(db.text('SELECT 1'))
-        
-        return jsonify({
-            'status': 'healthy',
-            'timestamp': datetime.utcnow().isoformat(),
-            'database': 'connected',
-            'auth_system': 'available',
-            'environment': 'deployed' if os.environ.get('REPL_ID') else 'development'
-        }), 200
-        
-    except Exception as e:
-        logger.error(f"Health check failed: {e}")
-        return jsonify({
-            'status': 'unhealthy',
-            'error': str(e),
-            'timestamp': datetime.utcnow().isoformat()
-        }), 500
-
 @app.route('/')
 def index():
     """Landing page with survey overview"""
