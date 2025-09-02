@@ -161,11 +161,21 @@ async function requestToken() {
     showState('loading');
 
     try {
-        // Use absolute URL construction for deployment compatibility
-        const baseUrl = window.location.origin;
-        const tokenUrl = `${baseUrl}/auth/request-token`;
+        // Multiple URL strategies for deployment compatibility
+        let tokenUrl;
         
-        console.log('Requesting token from:', tokenUrl);
+        // Strategy 1: Relative URL (works best with custom domains)
+        if (window.location.host.includes('.replit.app') || window.location.host.includes('localhost')) {
+            // For Replit domains and localhost, use relative paths
+            tokenUrl = '/auth/request-token';
+        } else {
+            // For custom domains, construct absolute URL
+            tokenUrl = `${window.location.origin}/auth/request-token`;
+        }
+        
+        console.log('Environment:', window.location.host);
+        console.log('Using token URL:', tokenUrl);
+        console.log('Full location:', window.location.href);
         
         const response = await fetch(tokenUrl, {
             method: 'POST',

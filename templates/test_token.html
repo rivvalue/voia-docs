@@ -41,10 +41,24 @@
             addResult(`Current URL: ${window.location.origin}`, 'info');
             addResult(`Full URL: ${window.location.href}`, 'info');
             
-            // Test 2: Construct token URL
-            const baseUrl = window.location.origin;
-            const tokenUrl = `${baseUrl}/auth/request-token`;
-            addResult(`Token URL: ${tokenUrl}`, 'info');
+            // Test 2: Smart URL construction for different domains
+            let tokenUrl;
+            const host = window.location.host;
+            addResult(`Host: ${host}`, 'info');
+            addResult(`Protocol: ${window.location.protocol}`, 'info');
+            addResult(`Origin: ${window.location.origin}`, 'info');
+            
+            // Domain-specific URL strategy
+            if (host.includes('.replit.app') || host.includes('localhost') || host.includes('127.0.0.1')) {
+                // Replit domains and localhost - use relative paths
+                tokenUrl = '/auth/request-token';
+                addResult('Using relative URL for Replit/localhost', 'info');
+            } else {
+                // Custom domains - use absolute URLs
+                tokenUrl = `${window.location.origin}/auth/request-token`;
+                addResult('Using absolute URL for custom domain', 'info');
+            }
+            addResult(`Final token URL: ${tokenUrl}`, 'info');
             
             // Test 3: Test browser fetch support
             if (typeof fetch === 'undefined') {
