@@ -89,6 +89,17 @@ class AIConversationalSurvey:
         print(f"Extracted data: {extracted}")
         print(f"Full extracted data: {self.extracted_data}")
         
+        # ANTI-LOOP PROTECTION: Prevent infinite loops
+        if self.step_count > 12:
+            print("LOOP PROTECTION: Forcing completion after 12 steps")
+            return {
+                'message': "Thank you so much for your detailed feedback about FC inc! Your insights are very valuable.",
+                'message_type': 'completion',
+                'step': 'forced_complete',
+                'progress': 100,
+                'is_complete': True
+            }
+        
         # Check if we have enough data to complete
         if self._check_completion_criteria():
             next_question = {
@@ -369,7 +380,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         """Check if we have enough data to complete the survey"""
         # Core requirements
         has_nps = self.extracted_data.get('nps_score') is not None
-        has_reasoning = self.extracted_data.get('nps_reasoning') is not None
+        has_reasoning = self.extracted_data.get('nps_reasoning') is not None or self.extracted_data.get('compliment_feedback') is not None or self.extracted_data.get('complaint_feedback') is not None
         has_tenure = self.extracted_data.get('tenure_with_fc') is not None
         
         # Additional data points
@@ -377,16 +388,24 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         has_service = self.extracted_data.get('service_rating') is not None
         has_improvement = self.extracted_data.get('improvement_feedback') is not None
         
-        # Must have at least core data (NPS + reasoning + tenure)
+        # Must have at least core data (NPS + some reasoning + tenure)
         has_core = has_nps and has_reasoning and has_tenure
         
         # Should have at least one additional rating or feedback
         has_additional = has_satisfaction or has_service or has_improvement
         
-        # Or if we've gone through many steps (safety valve)
-        enough_steps = self.step_count >= 8
+        # ENHANCED COMPLETION LOGIC:
+        # Complete if we have core data AND (additional data OR enough conversation steps)
+        enough_steps = self.step_count >= 6  # Reduced from 8 to prevent loops
         
-        return has_core and (has_additional or enough_steps)
+        # Force completion for loop prevention
+        force_complete = self.step_count >= 10
+        
+        completion_ready = has_core and (has_additional or enough_steps) or force_complete
+        
+        print(f"COMPLETION CHECK: Core={has_core}, Additional={has_additional}, Steps={self.step_count}, Ready={completion_ready}")
+        
+        return completion_ready
     
     def _get_next_question_priority(self) -> str:
         """Determine what question should be asked next based on collected data"""
@@ -516,12 +535,12 @@ Be conversational, empathetic, and adaptive to their communication style."""
         print(f"Tenure from extracted_data: {self.extracted_data.get('tenure_with_fc')}")
         print(f"NPS from extracted_data: {self.extracted_data.get('nps_score')}")
         
-        # Special case: If we have tenure and just got NPS score, go directly to reasoning
+        # FIXED: Special case handling without step manipulation
         if (self.extracted_data.get('tenure_with_fc') is not None and 
             self.extracted_data.get('nps_score') is not None and 
-            self.step_count <= 3):
+            not self.extracted_data.get('nps_reasoning') and
+            self.step_count <= 4):
             score = self.extracted_data['nps_score']
-            self.step_count = 4  # Set to next step to avoid re-asking
             if score >= 9:
                 return {
                     'message': f"Wonderful! A {score} is fantastic. What specifically about FC inc made your experience so great?",
@@ -560,7 +579,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 }
             else:
                 # We already have tenure, skip to NPS question
-                self.step_count = 2
+                # Don't manipulate step count - let natural progression continue
                 return {
                     'message': "On a scale of 0-10, how likely are you to recommend FC inc to a friend or colleague?",
                     'message_type': 'ai_question',
