@@ -62,12 +62,19 @@ class AIConversationalSurvey:
         # Extract data from user input
         extracted = self._extract_survey_data_with_ai(user_input, context)
         
-        # Track what was just extracted for debugging
+        # Track what was just extracted for debugging - but PREVENT overwrites of existing data
         newly_extracted = {}
         for key, value in extracted.items():
-            if value is not None and self.extracted_data.get(key) != value:
-                newly_extracted[key] = value
-                self.extracted_data[key] = value
+            if value is not None:
+                # CRITICAL: Only update if we don't already have this data to prevent overwrites
+                if self.extracted_data.get(key) is None:
+                    newly_extracted[key] = value
+                    self.extracted_data[key] = value
+                    print(f"LOCKED DATA: {key} = {value} (first time captured)")
+                else:
+                    # Data already exists, don't overwrite - log the attempt
+                    existing_value = self.extracted_data.get(key)
+                    print(f"DATA PROTECTION: Prevented overwrite of {key}. Keeping existing: {existing_value}, AI suggested: {value}")
         
         self.survey_data['extracted_data'] = self.extracted_data
         
@@ -122,12 +129,19 @@ class AIConversationalSurvey:
     def _extract_survey_data_with_ai(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
         """Extract structured survey data from natural language using OpenAI"""
         try:
+            # Get list of already captured data to prevent overwrites
+            locked_fields = [key for key, value in self.extracted_data.items() if value is not None]
+            
             prompt = f"""Extract survey data from this customer response: "{user_input}"
 
 Context of conversation:
 - Company: {context.get('company_name', 'Unknown')}
 - Current extracted data: {json.dumps(self.extracted_data, indent=2)}
 - Conversation step: {self.step_count}
+- ALREADY CAPTURED (DO NOT RE-EXTRACT): {locked_fields}
+
+CRITICAL INSTRUCTION: Only extract NEW information from this specific response. 
+DO NOT re-extract or change data that was already captured in previous responses.
 
 Extract any of the following data present in the response:
 - Tenure with FC inc: Look for duration mentions like "6 months", "2 years", "less than 6 months", etc.
@@ -160,7 +174,9 @@ Return ONLY JSON in this format:
     "additional_comments": "text" or null
 }}
 
-Only include fields that are clearly present in the response. If a field is not mentioned, use null."""
+Only include fields that are clearly present in the response. If a field is not mentioned, use null.
+
+IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), return null for those fields to prevent overwrites."""
 
             response = self.openai_client.chat.completions.create(
                 model="gpt-4o",
@@ -228,7 +244,7 @@ Only include fields that are clearly present in the response. If a field is not 
                             extracted['nps_category'] = 'Passive'
                         else:
                             extracted['nps_category'] = 'Detractor'
-                        print(f"Successfully extracted NPS score: {score}")
+                        print(f"FIRST TIME NPS CAPTURE (FALLBACK): {score} - LOCKED")
                         break
                 if 'nps_score' in extracted:
                     break
