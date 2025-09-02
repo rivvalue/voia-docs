@@ -213,18 +213,25 @@ def survey():
             return render_template('survey.html', error="Authentication required - please generate a token first")
 
 @app.route('/submit_survey', methods=['POST'])
-@require_auth(allow_overwrite=False)  # Require authentication, no overwrites by default
 @rate_limit(limit=10)  # 10 survey submissions per minute per IP
 def submit_survey():
     """Handle authenticated survey submission and prevent duplicates"""
     try:
-        data = request.json
+        # Check if user is authenticated via session
+        if not session.get('auth_token'):
+            return jsonify({'error': 'Authentication required', 'code': 'AUTH_ERROR'}), 401
+            
+        # Accept both JSON and form data
+        if request.content_type and 'application/json' in request.content_type:
+            data = request.json
+        else:
+            data = request.form.to_dict()
+            
         if not data:
-            return jsonify({'error': 'No JSON data provided'}), 400
+            return jsonify({'error': 'No data provided'}), 400
         
-        # Get authenticated email from Flask's g object
-        authenticated_email = getattr(g, 'authenticated_email', None)
-        existing_response = getattr(g, 'existing_response', None)
+        # Get authenticated email from session
+        authenticated_email = session.get('auth_email')
         
         if not authenticated_email:
             return jsonify({'error': 'Authentication failed'}), 401
