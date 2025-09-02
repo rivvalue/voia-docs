@@ -89,9 +89,9 @@ class AIConversationalSurvey:
         print(f"Extracted data: {extracted}")
         print(f"Full extracted data: {self.extracted_data}")
         
-        # IMMEDIATE ANTI-LOOP PROTECTION: Prevent infinite loops
-        if self.step_count > 6:
-            print("IMMEDIATE LOOP PROTECTION: Forcing completion after 6 steps")
+        # ANTI-LOOP PROTECTION: Prevent infinite loops but allow service questions
+        if self.step_count > 8:
+            print("LOOP PROTECTION: Forcing completion after 8 steps")
             self.is_complete = True
             return {
                 'message': "Thank you so much for your detailed feedback about FC inc! Your insights are very valuable.",
@@ -389,18 +389,24 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         has_service = self.extracted_data.get('service_rating') is not None
         has_improvement = self.extracted_data.get('improvement_feedback') is not None
         
-        # SIMPLIFIED COMPLETION LOGIC TO STOP LOOPS:
-        # Complete if we have basic data (NPS + tenure + any reasoning)
-        has_minimal = has_nps and has_tenure and has_reasoning
+        # BALANCED COMPLETION LOGIC: Get key data but prevent loops
+        # Core data: NPS + tenure + reasoning  
+        has_core = has_nps and has_tenure and has_reasoning
         
-        # Force completion after fewer steps
-        enough_steps = self.step_count >= 4  # Reduced significantly to prevent loops
-        force_complete = self.step_count >= 6  # Force much earlier
+        # Prefer to get at least one service rating
+        has_service_feedback = has_satisfaction or has_service or has_improvement
         
-        # AGGRESSIVE COMPLETION: Complete much sooner to prevent loops
-        completion_ready = has_minimal or enough_steps or force_complete
+        # BALANCED APPROACH: Try to get service feedback but don't loop forever
+        has_sufficient_data = has_core and has_service_feedback
         
-        print(f"COMPLETION CHECK: NPS={has_nps}, Tenure={has_tenure}, Reasoning={has_reasoning}, Steps={self.step_count}, Ready={completion_ready}")
+        # Progressive completion thresholds
+        enough_steps = self.step_count >= 5  # Allow a bit more time for service questions
+        force_complete = self.step_count >= 7  # Still force completion to prevent loops
+        
+        # Complete if we have sufficient data OR enough steps OR force
+        completion_ready = has_sufficient_data or enough_steps or force_complete
+        
+        print(f"COMPLETION CHECK: NPS={has_nps}, Tenure={has_tenure}, Reasoning={has_reasoning}, Service={has_service_feedback}, Steps={self.step_count}, Ready={completion_ready}")
         
         return completion_ready
     
