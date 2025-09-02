@@ -232,15 +232,15 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         if not self.extracted_data.get('nps_score') and re.search(r'\b([0-9]|10)\b', user_input):
             print(f"Attempting NPS extraction at step {self.step_count} for input: '{user_input}'")
             nps_patterns = [
-                r'(?:score|rating|give|rate).*?([0-9]|10)',
-                r'^([0-9]|10)(?:\s|$|/|,|\.)',
-                r'([0-9]|10)\s*(?:out of 10|/10)',
-                r'(?:i.*d.*say|i.*d.*give|i.*d.*rate).*?([0-9]|10)',
-                r'(?:probably|maybe|around|about).*?([0-9]|10)',
-                r'\b([0-9]|10)\b(?!\d)',  # Standalone number not part of larger number
-                r'([0-9]|10)',  # Any single digit or 10 in the text
-                r'(?:is|was|would be|rating|score).*?([0-9]|10)',
-                r'([0-9]|10)(?:\s*(?:stars?|points?|rating))?'  # Number followed by optional unit
+                r'(?:score|rating|give|rate).*?(10|[0-9])',  # Fixed: 10 before single digits
+                r'^(10|[0-9])(?:\s|$|/|,|\.)',
+                r'(10|[0-9])\s*(?:out of 10|/10)',
+                r'(?:i.*d.*say|i.*d.*give|i.*d.*rate).*?(10|[0-9])',  # Fixed order
+                r'(?:probably|maybe|around|about).*?(10|[0-9])',
+                r'\b(10|[0-9])\b(?!\d)',  # Fixed: Check for 10 first
+                r'(10|[0-9])',  # Fixed order
+                r'(?:is|was|would be|rating|score).*?(10|[0-9])',
+                r'(10|[0-9])(?:\s*(?:stars?|points?|rating))?'  # Fixed order
             ]
             
             for pattern in nps_patterns:
