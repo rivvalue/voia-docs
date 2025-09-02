@@ -355,10 +355,13 @@ function finalizeSurvey() {
         // Show completion state
         showSurveyComplete();
         
-        // Clear session and redirect after successful completion
-        setTimeout(() => {
+        // IMMEDIATE token invalidation test  
+        console.log('About to set timeout for conversational survey token invalidation...');
+        const timeoutId = setTimeout(() => {
+            console.log('Conversational timeout triggered! Calling clearAuthenticationAndRedirect...');
             clearAuthenticationAndRedirect('Conversational survey completed successfully! Please get a new token for another survey.');
         }, 4000);  // Wait 4 seconds to show completion message
+        console.log('Conversational timeout set with ID:', timeoutId);
         
         console.log('Conversational survey finalized successfully:', data);
         console.log('Token invalidation will trigger in 4 seconds...');
@@ -378,8 +381,10 @@ function showSurveyComplete() {
     updateProgress(100);
 }
 
-// Clear authentication session and redirect to get new token
+// Clear authentication session and redirect to get new token  
 function clearAuthenticationAndRedirect(message) {
+    console.log('conversational clearAuthenticationAndRedirect called with message:', message);
+    
     // Clear session data by making a logout request
     fetch('/api/logout_session', {
         method: 'POST',
@@ -387,12 +392,19 @@ function clearAuthenticationAndRedirect(message) {
             'Content-Type': 'application/json'
         }
     })
-    .then(() => {
+    .then(response => {
+        console.log('Conversational logout response:', response);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Conversational logout successful:', data);
         // Show message and redirect
         alert(message);
+        console.log('About to redirect to /server-auth from conversational survey');
         window.location.href = '/server-auth';
     })
-    .catch(() => {
+    .catch(error => {
+        console.log('Conversational logout failed, redirecting anyway:', error);
         // Even if logout fails, redirect anyway
         alert(message);
         window.location.href = '/server-auth';

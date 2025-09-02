@@ -179,10 +179,13 @@ function submitSurvey() {
         // Clear stored data
         clearSavedData();
         
-        // Clear session and redirect after successful submission
-        setTimeout(() => {
+        // IMMEDIATE token invalidation test
+        console.log('About to set timeout for token invalidation...');
+        const timeoutId = setTimeout(() => {
+            console.log('Timeout triggered! Calling clearAuthenticationAndRedirect...');
             clearAuthenticationAndRedirect('Survey submitted successfully! Please get a new token for another survey.');
         }, 3000);  // Wait 3 seconds to show success message
+        console.log('Timeout set with ID:', timeoutId);
         
         console.log('Survey submitted successfully:', data);
         console.log('Token invalidation will trigger in 3 seconds...');
@@ -256,6 +259,8 @@ function clearSavedData() {
 
 // Clear authentication session and redirect to get new token
 function clearAuthenticationAndRedirect(message) {
+    console.log('clearAuthenticationAndRedirect called with message:', message);
+    
     // Clear session data by making a logout request
     fetch('/api/logout_session', {
         method: 'POST',
@@ -263,12 +268,19 @@ function clearAuthenticationAndRedirect(message) {
             'Content-Type': 'application/json'
         }
     })
-    .then(() => {
+    .then(response => {
+        console.log('Logout response:', response);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Logout successful:', data);
         // Show message and redirect
         alert(message);
+        console.log('About to redirect to /server-auth');
         window.location.href = '/server-auth';
     })
-    .catch(() => {
+    .catch(error => {
+        console.log('Logout failed, redirecting anyway:', error);
         // Even if logout fails, redirect anyway
         alert(message);
         window.location.href = '/server-auth';
