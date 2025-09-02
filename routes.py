@@ -609,8 +609,13 @@ def conversation_response():
         if not conversation_id or not user_input:
             return jsonify({'error': 'Conversation ID and user input are required'}), 400
         
+        # Get authenticated email from session
+        authenticated_email = session.get('auth_email')
+        if not authenticated_email:
+            return jsonify({'error': 'Authentication session expired', 'code': 'AUTH_ERROR'}), 401
+        
         # Add authenticated email and conversation_id to survey data
-        survey_data['respondent_email'] = g.authenticated_email
+        survey_data['respondent_email'] = authenticated_email
         survey_data['conversation_id'] = conversation_id
         
         # Process response with AI
@@ -624,14 +629,22 @@ def conversation_response():
 
 @app.route('/api/finalize_conversation', methods=['POST'])
 @rate_limit(limit=20)
-@require_auth()
 def finalize_conversation():
     """Finalize conversational survey and save to database"""
     try:
+        # Check if user is authenticated via session
+        if not session.get('auth_token'):
+            return jsonify({'error': 'Authentication required', 'code': 'AUTH_ERROR'}), 401
+            
         data = request.get_json()
         conversation_id = data.get('conversation_id')
         survey_data = data.get('survey_data', {})
         messages = data.get('messages', [])
+        
+        # Get authenticated email from session
+        authenticated_email = session.get('auth_email')
+        if not authenticated_email:
+            return jsonify({'error': 'Authentication session expired', 'code': 'AUTH_ERROR'}), 401
         
         if not conversation_id:
             return jsonify({'error': 'Conversation ID is required'}), 400
