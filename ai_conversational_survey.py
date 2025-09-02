@@ -111,8 +111,13 @@ class AIConversationalSurvey:
         return next_question
     
     def _generate_welcome_message(self, company_name: str, respondent_name: str) -> str:
-        """Generate personalized welcome message"""
-        return f"Hi {respondent_name}! I'm here to gather your feedback about FC inc. This will be a quick conversation to understand your experience and help improve their service. Let's start - on a scale of 0-10, how likely are you to recommend FC inc to a friend or colleague?"
+        """Generate personalized welcome message based on existing data"""
+        if self.extracted_data.get('tenure_with_fc'):
+            # If we already have tenure, jump to NPS
+            return f"Hi {respondent_name}! I'm here to gather your feedback about FC inc. I see you've been working with them for {self.extracted_data['tenure_with_fc']}. That's great! Let's start - on a scale of 0-10, how likely are you to recommend FC inc to a friend or colleague?"
+        else:
+            # Standard welcome message asking for tenure first
+            return f"Hi {respondent_name}! I'm here to gather your feedback about FC inc. This will be a quick conversation to understand your experience and help improve their service. Let's start - how long have you been working with FC inc?"
     
     def _extract_survey_data_with_ai(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
         """Extract structured survey data from natural language using OpenAI"""
@@ -424,6 +429,7 @@ GUIDELINES:
 - Keep the conversation natural and engaging
 - Ask ONE question at a time
 - CRITICALLY IMPORTANT: DON'T ask for information you already have (check SURVEY DATA COLLECTED SO FAR)
+- If tenure_with_fc is already known, NEVER ask about it again
 - Look at what you have already collected and ask for what's missing logically
 - If you have NPS score but no reasoning, ask WHY they gave that score
 - If you have tenure but no satisfaction rating, ask about satisfaction
