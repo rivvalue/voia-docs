@@ -360,6 +360,8 @@ function finalizeSurvey() {
             clearAuthenticationAndRedirect('Conversational survey completed successfully! Please get a new token for another survey.');
         }, 4000);  // Wait 4 seconds to show completion message
         
+        console.log('Conversational survey finalized successfully:', data);
+        console.log('Token invalidation will trigger in 4 seconds...');
     })
     .catch(error => {
         console.error('Error finalizing survey:', error);

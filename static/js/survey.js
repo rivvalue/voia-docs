@@ -145,15 +145,19 @@ function submitSurvey() {
         },
         body: JSON.stringify(formData)
     })
-    .then(response => response.json())
-    .then(data => {
+    .then(response => {
+        // Store response status before consuming the response
+        const status = response.status;
+        return response.json().then(data => ({ data, status }));
+    })
+    .then(({ data, status }) => {
         if (data.error) {
             // Handle specific error cases
             if (data.code === 'AUTH_ERROR' || data.code === 'MISSING_AUTH') {
                 alert('Authentication failed. Please get a new token.');
                 window.location.href = '/auth';
                 return;
-            } else if (response.status === 409) {
+            } else if (status === 409) {
                 // Duplicate response
                 const overwrite = confirm(
                     'You have already submitted a response. Would you like to overwrite it?'
@@ -181,6 +185,7 @@ function submitSurvey() {
         }, 3000);  // Wait 3 seconds to show success message
         
         console.log('Survey submitted successfully:', data);
+        console.log('Token invalidation will trigger in 3 seconds...');
     })
     .catch(error => {
         console.error('Error submitting survey:', error);
