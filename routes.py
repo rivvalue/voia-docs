@@ -153,6 +153,7 @@ def server_auth_generate():
     """Server-side token generation"""
     try:
         email = request.form.get('email', '').strip().lower()
+        survey_type = request.form.get('survey_type', 'conversational')
         
         if not email:
             token_result = {
@@ -170,7 +171,8 @@ def server_auth_generate():
                 'success': True,
                 'email': token_data['email'],
                 'token': token_data['token'],
-                'expires_in': token_data['expires_in']
+                'expires_in': token_data['expires_in'],
+                'survey_type': survey_type
             }
         else:
             token_result = {
@@ -191,8 +193,24 @@ def server_auth_generate():
 
 @app.route('/survey')
 def survey():
-    """Main survey page"""
-    return render_template('survey.html')
+    """Main survey page - check for token in URL"""
+    token = request.args.get('token')
+    if token:
+        # Verify token and store in session for form submission
+        import simple_token_system
+        verification = simple_token_system.verify_simple_token(token)
+        if verification.get('valid'):
+            session['auth_token'] = token
+            session['auth_email'] = verification.get('email')
+            return render_template('survey.html', authenticated=True, email=verification.get('email'))
+        else:
+            return render_template('survey.html', error="Invalid or expired token")
+    else:
+        # Check if already authenticated via session
+        if session.get('auth_token'):
+            return render_template('survey.html', authenticated=True, email=session.get('auth_email'))
+        else:
+            return render_template('survey.html', error="Authentication required - please generate a token first")
 
 @app.route('/submit_survey', methods=['POST'])
 @require_auth(allow_overwrite=False)  # Require authentication, no overwrites by default
@@ -512,8 +530,24 @@ def api_company_trends():
 # Conversational Survey Routes
 @app.route('/conversational_survey')
 def conversational_survey():
-    """AI-powered conversational survey page"""
-    return render_template('conversational_survey.html')
+    """AI-powered conversational survey page - check for token in URL"""
+    token = request.args.get('token')
+    if token:
+        # Verify token and store in session for survey submission
+        import simple_token_system
+        verification = simple_token_system.verify_simple_token(token)
+        if verification.get('valid'):
+            session['auth_token'] = token
+            session['auth_email'] = verification.get('email')
+            return render_template('conversational_survey.html', authenticated=True, email=verification.get('email'))
+        else:
+            return render_template('conversational_survey.html', error="Invalid or expired token")
+    else:
+        # Check if already authenticated via session
+        if session.get('auth_token'):
+            return render_template('conversational_survey.html', authenticated=True, email=session.get('auth_email'))
+        else:
+            return render_template('conversational_survey.html', error="Authentication required - please generate a token first")
 
 @app.route('/api/start_conversation', methods=['POST'])
 @rate_limit(limit=10)
