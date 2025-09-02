@@ -23,7 +23,7 @@ function initializeAuthentication() {
         if (document.getElementById('respondentEmail') && window.userEmail) {
             document.getElementById('respondentEmail').value = window.userEmail;
         }
-        showSurveySetup();
+        // Don't call showSurveySetup() since template already shows it
     } else {
         showAuthRequired();
     }
@@ -40,31 +40,48 @@ function showSurveySetup() {
 }
 
 function setupEventListeners() {
-    // Setup form submission
-    document.getElementById('setupForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        startConversation();
-    });
+    // Setup form submission - ensure form exists first
+    const setupForm = document.getElementById('setupForm');
+    if (setupForm) {
+        setupForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Form submitted, starting conversation...');
+            startConversation();
+        });
+        console.log('Setup form event listener attached successfully');
+    } else {
+        console.error('Setup form not found!');
+    }
     
     // Send message on button click
-    document.getElementById('sendButton').addEventListener('click', function() {
-        sendMessage();
-    });
+    const sendButton = document.getElementById('sendButton');
+    if (sendButton) {
+        sendButton.addEventListener('click', function() {
+            sendMessage();
+        });
+    }
     
     // Send message on Enter key (but allow Shift+Enter for new lines)
-    document.getElementById('userInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
-    });
+    const userInput = document.getElementById('userInput');
+    if (userInput) {
+        userInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    }
 }
 
 function startConversation() {
+    console.log('startConversation called');
+    
     const companyName = document.getElementById('companyName').value.trim();
     const respondentName = document.getElementById('respondentName').value.trim();
     const respondentEmail = document.getElementById('respondentEmail').value.trim();
     const tenureWithFc = document.getElementById('tenureWithFc').value;
+    
+    console.log('Form values:', {companyName, respondentName, respondentEmail, tenureWithFc});
     
     if (!companyName || !respondentName || !respondentEmail || !tenureWithFc) {
         alert('Please fill in all required fields.');
@@ -201,6 +218,53 @@ function formatMessage(message) {
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
         .replace(/\n/g, '<br>');
+}
+
+// Add missing helper functions
+function showLoadingState() {
+    document.getElementById('surveySetup').style.display = 'none';
+    document.getElementById('conversationInterface').style.display = 'none';
+    document.getElementById('loadingState').style.display = 'block';
+    document.getElementById('surveyComplete').style.display = 'none';
+}
+
+function showConversationInterface() {
+    document.getElementById('surveySetup').style.display = 'none';
+    document.getElementById('conversationInterface').style.display = 'block';
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('surveyComplete').style.display = 'none';
+}
+
+function showTypingIndicator() {
+    const chatMessages = document.getElementById('chatMessages');
+    const typingElement = document.createElement('div');
+    typingElement.className = 'chat-message assistant typing-indicator';
+    typingElement.id = 'typingIndicator';
+    typingElement.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+    chatMessages.appendChild(typingElement);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function removeTypingIndicator() {
+    const typingIndicator = document.getElementById('typingIndicator');
+    if (typingIndicator) {
+        typingIndicator.remove();
+    }
+}
+
+function updateProgress(progress) {
+    const progressBar = document.getElementById('progressBar');
+    if (progressBar) {
+        progressBar.style.width = progress + '%';
+        progressBar.setAttribute('aria-valuenow', progress);
+    }
+}
+
+function finalizeSurvey() {
+    document.getElementById('surveySetup').style.display = 'none';
+    document.getElementById('conversationInterface').style.display = 'none';
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('surveyComplete').style.display = 'block';
 }
 
 function showTypingIndicator() {
