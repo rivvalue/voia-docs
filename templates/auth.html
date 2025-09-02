@@ -161,15 +161,26 @@ async function requestToken() {
     showState('loading');
 
     try {
-        const response = await fetch('/auth/request-token', {
+        // Use absolute URL construction for deployment compatibility
+        const baseUrl = window.location.origin;
+        const tokenUrl = `${baseUrl}/auth/request-token`;
+        
+        console.log('Requesting token from:', tokenUrl);
+        
+        const response = await fetch(tokenUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
             body: JSON.stringify({ email: email })
         });
 
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+
         const data = await response.json();
+        console.log('Response data:', data);
 
         if (response.ok) {
             // Success
@@ -183,6 +194,7 @@ async function requestToken() {
             showState('success');
         } else {
             // Error
+            console.error('Token generation failed:', data);
             document.getElementById('errorMessage').textContent = 
                 data.error || 'Failed to generate token';
             showState('error');
@@ -190,7 +202,7 @@ async function requestToken() {
     } catch (error) {
         console.error('Error requesting token:', error);
         document.getElementById('errorMessage').textContent = 
-            'Network error. Please check your connection and try again.';
+            `Network error: ${error.message}. Please check your connection and try again.`;
         showState('error');
     }
 }
