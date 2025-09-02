@@ -111,6 +111,7 @@ function handleNpsSelection() {
 }
 
 function submitSurvey() {
+    console.log('=== SUBMIT SURVEY CALLED ===');
     // Check authentication via server-side status
     if (window.isAuthenticated === false) {
         alert('Authentication required. Please get a token first.');
@@ -151,6 +152,7 @@ function submitSurvey() {
         return response.json().then(data => ({ data, status }));
     })
     .then(({ data, status }) => {
+        console.log('Survey response received:', data, 'Status:', status);
         if (data.error) {
             // Handle specific error cases
             if (data.code === 'AUTH_ERROR' || data.code === 'MISSING_AUTH') {
@@ -179,13 +181,9 @@ function submitSurvey() {
         // Clear stored data
         clearSavedData();
         
-        // IMMEDIATE token invalidation test
-        console.log('About to set timeout for token invalidation...');
-        const timeoutId = setTimeout(() => {
-            console.log('Timeout triggered! Calling clearAuthenticationAndRedirect...');
-            clearAuthenticationAndRedirect('Survey submitted successfully! Please get a new token for another survey.');
-        }, 3000);  // Wait 3 seconds to show success message
-        console.log('Timeout set with ID:', timeoutId);
+        // IMMEDIATE token invalidation test - removing timeout for debugging
+        console.log('IMMEDIATE token invalidation - no timeout');
+        clearAuthenticationAndRedirect('Survey submitted successfully! Please get a new token for another survey.');
         
         console.log('Survey submitted successfully:', data);
         console.log('Token invalidation will trigger in 3 seconds...');

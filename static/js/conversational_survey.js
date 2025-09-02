@@ -327,6 +327,7 @@ function showLoadingState() {
 }
 
 function finalizeSurvey() {
+    console.log('=== FINALIZE CONVERSATIONAL SURVEY CALLED ===');
     // Hide input area
     document.getElementById('inputArea').style.display = 'none';
     
@@ -355,13 +356,9 @@ function finalizeSurvey() {
         // Show completion state
         showSurveyComplete();
         
-        // IMMEDIATE token invalidation test  
-        console.log('About to set timeout for conversational survey token invalidation...');
-        const timeoutId = setTimeout(() => {
-            console.log('Conversational timeout triggered! Calling clearAuthenticationAndRedirect...');
-            clearAuthenticationAndRedirect('Conversational survey completed successfully! Please get a new token for another survey.');
-        }, 4000);  // Wait 4 seconds to show completion message
-        console.log('Conversational timeout set with ID:', timeoutId);
+        // IMMEDIATE token invalidation test - removing timeout for debugging
+        console.log('IMMEDIATE conversational token invalidation - no timeout');
+        clearAuthenticationAndRedirect('Conversational survey completed successfully! Please get a new token for another survey.');
         
         console.log('Conversational survey finalized successfully:', data);
         console.log('Token invalidation will trigger in 4 seconds...');
