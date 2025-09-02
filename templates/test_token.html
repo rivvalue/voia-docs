@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Generation Test</title>
+    <style>
+        body { padding: 20px; font-family: Arial, sans-serif; }
+        .result { margin: 10px 0; padding: 10px; background: #f5f5f5; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e8; color: #2e7d32; }
+        button { padding: 10px 20px; margin: 5px; }
+        input { padding: 8px; margin: 5px; width: 300px; }
+    </style>
+</head>
+<body>
+    <h1>Token Generation Test</h1>
+    
+    <div>
+        <input type="email" id="emailInput" placeholder="Enter email address" value="test@example.com">
+        <button onclick="testTokenGeneration()">Generate Token</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+    
+    <div id="results"></div>
+    
+    <script>
+    async function testTokenGeneration() {
+        const email = document.getElementById('emailInput').value.trim();
+        const resultsDiv = document.getElementById('results');
+        
+        if (!email) {
+            addResult('Please enter an email address', 'error');
+            return;
+        }
+        
+        addResult('Starting token generation test...', 'info');
+        
+        try {
+            // Test 1: Check current URL
+            addResult(`Current URL: ${window.location.origin}`, 'info');
+            
+            // Test 2: Construct token URL
+            const baseUrl = window.location.origin;
+            const tokenUrl = `${baseUrl}/auth/request-token`;
+            addResult(`Token URL: ${tokenUrl}`, 'info');
+            
+            // Test 3: Make the request
+            addResult('Making request...', 'info');
+            const response = await fetch(tokenUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ email: email })
+            });
+            
+            addResult(`Response status: ${response.status}`, response.ok ? 'success' : 'error');
+            addResult(`Response headers: ${JSON.stringify([...response.headers])}`, 'info');
+            
+            // Test 4: Parse response
+            const data = await response.json();
+            
+            if (response.ok) {
+                addResult(`SUCCESS: Token generated for ${data.email}`, 'success');
+                addResult(`Token: ${data.token}`, 'success');
+                addResult(`Expires in: ${data.expires_in} seconds`, 'info');
+            } else {
+                addResult(`ERROR: ${data.error || 'Unknown error'}`, 'error');
+                addResult(`Error code: ${data.code || 'N/A'}`, 'error');
+            }
+            
+        } catch (error) {
+            addResult(`NETWORK ERROR: ${error.message}`, 'error');
+            addResult(`Error details: ${error.toString()}`, 'error');
+        }
+    }
+    
+    function addResult(message, type = 'info') {
+        const resultsDiv = document.getElementById('results');
+        const div = document.createElement('div');
+        div.className = `result ${type}`;
+        div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+        resultsDiv.appendChild(div);
+        div.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function clearResults() {
+        document.getElementById('results').innerHTML = '';
+    }
+    </script>
+</body>
+</html>

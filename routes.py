@@ -133,6 +133,11 @@ def auth():
     """Authentication page for token generation"""
     return render_template('auth.html')
 
+@app.route('/test-token')
+def test_token():
+    """Test page for token generation debugging"""
+    return render_template('test_token.html')
+
 @app.route('/survey')
 def survey():
     """Main survey page"""
