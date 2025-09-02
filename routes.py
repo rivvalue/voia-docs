@@ -548,13 +548,14 @@ def conversational_survey():
             session['auth_email'] = verification.get('email')
             return render_template('conversational_survey.html', authenticated=True, email=verification.get('email'))
         else:
-            return render_template('conversational_survey.html', error="Invalid or expired token")
+            return render_template('conversational_survey.html', authenticated=False, error="Invalid or expired token")
     else:
         # Check if already authenticated via session
         if session.get('auth_token'):
             return render_template('conversational_survey.html', authenticated=True, email=session.get('auth_email'))
         else:
-            return render_template('conversational_survey.html', error="Authentication required - please generate a token first")
+            # Redirect unauthenticated users to auth page instead of showing broken page
+            return redirect(url_for('server_auth'))
 
 @app.route('/api/start_conversation', methods=['POST'])
 @rate_limit(limit=10)

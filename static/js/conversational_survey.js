@@ -11,27 +11,45 @@ let conversationState = {
 
 // Initialize the conversational survey
 document.addEventListener('DOMContentLoaded', function() {
-    initializeAuthentication();
+    console.log('DOM loaded, initializing conversational survey...');
+    console.log('isAuthenticated:', window.isAuthenticated);
+    console.log('userEmail:', window.userEmail);
+    
+    // Force setup regardless of authentication status for debugging
     setupEventListeners();
+    
+    // Initialize authentication
+    initializeAuthentication();
 });
 
 function initializeAuthentication() {
+    console.log('Checking authentication status...');
+    
     // Check if user is authenticated via server-side template
     if (window.isAuthenticated) {
+        console.log('User is authenticated');
         conversationState.authToken = 'server-authenticated'; // Flag for server-auth
         // Pre-fill email if available
         if (document.getElementById('respondentEmail') && window.userEmail) {
             document.getElementById('respondentEmail').value = window.userEmail;
         }
-        // Don't call showSurveySetup() since template already shows it
+        // Form should already be visible from template
     } else {
+        console.log('User not authenticated, showing auth required');
         showAuthRequired();
     }
 }
 
 function showAuthRequired() {
-    document.getElementById('authCheck').style.display = 'block';
-    document.getElementById('surveySetup').style.display = 'none';
+    const authCheck = document.getElementById('authCheck');
+    const surveySetup = document.getElementById('surveySetup');
+    
+    if (authCheck) {
+        authCheck.style.display = 'block';
+    }
+    if (surveySetup) {
+        surveySetup.style.display = 'none';
+    }
 }
 
 function showSurveySetup() {
