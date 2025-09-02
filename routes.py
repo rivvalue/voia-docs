@@ -130,8 +130,8 @@ def verify_token():
 
 @app.route('/auth')
 def auth():
-    """Authentication page for token generation"""
-    return render_template('auth.html')
+    """Authentication page - redirect to server-side auth"""
+    return redirect(url_for('server_auth'))
 
 @app.route('/test-token')
 def test_token():

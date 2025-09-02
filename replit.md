@@ -131,9 +131,10 @@ The system uses a single main entity `SurveyResponse` that stores:
 
 ### Email-Based Token Authentication
 - **JWT Token System**: Secure 24-hour tokens tied to email addresses
-- **Token Generation**: `/auth/request-token` endpoint with rate limiting (5 requests/min)
+- **Server-Side Token Generation**: `/server-auth` endpoint with form-based authentication (bypasses JavaScript/CORS issues)
+- **Simple Token System**: Independent token generation without circular imports
 - **Token Verification**: `/auth/verify-token` endpoint for validation
-- **Audit Trail**: AuthToken model tracks token usage, IP addresses, and user agents
+- **Fallback Authentication**: Original `/auth/request-token` API endpoint with CORS support
 
 ### Duplicate Response Prevention
 - **Primary Endpoint**: `/submit_survey` - Prevents duplicate responses per email
