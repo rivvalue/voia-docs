@@ -175,6 +175,11 @@ function submitSurvey() {
         // Clear stored data
         clearSavedData();
         
+        // Clear session and redirect after successful submission
+        setTimeout(() => {
+            clearAuthenticationAndRedirect('Survey submitted successfully! Please get a new token for another survey.');
+        }, 3000);  // Wait 3 seconds to show success message
+        
         console.log('Survey submitted successfully:', data);
     })
     .catch(error => {
@@ -242,6 +247,27 @@ document.getElementById('tenureWithFc').addEventListener('change', autoSave);
 // Clear saved data on successful submission
 function clearSavedData() {
     localStorage.removeItem('surveyDraft');
+}
+
+// Clear authentication session and redirect to get new token
+function clearAuthenticationAndRedirect(message) {
+    // Clear session data by making a logout request
+    fetch('/api/logout_session', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(() => {
+        // Show message and redirect
+        alert(message);
+        window.location.href = '/server-auth';
+    })
+    .catch(() => {
+        // Even if logout fails, redirect anyway
+        alert(message);
+        window.location.href = '/server-auth';
+    });
 }
 
 // Authentication functions
@@ -339,6 +365,11 @@ function submitSurveyOverwrite(formData) {
         
         // Clear stored data
         clearSavedData();
+        
+        // Clear session and redirect after successful overwrite
+        setTimeout(() => {
+            clearAuthenticationAndRedirect('Survey updated successfully! Please get a new token for another survey.');
+        }, 3000);  // Wait 3 seconds to show success message
         
         console.log('Survey overwritten successfully:', data);
     })

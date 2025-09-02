@@ -707,3 +707,18 @@ def finalize_conversation():
         logger.error(f"Error finalizing conversation: {e}")
         db.session.rollback()
         return jsonify({'error': 'Failed to finalize survey'}), 500
+
+@app.route('/api/logout_session', methods=['POST'])
+def logout_session():
+    """Clear session authentication after survey completion"""
+    try:
+        # Clear session data
+        session.pop('auth_token', None)
+        session.pop('auth_email', None)
+        session.clear()
+        
+        return jsonify({'message': 'Session cleared successfully'})
+        
+    except Exception as e:
+        logger.error(f"Error clearing session: {e}")
+        return jsonify({'error': 'Failed to clear session'}), 500

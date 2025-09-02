@@ -355,6 +355,11 @@ function finalizeSurvey() {
         // Show completion state
         showSurveyComplete();
         
+        // Clear session and redirect after successful completion
+        setTimeout(() => {
+            clearAuthenticationAndRedirect('Conversational survey completed successfully! Please get a new token for another survey.');
+        }, 4000);  // Wait 4 seconds to show completion message
+        
     })
     .catch(error => {
         console.error('Error finalizing survey:', error);
@@ -369,6 +374,27 @@ function showSurveyComplete() {
     
     // Update progress to 100%
     updateProgress(100);
+}
+
+// Clear authentication session and redirect to get new token
+function clearAuthenticationAndRedirect(message) {
+    // Clear session data by making a logout request
+    fetch('/api/logout_session', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(() => {
+        // Show message and redirect
+        alert(message);
+        window.location.href = '/server-auth';
+    })
+    .catch(() => {
+        // Even if logout fails, redirect anyway
+        alert(message);
+        window.location.href = '/server-auth';
+    });
 }
 
 // CSS for styling (add to your CSS file)
