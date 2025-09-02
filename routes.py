@@ -143,6 +143,52 @@ def simple_auth():
     """Simple authentication test page"""
     return render_template('simple_auth.html')
 
+@app.route('/server-auth', methods=['GET', 'POST'])
+def server_auth():
+    """Server-side authentication - no JavaScript required"""
+    return render_template('server_auth.html')
+
+@app.route('/server-auth/generate', methods=['POST'])
+def server_auth_generate():
+    """Server-side token generation"""
+    try:
+        email = request.form.get('email', '').strip().lower()
+        
+        if not email:
+            token_result = {
+                'success': False,
+                'error': 'Email address is required'
+            }
+            return render_template('server_auth.html', token_result=token_result)
+        
+        # Use ultra-simple token system to avoid all import issues
+        import simple_token_system
+        token_data = simple_token_system.create_simple_token(email)
+        
+        if token_data['success']:
+            token_result = {
+                'success': True,
+                'email': token_data['email'],
+                'token': token_data['token'],
+                'expires_in': token_data['expires_in']
+            }
+        else:
+            token_result = {
+                'success': False,
+                'error': token_data['error']
+            }
+        
+        app.logger.info(f"Server-side token generated for {email}")
+        return render_template('server_auth.html', token_result=token_result)
+        
+    except Exception as e:
+        app.logger.error(f"Server-side token generation failed: {e}")
+        token_result = {
+            'success': False,
+            'error': f'Token generation failed: {str(e)}'
+        }
+        return render_template('server_auth.html', token_result=token_result)
+
 @app.route('/survey')
 def survey():
     """Main survey page"""
