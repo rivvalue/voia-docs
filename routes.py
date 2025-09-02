@@ -138,6 +138,11 @@ def test_token():
     """Test page for token generation debugging"""
     return render_template('test_token.html')
 
+@app.route('/simple-auth')
+def simple_auth():
+    """Simple authentication test page"""
+    return render_template('simple_auth.html')
+
 @app.route('/survey')
 def survey():
     """Main survey page"""

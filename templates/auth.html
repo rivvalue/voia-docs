@@ -177,13 +177,31 @@ async function requestToken() {
         console.log('Using token URL:', tokenUrl);
         console.log('Full location:', window.location.href);
         
-        const response = await fetch(tokenUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({ email: email })
+        // Use XMLHttpRequest for better compatibility
+        const response = await new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', tokenUrl, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.setRequestHeader('Accept', 'application/json');
+            
+            xhr.onload = () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    resolve({
+                        ok: true,
+                        status: xhr.status,
+                        json: () => Promise.resolve(JSON.parse(xhr.responseText))
+                    });
+                } else {
+                    resolve({
+                        ok: false,
+                        status: xhr.status,
+                        json: () => Promise.resolve(JSON.parse(xhr.responseText || '{}'))
+                    });
+                }
+            };
+            
+            xhr.onerror = () => reject(new Error('Network error'));
+            xhr.send(JSON.stringify({ email: email }));
         });
 
         console.log('Response status:', response.status);
