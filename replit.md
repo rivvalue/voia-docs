@@ -32,7 +32,7 @@ Key architectural decisions include:
     - **Authentication**: JWT token-based authentication with email validation and admin roles for data export protection, featuring server-side token generation for enhanced security. **Automatic token invalidation after survey completion prevents duplicate submissions.**
     - **Performance**: PostgreSQL migration, database indexing, connection pooling, asynchronous background task processing for AI analysis, and comprehensive rate limiting (IP-based).
 - **Security**: Token-based authentication, duplicate response prevention (via separate submit/overwrite endpoints), enhanced rate limiting, and robust input validation.
-- **Branding**: "Voxa - Voice Of Client Agent" branding with "AI Powered Client Insights" subtitle and "Voxa: Hear what matters. Act on what counts." tagline.
+- **Branding**: "Voxa - Voice Of Client" branding with "AI Powered Client Insights" subtitle and "Voxa: Hear what matters. Act on what counts." tagline.
 
 ## External Dependencies
 - **OpenAI API**: For advanced AI functionalities including sentiment analysis, theme extraction, and the conversational survey system (Voxa).
