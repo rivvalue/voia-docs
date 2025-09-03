@@ -138,7 +138,6 @@
                                             </span>
                                         </div>
                                     </div>
-                                    <input type="radio" name="survey_type" value="conversational" id="radio-conversational" class="survey-type-radio" checked>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="survey-type-card card h-100" onclick="selectSurveyType('traditional', this)">
@@ -153,7 +152,6 @@
                                             </span>
                                         </div>
                                     </div>
-                                    <input type="radio" name="survey_type" value="traditional" id="radio-traditional" class="survey-type-radio">
                                 </div>
                             </div>
                         </div>
@@ -222,11 +220,16 @@ function selectSurveyType(type, cardElement) {
     // Add selected class to clicked card
     cardElement.classList.add('selected');
     
-    // Update radio button selection
-    document.querySelectorAll('input[name="survey_type"]').forEach(radio => {
-        radio.checked = false;
-    });
-    document.getElementById('radio-' + type).checked = true;
+    // Set the survey type in a hidden input
+    let hiddenInput = document.getElementById('survey_type_input');
+    if (!hiddenInput) {
+        hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'survey_type';
+        hiddenInput.id = 'survey_type_input';
+        document.querySelector('form').appendChild(hiddenInput);
+    }
+    hiddenInput.value = type;
     
     // Add visual feedback with slight animation
     setTimeout(() => {
@@ -241,10 +244,13 @@ function selectSurveyType(type, cardElement) {
 document.addEventListener('DOMContentLoaded', function() {
     // Ensure conversational is selected by default
     const defaultCard = document.querySelector('.survey-type-card.selected');
-    if (!defaultCard) {
+    if (defaultCard) {
+        // Set the hidden input value for the already selected card
+        selectSurveyType('conversational', defaultCard);
+    } else {
         const conversationalCard = document.querySelector('.survey-type-card[onclick*="conversational"]');
         if (conversationalCard) {
-            conversationalCard.classList.add('selected');
+            selectSurveyType('conversational', conversationalCard);
         }
     }
 });
