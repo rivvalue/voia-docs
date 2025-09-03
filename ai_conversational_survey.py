@@ -24,21 +24,24 @@ class AIConversationalSurvey:
         
     def start_conversation(self, company_name: str, respondent_name: str) -> Dict[str, Any]:
         """Start a new AI-powered conversational survey"""
-        # Preserve any pre-populated extracted_data (like tenure from form)
-        existing_extracted_data = self.extracted_data.copy() if hasattr(self, 'extracted_data') else {}
+        # CRITICAL FIX: Preserve any pre-populated extracted_data (like tenure from form)
+        # The extracted_data might already be set by start_ai_conversational_survey
+        existing_extracted_data = self.extracted_data.copy() if hasattr(self, 'extracted_data') and self.extracted_data else {}
+        
+        print(f"CRITICAL DEBUG: Pre-conversation extracted_data: {existing_extracted_data}")
         
         self.survey_data = {
             'company_name': company_name,
             'respondent_name': respondent_name,
             'conversation_history': [],
-            'extracted_data': existing_extracted_data
+            'extracted_data': existing_extracted_data  # Preserve the pre-populated data
         }
         
-        # Update extracted_data reference to survey_data for consistency
+        # CRITICAL: Keep reference to extracted_data intact
         self.extracted_data = self.survey_data['extracted_data']
         
         # Debug logging
-        print(f"Starting conversation with pre-populated data: {self.extracted_data}")
+        print(f"STARTUP DEBUG: After initialization, extracted_data: {self.extracted_data}")
         
         welcome_message = self._generate_welcome_message(company_name, respondent_name)
         
@@ -870,13 +873,17 @@ def process_ai_conversation_response(user_input: str, context: Dict[str, Any]) -
         print(f"DEBUG: Found existing instance with step {ai_survey.step_count}, extracted data: {ai_survey.extracted_data}")
         return ai_survey.process_user_response(user_input, context)
     else:
-        print(f"DEBUG: No instance found for conversation_id {conversation_id}, creating new one")
-        # Fallback - create new instance
-        ai_survey = AIConversationalSurvey()
-        ai_survey.survey_data = context
-        if conversation_id:
-            ai_conversation_instances[conversation_id] = ai_survey
-        return ai_survey.process_user_response(user_input, context)
+        print(f"CRITICAL ERROR: No instance found for conversation_id {conversation_id}")
+        print(f"AVAILABLE INSTANCES: {ai_conversation_instances}")
+        # This should not happen in normal flow, but handle it gracefully
+        return {
+            'message': 'I apologize, but there was an error with your session. Please refresh the page and start again.',
+            'message_type': 'error',
+            'step': 'error',
+            'progress': 0,
+            'is_complete': True,
+            'error': 'session_lost'
+        }
 
 def finalize_ai_conversational_survey(context: Dict[str, Any]) -> Dict[str, Any]:
     """Finalize and convert AI conversational survey to structured format"""
