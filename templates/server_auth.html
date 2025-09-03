@@ -131,21 +131,6 @@
                     {% endif %}
                 </div>
             </div>
-            
-            <!-- Debug Information -->
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h6>🔍 Environment Debug Info</h6>
-                </div>
-                <div class="card-body">
-                    <small class="text-muted">
-                        <p><strong>Host:</strong> {{ request.host }}</p>
-                        <p><strong>URL:</strong> {{ request.url }}</p>
-                        <p><strong>Method:</strong> {{ request.method }}</p>
-                        <p><strong>User Agent:</strong> {{ request.headers.get('User-Agent', 'Unknown')[:50] }}...</p>
-                    </small>
-                </div>
-            </div>
         </div>
     </div>
 </div>

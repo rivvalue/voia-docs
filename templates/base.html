@@ -20,10 +20,14 @@
 <body>
     <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
-                <img src="{{ url_for('static', filename='rivvalue-logo.png') }}" alt="Rivvalue Inc." height="40" class="me-3">
-                <span>Voxa - Voice Of Client Agent</span>
-            </a>
+            <div class="navbar-brand d-flex align-items-center">
+                <a href="https://rivvalue.com" target="_blank" rel="noopener noreferrer" class="me-3">
+                    <img src="{{ url_for('static', filename='rivvalue-logo.png') }}" alt="Rivvalue Inc." height="40">
+                </a>
+                <a href="{{ url_for('index') }}" class="text-decoration-none text-reset">
+                    <span>Voxa - Voice Of Client Agent</span>
+                </a>
+            </div>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
