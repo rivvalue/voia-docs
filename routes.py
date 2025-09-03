@@ -516,6 +516,16 @@ def dashboard_data():
         logger.error(f"Error fetching dashboard data: {e}")
         return jsonify({'error': 'Failed to fetch dashboard data'}), 500
 
+@app.route('/api/company_nps')
+def company_nps():
+    """API endpoint for company NPS data"""
+    try:
+        data = get_company_nps_data()
+        return jsonify(data)
+    except Exception as e:
+        logger.error(f"Error fetching company NPS data: {e}")
+        return jsonify({'error': 'Failed to fetch company NPS data'}), 500
+
 @app.route('/api/survey_responses')
 def survey_responses():
     """API endpoint for survey responses with pagination"""
