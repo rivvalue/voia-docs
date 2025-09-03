@@ -530,16 +530,26 @@ function loadSurveyResponses() {
 }
 
 function loadCompanyNpsData() {
+    console.log('Loading company NPS data...');
     fetch('/api/company_nps')
-        .then(response => response.json())
+        .then(response => {
+            console.log('Received response:', response.status);
+            return response.json();
+        })
         .then(data => {
+            console.log('Company NPS data received:', data);
             // API returns array directly, not wrapped in success object
             if (Array.isArray(data)) {
+                console.log(`Populating table with ${data.length} companies`);
                 populateCompanyNpsTable(data);
             } else if (data.error) {
                 console.error('Error loading company NPS data:', data.error);
+                document.getElementById('companyNpsTable').innerHTML = 
+                    `<tr><td colspan="8" class="text-center text-danger">Error: ${data.error}</td></tr>`;
             } else {
                 console.error('Unexpected data format:', data);
+                document.getElementById('companyNpsTable').innerHTML = 
+                    '<tr><td colspan="8" class="text-center text-warning">Unexpected data format</td></tr>';
             }
         })
         .catch(error => {
@@ -550,9 +560,16 @@ function loadCompanyNpsData() {
 }
 
 function populateCompanyNpsTable(companyData) {
+    console.log('Populating company table with:', companyData);
     const tbody = document.getElementById('companyNpsTable');
     
+    if (!tbody) {
+        console.error('Company NPS table body not found!');
+        return;
+    }
+    
     if (!companyData || companyData.length === 0) {
+        console.log('No company data to display');
         tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No company data available yet</td></tr>';
         return;
     }
