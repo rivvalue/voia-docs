@@ -530,29 +530,43 @@ function loadSurveyResponses() {
 }
 
 function loadCompanyNpsData() {
+    console.log('Loading company NPS data...');
     fetch('/api/company_nps')
         .then(response => response.json())
         .then(data => {
+            console.log('Company NPS data received:', data);
             if (data.success) {
+                console.log('Populating table with', data.data.length, 'companies');
                 populateCompanyNpsTable(data.data);
             } else {
                 console.error('Error loading company NPS data:', data.error);
+                document.getElementById('companyNpsTable').innerHTML = 
+                    '<tr><td colspan="8" class="text-center text-danger">Error: ' + (data.error || 'Unknown error') + '</td></tr>';
             }
         })
         .catch(error => {
             console.error('Error fetching company NPS data:', error);
             document.getElementById('companyNpsTable').innerHTML = 
-                '<tr><td colspan="8" class="text-center text-muted">Error loading company data</td></tr>';
+                '<tr><td colspan="8" class="text-center text-danger">Network error loading company data</td></tr>';
         });
 }
 
 function populateCompanyNpsTable(companyData) {
+    console.log('populateCompanyNpsTable called with:', companyData);
     const tbody = document.getElementById('companyNpsTable');
     
+    if (!tbody) {
+        console.error('companyNpsTable element not found!');
+        return;
+    }
+    
     if (!companyData || companyData.length === 0) {
+        console.log('No company data to display');
         tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No company data available yet</td></tr>';
         return;
     }
+    
+    console.log('Rendering', companyData.length, 'companies to table');
     
     tbody.innerHTML = companyData.map(company => {
         // Risk level badge styling
