@@ -253,5 +253,24 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}?v={{ range(1000, 9999) | random }}"></script>
+<script>
+// Inline backup to ensure SOMETHING executes
+setTimeout(function() {
+    console.log('Inline backup script executing...');
+    fetch('/api/company_nps')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Inline backup got data:', data);
+            const tbody = document.getElementById('companyNpsTable');
+            if (tbody && data.success) {
+                tbody.innerHTML = data.data.map(company => 
+                    '<tr><td>' + company.company_name + '</td><td>' + company.total_responses + '</td><td>' + company.avg_nps + '</td><td>' + company.company_nps + '</td><td>' + company.promoters + 'P/' + company.passives + 'Pa/' + company.detractors + 'D</td><td>' + company.risk_level + '</td><td>' + (company.latest_response || 'N/A') + '</td><td>' + (company.latest_churn_risk || 'N/A') + '</td></tr>'
+                ).join('');
+                console.log('Inline backup populated table with', data.data.length, 'companies');
+            }
+        })
+        .catch(error => console.error('Inline backup error:', error));
+}, 2000);
+</script>
 {% endblock %}
