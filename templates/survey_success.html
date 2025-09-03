@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Survey Submitted - Voxa{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card border-success">
+            <div class="card-header bg-success text-white text-center">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Survey Submitted Successfully!
+                </h4>
+            </div>
+            <div class="card-body text-center">
+                <div class="alert alert-success">
+                    <h5>Thank You!</h5>
+                    <p>Your feedback has been submitted and will be analyzed by our AI system.</p>
+                    <p><strong>Response ID:</strong> {{ response_id }}</p>
+                    <p><strong>Analysis Status:</strong> {{ analysis_status }}</p>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <h6><i class="fas fa-lock me-2"></i>Token Invalidated</h6>
+                    <p>Your authentication token has been automatically invalidated to prevent duplicate submissions.</p>
+                    <p><strong>To submit another survey, you'll need to get a new token.</strong></p>
+                </div>
+                
+                <div class="d-flex gap-2 justify-content-center">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">
+                        <i class="fas fa-home me-2"></i>Home
+                    </a>
+                    <a href="{{ url_for('server_auth') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-key me-2"></i>Get New Token
+                    </a>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-info">
+                        <i class="fas fa-chart-bar me-2"></i>Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

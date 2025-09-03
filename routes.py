@@ -216,6 +216,90 @@ def survey():
             # Redirect unauthenticated users to auth page instead of showing broken page
             return redirect(url_for('server_auth'))
 
+@app.route('/submit_survey_form', methods=['POST'])
+@rate_limit(limit=10)
+def submit_survey_form():
+    """Handle server-side form submission (no JavaScript required)"""
+    try:
+        print("=== FORM SUBMISSION RECEIVED ===")
+        
+        # Check if user is authenticated via session
+        if not session.get('auth_token'):
+            return render_template('survey.html', authenticated=False, error='Authentication required')
+            
+        # Get form data
+        data = request.form.to_dict()
+        print(f"Form data received: {data}")
+        
+        # Get authenticated email from session
+        authenticated_email = session.get('auth_email')
+        print(f"Authenticated email: {authenticated_email}")
+        
+        if not authenticated_email:
+            return render_template('survey.html', authenticated=False, error='Authentication session expired')
+        
+        # Validate required fields
+        required_fields = ['company_name', 'respondent_name', 'nps_score']
+        for field in required_fields:
+            if field not in data or not data[field]:
+                return render_template('survey.html', authenticated=True, email=authenticated_email, 
+                                     error=f'Missing required field: {field}')
+        
+        # Process survey submission (same logic as AJAX version)
+        nps_score = int(data['nps_score'])
+        if nps_score >= 9:
+            nps_category = 'Promoter'
+        elif nps_score >= 7:
+            nps_category = 'Passive'
+        else:
+            nps_category = 'Detractor'
+        
+        # Create survey response
+        response = SurveyResponse(
+            company_name=data['company_name'],
+            respondent_name=data['respondent_name'],
+            respondent_email=authenticated_email,
+            tenure_with_fc=data.get('tenure_with_fc'),
+            nps_score=nps_score,
+            nps_category=nps_category,
+            satisfaction_rating=int(data['satisfaction_rating']) if data.get('satisfaction_rating') else None,
+            product_value_rating=int(data['product_value_rating']) if data.get('product_value_rating') else None,
+            service_rating=int(data['service_rating']) if data.get('service_rating') else None,
+            pricing_rating=int(data['pricing_rating']) if data.get('pricing_rating') else None,
+            improvement_feedback=data.get('improvement_feedback'),
+            recommendation_reason=data.get('recommendation_reason'),
+            additional_comments=data.get('additional_comments')
+        )
+        
+        db.session.add(response)
+        db.session.commit()
+        
+        # Queue AI analysis
+        try:
+            add_analysis_task(response.id)
+            analysis_status = "queued"
+        except Exception as e:
+            logger.error(f"Failed to queue AI analysis: {e}")
+            analysis_status = "failed"
+        
+        # AUTOMATIC TOKEN INVALIDATION
+        session.pop('auth_token', None)
+        session.pop('auth_email', None)
+        session.permanent = False
+        print(f"=== TOKEN INVALIDATED FOR {authenticated_email} ===")
+        logger.info(f"Form survey submitted by {authenticated_email} - Token invalidated")
+        
+        # Redirect to success page showing token was invalidated
+        return render_template('survey_success.html', 
+                             response_id=response.id,
+                             analysis_status=analysis_status,
+                             email=authenticated_email)
+        
+    except Exception as e:
+        logger.error(f"Error in form survey submission: {e}")
+        return render_template('survey.html', authenticated=True, email=session.get('auth_email'), 
+                             error=f'Survey submission failed: {str(e)}')
+
 @app.route('/submit_survey', methods=['POST'])
 @rate_limit(limit=10)  # 10 survey submissions per minute per IP
 def submit_survey():
