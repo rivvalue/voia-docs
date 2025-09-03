@@ -621,14 +621,39 @@ def health_check():
 @app.route('/api/company_nps')
 @rate_limit(limit=100)
 def api_company_nps():
-    """API endpoint for company-segregated NPS data"""
+    """API endpoint for company-segregated NPS data with pagination"""
     try:
         from data_storage import get_company_nps_data
-        company_nps_data = get_company_nps_data()
+        
+        # Get pagination parameters
+        page = request.args.get('page', 1, type=int)
+        per_page = min(request.args.get('per_page', 10, type=int), 100)  # Max 100 per page
+        
+        # Get all company data
+        all_company_data = get_company_nps_data()
+        total_companies = len(all_company_data)
+        
+        # Calculate pagination
+        start_idx = (page - 1) * per_page
+        end_idx = start_idx + per_page
+        company_data = all_company_data[start_idx:end_idx]
+        
+        # Calculate pagination info
+        total_pages = (total_companies + per_page - 1) // per_page
+        has_prev = page > 1
+        has_next = page < total_pages
+        
         return jsonify({
             'success': True,
-            'data': company_nps_data,
-            'total_companies': len(company_nps_data)
+            'data': company_data,
+            'pagination': {
+                'page': page,
+                'per_page': per_page,
+                'total': total_companies,
+                'pages': total_pages,
+                'has_prev': has_prev,
+                'has_next': has_next
+            }
         })
     except Exception as e:
         logger.error(f"Error getting company NPS data: {e}")

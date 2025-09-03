@@ -523,13 +523,15 @@ function populateGrowthOpportunities() {
     container.innerHTML = html;
 }
 
-// Pagination state for survey responses
-let currentPage = 1;
-const itemsPerPage = 5;
+// Pagination state for both tables
+let currentResponsesPage = 1;
+let currentCompanyPage = 1;
+const responsesPerPage = 10;
+const companiesPerPage = 10;
 
 function loadSurveyResponses(page = 1) {
-    currentPage = page;
-    fetch(`/api/survey_responses?page=${page}&per_page=${itemsPerPage}`)
+    currentResponsesPage = page;
+    fetch(`/api/survey_responses?page=${page}&per_page=${responsesPerPage}`)
         .then(response => response.json())
         .then(data => {
             const tbody = document.getElementById('responsesTable');
@@ -576,31 +578,31 @@ function loadSurveyResponses(page = 1) {
             
             // Update pagination info and controls
             if (pagination) {
-                updatePaginationInfo(pagination.page, pagination.pages, pagination.total);
-                updatePaginationControls(pagination);
+                updateResponsesPaginationInfo(pagination.page, pagination.pages, pagination.total);
+                updateResponsesPaginationControls(pagination);
             }
         })
         .catch(error => {
             console.error('Error loading survey responses:', error);
             document.getElementById('responsesTable').innerHTML = 
                 '<tr><td colspan="7" class="text-center text-danger">Error loading responses.</td></tr>';
-            updatePaginationInfo(0, 0, 0);
-            updatePaginationControls(null);
+            updateResponsesPaginationInfo(0, 0, 0);
+            updateResponsesPaginationControls(null);
         });
 }
 
-function updatePaginationInfo(currentPage, totalPages, totalItems) {
+function updateResponsesPaginationInfo(currentPage, totalPages, totalItems) {
     const info = document.getElementById('paginationInfo');
     if (totalItems === 0) {
         info.textContent = 'No responses found';
     } else {
-        const startItem = (currentPage - 1) * itemsPerPage + 1;
-        const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+        const startItem = (currentPage - 1) * responsesPerPage + 1;
+        const endItem = Math.min(currentPage * responsesPerPage, totalItems);
         info.textContent = `Showing ${startItem}-${endItem} of ${totalItems} responses`;
     }
 }
 
-function updatePaginationControls(pagination) {
+function updateResponsesPaginationControls(pagination) {
     const controls = document.getElementById('paginationControls');
     
     if (!pagination || pagination.pages <= 1) {
@@ -648,31 +650,102 @@ function updatePaginationControls(pagination) {
     controls.innerHTML = html;
 }
 
-function loadCompanyNpsData() {
+// Company pagination functions
+function updateCompanyPaginationInfo(currentPage, totalPages, totalItems) {
+    const info = document.getElementById('companyPaginationInfo');
+    if (totalItems === 0) {
+        info.textContent = 'No companies found';
+    } else {
+        const startItem = (currentPage - 1) * companiesPerPage + 1;
+        const endItem = Math.min(currentPage * companiesPerPage, totalItems);
+        info.textContent = `Showing ${startItem}-${endItem} of ${totalItems} companies`;
+    }
+}
+
+function updateCompanyPaginationControls(pagination) {
+    const controls = document.getElementById('companyPaginationControls');
+    
+    if (!pagination || pagination.pages <= 1) {
+        controls.innerHTML = '';
+        return;
+    }
+    
+    let html = '';
+    
+    // Previous button
+    if (pagination.has_prev) {
+        html += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="loadCompanyNpsData(${pagination.page - 1}); return false;">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+        `;
+    } else {
+        html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-left"></i></span></li>';
+    }
+    
+    // Page numbers
+    for (let i = 1; i <= pagination.pages; i++) {
+        if (i === pagination.page) {
+            html += `<li class="page-item active"><span class="page-link">${i}</span></li>`;
+        } else {
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadCompanyNpsData(${i}); return false;">${i}</a></li>`;
+        }
+    }
+    
+    // Next button
+    if (pagination.has_next) {
+        html += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="loadCompanyNpsData(${pagination.page + 1}); return false;">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        `;
+    } else {
+        html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-right"></i></span></li>';
+    }
+    
+    controls.innerHTML = html;
+}
+
+function loadCompanyNpsData(page = 1) {
+    currentCompanyPage = page;
     console.log('Loading company NPS data...');
-    fetch('/api/company_nps')
+    fetch(`/api/company_nps?page=${page}&per_page=${companiesPerPage}`)
         .then(response => response.json())
         .then(data => {
             console.log('Company NPS data received:', data);
             if (data.success) {
                 console.log('Populating table with', data.data.length, 'companies');
                 populateCompanyNpsTable(data.data);
+                
+                // Update pagination info and controls for company table
+                if (data.pagination) {
+                    updateCompanyPaginationInfo(data.pagination.page, data.pagination.pages, data.pagination.total);
+                    updateCompanyPaginationControls(data.pagination);
+                }
             } else {
                 console.error('Error loading company NPS data:', data.error);
-                document.getElementById('companyNpsTable').innerHTML = 
+                document.getElementById('companyNpsTableServerSide').innerHTML = 
                     '<tr><td colspan="8" class="text-center text-danger">Error: ' + (data.error || 'Unknown error') + '</td></tr>';
+                updateCompanyPaginationInfo(0, 0, 0);
+                updateCompanyPaginationControls(null);
             }
         })
         .catch(error => {
             console.error('Error fetching company NPS data:', error);
-            document.getElementById('companyNpsTable').innerHTML = 
+            document.getElementById('companyNpsTableServerSide').innerHTML = 
                 '<tr><td colspan="8" class="text-center text-danger">Network error loading company data</td></tr>';
+            updateCompanyPaginationInfo(0, 0, 0);
+            updateCompanyPaginationControls(null);
         });
 }
 
 function populateCompanyNpsTable(companyData) {
     console.log('populateCompanyNpsTable called with:', companyData);
-    const tbody = document.getElementById('companyNpsTable');
+    const tbody = document.getElementById('companyNpsTableServerSide');
     
     if (!tbody) {
         console.error('companyNpsTable element not found!');
