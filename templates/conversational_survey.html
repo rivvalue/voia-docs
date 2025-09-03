@@ -154,9 +154,8 @@
 window.isAuthenticated = {{ 'true' if authenticated else 'false' }};
 window.userEmail = '{{ email or '' }}';
 
-// IMMEDIATE TEST - This should show in console
-console.log('=== CONVERSATIONAL INLINE SCRIPT WORKING ===');
-alert('CONVERSATIONAL INLINE SCRIPT TEST - You should see this alert immediately!');
+// Authentication status passed to JavaScript (server-side token invalidation now implemented)  
+console.log('Conversational survey loaded - Server-side token invalidation active');
 </script>
 <script src="{{ url_for('static', filename='js/conversational_survey.js') }}"></script>
 {% endblock %}

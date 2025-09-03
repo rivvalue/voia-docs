@@ -293,13 +293,17 @@ def submit_survey():
             logger.error(f"Failed to queue AI analysis: {e}")
             analysis_status = "failed"
         
-        logger.info(f"Survey submitted by authenticated user: {authenticated_email}")
+        # AUTOMATIC TOKEN INVALIDATION - Clear session to prevent survey restarts
+        session.pop('auth_token', None)
+        session.pop('auth_email', None)
+        logger.info(f"Survey submitted by authenticated user: {authenticated_email} - Token invalidated")
         
         return jsonify({
-            'message': 'Survey submitted successfully',
+            'message': 'Survey submitted successfully - Token invalidated to prevent restart',
             'response_id': response.id,
             'analysis_status': analysis_status,
-            'authenticated_email': authenticated_email
+            'authenticated_email': authenticated_email,
+            'token_invalidated': True
         })
         
     except Exception as e:
@@ -694,13 +698,17 @@ def finalize_conversation():
         # Queue AI analysis
         add_analysis_task(response.id)
         
-        logger.info(f"Conversational survey completed by {authenticated_email}")
+        # AUTOMATIC TOKEN INVALIDATION - Clear session to prevent survey restarts
+        session.pop('auth_token', None)
+        session.pop('auth_email', None)
+        logger.info(f"Conversational survey completed by {authenticated_email} - Token invalidated")
         
         return jsonify({
-            'message': 'Survey completed successfully',
+            'message': 'Survey completed successfully - Token invalidated to prevent restart',
             'response_id': response.id,
             'analysis_status': 'queued',
-            'authenticated_email': authenticated_email
+            'authenticated_email': authenticated_email,
+            'token_invalidated': True
         })
         
     except Exception as e:
