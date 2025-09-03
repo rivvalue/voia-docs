@@ -379,18 +379,15 @@ function finalizeSurvey() {
         // Show completion state
         showSurveyComplete();
         
-        // IMMEDIATE token invalidation test - removing timeout for debugging
-        console.log('IMMEDIATE conversational token invalidation - no timeout');
-        alert('SUCCESS: Conversational survey completed! Token invalidation should happen now.');
-        clearAuthenticationAndRedirect('Conversational survey completed successfully! Please get a new token for another survey.');
-        
+        // Token invalidation happens server-side automatically
         console.log('Conversational survey finalized successfully:', data);
-        console.log('Token invalidation will trigger in 4 seconds...');
+        console.log('Token has been invalidated server-side for security');
     })
     .catch(error => {
         console.error('Error finalizing survey:', error);
-        alert('ERROR: Conversational survey finalization failed - ' + error.message);
-        alert('Error finalizing survey: ' + error.message);
+        // Show error message in UI instead of alert
+        addMessage('ai', 'I apologize, but there was an error finalizing your survey. Please try refreshing the page or contact support if the issue persists.');
+        document.getElementById('inputArea').style.display = 'block'; // Re-enable input
     });
 }
 
@@ -420,15 +417,14 @@ function clearAuthenticationAndRedirect(message) {
     })
     .then(data => {
         console.log('Conversational logout successful:', data);
-        // Show message and redirect
-        alert(message);
-        console.log('About to redirect to /server-auth from conversational survey');
+        // Redirect without alert
+        console.log('Redirecting to /server-auth from conversational survey');
         window.location.href = '/server-auth';
     })
     .catch(error => {
         console.log('Conversational logout failed, redirecting anyway:', error);
         // Even if logout fails, redirect anyway
-        alert(message);
+        console.log('Logout failed, redirecting anyway:', message);
         window.location.href = '/server-auth';
     });
 }
@@ -500,3 +496,21 @@ const styles = `
 
 // Add styles to head
 document.head.insertAdjacentHTML('beforeend', styles);
+
+// Function to start a new session
+function startNewSession() {
+    console.log('Starting new session - clearing state and redirecting');
+    
+    // Clear current conversation state
+    conversationState = {
+        authToken: null,
+        conversationId: null,
+        messages: [],
+        surveyData: {},
+        currentStep: 'setup',
+        isComplete: false
+    };
+    
+    // Redirect to get new token
+    window.location.href = '/server-auth';
+}

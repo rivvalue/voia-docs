@@ -128,18 +128,42 @@
             <!-- Survey Complete -->
             <div id="surveyComplete" class="card" style="display: none;">
                 <div class="card-body text-center">
-                    <div class="success-icon mb-3">
+                    <div class="success-icon mb-4">
                         <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
                     </div>
-                    <h4 class="text-success">Thank You!</h4>
-                    <p class="lead">Your feedback has been submitted successfully and will be analyzed by our AI.</p>
-                    <p class="text-muted">We appreciate you taking the time to share your thoughts with us.</p>
+                    <h4 class="text-success mb-3">Research Session Complete!</h4>
+                    <p class="lead mb-2">Your feedback has been successfully analyzed by Voxa Intelligence.</p>
+                    <p class="text-muted mb-4">This completes your demonstration of our Voice of Client Agent capabilities.</p>
+                    
+                    <!-- Next Steps Section -->
+                    <div class="border rounded p-4 mb-4" style="background-color: #f8f9fa;">
+                        <h5 class="mb-3"><i class="fas fa-rocket me-2 text-primary"></i>What's Next?</h5>
+                        <p class="text-muted mb-3">Experience the full power of Voice of Client Agent for your organization.</p>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <button onclick="startNewSession()" class="btn btn-outline-primary btn-lg w-100">
+                                    <i class="fas fa-redo me-2"></i>Try Another Session
+                                </button>
+                                <small class="text-muted d-block mt-2">Experience Voxa with different scenarios</small>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="mailto:info@rivvalue.com?subject=Voice of Client Agent - Full Service Inquiry&body=Hi Rivvalue team,%0A%0AI just completed the Voxa Intelligence demonstration and I'm interested in learning more about implementing the full Voice of Client Agent service for my organization.%0A%0APlease contact me to discuss how this can benefit our customer feedback strategy.%0A%0AThank you!" 
+                                   class="btn btn-primary btn-lg w-100">
+                                    <i class="fas fa-envelope me-2"></i>Contact Rivvalue
+                                </a>
+                                <small class="text-muted d-block mt-2">Implement full VoC Agent for your business</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Additional Options -->
                     <div class="mt-4">
-                        <a href="{{ url_for('index') }}" class="btn btn-primary me-2">
-                            <i class="fas fa-home me-2"></i>Return Home
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary me-2">
+                            <i class="fas fa-chart-bar me-2"></i>View Research Data
                         </a>
-                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary">
-                            <i class="fas fa-chart-bar me-2"></i>View Dashboard
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-home me-2"></i>Return Home
                         </a>
                     </div>
                 </div>
