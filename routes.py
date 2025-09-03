@@ -16,6 +16,13 @@ import uuid
 
 logger = logging.getLogger(__name__)
 
+def normalize_company_name(company_name):
+    """Normalize company name for case-insensitive comparison"""
+    if not company_name:
+        return company_name
+    # Convert to title case for consistent display (first letter caps, rest lowercase)
+    return company_name.strip().title()
+
 @app.route('/')
 def index():
     """Landing page with survey overview"""
@@ -254,9 +261,9 @@ def submit_survey_form():
         else:
             nps_category = 'Detractor'
         
-        # Create survey response
+        # Create survey response with normalized company name
         response = SurveyResponse(
-            company_name=data['company_name'],
+            company_name=normalize_company_name(data['company_name']),
             respondent_name=data['respondent_name'],
             respondent_email=authenticated_email,
             tenure_with_fc=data.get('tenure_with_fc'),
@@ -352,9 +359,9 @@ def submit_survey():
                 'submitted_at': existing_response.created_at.isoformat()
             }), 409
         
-        # Create new survey response with authenticated email
+        # Create new survey response with authenticated email and normalized company name
         response = SurveyResponse(
-            company_name=data['company_name'],
+            company_name=normalize_company_name(data['company_name']),
             respondent_name=data['respondent_name'],
             respondent_email=authenticated_email,  # Use authenticated email
             tenure_with_fc=data.get('tenure_with_fc'),
@@ -756,9 +763,9 @@ def finalize_conversation():
         # Convert conversational data to structured survey format
         structured_data = finalize_ai_conversational_survey(survey_data)
         
-        # Create survey response record
+        # Create survey response record with normalized company name
         response = SurveyResponse(
-            company_name=structured_data.get('company_name'),
+            company_name=normalize_company_name(structured_data.get('company_name')),
             respondent_name=structured_data.get('respondent_name'),
             respondent_email=authenticated_email,
             tenure_with_fc=structured_data.get('tenure_with_fc'),

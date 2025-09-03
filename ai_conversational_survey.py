@@ -4,6 +4,13 @@ import uuid
 from typing import Dict, Any, List
 from openai import OpenAI
 
+def normalize_company_name(company_name):
+    """Normalize company name for case-insensitive comparison"""
+    if not company_name:
+        return company_name
+    # Convert to title case for consistent display (first letter caps, rest lowercase)
+    return company_name.strip().title()
+
 class AIConversationalSurvey:
     """OpenAI-powered conversational survey system with adaptive questioning"""
     
@@ -758,7 +765,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 nps_category = 'Detractor'
         
         return {
-            'company_name': context.get('company_name'),
+            'company_name': normalize_company_name(context.get('company_name')),
             'respondent_name': context.get('respondent_name'),
             'respondent_email': context.get('respondent_email'),
             'tenure_with_fc': extracted.get('tenure_with_fc'),
@@ -905,8 +912,9 @@ def finalize_ai_conversational_survey(context: Dict[str, Any]) -> Dict[str, Any]
         print(f"Fallback survey_data: {survey_data}")
         print(f"Fallback extracted_data: {extracted_data}")
         
+        raw_company_name = context.get('company_name') or survey_data.get('company_name')
         return {
-            'company_name': context.get('company_name') or survey_data.get('company_name'),
+            'company_name': normalize_company_name(raw_company_name),
             'respondent_name': context.get('respondent_name') or survey_data.get('respondent_name'),
             'respondent_email': context.get('respondent_email'),
             'nps_score': extracted_data.get('nps_score'),
