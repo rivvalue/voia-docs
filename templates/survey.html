@@ -218,6 +218,10 @@
     {% if authenticated %}
     window.userEmail = "{{ email }}";
     {% endif %}
+    
+    // IMMEDIATE TEST - This should show in console
+    console.log('=== INLINE SCRIPT WORKING ===');
+    alert('INLINE SCRIPT TEST - You should see this alert immediately!');
 </script>
 <script src="{{ url_for('static', filename='js/survey.js') }}"></script>
 {% endblock %}
