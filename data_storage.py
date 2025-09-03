@@ -66,7 +66,7 @@ def get_dashboard_data():
             for row in high_risk_responses
         ]
         
-        # Growth opportunities summary - grouped by company
+        # Growth opportunities summary - grouped by company (case-insensitive)
         growth_opportunities_by_company = {}
         responses_with_opportunities = SurveyResponse.query.filter(
             SurveyResponse.growth_opportunities.isnot(None)
@@ -77,12 +77,19 @@ def get_dashboard_data():
                 try:
                     opportunities = json.loads(response.growth_opportunities)
                     company_name = response.company_name
+                    company_key = company_name.upper()  # Use uppercase for case-insensitive grouping
                     
-                    if company_name not in growth_opportunities_by_company:
-                        growth_opportunities_by_company[company_name] = []
+                    if company_key not in growth_opportunities_by_company:
+                        growth_opportunities_by_company[company_key] = {
+                            'display_name': company_name,  # Keep the actual company name for display
+                            'opportunities': []
+                        }
+                    else:
+                        # Update display name to the most recent case version
+                        growth_opportunities_by_company[company_key]['display_name'] = company_name
                     
                     for opp in opportunities:
-                        growth_opportunities_by_company[company_name].append({
+                        growth_opportunities_by_company[company_key]['opportunities'].append({
                             'type': opp.get('type', 'unknown'),
                             'description': opp.get('description', ''),
                             'action': opp.get('action', '')
@@ -92,11 +99,11 @@ def get_dashboard_data():
         
         # Convert to list format for frontend - only include companies with actual opportunities
         growth_opportunities = []
-        for company_name, opportunities in growth_opportunities_by_company.items():
-            if opportunities:  # Only add if there are actual opportunities
+        for company_key, company_data in growth_opportunities_by_company.items():
+            if company_data['opportunities']:  # Only add if there are actual opportunities
                 growth_opportunities.append({
-                    'company_name': company_name,
-                    'opportunities': opportunities
+                    'company_name': company_data['display_name'],
+                    'opportunities': company_data['opportunities']
                 })
         
         # Key themes aggregation

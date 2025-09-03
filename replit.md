@@ -13,7 +13,7 @@ The system is a Flask web application utilizing a multi-tiered architecture. The
 ## Recent Changes (September 2025)
 ✅ **Token Invalidation System Implemented** - Automatic server-side session clearing after survey completion prevents duplicate submissions and survey restarts. Both traditional and conversational surveys now require new tokens after successful completion.
 
-✅ **Company Name Case-Insensitive Normalization** - Fixed bug where "mondou" and "Mondou" were treated as separate companies. All company names are now normalized to Title Case on submission and analytics group companies case-insensitively using SQL UPPER() functions.
+✅ **Company Name Case-Insensitive Normalization** - Fixed bug where "mondou" and "Mondou" were treated as separate companies. All company names are now normalized to Title Case on submission and analytics group companies case-insensitively using SQL UPPER() functions. Updated both NPS analytics and Growth Opportunities sections to use case-insensitive grouping.
 
 ✅ **Production Database Integration Fixed** - Resolved dashboard data loading issue where NPS by Company table showed "No company data available". The system now correctly accesses production PostgreSQL database (Neon) with 11 actual customer responses from 9 companies. Server-side rendering implemented to prevent JavaScript interference with data display. Dashboard now shows authentic customer feedback data including company-specific NPS scores, risk levels, and response counts. **CONFIRMED WORKING**: After deployment, production dashboard successfully displays all company data with proper JavaScript console logging.
 
