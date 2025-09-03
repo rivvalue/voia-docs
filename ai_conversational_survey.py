@@ -57,7 +57,8 @@ class AIConversationalSurvey:
             'step': 'welcome',
             'progress': 10,
             'is_complete': False,
-            'conversation_id': str(uuid.uuid4())
+            'conversation_id': str(uuid.uuid4()),
+            'extracted_data': self.extracted_data  # Include initial extracted data
         }
     
     def process_user_response(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
@@ -137,6 +138,8 @@ class AIConversationalSurvey:
         print(f"Step {self.step_count}: Extracted data: {self.extracted_data}")
         print(f"Next question: {next_question.get('message', '')}")
         
+        # Add extracted_data to response for frontend state sync
+        next_question['extracted_data'] = self.extracted_data
         return next_question
     
     def _generate_welcome_message(self, company_name: str, respondent_name: str) -> str:
@@ -873,17 +876,37 @@ def process_ai_conversation_response(user_input: str, context: Dict[str, Any]) -
         print(f"DEBUG: Found existing instance with step {ai_survey.step_count}, extracted data: {ai_survey.extracted_data}")
         return ai_survey.process_user_response(user_input, context)
     else:
-        print(f"CRITICAL ERROR: No instance found for conversation_id {conversation_id}")
+        print(f"WARNING: No instance found for conversation_id {conversation_id}, recreating from context")
         print(f"AVAILABLE INSTANCES: {ai_conversation_instances}")
-        # This should not happen in normal flow, but handle it gracefully
-        return {
-            'message': 'I apologize, but there was an error with your session. Please refresh the page and start again.',
-            'message_type': 'error',
-            'step': 'error',
-            'progress': 0,
-            'is_complete': True,
-            'error': 'session_lost'
+        
+        # RECOVERY: Recreate the conversation instance from context data
+        ai_survey = AIConversationalSurvey()
+        
+        # Restore survey data from context
+        company_name = context.get('company_name', '')
+        respondent_name = context.get('respondent_name', '')
+        
+        # Initialize the survey data with context
+        ai_survey.survey_data = {
+            'company_name': company_name,
+            'respondent_name': respondent_name,
+            'conversation_history': context.get('conversation_history', []),
+            'extracted_data': context.get('extracted_data', {})
         }
+        
+        # Set extracted data from context
+        ai_survey.extracted_data = ai_survey.survey_data['extracted_data']
+        
+        # Try to restore step count from context or estimate it
+        ai_survey.step_count = context.get('step_count', len(context.get('conversation_history', [])) // 2)
+        
+        print(f"RECOVERY: Recreated instance with step {ai_survey.step_count}, extracted data: {ai_survey.extracted_data}")
+        
+        # Store the recreated instance
+        if conversation_id:
+            ai_conversation_instances[conversation_id] = ai_survey
+        
+        return ai_survey.process_user_response(user_input, context)
 
 def finalize_ai_conversational_survey(context: Dict[str, Any]) -> Dict[str, Any]:
     """Finalize and convert AI conversational survey to structured format"""

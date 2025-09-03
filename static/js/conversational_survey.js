@@ -183,7 +183,14 @@ function sendMessage() {
         body: JSON.stringify({
             conversation_id: conversationState.conversationId,
             user_input: message,
-            survey_data: conversationState.surveyData
+            survey_data: {
+                ...conversationState.surveyData,
+                conversation_history: conversationState.messages,
+                extracted_data: conversationState.surveyData.extracted_data || {},
+                step_count: conversationState.messages.filter(m => m.sender === 'user').length,
+                company_name: conversationState.surveyData.company_name,
+                respondent_name: conversationState.surveyData.respondent_name
+            }
         })
     })
     .then(response => response.json())
@@ -200,6 +207,15 @@ function sendMessage() {
         
         // Update progress
         updateProgress(data.progress || 0);
+        
+        // Update extracted data if provided by AI
+        if (data.extracted_data) {
+            conversationState.surveyData.extracted_data = {
+                ...conversationState.surveyData.extracted_data || {},
+                ...data.extracted_data
+            };
+            console.log('Updated extracted data:', conversationState.surveyData.extracted_data);
+        }
         
         // Check if survey is complete
         if (data.is_complete) {
