@@ -50,14 +50,14 @@ function validateCurrentStep() {
             const tenureWithFc = document.getElementById('tenureWithFc').value;
             
             if (!companyName || !respondentName || !respondentEmail || !tenureWithFc) {
-                alert('Please fill in all required fields.');
+                showValidationError('Please fill in all required fields.');
                 return false;
             }
             
             // Basic email validation
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(respondentEmail)) {
-                alert('Please enter a valid email address.');
+                showValidationError('Please enter a valid email address.');
                 return false;
             }
             break;
@@ -65,7 +65,7 @@ function validateCurrentStep() {
         case 2:
             const npsScore = document.querySelector('input[name="npsScore"]:checked');
             if (!npsScore) {
-                alert('Please select an NPS score.');
+                showValidationError('Please select an NPS score.');
                 return false;
             }
             selectedNpsScore = parseInt(npsScore.value);
@@ -157,7 +157,7 @@ function submitSurvey() {
         if (data.error) {
             // Handle specific error cases
             if (data.code === 'AUTH_ERROR' || data.code === 'MISSING_AUTH') {
-                alert('Authentication failed. Please get a new token.');
+                console.log('Authentication failed, redirecting to auth page');
                 window.location.href = '/auth';
                 return;
             } else if (status === 409) {
@@ -182,23 +182,27 @@ function submitSurvey() {
         // Clear stored data
         clearSavedData();
         
-        // IMMEDIATE token invalidation test - removing timeout for debugging
-        console.log('IMMEDIATE token invalidation - no timeout');
-        alert('SUCCESS: Survey completed! Token invalidation should happen now.');
-        clearAuthenticationAndRedirect('Survey submitted successfully! Please get a new token for another survey.');
-        
-        console.log('Survey submitted successfully:', data);
-        console.log('Token invalidation will trigger in 3 seconds...');
+        // Token invalidation happens server-side automatically
+        console.log('Traditional survey completed successfully:', data);
+        console.log('Token has been invalidated server-side for security');
     })
     .catch(error => {
         console.error('Error submitting survey:', error);
-        alert('ERROR: Survey submission failed - ' + error.message);
         
         // Hide loading state and show form again
         document.getElementById('loadingState').classList.add('d-none');
         document.getElementById('surveyForm').classList.remove('d-none');
         
-        alert('Error: ' + error.message);
+        // Show error message in UI instead of alert
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'alert alert-danger mt-3';
+        errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>Error submitting survey: ${error.message}`;
+        document.getElementById('surveyForm').appendChild(errorDiv);
+        
+        // Remove error message after 5 seconds
+        setTimeout(() => {
+            errorDiv.remove();
+        }, 5000);
     });
 }
 
@@ -229,6 +233,43 @@ function autoSave() {
     };
     
     localStorage.setItem('surveyDraft', JSON.stringify(formData));
+}
+
+// Function to start a new traditional session
+function startNewTraditionalSession() {
+    console.log('Starting new traditional session - clearing state and redirecting');
+    
+    // Clear form data and current state
+    currentStep = 1;
+    selectedNpsScore = null;
+    authToken = null;
+    clearSavedData();
+    
+    // Redirect to get new token
+    window.location.href = '/server-auth';
+}
+
+// Show validation error in UI instead of alert
+function showValidationError(message) {
+    // Remove any existing error messages
+    const existingError = document.querySelector('.validation-error');
+    if (existingError) {
+        existingError.remove();
+    }
+    
+    // Create error message
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'alert alert-warning validation-error mt-3';
+    errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>${message}`;
+    
+    // Add to current step
+    const currentStepDiv = document.getElementById(`step${currentStep}`);
+    currentStepDiv.appendChild(errorDiv);
+    
+    // Remove error message after 4 seconds
+    setTimeout(() => {
+        errorDiv.remove();
+    }, 4000);
 }
 
 // Load saved data on page load
