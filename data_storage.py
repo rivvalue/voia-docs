@@ -242,9 +242,9 @@ def get_company_nps_data():
             else:
                 risk_level = "Low"
             
-            # Get latest churn risk for this company
-            latest_response = SurveyResponse.query.filter_by(
-                company_name=company.company_name
+            # Get latest churn risk for this company (case-insensitive)
+            latest_response = SurveyResponse.query.filter(
+                func.upper(SurveyResponse.company_name) == func.upper(company.company_name)
             ).order_by(SurveyResponse.created_at.desc()).first()
             
             latest_churn_risk = None
@@ -277,17 +277,17 @@ def get_company_nps_data():
 def get_company_trends():
     """Get NPS trends over time by company"""
     try:
-        # Get monthly trends for each company
+        # Get monthly trends for each company (case-insensitive)
         monthly_data = db.session.query(
-            SurveyResponse.company_name,
+            func.max(SurveyResponse.company_name).label('company_name'),
             func.date_trunc('month', SurveyResponse.created_at).label('month'),
             func.avg(SurveyResponse.nps_score).label('avg_nps'),
             func.count(SurveyResponse.id).label('response_count')
         ).group_by(
-            SurveyResponse.company_name,
+            func.upper(SurveyResponse.company_name),
             func.date_trunc('month', SurveyResponse.created_at)
         ).order_by(
-            SurveyResponse.company_name,
+            func.upper(SurveyResponse.company_name),
             func.date_trunc('month', SurveyResponse.created_at)
         ).all()
         
