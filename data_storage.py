@@ -208,15 +208,15 @@ def get_dashboard_data():
 def get_company_nps_data():
     """Get NPS data segregated by company"""
     try:
-        # Get all responses grouped by company (case-insensitive)
+        # Get all responses grouped by company (case-insensitive using proper aggregation)
         company_stats = db.session.query(
             func.upper(SurveyResponse.company_name).label('company_key'),
             func.max(SurveyResponse.company_name).label('company_name'),  # Use one display name
             func.count(SurveyResponse.id).label('total_responses'),
             func.avg(SurveyResponse.nps_score).label('avg_nps'),
             func.max(SurveyResponse.created_at).label('latest_response'),
-            func.count(func.nullif(SurveyResponse.nps_score >= 9, False)).label('promoters'),
-            func.count(func.nullif(SurveyResponse.nps_score <= 6, False)).label('detractors')
+            func.sum(func.case((SurveyResponse.nps_score >= 9, 1), else_=0)).label('promoters'),
+            func.sum(func.case((SurveyResponse.nps_score <= 6, 1), else_=0)).label('detractors')
         ).group_by(func.upper(SurveyResponse.company_name)).all()
         
         company_nps_list = []

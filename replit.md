@@ -13,6 +13,8 @@ The system is a Flask web application utilizing a multi-tiered architecture. The
 ## Recent Changes (September 2025)
 ✅ **Token Invalidation System Implemented** - Automatic server-side session clearing after survey completion prevents duplicate submissions and survey restarts. Both traditional and conversational surveys now require new tokens after successful completion.
 
+✅ **Company Name Case-Insensitive Normalization** - Fixed bug where "mondou" and "Mondou" were treated as separate companies. All company names are now normalized to Title Case on submission and analytics group companies case-insensitively using SQL UPPER() functions.
+
 Key architectural decisions include:
 - **UI/UX**: Multi-step survey forms with progressive disclosure, interactive dashboards, and a chat-style interface for conversational surveys. Branding includes Rivvalue Inc. logo, a professional blue color scheme, and specific taglines.
 - **Technical Implementations**:
