@@ -6,8 +6,48 @@ let charts = {};
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Dashboard JavaScript loaded and DOM ready');
+    
+    // Immediate fallback for company NPS data
+    setTimeout(function() {
+        console.log('Fallback: Loading company NPS data directly');
+        loadCompanyNpsDataDirect();
+    }, 1000);
+    
     loadDashboardData();
 });
+
+// Direct company NPS data loading as fallback
+function loadCompanyNpsDataDirect() {
+    console.log('Direct loading of company NPS data...');
+    fetch('/api/company_nps')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Direct API response:', data);
+            if (data.success && data.data) {
+                const tbody = document.getElementById('companyNpsTable');
+                if (tbody) {
+                    console.log('Found table, populating with', data.data.length, 'companies');
+                    tbody.innerHTML = data.data.map(company => `
+                        <tr>
+                            <td><strong>${company.company_name}</strong></td>
+                            <td>${company.total_responses}</td>
+                            <td>${company.avg_nps}</td>
+                            <td><span class="badge bg-primary">${company.company_nps}</span></td>
+                            <td><small>${company.promoters}P / ${company.passives}Pa / ${company.detractors}D</small></td>
+                            <td><span class="badge bg-warning">${company.risk_level}</span></td>
+                            <td>${company.latest_response || 'N/A'}</td>
+                            <td>${company.latest_churn_risk || 'N/A'}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    console.error('companyNpsTable element not found');
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Direct loading error:', error);
+        });
+}
 
 function loadDashboardData() {
     console.log('loadDashboardData called');
