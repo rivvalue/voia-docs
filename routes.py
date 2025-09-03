@@ -700,7 +700,9 @@ def start_conversation():
             'conversation_id': conversation_response['conversation_id'],
             'message': conversation_response['message'],
             'step': conversation_response['step'],
-            'progress': conversation_response['progress']
+            'progress': conversation_response['progress'],
+            'extracted_data': conversation_response.get('extracted_data', {}),
+            'is_complete': conversation_response.get('is_complete', False)
         })
         
     except Exception as e:

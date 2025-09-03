@@ -141,6 +141,12 @@ function startConversation() {
         conversationState.conversationId = data.conversation_id;
         conversationState.currentStep = data.step;
         
+        // Initialize extracted_data with data from server
+        if (data.extracted_data) {
+            conversationState.surveyData.extracted_data = data.extracted_data;
+            console.log('Initial extracted data from server:', data.extracted_data);
+        }
+        
         // Show conversation interface
         showConversationInterface();
         
