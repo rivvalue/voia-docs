@@ -199,7 +199,7 @@
                                     <th>Latest Churn Risk</th>
                                 </tr>
                             </thead>
-                            <tbody id="companyNpsTable">
+                            <tbody id="companyNpsTableServerSide">
                                 {% if company_nps_data %}
                                     {% for company in company_nps_data %}
                                     <tr>
@@ -285,7 +285,7 @@ setTimeout(function() {
         .then(response => response.json())
         .then(data => {
             console.log('Inline backup got data:', data);
-            const tbody = document.getElementById('companyNpsTable');
+            const tbody = document.getElementById('companyNpsTableOLD'); // Disabled to prevent overwriting server-side data
             if (tbody && data.success) {
                 tbody.innerHTML = data.data.map(company => 
                     '<tr><td>' + company.company_name + '</td><td>' + company.total_responses + '</td><td>' + company.avg_nps + '</td><td>' + company.company_nps + '</td><td>' + company.promoters + 'P/' + company.passives + 'Pa/' + company.detractors + 'D</td><td>' + company.risk_level + '</td><td>' + (company.latest_response || 'N/A') + '</td><td>' + (company.latest_churn_risk || 'N/A') + '</td></tr>'
