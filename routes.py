@@ -19,7 +19,10 @@ logger = logging.getLogger(__name__)
 @app.route('/')
 def index():
     """Landing page with survey overview"""
-    return render_template('index.html')
+    # Pass authentication status to template
+    auth_email = session.get('auth_email')
+    is_authenticated = bool(session.get('auth_token'))
+    return render_template('index.html', authenticated=is_authenticated, email=auth_email)
 
 @app.route('/auth/request-token', methods=['POST'])
 @rate_limit(limit=5)  # 5 token requests per minute per IP
