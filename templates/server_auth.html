@@ -106,6 +106,7 @@
                             <h4 class="text-center mb-4">Enter an email to generate a secure session token.<br>
                             <small class="text-muted">No spam, no subscriptions. Just a hands-on look at how Voxa works.</small></h4>
                             <label for="email" class="form-label fs-5">Email Address</label>
+                            <small class="text-muted d-block mb-2">Used only to create a secure session. We won't contact you.</small>
                             <input type="email" class="form-control form-control-lg" name="email" 
                                    value="{{ request.form.get('email', '') }}" 
                                    placeholder="Enter your email address" required>
@@ -154,8 +155,8 @@
                         </div>
                         <div class="text-center mt-3">
                             <small class="text-muted">
-                                <i class="fas fa-chart-line me-1"></i>
-                                Real-time machine learning analysis will process your input
+                                <i class="fas fa-shield-alt me-1"></i>
+                                All data in this demo is anonymized. Read our privacy commitment for more info.
                             </small>
                         </div>
                     </form>
