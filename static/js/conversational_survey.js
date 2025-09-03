@@ -367,6 +367,7 @@ function finalizeSurvey() {
     })
     .catch(error => {
         console.error('Error finalizing survey:', error);
+        alert('ERROR: Conversational survey finalization failed - ' + error.message);
         alert('Error finalizing survey: ' + error.message);
     });
 }

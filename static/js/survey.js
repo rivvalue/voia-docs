@@ -192,6 +192,7 @@ function submitSurvey() {
     })
     .catch(error => {
         console.error('Error submitting survey:', error);
+        alert('ERROR: Survey submission failed - ' + error.message);
         
         // Hide loading state and show form again
         document.getElementById('loadingState').classList.add('d-none');
