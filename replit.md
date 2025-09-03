@@ -10,6 +10,9 @@ Project customization: Rivvalue Inc. branding and conversational AI surveys for 
 ## System Architecture
 The system is a Flask web application utilizing a multi-tiered architecture. The frontend uses Jinja2 templates, Bootstrap 5 (dark theme), custom CSS, and vanilla JavaScript for dynamic elements and Chart.js for data visualization. The backend is built with Flask and SQLAlchemy ORM, designed to be scalable from SQLite (development) to PostgreSQL (production). AI integration is central, primarily leveraging OpenAI API for natural language processing, sentiment analysis, and conversational survey capabilities (Voxa). TextBlob is used for additional text analysis.
 
+## Recent Changes (September 2025)
+✅ **Token Invalidation System Implemented** - Automatic server-side session clearing after survey completion prevents duplicate submissions and survey restarts. Both traditional and conversational surveys now require new tokens after successful completion.
+
 Key architectural decisions include:
 - **UI/UX**: Multi-step survey forms with progressive disclosure, interactive dashboards, and a chat-style interface for conversational surveys. Branding includes Rivvalue Inc. logo, a professional blue color scheme, and specific taglines.
 - **Technical Implementations**:
@@ -17,7 +20,7 @@ Key architectural decisions include:
     - **AI Analysis Engine**: Sentiment analysis, key theme extraction, churn risk assessment (categorical levels: Minimal, Low, Medium, High), and growth opportunity identification, including NPS-based growth factor analysis.
     - **Conversational Surveys**: AI-powered (GPT-4o) natural language interface replacing traditional forms, dynamic question generation, real-time processing, and structured data extraction from natural language.
     - **Data Management**: Centralized data aggregation, NPS calculation, time-based filtering, and database query optimization.
-    - **Authentication**: JWT token-based authentication with email validation and admin roles for data export protection, featuring server-side token generation for enhanced security.
+    - **Authentication**: JWT token-based authentication with email validation and admin roles for data export protection, featuring server-side token generation for enhanced security. **Automatic token invalidation after survey completion prevents duplicate submissions.**
     - **Performance**: PostgreSQL migration, database indexing, connection pooling, asynchronous background task processing for AI analysis, and comprehensive rate limiting (IP-based).
 - **Security**: Token-based authentication, duplicate response prevention (via separate submit/overwrite endpoints), enhanced rate limiting, and robust input validation.
 - **Branding**: "Voxa - Voice Of Client Agent" branding with "AI Powered Client Insights" subtitle and "Voxa: Hear what matters. Act on what counts." tagline.
