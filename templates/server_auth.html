@@ -32,17 +32,34 @@
 <div class="container-fluid py-5">
     <!-- Header -->
     <div class="text-center mb-5">
-        <h1 class="display-4 fw-bold">Voxa - Voice Of Client Agent</h1>
-        <p class="lead text-muted">AI Powered Client Insights</p>
-        <p class="tagline">Hear what matters. Act on what counts.</p>
+        <div class="badge bg-success mb-3" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+            <i class="fas fa-eye me-2"></i>Free Sneak Peek Experience
+        </div>
+        <h1 class="display-4 fw-bold">Experience Voxa</h1>
+        <p class="lead text-muted">See how AI transforms customer feedback collection</p>
+        <p class="tagline">This is just a preview of Rivvalue's Voice of Client Agent platform</p>
+        <div class="alert alert-light border-primary d-inline-block mt-3">
+            <small class="text-primary">
+                <i class="fas fa-clock me-1"></i>Takes 2-3 minutes
+                <i class="fas fa-gift ms-3 me-1"></i>Completely free
+                <i class="fas fa-shield-alt ms-3 me-1"></i>No signup required
+            </small>
+        </div>
     </div>
 
     <div class="row justify-content-center">
         <div class="col-xl-8">
             <div class="card border-0 shadow-lg">
                 <div class="card-header bg-transparent border-bottom-0 py-4">
-                    <h3 class="card-title text-center mb-0">Get Started with Your Survey</h3>
-                    <p class="text-center text-muted mt-2">Enter your email and choose your preferred survey experience</p>
+                    <h3 class="card-title text-center mb-0">
+                        <i class="fas fa-rocket text-primary me-2"></i>Start Your Demo Experience
+                    </h3>
+                    <p class="text-center text-muted mt-2">Enter your email and discover how Voxa revolutionizes feedback collection</p>
+                    <div class="text-center">
+                        <small class="badge bg-warning text-dark">
+                            <i class="fas fa-star me-1"></i>Most users prefer the AI conversation
+                        </small>
+                    </div>
                 </div>
                 <div class="card-body p-5">
                     <!-- Server-side form submission -->
@@ -59,27 +76,27 @@
                             <label class="form-label fs-5">Choose Your Survey Experience</label>
                             <div class="row g-3 mt-2">
                                 <div class="col-md-6">
-                                    <div class="survey-type-card card h-100" onclick="selectSurveyType('conversational')">
+                                    <div class="survey-type-card card h-100" onclick="selectSurveyType('conversational', this)">
                                         <div class="card-body text-center p-4">
                                             <div class="mb-3">
                                                 <i class="fas fa-comments fa-3x text-primary"></i>
                                             </div>
-                                            <h5 class="card-title">Conversational AI Survey</h5>
-                                            <p class="card-text text-muted">Natural conversation with our AI agent Voxa for a personalized experience</p>
-                                            <small class="text-success">Recommended</small>
+                                            <h5 class="card-title">Chat with Voxa AI</h5>
+                                            <p class="card-text text-muted">Have a natural conversation instead of filling forms. Experience the future of surveys!</p>
+                                            <small class="text-success"><i class="fas fa-star me-1"></i>Most Popular Choice</small>
                                         </div>
                                     </div>
                                     <input type="radio" name="survey_type" value="conversational" id="radio-conversational" class="d-none" checked>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="survey-type-card card h-100" onclick="selectSurveyType('traditional')">
+                                    <div class="survey-type-card card h-100" onclick="selectSurveyType('traditional', this)">
                                         <div class="card-body text-center p-4">
                                             <div class="mb-3">
                                                 <i class="fas fa-list-alt fa-3x text-secondary"></i>
                                             </div>
                                             <h5 class="card-title">Traditional Form</h5>
-                                            <p class="card-text text-muted">Standard questionnaire format for quick and familiar completion</p>
-                                            <small class="text-muted">Classic Experience</small>
+                                            <p class="card-text text-muted">Familiar questionnaire format if you prefer the classic survey experience</p>
+                                            <small class="text-muted"><i class="fas fa-list me-1"></i>Standard Option</small>
                                         </div>
                                     </div>
                                     <input type="radio" name="survey_type" value="traditional" id="radio-traditional" class="d-none">
@@ -88,10 +105,16 @@
                         </div>
                         
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg py-3">
-                                <i class="fas fa-arrow-right me-2"></i>
-                                Start Survey Experience
+                            <button type="submit" class="btn btn-primary btn-lg py-3" style="background: linear-gradient(135deg, #E13A44 0%, #c12d37 100%); border: none; font-weight: 600;">
+                                <i class="fas fa-rocket me-2"></i>
+                                Launch My Voxa Experience
                             </button>
+                        </div>
+                        <div class="text-center mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-info-circle me-1"></i>
+                                You'll get instant AI analysis after completing the survey
+                            </small>
                         </div>
                     </form>
                     
@@ -136,14 +159,20 @@
 </div>
 
 <script>
-function selectSurveyType(type) {
+function selectSurveyType(type, element) {
     // Remove selected class from all cards
     document.querySelectorAll('.survey-type-card').forEach(card => {
         card.classList.remove('selected');
     });
     
     // Add selected class to clicked card
-    event.currentTarget.classList.add('selected');
+    if (element) {
+        element.classList.add('selected');
+    } else {
+        // Fallback: find the card by survey type
+        const card = document.querySelector(`[onclick*="${type}"]`);
+        if (card) card.classList.add('selected');
+    }
     
     // Update radio button
     document.getElementById('radio-' + type).checked = true;

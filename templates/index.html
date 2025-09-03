@@ -2,70 +2,223 @@
 
 {% block title %}Voxa - Voice Of Client Agent - Home{% endblock %}
 
+{% block extra_head %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        padding: 3rem 2rem;
+        margin-bottom: 3rem;
+        border: 1px solid #dee2e6;
+    }
+    .demo-card {
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+    .demo-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(225, 58, 68, 0.2);
+        border-color: #E13A44;
+    }
+    .demo-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #E13A44, transparent);
+        transition: left 0.5s;
+    }
+    .demo-card:hover::before {
+        left: 100%;
+    }
+    .cta-button {
+        background: linear-gradient(135deg, #E13A44 0%, #c12d37 100%);
+        border: none;
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(225, 58, 68, 0.3);
+    }
+    .cta-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(225, 58, 68, 0.4);
+    }
+    .sneak-peek-badge {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: inline-block;
+        margin-bottom: 1rem;
+        animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    .feature-highlight {
+        background: rgba(225, 58, 68, 0.05);
+        border-left: 4px solid #E13A44;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-radius: 0 10px 10px 0;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
+<div class="container-fluid px-0">
+    <!-- Hero Section -->
+    <div class="hero-section text-center">
+        <div class="sneak-peek-badge">
+            <i class="fas fa-eye me-2"></i>Sneak Peek Experience
+        </div>
+        <h1 class="display-3 fw-bold mb-3">Meet Voxa</h1>
+        <h2 class="h3 text-muted mb-4">Your AI-Powered Voice of Client Agent</h2>
+        <p class="lead mb-4" style="color: #E13A44; font-size: 1.3rem; font-weight: 500;">
+            Experience the future of customer feedback collection
+        </p>
+        <p class="fs-5 text-muted mb-4">
+            This is a preview of Rivvalue's revolutionary Voice of Client Agent platform.<br>
+            Try our AI conversation engine and see how it transforms feedback collection.
+        </p>
+        
+        <div class="d-flex justify-content-center gap-3 flex-wrap mb-4">
+            <a href="{{ url_for('auth') }}" class="btn cta-button text-white">
+                <i class="fas fa-rocket me-2"></i>Try Voxa Now - It's Free!
+            </a>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-chart-line me-2"></i>View Demo Dashboard
+            </a>
+        </div>
+        
+        <!-- Quick Value Props -->
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <div class="feature-highlight">
+                    <i class="fas fa-comments text-primary fa-2x mb-2"></i>
+                    <h6>Natural Conversations</h6>
+                    <small class="text-muted">No more boring forms - just talk to Voxa</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-highlight">
+                    <i class="fas fa-brain text-success fa-2x mb-2"></i>
+                    <h6>AI-Powered Insights</h6>
+                    <small class="text-muted">Get instant sentiment and theme analysis</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-highlight">
+                    <i class="fas fa-clock text-warning fa-2x mb-2"></i>
+                    <h6>2-Minute Experience</h6>
+                    <small class="text-muted">See results in real-time</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row">
-    <div class="col-lg-8 mx-auto">
+    <div class="col-lg-10 mx-auto">
+        <!-- What You'll Experience Section -->
         <div class="text-center mb-5">
-            <img src="{{ url_for('static', filename='rivvalue-logo.png') }}" alt="Rivvalue Inc." height="80" class="mb-4">
-            <h1 class="display-4 mb-3">Voxa - Voice Of Client Agent</h1>
-            <p class="lead">AI Powered Client Insights</p>
-            <p class="mb-4" style="color: #E13A44; font-size: 1.2rem; font-weight: 500;">Voxa: Hear what matters. Act on what counts.</p>
-            
-            <!-- Authentication Status -->
-            {% if authenticated %}
-            <div class="alert alert-success d-inline-block">
-                <i class="fas fa-check-circle me-2"></i>
-                <strong>Authenticated as:</strong> {{ email }}
+            <h3 class="mb-4">What You'll Experience in This Demo</h3>
+            <p class="lead text-muted">Get a hands-on preview of how Voxa revolutionizes customer feedback</p>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <!-- Step 1: Try the Conversation -->
+            <div class="col-md-4">
+                <div class="demo-card card h-100 border-0 shadow">
+                    <div class="card-header bg-gradient text-white text-center" style="background: linear-gradient(135deg, #E13A44 0%, #c12d37 100%);">
+                        <strong><i class="fas fa-play me-2"></i>STEP 1</strong>
+                    </div>
+                    <div class="card-body text-center">
+                        <i class="fas fa-comments fa-4x text-primary mb-3"></i>
+                        <h5 class="card-title">Chat with Voxa</h5>
+                        <p class="card-text">Experience natural conversation instead of filling boring survey forms. Voxa understands context and asks intelligent follow-ups.</p>
+                        <div class="mb-3">
+                            <small class="badge bg-success">2-3 minutes</small>
+                            <small class="badge bg-info ms-1">Natural Language</small>
+                        </div>
+                        <a href="{{ url_for('auth') }}" class="btn btn-primary btn-lg w-100 mb-2">
+                            <i class="fas fa-rocket me-2"></i>Start AI Conversation
+                        </a>
+                        <a href="{{ url_for('auth') }}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-list me-1"></i>Or try traditional form
+                        </a>
+                    </div>
+                </div>
             </div>
-            {% else %}
-            <div class="alert alert-warning d-inline-block">
-                <i class="fas fa-key me-2"></i>
-                <strong>Not authenticated</strong> - Get a token to participate in surveys
+
+            <!-- Step 2: See AI Analysis -->
+            <div class="col-md-4">
+                <div class="demo-card card h-100 border-0 shadow">
+                    <div class="card-header bg-success text-white text-center">
+                        <strong><i class="fas fa-brain me-2"></i>STEP 2</strong>
+                    </div>
+                    <div class="card-body text-center">
+                        <i class="fas fa-magic fa-4x text-success mb-3"></i>
+                        <h5 class="card-title">AI Instant Analysis</h5>
+                        <p class="card-text">Watch Voxa analyze your feedback in real-time: sentiment, themes, churn risk, and growth opportunities.</p>
+                        <div class="mb-3">
+                            <small class="badge bg-warning">Instant</small>
+                            <small class="badge bg-primary ms-1">GPT-4 Powered</small>
+                        </div>
+                        <div class="text-muted">
+                            <small><i class="fas fa-check me-1"></i>Sentiment Analysis</small><br>
+                            <small><i class="fas fa-check me-1"></i>Theme Extraction</small><br>
+                            <small><i class="fas fa-check me-1"></i>Risk Assessment</small>
+                        </div>
+                    </div>
+                </div>
             </div>
-            {% endif %}
-            
-            <!-- New AI Feature Highlight -->
-            <div class="alert alert-info d-inline-block">
-                <strong>New!</strong> AI Conversational Surveys - Talk naturally instead of filling forms
+
+            <!-- Step 3: Explore Dashboard -->
+            <div class="col-md-4">
+                <div class="demo-card card h-100 border-0 shadow">
+                    <div class="card-header bg-info text-white text-center">
+                        <strong><i class="fas fa-chart-line me-2"></i>STEP 3</strong>
+                    </div>
+                    <div class="card-body text-center">
+                        <i class="fas fa-dashboard fa-4x text-info mb-3"></i>
+                        <h5 class="card-title">Live Dashboard</h5>
+                        <p class="card-text">Explore real customer insights with NPS scores, company analytics, and risk assessments from actual users.</p>
+                        <div class="mb-3">
+                            <small class="badge bg-primary">Real Data</small>
+                            <small class="badge bg-success ms-1">Interactive</small>
+                        </div>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-info btn-lg w-100">
+                            <i class="fas fa-eye me-2"></i>Explore Dashboard
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card h-100 border-primary">
-                    <div class="card-header bg-primary text-white text-center">
-                        <strong>NEW!</strong>
-                    </div>
-                    <div class="card-body text-center">
-                        <i class="fas fa-comments fa-3x text-primary mb-3"></i>
-                        <h5 class="card-title">AI Conversation Survey</h5>
-                        <p class="card-text">Have a natural conversation with Voxa to raise your voice - no forms to fill!</p>
-                        <a href="{{ url_for('conversational_survey') }}" class="btn btn-primary mb-2">Try AI Survey</a>
-                        <br>
-                        <a href="{{ url_for('survey') }}" class="btn btn-outline-primary btn-sm">Traditional Form</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <i class="fas fa-brain fa-3x text-success mb-3"></i>
-                        <h5 class="card-title">AI Analysis</h5>
-                        <p class="card-text">Leverage Voxa to analyze sentiment, extract key themes, and identify patterns in customer feedback.</p>
-                        <button class="btn btn-success" disabled>Automated</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <i class="fas fa-chart-line fa-3x text-info mb-3"></i>
-                        <h5 class="card-title">Insights Dashboard</h5>
-                        <p class="card-text">View comprehensive analytics, churn risk assessments, and growth opportunities.</p>
-                        <a href="{{ url_for('dashboard') }}" class="btn btn-info">View Dashboard</a>
-                    </div>
+        <!-- Call to Action Section -->
+        <div class="text-center mb-5">
+            <div class="alert alert-light border-2" style="border-color: #E13A44 !important;">
+                <h4 class="alert-heading text-primary">Ready to Transform Your Customer Feedback?</h4>
+                <p class="mb-0">This demo showcases just a fraction of what our full Voice of Client Agent platform can do for your business.</p>
+                <hr>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a href="{{ url_for('auth') }}" class="btn cta-button text-white">
+                        <i class="fas fa-play me-2"></i>Experience Voxa Now
+                    </a>
+                    <a href="https://rivvalue.com" target="_blank" class="btn btn-outline-primary">
+                        <i class="fas fa-building me-2"></i>Learn About Rivvalue
+                    </a>
                 </div>
             </div>
         </div>

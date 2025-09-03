@@ -11,6 +11,10 @@ Project customization: Rivvalue Inc. branding and conversational AI surveys for 
 The system is a Flask web application utilizing a multi-tiered architecture. The frontend uses Jinja2 templates, Bootstrap 5 (dark theme), custom CSS, and vanilla JavaScript for dynamic elements and Chart.js for data visualization. The backend is built with Flask and SQLAlchemy ORM, designed to be scalable from SQLite (development) to PostgreSQL (production). AI integration is central, primarily leveraging OpenAI API for natural language processing, sentiment analysis, and conversational survey capabilities (Voxa). TextBlob is used for additional text analysis.
 
 ## Recent Changes (September 2025)
+✅ **Enhanced User Onboarding and Experience** - Completely redesigned landing page and Get Token page to better drive visitor engagement with Voxa as a "sneak peek" into Rivvalue's Voice of Client Agent platform. Added compelling hero section with animated elements, 3-step demo journey, prominent CTAs, and messaging emphasizing the free demo nature. Enhanced Get Token page with sneak peek badges, improved copy, and visual indicators highlighting AI conversation as the preferred choice.
+
+✅ **JavaScript Error Fixes** - Resolved console errors in survey type selection by properly passing element context to selectSurveyType function. Fixed event handling issues that were causing "undefined is not an object" errors during card selection.
+
 ✅ **Token Invalidation System Implemented** - Automatic server-side session clearing after survey completion prevents duplicate submissions and survey restarts. Both traditional and conversational surveys now require new tokens after successful completion.
 
 ✅ **Company Name Case-Insensitive Normalization** - Fixed bug where "mondou" and "Mondou" were treated as separate companies. All company names are now normalized to Title Case on submission and analytics group companies case-insensitively using SQL UPPER() functions. Updated both NPS analytics and Growth Opportunities sections to use case-insensitive grouping.
