@@ -37,37 +37,27 @@
         border-bottom: none;
     }
     
-    .survey-type-card.selected .badge {
-        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
-        color: #E13A44 !important;
-        border: 1px solid #E13A44;
-        font-weight: 600;
-        box-shadow: 0 2px 8px rgba(225, 58, 68, 0.2);
-    }
-    
     .survey-type-card .badge {
         transition: all 0.3s ease;
-        font-size: 0.85rem;
-        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        padding: 0.6rem 1.2rem;
+        font-weight: 500;
+        border: 1px solid transparent;
     }
     
-    .selection-indicator {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #dee2e6;
-        transition: all 0.3s ease;
-        opacity: 0.5;
+    .survey-type-card.selected .badge {
+        background: linear-gradient(135deg, #E13A44 0%, #c12d37 100%) !important;
+        color: white !important;
+        border: 1px solid #E13A44;
+        font-weight: 700;
+        box-shadow: 0 4px 15px rgba(225, 58, 68, 0.4);
+        transform: scale(1.05);
     }
     
-    .survey-type-card.selected .selection-indicator {
-        background: linear-gradient(135deg, #E13A44 0%, #c12d37 100%);
-        box-shadow: 0 0 0 3px rgba(225, 58, 68, 0.3);
-        opacity: 1;
-        transform: scale(1.2);
+    .survey-type-card:not(.selected) .badge {
+        background: #f8f9fa;
+        color: #6c757d;
+        border: 1px solid #dee2e6;
     }
     
     .survey-type-radio {
@@ -132,7 +122,6 @@
                             <div class="row g-3 mt-2">
                                 <div class="col-md-6">
                                     <div class="survey-type-card card h-100 selected" onclick="selectSurveyType('conversational', this)">
-                                        <div class="selection-indicator"></div>
                                         <div class="card-body text-center p-4">
                                             <div class="mb-3">
                                                 <i class="fas fa-comments fa-3x text-primary"></i>
@@ -148,7 +137,6 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="survey-type-card card h-100" onclick="selectSurveyType('traditional', this)">
-                                        <div class="selection-indicator"></div>
                                         <div class="card-body text-center p-4">
                                             <div class="mb-3">
                                                 <i class="fas fa-list-alt fa-3x text-secondary"></i>
