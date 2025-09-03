@@ -179,19 +179,14 @@
                                 <p><strong>Expires in:</strong> {{ token_result.expires_in }} seconds</p>
                                 
                                 <div class="mt-3">
-                                    {% if token_result.survey_type == 'conversational' %}
-                                        <a href="{{ url_for('conversational_survey') }}?token={{ token_result.token }}" 
-                                           class="btn btn-success btn-lg">
-                                            <i class="fas fa-comments me-2"></i>
-                                            Start Conversational Survey →
-                                        </a>
-                                    {% else %}
-                                        <a href="{{ url_for('survey') }}?token={{ token_result.token }}" 
-                                           class="btn btn-success btn-lg">
-                                            <i class="fas fa-list-alt me-2"></i>
-                                            Start Traditional Survey →
-                                        </a>
-                                    {% endif %}
+                                    <a href="{{ url_for('conversational_survey') }}?token={{ token_result.token }}" 
+                                       id="dynamicSurveyButton"
+                                       class="btn btn-success btn-lg"
+                                       data-conversational-url="{{ url_for('conversational_survey') }}?token={{ token_result.token }}"
+                                       data-traditional-url="{{ url_for('survey') }}?token={{ token_result.token }}">
+                                        <i class="fas fa-comments me-2" id="buttonIcon"></i>
+                                        <span id="buttonText">Start Conversational Survey →</span>
+                                    </a>
                                 </div>
                             </div>
                         {% else %}
@@ -237,6 +232,27 @@ function selectSurveyType(type, cardElement) {
     cardElement.style.border = '3px solid #E13A44';
     cardElement.style.boxShadow = '0 0 0 1px rgba(225, 58, 68, 0.3)';
     cardElement.style.backgroundColor = 'rgba(225, 58, 68, 0.05)';
+    
+    // Update the survey button if token is already generated
+    updateSurveyButton(type);
+}
+
+function updateSurveyButton(surveyType) {
+    const button = document.getElementById('dynamicSurveyButton');
+    const buttonText = document.getElementById('buttonText');
+    const buttonIcon = document.getElementById('buttonIcon');
+    
+    if (button && buttonText && buttonIcon) {
+        if (surveyType === 'conversational') {
+            button.href = button.getAttribute('data-conversational-url');
+            buttonIcon.className = 'fas fa-comments me-2';
+            buttonText.textContent = 'Start Conversational Survey →';
+        } else {
+            button.href = button.getAttribute('data-traditional-url');
+            buttonIcon.className = 'fas fa-list-alt me-2';
+            buttonText.textContent = 'Start Traditional Survey →';
+        }
+    }
 }
 
 // Initialize selection state on page load
@@ -255,6 +271,9 @@ document.addEventListener('DOMContentLoaded', function() {
             selectSurveyType('conversational', conversationalCard);
         }
     }
+    
+    // Initialize button text based on current selection
+    updateSurveyButton(previousSelection);
 });
 </script>
 
