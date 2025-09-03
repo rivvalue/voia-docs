@@ -254,4 +254,45 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script>
+// Inline test to force load company data
+console.log('Inline script loaded');
+setTimeout(function() {
+    console.log('Testing direct API call...');
+    fetch('/api/company_nps')
+        .then(response => response.json())
+        .then(data => {
+            console.log('Direct API response:', data);
+            const tbody = document.getElementById('companyNpsTable');
+            if (tbody && Array.isArray(data) && data.length > 0) {
+                console.log('Populating table with', data.length, 'companies');
+                tbody.innerHTML = data.map(company => `
+                    <tr>
+                        <td><strong>${company.company_name}</strong></td>
+                        <td>${company.total_responses}</td>
+                        <td>${company.avg_nps}</td>
+                        <td><span class="badge bg-warning">${company.company_nps}</span></td>
+                        <td>${company.promoters}P / ${company.passives}Pa / ${company.detractors}D</td>
+                        <td><span class="badge bg-secondary">${company.risk_level}</span></td>
+                        <td>${company.latest_response || 'N/A'}</td>
+                        <td>${company.latest_churn_risk || 'N/A'}</td>
+                    </tr>
+                `).join('');
+                console.log('Table populated successfully');
+            } else {
+                console.log('No valid data to populate');
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No data available</td></tr>';
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Direct API call failed:', error);
+            const tbody = document.getElementById('companyNpsTable');
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error loading data</td></tr>';
+            }
+        });
+}, 2000);
+</script>
 {% endblock %}
