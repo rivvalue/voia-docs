@@ -4,9 +4,18 @@ let dashboardData = null;
 let charts = {};
 
 // Initialize dashboard
+console.log('Dashboard JavaScript file loaded');
+
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Dashboard JavaScript loaded and DOM ready');
     loadDashboardData();
 });
+
+// Force load company data after a delay (fallback)
+setTimeout(function() {
+    console.log('Forcing company NPS data load after 3 seconds');
+    loadCompanyNpsData();
+}, 3000);
 
 function loadDashboardData() {
     document.getElementById('loadingIndicator').classList.remove('d-none');
