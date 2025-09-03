@@ -208,16 +208,52 @@ def get_dashboard_data():
 def get_company_nps_data():
     """Get NPS data segregated by company"""
     try:
-        # Get all responses grouped by company (case-insensitive using proper aggregation)
-        company_stats = db.session.query(
-            func.upper(SurveyResponse.company_name).label('company_key'),
-            func.max(SurveyResponse.company_name).label('company_name'),  # Use one display name
-            func.count(SurveyResponse.id).label('total_responses'),
-            func.avg(SurveyResponse.nps_score).label('avg_nps'),
-            func.max(SurveyResponse.created_at).label('latest_response'),
-            func.count(func.nullif((SurveyResponse.nps_score >= 9), False)).label('promoters'),
-            func.count(func.nullif((SurveyResponse.nps_score <= 6), False)).label('detractors')
-        ).group_by(func.upper(SurveyResponse.company_name)).all()
+        # Get all responses grouped by company using simple working queries
+        all_responses = SurveyResponse.query.all()
+        
+        # Group by company name (case-insensitive) using Python
+        company_groups = {}
+        for response in all_responses:
+            company_key = response.company_name.upper() if response.company_name else ''
+            if company_key not in company_groups:
+                company_groups[company_key] = {
+                    'responses': [],
+                    'display_name': response.company_name  # Use first occurrence as display name
+                }
+            company_groups[company_key]['responses'].append(response)
+        
+        company_stats = []
+        for company_key, group in company_groups.items():
+            responses = group['responses']
+            total_responses = len(responses)
+            
+            if total_responses > 0:
+                nps_scores = [r.nps_score for r in responses if r.nps_score is not None]
+                avg_nps = sum(nps_scores) / len(nps_scores) if nps_scores else 0
+                
+                promoters = len([s for s in nps_scores if s >= 9])
+                detractors = len([s for s in nps_scores if s <= 6])
+                
+                latest_response = max(responses, key=lambda x: x.created_at if x.created_at else datetime.min)
+                
+                # Create a simple object to match the SQLAlchemy result structure
+                class CompanyStats:
+                    def __init__(self, company_name, total_responses, avg_nps, latest_response, promoters, detractors):
+                        self.company_name = company_name
+                        self.total_responses = total_responses
+                        self.avg_nps = avg_nps
+                        self.latest_response = latest_response.created_at if latest_response else None
+                        self.promoters = promoters
+                        self.detractors = detractors
+                
+                company_stats.append(CompanyStats(
+                    group['display_name'],
+                    total_responses,
+                    avg_nps,
+                    latest_response,
+                    promoters,
+                    detractors
+                ))
         
         company_nps_list = []
         
@@ -242,10 +278,12 @@ def get_company_nps_data():
             else:
                 risk_level = "Low"
             
-            # Get latest churn risk for this company (case-insensitive)
-            latest_response = SurveyResponse.query.filter(
-                func.upper(SurveyResponse.company_name) == func.upper(company.company_name)
-            ).order_by(SurveyResponse.created_at.desc()).first()
+            # Get latest churn risk for this company
+            latest_response = None
+            for response in all_responses:
+                if response.company_name and response.company_name.upper() == company.company_name.upper():
+                    if not latest_response or (response.created_at and response.created_at > latest_response.created_at):
+                        latest_response = response
             
             latest_churn_risk = None
             if latest_response and latest_response.churn_risk_level:
