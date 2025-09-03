@@ -503,7 +503,14 @@ def submit_survey_overwrite():
 @app.route('/dashboard')
 def dashboard():
     """Dashboard showing survey results and insights"""
-    return render_template('dashboard.html')
+    try:
+        from data_storage import get_company_nps_data
+        company_nps_data = get_company_nps_data()
+    except Exception as e:
+        logger.error(f"Error loading company NPS data for dashboard: {e}")
+        company_nps_data = []
+    
+    return render_template('dashboard.html', company_nps_data=company_nps_data)
 
 @app.route('/api/dashboard_data')
 def dashboard_data():

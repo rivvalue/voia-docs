@@ -200,7 +200,30 @@
                                 </tr>
                             </thead>
                             <tbody id="companyNpsTable">
-                                <!-- Will be populated by JavaScript -->
+                                {% if company_nps_data %}
+                                    {% for company in company_nps_data %}
+                                    <tr>
+                                        <td><strong>{{ company.company_name }}</strong></td>
+                                        <td>{{ company.total_responses }}</td>
+                                        <td>{{ company.avg_nps }}</td>
+                                        <td>
+                                            <span class="badge {% if company.company_nps > 20 %}bg-success{% elif company.company_nps >= -20 %}bg-warning{% else %}bg-danger{% endif %}">
+                                                {% if company.company_nps > 0 %}+{% endif %}{{ company.company_nps }}
+                                            </span>
+                                        </td>
+                                        <td><small>{{ company.promoters }}P / {{ company.passives }}Pa / {{ company.detractors }}D</small></td>
+                                        <td>
+                                            <span class="badge {% if company.risk_level == 'Low' %}bg-success{% elif company.risk_level == 'Medium' %}bg-warning{% elif company.risk_level == 'High' %}bg-danger{% elif company.risk_level == 'Critical' %}bg-dark{% else %}bg-secondary{% endif %}">
+                                                {{ company.risk_level }}
+                                            </span>
+                                        </td>
+                                        <td>{{ company.latest_response or 'N/A' }}</td>
+                                        <td>{{ company.latest_churn_risk or 'N/A' }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr><td colspan="8" class="text-center text-muted">No company data available yet</td></tr>
+                                {% endif %}
                             </tbody>
                         </table>
                     </div>
