@@ -299,6 +299,8 @@ def submit_survey():
         # AUTOMATIC TOKEN INVALIDATION - Clear session to prevent survey restarts
         session.pop('auth_token', None)
         session.pop('auth_email', None)
+        session.permanent = False  # Force session to be non-permanent for immediate effect
+        print(f"=== TOKEN INVALIDATED FOR {authenticated_email} ===")
         logger.info(f"Survey submitted by authenticated user: {authenticated_email} - Token invalidated")
         
         return jsonify({
@@ -704,6 +706,8 @@ def finalize_conversation():
         # AUTOMATIC TOKEN INVALIDATION - Clear session to prevent survey restarts
         session.pop('auth_token', None)
         session.pop('auth_email', None)
+        session.permanent = False  # Force session to be non-permanent for immediate effect
+        print(f"=== CONVERSATIONAL TOKEN INVALIDATED FOR {authenticated_email} ===")
         logger.info(f"Conversational survey completed by {authenticated_email} - Token invalidated")
         
         return jsonify({
