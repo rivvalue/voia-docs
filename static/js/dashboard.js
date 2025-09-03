@@ -5,10 +5,12 @@ let charts = {};
 
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Dashboard JavaScript loaded and DOM ready');
     loadDashboardData();
 });
 
 function loadDashboardData() {
+    console.log('loadDashboardData called');
     document.getElementById('loadingIndicator').classList.remove('d-none');
     document.getElementById('dashboardContent').classList.add('d-none');
     
@@ -33,6 +35,7 @@ function loadDashboardData() {
 }
 
 function populateDashboard() {
+    console.log('populateDashboard called with data:', dashboardData);
     // Update key metrics
     document.getElementById('totalResponses').textContent = dashboardData.total_responses || 0;
     document.getElementById('npsScore').textContent = dashboardData.nps_score || 0;
@@ -61,6 +64,7 @@ function populateDashboard() {
     loadSurveyResponses();
     
     // Load company NPS data
+    console.log('About to call loadCompanyNpsData...');
     loadCompanyNpsData();
 }
 
