@@ -5,13 +5,14 @@ The Voice of Client Agent (Voxa) is a Flask-based system designed for comprehens
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
+User interface tone: Thought leadership and research-oriented language, avoiding sales-oriented messaging.
 Project customization: Rivvalue Inc. branding and conversational AI surveys for enhanced user experience.
 
 ## System Architecture
 The system is a Flask web application utilizing a multi-tiered architecture. The frontend uses Jinja2 templates, Bootstrap 5 (dark theme), custom CSS, and vanilla JavaScript for dynamic elements and Chart.js for data visualization. The backend is built with Flask and SQLAlchemy ORM, designed to be scalable from SQLite (development) to PostgreSQL (production). AI integration is central, primarily leveraging OpenAI API for natural language processing, sentiment analysis, and conversational survey capabilities (Voxa). TextBlob is used for additional text analysis.
 
 ## Recent Changes (September 2025)
-✅ **Enhanced User Onboarding and Experience** - Completely redesigned landing page and Get Token page to better drive visitor engagement with Voxa as a "sneak peek" into Rivvalue's Voice of Client Agent platform. Added compelling hero section with animated elements, 3-step demo journey, prominent CTAs, and messaging emphasizing the free demo nature. Enhanced Get Token page with sneak peek badges, improved copy, and visual indicators highlighting AI conversation as the preferred choice.
+✅ **Thought Leadership UI Redesign** - Transformed messaging from sales-oriented to research and thought leadership tone throughout landing page and authentication flow. Repositioned platform as "Voxa Intelligence" with emphasis on research demonstration, machine learning methodology, and academic/scientific language. Updated CTAs to use research-focused terminology ("Participate in Research", "Initialize Research Session") while maintaining user engagement through sophisticated technical positioning.
 
 ✅ **JavaScript Error Fixes** - Resolved console errors in survey type selection by properly passing element context to selectSurveyType function. Fixed event handling issues that were causing "undefined is not an object" errors during card selection.
 
