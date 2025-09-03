@@ -1,6 +1,6 @@
 import json
 from datetime import datetime, timedelta
-from sqlalchemy import func
+from sqlalchemy import func, case
 from app import db
 from models import SurveyResponse
 from flask import request
@@ -215,8 +215,8 @@ def get_company_nps_data():
             func.count(SurveyResponse.id).label('total_responses'),
             func.avg(SurveyResponse.nps_score).label('avg_nps'),
             func.max(SurveyResponse.created_at).label('latest_response'),
-            func.sum(func.case((SurveyResponse.nps_score >= 9, 1), else_=0)).label('promoters'),
-            func.sum(func.case((SurveyResponse.nps_score <= 6, 1), else_=0)).label('detractors')
+            func.sum(case((SurveyResponse.nps_score >= 9, 1), else_=0)).label('promoters'),
+            func.sum(case((SurveyResponse.nps_score <= 6, 1), else_=0)).label('detractors')
         ).group_by(func.upper(SurveyResponse.company_name)).all()
         
         company_nps_list = []

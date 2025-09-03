@@ -2,7 +2,6 @@ from flask import render_template, request, jsonify, flash, redirect, url_for, g
 from app import app, db
 from models import SurveyResponse
 from models_auth import AuthToken
-from data_storage import get_dashboard_data, get_company_nps_data, get_company_trends
 from task_queue import add_analysis_task, get_queue_stats
 from rate_limiter import rate_limit
 from auth_system import require_auth, generate_user_token, require_admin_auth
@@ -510,6 +509,7 @@ def dashboard():
 def dashboard_data():
     """API endpoint for dashboard data"""
     try:
+        from data_storage import get_dashboard_data
         data = get_dashboard_data()
         return jsonify(data)
     except Exception as e:
@@ -616,6 +616,7 @@ def health_check():
 def api_company_nps():
     """API endpoint for company-segregated NPS data"""
     try:
+        from data_storage import get_company_nps_data
         company_nps_data = get_company_nps_data()
         return jsonify({
             'success': True,
@@ -631,6 +632,7 @@ def api_company_nps():
 def api_company_trends():
     """API endpoint for company NPS trends"""
     try:
+        from data_storage import get_company_trends
         company_trends = get_company_trends()
         return jsonify({
             'success': True,
