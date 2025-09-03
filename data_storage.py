@@ -79,20 +79,72 @@ def get_dashboard_data():
             SurveyResponse.churn_risk_score.isnot(None)
         ).order_by(SurveyResponse.churn_risk_score.desc()).all()
         
-        # High risk accounts - updated to use new categorical system
+        # High risk accounts - grouped by company (case-insensitive)
+        high_risk_by_company = {}
         high_risk_responses = SurveyResponse.query.filter(
-            SurveyResponse.churn_risk_level.in_(['High'])
+            SurveyResponse.churn_risk_level.in_(['High', 'Critical'])  # Include Critical risk too
         ).all()
         
-        high_risk_accounts = [
-            {
-                'company_name': row.company_name,
-                'risk_level': row.churn_risk_level,
-                'risk_score': row.churn_risk_score,
-                'nps_score': row.nps_score
-            }
-            for row in high_risk_responses
-        ]
+        for response in high_risk_responses:
+            if response.company_name:
+                company_key = response.company_name.upper()  # Case-insensitive grouping
+                
+                if company_key not in high_risk_by_company:
+                    high_risk_by_company[company_key] = {
+                        'company_name': response.company_name,
+                        'risk_levels': [],
+                        'risk_scores': [],
+                        'nps_scores': [],
+                        'respondent_count': 0,
+                        'latest_response': response.created_at
+                    }
+                else:
+                    # Update display name to most recent case version
+                    high_risk_by_company[company_key]['company_name'] = response.company_name
+                    # Update latest response date
+                    if response.created_at > high_risk_by_company[company_key]['latest_response']:
+                        high_risk_by_company[company_key]['latest_response'] = response.created_at
+                
+                # Add this response's data
+                company_data = high_risk_by_company[company_key]
+                if response.churn_risk_level:
+                    company_data['risk_levels'].append(response.churn_risk_level)
+                if response.churn_risk_score is not None:
+                    company_data['risk_scores'].append(response.churn_risk_score)
+                if response.nps_score is not None:
+                    company_data['nps_scores'].append(response.nps_score)
+                company_data['respondent_count'] += 1
+        
+        # Convert to final format with aggregated data
+        high_risk_accounts = []
+        for company_key, company_data in high_risk_by_company.items():
+            # Determine highest risk level for the company
+            risk_levels = company_data['risk_levels']
+            if 'Critical' in risk_levels:
+                max_risk_level = 'Critical'
+            elif 'High' in risk_levels:
+                max_risk_level = 'High'
+            else:
+                max_risk_level = 'Medium'  # Fallback
+            
+            # Calculate averages for scores
+            avg_risk_score = sum(company_data['risk_scores']) / len(company_data['risk_scores']) if company_data['risk_scores'] else 0
+            avg_nps_score = sum(company_data['nps_scores']) / len(company_data['nps_scores']) if company_data['nps_scores'] else 0
+            
+            high_risk_accounts.append({
+                'company_name': company_data['company_name'],
+                'risk_level': max_risk_level,
+                'risk_score': round(avg_risk_score, 2),
+                'nps_score': round(avg_nps_score, 1),
+                'respondent_count': company_data['respondent_count'],
+                'latest_response': company_data['latest_response']
+            })
+        
+        # Sort by highest risk first, then by lowest NPS
+        high_risk_accounts.sort(key=lambda x: (
+            0 if x['risk_level'] == 'Critical' else 1 if x['risk_level'] == 'High' else 2,
+            x['nps_score']
+        ))
         
         # Growth opportunities summary - grouped by company (case-insensitive) and normalized by type
         growth_opportunities_by_company = {}
