@@ -199,8 +199,9 @@
                                     <th>Latest Churn Risk</th>
                                 </tr>
                             </thead>
-                            <tbody id="companyNpsTableServerSide">
+                            <tbody id="companyNpsTableServerSide" style="display: table-row-group !important; visibility: visible !important;">
                                 {% if company_nps_data %}
+                                    <!-- Server-side data: {{ company_nps_data|length }} companies -->
                                     {% for company in company_nps_data %}
                                     <tr>
                                         <td><strong>{{ company.company_name }}</strong></td>
@@ -222,6 +223,7 @@
                                     </tr>
                                     {% endfor %}
                                 {% else %}
+                                    <!-- No server-side data found -->
                                     <tr><td colspan="8" class="text-center text-muted">No company data available yet</td></tr>
                                 {% endif %}
                             </tbody>
@@ -276,24 +278,6 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- JavaScript disabled for company NPS table - using server-side rendering only -->
 <script src="{{ url_for('static', filename='js/dashboard.js') }}?v={{ range(1000, 9999) | random }}"></script>
-<script>
-// Inline backup to ensure SOMETHING executes
-setTimeout(function() {
-    console.log('Inline backup script executing...');
-    fetch('/api/company_nps')
-        .then(response => response.json())
-        .then(data => {
-            console.log('Inline backup got data:', data);
-            const tbody = document.getElementById('companyNpsTableOLD'); // Disabled to prevent overwriting server-side data
-            if (tbody && data.success) {
-                tbody.innerHTML = data.data.map(company => 
-                    '<tr><td>' + company.company_name + '</td><td>' + company.total_responses + '</td><td>' + company.avg_nps + '</td><td>' + company.company_nps + '</td><td>' + company.promoters + 'P/' + company.passives + 'Pa/' + company.detractors + 'D</td><td>' + company.risk_level + '</td><td>' + (company.latest_response || 'N/A') + '</td><td>' + (company.latest_churn_risk || 'N/A') + '</td></tr>'
-                ).join('');
-                console.log('Inline backup populated table with', data.data.length, 'companies');
-            }
-        })
-        .catch(error => console.error('Inline backup error:', error));
-}, 2000);
-</script>
 {% endblock %}
