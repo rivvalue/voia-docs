@@ -533,10 +533,13 @@ function loadCompanyNpsData() {
     fetch('/api/company_nps')
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                populateCompanyNpsTable(data.data);
-            } else {
+            // API returns array directly, not wrapped in success object
+            if (Array.isArray(data)) {
+                populateCompanyNpsTable(data);
+            } else if (data.error) {
                 console.error('Error loading company NPS data:', data.error);
+            } else {
+                console.error('Unexpected data format:', data);
             }
         })
         .catch(error => {
