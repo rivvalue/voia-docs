@@ -5,6 +5,34 @@ from app import db
 from models import SurveyResponse
 from flask import request
 
+def normalize_opportunity_type(opp_type):
+    """Normalize opportunity types for better grouping"""
+    if not opp_type:
+        return 'unknown'
+    
+    # Convert to lowercase and strip whitespace
+    normalized = opp_type.lower().strip()
+    
+    # Define mapping for similar opportunity types
+    type_mappings = {
+        'upsell': ['upsell', 'upselling', 'up-sell', 'up-selling'],
+        'cross-sell': ['cross-sell', 'cross-selling', 'crosssell', 'crossselling'],
+        'advocacy': ['advocacy', 'advocate', 'brand advocacy', 'testimonial'],
+        'partnership': ['partnership', 'partnerships', 'partnership opportunities', 'partner'],
+        'product_improvement': ['product improvement', 'product enhancement', 'product feedback'],
+        'support_enhancement': ['support enhancement', 'support improvement', 'customer support'],
+        'feature_request': ['feature request', 'feature requests', 'new features'],
+        'retention': ['retention', 'churn prevention', 'customer retention']
+    }
+    
+    # Find the canonical type for this opportunity
+    for canonical_type, variations in type_mappings.items():
+        if normalized in variations:
+            return canonical_type
+    
+    # If no mapping found, return the normalized version
+    return normalized
+
 def get_dashboard_data():
     """Compile dashboard data for visualization"""
     try:
@@ -66,7 +94,7 @@ def get_dashboard_data():
             for row in high_risk_responses
         ]
         
-        # Growth opportunities summary - grouped by company (case-insensitive)
+        # Growth opportunities summary - grouped by company (case-insensitive) and normalized by type
         growth_opportunities_by_company = {}
         responses_with_opportunities = SurveyResponse.query.filter(
             SurveyResponse.growth_opportunities.isnot(None)
@@ -82,28 +110,60 @@ def get_dashboard_data():
                     if company_key not in growth_opportunities_by_company:
                         growth_opportunities_by_company[company_key] = {
                             'display_name': company_name,  # Keep the actual company name for display
-                            'opportunities': []
+                            'opportunities_by_type': {}  # Group by normalized type
                         }
                     else:
                         # Update display name to the most recent case version
                         growth_opportunities_by_company[company_key]['display_name'] = company_name
                     
                     for opp in opportunities:
-                        growth_opportunities_by_company[company_key]['opportunities'].append({
-                            'type': opp.get('type', 'unknown'),
-                            'description': opp.get('description', ''),
-                            'action': opp.get('action', '')
-                        })
+                        # Normalize the opportunity type to group similar ones
+                        original_type = opp.get('type', 'unknown')
+                        normalized_type = normalize_opportunity_type(original_type)
+                        
+                        # Group opportunities by normalized type
+                        if normalized_type not in growth_opportunities_by_company[company_key]['opportunities_by_type']:
+                            growth_opportunities_by_company[company_key]['opportunities_by_type'][normalized_type] = {
+                                'type': normalized_type.replace('_', ' ').title(),  # Pretty format for display
+                                'descriptions': [],
+                                'actions': [],
+                                'count': 0
+                            }
+                        
+                        # Add to the grouped opportunity
+                        type_group = growth_opportunities_by_company[company_key]['opportunities_by_type'][normalized_type]
+                        description = opp.get('description', '')
+                        action = opp.get('action', '')
+                        
+                        if description and description not in type_group['descriptions']:
+                            type_group['descriptions'].append(description)
+                        if action and action not in type_group['actions']:
+                            type_group['actions'].append(action)
+                        type_group['count'] += 1
+                        
                 except json.JSONDecodeError:
                     continue
         
         # Convert to list format for frontend - only include companies with actual opportunities
         growth_opportunities = []
         for company_key, company_data in growth_opportunities_by_company.items():
-            if company_data['opportunities']:  # Only add if there are actual opportunities
+            if company_data['opportunities_by_type']:  # Only add if there are actual opportunities
+                # Convert grouped opportunities back to list format
+                consolidated_opportunities = []
+                for type_key, type_data in company_data['opportunities_by_type'].items():
+                    consolidated_opportunities.append({
+                        'type': type_data['type'],
+                        'description': '; '.join(type_data['descriptions']),
+                        'action': '; '.join(type_data['actions']),
+                        'count': type_data['count']
+                    })
+                
+                # Sort by count (most frequent first) and then by type
+                consolidated_opportunities.sort(key=lambda x: (-x['count'], x['type']))
+                
                 growth_opportunities.append({
                     'company_name': company_data['display_name'],
-                    'opportunities': company_data['opportunities']
+                    'opportunities': consolidated_opportunities
                 })
         
         # Key themes aggregation
