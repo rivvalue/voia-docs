@@ -523,15 +523,23 @@ function populateGrowthOpportunities() {
     container.innerHTML = html;
 }
 
-function loadSurveyResponses() {
-    fetch('/api/survey_responses?per_page=10')
+// Pagination state for survey responses
+let currentPage = 1;
+const itemsPerPage = 5;
+
+function loadSurveyResponses(page = 1) {
+    currentPage = page;
+    fetch(`/api/survey_responses?page=${page}&per_page=${itemsPerPage}`)
         .then(response => response.json())
         .then(data => {
             const tbody = document.getElementById('responsesTable');
             const responses = data.responses || data; // Handle both old and new format
+            const pagination = data.pagination;
             
             if (responses.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No survey responses yet.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No survey responses yet.</td></tr>';
+                updatePaginationInfo(0, 0, 0);
+                updatePaginationControls(null);
                 return;
             }
             
@@ -565,12 +573,79 @@ function loadSurveyResponses() {
             }).join('');
             
             tbody.innerHTML = html;
+            
+            // Update pagination info and controls
+            if (pagination) {
+                updatePaginationInfo(pagination.page, pagination.pages, pagination.total);
+                updatePaginationControls(pagination);
+            }
         })
         .catch(error => {
             console.error('Error loading survey responses:', error);
             document.getElementById('responsesTable').innerHTML = 
                 '<tr><td colspan="7" class="text-center text-danger">Error loading responses.</td></tr>';
+            updatePaginationInfo(0, 0, 0);
+            updatePaginationControls(null);
         });
+}
+
+function updatePaginationInfo(currentPage, totalPages, totalItems) {
+    const info = document.getElementById('paginationInfo');
+    if (totalItems === 0) {
+        info.textContent = 'No responses found';
+    } else {
+        const startItem = (currentPage - 1) * itemsPerPage + 1;
+        const endItem = Math.min(currentPage * itemsPerPage, totalItems);
+        info.textContent = `Showing ${startItem}-${endItem} of ${totalItems} responses`;
+    }
+}
+
+function updatePaginationControls(pagination) {
+    const controls = document.getElementById('paginationControls');
+    
+    if (!pagination || pagination.pages <= 1) {
+        controls.innerHTML = '';
+        return;
+    }
+    
+    let html = '';
+    
+    // Previous button
+    if (pagination.has_prev) {
+        html += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="loadSurveyResponses(${pagination.page - 1}); return false;">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+        `;
+    } else {
+        html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-left"></i></span></li>';
+    }
+    
+    // Page numbers
+    for (let i = 1; i <= pagination.pages; i++) {
+        if (i === pagination.page) {
+            html += `<li class="page-item active"><span class="page-link">${i}</span></li>`;
+        } else {
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadSurveyResponses(${i}); return false;">${i}</a></li>`;
+        }
+    }
+    
+    // Next button
+    if (pagination.has_next) {
+        html += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="loadSurveyResponses(${pagination.page + 1}); return false;">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        `;
+    } else {
+        html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-right"></i></span></li>';
+    }
+    
+    controls.innerHTML = html;
 }
 
 function loadCompanyNpsData() {
