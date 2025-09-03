@@ -124,7 +124,7 @@
                             <label class="form-label fs-5">Choose Your Survey Experience</label>
                             <div class="row g-3 mt-2">
                                 <div class="col-md-6">
-                                    <div class="survey-type-card card h-100 selected" onclick="selectSurveyType('conversational', this)">
+                                    <div class="survey-type-card card h-100" onclick="selectSurveyType('conversational', this)">
                                         <div class="card-body text-center p-4">
                                             <div class="mb-3">
                                                 <i class="fas fa-comments fa-3x text-primary"></i>
@@ -241,12 +241,15 @@ function selectSurveyType(type, cardElement) {
 
 // Initialize selection state on page load
 document.addEventListener('DOMContentLoaded', function() {
-    // Ensure conversational is selected by default
-    const defaultCard = document.querySelector('.survey-type-card.selected');
-    if (defaultCard) {
-        // Set the hidden input value for the already selected card
-        selectSurveyType('conversational', defaultCard);
+    // Check if there was a previous selection from form data
+    const previousSelection = '{{ request.form.get("survey_type", "conversational") }}';
+    
+    // Find the card for the previous selection
+    const selectedCard = document.querySelector(`.survey-type-card[onclick*="${previousSelection}"]`);
+    if (selectedCard) {
+        selectSurveyType(previousSelection, selectedCard);
     } else {
+        // Fallback to conversational if no previous selection
         const conversationalCard = document.querySelector('.survey-type-card[onclick*="conversational"]');
         if (conversationalCard) {
             selectSurveyType('conversational', conversationalCard);
