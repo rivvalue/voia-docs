@@ -99,21 +99,12 @@
     <div class="row justify-content-center">
         <div class="col-xl-8">
             <div class="card border-0 shadow-lg">
-                <div class="card-header bg-transparent border-bottom-0 py-4">
-                    <h3 class="card-title text-center mb-0">
-                        <i class="fas fa-microscope text-primary me-2"></i>Research Participation Portal
-                    </h3>
-                    <p class="text-center text-muted mt-2">Contribute to natural language processing research by selecting your interaction methodology</p>
-                    <div class="text-center">
-                        <small class="badge bg-info text-light">
-                            <i class="fas fa-brain me-1"></i>AI conversation yields richer data insights
-                        </small>
-                    </div>
-                </div>
                 <div class="card-body p-5">
                     <!-- Server-side form submission -->
                     <form method="POST" action="{{ url_for('server_auth_generate') }}">
                         <div class="mb-4">
+                            <h4 class="text-center mb-4">Enter an email to generate a secure session token.<br>
+                            <small class="text-muted">No spam, no subscriptions. Just a hands-on look at how Voxa works.</small></h4>
                             <label for="email" class="form-label fs-5">Email Address</label>
                             <input type="email" class="form-control form-control-lg" name="email" 
                                    value="{{ request.form.get('email', '') }}" 
