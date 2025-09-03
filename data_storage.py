@@ -208,16 +208,15 @@ def get_dashboard_data():
 def get_company_nps_data():
     """Get NPS data segregated by company"""
     try:
-        # Get all responses grouped by company (case-insensitive using proper aggregation)
+        # Get all responses grouped by company
         company_stats = db.session.query(
-            func.upper(SurveyResponse.company_name).label('company_key'),
-            func.max(SurveyResponse.company_name).label('company_name'),  # Use one display name
+            SurveyResponse.company_name,
             func.count(SurveyResponse.id).label('total_responses'),
             func.avg(SurveyResponse.nps_score).label('avg_nps'),
             func.max(SurveyResponse.created_at).label('latest_response'),
-            func.sum(case((SurveyResponse.nps_score >= 9, 1), else_=0)).label('promoters'),
-            func.sum(case((SurveyResponse.nps_score <= 6, 1), else_=0)).label('detractors')
-        ).group_by(func.upper(SurveyResponse.company_name)).all()
+            func.count(func.nullif(SurveyResponse.nps_score >= 9, False)).label('promoters'),
+            func.count(func.nullif(SurveyResponse.nps_score <= 6, False)).label('detractors')
+        ).group_by(SurveyResponse.company_name).all()
         
         company_nps_list = []
         
@@ -242,9 +241,9 @@ def get_company_nps_data():
             else:
                 risk_level = "Low"
             
-            # Get latest churn risk for this company (case-insensitive)
-            latest_response = SurveyResponse.query.filter(
-                func.upper(SurveyResponse.company_name) == func.upper(company.company_name)
+            # Get latest churn risk for this company
+            latest_response = SurveyResponse.query.filter_by(
+                company_name=company.company_name
             ).order_by(SurveyResponse.created_at.desc()).first()
             
             latest_churn_risk = None
