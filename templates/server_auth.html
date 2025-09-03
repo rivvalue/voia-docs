@@ -20,8 +20,9 @@
     
     .survey-type-card.selected {
         border-color: #E13A44;
-        background: linear-gradient(135deg, rgba(225, 58, 68, 0.08) 0%, rgba(225, 58, 68, 0.12) 100%);
-        box-shadow: 0 8px 25px rgba(225, 58, 68, 0.2);
+        background: linear-gradient(135deg, rgba(225, 58, 68, 0.06) 0%, rgba(225, 58, 68, 0.1) 100%);
+        box-shadow: 0 12px 40px rgba(225, 58, 68, 0.15);
+        transform: translateY(-3px);
     }
     
     .survey-type-card .card-header {
@@ -37,35 +38,36 @@
     }
     
     .survey-type-card.selected .badge {
-        background: rgba(255,255,255,0.9) !important;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
         color: #E13A44 !important;
+        border: 1px solid #E13A44;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(225, 58, 68, 0.2);
+    }
+    
+    .survey-type-card .badge {
+        transition: all 0.3s ease;
+        font-size: 0.85rem;
+        padding: 0.5rem 1rem;
     }
     
     .selection-indicator {
         position: absolute;
         top: 15px;
         right: 15px;
-        width: 24px;
-        height: 24px;
-        border: 2px solid #dee2e6;
+        width: 8px;
+        height: 8px;
         border-radius: 50%;
-        background: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        background: #dee2e6;
         transition: all 0.3s ease;
+        opacity: 0.5;
     }
     
     .survey-type-card.selected .selection-indicator {
-        border-color: #E13A44;
-        background: #E13A44;
-        color: white;
-    }
-    
-    .survey-type-card.selected .selection-indicator::after {
-        content: '✓';
-        font-size: 14px;
-        font-weight: bold;
+        background: linear-gradient(135deg, #E13A44 0%, #c12d37 100%);
+        box-shadow: 0 0 0 3px rgba(225, 58, 68, 0.3);
+        opacity: 1;
+        transform: scale(1.2);
     }
     
     .survey-type-radio {
@@ -138,7 +140,7 @@
                                             <h5 class="card-title">Conversational Interface</h5>
                                             <p class="card-text text-muted">Engage with our natural language processing system to demonstrate advanced dialogue-based data collection.</p>
                                             <span class="badge bg-success mt-2">
-                                                <i class="fas fa-beaker me-1"></i>Advanced Research Method
+                                                <i class="fas fa-star me-1"></i>Recommended
                                             </span>
                                         </div>
                                     </div>
@@ -154,7 +156,7 @@
                                             <h5 class="card-title">Structured Questionnaire</h5>
                                             <p class="card-text text-muted">Traditional form-based methodology for comparative analysis against conversational approaches.</p>
                                             <span class="badge bg-secondary mt-2">
-                                                <i class="fas fa-clipboard-list me-1"></i>Control Group Method
+                                                <i class="fas fa-clipboard-check me-1"></i>Traditional Method
                                             </span>
                                         </div>
                                     </div>
