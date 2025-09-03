@@ -7,8 +7,8 @@
     .hero-section {
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         border-radius: 15px;
-        padding: 3rem 2rem;
-        margin-bottom: 3rem;
+        padding: 4rem 2rem;
+        margin-bottom: 5rem;
         border: 1px solid #dee2e6;
     }
     .demo-card {
@@ -68,9 +68,22 @@
     .feature-highlight {
         background: rgba(225, 58, 68, 0.05);
         border-left: 4px solid #E13A44;
-        padding: 1rem;
+        padding: 1.5rem;
         margin: 1rem 0;
         border-radius: 0 10px 10px 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .mb-6 {
+        margin-bottom: 4rem !important;
+    }
+    
+    .mt-6 {
+        margin-top: 4rem !important;
     }
 </style>
 {% endblock %}
@@ -102,25 +115,25 @@
         </div>
         
         <!-- Quick Value Props -->
-        <div class="row mt-5">
-            <div class="col-md-4">
+        <div class="row mt-5 mb-4">
+            <div class="col-md-4 mb-4">
                 <div class="feature-highlight">
-                    <i class="fas fa-comments text-primary fa-2x mb-2"></i>
-                    <h6>Conversational Intelligence</h6>
+                    <i class="fas fa-comments text-primary fa-2x mb-3"></i>
+                    <h6 class="mb-3">Conversational Intelligence</h6>
                     <small class="text-muted">Natural language processing that understands context and nuance</small>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 mb-4">
                 <div class="feature-highlight">
-                    <i class="fas fa-brain text-success fa-2x mb-2"></i>
-                    <h6>Deep Learning Analysis</h6>
+                    <i class="fas fa-brain text-success fa-2x mb-3"></i>
+                    <h6 class="mb-3">Deep Learning Analysis</h6>
                     <small class="text-muted">Advanced sentiment classification and thematic pattern recognition</small>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 mb-4">
                 <div class="feature-highlight">
-                    <i class="fas fa-atom text-warning fa-2x mb-2"></i>
-                    <h6>Real-Time Processing</h6>
+                    <i class="fas fa-atom text-warning fa-2x mb-3"></i>
+                    <h6 class="mb-3">Real-Time Processing</h6>
                     <small class="text-muted">Immediate insight generation from unstructured feedback data</small>
                 </div>
             </div>
@@ -131,11 +144,11 @@
 <div class="row">
     <div class="col-lg-10 mx-auto">
         <!-- What You'll Experience Section -->
-        <div class="text-center mb-5">
-            <p class="lead text-muted">Interactive demonstration of AI-powered customer intelligence extraction</p>
+        <div class="text-center mb-5 mt-5">
+            <p class="lead text-muted mb-5">Interactive demonstration of AI-powered customer intelligence extraction</p>
         </div>
 
-        <div class="row g-4 mb-5">
+        <div class="row g-4 mb-6">
             <!-- Step 1: Try the Conversation -->
             <div class="col-md-4">
                 <div class="demo-card card h-100 border-0 shadow">
@@ -207,28 +220,28 @@
 
 
 
-        <div class="row mt-5">
+        <div class="row mt-6 mb-5">
             <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
                         <h5 class="card-title mb-0">Key Features</h5>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body py-4">
                         <div class="row">
                             <div class="col-md-6">
                                 <ul class="list-unstyled">
-                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>NPS scoring system (0-10 scale)</li>
-                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Dynamic follow-up questions</li>
-                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Sentiment analysis</li>
-                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Key theme extraction</li>
+                                    <li class="mb-3"><i class="fas fa-check text-success me-3"></i>NPS scoring system (0-10 scale)</li>
+                                    <li class="mb-3"><i class="fas fa-check text-success me-3"></i>Dynamic follow-up questions</li>
+                                    <li class="mb-3"><i class="fas fa-check text-success me-3"></i>Sentiment analysis</li>
+                                    <li class="mb-3"><i class="fas fa-check text-success me-3"></i>Key theme extraction</li>
                                 </ul>
                             </div>
                             <div class="col-md-6">
                                 <ul class="list-unstyled">
-                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Churn risk assessment</li>
-                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Growth opportunity identification</li>
-                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Real-time analytics dashboard</li>
-                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Data export functionality</li>
+                                    <li class="mb-3"><i class="fas fa-check text-success me-3"></i>Churn risk assessment</li>
+                                    <li class="mb-3"><i class="fas fa-check text-success me-3"></i>Growth opportunity identification</li>
+                                    <li class="mb-3"><i class="fas fa-check text-success me-3"></i>Real-time analytics dashboard</li>
+                                    <li class="mb-3"><i class="fas fa-check text-success me-3"></i>Data export functionality</li>
                                 </ul>
                             </div>
                         </div>
