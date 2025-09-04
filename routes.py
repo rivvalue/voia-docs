@@ -988,3 +988,56 @@ def logout_session():
     except Exception as e:
         logger.error(f"Error clearing session: {e}")
         return jsonify({'error': 'Failed to clear session'}), 500
+
+@app.route('/api/export_user_data', methods=['GET'])
+def export_user_data():
+    """Export survey data for current user only (no admin required)"""
+    try:
+        # Get user email from session (if available) or use anonymous access
+        user_email = session.get('auth_email')
+        
+        if not user_email:
+            # If no session, try to get from recent submissions via IP or other identifier
+            # For now, return empty result if no user context
+            return jsonify({
+                'success': False,
+                'message': 'No user authentication found. Please complete a survey first.'
+            }), 404
+        
+        # Query only responses from this specific user
+        user_responses = SurveyResponse.query.filter_by(
+            respondent_email=user_email
+        ).all()
+        
+        if not user_responses:
+            return jsonify({
+                'success': False,
+                'message': 'No survey responses found for your email address.'
+            }), 404
+        
+        # Convert responses to dict format
+        export_data = []
+        for response in user_responses:
+            response_dict = response.to_dict()
+            # Remove sensitive fields that user doesn't need
+            if 'id' in response_dict:
+                del response_dict['id']
+            export_data.append(response_dict)
+        
+        return jsonify({
+            'success': True,
+            'data': export_data,
+            'export_info': {
+                'export_type': 'user_responses',
+                'exported_by': user_email,
+                'export_date': datetime.utcnow().isoformat(),
+                'total_responses': len(export_data)
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error exporting user data: {e}")
+        return jsonify({
+            'success': False,
+            'error': 'Failed to export user data'
+        }), 500

@@ -1020,6 +1020,48 @@ function exportData() {
     });
 }
 
+// Export user-specific data (current user's responses only)
+function exportUserData() {
+    // This function works based on server-side session, no client-side auth needed
+    
+    fetch('/api/export_user_data', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.status === 404) {
+            alert('No survey responses found. Please complete a survey first.');
+            return null;
+        }
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(result => {
+        if (!result) return; // No data found
+        
+        const data = result.data || result;
+        const dataStr = JSON.stringify(data, null, 2);
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        
+        const exportFileDefaultName = `my_survey_responses_${new Date().toISOString().split('T')[0]}.json`;
+        
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportFileDefaultName);
+        linkElement.click();
+        
+        console.log('User response data exported successfully');
+    })
+    .catch(error => {
+        console.error('Error exporting user data:', error);
+        alert('Error exporting your response data. Please try again.');
+    });
+}
+
 // Admin login function
 function adminLogin() {
     const email = prompt('Enter admin email address:');
