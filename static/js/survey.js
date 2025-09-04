@@ -7,7 +7,20 @@ let authToken = null;
 
 // Initialize the survey
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Survey form loaded');
+    
+    // Check for user email mismatch and clear conflicting data before loading
+    if (window.userEmail) {
+        const storedEmail = localStorage.getItem('auth_email') || '';
+        if (storedEmail && storedEmail !== window.userEmail) {
+            console.log('Detected different authenticated user - clearing old localStorage data');
+            localStorage.clear(); // Clear all localStorage to prevent cross-user data pollution
+        }
+    }
+    
     updateProgress();
+    loadSavedData();
+    
     // Check if user is authenticated via server-side template
     if (window.isAuthenticated === false) {
         showAuthRequired();
@@ -278,6 +291,18 @@ function loadSavedData() {
     if (savedData) {
         const data = JSON.parse(savedData);
         
+        // Check if the current authenticated user is different from saved data
+        const currentUserEmail = window.userEmail || '';
+        const savedUserEmail = data.respondent_email || '';
+        
+        // If different user is authenticated, clear old data and don't load it
+        if (currentUserEmail && savedUserEmail && currentUserEmail !== savedUserEmail) {
+            console.log('Different user detected - clearing previous user data');
+            clearSavedData();
+            return;
+        }
+        
+        // Only load data if it's for the same user or if no user is specified
         document.getElementById('companyName').value = data.company_name || '';
         document.getElementById('respondentName').value = data.respondent_name || '';
         document.getElementById('respondentEmail').value = data.respondent_email || '';
@@ -297,6 +322,15 @@ document.getElementById('tenureWithFc').addEventListener('change', autoSave);
 // Clear saved data on successful submission
 function clearSavedData() {
     localStorage.removeItem('surveyDraft');
+    // Also clear any old authentication data that might be lingering
+    const currentUserEmail = window.userEmail || '';
+    const storedEmail = localStorage.getItem('auth_email') || '';
+    
+    // If the current session email doesn't match stored email, clear auth data
+    if (currentUserEmail && storedEmail && currentUserEmail !== storedEmail) {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('auth_email');
+    }
 }
 
 // Clear authentication session and redirect to get new token
