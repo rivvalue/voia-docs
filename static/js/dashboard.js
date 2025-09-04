@@ -363,7 +363,7 @@ function createTenureChart() {
                     '#BDBDBD', 
                     '#E9E8E4',
                     '#000000',
-                    '#FFFFFF'
+                    'rgba(225, 58, 68, 0.6)'
                 ],
                 borderColor: '#FFFFFF',
                 borderWidth: 2
