@@ -214,15 +214,15 @@ def survey():
         if verification.get('valid'):
             email = verification.get('email')
             
-            # Check if this email has already submitted a response
-            existing_response = SurveyResponse.query.filter_by(respondent_email=email).first()
-            if existing_response:
-                # Show completion message instead of survey form
-                return render_template('survey_completed.html', 
-                                     email=email,
-                                     user_email=email,
-                                     completion_date=existing_response.created_at.strftime("%B %d, %Y"),
-                                     show_alternatives=True)
+            # Allow response updates - don't block existing responses
+            # existing_response = SurveyResponse.query.filter_by(respondent_email=email).first()
+            # if existing_response:
+            #     # Show completion message instead of survey form
+            #     return render_template('survey_completed.html', 
+            #                          email=email,
+            #                          user_email=email,
+            #                          completion_date=existing_response.created_at.strftime("%B %d, %Y"),
+            #                          show_alternatives=True)
             
             session['auth_token'] = token
             session['auth_email'] = email
@@ -234,15 +234,15 @@ def survey():
         if session.get('auth_token'):
             email = session.get('auth_email')
             
-            # Check if this email has already submitted a response
-            existing_response = SurveyResponse.query.filter_by(respondent_email=email).first()
-            if existing_response:
-                # Show completion message instead of survey form
-                return render_template('survey_completed.html', 
-                                     email=email,
-                                     user_email=email,
-                                     completion_date=existing_response.created_at.strftime("%B %d, %Y"),
-                                     show_alternatives=True)
+            # Allow response updates - don't block existing responses
+            # existing_response = SurveyResponse.query.filter_by(respondent_email=email).first()
+            # if existing_response:
+            #     # Show completion message instead of survey form
+            #     return render_template('survey_completed.html', 
+            #                          email=email,
+            #                          user_email=email,
+            #                          completion_date=existing_response.created_at.strftime("%B %d, %Y"),
+            #                          show_alternatives=True)
                                      
             return render_template('survey.html', authenticated=True, email=email, user_email=email)
         else:
