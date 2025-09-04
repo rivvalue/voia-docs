@@ -391,7 +391,7 @@ def submit_survey():
             existing_response.improvement_feedback = data.get('improvement_feedback')
             existing_response.recommendation_reason = data.get('recommendation_reason')
             existing_response.additional_comments = data.get('additional_comments')
-            existing_response.updated_at = datetime.utcnow()  # Update timestamp
+
             response = existing_response
         else:
             # Create new survey response with authenticated email and normalized company name
@@ -921,7 +921,7 @@ def finalize_conversation():
             existing_response.improvement_feedback = structured_data.get('improvement_feedback')
             existing_response.recommendation_reason = structured_data.get('recommendation_reason')
             existing_response.additional_comments = structured_data.get('additional_comments')
-            existing_response.updated_at = datetime.utcnow()  # Update timestamp
+
             response = existing_response
         else:
             # Create survey response record with normalized company name
