@@ -1031,8 +1031,37 @@ function exportUserData() {
         }
     })
     .then(response => {
+        if (response.status === 400) {
+            // Need to get email from user
+            return response.json().then(data => {
+                if (data.code === 'EMAIL_REQUIRED') {
+                    const email = prompt('Please enter your email address to export your survey responses:');
+                    if (!email) return null;
+                    
+                    // Retry with email
+                    return fetch('/api/export_user_data', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email: email })
+                    })
+                    .then(retryResponse => {
+                        if (retryResponse.status === 404) {
+                            alert('No survey responses found for this email address.');
+                            return null;
+                        }
+                        if (!retryResponse.ok) {
+                            throw new Error(`HTTP error! status: ${retryResponse.status}`);
+                        }
+                        return retryResponse.json();
+                    });
+                }
+                throw new Error(data.message || 'Unknown error');
+            });
+        }
         if (response.status === 404) {
-            alert('No survey responses found. Please complete a survey first.');
+            alert('No survey responses found for your email address.');
             return null;
         }
         if (!response.ok) {

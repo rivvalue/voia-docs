@@ -989,20 +989,27 @@ def logout_session():
         logger.error(f"Error clearing session: {e}")
         return jsonify({'error': 'Failed to clear session'}), 500
 
-@app.route('/api/export_user_data', methods=['GET'])
+@app.route('/api/export_user_data', methods=['GET', 'POST'])
 def export_user_data():
     """Export survey data for current user only (no admin required)"""
     try:
-        # Get user email from session (if available) or use anonymous access
+        # Try to get user email from session first
         user_email = session.get('auth_email')
         
+        # If no session, try to get from request body (POST) or query params (GET)
         if not user_email:
-            # If no session, try to get from recent submissions via IP or other identifier
-            # For now, return empty result if no user context
+            if request.method == 'POST':
+                data = request.get_json()
+                user_email = data.get('email') if data else None
+            else:
+                user_email = request.args.get('email')
+        
+        if not user_email:
             return jsonify({
                 'success': False,
-                'message': 'No user authentication found. Please complete a survey first.'
-            }), 404
+                'message': 'Email address required. Please provide your email address.',
+                'code': 'EMAIL_REQUIRED'
+            }), 400
         
         # Query only responses from this specific user
         user_responses = SurveyResponse.query.filter_by(
