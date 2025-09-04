@@ -27,8 +27,11 @@ def index():
     """Landing page with survey overview"""
     # Pass authentication status to template
     auth_email = session.get('auth_email')
-    is_authenticated = bool(session.get('auth_token'))
-    return render_template('index.html', authenticated=is_authenticated, email=auth_email, user_email=auth_email)
+    auth_token = session.get('auth_token')
+    is_authenticated = bool(auth_token)
+    # Only show user email if there's both token and email (active session)
+    user_email = auth_email if (auth_token and auth_email) else None
+    return render_template('index.html', authenticated=is_authenticated, email=auth_email, user_email=user_email)
 
 @app.route('/auth/request-token', methods=['POST'])
 @rate_limit(limit=5)  # 5 token requests per minute per IP
@@ -534,7 +537,11 @@ def dashboard():
         logger.error(f"Error loading company NPS data for dashboard: {e}")
         company_nps_data = []
     
-    return render_template('dashboard.html', company_nps_data=company_nps_data, user_email=session.get('auth_email'))
+    # Only show user email if there's both token and email (active session)
+    auth_email = session.get('auth_email')
+    auth_token = session.get('auth_token')
+    user_email = auth_email if (auth_token and auth_email) else None
+    return render_template('dashboard.html', company_nps_data=company_nps_data, user_email=user_email)
 
 @app.route('/api/dashboard_data')
 def dashboard_data():
