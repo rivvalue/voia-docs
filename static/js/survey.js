@@ -173,17 +173,6 @@ function submitSurvey() {
                 console.log('Authentication failed, redirecting to auth page');
                 window.location.href = '/auth';
                 return;
-            } else if (status === 409) {
-                // Duplicate response
-                const overwrite = confirm(
-                    'You have already submitted a response. Would you like to overwrite it?'
-                );
-                if (overwrite) {
-                    submitSurveyOverwrite(formData);
-                    return;
-                } else {
-                    throw new Error('You have already submitted a response.');
-                }
             }
             throw new Error(data.error);
         }
@@ -419,63 +408,6 @@ function showAuthRequired() {
     formContainer.insertBefore(authAlert, formContainer.firstChild);
 }
 
-function submitSurveyOverwrite(formData) {
-    if (!authToken) {
-        alert('Authentication required. Please get a token first.');
-        window.location.href = '/auth';
-        return;
-    }
-    
-    // Show loading state again
-    document.getElementById('surveyForm').classList.add('d-none');
-    document.getElementById('loadingState').classList.remove('d-none');
-    
-    // Submit to overwrite endpoint
-    fetch('/submit_survey_overwrite', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + authToken
-        },
-        body: JSON.stringify(formData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.error) {
-            throw new Error(data.error);
-        }
-        
-        // Show success state
-        document.getElementById('loadingState').classList.add('d-none');
-        document.getElementById('successState').classList.remove('d-none');
-        
-        // Update success message to indicate overwrite
-        const successDiv = document.getElementById('successState');
-        const heading = successDiv.querySelector('h5');
-        if (heading && data.action === 'updated') {
-            heading.textContent = 'Survey Updated Successfully!';
-        }
-        
-        // Clear stored data
-        clearSavedData();
-        
-        // Clear session and redirect after successful overwrite
-        setTimeout(() => {
-            clearAuthenticationAndRedirect('Survey updated successfully! Please get a new token for another survey.');
-        }, 3000);  // Wait 3 seconds to show success message
-        
-        console.log('Survey overwritten successfully:', data);
-    })
-    .catch(error => {
-        console.error('Error overwriting survey:', error);
-        
-        // Hide loading state and show form again
-        document.getElementById('loadingState').classList.add('d-none');
-        document.getElementById('surveyForm').classList.remove('d-none');
-        
-        alert('Error: ' + error.message);
-    });
-}
 
 // Load saved data when page loads
 loadSavedData();

@@ -372,37 +372,45 @@ def submit_survey():
         else:
             nps_category = 'Detractor'
         
-        # Check for existing response to prevent duplicates
+        # Check for existing response to update instead of creating duplicate
         existing_response = SurveyResponse.query.filter_by(
             respondent_email=authenticated_email
         ).first()
         
-        # Handle existing response (this should not happen with allow_overwrite=False)
         if existing_response:
-            return jsonify({
-                'error': 'You have already submitted a response',
-                'existing_response_id': existing_response.id,
-                'submitted_at': existing_response.created_at.isoformat()
-            }), 409
-        
-        # Create new survey response with authenticated email and normalized company name
-        response = SurveyResponse(
-            company_name=normalize_company_name(data['company_name']),
-            respondent_name=data['respondent_name'],
-            respondent_email=authenticated_email,  # Use authenticated email
-            tenure_with_fc=data.get('tenure_with_fc'),
-            nps_score=nps_score,
-            nps_category=nps_category,
-            satisfaction_rating=int(data['satisfaction_rating']) if data.get('satisfaction_rating') else None,
-            product_value_rating=int(data['product_value_rating']) if data.get('product_value_rating') else None,
-            service_rating=int(data['service_rating']) if data.get('service_rating') else None,
-            pricing_rating=int(data['pricing_rating']) if data.get('pricing_rating') else None,
-            improvement_feedback=data.get('improvement_feedback'),
-            recommendation_reason=data.get('recommendation_reason'),
-            additional_comments=data.get('additional_comments')
-        )
-        
-        db.session.add(response)
+            # Update existing response
+            existing_response.company_name = normalize_company_name(data['company_name'])
+            existing_response.respondent_name = data['respondent_name']
+            existing_response.tenure_with_fc = data.get('tenure_with_fc')
+            existing_response.nps_score = nps_score
+            existing_response.nps_category = nps_category
+            existing_response.satisfaction_rating = int(data['satisfaction_rating']) if data.get('satisfaction_rating') else None
+            existing_response.product_value_rating = int(data['product_value_rating']) if data.get('product_value_rating') else None
+            existing_response.service_rating = int(data['service_rating']) if data.get('service_rating') else None
+            existing_response.pricing_rating = int(data['pricing_rating']) if data.get('pricing_rating') else None
+            existing_response.improvement_feedback = data.get('improvement_feedback')
+            existing_response.recommendation_reason = data.get('recommendation_reason')
+            existing_response.additional_comments = data.get('additional_comments')
+            existing_response.updated_at = datetime.utcnow()  # Update timestamp
+            response = existing_response
+        else:
+            # Create new survey response with authenticated email and normalized company name
+            response = SurveyResponse(
+                company_name=normalize_company_name(data['company_name']),
+                respondent_name=data['respondent_name'],
+                respondent_email=authenticated_email,  # Use authenticated email
+                tenure_with_fc=data.get('tenure_with_fc'),
+                nps_score=nps_score,
+                nps_category=nps_category,
+                satisfaction_rating=int(data['satisfaction_rating']) if data.get('satisfaction_rating') else None,
+                product_value_rating=int(data['product_value_rating']) if data.get('product_value_rating') else None,
+                service_rating=int(data['service_rating']) if data.get('service_rating') else None,
+                pricing_rating=int(data['pricing_rating']) if data.get('pricing_rating') else None,
+                improvement_feedback=data.get('improvement_feedback'),
+                recommendation_reason=data.get('recommendation_reason'),
+                additional_comments=data.get('additional_comments')
+            )
+            db.session.add(response)
         db.session.commit()
         
         # Queue AI analysis for background processing
@@ -758,15 +766,15 @@ def conversational_survey():
         if verification.get('valid'):
             email = verification.get('email')
             
-            # Check if this email has already submitted a response
-            existing_response = SurveyResponse.query.filter_by(respondent_email=email).first()
-            if existing_response:
-                # Show completion message instead of survey form
-                return render_template('conversational_survey_completed.html', 
-                                     email=email,
-                                     user_email=email,
-                                     completion_date=existing_response.created_at.strftime("%B %d, %Y"),
-                                     show_alternatives=True)
+            # Allow response updates - don't block existing responses
+            # existing_response = SurveyResponse.query.filter_by(respondent_email=email).first()
+            # if existing_response:
+            #     # Show completion message instead of survey form
+            #     return render_template('conversational_survey_completed.html', 
+            #                          email=email,
+            #                          user_email=email,
+            #                          completion_date=existing_response.created_at.strftime("%B %d, %Y"),
+            #                          show_alternatives=True)
             
             session['auth_token'] = token
             session['auth_email'] = email
@@ -778,15 +786,15 @@ def conversational_survey():
         if session.get('auth_token'):
             email = session.get('auth_email')
             
-            # Check if this email has already submitted a response
-            existing_response = SurveyResponse.query.filter_by(respondent_email=email).first()
-            if existing_response:
-                # Show completion message instead of survey form
-                return render_template('conversational_survey_completed.html', 
-                                     email=email,
-                                     user_email=email,
-                                     completion_date=existing_response.created_at.strftime("%B %d, %Y"),
-                                     show_alternatives=True)
+            # Allow response updates - don't block existing responses
+            # existing_response = SurveyResponse.query.filter_by(respondent_email=email).first()
+            # if existing_response:
+            #     # Show completion message instead of survey form
+            #     return render_template('conversational_survey_completed.html', 
+            #                          email=email,
+            #                          user_email=email,
+            #                          completion_date=existing_response.created_at.strftime("%B %d, %Y"),
+            #                          show_alternatives=True)
                                      
             return render_template('conversational_survey.html', authenticated=True, email=email, user_email=email)
         else:
@@ -895,21 +903,43 @@ def finalize_conversation():
         # Convert conversational data to structured survey format
         structured_data = finalize_ai_conversational_survey(survey_data)
         
-        # Create survey response record with normalized company name
-        response = SurveyResponse(
-            company_name=normalize_company_name(structured_data.get('company_name')),
-            respondent_name=structured_data.get('respondent_name'),
-            respondent_email=authenticated_email,
-            tenure_with_fc=structured_data.get('tenure_with_fc'),
-            nps_score=structured_data.get('nps_score'),
-            satisfaction_rating=structured_data.get('satisfaction_rating'),
-            product_value_rating=structured_data.get('product_value_rating'),
-            service_rating=structured_data.get('service_rating'),
-            pricing_rating=structured_data.get('pricing_rating'),
-            improvement_feedback=structured_data.get('improvement_feedback'),
-            recommendation_reason=structured_data.get('recommendation_reason'),
-            additional_comments=structured_data.get('additional_comments')
-        )
+        # Check for existing response to update instead of creating duplicate
+        existing_response = SurveyResponse.query.filter_by(
+            respondent_email=authenticated_email
+        ).first()
+        
+        if existing_response:
+            # Update existing response
+            existing_response.company_name = normalize_company_name(structured_data.get('company_name'))
+            existing_response.respondent_name = structured_data.get('respondent_name')
+            existing_response.tenure_with_fc = structured_data.get('tenure_with_fc')
+            existing_response.nps_score = structured_data.get('nps_score')
+            existing_response.satisfaction_rating = structured_data.get('satisfaction_rating')
+            existing_response.product_value_rating = structured_data.get('product_value_rating')
+            existing_response.service_rating = structured_data.get('service_rating')
+            existing_response.pricing_rating = structured_data.get('pricing_rating')
+            existing_response.improvement_feedback = structured_data.get('improvement_feedback')
+            existing_response.recommendation_reason = structured_data.get('recommendation_reason')
+            existing_response.additional_comments = structured_data.get('additional_comments')
+            existing_response.updated_at = datetime.utcnow()  # Update timestamp
+            response = existing_response
+        else:
+            # Create survey response record with normalized company name
+            response = SurveyResponse(
+                company_name=normalize_company_name(structured_data.get('company_name')),
+                respondent_name=structured_data.get('respondent_name'),
+                respondent_email=authenticated_email,
+                tenure_with_fc=structured_data.get('tenure_with_fc'),
+                nps_score=structured_data.get('nps_score'),
+                satisfaction_rating=structured_data.get('satisfaction_rating'),
+                product_value_rating=structured_data.get('product_value_rating'),
+                service_rating=structured_data.get('service_rating'),
+                pricing_rating=structured_data.get('pricing_rating'),
+                improvement_feedback=structured_data.get('improvement_feedback'),
+                recommendation_reason=structured_data.get('recommendation_reason'),
+                additional_comments=structured_data.get('additional_comments')
+            )
+            db.session.add(response)
         
         # Calculate NPS category
         if response.nps_score is not None:
@@ -919,8 +949,6 @@ def finalize_conversation():
                 response.nps_category = "Passive"
             else:
                 response.nps_category = "Detractor"
-        
-        db.session.add(response)
         db.session.commit()
         
         # Queue AI analysis
