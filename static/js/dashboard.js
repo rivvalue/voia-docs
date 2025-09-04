@@ -106,6 +106,10 @@ function populateDashboard() {
     // Load company NPS data
     console.log('About to call loadCompanyNpsData...');
     loadCompanyNpsData();
+    
+    // Load tenure NPS data
+    console.log('About to call loadTenureNpsData...');
+    loadTenureNpsData();
 }
 
 function createNpsChart() {
@@ -523,11 +527,13 @@ function populateGrowthOpportunities() {
     container.innerHTML = html;
 }
 
-// Pagination state for both tables
+// Pagination state for all tables
 let currentResponsesPage = 1;
 let currentCompanyPage = 1;
+let currentTenurePage = 1;
 const responsesPerPage = 10;
 const companiesPerPage = 10;
+const tenureGroupsPerPage = 10;
 
 function loadSurveyResponses(page = 1) {
     currentResponsesPage = page;
@@ -708,6 +714,152 @@ function updateCompanyPaginationControls(pagination) {
     }
     
     controls.innerHTML = html;
+}
+
+// Tenure pagination functions
+function updateTenurePaginationInfo(currentPage, totalPages, totalItems) {
+    const info = document.getElementById('tenurePaginationInfo');
+    if (totalItems === 0) {
+        info.textContent = 'No tenure data found';
+    } else {
+        const startItem = (currentPage - 1) * tenureGroupsPerPage + 1;
+        const endItem = Math.min(currentPage * tenureGroupsPerPage, totalItems);
+        info.textContent = `Showing ${startItem}-${endItem} of ${totalItems} tenure groups`;
+    }
+}
+
+function updateTenurePaginationControls(pagination) {
+    const controls = document.getElementById('tenurePaginationControls');
+    
+    if (!pagination || pagination.pages <= 1) {
+        controls.innerHTML = '';
+        return;
+    }
+    
+    let html = '';
+    
+    // Previous button
+    if (pagination.has_prev) {
+        html += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="loadTenureNpsData(${pagination.page - 1}); return false;">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+        `;
+    } else {
+        html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-left"></i></span></li>';
+    }
+    
+    // Page numbers
+    for (let i = 1; i <= pagination.pages; i++) {
+        if (i === pagination.page) {
+            html += `<li class="page-item active"><span class="page-link">${i}</span></li>`;
+        } else {
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadTenureNpsData(${i}); return false;">${i}</a></li>`;
+        }
+    }
+    
+    // Next button
+    if (pagination.has_next) {
+        html += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="loadTenureNpsData(${pagination.page + 1}); return false;">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        `;
+    } else {
+        html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-right"></i></span></li>';
+    }
+    
+    controls.innerHTML = html;
+}
+
+function loadTenureNpsData(page = 1) {
+    currentTenurePage = page;
+    console.log('Loading tenure NPS data...');
+    fetch(`/api/tenure_nps?page=${page}&per_page=${tenureGroupsPerPage}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Tenure NPS data received:', data);
+            if (data.success) {
+                console.log('Populating table with', data.data.length, 'tenure groups');
+                populateTenureNpsTable(data.data);
+                
+                // Update pagination info and controls for tenure table
+                if (data.pagination) {
+                    updateTenurePaginationInfo(data.pagination.page, data.pagination.pages, data.pagination.total);
+                    updateTenurePaginationControls(data.pagination);
+                }
+            } else {
+                console.error('Error loading tenure NPS data:', data.error);
+                document.getElementById('tenureNpsTable').innerHTML = 
+                    '<tr><td colspan="8" class="text-center text-danger">Error: ' + (data.error || 'Unknown error') + '</td></tr>';
+                updateTenurePaginationInfo(0, 0, 0);
+                updateTenurePaginationControls(null);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching tenure NPS data:', error);
+            document.getElementById('tenureNpsTable').innerHTML = 
+                '<tr><td colspan="8" class="text-center text-danger">Network error loading tenure data</td></tr>';
+            updateTenurePaginationInfo(0, 0, 0);
+            updateTenurePaginationControls(null);
+        });
+}
+
+function populateTenureNpsTable(tenureData) {
+    console.log('populateTenureNpsTable called with:', tenureData);
+    const tbody = document.getElementById('tenureNpsTable');
+    
+    if (!tbody) {
+        console.error('tenureNpsTable element not found!');
+        return;
+    }
+    
+    if (!tenureData || tenureData.length === 0) {
+        console.log('No tenure data to display');
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No tenure data available yet</td></tr>';
+        return;
+    }
+    
+    console.log('Rendering', tenureData.length, 'tenure groups to table');
+    
+    tbody.innerHTML = tenureData.map(tenure => {
+        // Risk level badge styling
+        let riskBadgeClass = 'bg-secondary';
+        if (tenure.risk_level === 'Low') riskBadgeClass = 'bg-success';
+        else if (tenure.risk_level === 'Medium') riskBadgeClass = 'bg-warning';
+        else if (tenure.risk_level === 'High') riskBadgeClass = 'bg-danger';
+        else if (tenure.risk_level === 'Critical') riskBadgeClass = 'bg-dark';
+        else if (tenure.risk_level === 'Insufficient Data') riskBadgeClass = 'bg-secondary';
+        
+        // Tenure NPS badge styling
+        let npsBadgeClass = 'bg-secondary';
+        if (tenure.tenure_nps > 20) npsBadgeClass = 'bg-success';
+        else if (tenure.tenure_nps >= -20) npsBadgeClass = 'bg-warning'; 
+        else npsBadgeClass = 'bg-danger';
+        
+        // Distribution breakdown
+        const distributionText = `${tenure.promoters}P / ${tenure.passives}Pa / ${tenure.detractors}D`;
+        
+        // Churn risk display
+        const churnRiskDisplay = tenure.latest_churn_risk || 'N/A';
+        
+        return `
+            <tr>
+                <td><strong>${tenure.tenure_group}</strong></td>
+                <td>${tenure.total_responses}</td>
+                <td>${tenure.avg_nps}</td>
+                <td><span class="badge ${npsBadgeClass}">${tenure.tenure_nps > 0 ? '+' : ''}${tenure.tenure_nps}</span></td>
+                <td><small>${distributionText}</small></td>
+                <td><span class="badge ${riskBadgeClass}">${tenure.risk_level}</span></td>
+                <td>${tenure.latest_response || 'N/A'}</td>
+                <td>${churnRiskDisplay}</td>
+            </tr>
+        `;
+    }).join('');
 }
 
 function loadCompanyNpsData(page = 1) {

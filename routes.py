@@ -674,6 +674,47 @@ def api_company_trends():
         logger.error(f"Error getting company trends: {e}")
         return jsonify({'error': 'Failed to get company trends'}), 500
 
+@app.route('/api/tenure_nps')
+@rate_limit(limit=100)
+def api_tenure_nps():
+    """API endpoint for tenure-segregated NPS data with pagination"""
+    try:
+        from data_storage import get_tenure_nps_data
+        
+        # Get pagination parameters
+        page = request.args.get('page', 1, type=int)
+        per_page = min(request.args.get('per_page', 10, type=int), 100)  # Max 100 per page
+        
+        # Get all tenure data
+        all_tenure_data = get_tenure_nps_data()
+        total_tenure_groups = len(all_tenure_data)
+        
+        # Calculate pagination
+        start_idx = (page - 1) * per_page
+        end_idx = start_idx + per_page
+        tenure_data = all_tenure_data[start_idx:end_idx]
+        
+        # Calculate pagination info
+        total_pages = (total_tenure_groups + per_page - 1) // per_page
+        has_prev = page > 1
+        has_next = page < total_pages
+        
+        return jsonify({
+            'success': True,
+            'data': tenure_data,
+            'pagination': {
+                'page': page,
+                'per_page': per_page,
+                'total': total_tenure_groups,
+                'pages': total_pages,
+                'has_prev': has_prev,
+                'has_next': has_next
+            }
+        })
+    except Exception as e:
+        logger.error(f"Error getting tenure NPS data: {e}")
+        return jsonify({'error': 'Failed to get tenure NPS data'}), 500
+
 # Conversational Survey Routes
 @app.route('/conversational_survey')
 def conversational_survey():

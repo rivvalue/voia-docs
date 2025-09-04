@@ -392,6 +392,85 @@ def get_company_nps_data():
         print(f"Error getting company NPS data: {e}")
         return []
 
+def get_tenure_nps_data():
+    """Get NPS data segregated by customer tenure"""
+    try:
+        # Get all responses grouped by tenure
+        tenure_stats = db.session.query(
+            SurveyResponse.tenure_with_fc,
+            func.count(SurveyResponse.id).label('total_responses'),
+            func.avg(SurveyResponse.nps_score).label('avg_nps'),
+            func.max(SurveyResponse.created_at).label('latest_response'),
+            func.count(func.nullif(SurveyResponse.nps_score >= 9, False)).label('promoters'),
+            func.count(func.nullif(SurveyResponse.nps_score <= 6, False)).label('detractors')
+        ).filter(
+            SurveyResponse.tenure_with_fc.isnot(None)
+        ).group_by(SurveyResponse.tenure_with_fc).all()
+        
+        tenure_nps_list = []
+        
+        for tenure in tenure_stats:
+            # Calculate tenure NPS score
+            total = tenure.total_responses
+            promoters = tenure.promoters or 0
+            detractors = tenure.detractors or 0
+            
+            if total > 0:
+                tenure_nps = round(((promoters - detractors) / total) * 100)
+            else:
+                tenure_nps = 0
+            
+            # Determine risk level based on NPS and sample size
+            if total < 2:
+                risk_level = "Insufficient Data"
+            elif tenure_nps <= -50:
+                risk_level = "Critical"
+            elif tenure_nps <= -20:
+                risk_level = "High"
+            elif tenure_nps <= 20:
+                risk_level = "Medium"
+            else:
+                risk_level = "Low"
+            
+            # Get latest churn risk for this tenure group
+            latest_response = SurveyResponse.query.filter(
+                SurveyResponse.tenure_with_fc == tenure.tenure_with_fc
+            ).order_by(SurveyResponse.created_at.desc()).first()
+            
+            latest_churn_risk = None
+            if latest_response and latest_response.churn_risk_level:
+                latest_churn_risk = latest_response.churn_risk_level
+            
+            tenure_nps_list.append({
+                'tenure_group': tenure.tenure_with_fc,
+                'total_responses': total,
+                'avg_nps': round(tenure.avg_nps, 1) if tenure.avg_nps else 0,
+                'tenure_nps': tenure_nps,
+                'promoters': promoters,
+                'detractors': detractors,
+                'passives': total - promoters - detractors,
+                'risk_level': risk_level,
+                'latest_response': tenure.latest_response.strftime('%Y-%m-%d') if tenure.latest_response else None,
+                'latest_churn_risk': latest_churn_risk
+            })
+        
+        # Sort by tenure order (logical progression from new to long-term customers)
+        tenure_order = {
+            "Less than 1 year": 0,
+            "1-2 years": 1, 
+            "2-3 years": 2,
+            "3-5 years": 3,
+            "5-10 years": 4,
+            "More than 10 years": 5
+        }
+        tenure_nps_list.sort(key=lambda x: tenure_order.get(x['tenure_group'], 6))
+        
+        return tenure_nps_list
+        
+    except Exception as e:
+        print(f"Error getting tenure NPS data: {e}")
+        return []
+
 def get_company_trends():
     """Get NPS trends over time by company"""
     try:
