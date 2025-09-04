@@ -209,15 +209,37 @@ def survey():
         import simple_token_system
         verification = simple_token_system.verify_simple_token(token)
         if verification.get('valid'):
+            email = verification.get('email')
+            
+            # Check if this email has already submitted a response
+            existing_response = SurveyResponse.query.filter_by(respondent_email=email).first()
+            if existing_response:
+                # Show completion message instead of survey form
+                return render_template('survey_completed.html', 
+                                     email=email,
+                                     completion_date=existing_response.created_at.strftime("%B %d, %Y"),
+                                     show_alternatives=True)
+            
             session['auth_token'] = token
-            session['auth_email'] = verification.get('email')
-            return render_template('survey.html', authenticated=True, email=verification.get('email'))
+            session['auth_email'] = email
+            return render_template('survey.html', authenticated=True, email=email)
         else:
             return render_template('survey.html', authenticated=False, error="Invalid or expired token")
     else:
         # Check if already authenticated via session
         if session.get('auth_token'):
-            return render_template('survey.html', authenticated=True, email=session.get('auth_email'))
+            email = session.get('auth_email')
+            
+            # Check if this email has already submitted a response
+            existing_response = SurveyResponse.query.filter_by(respondent_email=email).first()
+            if existing_response:
+                # Show completion message instead of survey form
+                return render_template('survey_completed.html', 
+                                     email=email,
+                                     completion_date=existing_response.created_at.strftime("%B %d, %Y"),
+                                     show_alternatives=True)
+                                     
+            return render_template('survey.html', authenticated=True, email=email)
         else:
             # Redirect unauthenticated users to auth page instead of showing broken page
             return redirect(url_for('server_auth'))
