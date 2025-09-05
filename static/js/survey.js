@@ -276,12 +276,20 @@ function showValidationError(message) {
 
 // Load saved data on page load
 function loadSavedData() {
+    const currentUserEmail = window.userEmail || '';
+    
+    // First, pre-populate email if user is authenticated
+    if (currentUserEmail) {
+        console.log('Pre-populating email for authenticated user:', currentUserEmail);
+        document.getElementById('respondentEmail').value = currentUserEmail;
+        document.getElementById('respondentEmail').readOnly = true; // Make it read-only since it's authenticated
+    }
+    
     const savedData = localStorage.getItem('surveyDraft');
     if (savedData) {
         const data = JSON.parse(savedData);
         
         // Check if the current authenticated user is different from saved data
-        const currentUserEmail = window.userEmail || '';
         const savedUserEmail = data.respondent_email || '';
         
         // If different user is authenticated, clear old data and don't load it
@@ -294,7 +302,10 @@ function loadSavedData() {
         // Only load data if it's for the same user or if no user is specified
         document.getElementById('companyName').value = data.company_name || '';
         document.getElementById('respondentName').value = data.respondent_name || '';
-        document.getElementById('respondentEmail').value = data.respondent_email || '';
+        // Only override email if no authenticated user (shouldn't happen but safety check)
+        if (!currentUserEmail) {
+            document.getElementById('respondentEmail').value = data.respondent_email || '';
+        }
         document.getElementById('tenureWithFc').value = data.tenure_with_fc || '';
         
         // Optionally restore to saved step
