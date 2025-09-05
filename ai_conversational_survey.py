@@ -428,7 +428,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             return "Ask about business relationship tenure with Archelo Group (how long working together)"
         elif not data.get('nps_score'):
             return "Ask for NPS score (0-10 likelihood to recommend Archelo Group)"
-        elif not data.get('nps_reasoning'):
+        elif not data.get('nps_reasoning') and not data.get('improvement_feedback'):
             return "Ask WHY they gave that NPS score - what's their reasoning about Archelo Group"
         elif not data.get('satisfaction_rating'):
             return "Ask for overall satisfaction rating (1-5) with Archelo Group"
