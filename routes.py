@@ -427,6 +427,8 @@ def submit_survey():
             analysis_status = "failed"
         
         # AUTOMATIC TOKEN INVALIDATION - Clear session to prevent survey restarts
+        # But preserve email for export functionality
+        session['export_email'] = authenticated_email  # Preserve for export
         session.pop('auth_token', None)
         session.pop('auth_email', None)
         session.permanent = False  # Force session to be non-permanent for immediate effect
@@ -998,8 +1000,8 @@ def logout_session():
 def export_user_data():
     """Export survey data for current user only (no admin required)"""
     try:
-        # Try to get user email from session first
-        user_email = session.get('auth_email')
+        # Try to get user email from session first (auth_email for active sessions, export_email for post-completion)
+        user_email = session.get('auth_email') or session.get('export_email')
         
         # If no session, try to get from request body (POST) or query params (GET)
         if not user_email:
