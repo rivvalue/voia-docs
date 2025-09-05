@@ -180,7 +180,7 @@ Extract any of the following data present in the response:
 
 Return ONLY JSON in this format:
 {{
-    "tenure_with_archelo": string or null,
+    "tenure_with_fc": string or null,
     "nps_score": number or null,
     "nps_category": "Promoter/Passive/Detractor" or null,
     "satisfaction_rating": number or null,
@@ -345,7 +345,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
                 break
         
         # Extract tenure information - only if we're answering the tenure question (step_count will be 1 when processing tenure response)
-        if not self.extracted_data.get('tenure_with_archelo') and self.step_count == 1:
+        if not self.extracted_data.get('tenure_with_fc') and self.step_count == 1:
             tenure_patterns = {
                 'Less than 6 months': ['less than 6 months', 'under 6 months', 'few months', '3 months', '4 months', '5 months'],
                 '6 months - 1 year': ['6 months', 'seven months', '8 months', '9 months', '10 months', '11 months', 'about a year'],
@@ -358,7 +358,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             
             for tenure_option, patterns in tenure_patterns.items():
                 if any(pattern in text_lower for pattern in patterns):
-                    extracted['tenure_with_archelo'] = tenure_option
+                    extracted['tenure_with_fc'] = tenure_option
                     break
         
         # Extract improvement suggestions
@@ -391,7 +391,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         # Core requirements
         has_nps = self.extracted_data.get('nps_score') is not None
         has_reasoning = self.extracted_data.get('nps_reasoning') is not None or self.extracted_data.get('compliment_feedback') is not None or self.extracted_data.get('complaint_feedback') is not None or self.extracted_data.get('additional_comments') is not None
-        has_tenure = self.extracted_data.get('tenure_with_archelo') is not None
+        has_tenure = self.extracted_data.get('tenure_with_fc') is not None
         
         # Additional data points
         has_satisfaction = self.extracted_data.get('satisfaction_rating') is not None
@@ -424,7 +424,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         data = self.extracted_data
         
         # Check what we have and what we need
-        if not data.get('tenure_with_archelo'):
+        if not data.get('tenure_with_fc'):
             return "Ask about business relationship tenure with Archelo Group (how long working together)"
         elif not data.get('nps_score'):
             return "Ask for NPS score (0-10 likelihood to recommend Archelo Group)"
@@ -476,7 +476,7 @@ GUIDELINES:
 - Keep the conversation natural and engaging
 - Ask ONE question at a time
 - CRITICALLY IMPORTANT: DON'T ask for information you already have (check SURVEY DATA COLLECTED SO FAR)
-- If tenure_with_archelo is already known, NEVER ask about it again
+- If tenure_with_fc is already known, NEVER ask about it again
 - Look at what you have already collected and ask for what's missing logically
 - If you have NPS score but no reasoning, ask WHY they gave that score
 - If you have tenure but no satisfaction rating, ask about satisfaction
@@ -544,11 +544,11 @@ Be conversational, empathetic, and adaptive to their communication style."""
         
         print(f"Fallback generation - Step: {self.step_count}, Extracted: {extracted}")
         print(f"Current extracted data: {self.extracted_data}")
-        print(f"Tenure from extracted_data: {self.extracted_data.get('tenure_with_archelo')}")
+        print(f"Tenure from extracted_data: {self.extracted_data.get('tenure_with_fc')}")
         print(f"NPS from extracted_data: {self.extracted_data.get('nps_score')}")
         
         # FIXED: Special case handling without step manipulation
-        if (self.extracted_data.get('tenure_with_archelo') is not None and 
+        if (self.extracted_data.get('tenure_with_fc') is not None and 
             self.extracted_data.get('nps_score') is not None and 
             not self.extracted_data.get('nps_reasoning') and
             self.step_count <= 4):
@@ -581,7 +581,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
         # Use step-based progression but check if we already have tenure data
         if self.step_count == 1:
             # First question: Ask for tenure with Archelo Group ONLY if we don't have it
-            if self.extracted_data.get('tenure_with_archelo') is None:
+            if self.extracted_data.get('tenure_with_fc') is None:
                 return {
                     'message': "How long have you been working with Archelo Group? Please choose from: Less than 6 months, 6 months - 1 year, 1-2 years, 2-3 years, 3-5 years, 5-10 years, or More than 10 years.",
                     'message_type': 'ai_question',
@@ -770,7 +770,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
             'company_name': normalize_company_name(context.get('company_name')),
             'respondent_name': context.get('respondent_name'),
             'respondent_email': context.get('respondent_email'),
-            'tenure_with_archelo': extracted.get('tenure_with_archelo'),
+            'tenure_with_fc': extracted.get('tenure_with_fc'),
             'nps_score': nps_score,
             'nps_category': nps_category,
             'satisfaction_rating': extracted.get('satisfaction_rating'),
@@ -841,15 +841,15 @@ Be conversational, empathetic, and adaptive to their communication style."""
 # Global instances for session persistence
 ai_conversation_instances = {}
 
-def start_ai_conversational_survey(company_name: str, respondent_name: str, tenure_with_archelo: str = None) -> Dict[str, Any]:
+def start_ai_conversational_survey(company_name: str, respondent_name: str, tenure_with_fc: str = None) -> Dict[str, Any]:
     """Start a new AI-powered conversational survey session"""
     conversation_id = str(uuid.uuid4())
     ai_survey = AIConversationalSurvey()
     
     # If tenure data is provided from the form, pre-populate it
-    if tenure_with_archelo:
-        ai_survey.extracted_data['tenure_with_archelo'] = tenure_with_archelo
-        print(f"Pre-populated tenure from form: {tenure_with_archelo}")
+    if tenure_with_fc:
+        ai_survey.extracted_data['tenure_with_fc'] = tenure_with_fc
+        print(f"Pre-populated tenure from form: {tenure_with_fc}")
     
     result = ai_survey.start_conversation(company_name, respondent_name)
     result['conversation_id'] = conversation_id
