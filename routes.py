@@ -962,6 +962,8 @@ def finalize_conversation():
         add_analysis_task(response.id)
         
         # AUTOMATIC TOKEN INVALIDATION - Clear session to prevent survey restarts
+        # But preserve email for export functionality
+        session['export_email'] = authenticated_email  # Preserve for export
         session.pop('auth_token', None)
         session.pop('auth_email', None)
         session.permanent = False  # Force session to be non-permanent for immediate effect
