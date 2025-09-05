@@ -33,6 +33,11 @@ def index():
     user_email = auth_email if (auth_token and auth_email) else None
     return render_template('index.html', authenticated=is_authenticated, email=auth_email, user_email=user_email)
 
+@app.route('/demo')
+def demo_intro():
+    """Demo introduction page with Archelo Group context"""
+    return render_template('demo_intro.html')
+
 @app.route('/auth/request-token', methods=['POST'])
 @rate_limit(limit=5)  # 5 token requests per minute per IP
 def request_token():
