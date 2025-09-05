@@ -89,9 +89,9 @@
         </div>
     </nav>
 
-    <!-- Archelo Logo for all pages except home -->
+    <!-- Archelo Logo for all pages except home and demo intro -->
     {% set current_endpoint = request.endpoint %}
-    {% if current_endpoint != 'index' %}
+    {% if current_endpoint != 'index' and current_endpoint != 'demo_intro' %}
     <img src="{{ url_for('static', filename='images/archelo-logo.png') }}" 
          alt="Archelo Group" 
          class="archelo-logo-top-right">
