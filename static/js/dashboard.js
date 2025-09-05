@@ -123,7 +123,9 @@ function createNpsChart() {
     const npsData = dashboardData.nps_distribution || [];
     const labels = npsData.map(item => item.category);
     const data = npsData.map(item => item.count);
-    const colors = ['#E13A44', '#BDBDBD', '#8A8A8A']; // Red (Detractor), Medium Gray (Passive), Dark Gray (Promoter)
+    
+    // Professional color palette matching the design
+    const chartColors = ['#E13A44', '#BDBDBD', '#8A8A8A']; // Red (Detractor), Medium Gray (Passive), Dark Gray (Promoter)
     
     charts.npsChart = new Chart(ctx, {
         type: 'doughnut',
@@ -131,22 +133,53 @@ function createNpsChart() {
             labels: labels,
             datasets: [{
                 data: data,
-                backgroundColor: colors,
-                borderWidth: 2,
-                borderColor: '#FFFFFF'
+                backgroundColor: chartColors,
+                borderWidth: 3,
+                borderColor: '#FFFFFF',
+                hoverBorderWidth: 4,
+                hoverBorderColor: '#E13A44'
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            cutout: '60%',
             plugins: {
                 legend: {
                     position: 'bottom',
                     labels: {
                         color: '#000000',
                         usePointStyle: true,
-                        padding: 20
+                        padding: 20,
+                        font: {
+                            family: 'Inter',
+                            size: 13,
+                            weight: '500'
+                        }
                     }
+                },
+                tooltip: {
+                    backgroundColor: '#000000',
+                    titleColor: '#FFFFFF',
+                    bodyColor: '#FFFFFF',
+                    borderColor: '#E13A44',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    titleFont: {
+                        family: 'Inter',
+                        size: 14,
+                        weight: '600'
+                    },
+                    bodyFont: {
+                        family: 'Inter',
+                        size: 13,
+                        weight: '500'
+                    }
+                }
+            },
+            elements: {
+                arc: {
+                    borderRadius: 4
                 }
             }
         }

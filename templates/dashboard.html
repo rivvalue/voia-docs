@@ -6,121 +6,129 @@
 
 {% block content %}
 <div data-page="dashboard"></div>
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Analytics Dashboard</h2>
-    <div>
-        <button class="btn btn-outline-primary" onclick="refreshData()">
-            <i class="fas fa-sync-alt me-2"></i>Refresh
-        </button>
-        <button class="btn btn-outline-info" onclick="exportUserData()">
-            <i class="fas fa-user-circle me-2"></i>Export Response Data
-        </button>
-        <button class="btn btn-outline-success" onclick="exportData()">
-            <i class="fas fa-download me-2"></i>Export Full Data
-        </button>
-        <button class="btn btn-outline-secondary" onclick="adminLogin()" id="adminLoginBtn">
-            <i class="fas fa-key me-2"></i>Admin Login
-        </button>
+<div class="dashboard-header">
+    <div class="d-flex justify-content-between align-items-start">
+        <div>
+            <h2>Analytics Dashboard</h2>
+            <p class="dashboard-subtitle">Comprehensive customer feedback insights and analysis</p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <button class="btn btn-outline-primary btn-sm" onclick="refreshData()">
+                <i class="fas fa-sync-alt me-2"></i>Refresh
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="exportUserData()">
+                <i class="fas fa-user-circle me-2"></i>Export Response Data
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="exportData()">
+                <i class="fas fa-download me-2"></i>Export Full Data
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="adminLogin()" id="adminLoginBtn">
+                <i class="fas fa-key me-2"></i>Admin Login
+            </button>
+        </div>
     </div>
 </div>
 
 <!-- Loading state -->
-<div class="text-center" id="loadingIndicator">
-    <div class="spinner-border text-primary" role="status">
+<div class="loading-card" id="loadingIndicator">
+    <div class="spinner-border" role="status">
         <span class="visually-hidden">Loading dashboard data...</span>
     </div>
-    <p class="mt-2">Loading dashboard data...</p>
+    <div class="loading-text">Loading dashboard data...</div>
 </div>
 
 <!-- Dashboard content -->
 <div class="d-none" id="dashboardContent">
     <!-- Key Metrics -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h3 class="card-title text-primary" id="totalResponses">0</h3>
-                    <p class="card-text">Total Responses</p>
-                </div>
+    <div class="row mb-4 g-3">
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <div class="kpi-card kpi-primary">
+                <div class="kpi-value text-primary" id="totalResponses">0</div>
+                <div class="kpi-label">Total Responses</div>
+                <div class="kpi-trend" id="totalResponsesTrend">All time feedback collected</div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h3 class="card-title text-success" id="npsScore">0</h3>
-                    <p class="card-text">NPS Score</p>
-                </div>
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <div class="kpi-card kpi-success">
+                <div class="kpi-value text-success" id="npsScore">0</div>
+                <div class="kpi-label">NPS Score</div>
+                <div class="kpi-trend" id="npsScoreTrend">Overall satisfaction metric</div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h3 class="card-title text-info" id="recentResponses">0</h3>
-                    <p class="card-text">Recent (30 days)</p>
-                </div>
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <div class="kpi-card kpi-info">
+                <div class="kpi-value text-info" id="recentResponses">0</div>
+                <div class="kpi-label">Recent (30 days)</div>
+                <div class="kpi-trend" id="recentResponsesTrend">Latest customer feedback</div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h3 class="card-title text-warning" id="highRiskCount">0</h3>
-                    <p class="card-text">High Risk Accounts</p>
-                </div>
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <div class="kpi-card kpi-warning">
+                <div class="kpi-value text-warning" id="highRiskCount">0</div>
+                <div class="kpi-label">High Risk Accounts</div>
+                <div class="kpi-trend" id="highRiskTrend">Accounts requiring attention</div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h3 class="card-title text-success" id="growthPotential">0%</h3>
-                    <p class="card-text">Growth Potential</p>
-                </div>
+        <div class="col-lg-2 col-md-4 col-sm-6">
+            <div class="kpi-card kpi-success">
+                <div class="kpi-value text-success" id="growthPotential">0%</div>
+                <div class="kpi-label">Growth Potential</div>
+                <div class="kpi-trend" id="growthPotentialTrend">Revenue expansion opportunity</div>
             </div>
         </div>
     </div>
 
     <!-- Charts Row -->
-    <div class="row mb-4">
+    <div class="row mb-4 g-3">
         <div class="col-md-6">
-            <div class="card">
+            <div class="chart-card">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">NPS Distribution</h5>
+                    <h5>NPS Distribution</h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="npsChart"></canvas>
+                    <div class="chart-container">
+                        <canvas id="npsChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card">
+            <div class="chart-card">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Sentiment Analysis</h5>
+                    <h5>Sentiment Analysis</h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="sentimentChart"></canvas>
+                    <div class="chart-container">
+                        <canvas id="sentimentChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Tenure Distribution -->
-    <div class="row mb-4">
+    <div class="row mb-4 g-3">
         <div class="col-md-6">
-            <div class="card">
+            <div class="chart-card">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Customer Tenure with FC inc</h5>
+                    <h5>Customer Tenure with Archelo Group</h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="tenureChart"></canvas>
+                    <div class="chart-container">
+                        <canvas id="tenureChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card">
+            <div class="chart-card">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">NPS-Based Growth Factor Analysis</h5>
+                    <h5>NPS-Based Growth Factor Analysis</h5>
                 </div>
                 <div class="card-body">
-                    <canvas id="growthFactorChart"></canvas>
+                    <div class="chart-container">
+                        <canvas id="growthFactorChart"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
@@ -185,12 +193,12 @@
     <!-- Company NPS Segregation Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">NPS by Client Company</h5>
-                    <small class="text-muted">Strategic account management - NPS scores segregated by company evaluating FC inc</small>
+            <div class="data-table">
+                <div class="table-header">
+                    <h5>NPS by Client Company</h5>
+                    <small class="text-muted">Strategic account management - NPS scores segregated by company evaluating Archelo Group</small>
                 </div>
-                <div class="card-body">
+                <div class="p-0">
                     <div class="table-responsive">
                         <table class="table table-striped table-hover">
                             <thead>
@@ -266,12 +274,12 @@
     <!-- Tenure NPS Segregation Section -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">NPS by Customer Tenure</h5>
+            <div class="data-table">
+                <div class="table-header">
+                    <h5>NPS by Customer Tenure</h5>
                     <small class="text-muted">Customer lifecycle insights - NPS scores segregated by length of business relationship</small>
                 </div>
-                <div class="card-body">
+                <div class="p-0">
                     <div class="table-responsive">
                         <table class="table table-striped table-hover">
                             <thead>
