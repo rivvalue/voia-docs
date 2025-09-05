@@ -90,7 +90,7 @@ function validateCurrentStep() {
             const serviceRating = document.getElementById('serviceRating').value;
             
             if (!satisfactionRating || !serviceRating) {
-                alert('Please provide ratings for satisfaction and FC inc service delivery.');
+                showValidationError('Please provide ratings for satisfaction and Archelo Group service delivery.');
                 return false;
             }
             break;

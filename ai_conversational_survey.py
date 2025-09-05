@@ -105,7 +105,7 @@ class AIConversationalSurvey:
             print("LOOP PROTECTION: Forcing completion after 8 steps")
             self.is_complete = True
             return {
-                'message': "Thank you so much for your detailed feedback about FC inc! Your insights are very valuable.",
+                'message': "Thank you so much for your detailed feedback about Archelo Group! Your insights are very valuable.",
                 'message_type': 'completion',
                 'step': 'forced_complete',
                 'progress': 100,
@@ -115,7 +115,7 @@ class AIConversationalSurvey:
         # Check if we have enough data to complete
         if self._check_completion_criteria():
             next_question = {
-                'message': "Thank you so much for taking the time to share your detailed feedback about FC inc! Your insights are incredibly valuable and will help us improve our service delivery. Have a wonderful day!",
+                'message': "Thank you so much for taking the time to share your detailed feedback about Archelo Group! Your insights are incredibly valuable and will help us improve our service delivery. Have a wonderful day!",
                 'message_type': 'completion',
                 'step': 'complete',
                 'progress': 100,
@@ -143,13 +143,9 @@ class AIConversationalSurvey:
         return next_question
     
     def _generate_welcome_message(self, company_name: str, respondent_name: str) -> str:
-        """Generate personalized welcome message based on existing data"""
-        if self.extracted_data.get('tenure_with_fc'):
-            # If we already have tenure, jump to NPS
-            return f"Hi {respondent_name}! I'm here to gather your feedback about FC inc. I see you've been working with them for {self.extracted_data['tenure_with_fc']}. That's great! Let's start - on a scale of 0-10, how likely are you to recommend FC inc to a friend or colleague?"
-        else:
-            # Standard welcome message asking for tenure first
-            return f"Hi {respondent_name}! I'm here to gather your feedback about FC inc. This will be a quick conversation to understand your experience and help improve their service. Let's start - how long have you been working with FC inc?"
+        """Generate personalized welcome message with Archelo Group introduction"""
+        # Always use the new Archelo Group introduction and go directly to NPS
+        return f"Hi {respondent_name}, we'd love to hear from you.\n\nArchelo is on a mission to make workplace tools less painful, and your feedback makes us better.\n\nThis short conversation will help us understand what's working, what's not, and how to improve your experience with ArcheloFlow.\n\nOn a scale of 0-10, how likely are you to recommend Archelo Group to a friend or colleague?"
     
     def _extract_survey_data_with_ai(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
         """Extract structured survey data from natural language using OpenAI"""
@@ -169,7 +165,7 @@ CRITICAL INSTRUCTION: Only extract NEW information from this specific response.
 DO NOT re-extract or change data that was already captured in previous responses.
 
 Extract any of the following data present in the response:
-- Tenure with FC inc: Look for duration mentions like "6 months", "2 years", "less than 6 months", etc.
+- Tenure with Archelo Group: Look for duration mentions like "6 months", "2 years", "less than 6 months", etc.
 - NPS score (0-10): Look for numbers, recommendations, likelihood scores
 - Satisfaction level (1-5): Look for satisfaction, happiness, contentment indicators
 - Service quality rating (1-5): Look for professional services, service delivery ratings
@@ -184,7 +180,7 @@ Extract any of the following data present in the response:
 
 Return ONLY JSON in this format:
 {{
-    "tenure_with_fc": string or null,
+    "tenure_with_archelo": string or null,
     "nps_score": number or null,
     "nps_category": "Promoter/Passive/Detractor" or null,
     "satisfaction_rating": number or null,
@@ -349,7 +345,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
                 break
         
         # Extract tenure information - only if we're answering the tenure question (step_count will be 1 when processing tenure response)
-        if not self.extracted_data.get('tenure_with_fc') and self.step_count == 1:
+        if not self.extracted_data.get('tenure_with_archelo') and self.step_count == 1:
             tenure_patterns = {
                 'Less than 6 months': ['less than 6 months', 'under 6 months', 'few months', '3 months', '4 months', '5 months'],
                 '6 months - 1 year': ['6 months', 'seven months', '8 months', '9 months', '10 months', '11 months', 'about a year'],
@@ -362,7 +358,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             
             for tenure_option, patterns in tenure_patterns.items():
                 if any(pattern in text_lower for pattern in patterns):
-                    extracted['tenure_with_fc'] = tenure_option
+                    extracted['tenure_with_archelo'] = tenure_option
                     break
         
         # Extract improvement suggestions
@@ -395,7 +391,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         # Core requirements
         has_nps = self.extracted_data.get('nps_score') is not None
         has_reasoning = self.extracted_data.get('nps_reasoning') is not None or self.extracted_data.get('compliment_feedback') is not None or self.extracted_data.get('complaint_feedback') is not None or self.extracted_data.get('additional_comments') is not None
-        has_tenure = self.extracted_data.get('tenure_with_fc') is not None
+        has_tenure = self.extracted_data.get('tenure_with_archelo') is not None
         
         # Additional data points
         has_satisfaction = self.extracted_data.get('satisfaction_rating') is not None
@@ -428,18 +424,18 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         data = self.extracted_data
         
         # Check what we have and what we need
-        if not data.get('tenure_with_fc'):
-            return "Ask about business relationship tenure with FC inc (how long working together)"
+        if not data.get('tenure_with_archelo'):
+            return "Ask about business relationship tenure with Archelo Group (how long working together)"
         elif not data.get('nps_score'):
-            return "Ask for NPS score (0-10 likelihood to recommend FC inc)"
+            return "Ask for NPS score (0-10 likelihood to recommend Archelo Group)"
         elif not data.get('nps_reasoning'):
-            return "Ask WHY they gave that NPS score - what's their reasoning about FC inc"
+            return "Ask WHY they gave that NPS score - what's their reasoning about Archelo Group"
         elif not data.get('satisfaction_rating'):
-            return "Ask for overall satisfaction rating (1-5) with FC inc"
+            return "Ask for overall satisfaction rating (1-5) with Archelo Group"
         elif not data.get('service_rating'):
-            return "Ask for professional services quality rating (1-5) from FC inc"
+            return "Ask for professional services quality rating (1-5) from Archelo Group"
         elif not data.get('improvement_feedback'):
-            return "Ask what FC inc could do better or improve"
+            return "Ask what Archelo Group could do better or improve"
         else:
             return "Wrap up the conversation - you have enough information"
     
@@ -449,7 +445,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             # Format conversation history for context
             history_text = self._format_conversation_history()
             
-            prompt = f"""You are conducting a customer feedback survey about FC inc (the supplier company). Focus on FC inc's service delivery, support quality, and business relationship aspects.
+            prompt = f"""You are conducting a customer feedback survey about Archelo Group (the supplier company). Focus on Archelo Group's service delivery, support quality, and business relationship aspects.
 
 CONVERSATION HISTORY:
 {history_text}
@@ -464,23 +460,23 @@ CONVERSATION STEP: {self.step_count}
 NEXT LOGICAL QUESTION PRIORITY:
 {self._get_next_question_priority()}
 
-YOUR ROLE: You are a helpful customer feedback specialist having a natural conversation. Your goal is to collect feedback about FC inc:
-1. Business relationship tenure - How long working with FC inc
-2. NPS score (0-10) - How likely to recommend FC inc
-3. Reason for their NPS score about FC inc
-4. Satisfaction level (1-5) - Overall satisfaction with FC inc
-5. Professional services quality rating (1-5) - Quality of FC inc's professional services
-6. Product value rating (1-5) - Value and quality of FC inc's products/solutions
-7. Pricing appreciation rating (1-5) - How they feel about FC inc's pricing value
-8. Support services rating (1-5) - Quality of FC inc's support and customer service
-9. Improvement suggestions - What could FC inc do better
-10. Additional feedback - Any other comments about FC inc
+YOUR ROLE: You are a helpful customer feedback specialist having a natural conversation. Your goal is to collect feedback about Archelo Group:
+1. Business relationship tenure - How long working with Archelo Group
+2. NPS score (0-10) - How likely to recommend Archelo Group
+3. Reason for their NPS score about Archelo Group
+4. Satisfaction level (1-5) - Overall satisfaction with Archelo Group
+5. Professional services quality rating (1-5) - Quality of Archelo Group's professional services
+6. Product value rating (1-5) - Value and quality of Archelo Group's products/solutions
+7. Pricing appreciation rating (1-5) - How they feel about Archelo Group's pricing value
+8. Support services rating (1-5) - Quality of Archelo Group's support and customer service
+9. Improvement suggestions - What could Archelo Group do better
+10. Additional feedback - Any other comments about Archelo Group
 
 GUIDELINES:
 - Keep the conversation natural and engaging
 - Ask ONE question at a time
 - CRITICALLY IMPORTANT: DON'T ask for information you already have (check SURVEY DATA COLLECTED SO FAR)
-- If tenure_with_fc is already known, NEVER ask about it again
+- If tenure_with_archelo is already known, NEVER ask about it again
 - Look at what you have already collected and ask for what's missing logically
 - If you have NPS score but no reasoning, ask WHY they gave that score
 - If you have tenure but no satisfaction rating, ask about satisfaction
@@ -548,18 +544,18 @@ Be conversational, empathetic, and adaptive to their communication style."""
         
         print(f"Fallback generation - Step: {self.step_count}, Extracted: {extracted}")
         print(f"Current extracted data: {self.extracted_data}")
-        print(f"Tenure from extracted_data: {self.extracted_data.get('tenure_with_fc')}")
+        print(f"Tenure from extracted_data: {self.extracted_data.get('tenure_with_archelo')}")
         print(f"NPS from extracted_data: {self.extracted_data.get('nps_score')}")
         
         # FIXED: Special case handling without step manipulation
-        if (self.extracted_data.get('tenure_with_fc') is not None and 
+        if (self.extracted_data.get('tenure_with_archelo') is not None and 
             self.extracted_data.get('nps_score') is not None and 
             not self.extracted_data.get('nps_reasoning') and
             self.step_count <= 4):
             score = self.extracted_data['nps_score']
             if score >= 9:
                 return {
-                    'message': f"Wonderful! A {score} is fantastic. What specifically about FC inc made your experience so great?",
+                    'message': f"Wonderful! A {score} is fantastic. What specifically about Archelo Group made your experience so great?",
                     'message_type': 'ai_question',
                     'step': 'nps_reasoning',
                     'progress': 40,
@@ -567,7 +563,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 }
             elif score >= 7:
                 return {
-                    'message': f"Thanks for the {score}! What would it take to make you even more likely to recommend FC inc?",
+                    'message': f"Thanks for the {score}! What would it take to make you even more likely to recommend Archelo Group?",
                     'message_type': 'ai_question',
                     'step': 'nps_reasoning',
                     'progress': 40,
@@ -575,7 +571,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 }
             else:
                 return {
-                    'message': f"I appreciate your honesty with the {score}. What are the main issues that are holding you back from recommending FC inc?",
+                    'message': f"I appreciate your honesty with the {score}. What are the main issues that are holding you back from recommending Archelo Group?",
                     'message_type': 'ai_question',
                     'step': 'nps_reasoning',
                     'progress': 40,
@@ -584,10 +580,10 @@ Be conversational, empathetic, and adaptive to their communication style."""
         
         # Use step-based progression but check if we already have tenure data
         if self.step_count == 1:
-            # First question: Ask for tenure with FC inc ONLY if we don't have it
-            if self.extracted_data.get('tenure_with_fc') is None:
+            # First question: Ask for tenure with Archelo Group ONLY if we don't have it
+            if self.extracted_data.get('tenure_with_archelo') is None:
                 return {
-                    'message': "How long have you been working with FC inc? Please choose from: Less than 6 months, 6 months - 1 year, 1-2 years, 2-3 years, 3-5 years, 5-10 years, or More than 10 years.",
+                    'message': "How long have you been working with Archelo Group? Please choose from: Less than 6 months, 6 months - 1 year, 1-2 years, 2-3 years, 3-5 years, 5-10 years, or More than 10 years.",
                     'message_type': 'ai_question',
                     'step': 'tenure_collection',
                     'progress': 15,
@@ -597,7 +593,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 # We already have tenure, skip to NPS question
                 # Don't manipulate step count - let natural progression continue
                 return {
-                    'message': "On a scale of 0-10, how likely are you to recommend FC inc to a friend or colleague?",
+                    'message': "On a scale of 0-10, how likely are you to recommend Archelo Group to a friend or colleague?",
                     'message_type': 'ai_question',
                     'step': 'nps_collection',
                     'progress': 25,
@@ -605,10 +601,10 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 }
 
         if self.step_count == 2:
-            # Second question: Ask for NPS about FC inc (the supplier) ONLY if we don't have it
+            # Second question: Ask for NPS about Archelo Group (the supplier) ONLY if we don't have it
             if self.extracted_data.get('nps_score') is None:
                 return {
-                    'message': "On a scale of 0-10, how likely are you to recommend FC inc to a friend or colleague?",
+                    'message': "On a scale of 0-10, how likely are you to recommend Archelo Group to a friend or colleague?",
                     'message_type': 'ai_question',
                     'step': 'nps_collection',
                     'progress': 25,
@@ -625,7 +621,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 score = extracted.get('nps_score') or self.extracted_data.get('nps_score')
                 if score >= 9:
                     return {
-                        'message': f"Wonderful! A {score} is fantastic. What specifically about FC inc made your experience so great?",
+                        'message': f"Wonderful! A {score} is fantastic. What specifically about Archelo Group made your experience so great?",
                         'message_type': 'ai_question',
                         'step': 'nps_reasoning',
                         'progress': 40,
@@ -633,7 +629,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                     }
                 elif score >= 7:
                     return {
-                        'message': f"Thanks for the {score}! What would it take to make you even more likely to recommend FC inc?",
+                        'message': f"Thanks for the {score}! What would it take to make you even more likely to recommend Archelo Group?",
                         'message_type': 'ai_question',
                         'step': 'nps_reasoning',
                         'progress': 40,
@@ -641,7 +637,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                     }
                 else:
                     return {
-                        'message': f"I appreciate your honesty with the {score}. What are the main issues that are holding you back from recommending FC inc?",
+                        'message': f"I appreciate your honesty with the {score}. What are the main issues that are holding you back from recommending Archelo Group?",
                         'message_type': 'ai_question',
                         'step': 'nps_reasoning',
                         'progress': 40,
@@ -652,7 +648,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 # This response is the user's answer to the NPS reasoning question
                 # Move to satisfaction question
                 return {
-                    'message': "How would you describe your overall satisfaction with FC inc's service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
+                    'message': "How would you describe your overall satisfaction with Archelo Group's service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
                     'message_type': 'ai_question',
                     'step': 'satisfaction',
                     'progress': 40,
@@ -662,7 +658,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
         elif self.step_count == 4:
             # Fourth question: Overall satisfaction rating
             return {
-                'message': "How would you describe your overall satisfaction with FC inc's service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
+                'message': "How would you describe your overall satisfaction with Archelo Group's service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
                 'message_type': 'ai_question',
                 'step': 'satisfaction',
                 'progress': 45,
@@ -672,7 +668,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
         elif self.step_count == 5:
             # Fifth question: Professional services quality rating
             return {
-                'message': "How would you rate the quality of FC inc's professional services? Excellent, good, average, poor, or very poor?",
+                'message': "How would you rate the quality of Archelo Group's professional services? Excellent, good, average, poor, or very poor?",
                 'message_type': 'ai_question',
                 'step': 'service_quality',
                 'progress': 50,
@@ -682,7 +678,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
         elif self.step_count == 6:
             # Sixth question: Product value rating
             return {
-                'message': "How would you rate the value and quality of FC inc's products or solutions? Excellent, good, average, poor, or very poor?",
+                'message': "How would you rate the value and quality of Archelo Group's products or solutions? Excellent, good, average, poor, or very poor?",
                 'message_type': 'ai_question',
                 'step': 'product_value',
                 'progress': 55,
@@ -692,7 +688,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
         elif self.step_count == 7:
             # Seventh question: Pricing appreciation rating
             return {
-                'message': "How do you feel about FC inc's pricing? Do you find it excellent value, good value, fair, expensive, or very expensive?",
+                'message': "How do you feel about Archelo Group's pricing? Do you find it excellent value, good value, fair, expensive, or very expensive?",
                 'message_type': 'ai_question',
                 'step': 'pricing_value',
                 'progress': 65,
@@ -702,7 +698,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
         elif self.step_count == 8:
             # Eighth question: Support services rating
             return {
-                'message': "How would you rate FC inc's support and customer service? Excellent, good, average, poor, or very poor?",
+                'message': "How would you rate Archelo Group's support and customer service? Excellent, good, average, poor, or very poor?",
                 'message_type': 'ai_question',
                 'step': 'support_quality',
                 'progress': 75,
@@ -713,7 +709,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
             # Ninth question: Improvement suggestions
             if extracted.get('nps_score', 0) < 7:
                 return {
-                    'message': "What specific changes would make the biggest difference in improving your experience with FC inc?",
+                    'message': "What specific changes would make the biggest difference in improving your experience with Archelo Group?",
                     'message_type': 'ai_question',
                     'step': 'improvement',
                     'progress': 85,
@@ -721,7 +717,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 }
             else:
                 return {
-                    'message': "Is there anything FC inc could do even better to enhance your experience?",
+                    'message': "Is there anything Archelo Group could do even better to enhance your experience?",
                     'message_type': 'ai_question',
                     'step': 'improvement',
                     'progress': 85,
@@ -731,7 +727,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
         # Step 10 or higher: Complete the survey
         else:
             return {
-                'message': "Thank you so much for sharing your valuable feedback about FC inc! Your insights help improve their service for everyone.",
+                'message': "Thank you so much for sharing your valuable feedback about Archelo Group! Your insights help improve their service for everyone.",
                 'message_type': 'conclusion',
                 'step': 'conclusion',
                 'progress': 100,
@@ -774,7 +770,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
             'company_name': normalize_company_name(context.get('company_name')),
             'respondent_name': context.get('respondent_name'),
             'respondent_email': context.get('respondent_email'),
-            'tenure_with_fc': extracted.get('tenure_with_fc'),
+            'tenure_with_archelo': extracted.get('tenure_with_archelo'),
             'nps_score': nps_score,
             'nps_category': nps_category,
             'satisfaction_rating': extracted.get('satisfaction_rating'),
@@ -845,15 +841,15 @@ Be conversational, empathetic, and adaptive to their communication style."""
 # Global instances for session persistence
 ai_conversation_instances = {}
 
-def start_ai_conversational_survey(company_name: str, respondent_name: str, tenure_with_fc: str = None) -> Dict[str, Any]:
+def start_ai_conversational_survey(company_name: str, respondent_name: str, tenure_with_archelo: str = None) -> Dict[str, Any]:
     """Start a new AI-powered conversational survey session"""
     conversation_id = str(uuid.uuid4())
     ai_survey = AIConversationalSurvey()
     
     # If tenure data is provided from the form, pre-populate it
-    if tenure_with_fc:
-        ai_survey.extracted_data['tenure_with_fc'] = tenure_with_fc
-        print(f"Pre-populated tenure from form: {tenure_with_fc}")
+    if tenure_with_archelo:
+        ai_survey.extracted_data['tenure_with_archelo'] = tenure_with_archelo
+        print(f"Pre-populated tenure from form: {tenure_with_archelo}")
     
     result = ai_survey.start_conversation(company_name, respondent_name)
     result['conversation_id'] = conversation_id
