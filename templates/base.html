@@ -16,6 +16,25 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    
+    <style>
+        .archelo-logo-top-right {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            width: 100px;
+            height: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .archelo-logo-top-right {
+                width: 80px;
+                top: 15px;
+                right: 15px;
+            }
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg">
@@ -69,6 +88,14 @@
             </div>
         </div>
     </nav>
+
+    <!-- Archelo Logo for all pages except home -->
+    {% set current_endpoint = request.endpoint %}
+    {% if current_endpoint != 'index' %}
+    <img src="{{ url_for('static', filename='images/archelo-logo.png') }}" 
+         alt="Archelo Group" 
+         class="archelo-logo-top-right">
+    {% endif %}
 
     <main class="container mt-4">
         {% block content %}{% endblock %}
