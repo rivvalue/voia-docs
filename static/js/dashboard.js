@@ -152,7 +152,7 @@ function createNpsChart() {
                         usePointStyle: true,
                         padding: 20,
                         font: {
-                            family: 'Inter',
+                            family: 'Karla',
                             size: 13,
                             weight: '500'
                         }
@@ -166,12 +166,12 @@ function createNpsChart() {
                     borderWidth: 1,
                     cornerRadius: 8,
                     titleFont: {
-                        family: 'Inter',
+                        family: 'Montserrat',
                         size: 14,
                         weight: '600'
                     },
                     bodyFont: {
-                        family: 'Inter',
+                        family: 'Karla',
                         size: 13,
                         weight: '500'
                     }
