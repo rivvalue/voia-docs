@@ -241,6 +241,7 @@ p, .text-body {
     box-shadow: var(--shadow-lg);
     padding: var(--spacing-sm);
     margin-top: var(--spacing-sm);
+    z-index: 1050;
 }
 
 .dropdown-item {
