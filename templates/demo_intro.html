@@ -15,16 +15,10 @@
         background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
         padding: 5rem 0 3rem 0;
         border-bottom: 1px solid #f0f0f0;
-        margin: 0 auto;
-        max-width: 83.333333%; /* Same as col-lg-10 */
-        border-radius: 15px;
-        margin-bottom: 2rem;
     }
     
     .content-section {
         padding: 4rem 0;
-        margin: 0 auto;
-        max-width: 83.333333%; /* Same as col-lg-10 */
     }
     
     .info-card {
@@ -70,9 +64,6 @@
         background: #fafafa;
         padding: 4rem 0;
         border-top: 1px solid #f0f0f0;
-        margin: 2rem auto 0 auto;
-        max-width: 83.333333%; /* Same as col-lg-10 */
-        border-radius: 15px;
     }
     
     .continue-button {
@@ -177,7 +168,9 @@
 {% endblock %}
 
 {% block content %}
-<div class="demo-page">
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="demo-page">
     <!-- Hero Section -->
     <div class="hero-section">
         <div class="row">
@@ -345,6 +338,8 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
         </div>
     </div>
 </div>
