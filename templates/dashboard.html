@@ -8,9 +8,14 @@
 <div data-page="dashboard"></div>
 <div class="dashboard-header">
     <div class="d-flex justify-content-between align-items-start">
-        <div>
-            <h2>Analytics Dashboard</h2>
-            <p class="dashboard-subtitle">Comprehensive customer feedback insights and analysis</p>
+        <div class="d-flex align-items-center">
+            <div>
+                <h2>Analytics Dashboard</h2>
+                <p class="dashboard-subtitle">Comprehensive customer feedback insights and analysis</p>
+            </div>
+            <img src="{{ url_for('static', filename='images/archelo-logo.png') }}" 
+                 alt="Archelo Group Logo" 
+                 style="width: 96px !important; height: auto; margin-left: auto; margin-right: 1rem; opacity: 0.9;">
         </div>
         <div class="d-flex gap-2 flex-wrap">
             <button class="btn btn-outline-primary btn-sm" onclick="refreshData()">
