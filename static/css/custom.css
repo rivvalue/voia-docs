@@ -186,6 +186,7 @@ p, .text-body {
     padding: var(--spacing-md) 0;
     box-shadow: var(--shadow-sm);
     backdrop-filter: blur(10px);
+    z-index: 10000 !important;
 }
 
 .navbar-brand {
@@ -241,17 +242,17 @@ p, .text-body {
     box-shadow: var(--shadow-lg);
     padding: var(--spacing-sm);
     margin-top: var(--spacing-sm);
-    z-index: 9999 !important;
+    z-index: 10001 !important;
 }
 
 /* More specific targeting for navbar dropdowns */
 .navbar .dropdown-menu {
-    z-index: 9999 !important;
+    z-index: 10001 !important;
 }
 
 /* Bootstrap dropdown override */
 .dropdown-menu.show {
-    z-index: 9999 !important;
+    z-index: 10001 !important;
 }
 
 .dropdown-item {
