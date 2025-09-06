@@ -130,8 +130,16 @@
                     <div class="success-icon mb-4">
                         <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
                     </div>
-                    <h4 class="text-success mb-3">Research Session Complete!</h4>
+                    <h4 class="text-success mb-3">Thank you for sharing with us your feedback.</h4>
                     <p class="lead mb-2">Your feedback has been successfully analyzed by Voxa Intelligence.</p>
+                    
+                    <!-- Dashboard Button -->
+                    <div class="mb-4">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-chart-bar me-2"></i>View Analytics Dashboard
+                        </a>
+                    </div>
+                    
                     <p class="text-muted mb-4">This completes your demonstration of our Voice of Client Agent capabilities.</p>
                     
                     <!-- Next Steps Section -->
@@ -158,9 +166,6 @@
                     
                     <!-- Additional Options -->
                     <div class="mt-4">
-                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary me-2">
-                            <i class="fas fa-chart-bar me-2"></i>View Analytics Dashboard
-                        </a>
                         <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-home me-2"></i>Return Home
                         </a>
