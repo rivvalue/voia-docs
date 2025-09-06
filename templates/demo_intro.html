@@ -31,6 +31,11 @@
         overflow: hidden;
     }
     
+    .info-card > * {
+        position: relative;
+        z-index: 2;
+    }
+    
     .info-card::before {
         content: '';
         position: absolute;
@@ -55,10 +60,9 @@
     }
     
     .feature-grid {
-        display: grid;
-        grid-template-columns: auto 1fr;
-        gap: 1rem;
+        display: flex;
         align-items: flex-start;
+        gap: 1rem;
         margin-bottom: 1.5rem;
     }
     
@@ -81,7 +85,9 @@
         width: 100%;
         height: 100%;
         mix-blend-mode: normal;
-        opacity: 0;
+        opacity: 0.1;
+        background: #E13A44;
+        z-index: 1;
     }
     
     .expectation-dot {
@@ -89,7 +95,7 @@
         height: 8px;
         background: #E13A44;
         border-radius: 50%;
-        margin-top: 0.6rem;
+        margin-top: 0.5rem;
         margin-right: 1rem;
         flex-shrink: 0;
     }
