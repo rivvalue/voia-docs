@@ -241,7 +241,17 @@ p, .text-body {
     box-shadow: var(--shadow-lg);
     padding: var(--spacing-sm);
     margin-top: var(--spacing-sm);
-    z-index: 1050 !important;
+    z-index: 9999 !important;
+}
+
+/* More specific targeting for navbar dropdowns */
+.navbar .dropdown-menu {
+    z-index: 9999 !important;
+}
+
+/* Bootstrap dropdown override */
+.dropdown-menu.show {
+    z-index: 9999 !important;
 }
 
 .dropdown-item {
