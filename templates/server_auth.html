@@ -104,12 +104,7 @@
                     <!-- Server-side form submission -->
                     <form method="POST" action="{{ url_for('server_auth_generate') }}">
                         <div class="mb-4">
-                            <div class="d-flex align-items-center justify-content-center mb-4">
-                                <h4 class="text-center mb-0 me-3">Enter an email to generate a secure session token.</h4>
-                                <img src="{{ url_for('static', filename='images/archelo-logo.png') }}" 
-                                     alt="Archelo Group Logo" 
-                                     style="width: 32px !important; height: auto; opacity: 0.9;">
-                            </div>
+                            <h4 class="text-center mb-4">Enter an email to generate a secure session token.</h4>
                             <div class="text-center mb-4">
                                 <small class="text-muted">No spam, no subscriptions. Just a hands-on look at how Voxa works.</small>
                             </div>
