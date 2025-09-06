@@ -17,69 +17,6 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
     
-    <style>
-        .archelo-logo-top-right {
-            position: fixed;
-            z-index: 1000;
-            height: auto;
-            opacity: 0.85;
-            transition: opacity 0.3s ease;
-        }
-        
-        .archelo-logo-top-right:hover {
-            opacity: 1;
-        }
-        
-        /* Default positioning for most pages */
-        .archelo-logo-top-right {
-            top: 90px;
-            right: 25px;
-            width: 100px;
-        }
-        
-        /* Auth page - smaller, positioned to not interfere with form */
-        .page-auth .archelo-logo-top-right {
-            top: 100px;
-            right: 30px;
-            width: 85px;
-        }
-        
-        /* Survey pages - compact size */
-        .page-survey .archelo-logo-top-right {
-            top: 85px;
-            right: 20px;
-            width: 75px;
-        }
-        
-        /* Conversational survey - smaller and positioned lower */
-        .page-conversational .archelo-logo-top-right {
-            top: auto;
-            bottom: 100px;
-            right: 20px;
-            width: 70px;
-            opacity: 0.7;
-        }
-        
-        /* Dashboard - larger as it's part of the interface */
-        .page-dashboard .archelo-logo-top-right {
-            top: 75px;
-            right: 25px;
-            width: 120px;
-        }
-        
-        @media (max-width: 768px) {
-            .archelo-logo-top-right {
-                width: 60px !important;
-                top: 70px !important;
-                right: 15px !important;
-            }
-            
-            .page-conversational .archelo-logo-top-right {
-                bottom: 80px !important;
-                width: 55px !important;
-            }
-        }
-    </style>
 </head>
 <body class="{% block page_class %}{% endblock %}">
     <nav class="navbar navbar-expand-lg">
@@ -134,14 +71,6 @@
         </div>
     </nav>
 
-    <!-- Archelo Logo for all pages except home, demo intro, and dashboard -->
-    {% set current_endpoint = request.endpoint %}
-    {% if current_endpoint != 'index' and current_endpoint != 'demo_intro' and current_endpoint != 'dashboard' %}
-    <img src="{{ url_for('static', filename='images/archelo-logo.png') }}?v=20250905" 
-         alt="Archelo Group" 
-         class="archelo-logo-top-right"
-         style="width: 32px !important; height: auto;">
-    {% endif %}
 
     <main class="container mt-4">
         {% block content %}{% endblock %}
