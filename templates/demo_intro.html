@@ -4,178 +4,339 @@
 
 {% block extra_head %}
 <style>
-    .demo-intro-container {
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        border-radius: 15px;
-        padding: 3rem 2rem;
-        margin: 2rem 0;
-        border: 1px solid #dee2e6;
+    .demo-page {
+        background: #ffffff;
+        min-height: 100vh;
+        padding: 0;
     }
     
-    .section-divider {
-        border: none;
-        height: 2px;
-        background: linear-gradient(90deg, transparent, #E13A44, transparent);
-        margin: 2rem 0;
+    .hero-section {
+        background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+        padding: 5rem 0 3rem 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .content-section {
+        padding: 4rem 0;
+    }
+    
+    .info-card {
+        background: #ffffff;
+        border: 1px solid #f1f1f1;
+        border-radius: 16px;
+        padding: 2.5rem;
+        height: 100%;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .info-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: linear-gradient(90deg, #E13A44, #c12d37);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .info-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.08);
+        border-color: #e5e5e5;
+    }
+    
+    .info-card:hover::before {
+        transform: scaleX(1);
+    }
+    
+    .feature-grid {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 1.5rem;
     }
     
     .feature-icon {
-        font-size: 1.5rem;
-        margin-right: 0.5rem;
+        width: 40px;
+        height: 40px;
+        background: rgba(225, 58, 68, 0.08);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         color: #E13A44;
+        font-size: 1.1rem;
+    }
+    
+    .continue-section {
+        background: #fafafa;
+        padding: 4rem 0;
+        border-top: 1px solid #f0f0f0;
     }
     
     .continue-button {
-        background: linear-gradient(135deg, #E13A44 0%, #c12d37 100%);
+        background: #E13A44;
         border: none;
-        padding: 1rem 3rem;
-        font-size: 1.2rem;
+        padding: 1.2rem 3rem;
+        font-size: 1.1rem;
         font-weight: 600;
-        border-radius: 50px;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(225, 58, 68, 0.3);
+        border-radius: 12px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         text-decoration: none;
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
         color: white;
+        box-shadow: 0 8px 32px rgba(225, 58, 68, 0.2);
     }
     
     .continue-button:hover {
+        background: #c12d37;
         transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(225, 58, 68, 0.4);
+        box-shadow: 0 12px 40px rgba(225, 58, 68, 0.3);
         color: white;
         text-decoration: none;
     }
     
-    .highlight-box {
-        background: rgba(225, 58, 68, 0.05);
-        border-left: 4px solid #E13A44;
-        padding: 1.5rem;
-        margin: 1.5rem 0;
-        border-radius: 0 10px 10px 0;
-    }
-    
-    .emoji-header {
+    .section-title {
+        font-weight: 700;
+        color: #1a1a1a;
+        margin-bottom: 0.5rem;
         font-size: 1.5rem;
-        margin-bottom: 1rem;
     }
     
-    .feature-list {
-        list-style: none;
-        padding-left: 0;
+    .section-subtitle {
+        color: #6b7280;
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 2rem;
     }
     
-    .feature-list li {
-        margin: 0.75rem 0;
+    .company-logo {
+        width: 100px;
+        height: auto;
+        margin-bottom: 1.5rem;
+        opacity: 0.9;
+    }
+    
+    .feature-text {
+        color: #4b5563;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin: 0;
+    }
+    
+    .expectation-item {
         display: flex;
         align-items: flex-start;
+        margin-bottom: 1rem;
+        padding: 0.75rem 0;
     }
     
-    .feature-list li::before {
-        content: "•";
-        color: #E13A44;
-        font-weight: bold;
-        margin-right: 0.5rem;
-        margin-top: 0.25rem;
+    .expectation-dot {
+        width: 6px;
+        height: 6px;
+        background: #E13A44;
+        border-radius: 50%;
+        margin-top: 0.75rem;
+        margin-right: 1rem;
+        flex-shrink: 0;
     }
     
-    .arrow-item::before {
-        content: "→";
-        color: #E13A44;
-        font-weight: bold;
-        margin-right: 0.5rem;
-        margin-left: 1rem;
+    .page-header {
+        font-size: 3rem;
+        font-weight: 800;
+        color: #1a1a1a;
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.02em;
     }
     
-    .arrow-item {
-        margin-left: 1rem;
+    .page-subtitle {
+        font-size: 1.25rem;
+        color: #6b7280;
+        font-weight: 400;
+        line-height: 1.6;
+        max-width: 600px;
+        margin: 0 auto 1rem auto;
+    }
+    
+    .scenario-text {
+        font-size: 1.1rem;
+        color: #374151;
+        line-height: 1.7;
+        max-width: 700px;
+        margin: 0 auto;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <div class="demo-intro-container">
-                <div class="text-center mb-4">
-                    <h1 class="display-4 fw-bold mb-3">Welcome to Your Voxa Demo</h1>
-                    <p class="lead text-muted">
-                        You're about to experience how Voxa turns open-ended feedback into actionable insight — in minutes.
-                    </p>
-                    <p class="fs-5">
-                        In this simulation, you'll step into the role of a customer invited by <strong>Archelo Group</strong>, a growing workplace solutions provider, to share feedback on their existing product: <strong>ArcheloFlow</strong>.
-                    </p>
+<div class="demo-page">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="text-center">
+                        <h1 class="page-header">Welcome to Your Voxa Demo</h1>
+                        <p class="page-subtitle">
+                            You're about to experience how Voxa turns open-ended feedback into actionable insights — in minutes.
+                        </p>
+                        <p class="scenario-text">
+                            In this simulation, you'll step into the role of a customer invited by <strong>Archelo Group</strong>, a growing workplace solutions provider, to share feedback on their existing product: <strong>ArcheloFlow</strong>.
+                        </p>
+                    </div>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <hr class="section-divider">
+    <!-- Content Section -->
+    <div class="content-section">
+        <div class="container">
+            <div class="row g-4">
+                <!-- About Archelo Group -->
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <img src="{{ url_for('static', filename='images/archelo-logo.png') }}" 
+                             alt="Archelo Group Logo" 
+                             class="company-logo">
+                        <h3 class="section-title">About Archelo Group</h3>
+                        <p class="section-subtitle">
+                            Archelo Group helps mid-sized companies improve remote onboarding, internal communication, and employee engagement through its flagship platform, <strong>ArcheloFlow</strong>.
+                        </p>
+                        <p class="feature-text">
+                            As part of their continuous improvement process, they've launched a feedback initiative using Rivvalue's VoC agent — <strong>Voxa</strong> — and you've been invited to participate.
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- What You'll Do -->
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <h3 class="section-title">What You'll Do</h3>
+                        <p class="section-subtitle">
+                            Simple steps to experience the power of AI-driven feedback collection.
+                        </p>
+                        
+                        <div class="expectation-item">
+                            <div class="expectation-dot"></div>
+                            <div class="feature-text">Choose your preferred feedback method: AI-powered conversational flow or traditional survey</div>
+                        </div>
+                        
+                        <div class="expectation-item">
+                            <div class="expectation-dot"></div>
+                            <div class="feature-text">Answer a few quick questions, just like a real customer would</div>
+                        </div>
+                        
+                        <div class="expectation-item">
+                            <div class="expectation-dot"></div>
+                            <div class="feature-text">Explore the live insights dashboard, instantly generated from your input</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="highlight-box">
-                            <div class="d-flex align-items-start mb-3">
-                                <img src="{{ url_for('static', filename='images/archelo-logo.png') }}" 
-                                     alt="Archelo Group Logo" 
-                                     style="width: 120px; height: auto; margin-right: 1rem; margin-top: 0.5rem;">
-                                <div>
-                                    <h4 class="emoji-header mb-2">🏢 About Archelo Group</h4>
-                                </div>
+            <div class="row g-4 mt-3">
+                <!-- Real-time Insights -->
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <h3 class="section-title">What You'll See, in Real-time</h3>
+                        <p class="section-subtitle">
+                            Instant analytics and insights generated from your feedback.
+                        </p>
+                        
+                        <div class="feature-grid">
+                            <div class="feature-icon">
+                                <i class="fas fa-chart-line"></i>
                             </div>
-                            <p>
-                                Archelo Group helps mid-sized companies improve remote onboarding, internal communication, and employee engagement through its flagship platform, <strong>ArcheloFlow</strong>.
-                            </p>
-                            <p>
-                                As part of their continuous improvement process, they've launched a feedback initiative using Rivvalue's VoC agent — <strong>Voxa</strong> — and you've been invited to participate.
-                            </p>
+                            <div class="feature-text">NPS score & distribution</div>
                         </div>
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <div class="highlight-box">
-                            <h4 class="emoji-header">💬 What You'll Do</h4>
-                            <ul class="feature-list">
-                                <li>Choose your preferred feedback method:</li>
-                                <li class="arrow-item">A modern, AI-powered conversational flow, or</li>
-                                <li class="arrow-item">A traditional, question-based survey</li>
-                                <li>Answer a few quick questions, just like a real customer or employee would</li>
-                                <li>Explore the live insights dashboard, instantly generated from your input</li>
-                            </ul>
+                        
+                        <div class="feature-grid">
+                            <div class="feature-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="feature-text">Churn risk flags</div>
+                        </div>
+                        
+                        <div class="feature-grid">
+                            <div class="feature-icon">
+                                <i class="fas fa-rocket"></i>
+                            </div>
+                            <div class="feature-text">Growth opportunities</div>
+                        </div>
+                        
+                        <div class="feature-grid">
+                            <div class="feature-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="feature-text">Key sentiment & themes</div>
+                        </div>
+                        
+                        <div class="feature-grid">
+                            <div class="feature-icon">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div class="feature-text">Account-level takeaways</div>
                         </div>
                     </div>
                 </div>
-
-                <hr class="section-divider">
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <h4 class="emoji-header">⚡ What You'll See, in real-time:</h4>
-                        <ul class="feature-list">
-                            <li><i class="fas fa-chart-line feature-icon"></i>NPS score & distribution</li>
-                            <li><i class="fas fa-exclamation-triangle feature-icon"></i>Churn risk flags</li>
-                            <li><i class="fas fa-rocket feature-icon"></i>Growth opportunities</li>
-                            <li><i class="fas fa-brain feature-icon"></i>Key sentiment & themes</li>
-                            <li><i class="fas fa-building feature-icon"></i>Account-level takeaways</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <h4 class="emoji-header">⏱️ What to Expect</h4>
-                        <ul class="feature-list">
-                            <li><i class="fas fa-clock feature-icon"></i>Total time: Less than 2 minutes</li>
-                            <li><i class="fas fa-shield-alt feature-icon"></i>No login, no spam, no setup</li>
-                            <li><i class="fas fa-user-secret feature-icon"></i>All responses are anonymized and used only for demonstration</li>
-                        </ul>
+                
+                <!-- What to Expect -->
+                <div class="col-md-6">
+                    <div class="info-card">
+                        <h3 class="section-title">What to Expect</h3>
+                        <p class="section-subtitle">
+                            Quick, secure, and completely anonymous demo experience.
+                        </p>
+                        
+                        <div class="feature-grid">
+                            <div class="feature-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="feature-text">Total time: Less than 2 minutes</div>
+                        </div>
+                        
+                        <div class="feature-grid">
+                            <div class="feature-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div class="feature-text">No login, no spam, no setup</div>
+                        </div>
+                        
+                        <div class="feature-grid">
+                            <div class="feature-icon">
+                                <i class="fas fa-user-secret"></i>
+                            </div>
+                            <div class="feature-text">All responses are anonymized and used only for demonstration</div>
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
 
-                <hr class="section-divider">
-
-                <div class="text-center">
-                    <h4 class="emoji-header mb-4">🔐 Ready to Begin?</h4>
-                    <p class="mb-4">Click below to continue to the secure session setup and begin the survey experience.</p>
-                    
-                    <a href="{{ url_for('auth') }}" class="continue-button">
-                        <i class="fas fa-play me-2"></i>Continue →
-                    </a>
+    <!-- Continue Section -->
+    <div class="continue-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <div class="text-center">
+                        <h3 class="section-title mb-3">Ready to Begin?</h3>
+                        <p class="section-subtitle mb-4">
+                            Click below to continue to the secure session setup and begin the survey experience.
+                        </p>
+                        
+                        <a href="{{ url_for('auth') }}" class="continue-button">
+                            <i class="fas fa-play me-2"></i>Continue
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
