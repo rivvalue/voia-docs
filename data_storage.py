@@ -331,6 +331,8 @@ def get_dashboard_data():
             company_name = None
             opportunities = []
             risk_factors = []
+            max_tenure = None
+            total_commercial_value = 0
             
             # Get opportunities data
             if company_key in growth_opportunities_by_company:
@@ -368,6 +370,46 @@ def get_dashboard_data():
                     severity_order = {'Critical': 0, 'High': 1, 'Medium': 2, 'Low': 3}
                     risk_factors.sort(key=lambda x: (severity_order.get(x['severity'], 2), -x['count']))
             
+            # Get tenure and commercial value data for this company
+            company_responses = SurveyResponse.query.filter(
+                func.upper(SurveyResponse.company_name) == company_key
+            ).all()
+            
+            # Calculate max tenure and total commercial value
+            tenure_values = []
+            commercial_values = []
+            for resp in company_responses:
+                if resp.tenure_with_fc:
+                    # Extract numeric value from tenure string (e.g., "2-3 years" -> 3)
+                    try:
+                        tenure_str = resp.tenure_with_fc.lower()
+                        # Handle different formats: "2-3 years", "5+ years", "1 year", etc.
+                        if '-' in tenure_str:
+                            # Take the higher value from range
+                            parts = tenure_str.split('-')
+                            if len(parts) >= 2:
+                                high_val = ''.join(filter(str.isdigit, parts[1]))
+                                if high_val:
+                                    tenure_values.append(int(high_val))
+                        elif '+' in tenure_str:
+                            # For "5+ years", take the base number
+                            base_val = ''.join(filter(str.isdigit, tenure_str))
+                            if base_val:
+                                tenure_values.append(int(base_val))
+                        else:
+                            # For simple "3 years", extract the number
+                            num_val = ''.join(filter(str.isdigit, tenure_str))
+                            if num_val:
+                                tenure_values.append(int(num_val))
+                    except (ValueError, AttributeError):
+                        pass
+                
+                if resp.commercial_value:
+                    commercial_values.append(resp.commercial_value)
+            
+            max_tenure = max(tenure_values) if tenure_values else None
+            total_commercial_value = sum(commercial_values) if commercial_values else 0
+            
             # Only include companies with either opportunities or risk factors
             if opportunities or risk_factors:
                 # Calculate account balance
@@ -404,7 +446,9 @@ def get_dashboard_data():
                     'balance': balance,
                     'opportunity_count': opportunity_count,
                     'risk_count': len(risk_factors),
-                    'critical_risks': critical_risk_count
+                    'critical_risks': critical_risk_count,
+                    'max_tenure': max_tenure,
+                    'commercial_value': total_commercial_value
                 })
         
         # Sort accounts by priority (most critical risks first, then by balance)
