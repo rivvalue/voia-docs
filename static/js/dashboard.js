@@ -786,9 +786,6 @@ function populateAccountIntelligence() {
         account.opportunities.forEach(opp => {
             const normalizedType = normalizeTypeForVisual(opp.type);
             
-            // Debug logging to see what's happening
-            console.log(`Original type: "${opp.type}" -> Normalized: "${normalizedType}"`);
-            
             if (opportunityMap.has(normalizedType)) {
                 opportunityMap.get(normalizedType).count += (opp.count || 1);
             } else {
