@@ -117,6 +117,9 @@ function populateDashboard() {
     // Populate growth opportunities
     populateGrowthOpportunities();
     
+    // Populate account risk factors
+    populateAccountRiskFactors();
+    
     // Load survey responses table
     loadSurveyResponses();
     
@@ -621,6 +624,58 @@ function populateGrowthOpportunities() {
     
     if (html === '') {
         container.innerHTML = '<p class="text-muted">No growth opportunities identified.</p>';
+        return;
+    }
+    
+    container.innerHTML = html;
+}
+
+function populateAccountRiskFactors() {
+    const container = document.getElementById('accountRiskFactors');
+    const companiesWithRiskFactors = dashboardData.account_risk_factors || [];
+    
+    if (companiesWithRiskFactors.length === 0) {
+        container.innerHTML = '<p class="text-muted">No account risk factors identified.</p>';
+        return;
+    }
+    
+    const html = companiesWithRiskFactors.map(company => {
+        // Ensure company has a name and risk factors array
+        if (!company.company_name || !company.risk_factors || !Array.isArray(company.risk_factors)) {
+            return '';
+        }
+        
+        const riskFactorsHtml = company.risk_factors.map(risk => {
+            const severityClass = risk.severity === 'Critical' ? 'danger' : 
+                                 risk.severity === 'High' ? 'warning' : 
+                                 risk.severity === 'Medium' ? 'info' : 'secondary';
+            
+            return `
+                <div class="risk-factor-item mb-3 p-3 border rounded">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="risk-type mb-1">${risk.type}</h6>
+                        <span class="badge bg-${severityClass}">${risk.severity}</span>
+                    </div>
+                    <p class="risk-description text-muted mb-2">${risk.description}</p>
+                    <small class="risk-action text-primary"><strong>Recommended Action:</strong> ${risk.action}</small>
+                    ${risk.count > 1 ? `<div class="text-end"><small class="text-muted">${risk.count} occurrences</small></div>` : ''}
+                </div>
+            `;
+        }).join('');
+        
+        return `
+            <div class="company-risk-factors mb-4">
+                <h6 class="company-name text-dark mb-3">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    ${company.company_name}
+                </h6>
+                ${riskFactorsHtml}
+            </div>
+        `;
+    }).join('');
+    
+    if (html === '') {
+        container.innerHTML = '<p class="text-muted">No account risk factors identified.</p>';
         return;
     }
     
