@@ -1403,3 +1403,64 @@ a:hover {
     color: var(--gray-dark);
     font-weight: 500;
 }
+/* Visual Account Intelligence Indicators */
+.visual-indicator {
+    font-size: 0.85em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.visual-indicator:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.opportunity-indicator:hover {
+    background-color: rgba(40, 167, 69, 0.1) !important;
+}
+
+.risk-indicator:hover {
+    background-color: rgba(220, 53, 69, 0.1) !important;
+}
+
+.account-visual-card {
+    transition: all 0.2s ease;
+}
+
+.account-visual-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.account-health-legend {
+    font-size: 0.9em;
+}
+
+.account-health-legend .badge {
+    font-size: 0.8em;
+    padding: 0.25rem 0.5rem;
+}
+
+.account-indicators {
+    line-height: 1.4;
+}
+
+/* Responsive adjustments for visual indicators */
+@media (max-width: 768px) {
+    .visual-indicator {
+        font-size: 0.75em;
+        padding: 3px 6px !important;
+        margin: 1px !important;
+    }
+    
+    .account-health-legend {
+        font-size: 0.8em;
+    }
+    
+    .account-health-legend .badge {
+        font-size: 0.7em;
+        padding: 0.2rem 0.4rem;
+    }
+}
