@@ -3,6 +3,23 @@
 let dashboardData = null;
 let charts = {};
 
+// Mobile detection and responsive configuration
+function isMobile() {
+    return window.innerWidth <= 768;
+}
+
+function getMobileChartConfig() {
+    const isMob = isMobile();
+    return {
+        fontSize: isMob ? 10 : 14,
+        legendFontSize: isMob ? 9 : 13,
+        legendPosition: isMob ? 'bottom' : 'bottom',
+        legendPadding: isMob ? 10 : 20,
+        maintainAspectRatio: isMob ? true : false,
+        chartHeight: isMob ? '250px' : '300px'
+    };
+}
+
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Dashboard JavaScript loaded and DOM ready');
@@ -127,6 +144,9 @@ function createNpsChart() {
     // Professional color palette matching the design
     const chartColors = ['#E13A44', '#BDBDBD', '#8A8A8A']; // Red (Detractor), Medium Gray (Passive), Dark Gray (Promoter)
     
+    // Get mobile-responsive configuration
+    const config = getMobileChartConfig();
+    
     charts.npsChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -142,18 +162,18 @@ function createNpsChart() {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: config.maintainAspectRatio,
             cutout: '60%',
             plugins: {
                 legend: {
-                    position: 'bottom',
+                    position: config.legendPosition,
                     labels: {
                         color: '#000000',
                         usePointStyle: true,
-                        padding: 20,
+                        padding: config.legendPadding,
                         font: {
                             family: 'Karla',
-                            size: 15,
+                            size: config.legendFontSize,
                             weight: '500'
                         }
                     }
@@ -167,12 +187,12 @@ function createNpsChart() {
                     cornerRadius: 8,
                     titleFont: {
                         family: 'Montserrat',
-                        size: 14,
+                        size: config.fontSize,
                         weight: '600'
                     },
                     bodyFont: {
                         family: 'Karla',
-                        size: 13,
+                        size: config.fontSize - 1,
                         weight: '500'
                     }
                 }
@@ -199,6 +219,9 @@ function createSentimentChart() {
     const data = sentimentData.map(item => item.count);
     const colors = ['#8A8A8A', '#BDBDBD', '#E13A44']; // Dark Gray (Positive), Medium Gray (Neutral), Red (Negative)
     
+    // Get mobile-responsive configuration
+    const config = getMobileChartConfig();
+    
     charts.sentimentChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -213,7 +236,7 @@ function createSentimentChart() {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: config.maintainAspectRatio,
             plugins: {
                 legend: {
                     display: false
@@ -225,7 +248,7 @@ function createSentimentChart() {
                     ticks: {
                         color: '#000000',
                         font: {
-                            size: 14
+                            size: config.fontSize
                         }
                     },
                     grid: {
@@ -236,7 +259,7 @@ function createSentimentChart() {
                     ticks: {
                         color: '#000000',
                         font: {
-                            size: 14
+                            size: config.fontSize
                         }
                     },
                     grid: {
@@ -338,6 +361,9 @@ function createThemesChart() {
     const labels = sortedThemes.map(item => item.theme.charAt(0).toUpperCase() + item.theme.slice(1));
     const data = sortedThemes.map(item => item.count);
     
+    // Get mobile-responsive configuration
+    const config = getMobileChartConfig();
+    
     charts.themesChart = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -352,7 +378,7 @@ function createThemesChart() {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: config.maintainAspectRatio,
             indexAxis: 'y',
             plugins: {
                 legend: {
@@ -364,7 +390,7 @@ function createThemesChart() {
                     ticks: {
                         color: '#000000',
                         font: {
-                            size: 13
+                            size: config.fontSize - 1
                         },
                         maxTicksLimit: false,
                         autoSkip: false,
@@ -380,7 +406,7 @@ function createThemesChart() {
                     ticks: {
                         color: '#000000',
                         font: {
-                            size: 14
+                            size: config.fontSize
                         }
                     },
                     grid: {

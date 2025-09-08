@@ -1222,6 +1222,56 @@ canvas {
     box-shadow: inset 3px 0 0 var(--primary-red);
 }
 
+/* Mobile responsiveness for charts */
+@media (max-width: 768px) {
+    .chart-card {
+        margin-bottom: var(--spacing-lg);
+        border-radius: var(--radius-lg);
+    }
+    
+    .chart-card .card-body {
+        padding: var(--spacing-md) !important;
+    }
+    
+    .chart-card canvas {
+        max-height: 250px !important;
+    }
+    
+    .kpi-card {
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .kpi-value {
+        font-size: var(--font-size-2xl) !important;
+    }
+    
+    .kpi-label {
+        font-size: var(--font-size-xs) !important;
+    }
+    
+    .kpi-trend {
+        font-size: var(--font-size-xs) !important;
+    }
+    
+    .row .col-md-6, .row .col-lg-6 {
+        margin-bottom: var(--spacing-lg);
+    }
+    
+    .data-table .table-header h5 {
+        font-size: var(--font-size-base) !important;
+    }
+    
+    .table {
+        font-size: var(--font-size-sm) !important;
+    }
+    
+    .table th,
+    .table td {
+        font-size: var(--font-size-sm) !important;
+        padding: var(--spacing-sm) !important;
+    }
+}
+
 /* Enhanced Badge Styling */
 .badge {
     font-size: var(--font-size-xs);
