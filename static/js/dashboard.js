@@ -658,9 +658,9 @@ function getVisualIndicator(type, category) {
     };
     
     if (category === 'risk') {
-        return riskIcons[type] || { icon: '⚠️', color: '#8A8A8A', label: 'Risk' };
+        return riskIcons[type] || { icon: '⚠️', color: '#8A8A8A', label: type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) };
     } else {
-        return opportunityIcons[type] || { icon: '📈', color: '#8A8A8A', label: 'Opportunity' };
+        return opportunityIcons[type] || { icon: '📈', color: '#8A8A8A', label: type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) };
     }
 }
 
@@ -668,28 +668,70 @@ function normalizeTypeForVisual(originalType) {
     const typeMap = {
         // Risk mappings
         'pricing concerns': 'pricing_concerns',
+        'pricing concern': 'pricing_concerns',
         'product problem': 'product_problems',
         'product problems': 'product_problems',
+        'product issue': 'product_problems',
+        'product issues': 'product_problems',
         'service issue': 'service_issues',
-        'service issues': 'service_issues', 
+        'service issues': 'service_issues',
+        'service problem': 'service_issues',
+        'service problems': 'service_issues',
         'churn risk': 'churn_risk',
         'low satisfaction': 'low_satisfaction',
         'poor ratings': 'poor_ratings',
         'contract risk': 'contract_issues',
+        'contract issue': 'contract_issues',
+        'contract issues': 'contract_issues',
         'critical satisfaction': 'critical_satisfaction',
         'relationship threat': 'relationship_threat',
         
-        // Opportunity mappings
+        // Opportunity mappings - including variations that come from backend
         'upsell potential': 'upsell',
+        'upsell opportunity': 'upsell',
+        'upsell': 'upsell',
+        'cross-sell potential': 'cross_sell',
+        'cross-sell opportunity': 'cross_sell',
         'cross-sell': 'cross_sell',
+        'cross sell': 'cross_sell',
         'referral potential': 'referral',
+        'referral opportunity': 'referral',
+        'referral': 'referral',
+        'advocacy potential': 'advocacy',
+        'advocacy opportunity': 'advocacy',
         'advocacy': 'advocacy',
+        'expansion potential': 'expansion',
+        'expansion opportunity': 'expansion',
         'expansion ready': 'expansion',
+        'expansion': 'expansion',
         'high satisfaction': 'high_satisfaction',
-        'engagement opportunity': 'engagement'
+        'high nps': 'high_satisfaction',
+        'engagement opportunity': 'engagement',
+        'engagement potential': 'engagement',
+        'engagement': 'engagement'
     };
     
-    return typeMap[originalType.toLowerCase()] || originalType.toLowerCase().replace(/\s+/g, '_');
+    const normalized = typeMap[originalType.toLowerCase()];
+    if (normalized) {
+        return normalized;
+    }
+    
+    // If no exact match, try to categorize based on keywords
+    const lower = originalType.toLowerCase();
+    if (lower.includes('upsell')) return 'upsell';
+    if (lower.includes('cross') && lower.includes('sell')) return 'cross_sell';
+    if (lower.includes('referral')) return 'referral';
+    if (lower.includes('advocacy')) return 'advocacy';
+    if (lower.includes('expansion')) return 'expansion';
+    if (lower.includes('satisfaction') && lower.includes('high')) return 'high_satisfaction';
+    if (lower.includes('engagement')) return 'engagement';
+    if (lower.includes('pricing')) return 'pricing_concerns';
+    if (lower.includes('product')) return 'product_problems';
+    if (lower.includes('service')) return 'service_issues';
+    if (lower.includes('churn')) return 'churn_risk';
+    
+    // Last resort: convert to snake_case
+    return originalType.toLowerCase().replace(/\s+/g, '_');
 }
 
 function populateAccountIntelligence() {
@@ -743,6 +785,10 @@ function populateAccountIntelligence() {
         const opportunityMap = new Map();
         account.opportunities.forEach(opp => {
             const normalizedType = normalizeTypeForVisual(opp.type);
+            
+            // Debug logging to see what's happening
+            console.log(`Original type: "${opp.type}" -> Normalized: "${normalizedType}"`);
+            
             if (opportunityMap.has(normalizedType)) {
                 opportunityMap.get(normalizedType).count += (opp.count || 1);
             } else {
