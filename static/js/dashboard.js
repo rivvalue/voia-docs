@@ -1005,8 +1005,8 @@ function populateAccountRiskFactors() {
         
         const riskFactorsHtml = company.risk_factors.map(risk => {
             const severityClass = risk.severity === 'Critical' ? 'danger' : 
-                                 risk.severity === 'High' ? 'warning' : 
-                                 risk.severity === 'Medium' ? 'info' : 'secondary';
+                                 risk.severity === 'High' ? 'danger' : 
+                                 risk.severity === 'Medium' ? 'secondary' : 'secondary';
             
             return `
                 <div class="risk-factor-item mb-3 p-3 border rounded">
