@@ -102,7 +102,7 @@
                 </div>
                 <div class="col-12 col-sm-6 col-lg-auto">
                     <div class="kpi-card kpi-warning">
-                        <div class="kpi-value text-warning" id="highRiskCount">0</div>
+                        <div class="kpi-value text-danger" id="highRiskCount">0</div>
                         <div class="kpi-label">High Risk Accounts</div>
                         <div class="kpi-trend" id="highRiskTrend">Accounts requiring attention</div>
                     </div>
@@ -272,13 +272,13 @@
                                                 <td>{{ company.total_responses }}</td>
                                                 <td>{{ company.avg_nps }}</td>
                                                 <td>
-                                                    <span class="badge {% if company.company_nps > 20 %}bg-success{% elif company.company_nps >= -20 %}bg-warning{% else %}bg-danger{% endif %}">
+                                                    <span class="badge {% if company.company_nps > 20 %}bg-success{% elif company.company_nps >= -20 %}bg-secondary{% else %}bg-danger{% endif %}">
                                                         {% if company.company_nps > 0 %}+{% endif %}{{ company.company_nps }}
                                                     </span>
                                                 </td>
                                                 <td><small>{{ company.promoters }}P / {{ company.passives }}Pa / {{ company.detractors }}D</small></td>
                                                 <td>
-                                                    <span class="badge {% if company.risk_level == 'Low' %}bg-success{% elif company.risk_level == 'Medium' %}bg-warning{% elif company.risk_level == 'High' %}bg-danger{% elif company.risk_level == 'Critical' %}bg-dark{% else %}bg-secondary{% endif %}">
+                                                    <span class="badge {% if company.risk_level == 'Low' %}bg-success{% elif company.risk_level == 'Medium' %}bg-secondary{% elif company.risk_level == 'High' %}bg-danger{% elif company.risk_level == 'Critical' %}bg-dark{% else %}bg-secondary{% endif %}">
                                                         {{ company.risk_level }}
                                                     </span>
                                                 </td>
@@ -311,7 +311,7 @@
                                     <strong>Company NPS</strong> = (% Promoters - % Detractors) within each company |
                                     <strong>Risk Levels:</strong> 
                                     <span class="badge bg-success">Low (>20)</span>
-                                    <span class="badge bg-warning">Medium (-20 to 20)</span>
+                                    <span class="badge bg-secondary">Medium (-20 to 20)</span>
                                     <span class="badge bg-danger">High (≤-20)</span>
                                     <span class="badge bg-dark">Critical (≤-50)</span>
                                 </small>
@@ -367,7 +367,7 @@
                                     <strong>Tenure NPS</strong> = (% Promoters - % Detractors) within each tenure group |
                                     <strong>Risk Levels:</strong> 
                                     <span class="badge bg-success">Low (>20)</span>
-                                    <span class="badge bg-warning">Medium (-20 to 20)</span>
+                                    <span class="badge bg-secondary">Medium (-20 to 20)</span>
                                     <span class="badge bg-danger">High (≤-20)</span>
                                     <span class="badge bg-dark">Critical (≤-50)</span>
                                     <span class="badge bg-secondary">Insufficient Data (&lt;2 responses)</span>
