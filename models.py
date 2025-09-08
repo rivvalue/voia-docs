@@ -30,6 +30,7 @@ class SurveyResponse(db.Model):
     churn_risk_level = db.Column(db.String(20))  # Minimal, Low, Medium, High
     churn_risk_factors = db.Column(db.Text)  # JSON string
     growth_opportunities = db.Column(db.Text)  # JSON string
+    account_risk_factors = db.Column(db.Text)  # JSON string - Account-specific risk factors
     growth_factor = db.Column(db.Float)  # Growth factor from NPS lookup table
     growth_rate = db.Column(db.String(10))  # Expected organic growth rate (e.g., "25%")
     growth_range = db.Column(db.String(20))  # NPS range (e.g., "50-69")
@@ -61,6 +62,7 @@ class SurveyResponse(db.Model):
             'churn_risk_level': self.churn_risk_level,
             'churn_risk_factors': json.loads(self.churn_risk_factors) if self.churn_risk_factors else [],
             'growth_opportunities': json.loads(self.growth_opportunities) if self.growth_opportunities else [],
+            'account_risk_factors': json.loads(self.account_risk_factors) if self.account_risk_factors else [],
             'growth_factor': self.growth_factor,
             'growth_rate': self.growth_rate,
             'growth_range': self.growth_range,

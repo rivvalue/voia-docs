@@ -44,6 +44,9 @@ def analyze_survey_response(response_id):
         # Identify growth opportunities
         growth_opportunities = identify_growth_opportunities(response, combined_text)
         
+        # Identify account risk factors
+        account_risk_factors = identify_account_risk_factors(response, combined_text)
+        
         # Calculate growth factor based on NPS
         growth_factor_data = calculate_growth_factor(response.nps_score)
         
@@ -55,6 +58,7 @@ def analyze_survey_response(response_id):
         response.churn_risk_level = churn_analysis['risk_level']
         response.churn_risk_factors = json.dumps(churn_analysis['risk_factors'])
         response.growth_opportunities = json.dumps(growth_opportunities)
+        response.account_risk_factors = json.dumps(account_risk_factors)
         response.growth_factor = growth_factor_data['growth_factor']
         response.growth_rate = growth_factor_data['growth_rate']
         response.growth_range = growth_factor_data['range']
@@ -381,6 +385,80 @@ def identify_growth_opportunities(response, text):
         logger.warning(f"AI growth opportunity identification failed: {e}")
     
     return opportunities
+
+def identify_account_risk_factors(response, text):
+    """Identify account-specific risk factors from customer feedback"""
+    risk_factors = []
+    
+    # Risk factors from low NPS scores
+    if response.nps_score <= 3:
+        risk_factors.append({
+            'type': 'critical_satisfaction',
+            'description': 'Critical NPS score - immediate attention required',
+            'severity': 'Critical',
+            'action': 'Schedule urgent customer success call within 24 hours'
+        })
+    elif response.nps_score <= 6:
+        risk_factors.append({
+            'type': 'low_satisfaction',
+            'description': 'Low NPS score - customer dissatisfaction',
+            'severity': 'High',
+            'action': 'Engage customer success team for retention strategy'
+        })
+    
+    # Risk factors from low ratings
+    low_ratings = []
+    if response.satisfaction_rating and response.satisfaction_rating <= 2:
+        low_ratings.append("satisfaction")
+    if response.product_value_rating and response.product_value_rating <= 2:
+        low_ratings.append("product value")
+    if response.service_rating and response.service_rating <= 2:
+        low_ratings.append("service")
+    if response.pricing_rating and response.pricing_rating <= 2:
+        low_ratings.append("pricing")
+    
+    if low_ratings:
+        risk_factors.append({
+            'type': 'poor_ratings',
+            'description': f'Poor ratings in: {", ".join(low_ratings)}',
+            'severity': 'High',
+            'action': 'Address specific pain points in affected areas'
+        })
+    
+    # Risk factors from existing churn assessment
+    if response.churn_risk_level in ['High', 'Medium']:
+        risk_factors.append({
+            'type': 'churn_risk',
+            'description': f'{response.churn_risk_level} churn risk identified',
+            'severity': response.churn_risk_level,
+            'action': 'Implement retention measures and regular check-ins'
+        })
+    
+    # AI-based risk factor identification
+    try:
+        if openai_client and text.strip():
+            ai_response = openai_client.chat.completions.create(
+                model="gpt-4o",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are a customer success expert. Analyze feedback to identify specific account risk factors such as pricing concerns, service issues, product problems, competitor mentions, contract risks, or relationship threats. Return JSON with risk factors, severity levels, and recommended actions."
+                    },
+                    {
+                        "role": "user",
+                        "content": f"Identify account risk factors from this feedback (NPS: {response.nps_score}): {text}"
+                    }
+                ],
+                response_format={"type": "json_object"}
+            )
+            
+            ai_result = json.loads(ai_response.choices[0].message.content)
+            ai_risk_factors = ai_result.get('risk_factors', [])
+            risk_factors.extend(ai_risk_factors)
+    except Exception as e:
+        logger.warning(f"AI account risk factor identification failed: {e}")
+    
+    return risk_factors
 
 def calculate_growth_factor(nps_score):
     """Calculate growth factor based on NPS score using lookup table"""
