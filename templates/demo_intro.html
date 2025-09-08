@@ -48,10 +48,9 @@
     
     
     .feature-grid {
-        display: grid;
-        grid-template-columns: auto 1fr;
-        gap: 1rem;
+        display: flex;
         align-items: center;
+        gap: 1rem;
         margin-bottom: 1.5rem;
     }
     
@@ -65,11 +64,16 @@
         justify-content: center;
         color: #E13A44;
         font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+    
+    .bottom-card .feature-icon {
+        color: #E13A44;
     }
     
     .continue-section {
         background: #fafafa;
-        padding: 4rem 0;
+        padding: 4rem 0 6rem 0;
         border-top: 1px solid #f0f0f0;
         margin-top: 4rem;
     }
@@ -78,7 +82,7 @@
         background: #E13A44;
         border: none;
         padding: 1.2rem 3rem;
-        font-size: 1.1rem;
+        font-size: 1.3rem;
         font-weight: 600;
         border-radius: 12px;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -257,7 +261,7 @@
             <div class="row">
                 <!-- Real-time Insights -->
                 <div class="col-md-6" style="padding-right: 3rem;">
-                    <div class="info-card" style="height: 100%;">
+                    <div class="info-card bottom-card" style="height: 100%;">
                         <h3 class="section-title">What You'll See, in Real-time</h3>
                         <p class="section-subtitle">
                             Instant analytics and insights generated from your feedback.
@@ -302,7 +306,7 @@
                 
                 <!-- What to Expect -->
                 <div class="col-md-6" style="padding-left: 3rem;">
-                    <div class="info-card" style="height: 100%;">
+                    <div class="info-card bottom-card" style="height: 100%;">
                         <h3 class="section-title">What to Expect</h3>
                         <p class="section-subtitle">
                             Quick, secure, and completely anonymous demo experience.
