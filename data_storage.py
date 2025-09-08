@@ -235,6 +235,9 @@ def get_dashboard_data():
                         growth_opportunities_by_company[company_key]['display_name'] = company_name
                     
                     for opp in opportunities:
+                        # Skip if opportunity is not a dictionary (defensive coding)
+                        if not isinstance(opp, dict):
+                            continue
                         # Normalize the opportunity type to group similar ones
                         original_type = opp.get('type', 'unknown')
                         normalized_type = normalize_opportunity_type(original_type)
@@ -307,6 +310,9 @@ def get_dashboard_data():
                         account_risk_factors_by_company[company_key]['display_name'] = company_name
                     
                     for risk in risk_factors:
+                        # Skip if risk is not a dictionary (defensive coding)
+                        if not isinstance(risk, dict):
+                            continue
                         # Normalize the risk factor type to group similar ones
                         original_type = risk.get('type', 'unknown')
                         normalized_type = normalize_risk_factor_type(original_type)
@@ -378,6 +384,9 @@ def get_dashboard_data():
                 try:
                     themes = json.loads(response.key_themes)
                     for theme in themes:
+                        # Skip if theme is not a dictionary (defensive coding)
+                        if not isinstance(theme, dict):
+                            continue
                         original_theme_name = theme.get('theme', 'unknown')
                         consolidated_theme_name = consolidate_theme_name(original_theme_name)
                         if consolidated_theme_name not in all_themes:
