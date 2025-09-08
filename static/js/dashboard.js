@@ -136,7 +136,13 @@ function populateDashboard() {
 }
 
 function createNpsChart() {
-    const ctx = document.getElementById('npsChart').getContext('2d');
+    const chartElement = document.getElementById('npsChart');
+    if (!chartElement) {
+        console.warn('NPS chart element not found');
+        return;
+    }
+    
+    const ctx = chartElement.getContext('2d');
     
     // Destroy existing chart if it exists
     if (charts.npsChart) {
@@ -213,7 +219,13 @@ function createNpsChart() {
 }
 
 function createSentimentChart() {
-    const ctx = document.getElementById('sentimentChart').getContext('2d');
+    const chartElement = document.getElementById('sentimentChart');
+    if (!chartElement) {
+        console.warn('Sentiment chart element not found');
+        return;
+    }
+    
+    const ctx = chartElement.getContext('2d');
     
     // Destroy existing chart if it exists
     if (charts.sentimentChart) {
@@ -278,7 +290,13 @@ function createSentimentChart() {
 }
 
 function createRatingsChart() {
-    const ctx = document.getElementById('ratingsChart').getContext('2d');
+    const chartElement = document.getElementById('ratingsChart');
+    if (!chartElement) {
+        console.warn('Ratings chart element not found');
+        return;
+    }
+    
+    const ctx = chartElement.getContext('2d');
     
     // Destroy existing chart if it exists
     if (charts.ratingsChart) {
@@ -354,7 +372,13 @@ function createRatingsChart() {
 }
 
 function createThemesChart() {
-    const ctx = document.getElementById('themesChart').getContext('2d');
+    const chartElement = document.getElementById('themesChart');
+    if (!chartElement) {
+        console.warn('Themes chart element not found');
+        return;
+    }
+    
+    const ctx = chartElement.getContext('2d');
     
     // Destroy existing chart if it exists
     if (charts.themesChart) {
@@ -433,7 +457,13 @@ function createThemesChart() {
 }
 
 function createTenureChart() {
-    const ctx = document.getElementById('tenureChart').getContext('2d');
+    const chartElement = document.getElementById('tenureChart');
+    if (!chartElement) {
+        console.warn('Tenure chart element not found');
+        return;
+    }
+    
+    const ctx = chartElement.getContext('2d');
     
     // Destroy existing chart if it exists
     if (charts.tenure) {
@@ -486,7 +516,13 @@ function createTenureChart() {
 }
 
 function createGrowthFactorChart() {
-    const ctx = document.getElementById('growthFactorChart').getContext('2d');
+    const chartElement = document.getElementById('growthFactorChart');
+    if (!chartElement) {
+        console.warn('Growth factor chart element not found');
+        return;
+    }
+    
+    const ctx = chartElement.getContext('2d');
     
     // Destroy existing chart if it exists
     if (charts.growthFactor) {
