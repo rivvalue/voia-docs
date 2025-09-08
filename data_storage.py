@@ -265,69 +265,50 @@ def get_dashboard_data():
                 except json.JSONDecodeError:
                     continue
         
-        # Convert to list format for frontend - only include companies with actual opportunities
-        growth_opportunities = []
-        for company_key, company_data in growth_opportunities_by_company.items():
-            if company_data['opportunities_by_type']:  # Only add if there are actual opportunities
-                # Convert grouped opportunities back to list format
-                consolidated_opportunities = []
-                for type_key, type_data in company_data['opportunities_by_type'].items():
-                    consolidated_opportunities.append({
-                        'type': type_data['type'],
-                        'description': '; '.join(type_data['descriptions']),
-                        'action': '; '.join(type_data['actions']),
-                        'count': type_data['count']
-                    })
-                
-                # Sort by count (most frequent first) and then by type
-                consolidated_opportunities.sort(key=lambda x: (-x['count'], x['type']))
-                
-                growth_opportunities.append({
-                    'company_name': company_data['display_name'],
-                    'opportunities': consolidated_opportunities
-                })
+        # Unified Account Intelligence - combine growth opportunities and risk factors by company
+        unified_account_intelligence = {}
         
-        # Account risk factors summary - grouped by company (case-insensitive) and normalized by type
-        account_risk_factors_by_company = {}
+        # Collect all companies that have either opportunities or risk factors
+        all_companies = set()
+        all_companies.update(growth_opportunities_by_company.keys())
+        
+        # Process risk factors data
         responses_with_risk_factors = SurveyResponse.query.filter(
             SurveyResponse.account_risk_factors.isnot(None)
         ).all()
         
+        account_risk_factors_by_company = {}
         for response in responses_with_risk_factors:
             if response.account_risk_factors:
                 try:
                     risk_factors = json.loads(response.account_risk_factors)
                     company_name = response.company_name
-                    company_key = company_name.upper()  # Use uppercase for case-insensitive grouping
+                    company_key = company_name.upper()
+                    all_companies.add(company_key)
                     
                     if company_key not in account_risk_factors_by_company:
                         account_risk_factors_by_company[company_key] = {
-                            'display_name': company_name,  # Keep the actual company name for display
-                            'risk_factors_by_type': {}  # Group by normalized type
+                            'display_name': company_name,
+                            'risk_factors_by_type': {}
                         }
                     else:
-                        # Update display name to the most recent case version
                         account_risk_factors_by_company[company_key]['display_name'] = company_name
                     
                     for risk in risk_factors:
-                        # Skip if risk is not a dictionary (defensive coding)
                         if not isinstance(risk, dict):
                             continue
-                        # Normalize the risk factor type to group similar ones
                         original_type = risk.get('type', 'unknown')
                         normalized_type = normalize_risk_factor_type(original_type)
                         
-                        # Group risk factors by normalized type
                         if normalized_type not in account_risk_factors_by_company[company_key]['risk_factors_by_type']:
                             account_risk_factors_by_company[company_key]['risk_factors_by_type'][normalized_type] = {
-                                'type': normalized_type.replace('_', ' ').title(),  # Pretty format for display
+                                'type': normalized_type.replace('_', ' ').title(),
                                 'descriptions': [],
                                 'actions': [],
                                 'severities': [],
                                 'count': 0
                             }
                         
-                        # Add to the grouped risk factor
                         type_group = account_risk_factors_by_company[company_key]['risk_factors_by_type'][normalized_type]
                         description = risk.get('description', '')
                         action = risk.get('action', '')
@@ -344,18 +325,110 @@ def get_dashboard_data():
                 except json.JSONDecodeError:
                     continue
         
-        # Convert to list format for frontend - only include companies with actual risk factors
+        # Create unified account intelligence structure
+        account_intelligence = []
+        for company_key in all_companies:
+            company_name = None
+            opportunities = []
+            risk_factors = []
+            
+            # Get opportunities data
+            if company_key in growth_opportunities_by_company:
+                company_data = growth_opportunities_by_company[company_key]
+                company_name = company_data['display_name']
+                if company_data['opportunities_by_type']:
+                    for type_key, type_data in company_data['opportunities_by_type'].items():
+                        opportunities.append({
+                            'type': type_data['type'],
+                            'description': '; '.join(type_data['descriptions']),
+                            'action': '; '.join(type_data['actions']),
+                            'count': type_data['count']
+                        })
+                    opportunities.sort(key=lambda x: (-x['count'], x['type']))
+            
+            # Get risk factors data
+            if company_key in account_risk_factors_by_company:
+                company_data = account_risk_factors_by_company[company_key]
+                if not company_name:  # If not set from opportunities
+                    company_name = company_data['display_name']
+                if company_data['risk_factors_by_type']:
+                    for type_key, type_data in company_data['risk_factors_by_type'].items():
+                        severity_priority = {'Critical': 4, 'High': 3, 'Medium': 2, 'Low': 1}
+                        highest_severity = max(type_data['severities'], 
+                                             key=lambda s: severity_priority.get(s, 0)) if type_data['severities'] else 'Medium'
+                        
+                        risk_factors.append({
+                            'type': type_data['type'],
+                            'description': '; '.join(type_data['descriptions']),
+                            'action': '; '.join(type_data['actions']),
+                            'severity': highest_severity,
+                            'count': type_data['count']
+                        })
+                    
+                    severity_order = {'Critical': 0, 'High': 1, 'Medium': 2, 'Low': 3}
+                    risk_factors.sort(key=lambda x: (severity_order.get(x['severity'], 2), -x['count']))
+            
+            # Only include companies with either opportunities or risk factors
+            if opportunities or risk_factors:
+                # Calculate account balance
+                opportunity_count = len(opportunities)
+                critical_risk_count = sum(1 for r in risk_factors if r['severity'] == 'Critical')
+                high_risk_count = sum(1 for r in risk_factors if r['severity'] == 'High')
+                total_risk_score = critical_risk_count * 3 + high_risk_count * 2 + sum(1 for r in risk_factors if r['severity'] in ['Medium', 'Low'])
+                
+                # Determine balance
+                if critical_risk_count > 0 or total_risk_score > opportunity_count * 2:
+                    balance = 'risk_heavy'
+                elif opportunity_count > 0 and total_risk_score <= opportunity_count:
+                    balance = 'opportunity_heavy'
+                else:
+                    balance = 'balanced'
+                
+                account_intelligence.append({
+                    'company_name': company_name,
+                    'opportunities': opportunities,
+                    'risk_factors': risk_factors,
+                    'balance': balance,
+                    'opportunity_count': opportunity_count,
+                    'risk_count': len(risk_factors),
+                    'critical_risks': critical_risk_count
+                })
+        
+        # Sort accounts by priority (most critical risks first, then by balance)
+        priority_order = {'risk_heavy': 0, 'balanced': 1, 'opportunity_heavy': 2}
+        account_intelligence.sort(key=lambda x: (
+            priority_order.get(x['balance'], 1),
+            -x['critical_risks'],
+            -x['risk_count'],
+            -x['opportunity_count']
+        ))
+        
+        # Keep separate structures for backward compatibility (in case other parts still need them)
+        growth_opportunities = []
+        for company_key, company_data in growth_opportunities_by_company.items():
+            if company_data['opportunities_by_type']:
+                consolidated_opportunities = []
+                for type_key, type_data in company_data['opportunities_by_type'].items():
+                    consolidated_opportunities.append({
+                        'type': type_data['type'],
+                        'description': '; '.join(type_data['descriptions']),
+                        'action': '; '.join(type_data['actions']),
+                        'count': type_data['count']
+                    })
+                consolidated_opportunities.sort(key=lambda x: (-x['count'], x['type']))
+                growth_opportunities.append({
+                    'company_name': company_data['display_name'],
+                    'opportunities': consolidated_opportunities
+                })
+        
         account_risk_factors = []
         for company_key, company_data in account_risk_factors_by_company.items():
-            if company_data['risk_factors_by_type']:  # Only add if there are actual risk factors
-                # Convert grouped risk factors back to list format
+            if company_data['risk_factors_by_type']:
                 consolidated_risk_factors = []
                 for type_key, type_data in company_data['risk_factors_by_type'].items():
-                    # Determine highest severity for this risk type
                     severity_priority = {'Critical': 4, 'High': 3, 'Medium': 2, 'Low': 1}
                     highest_severity = max(type_data['severities'], 
                                          key=lambda s: severity_priority.get(s, 0)) if type_data['severities'] else 'Medium'
-                    
                     consolidated_risk_factors.append({
                         'type': type_data['type'],
                         'description': '; '.join(type_data['descriptions']),
@@ -363,11 +436,8 @@ def get_dashboard_data():
                         'severity': highest_severity,
                         'count': type_data['count']
                     })
-                
-                # Sort by severity (most critical first) and then by count
                 severity_order = {'Critical': 0, 'High': 1, 'Medium': 2, 'Low': 3}
                 consolidated_risk_factors.sort(key=lambda x: (severity_order.get(x['severity'], 2), -x['count']))
-                
                 account_risk_factors.append({
                     'company_name': company_data['display_name'],
                     'risk_factors': consolidated_risk_factors
@@ -451,6 +521,7 @@ def get_dashboard_data():
                 for row in sentiment_distribution
             ],
             'high_risk_accounts': high_risk_accounts,
+            'account_intelligence': account_intelligence,
             'growth_opportunities': growth_opportunities,
             'account_risk_factors': account_risk_factors,
             'key_themes': [
