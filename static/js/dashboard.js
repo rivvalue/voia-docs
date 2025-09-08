@@ -773,10 +773,13 @@ function populateAccountIntelligence() {
     
     const accountsHtml = accountData.map(account => {
         const balanceClass = account.balance === 'risk_heavy' ? 'border-danger' : 
-                           account.balance === 'opportunity_heavy' ? 'border-success' : 'border-warning';
+                           account.balance === 'opportunity_heavy' ? 'border-secondary' : 'border-warning';
         
-        const balanceIcon = account.balance === 'risk_heavy' ? '🔴' : 
-                          account.balance === 'opportunity_heavy' ? '🟢' : '🟡';
+        const balanceIcon = account.balance === 'risk_heavy' ? '●' : 
+                          account.balance === 'opportunity_heavy' ? '●' : '●';
+        
+        const balanceIconColor = account.balance === 'risk_heavy' ? '#E13A44' : 
+                               account.balance === 'opportunity_heavy' ? '#8A8A8A' : '#BDBDBD';
         
         const balanceLabel = account.balance === 'risk_heavy' ? 'High Risk' : 
                            account.balance === 'opportunity_heavy' ? 'High Potential' : 'Balanced';
@@ -851,8 +854,8 @@ function populateAccountIntelligence() {
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="mb-0">${account.company_name}</h5>
                         <div class="d-flex align-items-center">
-                            <span style="font-size: 1.2em; margin-right: 5px;">${balanceIcon}</span>
-                            <span class="badge bg-light text-dark">${balanceLabel}</span>
+                            <span style="font-size: 1.2em; margin-right: 5px; color: ${balanceIconColor};">${balanceIcon}</span>
+                            <span class="badge" style="background-color: ${balanceIconColor}20; color: ${balanceIconColor}; border: 1px solid ${balanceIconColor};">${balanceLabel}</span>
                         </div>
                     </div>
                     
