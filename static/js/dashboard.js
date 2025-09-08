@@ -288,6 +288,9 @@ function createRatingsChart() {
         ratings.pricing || 0
     ];
     
+    // Get mobile-responsive configuration
+    const config = getMobileChartConfig();
+    
     charts.ratingsChart = new Chart(ctx, {
         type: 'radar',
         data: {
@@ -305,11 +308,16 @@ function createRatingsChart() {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: config.maintainAspectRatio,
             plugins: {
                 legend: {
+                    position: config.legendPosition,
                     labels: {
-                        color: '#000000'
+                        color: '#000000',
+                        padding: config.legendPadding,
+                        font: {
+                            size: config.legendFontSize
+                        }
                     }
                 }
             },
@@ -321,7 +329,7 @@ function createRatingsChart() {
                         color: '#000000',
                         stepSize: 1,
                         font: {
-                            size: 14
+                            size: config.fontSize
                         }
                     },
                     grid: {
@@ -330,7 +338,7 @@ function createRatingsChart() {
                     pointLabels: {
                         color: '#000000',
                         font: {
-                            size: 14
+                            size: config.fontSize
                         }
                     }
                 }
