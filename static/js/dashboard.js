@@ -82,7 +82,7 @@ function loadCompanyNpsDataDirect() {
                         <td>${company.avg_nps}</td>
                         <td><span class="badge bg-primary">${company.company_nps}</span></td>
                         <td><small>${company.promoters}P / ${company.passives}Pa / ${company.detractors}D</small></td>
-                        <td><span class="badge bg-warning">${company.risk_level}</span></td>
+                        <td><span class="badge" style="background-color: #8A8A8A; color: white;">${company.risk_level}</span></td>
                         <td>${company.latest_response || 'N/A'}</td>
                         <td>${company.latest_churn_risk || 'N/A'}</td>
                     </tr>
@@ -876,7 +876,7 @@ function populateAccountIntelligence() {
     
     const accountsHtml = accountData.map(account => {
         const balanceClass = account.balance === 'risk_heavy' ? 'border-danger' : 
-                           account.balance === 'opportunity_heavy' ? 'border-secondary' : 'border-warning';
+                           account.balance === 'opportunity_heavy' ? 'border-secondary' : 'border-secondary';
         
         const balanceIcon = account.balance === 'risk_heavy' ? '●' : 
                           account.balance === 'opportunity_heavy' ? '●' : '●';
@@ -1024,7 +1024,7 @@ function populateAccountRiskFactors() {
         return `
             <div class="company-risk-factors mb-4">
                 <h6 class="company-name text-dark mb-3">
-                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    <i class="fas fa-exclamation-triangle me-2" style="color: #E13A44;"></i>
                     ${company.company_name}
                 </h6>
                 ${riskFactorsHtml}
@@ -1079,7 +1079,7 @@ function loadSurveyResponses(page = 1) {
                         <td>${response.tenure_with_fc || 'N/A'}</td>
                         <td>
                             <span class="badge ${response.nps_score >= 9 ? 'bg-success' : 
-                                                response.nps_score >= 7 ? 'bg-warning' : 'bg-danger'}">
+                                                response.nps_score >= 7 ? 'bg-secondary' : 'bg-danger'}">
                                 ${response.nps_score}
                             </span>
                         </td>
@@ -1343,7 +1343,7 @@ function populateTenureNpsTable(tenureData) {
         // Risk level badge styling
         let riskBadgeClass = 'bg-secondary';
         if (tenure.risk_level === 'Low') riskBadgeClass = 'bg-success';
-        else if (tenure.risk_level === 'Medium') riskBadgeClass = 'bg-warning';
+        else if (tenure.risk_level === 'Medium') riskBadgeClass = 'bg-secondary';
         else if (tenure.risk_level === 'High') riskBadgeClass = 'bg-danger';
         else if (tenure.risk_level === 'Critical') riskBadgeClass = 'bg-dark';
         else if (tenure.risk_level === 'Insufficient Data') riskBadgeClass = 'bg-secondary';
@@ -1351,7 +1351,7 @@ function populateTenureNpsTable(tenureData) {
         // Tenure NPS badge styling
         let npsBadgeClass = 'bg-secondary';
         if (tenure.tenure_nps > 20) npsBadgeClass = 'bg-success';
-        else if (tenure.tenure_nps >= -20) npsBadgeClass = 'bg-warning'; 
+        else if (tenure.tenure_nps >= -20) npsBadgeClass = 'bg-secondary'; 
         else npsBadgeClass = 'bg-danger';
         
         // Distribution breakdown
@@ -1429,14 +1429,14 @@ function populateCompanyNpsTable(companyData) {
         // Risk level badge styling
         let riskBadgeClass = 'bg-secondary';
         if (company.risk_level === 'Low') riskBadgeClass = 'bg-success';
-        else if (company.risk_level === 'Medium') riskBadgeClass = 'bg-warning';
+        else if (company.risk_level === 'Medium') riskBadgeClass = 'bg-secondary';
         else if (company.risk_level === 'High') riskBadgeClass = 'bg-danger';
         else if (company.risk_level === 'Critical') riskBadgeClass = 'bg-dark';
         
         // Company NPS badge styling
         let npsBadgeClass = 'bg-secondary';
         if (company.company_nps > 20) npsBadgeClass = 'bg-success';
-        else if (company.company_nps >= -20) npsBadgeClass = 'bg-warning'; 
+        else if (company.company_nps >= -20) npsBadgeClass = 'bg-secondary'; 
         else npsBadgeClass = 'bg-danger';
         
         // Distribution breakdown
