@@ -153,7 +153,7 @@ function createNpsChart() {
                         padding: 20,
                         font: {
                             family: 'Karla',
-                            size: 13,
+                            size: 15,
                             weight: '500'
                         }
                     }
@@ -296,13 +296,19 @@ function createRatingsChart() {
                     max: 5,
                     ticks: {
                         color: '#000000',
-                        stepSize: 1
+                        stepSize: 1,
+                        font: {
+                            size: 14
+                        }
                     },
                     grid: {
                         color: '#BDBDBD'
                     },
                     pointLabels: {
-                        color: '#000000'
+                        color: '#000000',
+                        font: {
+                            size: 14
+                        }
                     }
                 }
             }
@@ -354,7 +360,10 @@ function createThemesChart() {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        color: '#000000'
+                        color: '#000000',
+                        font: {
+                            size: 14
+                        }
                     },
                     grid: {
                         color: '#E9E8E4'
@@ -363,7 +372,10 @@ function createThemesChart() {
                 x: {
                     beginAtZero: true,
                     ticks: {
-                        color: '#000000'
+                        color: '#000000',
+                        font: {
+                            size: 14
+                        }
                     },
                     grid: {
                         color: '#E9E8E4'
@@ -416,7 +428,10 @@ function createTenureChart() {
                     position: 'bottom',
                     labels: {
                         color: '#000000',
-                        padding: 20
+                        padding: 20,
+                        font: {
+                            size: 14
+                        }
                     }
                 }
             }
@@ -477,7 +492,10 @@ function createGrowthFactorChart() {
                     beginAtZero: true,
                     ticks: {
                         color: '#000000',
-                        stepSize: 1
+                        stepSize: 1,
+                        font: {
+                            size: 14
+                        }
                     },
                     grid: {
                         color: '#E9E8E4'
@@ -485,7 +503,10 @@ function createGrowthFactorChart() {
                 },
                 x: {
                     ticks: {
-                        color: '#000000'
+                        color: '#000000',
+                        font: {
+                            size: 14
+                        }
                     },
                     grid: {
                         color: '#E9E8E4'

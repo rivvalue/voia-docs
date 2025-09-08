@@ -1186,7 +1186,7 @@ canvas {
     background-color: var(--primary-white);
     color: var(--primary-black);
     margin-bottom: 0;
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-lg);
 }
 
 .table th {
@@ -1194,7 +1194,7 @@ canvas {
     border-color: var(--medium-gray);
     color: var(--primary-black);
     font-weight: 600;
-    font-size: var(--font-size-xs);
+    font-size: var(--font-size-base);
     text-transform: uppercase;
     letter-spacing: var(--letter-spacing-wide);
     padding: var(--spacing-md) var(--spacing-lg);
