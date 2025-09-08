@@ -1659,11 +1659,6 @@ function checkAdminStatus() {
     }
 }
 
-function adminLogout() {
-    localStorage.removeItem('authToken');
-    resetAdminButton();
-    alert('Admin logged out successfully.');
-}
 
 function resetAdminButton() {
     const adminBtn = document.getElementById('adminLoginBtn');
@@ -1718,6 +1713,7 @@ function updateAdminUI(isAdmin, email = null) {
         adminBtn.innerHTML = `<i class="fas fa-check me-2"></i>Admin: ${email}`;
         adminBtn.classList.remove('btn-outline-secondary');
         adminBtn.classList.add('btn-success');
+        adminBtn.onclick = adminLogout; // Change to logout function
         
         // Show export button
         exportBtn.classList.remove('d-none');
@@ -1726,10 +1722,18 @@ function updateAdminUI(isAdmin, email = null) {
         adminBtn.innerHTML = '<i class="fas fa-key me-2"></i>Admin Login';
         adminBtn.classList.remove('btn-success');
         adminBtn.classList.add('btn-outline-secondary');
+        adminBtn.onclick = adminLogin; // Change back to login function
         
         // Hide export button
         exportBtn.classList.add('d-none');
     }
+}
+
+// Admin logout function
+function adminLogout() {
+    localStorage.removeItem('authToken');
+    updateAdminUI(false);
+    alert('Admin logged out successfully.');
 }
 
 document.addEventListener('DOMContentLoaded', checkAdminStatus);
