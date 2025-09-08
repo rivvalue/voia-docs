@@ -26,6 +26,10 @@ CORS(app,
      allow_headers=['Content-Type', 'Authorization', 'Accept'],
      supports_credentials=True)
 
+# Disable template caching for development
+app.config["TEMPLATES_AUTO_RELOAD"] = True
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
+
 # Configure the database
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///voc_agent.db")
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
