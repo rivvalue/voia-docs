@@ -195,7 +195,7 @@ function createSentimentChart() {
     }
     
     const sentimentData = dashboardData.sentiment_distribution || [];
-    const labels = sentimentData.map(item => item.sentiment);
+    const labels = sentimentData.map(item => item.sentiment.charAt(0).toUpperCase() + item.sentiment.slice(1));
     const data = sentimentData.map(item => item.count);
     const colors = ['#8A8A8A', '#BDBDBD', '#E13A44']; // Dark Gray (Positive), Medium Gray (Neutral), Red (Negative)
     
@@ -223,7 +223,10 @@ function createSentimentChart() {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        color: '#000000'
+                        color: '#000000',
+                        font: {
+                            size: 14
+                        }
                     },
                     grid: {
                         color: '#E9E8E4'
@@ -231,7 +234,10 @@ function createSentimentChart() {
                 },
                 x: {
                     ticks: {
-                        color: '#000000'
+                        color: '#000000',
+                        font: {
+                            size: 14
+                        }
                     },
                     grid: {
                         color: '#E9E8E4'

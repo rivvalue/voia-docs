@@ -207,7 +207,7 @@ p, .text-body {
 .navbar-nav .nav-link {
     color: var(--primary-white) !important;
     font-weight: 500;
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-lg);
     letter-spacing: var(--letter-spacing-wide);
     padding: var(--spacing-sm) var(--spacing-md) !important;
     border-radius: var(--radius-md);
@@ -1044,8 +1044,8 @@ small, .small {
     transition: all 0.3s ease;
 }
 
-.kpi-card.kpi-primary::before { background: var(--primary-red); }
-.kpi-card.kpi-success::before { background: var(--gray-dark); }
+.kpi-card.kpi-primary::before { background: var(--gray-dark); }
+.kpi-card.kpi-success::before { background: var(--primary-red); }
 .kpi-card.kpi-info::before { background: var(--medium-gray); }
 .kpi-card.kpi-warning::before { background: var(--primary-red); }
 
