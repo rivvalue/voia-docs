@@ -34,6 +34,7 @@ class SurveyResponse(db.Model):
     growth_factor = db.Column(db.Float)  # Growth factor from NPS lookup table
     growth_rate = db.Column(db.String(10))  # Expected organic growth rate (e.g., "25%")
     growth_range = db.Column(db.String(20))  # NPS range (e.g., "50-69")
+    commercial_value = db.Column(db.Float)  # Commercial value of the client in dollars
     
     # Metadata
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
@@ -66,6 +67,7 @@ class SurveyResponse(db.Model):
             'growth_factor': self.growth_factor,
             'growth_rate': self.growth_rate,
             'growth_range': self.growth_range,
+            'commercial_value': self.commercial_value,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'analyzed_at': self.analyzed_at.isoformat() if self.analyzed_at else None
         }

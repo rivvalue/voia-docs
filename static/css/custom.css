@@ -640,6 +640,21 @@ p, .text-body {
     color: var(--primary-black) !important;
 }
 
+/* Force override any external Bootstrap warning colors */
+.text-warning {
+    color: var(--primary-red) !important;
+}
+
+.border-warning {
+    border-color: var(--medium-gray) !important;
+}
+
+.alert-warning {
+    background-color: var(--light-gray) !important;
+    border-color: var(--medium-gray) !important;
+    color: var(--primary-black) !important;
+}
+
 /* Risk and theme indicators */
 .risk-high {
     color: var(--primary-red);
