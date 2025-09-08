@@ -114,6 +114,9 @@ function populateDashboard() {
     // Populate high risk accounts
     populateHighRiskAccounts();
     
+    // Populate unified account intelligence
+    populateAccountIntelligence();
+    
     // Populate growth opportunities
     populateGrowthOpportunities();
     
@@ -626,6 +629,90 @@ function populateGrowthOpportunities() {
         container.innerHTML = '<p class="text-muted">No growth opportunities identified.</p>';
         return;
     }
+    
+    container.innerHTML = html;
+}
+
+function populateAccountIntelligence() {
+    const container = document.getElementById('accountIntelligence');
+    const accountData = dashboardData.account_intelligence || [];
+    
+    if (accountData.length === 0) {
+        container.innerHTML = '<p class="text-muted">No account intelligence data available.</p>';
+        return;
+    }
+    
+    const html = accountData.map(account => {
+        const balanceClass = account.balance === 'risk_heavy' ? 'border-danger' : 
+                           account.balance === 'opportunity_heavy' ? 'border-success' : 'border-warning';
+        
+        const balanceIcon = account.balance === 'risk_heavy' ? 'fas fa-exclamation-triangle text-danger' : 
+                          account.balance === 'opportunity_heavy' ? 'fas fa-trending-up text-success' : 'fas fa-balance-scale text-warning';
+        
+        const balanceLabel = account.balance === 'risk_heavy' ? 'Risk Heavy' : 
+                           account.balance === 'opportunity_heavy' ? 'Opportunity Heavy' : 'Balanced';
+        
+        // Render opportunities
+        const opportunitiesHtml = account.opportunities.length > 0 ? `
+            <div class="mb-3">
+                <h6 class="text-success mb-2"><i class="fas fa-arrow-up me-1"></i> Growth Opportunities (${account.opportunities.length})</h6>
+                ${account.opportunities.map(opp => `
+                    <div class="opportunity-item mb-2 p-2 rounded" style="background-color: #d4edda; border-left: 3px solid #28a745;">
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-bold">${opp.type}</span>
+                            ${opp.count > 1 ? `<small class="text-muted">${opp.count}x</small>` : ''}
+                        </div>
+                        <small class="text-muted d-block">${opp.description}</small>
+                        <small class="text-primary"><strong>Action:</strong> ${opp.action}</small>
+                    </div>
+                `).join('')}
+            </div>
+        ` : '';
+        
+        // Render risk factors
+        const riskFactorsHtml = account.risk_factors.length > 0 ? `
+            <div class="mb-3">
+                <h6 class="text-danger mb-2"><i class="fas fa-arrow-down me-1"></i> Risk Factors (${account.risk_factors.length})</h6>
+                ${account.risk_factors.map(risk => {
+                    const severityClass = risk.severity === 'Critical' ? 'danger' : 
+                                         risk.severity === 'High' ? 'warning' : 
+                                         risk.severity === 'Medium' ? 'info' : 'secondary';
+                    const bgClass = risk.severity === 'Critical' ? '#f8d7da' : 
+                                   risk.severity === 'High' ? '#fff3cd' : 
+                                   risk.severity === 'Medium' ? '#d1ecf1' : '#e2e3e5';
+                    
+                    return `
+                        <div class="risk-item mb-2 p-2 rounded" style="background-color: ${bgClass}; border-left: 3px solid var(--bs-${severityClass});">
+                            <div class="d-flex justify-content-between">
+                                <span class="fw-bold">${risk.type}</span>
+                                <span class="badge bg-${severityClass}">${risk.severity}</span>
+                            </div>
+                            <small class="text-muted d-block">${risk.description}</small>
+                            <small class="text-primary"><strong>Action:</strong> ${risk.action}</small>
+                            ${risk.count > 1 ? `<div class="text-end"><small class="text-muted">${risk.count} occurrences</small></div>` : ''}
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        ` : '';
+        
+        return `
+            <div class="account-intelligence-card card mb-4 ${balanceClass}" style="border-width: 2px;">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">${account.company_name}</h5>
+                    <div class="d-flex align-items-center">
+                        <i class="${balanceIcon} me-2"></i>
+                        <span class="badge bg-light text-dark">${balanceLabel}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    ${opportunitiesHtml}
+                    ${riskFactorsHtml}
+                    ${!opportunitiesHtml && !riskFactorsHtml ? '<p class="text-muted">No specific opportunities or risks identified.</p>' : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
     
     container.innerHTML = html;
 }
