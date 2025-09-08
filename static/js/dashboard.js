@@ -637,14 +637,14 @@ function populateGrowthOpportunities() {
 function getVisualIndicator(type, category) {
     const riskIcons = {
         'pricing_concerns': { icon: '💰', color: '#E13A44', label: 'Pricing' },
-        'product_problems': { icon: '🔧', color: '#C52D36', label: 'Product' },
+        'product_problems': { icon: '🔧', color: '#E13A44', label: 'Product' },
         'service_issues': { icon: '📞', color: '#E13A44', label: 'Service' },
-        'churn_risk': { icon: '⚠️', color: '#8A8A8A', label: 'Churn Risk' },
-        'low_satisfaction': { icon: '📉', color: '#C52D36', label: 'Low NPS' },
+        'churn_risk': { icon: '⚠️', color: '#E13A44', label: 'Churn Risk' },
+        'low_satisfaction': { icon: '📉', color: '#E13A44', label: 'Low NPS' },
         'poor_ratings': { icon: '⭐', color: '#E13A44', label: 'Poor Ratings' },
-        'contract_issues': { icon: '📋', color: '#BDBDBD', label: 'Contract' },
-        'relationship_threat': { icon: '🔗', color: '#C52D36', label: 'Relationship' },
-        'critical_satisfaction': { icon: '🚨', color: '#8A8A8A', label: 'Critical' }
+        'contract_issues': { icon: '📋', color: '#E13A44', label: 'Contract' },
+        'relationship_threat': { icon: '🔗', color: '#E13A44', label: 'Relationship' },
+        'critical_satisfaction': { icon: '🚨', color: '#E13A44', label: 'Critical' }
     };
     
     const opportunityIcons = {
@@ -658,7 +658,7 @@ function getVisualIndicator(type, category) {
     };
     
     if (category === 'risk') {
-        return riskIcons[type] || { icon: '⚠️', color: '#8A8A8A', label: type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) };
+        return riskIcons[type] || { icon: '⚠️', color: '#E13A44', label: type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) };
     } else {
         return opportunityIcons[type] || { icon: '📈', color: '#8A8A8A', label: type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) };
     }
