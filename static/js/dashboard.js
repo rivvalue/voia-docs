@@ -68,12 +68,22 @@ function loadCompanyNpsDataDirect() {
 
 function loadDashboardData() {
     console.log('loadDashboardData called');
-    document.getElementById('loadingIndicator').classList.remove('d-none');
-    document.getElementById('dashboardContent').classList.add('d-none');
+    const loadingElement = document.getElementById('loadingIndicator');
+    const contentElement = document.getElementById('dashboardContent');
+    
+    if (loadingElement) loadingElement.classList.remove('d-none');
+    if (contentElement) contentElement.classList.add('d-none');
     
     fetch('/api/dashboard_data')
-        .then(response => response.json())
+        .then(response => {
+            console.log('API response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log('Dashboard data received:', Object.keys(data));
             if (data.error) {
                 throw new Error(data.error);
             }
@@ -81,13 +91,15 @@ function loadDashboardData() {
             dashboardData = data;
             populateDashboard();
             
-            document.getElementById('loadingIndicator').classList.add('d-none');
-            document.getElementById('dashboardContent').classList.remove('d-none');
+            if (loadingElement) loadingElement.classList.add('d-none');
+            if (contentElement) contentElement.classList.remove('d-none');
         })
         .catch(error => {
             console.error('Error loading dashboard data:', error);
-            document.getElementById('loadingIndicator').innerHTML = 
-                '<div class="alert alert-danger">Error loading dashboard data. Please try again.</div>';
+            if (loadingElement) {
+                loadingElement.innerHTML = 
+                    '<div class="alert alert-danger">Error loading dashboard data: ' + error.message + '</div>';
+            }
         });
 }
 
@@ -103,13 +115,9 @@ function populateDashboard() {
     const growthPotential = dashboardData.growth_factor_analysis?.total_growth_potential || 0;
     document.getElementById('growthPotential').textContent = Math.round(growthPotential * 100) + '%';
     
-    // Create charts
-    createNpsChart();
-    createSentimentChart();
-    createRatingsChart();
+    // Only create charts for the active (Overview) tab initially
+    // Other charts will be created when their tabs are shown
     createThemesChart();
-    createTenureChart();
-    createGrowthFactorChart();
     
     // Populate high risk accounts
     populateHighRiskAccounts();
