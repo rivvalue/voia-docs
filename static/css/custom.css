@@ -1320,17 +1320,19 @@ canvas {
     .nav-tabs {
         flex-wrap: wrap !important;
         border-bottom: 1px solid var(--medium-gray);
+        gap: 0.5rem;
     }
     
     .nav-tabs .nav-link {
-        padding: var(--spacing-md) var(--spacing-sm) !important;
+        padding: var(--spacing-lg) var(--spacing-md) !important;
+        margin: 0 0.25rem !important;
         font-size: var(--font-size-sm) !important;
         white-space: nowrap;
         min-width: auto;
     }
     
     .nav-tabs .nav-link i {
-        margin-right: 4px !important;
+        margin-right: 6px !important;
     }
 }
 
@@ -1365,7 +1367,8 @@ canvas {
     
     /* Tab text even smaller on tiny screens */
     .nav-tabs .nav-link {
-        padding: var(--spacing-sm) 6px !important;
+        padding: var(--spacing-md) var(--spacing-sm) !important;
+        margin: 0 0.125rem !important;
         font-size: var(--font-size-xs) !important;
     }
     
@@ -1581,7 +1584,8 @@ a:hover {
     border: none;
     border-bottom: 3px solid transparent;
     background: none;
-    padding: 0.75rem 1.5rem;
+    padding: 1rem 2rem;
+    margin: 0 0.5rem;
     transition: all 0.3s ease;
 }
 
