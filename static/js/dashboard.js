@@ -633,34 +633,34 @@ function populateGrowthOpportunities() {
     container.innerHTML = html;
 }
 
-// Visual mapping for risk factors and opportunities
+// Visual mapping for risk factors and opportunities using established color palette
 function getVisualIndicator(type, category) {
     const riskIcons = {
-        'pricing_concerns': { icon: '💰', color: '#ff6b35', label: 'Pricing' },
-        'product_problems': { icon: '🔧', color: '#dc3545', label: 'Product' },
-        'service_issues': { icon: '📞', color: '#ff8c00', label: 'Service' },
-        'churn_risk': { icon: '⚠️', color: '#8b0000', label: 'Churn Risk' },
-        'low_satisfaction': { icon: '📉', color: '#dc3545', label: 'Low Satisfaction' },
-        'poor_ratings': { icon: '⭐', color: '#ff6b35', label: 'Poor Ratings' },
-        'contract_issues': { icon: '📋', color: '#ffc107', label: 'Contract' },
-        'relationship_threat': { icon: '🔗', color: '#dc3545', label: 'Relationship' },
-        'critical_satisfaction': { icon: '🚨', color: '#8b0000', label: 'Critical' }
+        'pricing_concerns': { icon: '💰', color: '#E13A44', label: 'Pricing' },
+        'product_problems': { icon: '🔧', color: '#C52D36', label: 'Product' },
+        'service_issues': { icon: '📞', color: '#E13A44', label: 'Service' },
+        'churn_risk': { icon: '⚠️', color: '#8A8A8A', label: 'Churn Risk' },
+        'low_satisfaction': { icon: '📉', color: '#C52D36', label: 'Low NPS' },
+        'poor_ratings': { icon: '⭐', color: '#E13A44', label: 'Poor Ratings' },
+        'contract_issues': { icon: '📋', color: '#BDBDBD', label: 'Contract' },
+        'relationship_threat': { icon: '🔗', color: '#C52D36', label: 'Relationship' },
+        'critical_satisfaction': { icon: '🚨', color: '#8A8A8A', label: 'Critical' }
     };
     
     const opportunityIcons = {
-        'upsell': { icon: '📈', color: '#28a745', label: 'Upsell' },
-        'cross_sell': { icon: '🎯', color: '#007bff', label: 'Cross-sell' },
-        'referral': { icon: '👥', color: '#20c997', label: 'Referral' },
-        'advocacy': { icon: '📢', color: '#198754', label: 'Advocacy' },
-        'expansion': { icon: '🚀', color: '#0d6efd', label: 'Expansion' },
-        'high_satisfaction': { icon: '⭐', color: '#ffd700', label: 'High NPS' },
-        'engagement': { icon: '🤝', color: '#20c997', label: 'Engagement' }
+        'upsell': { icon: '📈', color: '#8A8A8A', label: 'Upsell' },
+        'cross_sell': { icon: '🎯', color: '#BDBDBD', label: 'Cross-sell' },
+        'referral': { icon: '👥', color: '#8A8A8A', label: 'Referral' },
+        'advocacy': { icon: '📢', color: '#BDBDBD', label: 'Advocacy' },
+        'expansion': { icon: '🚀', color: '#8A8A8A', label: 'Expansion' },
+        'high_satisfaction': { icon: '⭐', color: '#E9E8E4', label: 'High NPS' },
+        'engagement': { icon: '🤝', color: '#BDBDBD', label: 'Engagement' }
     };
     
     if (category === 'risk') {
-        return riskIcons[type] || { icon: '⚠️', color: '#6c757d', label: 'Risk' };
+        return riskIcons[type] || { icon: '⚠️', color: '#8A8A8A', label: 'Risk' };
     } else {
-        return opportunityIcons[type] || { icon: '📈', color: '#28a745', label: 'Opportunity' };
+        return opportunityIcons[type] || { icon: '📈', color: '#8A8A8A', label: 'Opportunity' };
     }
 }
 
@@ -739,30 +739,64 @@ function populateAccountIntelligence() {
         const balanceLabel = account.balance === 'risk_heavy' ? 'High Risk' : 
                            account.balance === 'opportunity_heavy' ? 'High Potential' : 'Balanced';
         
-        // Create visual indicators for opportunities
-        const opportunityIndicators = account.opportunities.map(opp => {
+        // Consolidate opportunities by type to avoid duplicates
+        const opportunityMap = new Map();
+        account.opportunities.forEach(opp => {
             const normalizedType = normalizeTypeForVisual(opp.type);
-            const visual = getVisualIndicator(normalizedType, 'opportunity');
+            if (opportunityMap.has(normalizedType)) {
+                opportunityMap.get(normalizedType).count += (opp.count || 1);
+            } else {
+                opportunityMap.set(normalizedType, {
+                    type: opp.type,
+                    normalizedType: normalizedType,
+                    count: opp.count || 1
+                });
+            }
+        });
+        
+        // Create visual indicators for consolidated opportunities
+        const opportunityIndicators = Array.from(opportunityMap.values()).map(opp => {
+            const visual = getVisualIndicator(opp.normalizedType, 'opportunity');
             return `
                 <span class="visual-indicator opportunity-indicator" 
                       style="background-color: ${visual.color}20; border: 2px solid ${visual.color}; padding: 4px 8px; margin: 2px; border-radius: 12px; display: inline-block;"
-                      title="${opp.type}${opp.count > 1 ? ` (${opp.count}x)` : ''}">
+                      title="${opp.type}${opp.count > 1 ? ` (${opp.count} opportunities)` : ''}">
                     ${visual.icon} ${visual.label}${opp.count > 1 ? ` (${opp.count})` : ''}
                 </span>
             `;
         }).join('');
         
-        // Create visual indicators for risks  
-        const riskIndicators = account.risk_factors.map(risk => {
+        // Consolidate risks by type to avoid duplicates
+        const riskMap = new Map();
+        account.risk_factors.forEach(risk => {
             const normalizedType = normalizeTypeForVisual(risk.type);
-            const visual = getVisualIndicator(normalizedType, 'risk');
+            if (riskMap.has(normalizedType)) {
+                riskMap.get(normalizedType).count += (risk.count || 1);
+                // Keep the highest severity level
+                const severityPriority = { 'Critical': 4, 'High': 3, 'Medium': 2, 'Low': 1 };
+                if (severityPriority[risk.severity] > severityPriority[riskMap.get(normalizedType).severity]) {
+                    riskMap.get(normalizedType).severity = risk.severity;
+                }
+            } else {
+                riskMap.set(normalizedType, {
+                    type: risk.type,
+                    normalizedType: normalizedType,
+                    severity: risk.severity,
+                    count: risk.count || 1
+                });
+            }
+        });
+        
+        // Create visual indicators for consolidated risks  
+        const riskIndicators = Array.from(riskMap.values()).map(risk => {
+            const visual = getVisualIndicator(risk.normalizedType, 'risk');
             const intensityMap = { 'Critical': '●●●', 'High': '●●', 'Medium': '●', 'Low': '○' };
             const intensity = intensityMap[risk.severity] || '●';
             
             return `
                 <span class="visual-indicator risk-indicator" 
                       style="background-color: ${visual.color}20; border: 2px solid ${visual.color}; padding: 4px 8px; margin: 2px; border-radius: 12px; display: inline-block;"
-                      title="${risk.type} - ${risk.severity}${risk.count > 1 ? ` (${risk.count}x)` : ''}">
+                      title="${risk.type} - ${risk.severity}${risk.count > 1 ? ` (${risk.count} instances)` : ''}">
                     ${visual.icon} ${visual.label} ${intensity}${risk.count > 1 ? ` (${risk.count})` : ''}
                 </span>
             `;
