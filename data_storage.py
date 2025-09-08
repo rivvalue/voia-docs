@@ -376,11 +376,24 @@ def get_dashboard_data():
                 high_risk_count = sum(1 for r in risk_factors if r['severity'] == 'High')
                 total_risk_score = critical_risk_count * 3 + high_risk_count * 2 + sum(1 for r in risk_factors if r['severity'] in ['Medium', 'Low'])
                 
-                # Determine balance
+                # Check for critical business risks that prevent "High Potential" classification
+                critical_business_risks = sum(1 for r in risk_factors if any(
+                    risk_type in r.get('type', '').lower() 
+                    for risk_type in ['churn', 'pricing', 'product_problems', 'service_issues']
+                ))
+                
+                # Determine balance with stricter criteria for High Potential
                 if critical_risk_count > 0 or total_risk_score > opportunity_count * 2:
                     balance = 'risk_heavy'
-                elif opportunity_count > 0 and total_risk_score <= opportunity_count:
+                elif critical_business_risks > 0:
+                    # Accounts with churn risk, pricing issues, product problems, or service issues cannot be High Potential
+                    balance = 'balanced' if opportunity_count > total_risk_score else 'risk_heavy'
+                elif opportunity_count > 1 and total_risk_score == 0:
+                    # Only accounts with multiple opportunities and NO risk factors can be High Potential
                     balance = 'opportunity_heavy'
+                elif opportunity_count > 0 and total_risk_score == 0:
+                    # Single opportunity with no risks = Balanced
+                    balance = 'balanced'
                 else:
                     balance = 'balanced'
                 
