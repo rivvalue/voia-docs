@@ -31,6 +31,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 1000);
     
     loadDashboardData();
+    
+    // Check admin status on page load
+    checkAdminStatus();
 });
 
 // Direct company NPS data loading as fallback
@@ -1458,24 +1461,16 @@ function exportData() {
     .then(response => {
         if (response.status === 403) {
             alert('Admin access required. This feature is only available to administrators.');
-            // Clear invalid token
+            // Clear invalid token and hide export button
             localStorage.removeItem('authToken');
-            // Reset admin button
-            const adminBtn = document.getElementById('adminLoginBtn');
-            adminBtn.innerHTML = '<i class="fas fa-key me-2"></i>Admin Login';
-            adminBtn.classList.remove('btn-success');
-            adminBtn.classList.add('btn-outline-secondary');
+            updateAdminUI(false);
             return null;
         }
         if (response.status === 401) {
             alert('Authentication failed. Please log in with an admin account.');
-            // Clear invalid token
+            // Clear invalid token and hide export button
             localStorage.removeItem('authToken');
-            // Reset admin button
-            const adminBtn = document.getElementById('adminLoginBtn');
-            adminBtn.innerHTML = '<i class="fas fa-key me-2"></i>Admin Login';
-            adminBtn.classList.remove('btn-success');
-            adminBtn.classList.add('btn-outline-secondary');
+            updateAdminUI(false);
             return null;
         }
         if (!response.ok) {
@@ -1611,11 +1606,8 @@ function adminLogin() {
                 if (verifyData.valid && verifyData.is_admin) {
                     localStorage.setItem('authToken', data.token);
                     alert(`Admin login successful for ${email}! You can now export data.`);
-                    // Update button text
-                    const adminBtn = document.getElementById('adminLoginBtn');
-                    adminBtn.innerHTML = `<i class="fas fa-check me-2"></i>Admin: ${email}`;
-                    adminBtn.classList.remove('btn-outline-secondary');
-                    adminBtn.classList.add('btn-success');
+                    // Update button text and show export button
+                    updateAdminUI(true, email);
                 } else {
                     alert(`Access denied. ${email} is not an admin user.`);
                 }
@@ -1685,4 +1677,59 @@ function resetAdminButton() {
 setInterval(refreshData, 5 * 60 * 1000);
 
 // Check admin status on page load
+function checkAdminStatus() {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        updateAdminUI(false);
+        return;
+    }
+    
+    // Verify the token is still valid
+    fetch('/auth/verify-token', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token: token })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.valid && data.is_admin) {
+            updateAdminUI(true, data.email || 'Admin');
+        } else {
+            localStorage.removeItem('authToken');
+            updateAdminUI(false);
+        }
+    })
+    .catch(error => {
+        console.error('Error verifying token:', error);
+        localStorage.removeItem('authToken');
+        updateAdminUI(false);
+    });
+}
+
+// Update admin UI elements
+function updateAdminUI(isAdmin, email = null) {
+    const adminBtn = document.getElementById('adminLoginBtn');
+    const exportBtn = document.getElementById('exportDataBtn');
+    
+    if (isAdmin && email) {
+        // Show admin logged in state
+        adminBtn.innerHTML = `<i class="fas fa-check me-2"></i>Admin: ${email}`;
+        adminBtn.classList.remove('btn-outline-secondary');
+        adminBtn.classList.add('btn-success');
+        
+        // Show export button
+        exportBtn.classList.remove('d-none');
+    } else {
+        // Show logged out state
+        adminBtn.innerHTML = '<i class="fas fa-key me-2"></i>Admin Login';
+        adminBtn.classList.remove('btn-success');
+        adminBtn.classList.add('btn-outline-secondary');
+        
+        // Hide export button
+        exportBtn.classList.add('d-none');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', checkAdminStatus);
