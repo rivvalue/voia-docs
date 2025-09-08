@@ -361,14 +361,12 @@ function createThemesChart() {
             },
             scales: {
                 y: {
-                    beginAtZero: true,
                     ticks: {
                         color: '#000000',
                         font: {
                             size: 14
                         },
-                        maxTicksLimit: 10,
-                        stepSize: 1
+                        maxTicksLimit: 10
                     },
                     grid: {
                         color: '#E9E8E4'
