@@ -332,8 +332,11 @@ function createThemesChart() {
         return;
     }
     
-    const labels = themes.map(item => item.theme);
-    const data = themes.map(item => item.count);
+    // Sort themes by count (descending) and take top 10
+    const sortedThemes = themes.sort((a, b) => b.count - a.count).slice(0, 10);
+    
+    const labels = sortedThemes.map(item => item.theme.charAt(0).toUpperCase() + item.theme.slice(1));
+    const data = sortedThemes.map(item => item.count);
     
     charts.themesChart = new Chart(ctx, {
         type: 'bar',
@@ -363,7 +366,9 @@ function createThemesChart() {
                         color: '#000000',
                         font: {
                             size: 14
-                        }
+                        },
+                        maxTicksLimit: 10,
+                        stepSize: 1
                     },
                     grid: {
                         color: '#E9E8E4'

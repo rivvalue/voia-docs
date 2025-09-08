@@ -332,8 +332,8 @@ def get_dashboard_data():
             'high_risk_accounts': high_risk_accounts,
             'growth_opportunities': growth_opportunities,
             'key_themes': [
-                {'theme': theme, 'count': data['count']}
-                for theme, data in all_themes.items()
+                {'theme': theme.capitalize(), 'count': data['count']}
+                for theme, data in sorted(all_themes.items(), key=lambda x: x[1]['count'], reverse=True)[:10]
             ],
             'average_ratings': {
                 'satisfaction': round(avg_satisfaction, 1),
