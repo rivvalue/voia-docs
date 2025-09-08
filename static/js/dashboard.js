@@ -364,9 +364,12 @@ function createThemesChart() {
                     ticks: {
                         color: '#000000',
                         font: {
-                            size: 14
+                            size: 13
                         },
-                        maxTicksLimit: 10
+                        maxTicksLimit: false,
+                        autoSkip: false,
+                        maxRotation: 0,
+                        minRotation: 0
                     },
                     grid: {
                         color: '#E9E8E4'
