@@ -1224,43 +1224,86 @@ canvas {
     box-shadow: inset 3px 0 0 var(--primary-red);
 }
 
-/* Mobile responsiveness for charts */
+/* Enhanced Mobile Responsiveness */
 @media (max-width: 768px) {
+    /* Dashboard Header Mobile Fixes */
+    .dashboard-header {
+        padding: var(--spacing-lg) !important;
+    }
+    
+    .dashboard-header .d-flex {
+        align-items: center !important;
+    }
+    
+    .dashboard-title-section {
+        flex: 1 1 100%;
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .dashboard-actions {
+        flex: 1 1 100%;
+        justify-content: center !important;
+    }
+    
+    .dashboard-btn {
+        min-width: 44px !important; /* Touch target size */
+        height: 44px !important;
+        padding: var(--spacing-sm) !important;
+        font-size: var(--font-size-base) !important;
+        border-radius: var(--radius-lg) !important;
+    }
+    
+    /* Chart Enhancements for Mobile */
     .chart-card {
         margin-bottom: var(--spacing-lg);
         border-radius: var(--radius-lg);
     }
     
     .chart-card .card-body {
-        padding: var(--spacing-md) !important;
+        padding: var(--spacing-lg) !important;
     }
     
     .chart-card canvas {
-        max-height: 250px !important;
+        max-height: 300px !important;
+        min-height: 250px !important;
     }
     
+    .chart-container {
+        position: relative;
+        height: 300px !important;
+        margin: var(--spacing-sm) 0;
+    }
+    
+    /* KPI Cards Mobile */
     .kpi-card {
         margin-bottom: var(--spacing-md);
+        min-height: 120px;
+        padding: var(--spacing-lg) !important;
     }
     
     .kpi-value {
-        font-size: var(--font-size-2xl) !important;
+        font-size: var(--font-size-3xl) !important;
+        font-weight: 700 !important;
     }
     
     .kpi-label {
-        font-size: var(--font-size-xs) !important;
+        font-size: var(--font-size-sm) !important;
+        font-weight: 600 !important;
     }
     
     .kpi-trend {
-        font-size: var(--font-size-xs) !important;
+        font-size: var(--font-size-sm) !important;
+        line-height: 1.4 !important;
     }
     
+    /* Column Spacing */
     .row .col-md-6, .row .col-lg-6 {
         margin-bottom: var(--spacing-lg);
     }
     
+    /* Table Mobile */
     .data-table .table-header h5 {
-        font-size: var(--font-size-base) !important;
+        font-size: var(--font-size-lg) !important;
     }
     
     .table {
@@ -1270,7 +1313,68 @@ canvas {
     .table th,
     .table td {
         font-size: var(--font-size-sm) !important;
-        padding: var(--spacing-sm) !important;
+        padding: var(--spacing-md) var(--spacing-sm) !important;
+    }
+    
+    /* Tab Navigation Mobile */
+    .nav-tabs {
+        flex-wrap: wrap !important;
+        border-bottom: 1px solid var(--medium-gray);
+    }
+    
+    .nav-tabs .nav-link {
+        padding: var(--spacing-md) var(--spacing-sm) !important;
+        font-size: var(--font-size-sm) !important;
+        white-space: nowrap;
+        min-width: auto;
+    }
+    
+    .nav-tabs .nav-link i {
+        margin-right: 4px !important;
+    }
+}
+
+/* Small Mobile Devices - Additional adjustments */
+@media (max-width: 576px) {
+    .dashboard-actions {
+        gap: var(--spacing-sm) !important;
+    }
+    
+    .dashboard-btn {
+        min-width: 40px !important;
+        height: 40px !important;
+        padding: var(--spacing-xs) !important;
+    }
+    
+    .kpi-card {
+        min-height: 100px;
+        padding: var(--spacing-md) !important;
+    }
+    
+    .kpi-value {
+        font-size: var(--font-size-2xl) !important;
+    }
+    
+    .chart-card canvas {
+        max-height: 250px !important;
+    }
+    
+    .chart-container {
+        height: 250px !important;
+    }
+    
+    /* Tab text even smaller on tiny screens */
+    .nav-tabs .nav-link {
+        padding: var(--spacing-sm) 6px !important;
+        font-size: var(--font-size-xs) !important;
+    }
+    
+    .nav-tabs .nav-link span {
+        display: none !important;
+    }
+    
+    .nav-tabs .nav-link i {
+        margin-right: 0 !important;
     }
 }
 

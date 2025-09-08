@@ -10,13 +10,35 @@ function isMobile() {
 
 function getMobileChartConfig() {
     const isMob = isMobile();
+    const isSmallMobile = window.innerWidth <= 576;
+    
     return {
-        fontSize: isMob ? 10 : 14,
-        legendFontSize: isMob ? 9 : 13,
-        legendPosition: isMob ? 'bottom' : 'bottom',
-        legendPadding: isMob ? 10 : 20,
-        maintainAspectRatio: isMob ? true : false,
-        chartHeight: isMob ? '250px' : '300px'
+        fontSize: isSmallMobile ? 12 : (isMob ? 14 : 16),
+        legendFontSize: isSmallMobile ? 11 : (isMob ? 13 : 14),
+        titleFontSize: isSmallMobile ? 14 : (isMob ? 16 : 18),
+        legendPosition: 'bottom',
+        legendPadding: isMob ? 15 : 20,
+        maintainAspectRatio: false, // Allow charts to be more flexible
+        chartHeight: isSmallMobile ? '220px' : (isMob ? '280px' : '320px'),
+        // Enhanced mobile options
+        elements: {
+            point: {
+                radius: isMob ? 6 : 4,
+                hoverRadius: isMob ? 8 : 6
+            },
+            bar: {
+                borderWidth: isMob ? 2 : 1
+            }
+        },
+        // Better spacing for mobile
+        layout: {
+            padding: {
+                left: isMob ? 10 : 20,
+                right: isMob ? 10 : 20,
+                top: isMob ? 15 : 20,
+                bottom: isMob ? 15 : 20
+            }
+        }
     };
 }
 

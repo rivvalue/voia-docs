@@ -9,23 +9,31 @@
     <div class="col-lg-10 mx-auto">
         <div data-page="dashboard"></div>
         <div class="dashboard-header">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                <div class="dashboard-title-section">
                     <h2>Analytics Dashboard</h2>
                     <p class="dashboard-subtitle">Comprehensive customer feedback insights and analysis</p>
                 </div>
-                <div class="d-flex gap-2 flex-nowrap">
-                    <button class="btn btn-outline-primary btn-sm" onclick="refreshData()">
-                        <i class="fas fa-sync-alt me-2"></i>Refresh
+                <div class="dashboard-actions d-flex flex-wrap gap-2">
+                    <button class="btn btn-outline-primary btn-sm dashboard-btn" onclick="refreshData()">
+                        <i class="fas fa-sync-alt me-2 d-none d-sm-inline"></i>
+                        <i class="fas fa-sync-alt d-sm-none"></i>
+                        <span class="d-none d-sm-inline">Refresh</span>
                     </button>
-                    <button class="btn btn-outline-secondary btn-sm" onclick="exportUserData()">
-                        <i class="fas fa-user-circle me-2"></i>Export Response Data
+                    <button class="btn btn-outline-secondary btn-sm dashboard-btn" onclick="exportUserData()">
+                        <i class="fas fa-user-circle me-2 d-none d-sm-inline"></i>
+                        <i class="fas fa-user-circle d-sm-none"></i>
+                        <span class="d-none d-sm-inline">Export Response Data</span>
                     </button>
-                    <button class="btn btn-outline-secondary btn-sm d-none" onclick="exportData()" id="exportDataBtn">
-                        <i class="fas fa-download me-2"></i>Export Full Data
+                    <button class="btn btn-outline-secondary btn-sm dashboard-btn d-none" onclick="exportData()" id="exportDataBtn">
+                        <i class="fas fa-download me-2 d-none d-sm-inline"></i>
+                        <i class="fas fa-download d-sm-none"></i>
+                        <span class="d-none d-sm-inline">Export Full Data</span>
                     </button>
-                    <button class="btn btn-outline-secondary btn-sm" onclick="adminLogin()" id="adminLoginBtn">
-                        <i class="fas fa-key me-2"></i>Admin Login
+                    <button class="btn btn-outline-secondary btn-sm dashboard-btn" onclick="adminLogin()" id="adminLoginBtn">
+                        <i class="fas fa-key me-2 d-none d-sm-inline"></i>
+                        <i class="fas fa-key d-sm-none"></i>
+                        <span class="d-none d-sm-inline">Admin Login</span>
                     </button>
                 </div>
             </div>
