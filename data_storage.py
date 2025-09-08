@@ -70,6 +70,35 @@ def normalize_opportunity_type(opp_type):
     # If no mapping found, return the normalized version
     return normalized
 
+def normalize_risk_factor_type(risk_type):
+    """Normalize risk factor types for better grouping"""
+    if not risk_type:
+        return 'unknown'
+    
+    # Convert to lowercase and strip whitespace
+    normalized = risk_type.lower().strip()
+    
+    # Define mapping for similar risk factor types
+    type_mappings = {
+        'pricing_concern': ['pricing concern', 'pricing concerns', 'price sensitivity', 'cost issues', 'expensive'],
+        'service_issue': ['service issue', 'service issues', 'poor service', 'support problem', 'support issues'],
+        'product_problem': ['product problem', 'product issues', 'quality issue', 'product quality', 'functionality'],
+        'competitor_risk': ['competitor risk', 'competitor mention', 'competitive threat', 'considering alternatives'],
+        'satisfaction_risk': ['critical_satisfaction', 'low_satisfaction', 'dissatisfaction', 'unhappy customer'],
+        'relationship_risk': ['relationship risk', 'communication issue', 'trust issue', 'poor relationship'],
+        'contract_risk': ['contract risk', 'renewal risk', 'contract concerns', 'renewal at risk'],
+        'churn_risk': ['churn risk', 'retention risk', 'at risk', 'likely to leave'],
+        'poor_ratings': ['poor ratings', 'low ratings', 'rating concerns', 'poor performance']
+    }
+    
+    # Find the canonical type for this risk factor
+    for canonical_type, variations in type_mappings.items():
+        if normalized in variations:
+            return canonical_type
+    
+    # If no mapping found, return the normalized version
+    return normalized
+
 def get_dashboard_data():
     """Compile dashboard data for visualization"""
     try:
@@ -255,6 +284,89 @@ def get_dashboard_data():
                     'opportunities': consolidated_opportunities
                 })
         
+        # Account risk factors summary - grouped by company (case-insensitive) and normalized by type
+        account_risk_factors_by_company = {}
+        responses_with_risk_factors = SurveyResponse.query.filter(
+            SurveyResponse.account_risk_factors.isnot(None)
+        ).all()
+        
+        for response in responses_with_risk_factors:
+            if response.account_risk_factors:
+                try:
+                    risk_factors = json.loads(response.account_risk_factors)
+                    company_name = response.company_name
+                    company_key = company_name.upper()  # Use uppercase for case-insensitive grouping
+                    
+                    if company_key not in account_risk_factors_by_company:
+                        account_risk_factors_by_company[company_key] = {
+                            'display_name': company_name,  # Keep the actual company name for display
+                            'risk_factors_by_type': {}  # Group by normalized type
+                        }
+                    else:
+                        # Update display name to the most recent case version
+                        account_risk_factors_by_company[company_key]['display_name'] = company_name
+                    
+                    for risk in risk_factors:
+                        # Normalize the risk factor type to group similar ones
+                        original_type = risk.get('type', 'unknown')
+                        normalized_type = normalize_risk_factor_type(original_type)
+                        
+                        # Group risk factors by normalized type
+                        if normalized_type not in account_risk_factors_by_company[company_key]['risk_factors_by_type']:
+                            account_risk_factors_by_company[company_key]['risk_factors_by_type'][normalized_type] = {
+                                'type': normalized_type.replace('_', ' ').title(),  # Pretty format for display
+                                'descriptions': [],
+                                'actions': [],
+                                'severities': [],
+                                'count': 0
+                            }
+                        
+                        # Add to the grouped risk factor
+                        type_group = account_risk_factors_by_company[company_key]['risk_factors_by_type'][normalized_type]
+                        description = risk.get('description', '')
+                        action = risk.get('action', '')
+                        severity = risk.get('severity', 'Medium')
+                        
+                        if description and description not in type_group['descriptions']:
+                            type_group['descriptions'].append(description)
+                        if action and action not in type_group['actions']:
+                            type_group['actions'].append(action)
+                        if severity and severity not in type_group['severities']:
+                            type_group['severities'].append(severity)
+                        type_group['count'] += 1
+                        
+                except json.JSONDecodeError:
+                    continue
+        
+        # Convert to list format for frontend - only include companies with actual risk factors
+        account_risk_factors = []
+        for company_key, company_data in account_risk_factors_by_company.items():
+            if company_data['risk_factors_by_type']:  # Only add if there are actual risk factors
+                # Convert grouped risk factors back to list format
+                consolidated_risk_factors = []
+                for type_key, type_data in company_data['risk_factors_by_type'].items():
+                    # Determine highest severity for this risk type
+                    severity_priority = {'Critical': 4, 'High': 3, 'Medium': 2, 'Low': 1}
+                    highest_severity = max(type_data['severities'], 
+                                         key=lambda s: severity_priority.get(s, 0)) if type_data['severities'] else 'Medium'
+                    
+                    consolidated_risk_factors.append({
+                        'type': type_data['type'],
+                        'description': '; '.join(type_data['descriptions']),
+                        'action': '; '.join(type_data['actions']),
+                        'severity': highest_severity,
+                        'count': type_data['count']
+                    })
+                
+                # Sort by severity (most critical first) and then by count
+                severity_order = {'Critical': 0, 'High': 1, 'Medium': 2, 'Low': 3}
+                consolidated_risk_factors.sort(key=lambda x: (severity_order.get(x['severity'], 2), -x['count']))
+                
+                account_risk_factors.append({
+                    'company_name': company_data['display_name'],
+                    'risk_factors': consolidated_risk_factors
+                })
+        
         # Key themes aggregation
         all_themes = {}
         responses_with_themes = SurveyResponse.query.filter(
@@ -331,6 +443,7 @@ def get_dashboard_data():
             ],
             'high_risk_accounts': high_risk_accounts,
             'growth_opportunities': growth_opportunities,
+            'account_risk_factors': account_risk_factors,
             'key_themes': [
                 {'theme': theme.capitalize(), 'count': data['count']}
                 for theme, data in sorted(all_themes.items(), key=lambda x: x[1]['count'], reverse=True)[:10]
