@@ -133,6 +133,39 @@ function populateDashboard() {
     // Load tenure NPS data
     console.log('About to call loadTenureNpsData...');
     loadTenureNpsData();
+    
+    // Set up tab event listeners for chart initialization
+    setupTabEventListeners();
+}
+
+function setupTabEventListeners() {
+    // Get all tab buttons
+    const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('shown.bs.tab', function (event) {
+            const targetTab = event.target.getAttribute('data-bs-target');
+            console.log('Tab shown:', targetTab);
+            
+            // Re-initialize charts when Analytics tab is shown
+            if (targetTab === '#analytics') {
+                setTimeout(() => {
+                    createNpsChart();
+                    createSentimentChart();
+                    createRatingsChart();
+                    createTenureChart();
+                    createGrowthFactorChart();
+                }, 100);
+            }
+            
+            // Re-initialize themes chart when Overview tab is shown
+            if (targetTab === '#overview') {
+                setTimeout(() => {
+                    createThemesChart();
+                }, 100);
+            }
+        });
+    });
 }
 
 function createNpsChart() {
