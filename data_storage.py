@@ -1,9 +1,46 @@
 import json
+import re
 from datetime import datetime, timedelta
 from sqlalchemy import func, case
 from app import db
 from models import SurveyResponse
 from flask import request
+
+def consolidate_theme_name(theme_name):
+    """Consolidate similar theme names to reduce duplication"""
+    if not theme_name:
+        return 'unknown'
+    
+    # Convert to lowercase and strip whitespace
+    normalized = theme_name.lower().strip()
+    
+    # Remove common adjectives and determiners
+    normalized = re.sub(r'\b(customer|client|user|our|the|good|bad|great|poor)\s+', '', normalized)
+    
+    # Define mapping for similar themes
+    theme_mappings = {
+        'service': ['service', 'services', 'customer service', 'client service', 'support service'],
+        'support': ['support', 'customer support', 'tech support', 'technical support', 'help', 'assistance'],
+        'product': ['product', 'products', 'offering', 'solution', 'solutions'],
+        'pricing': ['pricing', 'price', 'prices', 'cost', 'costs', 'billing', 'payment'],
+        'quality': ['quality', 'reliability', 'performance', 'effectiveness'],
+        'features': ['features', 'feature', 'functionality', 'capabilities', 'tools'],
+        'team': ['team', 'staff', 'personnel', 'employees', 'people'],
+        'communication': ['communication', 'response time', 'responsiveness', 'follow-up'],
+        'value': ['value', 'worth', 'roi', 'return on investment'],
+        'experience': ['experience', 'satisfaction', 'journey', 'interaction']
+    }
+    
+    # Find the canonical theme for this name
+    for canonical_theme, variations in theme_mappings.items():
+        if normalized in variations or any(variation in normalized for variation in variations):
+            return canonical_theme
+    
+    # If no mapping found, return the normalized version (singular form)
+    if normalized.endswith('s') and len(normalized) > 3:
+        return normalized[:-1]  # Simple singularization
+    
+    return normalized
 
 def normalize_opportunity_type(opp_type):
     """Normalize opportunity types for better grouping"""
@@ -229,11 +266,12 @@ def get_dashboard_data():
                 try:
                     themes = json.loads(response.key_themes)
                     for theme in themes:
-                        theme_name = theme.get('theme', 'unknown')
-                        if theme_name not in all_themes:
-                            all_themes[theme_name] = {'count': 0, 'sentiments': []}
-                        all_themes[theme_name]['count'] += 1
-                        all_themes[theme_name]['sentiments'].append(theme.get('sentiment', 'neutral'))
+                        original_theme_name = theme.get('theme', 'unknown')
+                        consolidated_theme_name = consolidate_theme_name(original_theme_name)
+                        if consolidated_theme_name not in all_themes:
+                            all_themes[consolidated_theme_name] = {'count': 0, 'sentiments': []}
+                        all_themes[consolidated_theme_name]['count'] += 1
+                        all_themes[consolidated_theme_name]['sentiments'].append(theme.get('sentiment', 'neutral'))
                 except json.JSONDecodeError:
                     continue
         
