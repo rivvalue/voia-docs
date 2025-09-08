@@ -368,7 +368,7 @@ def identify_growth_opportunities(response, text):
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a business growth expert. Analyze customer feedback to identify growth opportunities such as upselling, cross-selling, feature requests, market expansion, or partnership opportunities. Return JSON with opportunities and recommended actions."
+                        "content": "You are a business growth expert. Analyze customer feedback to identify GENUINE GROWTH OPPORTUNITIES ONLY - such as upselling, cross-selling, market expansion, or partnership opportunities based on POSITIVE customer sentiment. DO NOT classify problems, issues, complaints, or areas needing improvement as opportunities. If feedback mentions problems, defects, poor service, dissatisfaction, or areas that need fixing, those are RISK FACTORS, not growth opportunities. Only identify positive signals that indicate genuine expansion potential from satisfied customers. Return JSON with opportunities and recommended actions."
                     },
                     {
                         "role": "user",
@@ -380,7 +380,21 @@ def identify_growth_opportunities(response, text):
             
             ai_result = json.loads(ai_response.choices[0].message.content)
             ai_opportunities = ai_result.get('opportunities', [])
-            opportunities.extend(ai_opportunities)
+            
+            # Filter out opportunities that contain problem/issue keywords
+            problem_keywords = ['problem', 'issue', 'poor', 'bad', 'fail', 'broken', 'error', 'bug', 'complaint', 'dissatisfied', 'unhappy', 'frustrat', 'difficult', 'hard', 'confusing', 'wrong', 'missing', 'lack', 'without', 'slow', 'delayed']
+            
+            filtered_opportunities = []
+            for opp in ai_opportunities:
+                opp_text = (str(opp.get('type', '')) + ' ' + str(opp.get('description', ''))).lower()
+                
+                # Skip if this opportunity mentions problems/issues
+                if any(keyword in opp_text for keyword in problem_keywords):
+                    continue
+                
+                filtered_opportunities.append(opp)
+            
+            opportunities.extend(filtered_opportunities)
     except Exception as e:
         logger.warning(f"AI growth opportunity identification failed: {e}")
     
