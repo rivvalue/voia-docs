@@ -633,6 +633,65 @@ function populateGrowthOpportunities() {
     container.innerHTML = html;
 }
 
+// Visual mapping for risk factors and opportunities
+function getVisualIndicator(type, category) {
+    const riskIcons = {
+        'pricing_concerns': { icon: '💰', color: '#ff6b35', label: 'Pricing' },
+        'product_problems': { icon: '🔧', color: '#dc3545', label: 'Product' },
+        'service_issues': { icon: '📞', color: '#ff8c00', label: 'Service' },
+        'churn_risk': { icon: '⚠️', color: '#8b0000', label: 'Churn Risk' },
+        'low_satisfaction': { icon: '📉', color: '#dc3545', label: 'Low Satisfaction' },
+        'poor_ratings': { icon: '⭐', color: '#ff6b35', label: 'Poor Ratings' },
+        'contract_issues': { icon: '📋', color: '#ffc107', label: 'Contract' },
+        'relationship_threat': { icon: '🔗', color: '#dc3545', label: 'Relationship' },
+        'critical_satisfaction': { icon: '🚨', color: '#8b0000', label: 'Critical' }
+    };
+    
+    const opportunityIcons = {
+        'upsell': { icon: '📈', color: '#28a745', label: 'Upsell' },
+        'cross_sell': { icon: '🎯', color: '#007bff', label: 'Cross-sell' },
+        'referral': { icon: '👥', color: '#20c997', label: 'Referral' },
+        'advocacy': { icon: '📢', color: '#198754', label: 'Advocacy' },
+        'expansion': { icon: '🚀', color: '#0d6efd', label: 'Expansion' },
+        'high_satisfaction': { icon: '⭐', color: '#ffd700', label: 'High NPS' },
+        'engagement': { icon: '🤝', color: '#20c997', label: 'Engagement' }
+    };
+    
+    if (category === 'risk') {
+        return riskIcons[type] || { icon: '⚠️', color: '#6c757d', label: 'Risk' };
+    } else {
+        return opportunityIcons[type] || { icon: '📈', color: '#28a745', label: 'Opportunity' };
+    }
+}
+
+function normalizeTypeForVisual(originalType) {
+    const typeMap = {
+        // Risk mappings
+        'pricing concerns': 'pricing_concerns',
+        'product problem': 'product_problems',
+        'product problems': 'product_problems',
+        'service issue': 'service_issues',
+        'service issues': 'service_issues', 
+        'churn risk': 'churn_risk',
+        'low satisfaction': 'low_satisfaction',
+        'poor ratings': 'poor_ratings',
+        'contract risk': 'contract_issues',
+        'critical satisfaction': 'critical_satisfaction',
+        'relationship threat': 'relationship_threat',
+        
+        // Opportunity mappings
+        'upsell potential': 'upsell',
+        'cross-sell': 'cross_sell',
+        'referral potential': 'referral',
+        'advocacy': 'advocacy',
+        'expansion ready': 'expansion',
+        'high satisfaction': 'high_satisfaction',
+        'engagement opportunity': 'engagement'
+    };
+    
+    return typeMap[originalType.toLowerCase()] || originalType.toLowerCase().replace(/\s+/g, '_');
+}
+
 function populateAccountIntelligence() {
     const container = document.getElementById('accountIntelligence');
     const accountData = dashboardData.account_intelligence || [];
@@ -642,79 +701,108 @@ function populateAccountIntelligence() {
         return;
     }
     
-    const html = accountData.map(account => {
+    // Create legend
+    const legendHtml = `
+        <div class="account-health-legend mb-4 p-3 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="text-success mb-2">🚀 Growth Opportunities</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-light text-dark">📈 Upsell</span>
+                        <span class="badge bg-light text-dark">🎯 Cross-sell</span>
+                        <span class="badge bg-light text-dark">👥 Referral</span>
+                        <span class="badge bg-light text-dark">📢 Advocacy</span>
+                        <span class="badge bg-light text-dark">⭐ High NPS</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-danger mb-2">⚠️ Risk Factors</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-light text-dark">💰 Pricing</span>
+                        <span class="badge bg-light text-dark">🔧 Product</span>
+                        <span class="badge bg-light text-dark">📞 Service</span>
+                        <span class="badge bg-light text-dark">📉 Low NPS</span>
+                        <span class="badge bg-light text-dark">🚨 Critical</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const accountsHtml = accountData.map(account => {
         const balanceClass = account.balance === 'risk_heavy' ? 'border-danger' : 
                            account.balance === 'opportunity_heavy' ? 'border-success' : 'border-warning';
         
-        const balanceIcon = account.balance === 'risk_heavy' ? 'fas fa-exclamation-triangle text-danger' : 
-                          account.balance === 'opportunity_heavy' ? 'fas fa-trending-up text-success' : 'fas fa-balance-scale text-warning';
+        const balanceIcon = account.balance === 'risk_heavy' ? '🔴' : 
+                          account.balance === 'opportunity_heavy' ? '🟢' : '🟡';
         
-        const balanceLabel = account.balance === 'risk_heavy' ? 'Risk Heavy' : 
-                           account.balance === 'opportunity_heavy' ? 'Opportunity Heavy' : 'Balanced';
+        const balanceLabel = account.balance === 'risk_heavy' ? 'High Risk' : 
+                           account.balance === 'opportunity_heavy' ? 'High Potential' : 'Balanced';
         
-        // Render opportunities
-        const opportunitiesHtml = account.opportunities.length > 0 ? `
-            <div class="mb-3">
-                <h6 class="text-success mb-2"><i class="fas fa-arrow-up me-1"></i> Growth Opportunities (${account.opportunities.length})</h6>
-                ${account.opportunities.map(opp => `
-                    <div class="opportunity-item mb-2 p-2 rounded" style="background-color: #d4edda; border-left: 3px solid #28a745;">
-                        <div class="d-flex justify-content-between">
-                            <span class="fw-bold">${opp.type}</span>
-                            ${opp.count > 1 ? `<small class="text-muted">${opp.count}x</small>` : ''}
-                        </div>
-                        <small class="text-muted d-block">${opp.description}</small>
-                        <small class="text-primary"><strong>Action:</strong> ${opp.action}</small>
-                    </div>
-                `).join('')}
-            </div>
-        ` : '';
+        // Create visual indicators for opportunities
+        const opportunityIndicators = account.opportunities.map(opp => {
+            const normalizedType = normalizeTypeForVisual(opp.type);
+            const visual = getVisualIndicator(normalizedType, 'opportunity');
+            return `
+                <span class="visual-indicator opportunity-indicator" 
+                      style="background-color: ${visual.color}20; border: 2px solid ${visual.color}; padding: 4px 8px; margin: 2px; border-radius: 12px; display: inline-block;"
+                      title="${opp.type}${opp.count > 1 ? ` (${opp.count}x)` : ''}">
+                    ${visual.icon} ${visual.label}${opp.count > 1 ? ` (${opp.count})` : ''}
+                </span>
+            `;
+        }).join('');
         
-        // Render risk factors
-        const riskFactorsHtml = account.risk_factors.length > 0 ? `
-            <div class="mb-3">
-                <h6 class="text-danger mb-2"><i class="fas fa-arrow-down me-1"></i> Risk Factors (${account.risk_factors.length})</h6>
-                ${account.risk_factors.map(risk => {
-                    const severityClass = risk.severity === 'Critical' ? 'danger' : 
-                                         risk.severity === 'High' ? 'warning' : 
-                                         risk.severity === 'Medium' ? 'info' : 'secondary';
-                    const bgClass = risk.severity === 'Critical' ? '#f8d7da' : 
-                                   risk.severity === 'High' ? '#fff3cd' : 
-                                   risk.severity === 'Medium' ? '#d1ecf1' : '#e2e3e5';
-                    
-                    return `
-                        <div class="risk-item mb-2 p-2 rounded" style="background-color: ${bgClass}; border-left: 3px solid var(--bs-${severityClass});">
-                            <div class="d-flex justify-content-between">
-                                <span class="fw-bold">${risk.type}</span>
-                                <span class="badge bg-${severityClass}">${risk.severity}</span>
-                            </div>
-                            <small class="text-muted d-block">${risk.description}</small>
-                            <small class="text-primary"><strong>Action:</strong> ${risk.action}</small>
-                            ${risk.count > 1 ? `<div class="text-end"><small class="text-muted">${risk.count} occurrences</small></div>` : ''}
-                        </div>
-                    `;
-                }).join('')}
-            </div>
-        ` : '';
+        // Create visual indicators for risks  
+        const riskIndicators = account.risk_factors.map(risk => {
+            const normalizedType = normalizeTypeForVisual(risk.type);
+            const visual = getVisualIndicator(normalizedType, 'risk');
+            const intensityMap = { 'Critical': '●●●', 'High': '●●', 'Medium': '●', 'Low': '○' };
+            const intensity = intensityMap[risk.severity] || '●';
+            
+            return `
+                <span class="visual-indicator risk-indicator" 
+                      style="background-color: ${visual.color}20; border: 2px solid ${visual.color}; padding: 4px 8px; margin: 2px; border-radius: 12px; display: inline-block;"
+                      title="${risk.type} - ${risk.severity}${risk.count > 1 ? ` (${risk.count}x)` : ''}">
+                    ${visual.icon} ${visual.label} ${intensity}${risk.count > 1 ? ` (${risk.count})` : ''}
+                </span>
+            `;
+        }).join('');
         
         return `
-            <div class="account-intelligence-card card mb-4 ${balanceClass}" style="border-width: 2px;">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">${account.company_name}</h5>
-                    <div class="d-flex align-items-center">
-                        <i class="${balanceIcon} me-2"></i>
-                        <span class="badge bg-light text-dark">${balanceLabel}</span>
+            <div class="account-visual-card card mb-3 ${balanceClass}" style="border-width: 2px;">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">${account.company_name}</h5>
+                        <div class="d-flex align-items-center">
+                            <span style="font-size: 1.2em; margin-right: 5px;">${balanceIcon}</span>
+                            <span class="badge bg-light text-dark">${balanceLabel}</span>
+                        </div>
                     </div>
-                </div>
-                <div class="card-body">
-                    ${opportunitiesHtml}
-                    ${riskFactorsHtml}
-                    ${!opportunitiesHtml && !riskFactorsHtml ? '<p class="text-muted">No specific opportunities or risks identified.</p>' : ''}
+                    
+                    <div class="account-indicators">
+                        ${opportunityIndicators ? `
+                            <div class="mb-2">
+                                <div class="fw-bold text-success mb-1" style="font-size: 0.9em;">Growth Opportunities</div>
+                                <div>${opportunityIndicators}</div>
+                            </div>
+                        ` : ''}
+                        
+                        ${riskIndicators ? `
+                            <div class="mb-2">
+                                <div class="fw-bold text-danger mb-1" style="font-size: 0.9em;">Risk Factors</div>
+                                <div>${riskIndicators}</div>
+                            </div>
+                        ` : ''}
+                        
+                        ${!opportunityIndicators && !riskIndicators ? 
+                            '<div class="text-muted text-center py-2" style="font-size: 0.9em;">No specific indicators identified</div>' : ''}
+                    </div>
                 </div>
             </div>
         `;
     }).join('');
     
-    container.innerHTML = html;
+    container.innerHTML = legendHtml + accountsHtml;
 }
 
 function populateAccountRiskFactors() {
