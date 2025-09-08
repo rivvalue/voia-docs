@@ -36,29 +36,32 @@ document.addEventListener('DOMContentLoaded', function() {
 // Direct company NPS data loading as fallback
 function loadCompanyNpsDataDirect() {
     console.log('Direct loading of company NPS data...');
+    
+    // Check if we're in the Survey Insights tab or if element exists
+    const tbody = document.getElementById('companyNpsTable');
+    if (!tbody) {
+        console.log('companyNpsTable element not found - probably in different tab, skipping...');
+        return;
+    }
+    
     fetch('/api/company_nps')
         .then(response => response.json())
         .then(data => {
             console.log('Direct API response:', data);
             if (data.success && data.data) {
-                const tbody = document.getElementById('companyNpsTable');
-                if (tbody) {
-                    console.log('Found table, populating with', data.data.length, 'companies');
-                    tbody.innerHTML = data.data.map(company => `
-                        <tr>
-                            <td><strong>${company.company_name}</strong></td>
-                            <td>${company.total_responses}</td>
-                            <td>${company.avg_nps}</td>
-                            <td><span class="badge bg-primary">${company.company_nps}</span></td>
-                            <td><small>${company.promoters}P / ${company.passives}Pa / ${company.detractors}D</small></td>
-                            <td><span class="badge bg-warning">${company.risk_level}</span></td>
-                            <td>${company.latest_response || 'N/A'}</td>
-                            <td>${company.latest_churn_risk || 'N/A'}</td>
-                        </tr>
-                    `).join('');
-                } else {
-                    console.error('companyNpsTable element not found');
-                }
+                console.log('Found table, populating with', data.data.length, 'companies');
+                tbody.innerHTML = data.data.map(company => `
+                    <tr>
+                        <td><strong>${company.company_name}</strong></td>
+                        <td>${company.total_responses}</td>
+                        <td>${company.avg_nps}</td>
+                        <td><span class="badge bg-primary">${company.company_nps}</span></td>
+                        <td><small>${company.promoters}P / ${company.passives}Pa / ${company.detractors}D</small></td>
+                        <td><span class="badge bg-warning">${company.risk_level}</span></td>
+                        <td>${company.latest_response || 'N/A'}</td>
+                        <td>${company.latest_churn_risk || 'N/A'}</td>
+                    </tr>
+                `).join('');
             }
         })
         .catch(error => {
@@ -125,11 +128,9 @@ function populateDashboard() {
     // Populate unified account intelligence
     populateAccountIntelligence();
     
-    // Populate growth opportunities
-    populateGrowthOpportunities();
-    
-    // Populate account risk factors
-    populateAccountRiskFactors();
+    // Skip legacy functions that don't work with new tab structure
+    // populateGrowthOpportunities(); // Removed - element doesn't exist in new tabs
+    // populateAccountRiskFactors();  // Removed - element doesn't exist in new tabs
     
     // Load survey responses table
     loadSurveyResponses();
