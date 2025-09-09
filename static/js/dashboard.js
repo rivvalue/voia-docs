@@ -3,6 +3,8 @@
 let dashboardData = null;
 let charts = {};
 let campaignData = null;
+let availableCampaigns = [];
+let selectedCampaignId = null;
 
 // Mobile detection and responsive configuration
 function isMobile() {
@@ -85,6 +87,97 @@ function forceRemoveYellowColors() {
     });
 }
 
+// ============================================================================
+// CAMPAIGN ANALYTICS FILTERING
+// ============================================================================
+
+// Load campaign options for analytics filtering
+async function loadCampaignFilterOptions() {
+    try {
+        const response = await fetch('/api/campaigns/filter-options');
+        if (response.ok) {
+            const data = await response.json();
+            availableCampaigns = data.campaigns;
+            populateCampaignFilterDropdown();
+        }
+    } catch (error) {
+        console.error('Error loading campaign filter options:', error);
+    }
+}
+
+// Populate campaign filter dropdown
+function populateCampaignFilterDropdown() {
+    const select = document.getElementById('campaignFilter');
+    if (!select) return;
+    
+    // Clear existing options except "All Campaigns"
+    select.innerHTML = '<option value="">All Campaigns</option>';
+    
+    // Add campaign options
+    availableCampaigns.forEach(campaign => {
+        const option = document.createElement('option');
+        option.value = campaign.id;
+        option.textContent = `${campaign.name} (${formatDate(campaign.start_date)} - ${formatDate(campaign.end_date)})`;
+        option.setAttribute('data-name', campaign.name);
+        option.setAttribute('data-start', campaign.start_date);
+        option.setAttribute('data-end', campaign.end_date);
+        select.appendChild(option);
+    });
+}
+
+// Apply campaign filter to analytics
+async function applyCampaignFilter() {
+    const select = document.getElementById('campaignFilter');
+    selectedCampaignId = select.value ? parseInt(select.value) : null;
+    
+    // Update selected campaign info display
+    updateSelectedCampaignInfo();
+    
+    // Reload dashboard data with campaign filter
+    await loadDashboardData();
+    
+    // Refresh all charts in Analytics tab
+    setTimeout(() => {
+        createNpsChart();
+        createSentimentChart();
+        createRatingsChart();
+        createTenureChart();
+        createGrowthFactorChart();
+    }, 100);
+}
+
+// Clear campaign filter
+function clearCampaignFilter() {
+    document.getElementById('campaignFilter').value = '';
+    applyCampaignFilter();
+}
+
+// Update selected campaign info display
+function updateSelectedCampaignInfo() {
+    const infoDiv = document.getElementById('selectedCampaignInfo');
+    const select = document.getElementById('campaignFilter');
+    
+    if (selectedCampaignId && select.selectedOptions.length > 0) {
+        const option = select.selectedOptions[0];
+        const campaignName = option.getAttribute('data-name');
+        const startDate = option.getAttribute('data-start');
+        const endDate = option.getAttribute('data-end');
+        
+        // Find full campaign data for description
+        const campaign = availableCampaigns.find(c => c.id === selectedCampaignId);
+        
+        document.getElementById('selectedCampaignName').textContent = campaignName;
+        document.getElementById('selectedCampaignDates').textContent = 
+            `${formatDate(startDate)} - ${formatDate(endDate)}`;
+        document.getElementById('selectedCampaignDesc').textContent = 
+            campaign?.description || 'No description available';
+        
+        infoDiv.style.display = 'block';
+    } else {
+        infoDiv.style.display = 'none';
+    }
+}
+
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Dashboard JavaScript loaded and DOM ready');
@@ -155,7 +248,13 @@ function loadDashboardData() {
     if (loadingElement) loadingElement.classList.remove('d-none');
     if (contentElement) contentElement.classList.add('d-none');
     
-    fetch('/api/dashboard_data')
+    // Build URL with campaign filter if selected
+    let url = '/api/dashboard_data';
+    if (selectedCampaignId) {
+        url += `?campaign_id=${selectedCampaignId}`;
+    }
+    
+    fetch(url)
         .then(response => {
             console.log('API response status:', response.status);
             if (!response.ok) {
@@ -253,6 +352,97 @@ function setupTabEventListeners() {
             }
         });
     });
+}
+
+// ============================================================================
+// CAMPAIGN ANALYTICS FILTERING
+// ============================================================================
+
+// Load campaign options for analytics filtering
+async function loadCampaignFilterOptions() {
+    try {
+        const response = await fetch('/api/campaigns/filter-options');
+        if (response.ok) {
+            const data = await response.json();
+            availableCampaigns = data.campaigns;
+            populateCampaignFilterDropdown();
+        }
+    } catch (error) {
+        console.error('Error loading campaign filter options:', error);
+    }
+}
+
+// Populate campaign filter dropdown
+function populateCampaignFilterDropdown() {
+    const select = document.getElementById('campaignFilter');
+    if (!select) return;
+    
+    // Clear existing options except "All Campaigns"
+    select.innerHTML = '<option value="">All Campaigns</option>';
+    
+    // Add campaign options
+    availableCampaigns.forEach(campaign => {
+        const option = document.createElement('option');
+        option.value = campaign.id;
+        option.textContent = `${campaign.name} (${formatDate(campaign.start_date)} - ${formatDate(campaign.end_date)})`;
+        option.setAttribute('data-name', campaign.name);
+        option.setAttribute('data-start', campaign.start_date);
+        option.setAttribute('data-end', campaign.end_date);
+        select.appendChild(option);
+    });
+}
+
+// Apply campaign filter to analytics
+async function applyCampaignFilter() {
+    const select = document.getElementById('campaignFilter');
+    selectedCampaignId = select.value ? parseInt(select.value) : null;
+    
+    // Update selected campaign info display
+    updateSelectedCampaignInfo();
+    
+    // Reload dashboard data with campaign filter
+    await loadDashboardData();
+    
+    // Refresh all charts in Analytics tab
+    setTimeout(() => {
+        createNpsChart();
+        createSentimentChart();
+        createRatingsChart();
+        createTenureChart();
+        createGrowthFactorChart();
+    }, 100);
+}
+
+// Clear campaign filter
+function clearCampaignFilter() {
+    document.getElementById('campaignFilter').value = '';
+    applyCampaignFilter();
+}
+
+// Update selected campaign info display
+function updateSelectedCampaignInfo() {
+    const infoDiv = document.getElementById('selectedCampaignInfo');
+    const select = document.getElementById('campaignFilter');
+    
+    if (selectedCampaignId && select.selectedOptions.length > 0) {
+        const option = select.selectedOptions[0];
+        const campaignName = option.getAttribute('data-name');
+        const startDate = option.getAttribute('data-start');
+        const endDate = option.getAttribute('data-end');
+        
+        // Find full campaign data for description
+        const campaign = availableCampaigns.find(c => c.id === selectedCampaignId);
+        
+        document.getElementById('selectedCampaignName').textContent = campaignName;
+        document.getElementById('selectedCampaignDates').textContent = 
+            `${formatDate(startDate)} - ${formatDate(endDate)}`;
+        document.getElementById('selectedCampaignDesc').textContent = 
+            campaign?.description || 'No description available';
+        
+        infoDiv.style.display = 'block';
+    } else {
+        infoDiv.style.display = 'none';
+    }
 }
 
 function createNpsChart() {
@@ -1897,7 +2087,10 @@ function adminLogout() {
     alert('Admin logged out successfully.');
 }
 
-document.addEventListener('DOMContentLoaded', checkAdminStatus);
+document.addEventListener('DOMContentLoaded', function() {
+    checkAdminStatus();
+    loadCampaignFilterOptions();
+});
 
 // ============================================================================
 // CAMPAIGN MANAGEMENT FUNCTIONALITY
@@ -2223,4 +2416,95 @@ function setupTabEventListeners() {
             }
         });
     });
+}
+
+// ============================================================================
+// CAMPAIGN ANALYTICS FILTERING
+// ============================================================================
+
+// Load campaign options for analytics filtering
+async function loadCampaignFilterOptions() {
+    try {
+        const response = await fetch('/api/campaigns/filter-options');
+        if (response.ok) {
+            const data = await response.json();
+            availableCampaigns = data.campaigns;
+            populateCampaignFilterDropdown();
+        }
+    } catch (error) {
+        console.error('Error loading campaign filter options:', error);
+    }
+}
+
+// Populate campaign filter dropdown
+function populateCampaignFilterDropdown() {
+    const select = document.getElementById('campaignFilter');
+    if (!select) return;
+    
+    // Clear existing options except "All Campaigns"
+    select.innerHTML = '<option value="">All Campaigns</option>';
+    
+    // Add campaign options
+    availableCampaigns.forEach(campaign => {
+        const option = document.createElement('option');
+        option.value = campaign.id;
+        option.textContent = `${campaign.name} (${formatDate(campaign.start_date)} - ${formatDate(campaign.end_date)})`;
+        option.setAttribute('data-name', campaign.name);
+        option.setAttribute('data-start', campaign.start_date);
+        option.setAttribute('data-end', campaign.end_date);
+        select.appendChild(option);
+    });
+}
+
+// Apply campaign filter to analytics
+async function applyCampaignFilter() {
+    const select = document.getElementById('campaignFilter');
+    selectedCampaignId = select.value ? parseInt(select.value) : null;
+    
+    // Update selected campaign info display
+    updateSelectedCampaignInfo();
+    
+    // Reload dashboard data with campaign filter
+    await loadDashboardData();
+    
+    // Refresh all charts in Analytics tab
+    setTimeout(() => {
+        createNpsChart();
+        createSentimentChart();
+        createRatingsChart();
+        createTenureChart();
+        createGrowthFactorChart();
+    }, 100);
+}
+
+// Clear campaign filter
+function clearCampaignFilter() {
+    document.getElementById('campaignFilter').value = '';
+    applyCampaignFilter();
+}
+
+// Update selected campaign info display
+function updateSelectedCampaignInfo() {
+    const infoDiv = document.getElementById('selectedCampaignInfo');
+    const select = document.getElementById('campaignFilter');
+    
+    if (selectedCampaignId && select.selectedOptions.length > 0) {
+        const option = select.selectedOptions[0];
+        const campaignName = option.getAttribute('data-name');
+        const startDate = option.getAttribute('data-start');
+        const endDate = option.getAttribute('data-end');
+        
+        // Find full campaign data for description
+        const campaign = availableCampaigns.find(c => c.id === selectedCampaignId);
+        
+        document.getElementById('selectedCampaignName').textContent = campaignName;
+        document.getElementById('selectedCampaignDates').textContent = 
+            `${formatDate(startDate)} - ${formatDate(endDate)}`;
+        document.getElementById('selectedCampaignDesc').textContent = 
+            campaign?.description || 'No description available';
+        
+        infoDiv.style.display = 'block';
+    } else {
+        infoDiv.style.display = 'none';
+    }
 }

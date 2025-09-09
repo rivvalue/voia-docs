@@ -1300,3 +1300,24 @@ def export_user_data():
             'success': False,
             'error': 'Failed to export user data'
         }), 500
+
+@app.route('/api/campaigns/filter-options')
+def get_campaign_filter_options():
+    """Get campaigns for analytics filtering (public endpoint)"""
+    try:
+        campaigns = Campaign.query.order_by(Campaign.start_date.desc()).all()
+        return jsonify({
+            'campaigns': [
+                {
+                    'id': campaign.id,
+                    'name': campaign.name,
+                    'start_date': campaign.start_date.isoformat(),
+                    'end_date': campaign.end_date.isoformat(),
+                    'status': campaign.status
+                }
+                for campaign in campaigns
+            ]
+        })
+    except Exception as e:
+        logger.error(f"Error getting campaign filter options: {e}")
+        return jsonify({'error': str(e)}), 500
