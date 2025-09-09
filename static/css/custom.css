@@ -1109,11 +1109,12 @@ small, .small {
     font-size: var(--font-size-lg);
     font-weight: 500;
     margin-bottom: 0;
+    white-space: nowrap;
 }
 
 .dashboard-logo {
-    max-height: 80px;
-    height: 80px;
+    max-height: 100px;
+    height: 100px;
     width: auto;
     object-fit: contain;
     filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));
