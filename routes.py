@@ -1,13 +1,13 @@
 from flask import render_template, request, jsonify, flash, redirect, url_for, g, session
 from app import app, db
-from models import SurveyResponse
+from models import SurveyResponse, Campaign
 from models_auth import AuthToken
 from task_queue import add_analysis_task, get_queue_stats
 from rate_limiter import rate_limit
 from auth_system import require_auth, generate_user_token, require_admin_auth
 from conversational_survey import start_conversational_survey, process_conversation_response, finalize_conversational_survey
 from ai_conversational_survey import start_ai_conversational_survey, process_ai_conversation_response, finalize_ai_conversational_survey
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import json
 import logging
 import re
@@ -643,6 +643,206 @@ def queue_status():
     except Exception as e:
         logger.error(f"Error getting queue status: {e}")
         return jsonify({'error': 'Failed to get queue status'}), 500
+
+# Campaign Management API Routes
+@app.route('/api/campaigns', methods=['GET'])
+@require_admin_auth()
+def list_campaigns():
+    """List all campaigns for the client"""
+    try:
+        client_identifier = 'archelo_group'  # Current single-client setup
+        
+        campaigns = Campaign.query.filter_by(
+            client_identifier=client_identifier
+        ).order_by(Campaign.created_at.desc()).all()
+        
+        return jsonify({
+            'campaigns': [campaign.to_dict() for campaign in campaigns],
+            'total_campaigns': len(campaigns),
+            'remaining_campaigns': 4 - len(campaigns),
+            'can_create_more': Campaign.can_create_campaign(client_identifier)
+        })
+        
+    except Exception as e:
+        logger.error(f"Error listing campaigns: {e}")
+        return jsonify({'error': 'Failed to fetch campaigns'}), 500
+
+@app.route('/api/campaigns', methods=['POST'])
+@require_admin_auth()
+def create_campaign():
+    """Create a new campaign"""
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        # Validate required fields
+        required_fields = ['name', 'start_date', 'end_date']
+        for field in required_fields:
+            if field not in data or not data[field]:
+                return jsonify({'error': f'Missing required field: {field}'}), 400
+        
+        client_identifier = 'archelo_group'  # Current single-client setup
+        
+        # Check campaign limit
+        if not Campaign.can_create_campaign(client_identifier):
+            return jsonify({
+                'error': 'Campaign limit reached. Maximum 4 campaigns allowed per year.',
+                'code': 'CAMPAIGN_LIMIT_EXCEEDED'
+            }), 400
+        
+        # Parse dates
+        try:
+            start_date = datetime.strptime(data['start_date'], '%Y-%m-%d').date()
+            end_date = datetime.strptime(data['end_date'], '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({
+                'error': 'Invalid date format. Use YYYY-MM-DD format.',
+                'code': 'INVALID_DATE_FORMAT'
+            }), 400
+        
+        # Validate date logic
+        if start_date > end_date:
+            return jsonify({
+                'error': 'Start date must be before end date',
+                'code': 'INVALID_DATE_RANGE'
+            }), 400
+        
+        # Check for overlapping campaigns
+        if Campaign.has_overlapping_campaign(start_date, end_date, client_identifier):
+            return jsonify({
+                'error': 'Campaign dates overlap with an existing active campaign',
+                'code': 'OVERLAPPING_CAMPAIGN'
+            }), 400
+        
+        # Create campaign
+        campaign = Campaign(
+            name=data['name'].strip(),
+            description=data.get('description', '').strip(),
+            start_date=start_date,
+            end_date=end_date,
+            client_identifier=client_identifier,
+            status='active'
+        )
+        
+        db.session.add(campaign)
+        db.session.commit()
+        
+        logger.info(f"Campaign created: {campaign.name} (ID: {campaign.id}) by {g.authenticated_email}")
+        
+        return jsonify({
+            'message': 'Campaign created successfully',
+            'campaign': campaign.to_dict()
+        }), 201
+        
+    except Exception as e:
+        logger.error(f"Error creating campaign: {e}")
+        db.session.rollback()
+        return jsonify({'error': 'Failed to create campaign'}), 500
+
+@app.route('/api/campaigns/<int:campaign_id>/close', methods=['POST'])
+@require_admin_auth()
+def close_campaign(campaign_id):
+    """Close a campaign manually"""
+    try:
+        client_identifier = 'archelo_group'  # Current single-client setup
+        
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            client_identifier=client_identifier
+        ).first()
+        
+        if not campaign:
+            return jsonify({'error': 'Campaign not found'}), 404
+        
+        if campaign.status == 'completed':
+            return jsonify({
+                'error': 'Campaign is already completed',
+                'code': 'ALREADY_COMPLETED'
+            }), 400
+        
+        # Close the campaign
+        campaign.close_campaign()
+        db.session.commit()
+        
+        logger.info(f"Campaign manually closed: {campaign.name} (ID: {campaign.id}) by {g.authenticated_email}")
+        
+        return jsonify({
+            'message': 'Campaign closed successfully',
+            'campaign': campaign.to_dict()
+        })
+        
+    except Exception as e:
+        logger.error(f"Error closing campaign: {e}")
+        db.session.rollback()
+        return jsonify({'error': 'Failed to close campaign'}), 500
+
+@app.route('/api/campaigns/active', methods=['GET'])
+def get_active_campaign():
+    """Get the currently active campaign"""
+    try:
+        client_identifier = 'archelo_group'  # Current single-client setup
+        
+        campaign = Campaign.get_active_campaign(client_identifier)
+        
+        if campaign:
+            return jsonify({
+                'active_campaign': campaign.to_dict(),
+                'has_active_campaign': True
+            })
+        else:
+            return jsonify({
+                'active_campaign': None,
+                'has_active_campaign': False,
+                'message': 'No active campaign found'
+            })
+        
+    except Exception as e:
+        logger.error(f"Error getting active campaign: {e}")
+        return jsonify({'error': 'Failed to get active campaign'}), 500
+
+@app.route('/api/campaigns/stats', methods=['GET'])
+@require_admin_auth()
+def campaign_stats():
+    """Get campaign statistics"""
+    try:
+        client_identifier = 'archelo_group'  # Current single-client setup
+        
+        total_campaigns = Campaign.count_client_campaigns(client_identifier)
+        active_campaign = Campaign.get_active_campaign(client_identifier)
+        can_create = Campaign.can_create_campaign(client_identifier)
+        
+        # Get campaign response counts
+        campaigns_with_responses = db.session.query(
+            Campaign.id,
+            Campaign.name,
+            Campaign.status,
+            db.func.count(SurveyResponse.id).label('response_count')
+        ).outerjoin(
+            SurveyResponse, Campaign.id == SurveyResponse.campaign_id
+        ).filter(
+            Campaign.client_identifier == client_identifier
+        ).group_by(Campaign.id, Campaign.name, Campaign.status).all()
+        
+        return jsonify({
+            'total_campaigns': total_campaigns,
+            'remaining_campaigns': 4 - total_campaigns,
+            'can_create_campaign': can_create,
+            'active_campaign': active_campaign.to_dict() if active_campaign else None,
+            'campaign_responses': [
+                {
+                    'campaign_id': c.id,
+                    'campaign_name': c.name,
+                    'status': c.status,
+                    'response_count': c.response_count
+                }
+                for c in campaigns_with_responses
+            ]
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting campaign stats: {e}")
+        return jsonify({'error': 'Failed to get campaign statistics'}), 500
 
 @app.route('/health')
 def health_check():
