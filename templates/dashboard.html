@@ -104,6 +104,20 @@
     <div class="tab-content" id="dashboardTabContent">
         <!-- Overview Tab -->
         <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+            <!-- Active Campaign Banner -->
+            <div class="row mb-3" id="activeCampaignBanner" style="display: none;">
+                <div class="col-12">
+                    <div class="alert alert-primary d-flex align-items-center border-0" style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);">
+                        <i class="fas fa-bullhorn me-3 text-white"></i>
+                        <div class="text-white">
+                            <strong>Survey Insights</strong> - Currently showing data from active campaign: 
+                            <span id="activeCampaignName" class="fw-bold">Campaign Name</span>
+                            <span class="ms-2" id="activeCampaignDates">Jan 1 - Dec 31, 2024</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Key Metrics -->
             <div class="row mb-4 g-3">
                 <div class="col">

@@ -600,7 +600,27 @@ def dashboard_data():
         # Get campaign filter parameter
         campaign_id = request.args.get('campaign_id', type=int)
         
+        # If no campaign specified, default to active campaign for Survey Insights
+        if campaign_id is None:
+            active_campaign = Campaign.query.filter_by(status='active').first()
+            if active_campaign:
+                campaign_id = active_campaign.id
+                logger.info(f"Survey Insights defaulting to active campaign: {active_campaign.name} (ID: {campaign_id})")
+        
         data = get_dashboard_data(campaign_id=campaign_id)
+        
+        # Add campaign context to response for UI display
+        if campaign_id:
+            campaign = Campaign.query.get(campaign_id)
+            if campaign:
+                data['active_campaign'] = {
+                    'id': campaign.id,
+                    'name': campaign.name,
+                    'status': campaign.status,
+                    'start_date': campaign.start_date.isoformat(),
+                    'end_date': campaign.end_date.isoformat()
+                }
+        
         return jsonify(data)
     except Exception as e:
         logger.error(f"Error fetching dashboard data: {e}")

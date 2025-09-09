@@ -105,6 +105,23 @@ async function loadCampaignFilterOptions() {
     }
 }
 
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
+    }
+}
+
 // Populate campaign filter dropdown
 function populateCampaignFilterDropdown() {
     const select = document.getElementById('campaignFilter');
@@ -175,6 +192,23 @@ function updateSelectedCampaignInfo() {
         infoDiv.style.display = 'block';
     } else {
         infoDiv.style.display = 'none';
+    }
+}
+
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
     }
 }
 
@@ -269,6 +303,10 @@ function loadDashboardData() {
             }
             
             dashboardData = data;
+            
+            // Display active campaign banner if showing active campaign data
+            updateActiveCampaignBanner(data);
+            
             populateDashboard();
             
             if (loadingElement) loadingElement.classList.add('d-none');
@@ -372,6 +410,23 @@ async function loadCampaignFilterOptions() {
     }
 }
 
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
+    }
+}
+
 // Populate campaign filter dropdown
 function populateCampaignFilterDropdown() {
     const select = document.getElementById('campaignFilter');
@@ -442,6 +497,23 @@ function updateSelectedCampaignInfo() {
         infoDiv.style.display = 'block';
     } else {
         infoDiv.style.display = 'none';
+    }
+}
+
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
     }
 }
 
@@ -1016,6 +1088,23 @@ function getVisualIndicator(type, category) {
     }
 }
 
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
+    }
+}
+
 function normalizeTypeForVisual(originalType) {
     const typeMap = {
         // Risk mappings
@@ -1425,6 +1514,23 @@ function updateResponsesPaginationInfo(currentPage, totalPages, totalItems) {
     }
 }
 
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
+    }
+}
+
 function updateResponsesPaginationControls(pagination) {
     const controls = document.getElementById('paginationControls');
     
@@ -1485,6 +1591,23 @@ function updateCompanyPaginationInfo(currentPage, totalPages, totalItems) {
     }
 }
 
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
+    }
+}
+
 function updateCompanyPaginationControls(pagination) {
     const controls = document.getElementById('companyPaginationControls');
     
@@ -1542,6 +1665,23 @@ function updateTenurePaginationInfo(currentPage, totalPages, totalItems) {
         const startItem = (currentPage - 1) * tenureGroupsPerPage + 1;
         const endItem = Math.min(currentPage * tenureGroupsPerPage, totalItems);
         info.textContent = `Showing ${startItem}-${endItem} of ${totalItems} tenure groups`;
+    }
+}
+
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
     }
 }
 
@@ -1985,6 +2125,23 @@ function checkAdminStatus() {
     }
 }
 
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
+    }
+}
+
 
 function resetAdminButton() {
     const adminBtn = document.getElementById('adminLoginBtn');
@@ -2061,6 +2218,23 @@ function updateAdminUI(isAdmin, email = null) {
     }
 }
 
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
+    }
+}
+
 // Control access to campaign management content
 function updateCampaignAccess(isAdmin) {
     const adminRequiredDiv = document.getElementById('campaign-admin-required');
@@ -2077,6 +2251,23 @@ function updateCampaignAccess(isAdmin) {
         // Show access required message, hide admin content
         if (adminContentDiv) adminContentDiv.style.display = 'none';
         if (adminRequiredDiv) adminRequiredDiv.style.display = 'block';
+    }
+}
+
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
     }
 }
 
@@ -2114,6 +2305,23 @@ async function loadCampaignData() {
         loadCampaignsList();
     } catch (error) {
         console.error('Error loading campaign data:', error);
+    }
+}
+
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
     }
 }
 
@@ -2167,6 +2375,23 @@ function updateCampaignUI() {
     }
 }
 
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
+    }
+}
+
 // Load campaigns list
 async function loadCampaignsList() {
     try {
@@ -2184,6 +2409,23 @@ async function loadCampaignsList() {
         updateCampaignsTable(data.campaigns);
     } catch (error) {
         console.error('Error loading campaigns list:', error);
+    }
+}
+
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
     }
 }
 
@@ -2286,6 +2528,23 @@ async function createCampaign() {
     }
 }
 
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
+    }
+}
+
 // Close campaign
 async function closeCampaign(campaignId) {
     if (!confirm('Are you sure you want to close this campaign? This action cannot be undone.')) {
@@ -2311,6 +2570,23 @@ async function closeCampaign(campaignId) {
     } catch (error) {
         console.error('Error closing campaign:', error);
         showErrorMessage('Failed to close campaign. Please try again.');
+    }
+}
+
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
     }
 }
 
@@ -2436,6 +2712,23 @@ async function loadCampaignFilterOptions() {
     }
 }
 
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
+    }
+}
+
 // Populate campaign filter dropdown
 function populateCampaignFilterDropdown() {
     const select = document.getElementById('campaignFilter');
@@ -2506,5 +2799,22 @@ function updateSelectedCampaignInfo() {
         infoDiv.style.display = 'block';
     } else {
         infoDiv.style.display = 'none';
+    }
+}
+
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
     }
 }
