@@ -702,3 +702,59 @@ document.addEventListener("DOMContentLoaded", function() {
         setTimeout(handleCampaignTabAccess, 100);
     }
 });
+
+// Admin login function for Campaign Management access
+function adminLogin() {
+    const email = prompt("Enter admin email address:");
+    if (!email) return;
+    
+    // Show loading state
+    const loginBtn = document.querySelector("button[onclick=\"adminLogin()\"]");
+    if (loginBtn) {
+        loginBtn.innerHTML = "<i class=\"fas fa-spinner fa-spin me-2\"></i>Authenticating...";
+        loginBtn.disabled = true;
+    }
+    
+    fetch("/auth/request-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            localStorage.setItem("authToken", data.token);
+            
+            // Verify admin status
+            return fetch("/auth/verify-token", {
+                method: "POST", 
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token: data.token })
+            });
+        } else {
+            throw new Error(data.message || "Authentication failed");
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.valid && data.is_admin) {
+            alert("Admin authentication successful! Refreshing campaign management...");
+            updateCampaignAccess(true);
+        } else {
+            throw new Error("Access denied: Admin privileges required");
+        }
+    })
+    .catch(error => {
+        console.error("Admin login error:", error);
+        alert("Authentication failed: " + error.message);
+        localStorage.removeItem("authToken");
+        updateCampaignAccess(false);
+    })
+    .finally(() => {
+        // Restore button state
+        if (loginBtn) {
+            loginBtn.innerHTML = "<i class=\"fas fa-key me-2\"></i>Admin Login";
+            loginBtn.disabled = false;
+        }
+    });
+}
