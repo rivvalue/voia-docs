@@ -1199,6 +1199,12 @@ small, .small {
     min-width: 0;
 }
 
+/* Force KPI warning cards to stay white (override warning color rules) */
+.kpi-card.kpi-warning {
+    background: var(--primary-white) !important;
+    color: inherit !important;
+}
+
 .kpi-card::before {
     content: '';
     position: absolute;
