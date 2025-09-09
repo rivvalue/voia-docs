@@ -154,7 +154,7 @@ async function applyCampaignFilter() {
     
     // Also refresh Overview tab chart if visible
     console.log('🎨 About to call createThemesChart from applyCampaignFilter');
-    createThemesChart();
+    setTimeout(() => createThemesChart(), 100);
 }
 
 // Clear campaign filter
@@ -342,7 +342,8 @@ function populateDashboard() {
     
     // Only create charts for the active (Overview) tab initially
     // Other charts will be created when their tabs are shown
-    createThemesChart();
+    // Wait for Bootstrap tab rendering to complete
+    setTimeout(() => createThemesChart(), 100);
     
     // Populate high risk accounts
     populateHighRiskAccounts();
