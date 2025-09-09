@@ -94,9 +94,14 @@ def request_token():
         
     except Exception as e:
         logger.error(f"Error generating token: {e}")
+        logger.error(f"Exception type: {type(e)}")
+        logger.error(f"Exception args: {e.args}")
+        import traceback
+        logger.error(f"Full traceback: {traceback.format_exc()}")
         return jsonify({
             'error': 'Failed to generate authentication token',
-            'code': 'TOKEN_GENERATION_FAILED'
+            'code': 'TOKEN_GENERATION_FAILED',
+            'debug_info': str(e) if app.debug else None
         }), 500
 
 @app.route('/auth/verify-token', methods=['POST'])
