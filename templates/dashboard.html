@@ -93,6 +93,11 @@
                 <i class="fas fa-comments me-2"></i>Survey Insights
             </button>
         </li>
+        <li class="nav-item" role="presentation" id="campaign-management-nav" style="display: none;">
+            <button class="nav-link" id="campaign-management-tab" data-bs-toggle="tab" data-bs-target="#campaign-management" type="button" role="tab" aria-controls="campaign-management" aria-selected="false">
+                <i class="fas fa-calendar-alt me-2"></i>Campaign Management
+            </button>
+        </li>
     </ul>
 
     <!-- Tab Content -->
@@ -447,8 +452,171 @@
                 </div>
             </div>
         </div>
+
+        <!-- Campaign Management Tab (Admin Only) -->
+        <div class="tab-pane fade" id="campaign-management" role="tabpanel" aria-labelledby="campaign-management-tab">
+            <!-- Campaign Management Header -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4><i class="fas fa-calendar-alt me-2"></i>Campaign Management</h4>
+                            <p class="text-muted">Manage feedback collection campaigns and track NPS over time</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="showCreateCampaignModal()" id="createCampaignBtn">
+                            <i class="fas fa-plus me-2"></i>Create Campaign
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Campaign Stats Cards -->
+            <div class="row mb-4 g-3">
+                <div class="col-md-3">
+                    <div class="kpi-card kpi-primary">
+                        <div class="kpi-value text-primary" id="totalCampaigns">0</div>
+                        <div class="kpi-label">Total Campaigns</div>
+                        <div class="kpi-trend" id="totalCampaignsTrend">Created this year</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="kpi-card kpi-success">
+                        <div class="kpi-value text-success" id="activeCampaigns">0</div>
+                        <div class="kpi-label">Active Campaign</div>
+                        <div class="kpi-trend" id="activeCampaignsTrend">Currently collecting feedback</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="kpi-card kpi-info">
+                        <div class="kpi-value text-info" id="remainingCampaigns">4</div>
+                        <div class="kpi-label">Remaining</div>
+                        <div class="kpi-trend" id="remainingCampaignsTrend">Available this year</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="kpi-card kpi-secondary">
+                        <div class="kpi-value text-secondary" id="campaignResponses">0</div>
+                        <div class="kpi-label">Campaign Responses</div>
+                        <div class="kpi-trend" id="campaignResponsesTrend">From active campaign</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Campaign Status -->
+            <div class="row mb-4" id="activeCampaignStatus" style="display: none;">
+                <div class="col-12">
+                    <div class="alert alert-info d-flex align-items-center">
+                        <i class="fas fa-info-circle me-3"></i>
+                        <div class="flex-grow-1">
+                            <strong id="activeCampaignName">Campaign Name</strong>
+                            <span class="ms-2" id="activeCampaignDates">Jan 1 - Dec 31, 2024</span>
+                            <div class="mt-1">
+                                <small class="text-muted" id="activeCampaignDesc">Campaign description</small>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="badge bg-success mb-1" id="activeCampaignBadge">Active</div>
+                            <div><small class="text-muted" id="activeCampaignDaysLeft">30 days remaining</small></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Campaigns List -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-list me-2"></i>Campaign History
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Campaign Name</th>
+                                            <th>Description</th>
+                                            <th>Start Date</th>
+                                            <th>End Date</th>
+                                            <th>Status</th>
+                                            <th>Responses</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="campaignsTable">
+                                        <!-- Will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="noCampaignsMessage" class="text-center py-4" style="display: none;">
+                                <i class="fas fa-calendar-plus fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No campaigns created yet</h5>
+                                <p class="text-muted">Create your first campaign to start tracking NPS over time</p>
+                                <button class="btn btn-primary" onclick="showCreateCampaignModal()">
+                                    <i class="fas fa-plus me-2"></i>Create Your First Campaign
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- Campaign Creation Modal -->
+<div class="modal fade" id="createCampaignModal" tabindex="-1" aria-labelledby="createCampaignModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createCampaignModalLabel">
+                    <i class="fas fa-calendar-plus me-2"></i>Create New Campaign
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createCampaignForm">
+                    <div class="mb-3">
+                        <label for="campaignName" class="form-label">Campaign Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="campaignName" placeholder="e.g., Q2 Product Satisfaction" required>
+                        <div class="form-text">A clear, descriptive name for your campaign</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="campaignDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="campaignDescription" rows="3" placeholder="Optional description of campaign goals or focus areas"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="campaignStartDate" class="form-label">Start Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="campaignStartDate" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="campaignEndDate" class="form-label">End Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="campaignEndDate" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Important:</strong> Only one campaign can be active at a time. Survey responses during the campaign period will automatically be tagged to this campaign.
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="createCampaign()">
+                    <i class="fas fa-plus me-2"></i>Create Campaign
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
     </div>
 </div>
 {% endblock %}

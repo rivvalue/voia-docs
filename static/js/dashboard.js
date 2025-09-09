@@ -2,6 +2,7 @@
 
 let dashboardData = null;
 let charts = {};
+let campaignData = null;
 
 // Mobile detection and responsive configuration
 function isMobile() {
@@ -1842,6 +1843,7 @@ function checkAdminStatus() {
 function updateAdminUI(isAdmin, email = null) {
     const adminBtn = document.getElementById('adminLoginBtn');
     const exportBtn = document.getElementById('exportDataBtn');
+    const campaignNav = document.getElementById('campaign-management-nav');
     
     if (isAdmin && email) {
         // Show admin logged in state
@@ -1852,6 +1854,12 @@ function updateAdminUI(isAdmin, email = null) {
         
         // Show export button
         exportBtn.classList.remove('d-none');
+        
+        // Show campaign management tab
+        if (campaignNav) {
+            campaignNav.style.display = 'block';
+            loadCampaignData(); // Load campaign data when admin logs in
+        }
     } else {
         // Show logged out state
         adminBtn.innerHTML = '<i class="fas fa-key me-2"></i>Admin Login';
@@ -1861,6 +1869,11 @@ function updateAdminUI(isAdmin, email = null) {
         
         // Hide export button
         exportBtn.classList.add('d-none');
+        
+        // Hide campaign management tab
+        if (campaignNav) {
+            campaignNav.style.display = 'none';
+        }
     }
 }
 
@@ -1872,3 +1885,311 @@ function adminLogout() {
 }
 
 document.addEventListener('DOMContentLoaded', checkAdminStatus);
+
+// ============================================================================
+// CAMPAIGN MANAGEMENT FUNCTIONALITY
+// ============================================================================
+
+// Load campaign data from API
+async function loadCampaignData() {
+    try {
+        const response = await fetch('/api/campaigns/stats', {
+            headers: {
+                'Authorization': localStorage.getItem('authToken')
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to load campaign data: ${response.status}`);
+        }
+        
+        campaignData = await response.json();
+        updateCampaignUI();
+        loadCampaignsList();
+    } catch (error) {
+        console.error('Error loading campaign data:', error);
+    }
+}
+
+// Update campaign UI with data
+function updateCampaignUI() {
+    if (!campaignData) return;
+    
+    // Update campaign stats cards
+    document.getElementById('totalCampaigns').textContent = campaignData.total_campaigns;
+    document.getElementById('activeCampaigns').textContent = campaignData.active_campaign ? '1' : '0';
+    document.getElementById('remainingCampaigns').textContent = campaignData.remaining_campaigns;
+    
+    // Calculate total responses for active campaign
+    let activeResponses = 0;
+    if (campaignData.active_campaign) {
+        const activeCampaignResponses = campaignData.campaign_responses.find(
+            c => c.campaign_id === campaignData.active_campaign.id
+        );
+        activeResponses = activeCampaignResponses ? activeCampaignResponses.response_count : 0;
+    }
+    document.getElementById('campaignResponses').textContent = activeResponses;
+    
+    // Update trends
+    document.getElementById('totalCampaignsTrend').textContent = `Created this year (max 4)`;
+    document.getElementById('activeCampaignsTrend').textContent = campaignData.active_campaign ? 'Currently collecting feedback' : 'No active campaign';
+    document.getElementById('remainingCampaignsTrend').textContent = campaignData.can_create_campaign ? 'Can create more' : 'Limit reached';
+    document.getElementById('campaignResponsesTrend').textContent = campaignData.active_campaign ? 'From active campaign' : 'No active campaign';
+    
+    // Show/hide active campaign status
+    const activeCampaignStatus = document.getElementById('activeCampaignStatus');
+    if (campaignData.active_campaign) {
+        activeCampaignStatus.style.display = 'block';
+        document.getElementById('activeCampaignName').textContent = campaignData.active_campaign.name;
+        document.getElementById('activeCampaignDates').textContent = 
+            `${formatDate(campaignData.active_campaign.start_date)} - ${formatDate(campaignData.active_campaign.end_date)}`;
+        document.getElementById('activeCampaignDesc').textContent = 
+            campaignData.active_campaign.description || 'No description provided';
+        document.getElementById('activeCampaignDaysLeft').textContent = 
+            `${campaignData.active_campaign.days_remaining} days remaining`;
+    } else {
+        activeCampaignStatus.style.display = 'none';
+    }
+    
+    // Update create campaign button state
+    const createBtn = document.getElementById('createCampaignBtn');
+    if (!campaignData.can_create_campaign) {
+        createBtn.disabled = true;
+        createBtn.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>Campaign Limit Reached';
+        createBtn.classList.remove('btn-primary');
+        createBtn.classList.add('btn-secondary');
+    }
+}
+
+// Load campaigns list
+async function loadCampaignsList() {
+    try {
+        const response = await fetch('/api/campaigns', {
+            headers: {
+                'Authorization': localStorage.getItem('authToken')
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to load campaigns: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        updateCampaignsTable(data.campaigns);
+    } catch (error) {
+        console.error('Error loading campaigns list:', error);
+    }
+}
+
+// Update campaigns table
+function updateCampaignsTable(campaigns) {
+    const tbody = document.getElementById('campaignsTable');
+    const noDataMsg = document.getElementById('noCampaignsMessage');
+    
+    if (campaigns.length === 0) {
+        tbody.innerHTML = '';
+        noDataMsg.style.display = 'block';
+        return;
+    }
+    
+    noDataMsg.style.display = 'none';
+    
+    tbody.innerHTML = campaigns.map(campaign => {
+        const statusBadge = campaign.status === 'active' ? 
+            '<span class="badge bg-success">Active</span>' : 
+            '<span class="badge bg-secondary">Completed</span>';
+            
+        const actions = campaign.status === 'active' ? 
+            `<button class="btn btn-sm btn-outline-danger" onclick="closeCampaign(${campaign.id})">
+                <i class="fas fa-stop me-1"></i>Close
+            </button>` : 
+            '<span class="text-muted">-</span>';
+            
+        return `
+            <tr>
+                <td><strong>${campaign.name}</strong></td>
+                <td>${campaign.description || '<em>No description</em>'}</td>
+                <td>${formatDate(campaign.start_date)}</td>
+                <td>${formatDate(campaign.end_date)}</td>
+                <td>${statusBadge}</td>
+                <td><span class="badge bg-info">${campaign.response_count || 0}</span></td>
+                <td>${actions}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Show create campaign modal
+function showCreateCampaignModal() {
+    // Set default dates (today to 30 days from now)
+    const today = new Date();
+    const endDate = new Date();
+    endDate.setDate(today.getDate() + 30);
+    
+    document.getElementById('campaignStartDate').value = today.toISOString().split('T')[0];
+    document.getElementById('campaignEndDate').value = endDate.toISOString().split('T')[0];
+    
+    // Clear form
+    document.getElementById('createCampaignForm').reset();
+    document.getElementById('campaignStartDate').value = today.toISOString().split('T')[0];
+    document.getElementById('campaignEndDate').value = endDate.toISOString().split('T')[0];
+    
+    // Show modal
+    new bootstrap.Modal(document.getElementById('createCampaignModal')).show();
+}
+
+// Create new campaign
+async function createCampaign() {
+    const form = document.getElementById('createCampaignForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    
+    const formData = {
+        name: document.getElementById('campaignName').value,
+        description: document.getElementById('campaignDescription').value,
+        start_date: document.getElementById('campaignStartDate').value,
+        end_date: document.getElementById('campaignEndDate').value
+    };
+    
+    try {
+        const response = await fetch('/api/campaigns', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': localStorage.getItem('authToken')
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            // Success
+            bootstrap.Modal.getInstance(document.getElementById('createCampaignModal')).hide();
+            showSuccessMessage('Campaign created successfully!');
+            loadCampaignData(); // Refresh data
+        } else {
+            // Error
+            showErrorMessage(result.error || 'Failed to create campaign');
+        }
+    } catch (error) {
+        console.error('Error creating campaign:', error);
+        showErrorMessage('Failed to create campaign. Please try again.');
+    }
+}
+
+// Close campaign
+async function closeCampaign(campaignId) {
+    if (!confirm('Are you sure you want to close this campaign? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/campaigns/${campaignId}/close`, {
+            method: 'POST',
+            headers: {
+                'Authorization': localStorage.getItem('authToken')
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            showSuccessMessage('Campaign closed successfully!');
+            loadCampaignData(); // Refresh data
+        } else {
+            showErrorMessage(result.error || 'Failed to close campaign');
+        }
+    } catch (error) {
+        console.error('Error closing campaign:', error);
+        showErrorMessage('Failed to close campaign. Please try again.');
+    }
+}
+
+// Utility functions
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+}
+
+function showSuccessMessage(message) {
+    // Create a temporary alert
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-success alert-dismissible fade show position-fixed';
+    alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
+    alert.innerHTML = `
+        <i class="fas fa-check-circle me-2"></i>${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(alert);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (alert.parentNode) {
+            alert.parentNode.removeChild(alert);
+        }
+    }, 5000);
+}
+
+function showErrorMessage(message) {
+    // Create a temporary alert
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-danger alert-dismissible fade show position-fixed';
+    alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
+    alert.innerHTML = `
+        <i class="fas fa-exclamation-circle me-2"></i>${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(alert);
+    
+    // Auto-remove after 8 seconds
+    setTimeout(() => {
+        if (alert.parentNode) {
+            alert.parentNode.removeChild(alert);
+        }
+    }, 8000);
+}
+
+// Add campaign management to tab listeners
+function setupTabEventListeners() {
+    // Get all tab buttons
+    const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('shown.bs.tab', function (event) {
+            const targetTab = event.target.getAttribute('data-bs-target');
+            console.log('Tab shown:', targetTab);
+            
+            // Re-initialize charts when Analytics tab is shown
+            if (targetTab === '#analytics') {
+                setTimeout(() => {
+                    createNpsChart();
+                    createSentimentChart();
+                    createRatingsChart();
+                    createTenureChart();
+                    createGrowthFactorChart();
+                }, 100);
+            }
+            
+            // Re-initialize themes chart when Overview tab is shown
+            if (targetTab === '#overview') {
+                setTimeout(() => {
+                    createThemesChart();
+                }, 100);
+            }
+            
+            // Load campaign data when Campaign Management tab is shown
+            if (targetTab === '#campaign-management') {
+                setTimeout(() => {
+                    loadCampaignData();
+                }, 100);
+            }
+        });
+    });
+}
