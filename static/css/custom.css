@@ -675,6 +675,13 @@ p, .text-body {
     border-color: var(--medium-gray) !important;
 }
 
+/* EXCEPTION: KPI cards with warning class should stay white */
+*[class*="warning"].kpi-card {
+    background-color: var(--primary-white) !important;
+    background: var(--primary-white) !important;
+    color: inherit !important;
+}
+
 /* Specifically target Font Awesome warning icons */
 .fa-exclamation-triangle,
 .fas.fa-exclamation-triangle {
@@ -1200,8 +1207,12 @@ small, .small {
 }
 
 /* Force KPI warning cards to stay white (override warning color rules) */
-.kpi-card.kpi-warning {
+.kpi-card.kpi-warning,
+.container .kpi-card.kpi-warning,
+body .kpi-card.kpi-warning,
+html .kpi-card.kpi-warning {
     background: var(--primary-white) !important;
+    background-color: var(--primary-white) !important;
     color: inherit !important;
 }
 
@@ -1218,7 +1229,7 @@ small, .small {
 .kpi-card.kpi-primary::before { background: var(--gray-dark); }
 .kpi-card.kpi-success::before { background: var(--primary-red); }
 .kpi-card.kpi-info::before { background: var(--medium-gray); }
-.kpi-card.kpi-warning::before { background: var(--primary-red); }
+.kpi-card.kpi-danger::before { background: var(--primary-red); }
 
 .kpi-card:hover {
     transform: translateY(-3px);
