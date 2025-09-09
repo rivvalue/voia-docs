@@ -1566,6 +1566,29 @@ canvas {
     }
 }
 
+/* High Risk Accounts Card Styling */
+.risk-card {
+    background: var(--light-gray);
+    border: 1px solid var(--medium-gray);
+    transition: all 0.2s ease;
+    min-height: 70px; /* Consistent height for each risk card */
+}
+
+.risk-card:hover {
+    background: rgba(225, 58, 68, 0.05);
+    border-color: var(--primary-red);
+    transform: translateX(2px);
+}
+
+.risk-card:last-child {
+    margin-bottom: 0 !important; /* Remove margin from last item */
+}
+
+/* High Risk Accounts Container - Show max 5 items */
+#highRiskAccounts {
+    max-height: 380px; /* Height for approximately 5 items */
+}
+
 /* Enhanced Badge Styling */
 .badge {
     font-size: var(--font-size-xs);
