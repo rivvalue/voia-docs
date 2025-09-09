@@ -183,3 +183,101 @@ class Campaign(db.Model):
             query = query.filter(Campaign.id != exclude_id)
             
         return query.first() is not None
+
+
+class CampaignKPISnapshot(db.Model):
+    """Immutable KPI snapshot for closed campaigns to prevent data drift"""
+    __tablename__ = 'campaign_kpi_snapshots'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=False, unique=True, index=True)
+    campaign = db.relationship('Campaign', backref=db.backref('kpi_snapshot', uselist=False))
+    
+    # Core Metrics
+    total_responses = db.Column(db.Integer, nullable=False, default=0)
+    total_companies = db.Column(db.Integer, nullable=False, default=0)
+    
+    # NPS Metrics
+    nps_score = db.Column(db.Float, nullable=False, default=0.0)
+    promoters_count = db.Column(db.Integer, nullable=False, default=0)
+    passives_count = db.Column(db.Integer, nullable=False, default=0)
+    detractors_count = db.Column(db.Integer, nullable=False, default=0)
+    
+    # Average Ratings (1-5 scale)
+    avg_satisfaction_rating = db.Column(db.Float, nullable=True)
+    avg_pricing_rating = db.Column(db.Float, nullable=True)
+    avg_service_rating = db.Column(db.Float, nullable=True)
+    avg_product_value_rating = db.Column(db.Float, nullable=True)
+    
+    # Sentiment Distribution (percentages)
+    sentiment_positive_pct = db.Column(db.Float, nullable=True, default=0.0)
+    sentiment_negative_pct = db.Column(db.Float, nullable=True, default=0.0)
+    sentiment_neutral_pct = db.Column(db.Float, nullable=True, default=0.0)
+    
+    # Risk Assessment
+    high_risk_accounts_count = db.Column(db.Integer, nullable=False, default=0)
+    churn_risk_high_pct = db.Column(db.Float, nullable=True, default=0.0)
+    churn_risk_medium_pct = db.Column(db.Float, nullable=True, default=0.0)
+    churn_risk_low_pct = db.Column(db.Float, nullable=True, default=0.0)
+    churn_risk_minimal_pct = db.Column(db.Float, nullable=True, default=0.0)
+    
+    # Growth Metrics
+    avg_growth_factor = db.Column(db.Float, nullable=True, default=0.0)
+    total_growth_potential = db.Column(db.Float, nullable=True, default=0.0)
+    
+    # Company Aggregations
+    avg_company_nps = db.Column(db.Float, nullable=True, default=0.0)
+    
+    # Distribution Data (stored as JSON for charts)
+    nps_distribution = db.Column(db.Text, nullable=True)  # JSON: [{"category": "Promoter", "count": 5}, ...]
+    sentiment_distribution = db.Column(db.Text, nullable=True)  # JSON: [{"label": "Positive", "count": 8}, ...]
+    tenure_distribution = db.Column(db.Text, nullable=True)  # JSON: [{"tenure": "1-2 years", "count": 3}, ...]
+    ratings_distribution = db.Column(db.Text, nullable=True)  # JSON: [{"category": "Satisfaction", "rating": 3.4}, ...]
+    growth_factor_distribution = db.Column(db.Text, nullable=True)  # JSON: [{"range": "70-100", "count": 2}, ...]
+    key_themes = db.Column(db.Text, nullable=True)  # JSON: [{"theme": "pricing", "frequency": 8}, ...]
+    high_risk_accounts = db.Column(db.Text, nullable=True)  # JSON: [{"company": "Acme Inc", "risk": "High"}, ...]
+    
+    # Snapshot Metadata
+    snapshot_version = db.Column(db.String(10), nullable=False, default='v1.0')  # Track engine versions
+    snapshot_created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+    data_period_start = db.Column(db.Date, nullable=False)  # Campaign start date
+    data_period_end = db.Column(db.Date, nullable=False)  # Campaign end date
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'campaign_id': self.campaign_id,
+            'campaign_name': self.campaign.name if self.campaign else None,
+            'total_responses': self.total_responses,
+            'total_companies': self.total_companies,
+            'nps_score': self.nps_score,
+            'promoters_count': self.promoters_count,
+            'passives_count': self.passives_count,
+            'detractors_count': self.detractors_count,
+            'avg_satisfaction_rating': self.avg_satisfaction_rating,
+            'avg_pricing_rating': self.avg_pricing_rating,
+            'avg_service_rating': self.avg_service_rating,
+            'avg_product_value_rating': self.avg_product_value_rating,
+            'sentiment_positive_pct': self.sentiment_positive_pct,
+            'sentiment_negative_pct': self.sentiment_negative_pct,
+            'sentiment_neutral_pct': self.sentiment_neutral_pct,
+            'high_risk_accounts_count': self.high_risk_accounts_count,
+            'churn_risk_high_pct': self.churn_risk_high_pct,
+            'churn_risk_medium_pct': self.churn_risk_medium_pct,
+            'churn_risk_low_pct': self.churn_risk_low_pct,
+            'churn_risk_minimal_pct': self.churn_risk_minimal_pct,
+            'avg_growth_factor': self.avg_growth_factor,
+            'total_growth_potential': self.total_growth_potential,
+            'avg_company_nps': self.avg_company_nps,
+            'nps_distribution': json.loads(self.nps_distribution) if self.nps_distribution else [],
+            'sentiment_distribution': json.loads(self.sentiment_distribution) if self.sentiment_distribution else [],
+            'tenure_distribution': json.loads(self.tenure_distribution) if self.tenure_distribution else [],
+            'ratings_distribution': json.loads(self.ratings_distribution) if self.ratings_distribution else [],
+            'growth_factor_distribution': json.loads(self.growth_factor_distribution) if self.growth_factor_distribution else [],
+            'key_themes': json.loads(self.key_themes) if self.key_themes else [],
+            'high_risk_accounts': json.loads(self.high_risk_accounts) if self.high_risk_accounts else [],
+            'snapshot_version': self.snapshot_version,
+            'snapshot_created_at': self.snapshot_created_at.isoformat() if self.snapshot_created_at else None,
+            'data_period_start': self.data_period_start.isoformat() if self.data_period_start else None,
+            'data_period_end': self.data_period_end.isoformat() if self.data_period_end else None
+        }
