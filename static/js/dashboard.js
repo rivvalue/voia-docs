@@ -1843,7 +1843,6 @@ function checkAdminStatus() {
 function updateAdminUI(isAdmin, email = null) {
     const adminBtn = document.getElementById('adminLoginBtn');
     const exportBtn = document.getElementById('exportDataBtn');
-    const campaignNav = document.getElementById('campaign-management-nav');
     
     if (isAdmin && email) {
         // Show admin logged in state
@@ -1855,11 +1854,8 @@ function updateAdminUI(isAdmin, email = null) {
         // Show export button
         exportBtn.classList.remove('d-none');
         
-        // Show campaign management tab
-        if (campaignNav) {
-            campaignNav.style.display = 'block';
-            loadCampaignData(); // Load campaign data when admin logs in
-        }
+        // Update campaign management access
+        updateCampaignAccess(true);
     } else {
         // Show logged out state
         adminBtn.innerHTML = '<i class="fas fa-key me-2"></i>Admin Login';
@@ -1870,10 +1866,27 @@ function updateAdminUI(isAdmin, email = null) {
         // Hide export button
         exportBtn.classList.add('d-none');
         
-        // Hide campaign management tab
-        if (campaignNav) {
-            campaignNav.style.display = 'none';
+        // Update campaign management access
+        updateCampaignAccess(false);
+    }
+}
+
+// Control access to campaign management content
+function updateCampaignAccess(isAdmin) {
+    const adminRequiredDiv = document.getElementById('campaign-admin-required');
+    const adminContentDiv = document.getElementById('campaign-admin-content');
+    
+    if (isAdmin) {
+        // Show admin content, hide access required message
+        if (adminRequiredDiv) adminRequiredDiv.style.display = 'none';
+        if (adminContentDiv) {
+            adminContentDiv.style.display = 'block';
+            loadCampaignData(); // Load campaign data when admin logs in
         }
+    } else {
+        // Show access required message, hide admin content
+        if (adminContentDiv) adminContentDiv.style.display = 'none';
+        if (adminRequiredDiv) adminRequiredDiv.style.display = 'block';
     }
 }
 
@@ -2184,10 +2197,28 @@ function setupTabEventListeners() {
                 }, 100);
             }
             
-            // Load campaign data when Campaign Management tab is shown
+            // Handle campaign management tab access
             if (targetTab === '#campaign-management') {
                 setTimeout(() => {
-                    loadCampaignData();
+                    // Check current admin status and update access accordingly
+                    const token = localStorage.getItem('authToken');
+                    if (token) {
+                        // Verify token is still valid and user is admin
+                        fetch('/auth/verify-token', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ token: token })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            updateCampaignAccess(data.valid && data.is_admin);
+                        })
+                        .catch(() => {
+                            updateCampaignAccess(false);
+                        });
+                    } else {
+                        updateCampaignAccess(false);
+                    }
                 }, 100);
             }
         });

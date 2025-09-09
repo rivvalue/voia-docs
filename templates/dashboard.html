@@ -93,7 +93,7 @@
                 <i class="fas fa-comments me-2"></i>Survey Insights
             </button>
         </li>
-        <li class="nav-item" role="presentation" id="campaign-management-nav" style="display: none;">
+        <li class="nav-item" role="presentation" id="campaign-management-nav">
             <button class="nav-link" id="campaign-management-tab" data-bs-toggle="tab" data-bs-target="#campaign-management" type="button" role="tab" aria-controls="campaign-management" aria-selected="false">
                 <i class="fas fa-calendar-alt me-2"></i>Campaign Management
             </button>
@@ -453,22 +453,51 @@
             </div>
         </div>
 
-        <!-- Campaign Management Tab (Admin Only) -->
+        <!-- Campaign Management Tab -->
         <div class="tab-pane fade" id="campaign-management" role="tabpanel" aria-labelledby="campaign-management-tab">
-            <!-- Campaign Management Header -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h4><i class="fas fa-calendar-alt me-2"></i>Campaign Management</h4>
-                            <p class="text-muted">Manage feedback collection campaigns and track NPS over time</p>
+            <!-- Admin Access Required Message (shown to non-admin users) -->
+            <div id="campaign-admin-required" class="text-center py-5" style="display: none;">
+                <div class="card mx-auto" style="max-width: 500px;">
+                    <div class="card-body">
+                        <i class="fas fa-lock fa-4x text-muted mb-4"></i>
+                        <h4 class="text-muted mb-3">Administrator Access Required</h4>
+                        <p class="text-muted mb-4">
+                            Campaign Management is restricted to administrators only. 
+                            Please contact your system administrator to access campaign management features.
+                        </p>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Campaign Management Features:</strong>
+                            <ul class="list-unstyled mt-2 mb-0">
+                                <li>• Create and manage feedback campaigns</li>
+                                <li>• Track NPS trends over time</li>
+                                <li>• Organize responses by campaign periods</li>
+                                <li>• Set campaign start and end dates</li>
+                            </ul>
                         </div>
-                        <button class="btn btn-primary" onclick="showCreateCampaignModal()" id="createCampaignBtn">
-                            <i class="fas fa-plus me-2"></i>Create Campaign
+                        <button class="btn btn-outline-primary" onclick="adminLogin()">
+                            <i class="fas fa-key me-2"></i>Admin Login
                         </button>
                     </div>
                 </div>
             </div>
+
+            <!-- Campaign Management Content (Admin Only) -->
+            <div id="campaign-admin-content" style="display: none;">
+                <!-- Campaign Management Header -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h4><i class="fas fa-calendar-alt me-2"></i>Campaign Management</h4>
+                                <p class="text-muted">Manage feedback collection campaigns and track NPS over time</p>
+                            </div>
+                            <button class="btn btn-primary" onclick="showCreateCampaignModal()" id="createCampaignBtn">
+                                <i class="fas fa-plus me-2"></i>Create Campaign
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
             <!-- Campaign Stats Cards -->
             <div class="row mb-4 g-3">
@@ -561,6 +590,7 @@
                         </div>
                     </div>
                 </div>
+            </div>
             </div>
         </div>
     </div>
