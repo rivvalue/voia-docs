@@ -141,11 +141,11 @@
             <!-- High Risk Accounts & Key Themes Summary -->
             <div class="row mb-4">
                 <div class="col-md-6">
-                    <div class="card">
+                    <div class="chart-card">
                         <div class="card-header">
-                            <h5 class="card-title mb-0">High Risk Accounts</h5>
+                            <h5>High Risk Accounts</h5>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body" style="height: 450px; overflow-y: auto;">
                             <div id="highRiskAccounts">
                                 <!-- Will be populated by JavaScript -->
                             </div>
@@ -153,12 +153,14 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="card">
+                    <div class="chart-card">
                         <div class="card-header">
-                            <h5 class="card-title mb-0">Key Themes</h5>
+                            <h5>Key Themes</h5>
                         </div>
                         <div class="card-body">
-                            <canvas id="themesChart"></canvas>
+                            <div class="chart-container">
+                                <canvas id="themesChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
