@@ -645,3 +645,60 @@ function formatDate(dateString) {
         return dateString;
     }
 }
+
+function updateCampaignAccess(isAdmin) {
+    const adminRequiredDiv = document.getElementById("campaign-admin-required");
+    const adminContentDiv = document.getElementById("campaign-admin-content");
+    
+    if (isAdmin) {
+        if (adminRequiredDiv) adminRequiredDiv.style.display = "none";
+        if (adminContentDiv) adminContentDiv.style.display = "block";
+        loadCampaignData();
+    } else {
+        if (adminRequiredDiv) adminRequiredDiv.style.display = "block";
+        if (adminContentDiv) adminContentDiv.style.display = "none";
+    }
+    
+    console.log("Campaign access updated - isAdmin:", isAdmin);
+}
+
+// Handle campaign management tab access for non-admin users
+function handleCampaignTabAccess() {
+    const token = localStorage.getItem("authToken");
+    
+    if (!token) {
+        // No admin token - show access required message
+        updateCampaignAccess(false);
+        return;
+    }
+    
+    // Verify admin token
+    fetch("/auth/verify-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: token })
+    })
+    .then(response => response.json())
+    .then(data => {
+        const isAdmin = data.valid && data.is_admin;
+        updateCampaignAccess(isAdmin);
+    })
+    .catch(() => {
+        // Error verifying token - show access required message
+        updateCampaignAccess(false);
+    });
+}
+
+// Initialize campaign access on page load
+document.addEventListener("DOMContentLoaded", function() {
+    // Set up tab event listener for campaign management
+    const campaignTab = document.querySelector("[data-bs-target=\"#campaign-management\"]");
+    if (campaignTab) {
+        campaignTab.addEventListener("shown.bs.tab", handleCampaignTabAccess);
+    }
+    
+    // Also handle initial load if campaign tab is active
+    if (window.location.hash === "#campaign-management") {
+        setTimeout(handleCampaignTabAccess, 100);
+    }
+});
