@@ -5,6 +5,25 @@
 {% block page_class %}page-dashboard{% endblock %}
 
 {% block content %}
+<style>
+/* EMERGENCY override - inject directly into page head */
+.text-warning, .text-warning:hover, .text-warning:focus, .text-warning:active,
+.bg-warning, .badge.bg-warning, .btn-warning, .btn-outline-warning,
+.border-warning, .alert-warning {
+    color: #E13A44 !important;
+    background-color: #BDBDBD !important;
+    border-color: #BDBDBD !important;
+}
+.fa-exclamation-triangle, .fas.fa-exclamation-triangle {
+    color: #E13A44 !important;
+}
+/* Override Bootstrap CSS variables with highest priority */
+:root {
+    --bs-warning: #BDBDBD !important;
+    --bs-warning-rgb: 189, 189, 189 !important;
+    --warning: #BDBDBD !important;
+}
+</style>
 <div class="row">
     <div class="col-lg-10 mx-auto">
         <div data-page="dashboard"></div>

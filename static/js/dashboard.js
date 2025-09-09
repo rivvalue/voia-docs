@@ -42,9 +42,54 @@ function getMobileChartConfig() {
     };
 }
 
+// Force yellow color override function
+function forceRemoveYellowColors() {
+    console.log('Running yellow color override...');
+    
+    // Target ALL possible warning elements on the entire page
+    const yellowSelectors = [
+        '.text-warning', '.bg-warning', '.border-warning', '.badge.bg-warning',
+        '.btn-warning', '.btn-outline-warning', '.alert-warning',
+        '.fa-exclamation-triangle', '.fas.fa-exclamation-triangle',
+        '[class*="warning"]'
+    ];
+    
+    yellowSelectors.forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+        console.log(`Found ${elements.length} elements with selector ${selector}`);
+        elements.forEach(el => {
+            // Force inline styles that override everything
+            if (el.classList.contains('fa-exclamation-triangle') || el.classList.contains('fas')) {
+                el.style.setProperty('color', '#E13A44', 'important');
+                console.log('Fixed icon color');
+            } else if (el.classList.contains('bg-warning') || el.classList.contains('badge')) {
+                el.style.setProperty('background-color', '#BDBDBD', 'important');
+                el.style.setProperty('color', '#000000', 'important');
+                el.style.setProperty('border-color', '#BDBDBD', 'important');
+                console.log('Fixed badge/background color');
+            } else if (el.classList.contains('text-warning')) {
+                el.style.setProperty('color', '#E13A44', 'important');
+                console.log('Fixed text color');
+            } else if (el.classList.contains('border-warning')) {
+                el.style.setProperty('border-color', '#BDBDBD', 'important');
+                console.log('Fixed border color');
+            } else {
+                // Generic warning class
+                el.style.setProperty('color', '#E13A44', 'important');
+                el.style.setProperty('background-color', '#BDBDBD', 'important');
+                el.style.setProperty('border-color', '#BDBDBD', 'important');
+                console.log('Fixed generic warning');
+            }
+        });
+    });
+}
+
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Dashboard JavaScript loaded and DOM ready');
+    
+    // Force remove yellow colors immediately
+    forceRemoveYellowColors();
     
     // Immediate fallback for company NPS data
     setTimeout(function() {
@@ -56,6 +101,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Check admin status on page load
     checkAdminStatus();
+    
+    // Run color override multiple times to catch dynamically loaded content
+    setTimeout(forceRemoveYellowColors, 100);
+    setTimeout(forceRemoveYellowColors, 500);
+    setTimeout(forceRemoveYellowColors, 1000);
+    setTimeout(forceRemoveYellowColors, 2000);
+    setTimeout(forceRemoveYellowColors, 5000);
 });
 
 // Direct company NPS data loading as fallback
