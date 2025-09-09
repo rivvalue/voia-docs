@@ -758,3 +758,63 @@ function adminLogin() {
         }
     });
 }
+
+// Load campaign management data for admin users
+function loadCampaignData() {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+        console.error("No admin token available for loading campaign data");
+        return;
+    }
+    
+    // Load campaigns and stats
+    Promise.all([
+        fetch("/api/campaigns", {
+            headers: { "Authorization": `Bearer ${token}` }
+        }),
+        fetch("/api/campaigns/stats", {
+            headers: { "Authorization": `Bearer ${token}` }
+        })
+    ])
+    .then(async ([campaignsRes, statsRes]) => {
+        const campaigns = await campaignsRes.json();
+        const stats = await statsRes.json();
+        
+        if (campaigns.campaigns) {
+            displayCampaigns(campaigns.campaigns);
+        }
+        
+        if (stats.stats) {
+            updateCampaignStats(stats.stats);
+        }
+    })
+    .catch(error => {
+        console.error("Error loading campaign data:", error);
+    });
+}
+
+// Display campaigns in the management interface
+function displayCampaigns(campaigns) {
+    console.log("Displaying campaigns:", campaigns);
+    // Campaign display logic would go here
+    // For now, just log success
+}
+
+// Update campaign statistics display
+function updateCampaignStats(stats) {
+    console.log("Updating campaign stats:", stats);
+    
+    // Update campaign stats in the UI
+    const elements = {
+        totalCampaigns: document.getElementById("totalCampaigns"),
+        activeCampaigns: document.getElementById("activeCampaigns")
+    };
+    
+    if (elements.totalCampaigns) {
+        elements.totalCampaigns.textContent = stats.total_campaigns || 0;
+    }
+    
+    if (elements.activeCampaigns) {
+        elements.activeCampaigns.textContent = stats.active_campaigns || 0;
+    }
+}
