@@ -1119,10 +1119,15 @@ small, .small {
     filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));
 }
 
-.dashboard-logo-section {
+.dashboard-left-half {
+    flex: 1;
+}
+
+.dashboard-right-half {
+    flex: 1;
     display: flex;
-    align-items: center;
     justify-content: flex-end;
+    align-items: center;
 }
 
 /* Professional KPI Cards */
