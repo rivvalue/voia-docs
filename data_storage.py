@@ -702,7 +702,7 @@ def convert_snapshot_to_dashboard_format(snapshot):
         return {
             'total_responses': snapshot.total_responses,
             'nps_score': snapshot.nps_score,
-            'recent_responses': snapshot.recent_responses_count or 0,  # For closed campaigns, this might be 0
+            'recent_responses': 0,  # For closed campaigns, this is always 0
             'nps_distribution': nps_distribution,
             'sentiment_distribution': sentiment_distribution,
             'high_risk_accounts': [],  # Would need to be stored separately for historical data
