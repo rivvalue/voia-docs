@@ -104,9 +104,15 @@
                     <!-- Server-side form submission -->
                     <form method="POST" action="{{ url_for('server_auth_generate') }}">
                         <div class="mb-4">
-                            <h4 class="text-center mb-4">Enter an email to generate a secure session token.</h4>
-                            <div class="text-center mb-4">
-                                <small class="text-muted">No spam, no subscriptions. Just a hands-on look at how Voxa works.</small>
+                            <!-- Email Banner with Logo -->
+                            <div class="row align-items-center mb-4">
+                                <div class="col-md-8">
+                                    <h4 class="mb-3">Enter an email to generate a secure session token.</h4>
+                                    <small class="text-muted">No spam, no subscriptions. Just a hands-on look at how Voxa works.</small>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <img src="{{ url_for('static', filename='images/archelo-logo.png') }}" alt="Archelo Group" class="server-auth-logo" style="height: 60px; width: auto; object-fit: contain; filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));">
+                                </div>
                             </div>
                             <label for="email" class="form-label fs-5">Email Address</label>
                             <small class="text-muted d-block mb-2">Used only to create a secure session. We won't contact you.</small>
