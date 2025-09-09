@@ -722,7 +722,7 @@ function adminLogin() {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
+        if (data.token) {
             localStorage.setItem("authToken", data.token);
             
             // Verify admin status
@@ -732,7 +732,7 @@ function adminLogin() {
                 body: JSON.stringify({ token: data.token })
             });
         } else {
-            throw new Error(data.message || "Authentication failed");
+            throw new Error(data.error || data.message || "Authentication failed");
         }
     })
     .then(response => response.json())
