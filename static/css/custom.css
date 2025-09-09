@@ -1266,17 +1266,17 @@ html .kpi-card.kpi-warning {
     margin-top: var(--spacing-sm);
 }
 
-/* Chart containers - Consistent height for all Analytics tab charts */
+/* Chart containers - Enhanced size for better readability */
 .chart-container {
     position: relative;
     padding: var(--spacing-md);
     background: var(--primary-white);
     border-radius: var(--radius-lg);
-    height: 320px; /* Standard height for all charts */
+    height: 450px; /* Increased height for better readability */
 }
 
 canvas {
-    max-height: 400px;
+    max-height: 500px; /* Increased max height for better readability */
     border-radius: var(--radius-md);
 }
 
@@ -1445,13 +1445,13 @@ canvas {
     }
     
     .chart-card canvas {
-        max-height: 300px !important;
-        min-height: 250px !important;
+        max-height: 380px !important; /* Increased for mobile readability */
+        min-height: 300px !important; /* Increased minimum height */
     }
     
     .chart-container {
         position: relative;
-        height: 320px !important; /* Consistent with desktop */
+        height: 400px !important; /* Increased mobile chart height */
         margin: var(--spacing-sm) 0;
     }
     
@@ -1543,7 +1543,11 @@ canvas {
     }
     
     .chart-container {
-        height: 280px !important; /* Slightly reduced for small mobile but proportional */
+        height: 320px !important; /* Increased for small mobile readability */
+    }
+    
+    .chart-card canvas {
+        max-height: 300px !important; /* Optimized for small screens */
     }
     
     /* Tab text even smaller on tiny screens */
