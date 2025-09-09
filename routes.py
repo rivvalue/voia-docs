@@ -591,10 +591,14 @@ def dashboard():
 
 @app.route('/api/dashboard_data')
 def dashboard_data():
-    """API endpoint for dashboard data"""
+    """API endpoint for dashboard data with optional campaign filtering"""
     try:
         from data_storage import get_dashboard_data
-        data = get_dashboard_data()
+        
+        # Get campaign filter parameter
+        campaign_id = request.args.get('campaign_id', type=int)
+        
+        data = get_dashboard_data(campaign_id=campaign_id)
         return jsonify(data)
     except Exception as e:
         logger.error(f"Error fetching dashboard data: {e}")

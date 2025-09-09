@@ -99,42 +99,60 @@ def normalize_risk_factor_type(risk_type):
     # If no mapping found, return the normalized version
     return normalized
 
-def get_dashboard_data():
-    """Compile dashboard data for visualization"""
+def get_dashboard_data(campaign_id=None):
+    """Compile dashboard data for visualization with optional campaign filtering"""
     try:
-        # Basic statistics
-        total_responses = SurveyResponse.query.count()
+        # Build base query with optional campaign filtering
+        base_query = SurveyResponse.query
+        if campaign_id:
+            base_query = base_query.filter(SurveyResponse.campaign_id == campaign_id)
         
-        # NPS distribution
-        nps_distribution = db.session.query(
+        # Basic statistics
+        total_responses = base_query.count()
+        
+        # NPS distribution with campaign filtering
+        nps_query = db.session.query(
             SurveyResponse.nps_category,
             func.count(SurveyResponse.id).label('count')
-        ).group_by(SurveyResponse.nps_category).all()
+        )
+        if campaign_id:
+            nps_query = nps_query.filter(SurveyResponse.campaign_id == campaign_id)
+        nps_distribution = nps_query.group_by(SurveyResponse.nps_category).all()
         
-        # Calculate NPS score
-        promoters = db.session.query(func.count(SurveyResponse.id)).filter(
+        # Calculate NPS score with campaign filtering
+        promoters_query = db.session.query(func.count(SurveyResponse.id)).filter(
             SurveyResponse.nps_score >= 9
-        ).scalar() or 0
+        )
+        if campaign_id:
+            promoters_query = promoters_query.filter(SurveyResponse.campaign_id == campaign_id)
+        promoters = promoters_query.scalar() or 0
         
-        detractors = db.session.query(func.count(SurveyResponse.id)).filter(
+        detractors_query = db.session.query(func.count(SurveyResponse.id)).filter(
             SurveyResponse.nps_score <= 6
-        ).scalar() or 0
+        )
+        if campaign_id:
+            detractors_query = detractors_query.filter(SurveyResponse.campaign_id == campaign_id)
+        detractors = detractors_query.scalar() or 0
         
         nps_score = ((promoters - detractors) / total_responses * 100) if total_responses > 0 else 0
         
-        # Recent responses (last 30 days)
+        # Recent responses (last 30 days) with campaign filtering
         thirty_days_ago = datetime.utcnow() - timedelta(days=30)
-        recent_responses = SurveyResponse.query.filter(
+        recent_query = base_query.filter(
             SurveyResponse.created_at >= thirty_days_ago
-        ).count()
+        )
+        recent_responses = recent_query.count()
         
-        # Sentiment distribution
-        sentiment_distribution = db.session.query(
+        # Sentiment distribution with campaign filtering
+        sentiment_query = db.session.query(
             SurveyResponse.sentiment_label,
             func.count(SurveyResponse.id).label('count')
         ).filter(
             SurveyResponse.sentiment_label.isnot(None)
-        ).group_by(SurveyResponse.sentiment_label).all()
+        )
+        if campaign_id:
+            sentiment_query = sentiment_query.filter(SurveyResponse.campaign_id == campaign_id)
+        sentiment_distribution = sentiment_query.group_by(SurveyResponse.sentiment_label).all()
         
         # Churn risk distribution
         churn_risk_data = db.session.query(
@@ -145,11 +163,14 @@ def get_dashboard_data():
             SurveyResponse.churn_risk_score.isnot(None)
         ).order_by(SurveyResponse.churn_risk_score.desc()).all()
         
-        # High risk accounts - grouped by company (case-insensitive)
+        # High risk accounts - grouped by company (case-insensitive) with campaign filtering
         high_risk_by_company = {}
-        high_risk_responses = SurveyResponse.query.filter(
+        high_risk_query = SurveyResponse.query.filter(
             SurveyResponse.churn_risk_level.in_(['High', 'Critical'])  # Include Critical risk too
-        ).all()
+        )
+        if campaign_id:
+            high_risk_query = high_risk_query.filter(SurveyResponse.campaign_id == campaign_id)
+        high_risk_responses = high_risk_query.all()
         
         for response in high_risk_responses:
             if response.company_name:
@@ -523,47 +544,68 @@ def get_dashboard_data():
                 except json.JSONDecodeError:
                     continue
         
-        # Average ratings
-        avg_satisfaction = db.session.query(func.avg(SurveyResponse.satisfaction_rating)).filter(
+        # Average ratings with campaign filtering
+        satisfaction_query = db.session.query(func.avg(SurveyResponse.satisfaction_rating)).filter(
             SurveyResponse.satisfaction_rating.isnot(None)
-        ).scalar() or 0
+        )
+        if campaign_id:
+            satisfaction_query = satisfaction_query.filter(SurveyResponse.campaign_id == campaign_id)
+        avg_satisfaction = satisfaction_query.scalar() or 0
         
-        avg_product_value = db.session.query(func.avg(SurveyResponse.product_value_rating)).filter(
+        product_value_query = db.session.query(func.avg(SurveyResponse.product_value_rating)).filter(
             SurveyResponse.product_value_rating.isnot(None)
-        ).scalar() or 0
+        )
+        if campaign_id:
+            product_value_query = product_value_query.filter(SurveyResponse.campaign_id == campaign_id)
+        avg_product_value = product_value_query.scalar() or 0
         
-        avg_service = db.session.query(func.avg(SurveyResponse.service_rating)).filter(
+        service_query = db.session.query(func.avg(SurveyResponse.service_rating)).filter(
             SurveyResponse.service_rating.isnot(None)
-        ).scalar() or 0
+        )
+        if campaign_id:
+            service_query = service_query.filter(SurveyResponse.campaign_id == campaign_id)
+        avg_service = service_query.scalar() or 0
         
-        avg_pricing = db.session.query(func.avg(SurveyResponse.pricing_rating)).filter(
+        pricing_query = db.session.query(func.avg(SurveyResponse.pricing_rating)).filter(
             SurveyResponse.pricing_rating.isnot(None)
-        ).scalar() or 0
+        )
+        if campaign_id:
+            pricing_query = pricing_query.filter(SurveyResponse.campaign_id == campaign_id)
+        avg_pricing = pricing_query.scalar() or 0
         
-        # Tenure distribution
-        tenure_distribution = db.session.query(
+        # Tenure distribution with campaign filtering
+        tenure_query = db.session.query(
             SurveyResponse.tenure_with_fc,
             func.count(SurveyResponse.id).label('count')
         ).filter(
             SurveyResponse.tenure_with_fc.isnot(None)
-        ).group_by(SurveyResponse.tenure_with_fc).all()
+        )
+        if campaign_id:
+            tenure_query = tenure_query.filter(SurveyResponse.campaign_id == campaign_id)
+        tenure_distribution = tenure_query.group_by(SurveyResponse.tenure_with_fc).all()
         
-        # Growth factor analysis
-        growth_factor_distribution = db.session.query(
+        # Growth factor analysis with campaign filtering
+        growth_factor_query = db.session.query(
             SurveyResponse.growth_range,
             SurveyResponse.growth_rate,
             func.count(SurveyResponse.id).label('count'),
             func.avg(SurveyResponse.growth_factor).label('avg_factor')
         ).filter(
             SurveyResponse.growth_factor.isnot(None)
-        ).group_by(SurveyResponse.growth_range, SurveyResponse.growth_rate).all()
+        )
+        if campaign_id:
+            growth_factor_query = growth_factor_query.filter(SurveyResponse.campaign_id == campaign_id)
+        growth_factor_distribution = growth_factor_query.group_by(SurveyResponse.growth_range, SurveyResponse.growth_rate).all()
         
-        # Overall growth potential (weighted average)
-        total_growth_potential = db.session.query(
+        # Overall growth potential (weighted average) with campaign filtering
+        growth_potential_query = db.session.query(
             func.avg(SurveyResponse.growth_factor).label('avg_growth_factor')
         ).filter(
             SurveyResponse.growth_factor.isnot(None)
-        ).scalar() or 0
+        )
+        if campaign_id:
+            growth_potential_query = growth_potential_query.filter(SurveyResponse.campaign_id == campaign_id)
+        total_growth_potential = growth_potential_query.scalar() or 0
         
         return {
             'total_responses': total_responses,
