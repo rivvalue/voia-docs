@@ -307,10 +307,12 @@ function loadDashboardData() {
             // Display active campaign banner if showing active campaign data
             updateActiveCampaignBanner(data);
             
-            populateDashboard();
-            
+            // Show content BEFORE creating charts
             if (loadingElement) loadingElement.classList.add('d-none');
             if (contentElement) contentElement.classList.remove('d-none');
+            
+            // Now populate dashboard with charts AFTER content is visible
+            populateDashboard();
             
             // Return the data for chaining if needed
             return data;
