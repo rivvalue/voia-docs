@@ -1120,21 +1120,57 @@ small, .small {
     filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));
 }
 
-/* Mobile responsive banner improvements */
+/* Mobile responsive improvements */
 @media (max-width: 767.98px) {
+    /* Navbar mobile fixes */
+    .navbar-brand {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.5rem !important;
+    }
+    
+    .navbar-brand img {
+        height: 30px !important;
+        width: auto !important;
+    }
+    
+    .navbar-brand span {
+        font-size: 1rem !important;
+        line-height: 1.2 !important;
+    }
+    
+    .navbar-nav {
+        margin-top: 1rem !important;
+    }
+    
+    .navbar-nav .nav-link {
+        padding: 0.75rem 0 !important;
+        margin: 0 !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Banner logo fixes */
     .dashboard-logo {
-        height: 80px !important;
+        height: 60px !important;
+        max-height: 60px !important;
         margin-bottom: 1rem;
     }
     
     .demo-logo {
-        height: 60px !important;
+        height: 50px !important;
         margin-top: 1rem;
     }
     
     .server-auth-logo {
-        height: 80px !important;
+        height: 60px !important;
         margin-top: 1rem;
+    }
+    
+    /* General logo mobile sizing */
+    img[height="40"], img[height="80"], img[height="120"], img[height="180"] {
+        height: 30px !important;
+        max-height: 30px !important;
+        width: auto !important;
     }
     
     .dashboard-subtitle {
