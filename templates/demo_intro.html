@@ -192,16 +192,21 @@
                     <div class="col-lg-12">
                         <div class="text-left" style="max-width: none;">
                             <h1 class="page-header" style="text-align: left; margin-bottom: 1.5rem;">Welcome to Your Voxa Demo</h1>
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <p class="page-subtitle" style="text-align: left; margin-bottom: 1.5rem; max-width: none;">
-                                        You're about to experience how Voxa turns open-ended feedback into actionable insights — in minutes.
-                                    </p>
-                                </div>
-                                <div class="col-lg-6">
+                            
+                            <!-- Full width tagline -->
+                            <p class="page-subtitle" style="text-align: left; margin-bottom: 2rem; max-width: none;">
+                                You're about to experience how Voxa turns open-ended feedback into actionable insights — in minutes.
+                            </p>
+                            
+                            <!-- Left content, Right logo layout -->
+                            <div class="row align-items-center">
+                                <div class="col-lg-8">
                                     <p class="scenario-text" style="text-align: left; max-width: none; margin: 0;">
                                         In this simulation, you'll step into the role of a customer invited by <strong>Archelo Group</strong>, a growing workplace solutions provider, to share feedback on their existing product: <strong>ArcheloFlow</strong>.
                                     </p>
+                                </div>
+                                <div class="col-lg-4 text-end">
+                                    <img src="{{ url_for('static', filename='images/archelo-logo.png') }}" alt="Archelo Group" class="demo-logo" style="height: 80px; width: auto; object-fit: contain; filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));">
                                 </div>
                             </div>
                         </div>
