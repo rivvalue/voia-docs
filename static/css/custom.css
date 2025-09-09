@@ -1177,12 +1177,13 @@ small, .small {
     margin-top: var(--spacing-sm);
 }
 
-/* Chart containers */
+/* Chart containers - Consistent height for all Analytics tab charts */
 .chart-container {
     position: relative;
     padding: var(--spacing-md);
     background: var(--primary-white);
     border-radius: var(--radius-lg);
+    height: 320px; /* Standard height for all charts */
 }
 
 canvas {
@@ -1361,7 +1362,7 @@ canvas {
     
     .chart-container {
         position: relative;
-        height: 300px !important;
+        height: 320px !important; /* Consistent with desktop */
         margin: var(--spacing-sm) 0;
     }
     
@@ -1453,7 +1454,7 @@ canvas {
     }
     
     .chart-container {
-        height: 250px !important;
+        height: 280px !important; /* Slightly reduced for small mobile but proportional */
     }
     
     /* Tab text even smaller on tiny screens */

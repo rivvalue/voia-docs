@@ -597,6 +597,9 @@ function createTenureChart() {
     const labels = dashboardData.tenure_distribution.map(item => item.tenure);
     const data = dashboardData.tenure_distribution.map(item => item.count);
     
+    // Get mobile-responsive configuration  
+    const config = getMobileChartConfig();
+    
     charts.tenure = new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -617,15 +620,15 @@ function createTenureChart() {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: config.maintainAspectRatio,
             plugins: {
                 legend: {
-                    position: 'bottom',
+                    position: config.legendPosition,
                     labels: {
                         color: '#000000',
-                        padding: 20,
+                        padding: config.legendPadding,
                         font: {
-                            size: 14
+                            size: config.legendFontSize
                         }
                     }
                 }
@@ -660,6 +663,9 @@ function createGrowthFactorChart() {
     const data = distribution.map(item => item.count);
     const colors = ['#E13A44', '#BDBDBD', '#E9E8E4', '#000000', '#FFFFFF'];
     
+    // Get mobile-responsive configuration  
+    const config = getMobileChartConfig();
+    
     charts.growthFactor = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -674,7 +680,7 @@ function createGrowthFactorChart() {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: config.maintainAspectRatio,
             plugins: {
                 legend: {
                     display: false
@@ -695,7 +701,7 @@ function createGrowthFactorChart() {
                         color: '#000000',
                         stepSize: 1,
                         font: {
-                            size: 14
+                            size: config.fontSize
                         }
                     },
                     grid: {
@@ -706,7 +712,7 @@ function createGrowthFactorChart() {
                     ticks: {
                         color: '#000000',
                         font: {
-                            size: 14
+                            size: config.fontSize
                         }
                     },
                     grid: {
