@@ -1004,6 +1004,44 @@ function populateAccountIntelligence() {
     }).join('');
     
     container.innerHTML = legendHtml + accountsHtml;
+    
+    // FORCE override any yellow colors by applying inline styles
+    setTimeout(() => {
+        // Override any warning icons or badges that might still be yellow
+        const warningElements = container.querySelectorAll('.text-warning, .bg-warning, .border-warning, .fa-exclamation-triangle, [class*="warning"]');
+        warningElements.forEach(el => {
+            if (el.classList.contains('fa-exclamation-triangle')) {
+                el.style.color = '#E13A44';
+            } else if (el.classList.contains('bg-warning')) {
+                el.style.backgroundColor = '#BDBDBD';
+                el.style.color = '#000000';
+            } else if (el.classList.contains('text-warning')) {
+                el.style.color = '#E13A44';
+            } else if (el.classList.contains('border-warning')) {
+                el.style.borderColor = '#BDBDBD';
+            }
+        });
+        
+        // Also check for any hardcoded yellow colors
+        const allElements = container.querySelectorAll('*');
+        allElements.forEach(el => {
+            const computedStyle = window.getComputedStyle(el);
+            const color = computedStyle.color;
+            const backgroundColor = computedStyle.backgroundColor;
+            const borderColor = computedStyle.borderColor;
+            
+            // If any yellow colors are detected, force change them
+            if (color.includes('rgb(255, 193, 7)') || color.includes('#ffc107') || color.includes('#FFC107')) {
+                el.style.color = '#E13A44';
+            }
+            if (backgroundColor.includes('rgb(255, 193, 7)') || backgroundColor.includes('#ffc107') || backgroundColor.includes('#FFC107')) {
+                el.style.backgroundColor = '#BDBDBD';
+            }
+            if (borderColor.includes('rgb(255, 193, 7)') || borderColor.includes('#ffc107') || borderColor.includes('#FFC107')) {
+                el.style.borderColor = '#BDBDBD';
+            }
+        });
+    }, 100);
 }
 
 function populateAccountRiskFactors() {
