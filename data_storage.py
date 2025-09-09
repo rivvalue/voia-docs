@@ -102,6 +102,28 @@ def normalize_risk_factor_type(risk_type):
 def get_dashboard_data(campaign_id=None):
     """Compile dashboard data for visualization with optional campaign filtering"""
     try:
+        # ============================================================================
+        # SNAPSHOT CHECK: Use immutable snapshot data for closed campaigns
+        # ============================================================================
+        if campaign_id:
+            # Check if campaign is closed and has a snapshot
+            campaign = Campaign.query.get(campaign_id)
+            if campaign and campaign.status == 'completed':
+                # Look for the most recent snapshot for this campaign
+                snapshot = CampaignKPISnapshot.query.filter_by(
+                    campaign_id=campaign_id
+                ).order_by(CampaignKPISnapshot.snapshot_created_at.desc()).first()
+                
+                if snapshot:
+                    print(f"Using KPI snapshot for closed campaign: {campaign.name} (ID: {campaign_id})")
+                    return convert_snapshot_to_dashboard_format(snapshot)
+                else:
+                    print(f"Warning: Closed campaign {campaign.name} has no snapshot - generating live data")
+        
+        # ============================================================================
+        # LIVE CALCULATION: For active campaigns or campaigns without snapshots
+        # ============================================================================
+        
         # Build base query with optional campaign filtering
         base_query = SurveyResponse.query
         if campaign_id:
@@ -653,6 +675,67 @@ def get_dashboard_data(campaign_id=None):
         
     except Exception as e:
         raise Exception(f"Error compiling dashboard data: {e}")
+
+def convert_snapshot_to_dashboard_format(snapshot):
+    """Convert CampaignKPISnapshot data to the format expected by the dashboard"""
+    try:
+        # Parse JSON fields back to Python objects
+        nps_distribution = json.loads(snapshot.nps_distribution) if snapshot.nps_distribution else []
+        sentiment_distribution = json.loads(snapshot.sentiment_distribution) if snapshot.sentiment_distribution else []
+        tenure_distribution = json.loads(snapshot.tenure_distribution) if snapshot.tenure_distribution else []
+        ratings_distribution = json.loads(snapshot.ratings_distribution) if snapshot.ratings_distribution else []
+        key_themes = json.loads(snapshot.key_themes) if snapshot.key_themes else []
+        growth_factor_distribution = json.loads(snapshot.growth_factor_distribution) if snapshot.growth_factor_distribution else []
+        
+        # Convert ratings distribution to expected format
+        average_ratings = {
+            'satisfaction': snapshot.avg_satisfaction_rating or 0,
+            'pricing': snapshot.avg_pricing_rating or 0,
+            'service': snapshot.avg_service_rating or 0,
+            'product_value': snapshot.avg_product_value_rating or 0
+        }
+        
+        # For closed campaigns, we don't have dynamic account intelligence data in snapshots
+        # These would need to be calculated separately if needed for historical campaigns
+        # For now, return empty arrays to maintain compatibility
+        
+        return {
+            'total_responses': snapshot.total_responses,
+            'nps_score': snapshot.nps_score,
+            'recent_responses': snapshot.recent_responses_count or 0,  # For closed campaigns, this might be 0
+            'nps_distribution': nps_distribution,
+            'sentiment_distribution': sentiment_distribution,
+            'high_risk_accounts': [],  # Would need to be stored separately for historical data
+            'account_intelligence': [],  # Dynamic data not stored in snapshots
+            'growth_opportunities': [],  # Dynamic data not stored in snapshots  
+            'account_risk_factors': [],  # Dynamic data not stored in snapshots
+            'key_themes': key_themes,
+            'average_ratings': average_ratings,
+            'tenure_distribution': tenure_distribution,
+            'growth_factor_analysis': {
+                'total_growth_potential': snapshot.total_growth_potential or 0,
+                'distribution': growth_factor_distribution
+            }
+        }
+        
+    except Exception as e:
+        print(f"Error converting snapshot to dashboard format: {e}")
+        # Fallback to minimal data structure if conversion fails
+        return {
+            'total_responses': snapshot.total_responses or 0,
+            'nps_score': snapshot.nps_score or 0,
+            'recent_responses': 0,
+            'nps_distribution': [],
+            'sentiment_distribution': [],
+            'high_risk_accounts': [],
+            'account_intelligence': [],
+            'growth_opportunities': [],
+            'account_risk_factors': [],
+            'key_themes': [],
+            'average_ratings': {'satisfaction': 0, 'product_value': 0, 'service': 0, 'pricing': 0},
+            'tenure_distribution': [],
+            'growth_factor_analysis': {'total_growth_potential': 0, 'distribution': []}
+        }
 
 def get_company_nps_data():
     """Get NPS data segregated by company"""
