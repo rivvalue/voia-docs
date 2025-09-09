@@ -71,6 +71,47 @@
 
 <!-- Dashboard content -->
 <div class="d-none" id="dashboardContent">
+    <!-- Global Campaign Filter -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);">
+                <div class="card-body py-3">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h6 class="mb-0"><i class="fas fa-filter me-2 text-primary"></i>Campaign Analytics Filter</h6>
+                            <small class="text-muted">Compare KPIs across different campaigns</small>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex gap-2 align-items-center">
+                                <label for="campaignFilter" class="form-label mb-0 me-2">Campaign:</label>
+                                <select class="form-select" id="campaignFilter" onchange="applyCampaignFilter()">
+                                    <option value="">Select Campaign</option>
+                                    <!-- Will be populated by JavaScript -->
+                                </select>
+                                <button class="btn btn-outline-secondary btn-sm" onclick="clearCampaignFilter()" title="Clear Filter">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Selected Campaign Info -->
+                    <div id="selectedCampaignInfo" class="mt-3" style="display: none;">
+                        <div class="alert alert-info mb-0 py-2" style="background: rgba(13, 110, 253, 0.1); border: 1px solid rgba(13, 110, 253, 0.2);">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Viewing:</strong> <span id="selectedCampaignName">Campaign Name</span>
+                            <span class="ms-2 text-muted">|</span>
+                            <span class="ms-2" id="selectedCampaignDates">Jan 1 - Dec 31, 2024</span>
+                            <div class="mt-1">
+                                <small class="text-muted" id="selectedCampaignDesc">Campaign description</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Navigation Tabs -->
     <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist" style="font-family: var(--font-family-headings); border-bottom: 2px solid var(--medium-gray);">
         <li class="nav-item" role="presentation">
@@ -210,50 +251,6 @@
 
         <!-- Analytics Tab -->
         <div class="tab-pane fade" id="analytics" role="tabpanel" aria-labelledby="analytics-tab">
-            <!-- Campaign Filter -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="row align-items-center">
-                                <div class="col-md-6">
-                                    <h6 class="mb-0"><i class="fas fa-filter me-2"></i>Campaign Analytics Filter</h6>
-                                    <small class="text-muted">Compare KPIs across different campaigns</small>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="d-flex gap-2 align-items-center">
-                                        <label for="campaignFilter" class="form-label mb-0 me-2">Campaign:</label>
-                                        <select class="form-select" id="campaignFilter" onchange="applyCampaignFilter()">
-                                            <option value="">All Campaigns</option>
-                                            <!-- Will be populated by JavaScript -->
-                                        </select>
-                                        <button class="btn btn-outline-secondary btn-sm" onclick="clearCampaignFilter()" title="Clear Filter">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Selected Campaign Info -->
-            <div class="row mb-3" id="selectedCampaignInfo" style="display: none;">
-                <div class="col-12">
-                    <div class="alert alert-info d-flex align-items-center">
-                        <i class="fas fa-info-circle me-3"></i>
-                        <div>
-                            <strong>Viewing Campaign:</strong> <span id="selectedCampaignName">Campaign Name</span>
-                            <span class="ms-2 text-muted" id="selectedCampaignDates">Jan 1 - Dec 31, 2024</span>
-                            <div class="mt-1">
-                                <small class="text-muted" id="selectedCampaignDesc">Campaign description</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Charts Row -->
     <div class="row mb-4 g-3">
         <div class="col-md-6">
