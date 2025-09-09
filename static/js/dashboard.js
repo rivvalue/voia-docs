@@ -110,8 +110,14 @@ function populateCampaignFilterDropdown() {
     const select = document.getElementById('campaignFilter');
     if (!select) return;
     
-    // Clear existing options except "All Campaigns"
-    select.innerHTML = '<option value="">All Campaigns</option>';
+    // Clear existing options - no "All Campaigns" option
+    select.innerHTML = '';
+    
+    // Add default option for campaign selection
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Select Campaign';
+    select.appendChild(defaultOption);
     
     // Add campaign options
     availableCampaigns.forEach(campaign => {
@@ -136,14 +142,15 @@ async function applyCampaignFilter() {
     // Reload dashboard data with campaign filter
     await loadDashboardData();
     
-    // Refresh all charts in Analytics tab
-    setTimeout(() => {
-        createNpsChart();
-        createSentimentChart();
-        createRatingsChart();
-        createTenureChart();
-        createGrowthFactorChart();
-    }, 100);
+    // Refresh all charts immediately after data loads - no setTimeout delay
+    createNpsChart();
+    createSentimentChart();
+    createRatingsChart();
+    createTenureChart();
+    createGrowthFactorChart();
+    
+    // Also refresh Overview tab chart if visible
+    createThemesChart();
 }
 
 // Clear campaign filter
@@ -356,35 +363,14 @@ function populateDashboard() {
     setupTabEventListeners();
 }
 
-function setupTabEventListeners() {
-    // Get all tab buttons
-    const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
-    
-    tabButtons.forEach(button => {
-        button.addEventListener('shown.bs.tab', function (event) {
-            const targetTab = event.target.getAttribute('data-bs-target');
-            console.log('Tab shown:', targetTab);
-            
-            // Re-initialize charts when Analytics tab is shown
-            if (targetTab === '#analytics') {
-                setTimeout(() => {
-                    createNpsChart();
-                    createSentimentChart();
-                    createRatingsChart();
-                    createTenureChart();
-                    createGrowthFactorChart();
-                }, 100);
-            }
-            
-            // Re-initialize themes chart when Overview tab is shown
-            if (targetTab === '#overview') {
-                setTimeout(() => {
-                    createThemesChart();
-                }, 100);
-            }
-        });
-    });
+// Helper function to get active campaign ID
+function getActiveCampaignId() {
+    // Find active campaign from available campaigns
+    const activeCampaign = availableCampaigns.find(c => c.status === 'active');
+    return activeCampaign ? activeCampaign.id : null;
 }
+
+// Note: setupTabEventListeners function is defined later in the file with full campaign management support
 
 function createNpsChart() {
     const chartElement = document.getElementById('npsChart');
@@ -2519,22 +2505,18 @@ function setupTabEventListeners() {
             const targetTab = event.target.getAttribute('data-bs-target');
             console.log('Tab shown:', targetTab);
             
-            // Re-initialize charts when Analytics tab is shown
+            // Re-initialize charts when Analytics tab is shown - immediate rendering
             if (targetTab === '#analytics') {
-                setTimeout(() => {
-                    createNpsChart();
-                    createSentimentChart();
-                    createRatingsChart();
-                    createTenureChart();
-                    createGrowthFactorChart();
-                }, 100);
+                createNpsChart();
+                createSentimentChart();
+                createRatingsChart();
+                createTenureChart();
+                createGrowthFactorChart();
             }
             
-            // Re-initialize themes chart when Overview tab is shown
+            // Re-initialize themes chart when Overview tab is shown - immediate rendering
             if (targetTab === '#overview') {
-                setTimeout(() => {
-                    createThemesChart();
-                }, 100);
+                createThemesChart();
             }
             
             // Handle campaign management tab access
