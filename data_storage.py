@@ -3,7 +3,7 @@ import re
 from datetime import datetime, timedelta
 from sqlalchemy import func, case
 from app import db
-from models import SurveyResponse
+from models import SurveyResponse, Campaign, CampaignKPISnapshot
 from flask import request
 
 def consolidate_theme_name(theme_name):
@@ -836,3 +836,336 @@ def get_company_trends():
     except Exception as e:
         print(f"Error getting company trends: {e}")
         return {}
+
+
+def generate_campaign_kpi_snapshot(campaign_id):
+    """Generate and store immutable KPI snapshot for a closed campaign"""
+    try:
+        # Get campaign details
+        campaign = Campaign.query.get(campaign_id)
+        if not campaign:
+            raise ValueError(f"Campaign with ID {campaign_id} not found")
+        
+        # Check if snapshot already exists
+        existing_snapshot = CampaignKPISnapshot.query.filter_by(campaign_id=campaign_id).first()
+        if existing_snapshot:
+            print(f"KPI snapshot already exists for campaign {campaign_id}")
+            return existing_snapshot
+        
+        print(f"Generating KPI snapshot for campaign: {campaign.name} (ID: {campaign_id})")
+        
+        # Build base query for this campaign
+        base_query = SurveyResponse.query.filter(SurveyResponse.campaign_id == campaign_id)
+        
+        # Basic statistics
+        total_responses = base_query.count()
+        if total_responses == 0:
+            print(f"No survey responses found for campaign {campaign_id}")
+            return None
+        
+        # Count unique companies
+        total_companies = db.session.query(
+            func.count(func.distinct(SurveyResponse.company_name))
+        ).filter(SurveyResponse.campaign_id == campaign_id).scalar() or 0
+        
+        # ============================================================================
+        # NPS METRICS CALCULATION
+        # ============================================================================
+        
+        # NPS distribution
+        nps_distribution_raw = db.session.query(
+            SurveyResponse.nps_category,
+            func.count(SurveyResponse.id).label('count')
+        ).filter(
+            SurveyResponse.campaign_id == campaign_id
+        ).group_by(SurveyResponse.nps_category).all()
+        
+        # Convert to JSON format
+        nps_distribution = [
+            {"category": row.nps_category, "count": row.count}
+            for row in nps_distribution_raw
+        ]
+        
+        # Calculate NPS counts
+        promoters = db.session.query(func.count(SurveyResponse.id)).filter(
+            SurveyResponse.campaign_id == campaign_id,
+            SurveyResponse.nps_score >= 9
+        ).scalar() or 0
+        
+        passives = db.session.query(func.count(SurveyResponse.id)).filter(
+            SurveyResponse.campaign_id == campaign_id,
+            SurveyResponse.nps_score >= 7,
+            SurveyResponse.nps_score <= 8
+        ).scalar() or 0
+        
+        detractors = db.session.query(func.count(SurveyResponse.id)).filter(
+            SurveyResponse.campaign_id == campaign_id,
+            SurveyResponse.nps_score <= 6
+        ).scalar() or 0
+        
+        # Calculate final NPS score
+        nps_score = ((promoters - detractors) / total_responses * 100) if total_responses > 0 else 0
+        
+        # ============================================================================
+        # RATINGS CALCULATION
+        # ============================================================================
+        
+        avg_satisfaction = db.session.query(func.avg(SurveyResponse.satisfaction_rating)).filter(
+            SurveyResponse.campaign_id == campaign_id,
+            SurveyResponse.satisfaction_rating.isnot(None)
+        ).scalar() or 0
+        
+        avg_pricing = db.session.query(func.avg(SurveyResponse.pricing_rating)).filter(
+            SurveyResponse.campaign_id == campaign_id,
+            SurveyResponse.pricing_rating.isnot(None)
+        ).scalar() or 0
+        
+        avg_service = db.session.query(func.avg(SurveyResponse.service_rating)).filter(
+            SurveyResponse.campaign_id == campaign_id,
+            SurveyResponse.service_rating.isnot(None)
+        ).scalar() or 0
+        
+        avg_product_value = db.session.query(func.avg(SurveyResponse.product_value_rating)).filter(
+            SurveyResponse.campaign_id == campaign_id,
+            SurveyResponse.product_value_rating.isnot(None)
+        ).scalar() or 0
+        
+        # Ratings distribution for charts
+        ratings_distribution = [
+            {"category": "Satisfaction", "rating": round(avg_satisfaction, 2) if avg_satisfaction else 0},
+            {"category": "Pricing", "rating": round(avg_pricing, 2) if avg_pricing else 0},
+            {"category": "Service", "rating": round(avg_service, 2) if avg_service else 0},
+            {"category": "Product Value", "rating": round(avg_product_value, 2) if avg_product_value else 0}
+        ]
+        
+        # ============================================================================
+        # SENTIMENT ANALYSIS
+        # ============================================================================
+        
+        sentiment_distribution_raw = db.session.query(
+            SurveyResponse.sentiment_label,
+            func.count(SurveyResponse.id).label('count')
+        ).filter(
+            SurveyResponse.campaign_id == campaign_id,
+            SurveyResponse.sentiment_label.isnot(None)
+        ).group_by(SurveyResponse.sentiment_label).all()
+        
+        # Convert to JSON and calculate percentages
+        sentiment_distribution = []
+        sentiment_positive_pct = 0
+        sentiment_negative_pct = 0
+        sentiment_neutral_pct = 0
+        
+        sentiment_total = sum(row.count for row in sentiment_distribution_raw)
+        if sentiment_total > 0:
+            for row in sentiment_distribution_raw:
+                pct = (row.count / sentiment_total) * 100
+                sentiment_distribution.append({
+                    "label": row.sentiment_label,
+                    "count": row.count,
+                    "percentage": round(pct, 1)
+                })
+                
+                if row.sentiment_label and 'positive' in row.sentiment_label.lower():
+                    sentiment_positive_pct = round(pct, 1)
+                elif row.sentiment_label and 'negative' in row.sentiment_label.lower():
+                    sentiment_negative_pct = round(pct, 1)
+                elif row.sentiment_label and 'neutral' in row.sentiment_label.lower():
+                    sentiment_neutral_pct = round(pct, 1)
+        
+        # ============================================================================
+        # RISK ASSESSMENT
+        # ============================================================================
+        
+        # High risk accounts count
+        high_risk_accounts_count = db.session.query(func.count(SurveyResponse.id)).filter(
+            SurveyResponse.campaign_id == campaign_id,
+            SurveyResponse.churn_risk_level.in_(['High', 'Critical'])
+        ).scalar() or 0
+        
+        # Churn risk distribution
+        churn_risk_distribution_raw = db.session.query(
+            SurveyResponse.churn_risk_level,
+            func.count(SurveyResponse.id).label('count')
+        ).filter(
+            SurveyResponse.campaign_id == campaign_id,
+            SurveyResponse.churn_risk_level.isnot(None)
+        ).group_by(SurveyResponse.churn_risk_level).all()
+        
+        # Calculate churn risk percentages
+        churn_total = sum(row.count for row in churn_risk_distribution_raw)
+        churn_risk_high_pct = 0
+        churn_risk_medium_pct = 0
+        churn_risk_low_pct = 0
+        churn_risk_minimal_pct = 0
+        
+        if churn_total > 0:
+            for row in churn_risk_distribution_raw:
+                pct = (row.count / churn_total) * 100
+                if row.churn_risk_level == 'High':
+                    churn_risk_high_pct = round(pct, 1)
+                elif row.churn_risk_level == 'Medium':
+                    churn_risk_medium_pct = round(pct, 1)
+                elif row.churn_risk_level == 'Low':
+                    churn_risk_low_pct = round(pct, 1)
+                elif row.churn_risk_level == 'Minimal':
+                    churn_risk_minimal_pct = round(pct, 1)
+        
+        # High risk accounts details
+        high_risk_responses = SurveyResponse.query.filter(
+            SurveyResponse.campaign_id == campaign_id,
+            SurveyResponse.churn_risk_level.in_(['High', 'Critical'])
+        ).all()
+        
+        high_risk_accounts = []
+        for response in high_risk_responses:
+            if response.company_name:
+                high_risk_accounts.append({
+                    "company": response.company_name,
+                    "risk_level": response.churn_risk_level,
+                    "nps_score": response.nps_score,
+                    "churn_risk_score": response.churn_risk_score
+                })
+        
+        # ============================================================================
+        # GROWTH METRICS
+        # ============================================================================
+        
+        avg_growth_factor = db.session.query(func.avg(SurveyResponse.growth_factor)).filter(
+            SurveyResponse.campaign_id == campaign_id,
+            SurveyResponse.growth_factor.isnot(None)
+        ).scalar() or 0
+        
+        total_growth_potential = avg_growth_factor  # Same as average for snapshot
+        
+        # Growth factor distribution
+        growth_factor_distribution_raw = db.session.query(
+            SurveyResponse.growth_range,
+            SurveyResponse.growth_rate,
+            func.count(SurveyResponse.id).label('count')
+        ).filter(
+            SurveyResponse.campaign_id == campaign_id,
+            SurveyResponse.growth_factor.isnot(None)
+        ).group_by(SurveyResponse.growth_range, SurveyResponse.growth_rate).all()
+        
+        growth_factor_distribution = [
+            {
+                "nps_range": row.growth_range or "Unknown",
+                "growth_rate": row.growth_rate or "0%",
+                "count": row.count
+            }
+            for row in growth_factor_distribution_raw
+        ]
+        
+        # ============================================================================
+        # TENURE DISTRIBUTION
+        # ============================================================================
+        
+        tenure_distribution_raw = db.session.query(
+            SurveyResponse.tenure_with_fc,
+            func.count(SurveyResponse.id).label('count')
+        ).filter(
+            SurveyResponse.campaign_id == campaign_id,
+            SurveyResponse.tenure_with_fc.isnot(None)
+        ).group_by(SurveyResponse.tenure_with_fc).all()
+        
+        tenure_distribution = [
+            {"tenure": row.tenure_with_fc, "count": row.count}
+            for row in tenure_distribution_raw
+        ]
+        
+        # ============================================================================
+        # KEY THEMES
+        # ============================================================================
+        
+        # Extract key themes from all text responses
+        all_themes = {}
+        responses_with_themes = SurveyResponse.query.filter(
+            SurveyResponse.campaign_id == campaign_id,
+            SurveyResponse.key_themes.isnot(None)
+        ).all()
+        
+        for response in responses_with_themes:
+            if response.key_themes:
+                try:
+                    themes = json.loads(response.key_themes)
+                    for theme in themes:
+                        consolidated_theme = consolidate_theme_name(theme)
+                        all_themes[consolidated_theme] = all_themes.get(consolidated_theme, 0) + 1
+                except:
+                    continue
+        
+        # Sort themes by frequency
+        sorted_themes = sorted(all_themes.items(), key=lambda x: x[1], reverse=True)
+        key_themes = [
+            {"theme": theme, "frequency": frequency}
+            for theme, frequency in sorted_themes[:10]  # Top 10 themes
+        ]
+        
+        # ============================================================================
+        # COMPANY AGGREGATIONS
+        # ============================================================================
+        
+        # Calculate average company NPS
+        company_nps_data = db.session.query(
+            SurveyResponse.company_name,
+            func.avg(SurveyResponse.nps_score).label('avg_nps')
+        ).filter(
+            SurveyResponse.campaign_id == campaign_id,
+            SurveyResponse.company_name.isnot(None)
+        ).group_by(SurveyResponse.company_name).all()
+        
+        avg_company_nps = sum(row.avg_nps for row in company_nps_data) / len(company_nps_data) if company_nps_data else 0
+        
+        # ============================================================================
+        # CREATE SNAPSHOT RECORD
+        # ============================================================================
+        
+        snapshot = CampaignKPISnapshot(
+            campaign_id=campaign_id,
+            total_responses=total_responses,
+            total_companies=total_companies,
+            nps_score=round(nps_score, 1),
+            promoters_count=promoters,
+            passives_count=passives,
+            detractors_count=detractors,
+            avg_satisfaction_rating=round(avg_satisfaction, 2) if avg_satisfaction else None,
+            avg_pricing_rating=round(avg_pricing, 2) if avg_pricing else None,
+            avg_service_rating=round(avg_service, 2) if avg_service else None,
+            avg_product_value_rating=round(avg_product_value, 2) if avg_product_value else None,
+            sentiment_positive_pct=sentiment_positive_pct,
+            sentiment_negative_pct=sentiment_negative_pct,
+            sentiment_neutral_pct=sentiment_neutral_pct,
+            high_risk_accounts_count=high_risk_accounts_count,
+            churn_risk_high_pct=churn_risk_high_pct,
+            churn_risk_medium_pct=churn_risk_medium_pct,
+            churn_risk_low_pct=churn_risk_low_pct,
+            churn_risk_minimal_pct=churn_risk_minimal_pct,
+            avg_growth_factor=round(avg_growth_factor, 2) if avg_growth_factor else 0,
+            total_growth_potential=round(total_growth_potential, 2) if total_growth_potential else 0,
+            avg_company_nps=round(avg_company_nps, 1) if avg_company_nps else 0,
+            nps_distribution=json.dumps(nps_distribution),
+            sentiment_distribution=json.dumps(sentiment_distribution),
+            tenure_distribution=json.dumps(tenure_distribution),
+            ratings_distribution=json.dumps(ratings_distribution),
+            growth_factor_distribution=json.dumps(growth_factor_distribution),
+            key_themes=json.dumps(key_themes),
+            high_risk_accounts=json.dumps(high_risk_accounts),
+            data_period_start=campaign.start_date,
+            data_period_end=campaign.end_date
+        )
+        
+        db.session.add(snapshot)
+        db.session.commit()
+        
+        print(f"✅ KPI snapshot created for campaign '{campaign.name}' with {total_responses} responses")
+        print(f"   NPS Score: {round(nps_score, 1)}")
+        print(f"   Companies: {total_companies}")
+        print(f"   High Risk Accounts: {high_risk_accounts_count}")
+        
+        return snapshot
+        
+    except Exception as e:
+        print(f"Error generating KPI snapshot for campaign {campaign_id}: {str(e)}")
+        db.session.rollback()
+        raise e
