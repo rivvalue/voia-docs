@@ -428,31 +428,37 @@ function updateActiveCampaignBanner(data) {
 }
 
 // Populate campaign filter dropdown
-
 function populateCampaignFilterDropdown() {
-    const select = document.getElementById("campaignFilter");
+    const select = document.getElementById('campaignFilter');
     if (!select) return;
     
-    select.innerHTML = "<option value=\"\">All Campaigns</option>";
+    // Clear existing options except "All Campaigns"
+    select.innerHTML = '<option value="">All Campaigns</option>';
     
+    // Add campaign options
     availableCampaigns.forEach(campaign => {
-        const option = document.createElement("option");
+        const option = document.createElement('option');
         option.value = campaign.id;
         option.textContent = `${campaign.name} (${formatDate(campaign.start_date)} - ${formatDate(campaign.end_date)})`;
-        option.setAttribute("data-name", campaign.name);
-        option.setAttribute("data-start", campaign.start_date);
-        option.setAttribute("data-end", campaign.end_date);
+        option.setAttribute('data-name', campaign.name);
+        option.setAttribute('data-start', campaign.start_date);
+        option.setAttribute('data-end', campaign.end_date);
         select.appendChild(option);
     });
 }
 
+// Apply campaign filter to analytics
 async function applyCampaignFilter() {
-    const select = document.getElementById("campaignFilter");
+    const select = document.getElementById('campaignFilter');
     selectedCampaignId = select.value ? parseInt(select.value) : null;
     
+    // Update selected campaign info display
     updateSelectedCampaignInfo();
+    
+    // Reload dashboard data with campaign filter
     await loadDashboardData();
     
+    // Refresh all charts in Analytics tab
     setTimeout(() => {
         createNpsChart();
         createSentimentChart();
@@ -462,359 +468,2353 @@ async function applyCampaignFilter() {
     }, 100);
 }
 
+// Clear campaign filter
 function clearCampaignFilter() {
-    document.getElementById("campaignFilter").value = "";
+    document.getElementById('campaignFilter').value = '';
     applyCampaignFilter();
 }
 
+// Update selected campaign info display
 function updateSelectedCampaignInfo() {
-    const infoDiv = document.getElementById("selectedCampaignInfo");
-    const select = document.getElementById("campaignFilter");
+    const infoDiv = document.getElementById('selectedCampaignInfo');
+    const select = document.getElementById('campaignFilter');
     
     if (selectedCampaignId && select.selectedOptions.length > 0) {
         const option = select.selectedOptions[0];
-        const campaignName = option.getAttribute("data-name");
-        const startDate = option.getAttribute("data-start");
-        const endDate = option.getAttribute("data-end");
+        const campaignName = option.getAttribute('data-name');
+        const startDate = option.getAttribute('data-start');
+        const endDate = option.getAttribute('data-end');
+        
+        // Find full campaign data for description
         const campaign = availableCampaigns.find(c => c.id === selectedCampaignId);
         
-        document.getElementById("selectedCampaignName").textContent = campaignName;
-        document.getElementById("selectedCampaignDates").textContent = 
+        document.getElementById('selectedCampaignName').textContent = campaignName;
+        document.getElementById('selectedCampaignDates').textContent = 
             `${formatDate(startDate)} - ${formatDate(endDate)}`;
-        document.getElementById("selectedCampaignDesc").textContent = 
-            campaign?.description || "No description available";
+        document.getElementById('selectedCampaignDesc').textContent = 
+            campaign?.description || 'No description available';
         
-        infoDiv.style.display = "block";
+        infoDiv.style.display = 'block';
     } else {
-        infoDiv.style.display = "none";
+        infoDiv.style.display = 'none';
     }
 }
 
-// ============================================================================
-// MISSING ESSENTIAL DASHBOARD FUNCTIONS - RESTORED
-// ============================================================================
-
-function populateDashboard() {
-    if (!dashboardData) return;
-    console.log('populateDashboard called with data:', Object.keys(dashboardData));
-    updateKPIs();
-    updateHighRiskAccounts();
-    updateAccountIntelligence();
-    setTimeout(() => {
-        createNpsChart();
-        createSentimentChart();
-        createRatingsChart();
-        createTenureChart();
-        createGrowthFactorChart();
-        createThemesChart();
-    }, 100);
-}
-
-function updateKPIs() {
-    if (!dashboardData) return;
-    const npsElement = document.getElementById('npsScore');
-    if (npsElement) npsElement.textContent = Math.round(dashboardData.nps_score || 0);
-    const responsesElement = document.getElementById('totalResponses');
-    if (responsesElement) responsesElement.textContent = dashboardData.total_responses || 0;
-    const recentElement = document.getElementById('recentResponses');
-    if (recentElement) recentElement.textContent = dashboardData.recent_responses || 0;
-    const riskElement = document.getElementById('highRiskAccounts');
-    if (riskElement) riskElement.textContent = dashboardData.high_risk_accounts?.length || 0;
-}
-
-function updateHighRiskAccounts() {
-    const container = document.getElementById('highRiskAccountsList');
-    if (!container || !dashboardData.high_risk_accounts) return;
-    if (dashboardData.high_risk_accounts.length === 0) {
-        container.innerHTML = '<p class="text-muted">No high-risk accounts identified.</p>';
-        return;
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
     }
-    container.innerHTML = dashboardData.high_risk_accounts.map(account => 
-        `<div class="risk-account-card"><strong>${account.company_name}</strong><span class="badge bg-danger">${account.risk_level}</span><small>NPS: ${account.nps_score}</small></div>`
-    ).join('');
-}
-
-function updateAccountIntelligence() {
-    const container = document.getElementById('accountIntelligence');
-    if (!container || !dashboardData.account_intelligence) return;
-    container.innerHTML = dashboardData.account_intelligence.map(account => 
-        `<div class="account-intel-card"><h6>${account.company_name}</h6><div class="intel-summary"><span class="risk-count">Risks: ${account.risk_count}</span><span class="opportunity-count">Opportunities: ${account.opportunity_count}</span></div></div>`
-    ).join('');
 }
 
 function createNpsChart() {
-    const ctx = document.getElementById('npsChart');
-    if (!ctx || !dashboardData) return;
-    const data = dashboardData.nps_distribution || [];
-    const labels = data.map(item => item[0]);
-    const values = data.map(item => item[1]);
-    if (charts.nps) charts.nps.destroy();
-    charts.nps = new Chart(ctx, {
+    const chartElement = document.getElementById('npsChart');
+    if (!chartElement) {
+        console.warn('NPS chart element not found');
+        return;
+    }
+    
+    const ctx = chartElement.getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (charts.npsChart) {
+        charts.npsChart.destroy();
+    }
+    
+    const npsData = dashboardData.nps_distribution || [];
+    const labels = npsData.map(item => item.category);
+    const data = npsData.map(item => item.count);
+    
+    // Professional color palette matching the design
+    const chartColors = ['#E13A44', '#BDBDBD', '#8A8A8A']; // Red (Detractor), Medium Gray (Passive), Dark Gray (Promoter)
+    
+    // Get mobile-responsive configuration
+    const config = getMobileChartConfig();
+    
+    charts.npsChart = new Chart(ctx, {
         type: 'doughnut',
-        data: { labels: labels, datasets: [{ data: values, backgroundColor: ['#FF6384', '#FFCE56', '#36A2EB'] }] },
-        options: { responsive: true, maintainAspectRatio: false }
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: chartColors,
+                borderWidth: 3,
+                borderColor: '#FFFFFF',
+                hoverBorderWidth: 4,
+                hoverBorderColor: '#E13A44'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: config.maintainAspectRatio,
+            cutout: '60%',
+            plugins: {
+                legend: {
+                    position: config.legendPosition,
+                    labels: {
+                        color: '#000000',
+                        usePointStyle: true,
+                        padding: config.legendPadding,
+                        font: {
+                            family: 'Karla',
+                            size: config.legendFontSize,
+                            weight: '500'
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#000000',
+                    titleColor: '#FFFFFF',
+                    bodyColor: '#FFFFFF',
+                    borderColor: '#E13A44',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    titleFont: {
+                        family: 'Montserrat',
+                        size: config.fontSize,
+                        weight: '600'
+                    },
+                    bodyFont: {
+                        family: 'Karla',
+                        size: config.fontSize - 1,
+                        weight: '500'
+                    }
+                }
+            },
+            elements: {
+                arc: {
+                    borderRadius: 4
+                }
+            }
+        }
     });
 }
 
 function createSentimentChart() {
-    const ctx = document.getElementById('sentimentChart');
-    if (!ctx || !dashboardData) return;
-    const data = dashboardData.sentiment_distribution || [];
-    const labels = data.map(item => item[0]);
-    const values = data.map(item => item[1]);
-    if (charts.sentiment) charts.sentiment.destroy();
-    charts.sentiment = new Chart(ctx, {
+    const chartElement = document.getElementById('sentimentChart');
+    if (!chartElement) {
+        console.warn('Sentiment chart element not found');
+        return;
+    }
+    
+    const ctx = chartElement.getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (charts.sentimentChart) {
+        charts.sentimentChart.destroy();
+    }
+    
+    const sentimentData = dashboardData.sentiment_distribution || [];
+    const labels = sentimentData.map(item => item.sentiment.charAt(0).toUpperCase() + item.sentiment.slice(1));
+    const data = sentimentData.map(item => item.count);
+    const colors = ['#8A8A8A', '#BDBDBD', '#E13A44']; // Dark Gray (Positive), Medium Gray (Neutral), Red (Negative)
+    
+    // Get mobile-responsive configuration
+    const config = getMobileChartConfig();
+    
+    charts.sentimentChart = new Chart(ctx, {
         type: 'bar',
-        data: { labels: labels, datasets: [{ data: values, backgroundColor: ['#FF6384', '#FFCE56', '#36A2EB'] }] },
-        options: { responsive: true, maintainAspectRatio: false }
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Responses',
+                data: data,
+                backgroundColor: colors,
+                borderWidth: 1,
+                borderColor: '#E9E8E4'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: config.maintainAspectRatio,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#000000',
+                        font: {
+                            size: config.fontSize
+                        }
+                    },
+                    grid: {
+                        color: '#E9E8E4'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: '#000000',
+                        font: {
+                            size: config.fontSize
+                        }
+                    },
+                    grid: {
+                        color: '#E9E8E4'
+                    }
+                }
+            }
+        }
     });
 }
 
 function createRatingsChart() {
-    const ctx = document.getElementById('ratingsChart');
-    if (!ctx || !dashboardData) return;
-    const ratings = dashboardData.ratings_distribution || {};
-    if (charts.ratings) charts.ratings.destroy();
-    charts.ratings = new Chart(ctx, {
+    const chartElement = document.getElementById('ratingsChart');
+    if (!chartElement) {
+        console.warn('Ratings chart element not found');
+        return;
+    }
+    
+    const ctx = chartElement.getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (charts.ratingsChart) {
+        charts.ratingsChart.destroy();
+    }
+    
+    const ratings = dashboardData.average_ratings || {};
+    const labels = ['Satisfaction', 'Product Value', 'Service', 'Pricing'];
+    const data = [
+        ratings.satisfaction || 0,
+        ratings.product_value || 0,
+        ratings.service || 0,
+        ratings.pricing || 0
+    ];
+    
+    // Get mobile-responsive configuration
+    const config = getMobileChartConfig();
+    
+    charts.ratingsChart = new Chart(ctx, {
         type: 'radar',
         data: {
-            labels: ['Satisfaction', 'Value', 'Service', 'Pricing'],
+            labels: labels,
             datasets: [{
-                label: 'Average Ratings',
-                data: [ratings.satisfaction || 0, ratings.value || 0, ratings.service || 0, ratings.pricing || 0],
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgba(54, 162, 235, 1)'
+                label: 'Average Rating',
+                data: data,
+                borderColor: '#E13A44',
+                backgroundColor: 'rgba(225, 58, 68, 0.1)',
+                borderWidth: 2,
+                pointBackgroundColor: '#E13A44',
+                pointBorderColor: '#FFFFFF',
+                pointBorderWidth: 2
             }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
-    });
-}
-
-function createTenureChart() {
-    const ctx = document.getElementById('tenureChart');
-    if (!ctx) { console.warn('Tenure chart element not found'); return; }
-    if (charts.tenure) charts.tenure.destroy();
-    charts.tenure = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['1-2 years', '2-3 years', '3-5 years', '5+ years'],
-            datasets: [{ label: 'Customer Distribution', data: [25, 30, 35, 10], backgroundColor: 'rgba(75, 192, 192, 0.6)' }]
-        },
-        options: { responsive: true, maintainAspectRatio: false }
-    });
-}
-
-function createGrowthFactorChart() {
-    const ctx = document.getElementById('growthFactorChart');
-    if (!ctx) { console.warn('Growth factor chart element not found'); return; }
-    if (charts.growthFactor) charts.growthFactor.destroy();
-    charts.growthFactor = new Chart(ctx, {
-        type: 'scatter',
-        data: { datasets: [{ label: 'Growth Opportunities', data: [{x: 8, y: 85}, {x: 7, y: 65}, {x: 9, y: 95}], backgroundColor: 'rgba(255, 99, 132, 0.6)' }] },
-        options: { responsive: true, maintainAspectRatio: false, scales: { x: { title: { display: true, text: 'NPS Score' } }, y: { title: { display: true, text: 'Growth Potential %' } } } }
+        options: {
+            responsive: true,
+            maintainAspectRatio: config.maintainAspectRatio,
+            plugins: {
+                legend: {
+                    position: config.legendPosition,
+                    labels: {
+                        color: '#000000',
+                        padding: config.legendPadding,
+                        font: {
+                            size: config.legendFontSize
+                        }
+                    }
+                }
+            },
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 5,
+                    ticks: {
+                        color: '#000000',
+                        stepSize: 1,
+                        font: {
+                            size: config.fontSize
+                        }
+                    },
+                    grid: {
+                        color: '#BDBDBD'
+                    },
+                    pointLabels: {
+                        color: '#000000',
+                        font: {
+                            size: config.fontSize
+                        }
+                    }
+                }
+            }
+        }
     });
 }
 
 function createThemesChart() {
-    const ctx = document.getElementById('themesChart');
-    if (!ctx || !dashboardData) return;
-    const themes = dashboardData.key_themes || [];
-    if (charts.themes) charts.themes.destroy();
-    charts.themes = new Chart(ctx, {
-        type: 'horizontalBar',
-        data: { labels: themes.map(t => t.theme), datasets: [{ label: 'Frequency', data: themes.map(t => t.count), backgroundColor: 'rgba(153, 102, 255, 0.6)' }] },
-        options: { responsive: true, maintainAspectRatio: false }
-    });
-}
-
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
-
-function formatDate(dateString) {
-    if (!dateString) return 'N/A';
-    try {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric' 
-        });
-    } catch (error) {
-        console.error('Error formatting date:', error);
-        return dateString;
-    }
-}
-
-function updateCampaignAccess(isAdmin) {
-    const adminRequiredDiv = document.getElementById("campaign-admin-required");
-    const adminContentDiv = document.getElementById("campaign-admin-content");
-    
-    if (isAdmin) {
-        if (adminRequiredDiv) adminRequiredDiv.style.display = "none";
-        if (adminContentDiv) adminContentDiv.style.display = "block";
-        loadCampaignData();
-    } else {
-        if (adminRequiredDiv) adminRequiredDiv.style.display = "block";
-        if (adminContentDiv) adminContentDiv.style.display = "none";
-    }
-    
-    console.log("Campaign access updated - isAdmin:", isAdmin);
-}
-
-// Handle campaign management tab access for non-admin users
-function handleCampaignTabAccess() {
-    const token = localStorage.getItem("authToken");
-    
-    if (!token) {
-        // No admin token - show access required message
-        updateCampaignAccess(false);
+    const chartElement = document.getElementById('themesChart');
+    if (!chartElement) {
+        console.warn('Themes chart element not found');
         return;
     }
     
-    // Verify admin token
-    fetch("/auth/verify-token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: token })
-    })
-    .then(response => response.json())
-    .then(data => {
-        const isAdmin = data.valid && data.is_admin;
-        updateCampaignAccess(isAdmin);
-    })
-    .catch(() => {
-        // Error verifying token - show access required message
-        updateCampaignAccess(false);
+    const ctx = chartElement.getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (charts.themesChart) {
+        charts.themesChart.destroy();
+    }
+    
+    const themes = dashboardData.key_themes || [];
+    if (themes.length === 0) {
+        // Display message when no themes are available
+        const chartContainer = ctx.canvas.parentElement;
+        chartContainer.innerHTML = '<div class="d-flex justify-content-center align-items-center" style="height: 300px;"><p class="text-muted">No themes identified yet</p></div>';
+        return;
+    }
+    
+    // Sort themes by count (descending) and take top 10
+    const sortedThemes = themes.sort((a, b) => b.count - a.count).slice(0, 10);
+    
+    const labels = sortedThemes.map(item => item.theme.charAt(0).toUpperCase() + item.theme.slice(1));
+    const data = sortedThemes.map(item => item.count);
+    
+    // Get mobile-responsive configuration
+    const config = getMobileChartConfig();
+    
+    charts.themesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Mentions',
+                data: data,
+                backgroundColor: '#BDBDBD',
+                borderWidth: 1,
+                borderColor: '#E9E8E4'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: config.maintainAspectRatio,
+            indexAxis: 'y',
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    ticks: {
+                        color: '#000000',
+                        font: {
+                            size: config.fontSize - 1
+                        },
+                        maxTicksLimit: false,
+                        autoSkip: false,
+                        maxRotation: 0,
+                        minRotation: 0
+                    },
+                    grid: {
+                        color: '#E9E8E4'
+                    }
+                },
+                x: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#000000',
+                        font: {
+                            size: config.fontSize
+                        }
+                    },
+                    grid: {
+                        color: '#E9E8E4'
+                    }
+                }
+            }
+        }
     });
 }
 
-// Initialize campaign access on page load
-document.addEventListener("DOMContentLoaded", function() {
-    // Set up tab event listener for campaign management
-    const campaignTab = document.querySelector("[data-bs-target=\"#campaign-management\"]");
-    if (campaignTab) {
-        campaignTab.addEventListener("shown.bs.tab", handleCampaignTabAccess);
+function createTenureChart() {
+    const chartElement = document.getElementById('tenureChart');
+    if (!chartElement) {
+        console.warn('Tenure chart element not found');
+        return;
     }
     
-    // Also handle initial load if campaign tab is active
-    if (window.location.hash === "#campaign-management") {
-        setTimeout(handleCampaignTabAccess, 100);
+    const ctx = chartElement.getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (charts.tenure) {
+        charts.tenure.destroy();
     }
-});
+    
+    if (!dashboardData.tenure_distribution || dashboardData.tenure_distribution.length === 0) {
+        ctx.canvas.parentNode.innerHTML = '<div class="alert alert-info">No tenure data available yet. This will populate as surveys are completed.</div>';
+        return;
+    }
+    
+    const labels = dashboardData.tenure_distribution.map(item => item.tenure);
+    const data = dashboardData.tenure_distribution.map(item => item.count);
+    
+    // Get mobile-responsive configuration  
+    const config = getMobileChartConfig();
+    
+    charts.tenure = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Customers',
+                data: data,
+                backgroundColor: [
+                    '#E13A44',
+                    '#BDBDBD', 
+                    '#E9E8E4',
+                    '#000000',
+                    'rgba(225, 58, 68, 0.6)'
+                ],
+                borderColor: '#FFFFFF',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: config.maintainAspectRatio,
+            plugins: {
+                legend: {
+                    position: config.legendPosition,
+                    labels: {
+                        color: '#000000',
+                        padding: config.legendPadding,
+                        font: {
+                            size: config.legendFontSize
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
 
-// Admin login function for Campaign Management access
+function createGrowthFactorChart() {
+    const chartElement = document.getElementById('growthFactorChart');
+    if (!chartElement) {
+        console.warn('Growth factor chart element not found');
+        return;
+    }
+    
+    const ctx = chartElement.getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (charts.growthFactor) {
+        charts.growthFactor.destroy();
+    }
+    
+    if (!dashboardData.growth_factor_analysis || 
+        !dashboardData.growth_factor_analysis.distribution || 
+        dashboardData.growth_factor_analysis.distribution.length === 0) {
+        ctx.canvas.parentNode.innerHTML = '<div class="alert alert-info">No growth factor data available yet. This will populate as surveys are completed.</div>';
+        return;
+    }
+    
+    const distribution = dashboardData.growth_factor_analysis.distribution;
+    const labels = distribution.map(item => `${item.nps_range} (${item.growth_rate})`);
+    const data = distribution.map(item => item.count);
+    const colors = ['#E13A44', '#BDBDBD', '#E9E8E4', '#000000', '#FFFFFF'];
+    
+    // Get mobile-responsive configuration  
+    const config = getMobileChartConfig();
+    
+    charts.growthFactor = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Customers',
+                data: data,
+                backgroundColor: colors.slice(0, data.length),
+                borderColor: '#FFFFFF',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: config.maintainAspectRatio,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        afterLabel: function(context) {
+                            const item = distribution[context.dataIndex];
+                            return [`Growth Factor: ${item.avg_factor}`, `Expected Growth: ${item.growth_rate}`];
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#000000',
+                        stepSize: 1,
+                        font: {
+                            size: config.fontSize
+                        }
+                    },
+                    grid: {
+                        color: '#E9E8E4'
+                    }
+                },
+                x: {
+                    ticks: {
+                        color: '#000000',
+                        font: {
+                            size: config.fontSize
+                        }
+                    },
+                    grid: {
+                        color: '#E9E8E4'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function populateHighRiskAccounts() {
+    const container = document.getElementById('highRiskAccounts');
+    const highRiskAccounts = dashboardData.high_risk_accounts || [];
+    
+    if (highRiskAccounts.length === 0) {
+        container.innerHTML = '<p class="text-muted">No high-risk accounts identified.</p>';
+        return;
+    }
+    
+    const html = highRiskAccounts.map(account => `
+        <div class="risk-card p-3 mb-3 rounded">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="mb-1">${account.company_name}</h6>
+                    <small class="text-muted">NPS Score: ${account.nps_score}</small>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-danger">${account.risk_level || 'High'} Risk</span>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    container.innerHTML = html;
+}
+
+function populateGrowthOpportunities() {
+    const container = document.getElementById('growthOpportunities');
+    const companiesWithOpportunities = dashboardData.growth_opportunities || [];
+    
+    if (companiesWithOpportunities.length === 0) {
+        container.innerHTML = '<p class="text-muted">No growth opportunities identified.</p>';
+        return;
+    }
+    
+    const html = companiesWithOpportunities.map(company => {
+        // Ensure company has a name and opportunities array
+        const companyName = company.company_name || 'Unknown Company';
+        const opportunities = company.opportunities || [];
+        
+        if (opportunities.length === 0) {
+            return ''; // Skip companies with no opportunities
+        }
+        
+        return `
+            <div class="company-opportunities-card p-3 mb-4 rounded" style="border: 1px solid #BDBDBD;">
+                <h6 class="mb-3" style="color: #E13A44; font-weight: bold;">${companyName}</h6>
+                ${opportunities.map(opp => `
+                    <div class="opportunity-card p-2 mb-2 rounded" style="background-color: #E9E8E4; border-left: 3px solid #E13A44;">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <p class="mb-1" style="color: #000000;">${opp.description || 'No description available'}</p>
+                                <small class="text-muted">${opp.action || 'No action specified'}</small>
+                            </div>
+                            <span class="badge bg-primary">${opp.type || 'unknown'}</span>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }).filter(html => html !== '').join(''); // Remove empty entries
+    
+    if (html === '') {
+        container.innerHTML = '<p class="text-muted">No growth opportunities identified.</p>';
+        return;
+    }
+    
+    container.innerHTML = html;
+}
+
+// Visual mapping for risk factors and opportunities using established color palette
+function getVisualIndicator(type, category) {
+    const riskIcons = {
+        'pricing_concerns': { icon: '💰', color: '#E13A44', label: 'Pricing' },
+        'product_problems': { icon: '🔧', color: '#E13A44', label: 'Product' },
+        'service_issues': { icon: '📞', color: '#E13A44', label: 'Service' },
+        'churn_risk': { icon: '⚠️', color: '#E13A44', label: 'Churn Risk' },
+        'low_satisfaction': { icon: '📉', color: '#E13A44', label: 'Low NPS' },
+        'poor_ratings': { icon: '⭐', color: '#E13A44', label: 'Poor Ratings' },
+        'contract_issues': { icon: '📋', color: '#E13A44', label: 'Contract' },
+        'relationship_threat': { icon: '🔗', color: '#E13A44', label: 'Relationship' },
+        'critical_satisfaction': { icon: '🚨', color: '#E13A44', label: 'Critical' }
+    };
+    
+    const opportunityIcons = {
+        'upsell': { icon: '📈', color: '#8A8A8A', label: 'Upsell' },
+        'cross_sell': { icon: '🎯', color: '#BDBDBD', label: 'Cross-sell' },
+        'referral': { icon: '👥', color: '#8A8A8A', label: 'Referral' },
+        'advocacy': { icon: '📢', color: '#BDBDBD', label: 'Advocacy' },
+        'expansion': { icon: '🚀', color: '#8A8A8A', label: 'Expansion' },
+        'high_satisfaction': { icon: '⭐', color: '#E9E8E4', label: 'High NPS' },
+        'engagement': { icon: '🤝', color: '#BDBDBD', label: 'Engagement' }
+    };
+    
+    if (category === 'risk') {
+        return riskIcons[type] || { icon: '⚠️', color: '#E13A44', label: type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) };
+    } else {
+        return opportunityIcons[type] || { icon: '📈', color: '#8A8A8A', label: type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) };
+    }
+}
+
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
+    }
+}
+
+function normalizeTypeForVisual(originalType) {
+    const typeMap = {
+        // Risk mappings
+        'pricing concerns': 'pricing_concerns',
+        'pricing concern': 'pricing_concerns',
+        'product problem': 'product_problems',
+        'product problems': 'product_problems',
+        'product issue': 'product_problems',
+        'product issues': 'product_problems',
+        'service issue': 'service_issues',
+        'service issues': 'service_issues',
+        'service problem': 'service_issues',
+        'service problems': 'service_issues',
+        'churn risk': 'churn_risk',
+        'low satisfaction': 'low_satisfaction',
+        'poor ratings': 'poor_ratings',
+        'contract risk': 'contract_issues',
+        'contract issue': 'contract_issues',
+        'contract issues': 'contract_issues',
+        'critical satisfaction': 'critical_satisfaction',
+        'relationship threat': 'relationship_threat',
+        
+        // Opportunity mappings - including variations that come from backend
+        'upsell potential': 'upsell',
+        'upsell opportunity': 'upsell',
+        'upsell': 'upsell',
+        'cross-sell potential': 'cross_sell',
+        'cross-sell opportunity': 'cross_sell',
+        'cross-sell': 'cross_sell',
+        'cross sell': 'cross_sell',
+        'referral potential': 'referral',
+        'referral opportunity': 'referral',
+        'referral': 'referral',
+        'advocacy potential': 'advocacy',
+        'advocacy opportunity': 'advocacy',
+        'advocacy': 'advocacy',
+        'expansion potential': 'expansion',
+        'expansion opportunity': 'expansion',
+        'expansion ready': 'expansion',
+        'expansion': 'expansion',
+        'high satisfaction': 'high_satisfaction',
+        'high nps': 'high_satisfaction',
+        'engagement opportunity': 'engagement',
+        'engagement potential': 'engagement',
+        'engagement': 'engagement'
+    };
+    
+    const normalized = typeMap[originalType.toLowerCase()];
+    if (normalized) {
+        return normalized;
+    }
+    
+    // If no exact match, try to categorize based on keywords
+    const lower = originalType.toLowerCase();
+    if (lower.includes('upsell')) return 'upsell';
+    if (lower.includes('cross') && lower.includes('sell')) return 'cross_sell';
+    if (lower.includes('referral')) return 'referral';
+    if (lower.includes('advocacy')) return 'advocacy';
+    if (lower.includes('expansion')) return 'expansion';
+    if (lower.includes('satisfaction') && lower.includes('high')) return 'high_satisfaction';
+    if (lower.includes('engagement')) return 'engagement';
+    if (lower.includes('pricing')) return 'pricing_concerns';
+    if (lower.includes('product')) return 'product_problems';
+    if (lower.includes('service')) return 'service_issues';
+    if (lower.includes('churn')) return 'churn_risk';
+    
+    // Last resort: convert to snake_case
+    return originalType.toLowerCase().replace(/\s+/g, '_');
+}
+
+function populateAccountIntelligence() {
+    const container = document.getElementById('accountIntelligence');
+    const accountData = dashboardData.account_intelligence || [];
+    
+    if (accountData.length === 0) {
+        container.innerHTML = '<p class="text-muted">No account intelligence data available.</p>';
+        return;
+    }
+    
+    // Create legend
+    const legendHtml = `
+        <div class="account-health-legend mb-4 p-3 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="text-success mb-2">Growth Opportunities</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-light text-dark">Upsell</span>
+                        <span class="badge bg-light text-dark">Cross-sell</span>
+                        <span class="badge bg-light text-dark">Referral</span>
+                        <span class="badge bg-light text-dark">Advocacy</span>
+                        <span class="badge bg-light text-dark">High NPS</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-danger mb-2">Risk Factors</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-light text-dark">Pricing</span>
+                        <span class="badge bg-light text-dark">Product</span>
+                        <span class="badge bg-light text-dark">Service</span>
+                        <span class="badge bg-light text-dark">Low NPS</span>
+                        <span class="badge bg-light text-dark">Critical</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const accountsHtml = accountData.map(account => {
+        const balanceClass = account.balance === 'risk_heavy' ? 'border-danger' : 
+                           account.balance === 'opportunity_heavy' ? 'border-secondary' : 'border-secondary';
+        
+        const balanceIcon = account.balance === 'risk_heavy' ? '●' : 
+                          account.balance === 'opportunity_heavy' ? '●' : '●';
+        
+        const balanceIconColor = account.balance === 'risk_heavy' ? '#E13A44' : 
+                               account.balance === 'opportunity_heavy' ? '#8A8A8A' : '#BDBDBD';
+        
+        const balanceLabel = account.balance === 'risk_heavy' ? 'High Risk' : 
+                           account.balance === 'opportunity_heavy' ? 'High Potential' : 'Balanced';
+        
+        // Consolidate opportunities by type to avoid duplicates
+        const opportunityMap = new Map();
+        account.opportunities.forEach(opp => {
+            const normalizedType = normalizeTypeForVisual(opp.type);
+            
+            if (opportunityMap.has(normalizedType)) {
+                opportunityMap.get(normalizedType).count += (opp.count || 1);
+            } else {
+                opportunityMap.set(normalizedType, {
+                    type: opp.type,
+                    normalizedType: normalizedType,
+                    count: opp.count || 1
+                });
+            }
+        });
+        
+        // Create visual indicators for consolidated opportunities
+        const opportunityIndicators = Array.from(opportunityMap.values()).map(opp => {
+            const visual = getVisualIndicator(opp.normalizedType, 'opportunity');
+            return `
+                <span class="visual-indicator opportunity-indicator" 
+                      style="background-color: ${visual.color}20; border: 2px solid ${visual.color}; padding: 4px 8px; margin: 2px; border-radius: 12px; display: inline-block;"
+                      title="${opp.type}${opp.count > 1 ? ` (${opp.count} opportunities)` : ''}">
+                    ${visual.label}${opp.count > 1 ? ` (${opp.count})` : ''}
+                </span>
+            `;
+        }).join('');
+        
+        // Consolidate risks by type to avoid duplicates
+        const riskMap = new Map();
+        account.risk_factors.forEach(risk => {
+            const normalizedType = normalizeTypeForVisual(risk.type);
+            if (riskMap.has(normalizedType)) {
+                riskMap.get(normalizedType).count += (risk.count || 1);
+                // Keep the highest severity level
+                const severityPriority = { 'Critical': 4, 'High': 3, 'Medium': 2, 'Low': 1 };
+                if (severityPriority[risk.severity] > severityPriority[riskMap.get(normalizedType).severity]) {
+                    riskMap.get(normalizedType).severity = risk.severity;
+                }
+            } else {
+                riskMap.set(normalizedType, {
+                    type: risk.type,
+                    normalizedType: normalizedType,
+                    severity: risk.severity,
+                    count: risk.count || 1
+                });
+            }
+        });
+        
+        // Create visual indicators for consolidated risks  
+        const riskIndicators = Array.from(riskMap.values()).map(risk => {
+            const visual = getVisualIndicator(risk.normalizedType, 'risk');
+            const intensityMap = { 'Critical': '●●●', 'High': '●●', 'Medium': '●', 'Low': '○' };
+            const intensity = intensityMap[risk.severity] || '●';
+            
+            return `
+                <span class="visual-indicator risk-indicator" 
+                      style="background-color: ${visual.color}20; border: 2px solid ${visual.color}; padding: 4px 8px; margin: 2px; border-radius: 12px; display: inline-block;"
+                      title="${risk.type} - ${risk.severity}${risk.count > 1 ? ` (${risk.count} instances)` : ''}">
+                    ${visual.label} ${intensity}${risk.count > 1 ? ` (${risk.count})` : ''}
+                </span>
+            `;
+        }).join('');
+        
+        return `
+            <div class="account-visual-card card mb-3 ${balanceClass}" style="border-width: 2px;">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">${account.company_name}</h5>
+                        <div class="d-flex align-items-center">
+                            <span style="font-size: 1.2em; margin-right: 5px; color: ${balanceIconColor};">${balanceIcon}</span>
+                            <span class="badge" style="background-color: ${balanceIconColor}20; color: ${balanceIconColor}; border: 1px solid ${balanceIconColor};">${balanceLabel}</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Account Details -->
+                    <div class="account-details mb-3 p-2 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted">Max Tenure:</small>
+                                <div class="fw-bold" style="color: #8A8A8A;">
+                                    ${account.max_tenure ? account.max_tenure + ' years' : 'N/A'}
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Commercial Value:</small>
+                                <div class="fw-bold" style="color: #8A8A8A;">
+                                    ${account.commercial_value ? '$' + account.commercial_value.toLocaleString() : 'N/A $'}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="account-indicators">
+                        ${opportunityIndicators ? `
+                            <div class="mb-2">
+                                <div class="fw-bold text-success mb-1" style="font-size: 0.9em;">Growth Opportunities</div>
+                                <div>${opportunityIndicators}</div>
+                            </div>
+                        ` : ''}
+                        
+                        ${riskIndicators ? `
+                            <div class="mb-2">
+                                <div class="fw-bold text-danger mb-1" style="font-size: 0.9em;">Risk Factors</div>
+                                <div>${riskIndicators}</div>
+                            </div>
+                        ` : ''}
+                        
+                        ${!opportunityIndicators && !riskIndicators ? 
+                            '<div class="text-muted text-center py-2" style="font-size: 0.9em;">No specific indicators identified</div>' : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    container.innerHTML = legendHtml + accountsHtml;
+    
+    // FORCE override any yellow colors by applying inline styles
+    setTimeout(() => {
+        // Override any warning icons or badges that might still be yellow
+        const warningElements = container.querySelectorAll('.text-warning, .bg-warning, .border-warning, .fa-exclamation-triangle, [class*="warning"]');
+        warningElements.forEach(el => {
+            if (el.classList.contains('fa-exclamation-triangle')) {
+                el.style.color = '#E13A44';
+            } else if (el.classList.contains('bg-warning')) {
+                el.style.backgroundColor = '#BDBDBD';
+                el.style.color = '#000000';
+            } else if (el.classList.contains('text-warning')) {
+                el.style.color = '#E13A44';
+            } else if (el.classList.contains('border-warning')) {
+                el.style.borderColor = '#BDBDBD';
+            }
+        });
+        
+        // Also check for any hardcoded yellow colors
+        const allElements = container.querySelectorAll('*');
+        allElements.forEach(el => {
+            const computedStyle = window.getComputedStyle(el);
+            const color = computedStyle.color;
+            const backgroundColor = computedStyle.backgroundColor;
+            const borderColor = computedStyle.borderColor;
+            
+            // If any yellow colors are detected, force change them
+            if (color.includes('rgb(255, 193, 7)') || color.includes('#ffc107') || color.includes('#FFC107')) {
+                el.style.color = '#E13A44';
+            }
+            if (backgroundColor.includes('rgb(255, 193, 7)') || backgroundColor.includes('#ffc107') || backgroundColor.includes('#FFC107')) {
+                el.style.backgroundColor = '#BDBDBD';
+            }
+            if (borderColor.includes('rgb(255, 193, 7)') || borderColor.includes('#ffc107') || borderColor.includes('#FFC107')) {
+                el.style.borderColor = '#BDBDBD';
+            }
+        });
+    }, 100);
+}
+
+function populateAccountRiskFactors() {
+    const container = document.getElementById('accountRiskFactors');
+    const companiesWithRiskFactors = dashboardData.account_risk_factors || [];
+    
+    if (companiesWithRiskFactors.length === 0) {
+        container.innerHTML = '<p class="text-muted">No account risk factors identified.</p>';
+        return;
+    }
+    
+    const html = companiesWithRiskFactors.map(company => {
+        // Ensure company has a name and risk factors array
+        if (!company.company_name || !company.risk_factors || !Array.isArray(company.risk_factors)) {
+            return '';
+        }
+        
+        const riskFactorsHtml = company.risk_factors.map(risk => {
+            const severityClass = risk.severity === 'Critical' ? 'danger' : 
+                                 risk.severity === 'High' ? 'danger' : 
+                                 risk.severity === 'Medium' ? 'secondary' : 'secondary';
+            
+            return `
+                <div class="risk-factor-item mb-3 p-3 border rounded">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="risk-type mb-1">${risk.type}</h6>
+                        <span class="badge bg-${severityClass}">${risk.severity}</span>
+                    </div>
+                    <p class="risk-description text-muted mb-2">${risk.description}</p>
+                    <small class="risk-action text-primary"><strong>Recommended Action:</strong> ${risk.action}</small>
+                    ${risk.count > 1 ? `<div class="text-end"><small class="text-muted">${risk.count} occurrences</small></div>` : ''}
+                </div>
+            `;
+        }).join('');
+        
+        return `
+            <div class="company-risk-factors mb-4">
+                <h6 class="company-name text-dark mb-3">
+                    ${company.company_name}
+                </h6>
+                ${riskFactorsHtml}
+            </div>
+        `;
+    }).join('');
+    
+    if (html === '') {
+        container.innerHTML = '<p class="text-muted">No account risk factors identified.</p>';
+        return;
+    }
+    
+    container.innerHTML = html;
+}
+
+// Pagination state for all tables
+let currentResponsesPage = 1;
+let currentCompanyPage = 1;
+let currentTenurePage = 1;
+const responsesPerPage = 10;
+const companiesPerPage = 10;
+const tenureGroupsPerPage = 10;
+
+function loadSurveyResponses(page = 1) {
+    currentResponsesPage = page;
+    fetch(`/api/survey_responses?page=${page}&per_page=${responsesPerPage}`)
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('responsesTable');
+            const responses = data.responses || data; // Handle both old and new format
+            const pagination = data.pagination;
+            
+            if (responses.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No survey responses yet.</td></tr>';
+                updatePaginationInfo(0, 0, 0);
+                updatePaginationControls(null);
+                return;
+            }
+            
+            const html = responses.map(response => {
+                const riskLevel = response.churn_risk_level || 'Minimal';
+                const riskClass = riskLevel === 'High' ? 'risk-high' : 
+                                 riskLevel === 'Medium' ? 'risk-medium' : 
+                                 riskLevel === 'Low' ? 'risk-low' : 'risk-minimal';
+                
+                const sentimentClass = response.sentiment_label === 'positive' ? 'theme-positive' :
+                                      response.sentiment_label === 'negative' ? 'theme-negative' : 'theme-neutral';
+                
+                return `
+                    <tr>
+                        <td>${response.company_name}</td>
+                        <td>${response.tenure_with_fc || 'N/A'}</td>
+                        <td>
+                            <span class="badge ${response.nps_score >= 9 ? 'bg-success' : 
+                                                response.nps_score >= 7 ? 'bg-secondary' : 'bg-danger'}">
+                                ${response.nps_score}
+                            </span>
+                        </td>
+                        <td>${response.nps_category}</td>
+                        <td class="${sentimentClass}">${response.sentiment_label || 'N/A'}</td>
+                        <td class="${riskClass}">
+                            ${riskLevel}
+                        </td>
+                        <td>${response.created_at ? new Date(response.created_at).toLocaleDateString() : 'N/A'}</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            tbody.innerHTML = html;
+            
+            // Update pagination info and controls
+            if (pagination) {
+                updateResponsesPaginationInfo(pagination.page, pagination.pages, pagination.total);
+                updateResponsesPaginationControls(pagination);
+            }
+        })
+        .catch(error => {
+            console.error('Error loading survey responses:', error);
+            document.getElementById('responsesTable').innerHTML = 
+                '<tr><td colspan="7" class="text-center text-danger">Error loading responses.</td></tr>';
+            updateResponsesPaginationInfo(0, 0, 0);
+            updateResponsesPaginationControls(null);
+        });
+}
+
+function updateResponsesPaginationInfo(currentPage, totalPages, totalItems) {
+    const info = document.getElementById('paginationInfo');
+    if (totalItems === 0) {
+        info.textContent = 'No responses found';
+    } else {
+        const startItem = (currentPage - 1) * responsesPerPage + 1;
+        const endItem = Math.min(currentPage * responsesPerPage, totalItems);
+        info.textContent = `Showing ${startItem}-${endItem} of ${totalItems} responses`;
+    }
+}
+
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
+    }
+}
+
+function updateResponsesPaginationControls(pagination) {
+    const controls = document.getElementById('paginationControls');
+    
+    if (!pagination || pagination.pages <= 1) {
+        controls.innerHTML = '';
+        return;
+    }
+    
+    let html = '';
+    
+    // Previous button
+    if (pagination.has_prev) {
+        html += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="loadSurveyResponses(${pagination.page - 1}); return false;">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+        `;
+    } else {
+        html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-left"></i></span></li>';
+    }
+    
+    // Page numbers
+    for (let i = 1; i <= pagination.pages; i++) {
+        if (i === pagination.page) {
+            html += `<li class="page-item active"><span class="page-link">${i}</span></li>`;
+        } else {
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadSurveyResponses(${i}); return false;">${i}</a></li>`;
+        }
+    }
+    
+    // Next button
+    if (pagination.has_next) {
+        html += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="loadSurveyResponses(${pagination.page + 1}); return false;">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        `;
+    } else {
+        html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-right"></i></span></li>';
+    }
+    
+    controls.innerHTML = html;
+}
+
+// Company pagination functions
+function updateCompanyPaginationInfo(currentPage, totalPages, totalItems) {
+    const info = document.getElementById('companyPaginationInfo');
+    if (totalItems === 0) {
+        info.textContent = 'No companies found';
+    } else {
+        const startItem = (currentPage - 1) * companiesPerPage + 1;
+        const endItem = Math.min(currentPage * companiesPerPage, totalItems);
+        info.textContent = `Showing ${startItem}-${endItem} of ${totalItems} companies`;
+    }
+}
+
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
+    }
+}
+
+function updateCompanyPaginationControls(pagination) {
+    const controls = document.getElementById('companyPaginationControls');
+    
+    if (!pagination || pagination.pages <= 1) {
+        controls.innerHTML = '';
+        return;
+    }
+    
+    let html = '';
+    
+    // Previous button
+    if (pagination.has_prev) {
+        html += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="loadCompanyNpsData(${pagination.page - 1}); return false;">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+        `;
+    } else {
+        html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-left"></i></span></li>';
+    }
+    
+    // Page numbers
+    for (let i = 1; i <= pagination.pages; i++) {
+        if (i === pagination.page) {
+            html += `<li class="page-item active"><span class="page-link">${i}</span></li>`;
+        } else {
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadCompanyNpsData(${i}); return false;">${i}</a></li>`;
+        }
+    }
+    
+    // Next button
+    if (pagination.has_next) {
+        html += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="loadCompanyNpsData(${pagination.page + 1}); return false;">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        `;
+    } else {
+        html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-right"></i></span></li>';
+    }
+    
+    controls.innerHTML = html;
+}
+
+// Tenure pagination functions
+function updateTenurePaginationInfo(currentPage, totalPages, totalItems) {
+    const info = document.getElementById('tenurePaginationInfo');
+    if (totalItems === 0) {
+        info.textContent = 'No tenure data found';
+    } else {
+        const startItem = (currentPage - 1) * tenureGroupsPerPage + 1;
+        const endItem = Math.min(currentPage * tenureGroupsPerPage, totalItems);
+        info.textContent = `Showing ${startItem}-${endItem} of ${totalItems} tenure groups`;
+    }
+}
+
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
+    }
+}
+
+function updateTenurePaginationControls(pagination) {
+    const controls = document.getElementById('tenurePaginationControls');
+    
+    if (!pagination || pagination.pages <= 1) {
+        controls.innerHTML = '';
+        return;
+    }
+    
+    let html = '';
+    
+    // Previous button
+    if (pagination.has_prev) {
+        html += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="loadTenureNpsData(${pagination.page - 1}); return false;">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+        `;
+    } else {
+        html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-left"></i></span></li>';
+    }
+    
+    // Page numbers
+    for (let i = 1; i <= pagination.pages; i++) {
+        if (i === pagination.page) {
+            html += `<li class="page-item active"><span class="page-link">${i}</span></li>`;
+        } else {
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadTenureNpsData(${i}); return false;">${i}</a></li>`;
+        }
+    }
+    
+    // Next button
+    if (pagination.has_next) {
+        html += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="loadTenureNpsData(${pagination.page + 1}); return false;">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        `;
+    } else {
+        html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-right"></i></span></li>';
+    }
+    
+    controls.innerHTML = html;
+}
+
+function loadTenureNpsData(page = 1) {
+    currentTenurePage = page;
+    console.log('Loading tenure NPS data...');
+    fetch(`/api/tenure_nps?page=${page}&per_page=${tenureGroupsPerPage}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Tenure NPS data received:', data);
+            if (data.success) {
+                console.log('Populating table with', data.data.length, 'tenure groups');
+                populateTenureNpsTable(data.data);
+                
+                // Update pagination info and controls for tenure table
+                if (data.pagination) {
+                    updateTenurePaginationInfo(data.pagination.page, data.pagination.pages, data.pagination.total);
+                    updateTenurePaginationControls(data.pagination);
+                }
+            } else {
+                console.error('Error loading tenure NPS data:', data.error);
+                document.getElementById('tenureNpsTable').innerHTML = 
+                    '<tr><td colspan="8" class="text-center text-danger">Error: ' + (data.error || 'Unknown error') + '</td></tr>';
+                updateTenurePaginationInfo(0, 0, 0);
+                updateTenurePaginationControls(null);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching tenure NPS data:', error);
+            document.getElementById('tenureNpsTable').innerHTML = 
+                '<tr><td colspan="8" class="text-center text-danger">Network error loading tenure data</td></tr>';
+            updateTenurePaginationInfo(0, 0, 0);
+            updateTenurePaginationControls(null);
+        });
+}
+
+function populateTenureNpsTable(tenureData) {
+    console.log('populateTenureNpsTable called with:', tenureData);
+    const tbody = document.getElementById('tenureNpsTable');
+    
+    if (!tbody) {
+        console.error('tenureNpsTable element not found!');
+        return;
+    }
+    
+    if (!tenureData || tenureData.length === 0) {
+        console.log('No tenure data to display');
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No tenure data available yet</td></tr>';
+        return;
+    }
+    
+    console.log('Rendering', tenureData.length, 'tenure groups to table');
+    
+    tbody.innerHTML = tenureData.map(tenure => {
+        // Risk level badge styling
+        let riskBadgeClass = 'bg-secondary';
+        if (tenure.risk_level === 'Low') riskBadgeClass = 'bg-success';
+        else if (tenure.risk_level === 'Medium') riskBadgeClass = 'bg-secondary';
+        else if (tenure.risk_level === 'High') riskBadgeClass = 'bg-danger';
+        else if (tenure.risk_level === 'Critical') riskBadgeClass = 'bg-dark';
+        else if (tenure.risk_level === 'Insufficient Data') riskBadgeClass = 'bg-secondary';
+        
+        // Tenure NPS badge styling
+        let npsBadgeClass = 'bg-secondary';
+        if (tenure.tenure_nps > 20) npsBadgeClass = 'bg-success';
+        else if (tenure.tenure_nps >= -20) npsBadgeClass = 'bg-secondary'; 
+        else npsBadgeClass = 'bg-danger';
+        
+        // Distribution breakdown
+        const distributionText = `${tenure.promoters}P / ${tenure.passives}Pa / ${tenure.detractors}D`;
+        
+        // Churn risk display
+        const churnRiskDisplay = tenure.latest_churn_risk || 'N/A';
+        
+        return `
+            <tr>
+                <td><strong>${tenure.tenure_group}</strong></td>
+                <td>${tenure.total_responses}</td>
+                <td>${tenure.avg_nps}</td>
+                <td><span class="badge ${npsBadgeClass}">${tenure.tenure_nps > 0 ? '+' : ''}${tenure.tenure_nps}</span></td>
+                <td><small>${distributionText}</small></td>
+                <td><span class="badge ${riskBadgeClass}">${tenure.risk_level}</span></td>
+                <td>${tenure.latest_response || 'N/A'}</td>
+                <td>${churnRiskDisplay}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function loadCompanyNpsData(page = 1) {
+    currentCompanyPage = page;
+    console.log('Loading company NPS data...');
+    fetch(`/api/company_nps?page=${page}&per_page=${companiesPerPage}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('Company NPS data received:', data);
+            if (data.success) {
+                console.log('Populating table with', data.data.length, 'companies');
+                populateCompanyNpsTable(data.data);
+                
+                // Update pagination info and controls for company table
+                if (data.pagination) {
+                    updateCompanyPaginationInfo(data.pagination.page, data.pagination.pages, data.pagination.total);
+                    updateCompanyPaginationControls(data.pagination);
+                }
+            } else {
+                console.error('Error loading company NPS data:', data.error);
+                document.getElementById('companyNpsTableServerSide').innerHTML = 
+                    '<tr><td colspan="8" class="text-center text-danger">Error: ' + (data.error || 'Unknown error') + '</td></tr>';
+                updateCompanyPaginationInfo(0, 0, 0);
+                updateCompanyPaginationControls(null);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching company NPS data:', error);
+            document.getElementById('companyNpsTableServerSide').innerHTML = 
+                '<tr><td colspan="8" class="text-center text-danger">Network error loading company data</td></tr>';
+            updateCompanyPaginationInfo(0, 0, 0);
+            updateCompanyPaginationControls(null);
+        });
+}
+
+function populateCompanyNpsTable(companyData) {
+    console.log('populateCompanyNpsTable called with:', companyData);
+    const tbody = document.getElementById('companyNpsTableServerSide');
+    
+    if (!tbody) {
+        console.error('companyNpsTable element not found!');
+        return;
+    }
+    
+    if (!companyData || companyData.length === 0) {
+        console.log('No company data to display');
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No company data available yet</td></tr>';
+        return;
+    }
+    
+    console.log('Rendering', companyData.length, 'companies to table');
+    
+    tbody.innerHTML = companyData.map(company => {
+        // Risk level badge styling
+        let riskBadgeClass = 'bg-secondary';
+        if (company.risk_level === 'Low') riskBadgeClass = 'bg-success';
+        else if (company.risk_level === 'Medium') riskBadgeClass = 'bg-secondary';
+        else if (company.risk_level === 'High') riskBadgeClass = 'bg-danger';
+        else if (company.risk_level === 'Critical') riskBadgeClass = 'bg-dark';
+        
+        // Company NPS badge styling
+        let npsBadgeClass = 'bg-secondary';
+        if (company.company_nps > 20) npsBadgeClass = 'bg-success';
+        else if (company.company_nps >= -20) npsBadgeClass = 'bg-secondary'; 
+        else npsBadgeClass = 'bg-danger';
+        
+        // Distribution breakdown
+        const distributionText = `${company.promoters}P / ${company.passives}Pa / ${company.detractors}D`;
+        
+        // Churn risk display
+        const churnRiskDisplay = company.latest_churn_risk || 'N/A';
+        
+        return `
+            <tr>
+                <td><strong>${company.company_name}</strong></td>
+                <td>${company.total_responses}</td>
+                <td>${company.avg_nps}</td>
+                <td><span class="badge ${npsBadgeClass}">${company.company_nps > 0 ? '+' : ''}${company.company_nps}</span></td>
+                <td><small>${distributionText}</small></td>
+                <td><span class="badge ${riskBadgeClass}">${company.risk_level}</span></td>
+                <td>${company.latest_response || 'N/A'}</td>
+                <td>${churnRiskDisplay}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function refreshData() {
+    loadDashboardData();
+    loadCompanyNpsData();
+}
+
+function exportData() {
+    // Check if user has admin token
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        alert('Download is only available to admin users. Please log in as Admin first.');
+        return;
+    }
+    
+    fetch('/api/export_data', {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.status === 403) {
+            alert('Admin access required. This feature is only available to administrators.');
+            // Clear invalid token and hide export button
+            localStorage.removeItem('authToken');
+            updateAdminUI(false);
+            return null;
+        }
+        if (response.status === 401) {
+            alert('Authentication failed. Please log in with an admin account.');
+            // Clear invalid token and hide export button
+            localStorage.removeItem('authToken');
+            updateAdminUI(false);
+            return null;
+        }
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(result => {
+        if (!result) return; // Authentication failed
+        
+        const data = result.data || result; // Handle both old and new format
+        const dataStr = JSON.stringify(data, null, 2);
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        
+        const exportFileDefaultName = `voc_survey_data_${new Date().toISOString().split('T')[0]}.json`;
+        
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportFileDefaultName);
+        linkElement.click();
+        
+        // Show success message if we have export info
+        if (result.export_info) {
+            console.log(`Data exported successfully by ${result.export_info.exported_by}`);
+        }
+    })
+    .catch(error => {
+        console.error('Error exporting data:', error);
+        alert('Error exporting data. Please try again or contact administrator.');
+    });
+}
+
+// Export user-specific data (current user's responses only)
+function exportUserData() {
+    // This function works based on server-side session, no client-side auth needed
+    
+    fetch('/api/export_user_data', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.status === 400) {
+            // Need to get email from user
+            return response.json().then(data => {
+                if (data.code === 'EMAIL_REQUIRED') {
+                    const email = prompt('Please enter your email address to export your survey responses:');
+                    if (!email) return null;
+                    
+                    // Retry with email
+                    return fetch('/api/export_user_data', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email: email })
+                    })
+                    .then(retryResponse => {
+                        if (retryResponse.status === 404) {
+                            alert('No survey responses found for this email address.');
+                            return null;
+                        }
+                        if (!retryResponse.ok) {
+                            throw new Error(`HTTP error! status: ${retryResponse.status}`);
+                        }
+                        return retryResponse.json();
+                    });
+                }
+                throw new Error(data.message || 'Unknown error');
+            });
+        }
+        if (response.status === 404) {
+            alert('No survey responses found for your email address.');
+            return null;
+        }
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(result => {
+        if (!result) return; // No data found
+        
+        const data = result.data || result;
+        const dataStr = JSON.stringify(data, null, 2);
+        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        
+        const exportFileDefaultName = `my_survey_responses_${new Date().toISOString().split('T')[0]}.json`;
+        
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('download', exportFileDefaultName);
+        linkElement.click();
+        
+        console.log('User response data exported successfully');
+    })
+    .catch(error => {
+        console.error('Error exporting user data:', error);
+        alert('Error exporting your response data. Please try again.');
+    });
+}
+
+// Admin login function
 function adminLogin() {
-    const email = prompt("Enter admin email address:");
+    const email = prompt('Enter admin email address:');
     if (!email) return;
     
-    // Show loading state
-    const loginBtn = document.querySelector("button[onclick=\"adminLogin()\"]");
-    if (loginBtn) {
-        loginBtn.innerHTML = "<i class=\"fas fa-spinner fa-spin me-2\"></i>Authenticating...";
-        loginBtn.disabled = true;
-    }
-    
-    fetch("/auth/request-token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+    // Generate admin token
+    fetch('/auth/request-token', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ email: email })
     })
     .then(response => response.json())
     .then(data => {
         if (data.token) {
-            localStorage.setItem("authToken", data.token);
+            // Clear any existing token first
+            localStorage.removeItem('authToken');
             
-            // Verify admin status
-            return fetch("/auth/verify-token", {
-                method: "POST", 
-                headers: { "Content-Type": "application/json" },
+            // Verify this is actually an admin token before storing
+            fetch('/auth/verify-token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 body: JSON.stringify({ token: data.token })
+            })
+            .then(response => response.json())
+            .then(verifyData => {
+                if (verifyData.valid && verifyData.is_admin) {
+                    localStorage.setItem('authToken', data.token);
+                    alert(`Admin login successful for ${email}! You can now export data.`);
+                    // Update button text and show export button
+                    updateAdminUI(true, email);
+                } else {
+                    alert(`Access denied. ${email} is not an admin user.`);
+                }
+            })
+            .catch(error => {
+                alert('Token verification failed.');
             });
         } else {
-            throw new Error(data.error || data.message || "Authentication failed");
+            alert('Failed to generate admin token: ' + (data.error || 'Unknown error'));
         }
+    })
+    .catch(error => {
+        console.error('Error generating admin token:', error);
+        alert('Error generating admin token. Please try again.');
+    });
+}
+
+// Check admin login status on page load
+function checkAdminStatus() {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+        // Verify the token is still valid and is admin
+        fetch('/auth/verify-token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ token: token })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.valid && data.is_admin) {
+                const adminBtn = document.getElementById('adminLoginBtn');
+                adminBtn.innerHTML = `<i class="fas fa-check me-2"></i>Admin: ${data.email}`;
+                adminBtn.classList.remove('btn-outline-secondary');
+                adminBtn.classList.add('btn-success');
+                adminBtn.onclick = adminLogout; // Change to logout function
+            } else {
+                // Token is invalid or not admin, clear it
+                localStorage.removeItem('authToken');
+                resetAdminButton();
+            }
+        })
+        .catch(error => {
+            // Token verification failed, clear it
+            localStorage.removeItem('authToken');
+            resetAdminButton();
+        });
+    }
+}
+
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
+    }
+}
+
+
+function resetAdminButton() {
+    const adminBtn = document.getElementById('adminLoginBtn');
+    adminBtn.innerHTML = '<i class="fas fa-key me-2"></i>Admin Login';
+    adminBtn.classList.remove('btn-success');
+    adminBtn.classList.add('btn-outline-secondary');
+    adminBtn.onclick = adminLogin;
+}
+
+// Auto-refresh dashboard every 5 minutes
+setInterval(refreshData, 5 * 60 * 1000);
+
+// Check admin status on page load
+function checkAdminStatus() {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        updateAdminUI(false);
+        return;
+    }
+    
+    // Verify the token is still valid
+    fetch('/auth/verify-token', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token: token })
     })
     .then(response => response.json())
     .then(data => {
         if (data.valid && data.is_admin) {
-            alert("Admin authentication successful! Refreshing campaign management...");
-            updateCampaignAccess(true);
+            updateAdminUI(true, data.email || 'Admin');
         } else {
-            throw new Error("Access denied: Admin privileges required");
+            localStorage.removeItem('authToken');
+            updateAdminUI(false);
         }
     })
     .catch(error => {
-        console.error("Admin login error:", error);
-        alert("Authentication failed: " + error.message);
-        localStorage.removeItem("authToken");
-        updateCampaignAccess(false);
-    })
-    .finally(() => {
-        // Restore button state
-        if (loginBtn) {
-            loginBtn.innerHTML = "<i class=\"fas fa-key me-2\"></i>Admin Login";
-            loginBtn.disabled = false;
-        }
+        console.error('Error verifying token:', error);
+        localStorage.removeItem('authToken');
+        updateAdminUI(false);
     });
 }
 
-// Load campaign management data for admin users
-function loadCampaignData() {
-    const token = localStorage.getItem("authToken");
-    if (!token) {
-        console.error("No admin token available for loading campaign data");
+// Update admin UI elements
+function updateAdminUI(isAdmin, email = null) {
+    const adminBtn = document.getElementById('adminLoginBtn');
+    const exportBtn = document.getElementById('exportDataBtn');
+    
+    if (isAdmin && email) {
+        // Show admin logged in state
+        adminBtn.innerHTML = `<i class="fas fa-check me-2"></i>Admin: ${email}`;
+        adminBtn.classList.remove('btn-outline-secondary');
+        adminBtn.classList.add('btn-success');
+        adminBtn.onclick = adminLogout; // Change to logout function
+        
+        // Show export button
+        exportBtn.classList.remove('d-none');
+        
+        // Update campaign management access
+        updateCampaignAccess(true);
+    } else {
+        // Show logged out state
+        adminBtn.innerHTML = '<i class="fas fa-key me-2"></i>Admin Login';
+        adminBtn.classList.remove('btn-success');
+        adminBtn.classList.add('btn-outline-secondary');
+        adminBtn.onclick = adminLogin; // Change back to login function
+        
+        // Hide export button
+        exportBtn.classList.add('d-none');
+        
+        // Update campaign management access
+        updateCampaignAccess(false);
+    }
+}
+
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
+    }
+}
+
+// Control access to campaign management content
+function updateCampaignAccess(isAdmin) {
+    const adminRequiredDiv = document.getElementById('campaign-admin-required');
+    const adminContentDiv = document.getElementById('campaign-admin-content');
+    
+    if (isAdmin) {
+        // Show admin content, hide access required message
+        if (adminRequiredDiv) adminRequiredDiv.style.display = 'none';
+        if (adminContentDiv) {
+            adminContentDiv.style.display = 'block';
+            loadCampaignData(); // Load campaign data when admin logs in
+        }
+    } else {
+        // Show access required message, hide admin content
+        if (adminContentDiv) adminContentDiv.style.display = 'none';
+        if (adminRequiredDiv) adminRequiredDiv.style.display = 'block';
+    }
+}
+
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
+    }
+}
+
+// Admin logout function
+function adminLogout() {
+    localStorage.removeItem('authToken');
+    updateAdminUI(false);
+    alert('Admin logged out successfully.');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    checkAdminStatus();
+    loadCampaignFilterOptions();
+});
+
+// ============================================================================
+// CAMPAIGN MANAGEMENT FUNCTIONALITY
+// ============================================================================
+
+// Load campaign data from API
+async function loadCampaignData() {
+    try {
+        const response = await fetch('/api/campaigns/stats', {
+            headers: {
+                'Authorization': localStorage.getItem('authToken')
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to load campaign data: ${response.status}`);
+        }
+        
+        campaignData = await response.json();
+        updateCampaignUI();
+        loadCampaignsList();
+    } catch (error) {
+        console.error('Error loading campaign data:', error);
+    }
+}
+
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
+    }
+}
+
+// Update campaign UI with data
+function updateCampaignUI() {
+    if (!campaignData) return;
+    
+    // Update campaign stats cards
+    document.getElementById('totalCampaigns').textContent = campaignData.total_campaigns;
+    document.getElementById('activeCampaigns').textContent = campaignData.active_campaign ? '1' : '0';
+    document.getElementById('remainingCampaigns').textContent = campaignData.remaining_campaigns;
+    
+    // Calculate total responses for active campaign
+    let activeResponses = 0;
+    if (campaignData.active_campaign) {
+        const activeCampaignResponses = campaignData.campaign_responses.find(
+            c => c.campaign_id === campaignData.active_campaign.id
+        );
+        activeResponses = activeCampaignResponses ? activeCampaignResponses.response_count : 0;
+    }
+    document.getElementById('campaignResponses').textContent = activeResponses;
+    
+    // Update trends
+    document.getElementById('totalCampaignsTrend').textContent = `Created this year (max 4)`;
+    document.getElementById('activeCampaignsTrend').textContent = campaignData.active_campaign ? 'Currently collecting feedback' : 'No active campaign';
+    document.getElementById('remainingCampaignsTrend').textContent = campaignData.can_create_campaign ? 'Can create more' : 'Limit reached';
+    document.getElementById('campaignResponsesTrend').textContent = campaignData.active_campaign ? 'From active campaign' : 'No active campaign';
+    
+    // Show/hide active campaign status
+    const activeCampaignStatus = document.getElementById('activeCampaignStatus');
+    if (campaignData.active_campaign) {
+        activeCampaignStatus.style.display = 'block';
+        document.getElementById('activeCampaignName').textContent = campaignData.active_campaign.name;
+        document.getElementById('activeCampaignDates').textContent = 
+            `${formatDate(campaignData.active_campaign.start_date)} - ${formatDate(campaignData.active_campaign.end_date)}`;
+        document.getElementById('activeCampaignDesc').textContent = 
+            campaignData.active_campaign.description || 'No description provided';
+        document.getElementById('activeCampaignDaysLeft').textContent = 
+            `${campaignData.active_campaign.days_remaining} days remaining`;
+    } else {
+        activeCampaignStatus.style.display = 'none';
+    }
+    
+    // Update create campaign button state
+    const createBtn = document.getElementById('createCampaignBtn');
+    if (!campaignData.can_create_campaign) {
+        createBtn.disabled = true;
+        createBtn.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>Campaign Limit Reached';
+        createBtn.classList.remove('btn-primary');
+        createBtn.classList.add('btn-secondary');
+    }
+}
+
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
+    }
+}
+
+// Load campaigns list
+async function loadCampaignsList() {
+    try {
+        const response = await fetch('/api/campaigns', {
+            headers: {
+                'Authorization': localStorage.getItem('authToken')
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Failed to load campaigns: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        updateCampaignsTable(data.campaigns);
+    } catch (error) {
+        console.error('Error loading campaigns list:', error);
+    }
+}
+
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
+    }
+}
+
+// Update campaigns table
+function updateCampaignsTable(campaigns) {
+    const tbody = document.getElementById('campaignsTable');
+    const noDataMsg = document.getElementById('noCampaignsMessage');
+    
+    if (campaigns.length === 0) {
+        tbody.innerHTML = '';
+        noDataMsg.style.display = 'block';
         return;
     }
     
-    // Load campaigns and stats
-    Promise.all([
-        fetch("/api/campaigns", {
-            headers: { "Authorization": `Bearer ${token}` }
-        }),
-        fetch("/api/campaigns/stats", {
-            headers: { "Authorization": `Bearer ${token}` }
-        })
-    ])
-    .then(async ([campaignsRes, statsRes]) => {
-        const campaigns = await campaignsRes.json();
-        const stats = await statsRes.json();
+    noDataMsg.style.display = 'none';
+    
+    tbody.innerHTML = campaigns.map(campaign => {
+        const statusBadge = campaign.status === 'active' ? 
+            '<span class="badge bg-success">Active</span>' : 
+            '<span class="badge bg-secondary">Completed</span>';
+            
+        const actions = campaign.status === 'active' ? 
+            `<button class="btn btn-sm btn-outline-danger" onclick="closeCampaign(${campaign.id})">
+                <i class="fas fa-stop me-1"></i>Close
+            </button>` : 
+            '<span class="text-muted">-</span>';
+            
+        return `
+            <tr>
+                <td><strong>${campaign.name}</strong></td>
+                <td>${campaign.description || '<em>No description</em>'}</td>
+                <td>${formatDate(campaign.start_date)}</td>
+                <td>${formatDate(campaign.end_date)}</td>
+                <td>${statusBadge}</td>
+                <td><span class="badge bg-info">${campaign.response_count || 0}</span></td>
+                <td>${actions}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// Show create campaign modal
+function showCreateCampaignModal() {
+    // Set default dates (today to 30 days from now)
+    const today = new Date();
+    const endDate = new Date();
+    endDate.setDate(today.getDate() + 30);
+    
+    document.getElementById('campaignStartDate').value = today.toISOString().split('T')[0];
+    document.getElementById('campaignEndDate').value = endDate.toISOString().split('T')[0];
+    
+    // Clear form
+    document.getElementById('createCampaignForm').reset();
+    document.getElementById('campaignStartDate').value = today.toISOString().split('T')[0];
+    document.getElementById('campaignEndDate').value = endDate.toISOString().split('T')[0];
+    
+    // Show modal
+    new bootstrap.Modal(document.getElementById('createCampaignModal')).show();
+}
+
+// Create new campaign
+async function createCampaign() {
+    const form = document.getElementById('createCampaignForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    
+    const formData = {
+        name: document.getElementById('campaignName').value,
+        description: document.getElementById('campaignDescription').value,
+        start_date: document.getElementById('campaignStartDate').value,
+        end_date: document.getElementById('campaignEndDate').value
+    };
+    
+    try {
+        const response = await fetch('/api/campaigns', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': localStorage.getItem('authToken')
+            },
+            body: JSON.stringify(formData)
+        });
         
-        if (campaigns.campaigns) {
-            displayCampaigns(campaigns.campaigns);
-        }
+        const result = await response.json();
         
-        if (stats.stats) {
-            updateCampaignStats(stats.stats);
+        if (response.ok) {
+            // Success
+            bootstrap.Modal.getInstance(document.getElementById('createCampaignModal')).hide();
+            showSuccessMessage('Campaign created successfully!');
+            loadCampaignData(); // Refresh data
+        } else {
+            // Error
+            showErrorMessage(result.error || 'Failed to create campaign');
         }
-    })
-    .catch(error => {
-        console.error("Error loading campaign data:", error);
+    } catch (error) {
+        console.error('Error creating campaign:', error);
+        showErrorMessage('Failed to create campaign. Please try again.');
+    }
+}
+
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
+    }
+}
+
+// Close campaign
+async function closeCampaign(campaignId) {
+    if (!confirm('Are you sure you want to close this campaign? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/campaigns/${campaignId}/close`, {
+            method: 'POST',
+            headers: {
+                'Authorization': localStorage.getItem('authToken')
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            showSuccessMessage('Campaign closed successfully!');
+            loadCampaignData(); // Refresh data
+        } else {
+            showErrorMessage(result.error || 'Failed to close campaign');
+        }
+    } catch (error) {
+        console.error('Error closing campaign:', error);
+        showErrorMessage('Failed to close campaign. Please try again.');
+    }
+}
+
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
+    }
+}
+
+// Utility functions
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
     });
 }
 
-// Display campaigns in the management interface
-function displayCampaigns(campaigns) {
-    console.log("Displaying campaigns:", campaigns);
-    // Campaign display logic would go here
-    // For now, just log success
+function showSuccessMessage(message) {
+    // Create a temporary alert
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-success alert-dismissible fade show position-fixed';
+    alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
+    alert.innerHTML = `
+        <i class="fas fa-check-circle me-2"></i>${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(alert);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (alert.parentNode) {
+            alert.parentNode.removeChild(alert);
+        }
+    }, 5000);
 }
 
-// Update campaign statistics display
-function updateCampaignStats(stats) {
-    console.log("Updating campaign stats:", stats);
+function showErrorMessage(message) {
+    // Create a temporary alert
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-danger alert-dismissible fade show position-fixed';
+    alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
+    alert.innerHTML = `
+        <i class="fas fa-exclamation-circle me-2"></i>${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(alert);
     
-    // Update campaign stats in the UI
-    const elements = {
-        totalCampaigns: document.getElementById("totalCampaigns"),
-        activeCampaigns: document.getElementById("activeCampaigns")
-    };
+    // Auto-remove after 8 seconds
+    setTimeout(() => {
+        if (alert.parentNode) {
+            alert.parentNode.removeChild(alert);
+        }
+    }, 8000);
+}
+
+// Add campaign management to tab listeners
+function setupTabEventListeners() {
+    // Get all tab buttons
+    const tabButtons = document.querySelectorAll('[data-bs-toggle="tab"]');
     
-    if (elements.totalCampaigns) {
-        elements.totalCampaigns.textContent = stats.total_campaigns || 0;
+    tabButtons.forEach(button => {
+        button.addEventListener('shown.bs.tab', function (event) {
+            const targetTab = event.target.getAttribute('data-bs-target');
+            console.log('Tab shown:', targetTab);
+            
+            // Re-initialize charts when Analytics tab is shown
+            if (targetTab === '#analytics') {
+                setTimeout(() => {
+                    createNpsChart();
+                    createSentimentChart();
+                    createRatingsChart();
+                    createTenureChart();
+                    createGrowthFactorChart();
+                }, 100);
+            }
+            
+            // Re-initialize themes chart when Overview tab is shown
+            if (targetTab === '#overview') {
+                setTimeout(() => {
+                    createThemesChart();
+                }, 100);
+            }
+            
+            // Handle campaign management tab access
+            if (targetTab === '#campaign-management') {
+                setTimeout(() => {
+                    // Check current admin status and update access accordingly
+                    const token = localStorage.getItem('authToken');
+                    if (token) {
+                        // Verify token is still valid and user is admin
+                        fetch('/auth/verify-token', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ token: token })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            updateCampaignAccess(data.valid && data.is_admin);
+                        })
+                        .catch(() => {
+                            updateCampaignAccess(false);
+                        });
+                    } else {
+                        updateCampaignAccess(false);
+                    }
+                }, 100);
+            }
+        });
+    });
+}
+
+// ============================================================================
+// CAMPAIGN ANALYTICS FILTERING
+// ============================================================================
+
+// Load campaign options for analytics filtering
+async function loadCampaignFilterOptions() {
+    try {
+        const response = await fetch('/api/campaigns/filter-options');
+        if (response.ok) {
+            const data = await response.json();
+            availableCampaigns = data.campaigns;
+            populateCampaignFilterDropdown();
+        }
+    } catch (error) {
+        console.error('Error loading campaign filter options:', error);
     }
+}
+
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
     
-    if (elements.activeCampaigns) {
-        elements.activeCampaigns.textContent = stats.active_campaigns || 0;
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
+    }
+}
+
+// Populate campaign filter dropdown
+function populateCampaignFilterDropdown() {
+    const select = document.getElementById('campaignFilter');
+    if (!select) return;
+    
+    // Clear existing options except "All Campaigns"
+    select.innerHTML = '<option value="">All Campaigns</option>';
+    
+    // Add campaign options
+    availableCampaigns.forEach(campaign => {
+        const option = document.createElement('option');
+        option.value = campaign.id;
+        option.textContent = `${campaign.name} (${formatDate(campaign.start_date)} - ${formatDate(campaign.end_date)})`;
+        option.setAttribute('data-name', campaign.name);
+        option.setAttribute('data-start', campaign.start_date);
+        option.setAttribute('data-end', campaign.end_date);
+        select.appendChild(option);
+    });
+}
+
+// Apply campaign filter to analytics
+async function applyCampaignFilter() {
+    const select = document.getElementById('campaignFilter');
+    selectedCampaignId = select.value ? parseInt(select.value) : null;
+    
+    // Update selected campaign info display
+    updateSelectedCampaignInfo();
+    
+    // Reload dashboard data with campaign filter
+    await loadDashboardData();
+    
+    // Refresh all charts in Analytics tab
+    setTimeout(() => {
+        createNpsChart();
+        createSentimentChart();
+        createRatingsChart();
+        createTenureChart();
+        createGrowthFactorChart();
+    }, 100);
+}
+
+// Clear campaign filter
+function clearCampaignFilter() {
+    document.getElementById('campaignFilter').value = '';
+    applyCampaignFilter();
+}
+
+// Update selected campaign info display
+function updateSelectedCampaignInfo() {
+    const infoDiv = document.getElementById('selectedCampaignInfo');
+    const select = document.getElementById('campaignFilter');
+    
+    if (selectedCampaignId && select.selectedOptions.length > 0) {
+        const option = select.selectedOptions[0];
+        const campaignName = option.getAttribute('data-name');
+        const startDate = option.getAttribute('data-start');
+        const endDate = option.getAttribute('data-end');
+        
+        // Find full campaign data for description
+        const campaign = availableCampaigns.find(c => c.id === selectedCampaignId);
+        
+        document.getElementById('selectedCampaignName').textContent = campaignName;
+        document.getElementById('selectedCampaignDates').textContent = 
+            `${formatDate(startDate)} - ${formatDate(endDate)}`;
+        document.getElementById('selectedCampaignDesc').textContent = 
+            campaign?.description || 'No description available';
+        
+        infoDiv.style.display = 'block';
+    } else {
+        infoDiv.style.display = 'none';
+    }
+}
+
+// Update active campaign banner display
+function updateActiveCampaignBanner(data) {
+    const banner = document.getElementById('activeCampaignBanner');
+    const nameSpan = document.getElementById('activeCampaignName');
+    const datesSpan = document.getElementById('activeCampaignDates');
+    
+    if (data.active_campaign && banner && nameSpan && datesSpan) {
+        nameSpan.textContent = data.active_campaign.name;
+        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
+        banner.style.display = 'block';
+        console.log('Active campaign banner displayed:', data.active_campaign.name);
+    } else if (banner) {
+        banner.style.display = 'none';
+        console.log('Active campaign banner hidden - showing all data');
     }
 }
