@@ -208,7 +208,9 @@ document.addEventListener('DOMContentLoaded', function() {
         loadCompanyNpsDataDirect();
     }, 1000);
     
-    loadDashboardData();
+    loadDashboardData().catch(error => {
+        console.error('Initial dashboard load failed:', error);
+    });
     
     // Load campaign filter options for Analytics tab
     loadCampaignFilterOptions();
@@ -274,7 +276,8 @@ function loadDashboardData() {
         url += `?campaign_id=${selectedCampaignId}`;
     }
     
-    fetch(url)
+    // Return the Promise to enable proper await behavior
+    return fetch(url)
         .then(response => {
             console.log('API response status:', response.status);
             if (!response.ok) {
@@ -297,6 +300,9 @@ function loadDashboardData() {
             
             if (loadingElement) loadingElement.classList.add('d-none');
             if (contentElement) contentElement.classList.remove('d-none');
+            
+            // Return the data for chaining if needed
+            return data;
         })
         .catch(error => {
             console.error('Error loading dashboard data:', error);
@@ -304,6 +310,8 @@ function loadDashboardData() {
                 loadingElement.innerHTML = 
                     '<div class="alert alert-danger">Error loading dashboard data: ' + error.message + '</div>';
             }
+            // Re-throw error to maintain Promise chain behavior
+            throw error;
         });
 }
 
@@ -1766,7 +1774,9 @@ function populateCompanyNpsTable(companyData) {
 }
 
 function refreshData() {
-    loadDashboardData();
+    loadDashboardData().catch(error => {
+        console.error('Dashboard reload after tab switch failed:', error);
+    });
     loadCompanyNpsData();
 }
 
