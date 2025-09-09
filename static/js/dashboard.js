@@ -903,23 +903,23 @@ function populateAccountIntelligence() {
         <div class="account-health-legend mb-4 p-3 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
             <div class="row">
                 <div class="col-md-6">
-                    <h6 class="text-success mb-2">🚀 Growth Opportunities</h6>
+                    <h6 class="text-success mb-2">Growth Opportunities</h6>
                     <div class="d-flex flex-wrap gap-2">
-                        <span class="badge bg-light text-dark">📈 Upsell</span>
-                        <span class="badge bg-light text-dark">🎯 Cross-sell</span>
-                        <span class="badge bg-light text-dark">👥 Referral</span>
-                        <span class="badge bg-light text-dark">📢 Advocacy</span>
-                        <span class="badge bg-light text-dark">⭐ High NPS</span>
+                        <span class="badge bg-light text-dark">Upsell</span>
+                        <span class="badge bg-light text-dark">Cross-sell</span>
+                        <span class="badge bg-light text-dark">Referral</span>
+                        <span class="badge bg-light text-dark">Advocacy</span>
+                        <span class="badge bg-light text-dark">High NPS</span>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <h6 class="text-danger mb-2">⚠️ Risk Factors</h6>
+                    <h6 class="text-danger mb-2">Risk Factors</h6>
                     <div class="d-flex flex-wrap gap-2">
-                        <span class="badge bg-light text-dark">💰 Pricing</span>
-                        <span class="badge bg-light text-dark">🔧 Product</span>
-                        <span class="badge bg-light text-dark">📞 Service</span>
-                        <span class="badge bg-light text-dark">📉 Low NPS</span>
-                        <span class="badge bg-light text-dark">🚨 Critical</span>
+                        <span class="badge bg-light text-dark">Pricing</span>
+                        <span class="badge bg-light text-dark">Product</span>
+                        <span class="badge bg-light text-dark">Service</span>
+                        <span class="badge bg-light text-dark">Low NPS</span>
+                        <span class="badge bg-light text-dark">Critical</span>
                     </div>
                 </div>
             </div>
@@ -962,7 +962,7 @@ function populateAccountIntelligence() {
                 <span class="visual-indicator opportunity-indicator" 
                       style="background-color: ${visual.color}20; border: 2px solid ${visual.color}; padding: 4px 8px; margin: 2px; border-radius: 12px; display: inline-block;"
                       title="${opp.type}${opp.count > 1 ? ` (${opp.count} opportunities)` : ''}">
-                    ${visual.icon} ${visual.label}${opp.count > 1 ? ` (${opp.count})` : ''}
+                    ${visual.label}${opp.count > 1 ? ` (${opp.count})` : ''}
                 </span>
             `;
         }).join('');
@@ -998,7 +998,7 @@ function populateAccountIntelligence() {
                 <span class="visual-indicator risk-indicator" 
                       style="background-color: ${visual.color}20; border: 2px solid ${visual.color}; padding: 4px 8px; margin: 2px; border-radius: 12px; display: inline-block;"
                       title="${risk.type} - ${risk.severity}${risk.count > 1 ? ` (${risk.count} instances)` : ''}">
-                    ${visual.icon} ${visual.label} ${intensity}${risk.count > 1 ? ` (${risk.count})` : ''}
+                    ${visual.label} ${intensity}${risk.count > 1 ? ` (${risk.count})` : ''}
                 </span>
             `;
         }).join('');
@@ -1132,7 +1132,6 @@ function populateAccountRiskFactors() {
         return `
             <div class="company-risk-factors mb-4">
                 <h6 class="company-name text-dark mb-3">
-                    <i class="fas fa-exclamation-triangle me-2" style="color: #E13A44;"></i>
                     ${company.company_name}
                 </h6>
                 ${riskFactorsHtml}
