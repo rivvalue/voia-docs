@@ -1120,15 +1120,32 @@ small, .small {
     filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));
 }
 
-.dashboard-left-half {
-    flex: 1;
-}
-
-.dashboard-right-half {
-    flex: 1;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
+/* Mobile responsive banner improvements */
+@media (max-width: 767.98px) {
+    .dashboard-logo {
+        height: 80px !important;
+        margin-bottom: 1rem;
+    }
+    
+    .demo-logo {
+        height: 60px !important;
+        margin-top: 1rem;
+    }
+    
+    .server-auth-logo {
+        height: 80px !important;
+        margin-top: 1rem;
+    }
+    
+    .dashboard-subtitle {
+        white-space: normal !important;
+        font-size: 1rem !important;
+    }
+    
+    .dashboard-actions {
+        justify-content: center !important;
+        margin-top: 1rem !important;
+    }
 }
 
 /* Professional KPI Cards */
