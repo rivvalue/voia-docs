@@ -71,12 +71,17 @@ def request_token():
         token = generate_user_token(email)
         
         # Store token metadata for audit
+        # Get IP address and truncate to fit database column (45 chars max)
+        raw_ip = request.environ.get('HTTP_X_FORWARDED_FOR', 
+                                   request.environ.get('REMOTE_ADDR', ''))
+        # Take first IP if multiple IPs, and truncate to 45 chars
+        ip_address = raw_ip.split(',')[0].strip()[:45] if raw_ip else ''
+        
         token_record = AuthToken(
             email=email,
             token_id=token[-16:],  # Use last 16 chars as token ID
             expires_at=datetime.utcnow() + timedelta(hours=24),
-            ip_address=request.environ.get('HTTP_X_FORWARDED_FOR', 
-                                         request.environ.get('REMOTE_ADDR')),
+            ip_address=ip_address,
             user_agent=request.headers.get('User-Agent', '')[:500]
         )
         
