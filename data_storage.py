@@ -932,10 +932,10 @@ def generate_campaign_kpi_snapshot(campaign_id):
         
         # Ratings distribution for charts
         ratings_distribution = [
-            {"category": "Satisfaction", "rating": round(avg_satisfaction, 2) if avg_satisfaction else 0},
-            {"category": "Pricing", "rating": round(avg_pricing, 2) if avg_pricing else 0},
-            {"category": "Service", "rating": round(avg_service, 2) if avg_service else 0},
-            {"category": "Product Value", "rating": round(avg_product_value, 2) if avg_product_value else 0}
+            {"category": "Satisfaction", "rating": round(float(avg_satisfaction), 2) if avg_satisfaction else 0},
+            {"category": "Pricing", "rating": round(float(avg_pricing), 2) if avg_pricing else 0},
+            {"category": "Service", "rating": round(float(avg_service), 2) if avg_service else 0},
+            {"category": "Product Value", "rating": round(float(avg_product_value), 2) if avg_product_value else 0}
         ]
         
         # ============================================================================
@@ -1115,7 +1115,7 @@ def generate_campaign_kpi_snapshot(campaign_id):
             SurveyResponse.company_name.isnot(None)
         ).group_by(SurveyResponse.company_name).all()
         
-        avg_company_nps = sum(row.avg_nps for row in company_nps_data) / len(company_nps_data) if company_nps_data else 0
+        avg_company_nps = sum(float(row.avg_nps) for row in company_nps_data) / len(company_nps_data) if company_nps_data else 0
         
         # ============================================================================
         # CREATE SNAPSHOT RECORD
@@ -1129,10 +1129,10 @@ def generate_campaign_kpi_snapshot(campaign_id):
             promoters_count=promoters,
             passives_count=passives,
             detractors_count=detractors,
-            avg_satisfaction_rating=round(avg_satisfaction, 2) if avg_satisfaction else None,
-            avg_pricing_rating=round(avg_pricing, 2) if avg_pricing else None,
-            avg_service_rating=round(avg_service, 2) if avg_service else None,
-            avg_product_value_rating=round(avg_product_value, 2) if avg_product_value else None,
+            avg_satisfaction_rating=round(float(avg_satisfaction), 2) if avg_satisfaction else None,
+            avg_pricing_rating=round(float(avg_pricing), 2) if avg_pricing else None,
+            avg_service_rating=round(float(avg_service), 2) if avg_service else None,
+            avg_product_value_rating=round(float(avg_product_value), 2) if avg_product_value else None,
             sentiment_positive_pct=sentiment_positive_pct,
             sentiment_negative_pct=sentiment_negative_pct,
             sentiment_neutral_pct=sentiment_neutral_pct,
@@ -1141,9 +1141,9 @@ def generate_campaign_kpi_snapshot(campaign_id):
             churn_risk_medium_pct=churn_risk_medium_pct,
             churn_risk_low_pct=churn_risk_low_pct,
             churn_risk_minimal_pct=churn_risk_minimal_pct,
-            avg_growth_factor=round(avg_growth_factor, 2) if avg_growth_factor else 0,
-            total_growth_potential=round(total_growth_potential, 2) if total_growth_potential else 0,
-            avg_company_nps=round(avg_company_nps, 1) if avg_company_nps else 0,
+            avg_growth_factor=round(float(avg_growth_factor), 2) if avg_growth_factor else 0,
+            total_growth_potential=round(float(total_growth_potential), 2) if total_growth_potential else 0,
+            avg_company_nps=round(float(avg_company_nps), 1) if avg_company_nps else 0,
             nps_distribution=json.dumps(nps_distribution),
             sentiment_distribution=json.dumps(sentiment_distribution),
             tenure_distribution=json.dumps(tenure_distribution),
