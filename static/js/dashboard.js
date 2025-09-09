@@ -99,9 +99,12 @@ async function loadCampaignFilterOptions() {
             const data = await response.json();
             availableCampaigns = data.campaigns;
             populateCampaignFilterDropdown();
+            return true;
         }
+        return false;
     } catch (error) {
         console.error('Error loading campaign filter options:', error);
+        return false;
     }
 }
 
@@ -110,25 +113,57 @@ function populateCampaignFilterDropdown() {
     const select = document.getElementById('campaignFilter');
     if (!select) return;
     
-    // Clear existing options - no "All Campaigns" option
+    // Clear existing options
     select.innerHTML = '';
     
-    // Add default option for campaign selection
-    const defaultOption = document.createElement('option');
-    defaultOption.value = '';
-    defaultOption.textContent = 'Select Campaign';
-    select.appendChild(defaultOption);
+    // Find default campaign: active campaign, or most recent if none active
+    let defaultCampaign = null;
+    
+    // First, look for active campaign
+    const activeCampaign = availableCampaigns.find(c => c.status === 'active');
+    if (activeCampaign) {
+        defaultCampaign = activeCampaign;
+    } else {
+        // If no active campaign, get the most recent (by end_date or created_at)
+        const sortedCampaigns = [...availableCampaigns].sort((a, b) => {
+            const dateA = new Date(a.end_date || a.created_at);
+            const dateB = new Date(b.end_date || b.created_at);
+            return dateB - dateA; // Most recent first
+        });
+        defaultCampaign = sortedCampaigns[0];
+    }
     
     // Add campaign options
     availableCampaigns.forEach(campaign => {
         const option = document.createElement('option');
         option.value = campaign.id;
-        option.textContent = `${campaign.name} (${formatDate(campaign.start_date)} - ${formatDate(campaign.end_date)})`;
+        
+        // Determine status
+        const status = campaign.status === 'active' ? 'Active' : 'Closed';
+        
+        // Format option text with status
+        option.textContent = `${campaign.name} (${formatDate(campaign.start_date)} - ${formatDate(campaign.end_date)}) - ${status}`;
         option.setAttribute('data-name', campaign.name);
         option.setAttribute('data-start', campaign.start_date);
         option.setAttribute('data-end', campaign.end_date);
+        option.setAttribute('data-status', status);
+        option.setAttribute('data-description', campaign.description || '');
+        
+        // Set as selected if this is the default campaign
+        if (defaultCampaign && campaign.id === defaultCampaign.id) {
+            option.selected = true;
+            selectedCampaignId = campaign.id;
+        }
+        
         select.appendChild(option);
     });
+    
+    // Update the selected campaign info display for default selection
+    if (defaultCampaign) {
+        updateSelectedCampaignInfo();
+        // Load dashboard data for default campaign
+        loadDashboardData();
+    }
 }
 
 // Apply campaign filter to analytics
@@ -173,15 +208,26 @@ function updateSelectedCampaignInfo() {
         const campaignName = option.getAttribute('data-name');
         const startDate = option.getAttribute('data-start');
         const endDate = option.getAttribute('data-end');
-        
-        // Find full campaign data for description
-        const campaign = availableCampaigns.find(c => c.id === selectedCampaignId);
+        const status = option.getAttribute('data-status');
+        const description = option.getAttribute('data-description');
         
         document.getElementById('selectedCampaignName').textContent = campaignName;
         document.getElementById('selectedCampaignDates').textContent = 
             `${formatDate(startDate)} - ${formatDate(endDate)}`;
+        
+        // Update status with proper styling
+        const statusBadge = document.getElementById('selectedCampaignStatus');
+        statusBadge.textContent = status;
+        if (status === 'Active') {
+            statusBadge.style.backgroundColor = '#28a745';
+            statusBadge.style.color = 'white';
+        } else {
+            statusBadge.style.backgroundColor = '#6c757d';
+            statusBadge.style.color = 'white';
+        }
+        
         document.getElementById('selectedCampaignDesc').textContent = 
-            campaign?.description || 'No description available';
+            description || 'No description available';
         
         infoDiv.style.display = 'block';
     } else {
@@ -219,12 +265,15 @@ document.addEventListener('DOMContentLoaded', function() {
         loadCompanyNpsDataDirect();
     }, 1000);
     
-    loadDashboardData().catch(error => {
-        console.error('Initial dashboard load failed:', error);
+    // Load campaign filter options first, then initial dashboard data
+    loadCampaignFilterOptions().then(() => {
+        // Only load dashboard data if no default campaign was auto-selected
+        if (!selectedCampaignId) {
+            loadDashboardData().catch(error => {
+                console.error('Initial dashboard load failed:', error);
+            });
+        }
     });
-    
-    // Load campaign filter options for Analytics tab
-    loadCampaignFilterOptions();
     
     // Check admin status on page load
     checkAdminStatus();
