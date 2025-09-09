@@ -302,7 +302,11 @@ def submit_survey_form():
         else:
             nps_category = 'Detractor'
         
-        # Create survey response with normalized company name
+        # Get active campaign for automatic assignment
+        active_campaign = Campaign.get_active_campaign('archelo_group')
+        campaign_id = active_campaign.id if active_campaign else None
+        
+        # Create survey response with normalized company name and campaign assignment
         response = SurveyResponse(
             company_name=normalize_company_name(data['company_name']),
             respondent_name=data['respondent_name'],
@@ -316,7 +320,8 @@ def submit_survey_form():
             pricing_rating=int(data['pricing_rating']) if data.get('pricing_rating') else None,
             improvement_feedback=data.get('improvement_feedback'),
             recommendation_reason=data.get('recommendation_reason'),
-            additional_comments=data.get('additional_comments')
+            additional_comments=data.get('additional_comments'),
+            campaign_id=campaign_id
         )
         
         db.session.add(response)
@@ -387,13 +392,17 @@ def submit_survey():
         else:
             nps_category = 'Detractor'
         
+        # Get active campaign for automatic assignment
+        active_campaign = Campaign.get_active_campaign('archelo_group')
+        campaign_id = active_campaign.id if active_campaign else None
+        
         # Check for existing response to update instead of creating duplicate
         existing_response = SurveyResponse.query.filter_by(
             respondent_email=authenticated_email
         ).first()
         
         if existing_response:
-            # Update existing response
+            # Update existing response (preserve campaign if no active campaign)
             existing_response.company_name = normalize_company_name(data['company_name'])
             existing_response.respondent_name = data['respondent_name']
             existing_response.tenure_with_fc = data.get('tenure_with_fc')
@@ -406,10 +415,13 @@ def submit_survey():
             existing_response.improvement_feedback = data.get('improvement_feedback')
             existing_response.recommendation_reason = data.get('recommendation_reason')
             existing_response.additional_comments = data.get('additional_comments')
+            # Update campaign if there's an active one, otherwise preserve existing
+            if campaign_id:
+                existing_response.campaign_id = campaign_id
 
             response = existing_response
         else:
-            # Create new survey response with authenticated email and normalized company name
+            # Create new survey response with authenticated email, normalized company name, and campaign assignment
             response = SurveyResponse(
                 company_name=normalize_company_name(data['company_name']),
                 respondent_name=data['respondent_name'],
@@ -423,7 +435,8 @@ def submit_survey():
                 pricing_rating=int(data['pricing_rating']) if data.get('pricing_rating') else None,
                 improvement_feedback=data.get('improvement_feedback'),
                 recommendation_reason=data.get('recommendation_reason'),
-                additional_comments=data.get('additional_comments')
+                additional_comments=data.get('additional_comments'),
+                campaign_id=campaign_id
             )
             db.session.add(response)
         db.session.commit()
@@ -489,9 +502,13 @@ def submit_survey_overwrite():
         else:
             nps_category = 'Detractor'
         
+        # Get active campaign for automatic assignment
+        active_campaign = Campaign.get_active_campaign('archelo_group')
+        campaign_id = active_campaign.id if active_campaign else None
+        
         if existing_response:
-            # Update existing response
-            existing_response.company_name = data['company_name']
+            # Update existing response with campaign assignment
+            existing_response.company_name = normalize_company_name(data['company_name'])
             existing_response.respondent_name = data['respondent_name']
             existing_response.tenure_with_fc = data.get('tenure_with_fc')
             existing_response.nps_score = nps_score
@@ -505,13 +522,16 @@ def submit_survey_overwrite():
             existing_response.additional_comments = data.get('additional_comments')
             existing_response.created_at = datetime.utcnow()  # Update timestamp
             existing_response.analyzed_at = None  # Reset analysis
+            # Update campaign if there's an active one, otherwise preserve existing
+            if campaign_id:
+                existing_response.campaign_id = campaign_id
             
             response = existing_response
             action = "updated"
         else:
-            # Create new response
+            # Create new response with campaign assignment
             response = SurveyResponse(
-                company_name=data['company_name'],
+                company_name=normalize_company_name(data['company_name']),
                 respondent_name=data['respondent_name'],
                 respondent_email=authenticated_email,
                 tenure_with_fc=data.get('tenure_with_fc'),
@@ -523,7 +543,8 @@ def submit_survey_overwrite():
                 pricing_rating=int(data['pricing_rating']) if data.get('pricing_rating') else None,
                 improvement_feedback=data.get('improvement_feedback'),
                 recommendation_reason=data.get('recommendation_reason'),
-                additional_comments=data.get('additional_comments')
+                additional_comments=data.get('additional_comments'),
+                campaign_id=campaign_id
             )
             db.session.add(response)
             action = "created"
@@ -1120,13 +1141,17 @@ def finalize_conversation():
         # Convert conversational data to structured survey format
         structured_data = finalize_ai_conversational_survey(survey_data)
         
+        # Get active campaign for automatic assignment
+        active_campaign = Campaign.get_active_campaign('archelo_group')
+        campaign_id = active_campaign.id if active_campaign else None
+        
         # Check for existing response to update instead of creating duplicate
         existing_response = SurveyResponse.query.filter_by(
             respondent_email=authenticated_email
         ).first()
         
         if existing_response:
-            # Update existing response
+            # Update existing response with campaign assignment
             existing_response.company_name = normalize_company_name(structured_data.get('company_name'))
             existing_response.respondent_name = structured_data.get('respondent_name')
             existing_response.tenure_with_fc = structured_data.get('tenure_with_fc')
@@ -1138,10 +1163,13 @@ def finalize_conversation():
             existing_response.improvement_feedback = structured_data.get('improvement_feedback')
             existing_response.recommendation_reason = structured_data.get('recommendation_reason')
             existing_response.additional_comments = structured_data.get('additional_comments')
+            # Update campaign if there's an active one, otherwise preserve existing
+            if campaign_id:
+                existing_response.campaign_id = campaign_id
 
             response = existing_response
         else:
-            # Create survey response record with normalized company name
+            # Create survey response record with normalized company name and campaign assignment
             response = SurveyResponse(
                 company_name=normalize_company_name(structured_data.get('company_name')),
                 respondent_name=structured_data.get('respondent_name'),
@@ -1154,7 +1182,8 @@ def finalize_conversation():
                 pricing_rating=structured_data.get('pricing_rating'),
                 improvement_feedback=structured_data.get('improvement_feedback'),
                 recommendation_reason=structured_data.get('recommendation_reason'),
-                additional_comments=structured_data.get('additional_comments')
+                additional_comments=structured_data.get('additional_comments'),
+                campaign_id=campaign_id
             )
             db.session.add(response)
         
