@@ -136,10 +136,13 @@ async function applyCampaignFilter() {
     const select = document.getElementById('campaignFilter');
     selectedCampaignId = select.value ? parseInt(select.value) : null;
     
+    console.log('🎯 Campaign filter applied:', selectedCampaignId);
+    
     // Update selected campaign info display
     updateSelectedCampaignInfo();
     
     // Reload dashboard data with campaign filter
+    console.log('📡 Loading dashboard data for campaign:', selectedCampaignId);
     await loadDashboardData();
     
     // Refresh all charts immediately after data loads - no setTimeout delay
@@ -150,6 +153,7 @@ async function applyCampaignFilter() {
     createGrowthFactorChart();
     
     // Also refresh Overview tab chart if visible
+    console.log('🎨 About to call createThemesChart from applyCampaignFilter');
     createThemesChart();
 }
 
@@ -609,9 +613,15 @@ function createRatingsChart() {
 }
 
 function createThemesChart() {
+    console.log('🎨 createThemesChart() called');
+    console.log('📊 dashboardData available:', !!dashboardData);
+    console.log('📊 dashboardData.key_themes:', dashboardData?.key_themes?.length || 'undefined');
+    
     const chartElement = document.getElementById('themesChart');
+    console.log('🎯 Chart element found:', !!chartElement);
+    
     if (!chartElement) {
-        console.warn('Themes chart element not found');
+        console.warn('❌ Themes chart element not found');
         return;
     }
     
@@ -619,11 +629,15 @@ function createThemesChart() {
     
     // Destroy existing chart if it exists
     if (charts.themesChart) {
+        console.log('🗑️ Destroying existing chart');
         charts.themesChart.destroy();
     }
     
     const themes = dashboardData.key_themes || [];
+    console.log('📋 Themes data:', themes.length, themes.slice(0, 2));
+    
     if (themes.length === 0) {
+        console.log('❌ No themes found - showing empty message');
         // Display message when no themes are available
         const chartContainer = ctx.canvas.parentElement;
         chartContainer.innerHTML = '<div class="d-flex justify-content-center align-items-center" style="height: 300px;"><p class="text-muted">No themes identified yet</p></div>';
