@@ -695,9 +695,7 @@ def convert_snapshot_to_dashboard_format(snapshot):
             'product_value': snapshot.avg_product_value_rating or 0
         }
         
-        # For closed campaigns, we don't have dynamic account intelligence data in snapshots
-        # These would need to be calculated separately if needed for historical campaigns
-        # For now, return empty arrays to maintain compatibility
+        # Return comprehensive dashboard data from snapshot
         
         return {
             'total_responses': snapshot.total_responses,
@@ -705,14 +703,16 @@ def convert_snapshot_to_dashboard_format(snapshot):
             'recent_responses': 0,  # For closed campaigns, this is always 0
             'nps_distribution': nps_distribution,
             'sentiment_distribution': sentiment_distribution,
-            'high_risk_accounts': [],  # Would need to be stored separately for historical data
-            'account_intelligence': [],  # Dynamic data not stored in snapshots
-            'growth_opportunities': [],  # Dynamic data not stored in snapshots  
-            'account_risk_factors': [],  # Dynamic data not stored in snapshots
+            'high_risk_accounts': json.loads(snapshot.high_risk_accounts) if snapshot.high_risk_accounts else [],
+            'account_intelligence': json.loads(snapshot.account_intelligence) if snapshot.account_intelligence else [],
+            'growth_opportunities': json.loads(snapshot.growth_opportunities_analysis) if snapshot.growth_opportunities_analysis else {},
+            'account_risk_factors': json.loads(snapshot.account_risk_factors_analysis) if snapshot.account_risk_factors_analysis else {},
+            'company_nps_data': json.loads(snapshot.company_nps_breakdown) if snapshot.company_nps_breakdown else [],
+            'tenure_nps_data': json.loads(snapshot.tenure_analysis) if snapshot.tenure_analysis else [],
             'key_themes': key_themes,
             'average_ratings': average_ratings,
             'tenure_distribution': tenure_distribution,
-            'growth_factor_analysis': {
+            'growth_factor_analysis': json.loads(snapshot.growth_factor_analysis_detailed) if snapshot.growth_factor_analysis_detailed else {
                 'total_growth_potential': snapshot.total_growth_potential or 0,
                 'distribution': growth_factor_distribution
             }
@@ -1201,6 +1201,59 @@ def generate_campaign_kpi_snapshot(campaign_id):
         avg_company_nps = sum(float(row.avg_nps) for row in company_nps_data) / len(company_nps_data) if company_nps_data else 0
         
         # ============================================================================
+        # CAPTURE COMPREHENSIVE ANALYSIS DATA FOR FULL DASHBOARD RESTORATION
+        # ============================================================================
+        
+        # Generate complete dashboard data to extract all components
+        print("📊 Capturing comprehensive analysis data for snapshot...")
+        full_dashboard_data = get_dashboard_data(campaign_id=campaign_id)
+        
+        # Custom JSON serializer to handle datetime objects
+        def serialize_for_json(obj):
+            if isinstance(obj, list):
+                return [serialize_for_json(item) for item in obj]
+            elif isinstance(obj, dict):
+                return {key: serialize_for_json(value) for key, value in obj.items()}
+            elif hasattr(obj, 'isoformat'):  # datetime objects
+                return obj.isoformat()
+            else:
+                return obj
+        
+        # Account Intelligence - Complete analysis by company
+        account_intelligence = serialize_for_json(full_dashboard_data.get('account_intelligence', []))
+        print(f"   ✅ Account Intelligence: {len(account_intelligence)} companies")
+        
+        # Growth Opportunities Analysis by company
+        growth_opportunities_analysis = serialize_for_json(full_dashboard_data.get('growth_opportunities', {}))
+        print(f"   ✅ Growth Opportunities: {len(growth_opportunities_analysis)} companies")
+        
+        # Account Risk Factors Analysis by company  
+        account_risk_factors_analysis = serialize_for_json(full_dashboard_data.get('account_risk_factors', {}))
+        print(f"   ✅ Risk Factors: {len(account_risk_factors_analysis)} companies")
+        
+        # Company NPS Breakdown for Survey Insights tab
+        company_nps_breakdown = []
+        company_nps_data_detailed = full_dashboard_data.get('company_nps_data', [])
+        if company_nps_data_detailed:
+            company_nps_breakdown = serialize_for_json(company_nps_data_detailed)
+        print(f"   ✅ Company NPS Breakdown: {len(company_nps_breakdown)} companies")
+        
+        # Tenure Analysis for Survey Insights tab
+        tenure_analysis = []
+        tenure_nps_data = full_dashboard_data.get('tenure_nps_data', [])
+        if tenure_nps_data:
+            tenure_analysis = serialize_for_json(tenure_nps_data)
+        print(f"   ✅ Tenure Analysis: {len(tenure_analysis)} groups")
+        
+        # Growth Factor Analysis Detailed
+        growth_factor_analysis_detailed = serialize_for_json(full_dashboard_data.get('growth_factor_analysis', {}))
+        print(f"   ✅ Growth Factor Analysis: {len(growth_factor_analysis_detailed)} metrics")
+        
+        # High Risk Accounts (enhanced with details)
+        high_risk_accounts = serialize_for_json(full_dashboard_data.get('high_risk_accounts', []))
+        print(f"   ✅ High Risk Accounts: {len(high_risk_accounts)} companies")
+        
+        # ============================================================================
         # CREATE SNAPSHOT RECORD
         # ============================================================================
         
@@ -1234,6 +1287,12 @@ def generate_campaign_kpi_snapshot(campaign_id):
             growth_factor_distribution=json.dumps(growth_factor_distribution),
             key_themes=json.dumps(key_themes),
             high_risk_accounts=json.dumps(high_risk_accounts),
+            account_intelligence=json.dumps(account_intelligence),
+            growth_opportunities_analysis=json.dumps(growth_opportunities_analysis),
+            account_risk_factors_analysis=json.dumps(account_risk_factors_analysis),
+            company_nps_breakdown=json.dumps(company_nps_breakdown),
+            tenure_analysis=json.dumps(tenure_analysis),
+            growth_factor_analysis_detailed=json.dumps(growth_factor_analysis_detailed),
             data_period_start=campaign.start_date,
             data_period_end=campaign.end_date
         )

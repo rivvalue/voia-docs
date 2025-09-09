@@ -237,6 +237,18 @@ class CampaignKPISnapshot(db.Model):
     key_themes = db.Column(db.Text, nullable=True)  # JSON: [{"theme": "pricing", "frequency": 8}, ...]
     high_risk_accounts = db.Column(db.Text, nullable=True)  # JSON: [{"company": "Acme Inc", "risk": "High"}, ...]
     
+    # Account Intelligence Data
+    account_intelligence = db.Column(db.Text, nullable=True)  # JSON: Full account intelligence analysis
+    growth_opportunities_analysis = db.Column(db.Text, nullable=True)  # JSON: Growth opportunities by company
+    account_risk_factors_analysis = db.Column(db.Text, nullable=True)  # JSON: Risk factors by company
+    
+    # Survey Insights Data  
+    company_nps_breakdown = db.Column(db.Text, nullable=True)  # JSON: Company-level NPS data
+    tenure_analysis = db.Column(db.Text, nullable=True)  # JSON: Tenure-based analysis
+    
+    # Analytics Charts Data
+    growth_factor_analysis_detailed = db.Column(db.Text, nullable=True)  # JSON: Detailed growth factor data
+    
     # Snapshot Metadata
     snapshot_version = db.Column(db.String(10), nullable=False, default='v1.0')  # Track engine versions
     snapshot_created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
@@ -276,6 +288,12 @@ class CampaignKPISnapshot(db.Model):
             'growth_factor_distribution': json.loads(self.growth_factor_distribution) if self.growth_factor_distribution else [],
             'key_themes': json.loads(self.key_themes) if self.key_themes else [],
             'high_risk_accounts': json.loads(self.high_risk_accounts) if self.high_risk_accounts else [],
+            'account_intelligence': json.loads(self.account_intelligence) if self.account_intelligence else [],
+            'growth_opportunities_analysis': json.loads(self.growth_opportunities_analysis) if self.growth_opportunities_analysis else {},
+            'account_risk_factors_analysis': json.loads(self.account_risk_factors_analysis) if self.account_risk_factors_analysis else {},
+            'company_nps_breakdown': json.loads(self.company_nps_breakdown) if self.company_nps_breakdown else [],
+            'tenure_analysis': json.loads(self.tenure_analysis) if self.tenure_analysis else [],
+            'growth_factor_analysis_detailed': json.loads(self.growth_factor_analysis_detailed) if self.growth_factor_analysis_detailed else {},
             'snapshot_version': self.snapshot_version,
             'snapshot_created_at': self.snapshot_created_at.isoformat() if self.snapshot_created_at else None,
             'data_period_start': self.data_period_start.isoformat() if self.data_period_start else None,
