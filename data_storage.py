@@ -687,7 +687,20 @@ def convert_snapshot_to_dashboard_format(snapshot):
     try:
         # Parse JSON fields back to Python objects
         nps_distribution = json.loads(snapshot.nps_distribution) if snapshot.nps_distribution else []
-        sentiment_distribution = json.loads(snapshot.sentiment_distribution) if snapshot.sentiment_distribution else []
+        raw_sentiment_distribution = json.loads(snapshot.sentiment_distribution) if snapshot.sentiment_distribution else []
+        
+        # Convert sentiment distribution format from snapshot to chart format
+        sentiment_distribution = []
+        for item in raw_sentiment_distribution:
+            if 'label' in item:  # Old snapshot format
+                sentiment_distribution.append({
+                    'sentiment': item['label'],
+                    'count': item['count']
+                })
+            elif 'sentiment' in item:  # New format already
+                sentiment_distribution.append(item)
+            else:
+                sentiment_distribution.append(item)  # Pass through unknown format
         tenure_distribution = json.loads(snapshot.tenure_distribution) if snapshot.tenure_distribution else []
         ratings_distribution = json.loads(snapshot.ratings_distribution) if snapshot.ratings_distribution else []
         key_themes = json.loads(snapshot.key_themes) if snapshot.key_themes else []
