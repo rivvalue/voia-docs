@@ -1022,10 +1022,38 @@ function createThemesChart() {
     console.log('📋 Themes data:', themes.length, themes.slice(0, 2));
     
     if (themes.length === 0) {
-        console.log('❌ No themes found - showing empty message');
-        // Display message when no themes are available
-        const chartContainer = ctx.canvas.parentElement;
-        chartContainer.innerHTML = '<div class="d-flex justify-content-center align-items-center" style="height: 300px;"><p class="text-muted">No themes identified yet</p></div>';
+        console.log('❌ No themes found - creating empty chart to preserve canvas');
+        // Create an empty chart instead of destroying the canvas element
+        charts.themesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['No Data'],
+                datasets: [{
+                    label: 'Mentions',
+                    data: [0],
+                    backgroundColor: '#E9E8E4',
+                    borderWidth: 1,
+                    borderColor: '#E9E8E4'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: getMobileChartConfig().maintainAspectRatio,
+                indexAxis: 'y',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false }
+                },
+                scales: {
+                    y: { display: false },
+                    x: { 
+                        beginAtZero: true,
+                        max: 1,
+                        display: false
+                    }
+                }
+            }
+        });
         return;
     }
     
