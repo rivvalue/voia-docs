@@ -737,8 +737,14 @@ function loadDashboardData() {
         .catch(error => {
             console.error('Error loading dashboard data:', error);
             if (loadingElement) {
-                loadingElement.innerHTML = 
-                    '<div class="alert alert-danger">Error loading dashboard data: ' + error.message + '</div>';
+                // Create error element safely using DOM methods
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'alert alert-danger';
+                errorDiv.textContent = 'Error loading dashboard data: ' + error.message;
+                
+                // Clear loading element and append error
+                loadingElement.innerHTML = '';
+                loadingElement.appendChild(errorDiv);
             }
             // Re-throw error to maintain Promise chain behavior
             throw error;
