@@ -257,9 +257,12 @@ def get_dashboard_data(campaign_id=None):
         
         # Growth opportunities summary - grouped by company (case-insensitive) and normalized by type
         growth_opportunities_by_company = {}
-        responses_with_opportunities = SurveyResponse.query.filter(
+        opportunities_query = SurveyResponse.query.filter(
             SurveyResponse.growth_opportunities.isnot(None)
-        ).all()
+        )
+        if campaign_id:
+            opportunities_query = opportunities_query.filter(SurveyResponse.campaign_id == campaign_id)
+        responses_with_opportunities = opportunities_query.all()
         
         for response in responses_with_opportunities:
             if response.growth_opportunities:
@@ -316,9 +319,12 @@ def get_dashboard_data(campaign_id=None):
         all_companies.update(growth_opportunities_by_company.keys())
         
         # Process risk factors data
-        responses_with_risk_factors = SurveyResponse.query.filter(
+        risk_factors_query = SurveyResponse.query.filter(
             SurveyResponse.account_risk_factors.isnot(None)
-        ).all()
+        )
+        if campaign_id:
+            risk_factors_query = risk_factors_query.filter(SurveyResponse.campaign_id == campaign_id)
+        responses_with_risk_factors = risk_factors_query.all()
         
         account_risk_factors_by_company = {}
         for response in responses_with_risk_factors:

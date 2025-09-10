@@ -1,6 +1,7 @@
 from flask import render_template, request, jsonify, flash, redirect, url_for, g, session
 from app import app, db
 from models import SurveyResponse, Campaign
+from data_storage import get_dashboard_data
 
 # Root route already exists - removed duplicate
 from models_auth import AuthToken
@@ -1335,7 +1336,8 @@ def get_campaign_filter_options():
                     'name': campaign.name,
                     'start_date': campaign.start_date.isoformat(),
                     'end_date': campaign.end_date.isoformat(),
-                    'status': campaign.status
+                    'status': campaign.status,
+                    'description': campaign.description
                 }
                 for campaign in campaigns
             ]
@@ -1343,3 +1345,105 @@ def get_campaign_filter_options():
     except Exception as e:
         logger.error(f"Error getting campaign filter options: {e}")
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/campaigns/comparison')
+def get_campaign_comparison():
+    """Get comparison data between two campaigns (public endpoint)"""
+    try:
+        campaign1_id = request.args.get('campaign1', type=int)
+        campaign2_id = request.args.get('campaign2', type=int)
+        
+        if not campaign1_id or not campaign2_id:
+            return jsonify({'error': 'Both campaign1 and campaign2 IDs required'}), 400
+            
+        # Get campaign details
+        campaign1 = Campaign.query.get(campaign1_id)
+        campaign2 = Campaign.query.get(campaign2_id)
+        
+        if not campaign1 or not campaign2:
+            return jsonify({'error': 'One or both campaigns not found'}), 404
+            
+        # Get dashboard data for both campaigns
+        data1 = get_dashboard_data(campaign_id=campaign1_id)
+        data2 = get_dashboard_data(campaign_id=campaign2_id)
+        
+        # Build comparison data
+        comparison = {
+            'campaign1': {
+                'id': campaign1.id,
+                'name': campaign1.name,
+                'status': campaign1.status,
+                'start_date': campaign1.start_date.isoformat() if campaign1.start_date else None,
+                'end_date': campaign1.end_date.isoformat() if campaign1.end_date else None,
+                'data': {
+                    'total_responses': data1.get('total_responses', 0),
+                    'nps_score': data1.get('nps_score', 0),
+                    'companies_analyzed': len(data1.get('account_intelligence', [])),
+                    'critical_risk_companies': sum(1 for company in data1.get('account_intelligence', []) if company.get('critical_risks', 0) > 0),
+                    'risk_heavy_accounts': sum(1 for company in data1.get('account_intelligence', []) if company.get('balance') == 'risk_heavy'),
+                    'opportunity_heavy_accounts': sum(1 for company in data1.get('account_intelligence', []) if company.get('balance') == 'opportunity_heavy'),
+                    'balanced_accounts': sum(1 for company in data1.get('account_intelligence', []) if company.get('balance') == 'balanced'),
+                    'total_risks': sum(company.get('risk_count', 0) for company in data1.get('account_intelligence', [])),
+                    'total_opportunities': sum(company.get('opportunity_count', 0) for company in data1.get('account_intelligence', []))
+                }
+            },
+            'campaign2': {
+                'id': campaign2.id,
+                'name': campaign2.name,
+                'status': campaign2.status,
+                'start_date': campaign2.start_date.isoformat() if campaign2.start_date else None,
+                'end_date': campaign2.end_date.isoformat() if campaign2.end_date else None,
+                'data': {
+                    'total_responses': data2.get('total_responses', 0),
+                    'nps_score': data2.get('nps_score', 0),
+                    'companies_analyzed': len(data2.get('account_intelligence', [])),
+                    'critical_risk_companies': sum(1 for company in data2.get('account_intelligence', []) if company.get('critical_risks', 0) > 0),
+                    'risk_heavy_accounts': sum(1 for company in data2.get('account_intelligence', []) if company.get('balance') == 'risk_heavy'),
+                    'opportunity_heavy_accounts': sum(1 for company in data2.get('account_intelligence', []) if company.get('balance') == 'opportunity_heavy'),
+                    'balanced_accounts': sum(1 for company in data2.get('account_intelligence', []) if company.get('balance') == 'balanced'),
+                    'total_risks': sum(company.get('risk_count', 0) for company in data2.get('account_intelligence', [])),
+                    'total_opportunities': sum(company.get('opportunity_count', 0) for company in data2.get('account_intelligence', []))
+                }
+            },
+            'company_details': []
+        }
+        
+        # Build company-by-company comparison
+        ai1 = data1.get('account_intelligence', [])
+        ai2 = data2.get('account_intelligence', [])
+        
+        # Create lookup maps
+        companies1 = {company.get('company_name', '').upper(): company for company in ai1}
+        companies2 = {company.get('company_name', '').upper(): company for company in ai2}
+        
+        # Get all unique companies
+        all_companies = set(companies1.keys()) | set(companies2.keys())
+        
+        for company_key in sorted(all_companies):
+            c1 = companies1.get(company_key, {})
+            c2 = companies2.get(company_key, {})
+            
+            # Use the most recent company name version
+            display_name = c1.get('company_name') or c2.get('company_name', company_key.title())
+            
+            comparison['company_details'].append({
+                'company_name': display_name,
+                'campaign1': {
+                    'risk_count': c1.get('risk_count', 0),
+                    'opportunity_count': c1.get('opportunity_count', 0),
+                    'balance': c1.get('balance', 'N/A'),
+                    'critical_risks': c1.get('critical_risks', 0)
+                },
+                'campaign2': {
+                    'risk_count': c2.get('risk_count', 0),
+                    'opportunity_count': c2.get('opportunity_count', 0),
+                    'balance': c2.get('balance', 'N/A'),
+                    'critical_risks': c2.get('critical_risks', 0)
+                }
+            })
+        
+        return jsonify(comparison)
+        
+    except Exception as e:
+        logger.error(f"Error getting campaign comparison: {e}")
+        return jsonify({'error': 'Failed to load comparison data'}), 500
