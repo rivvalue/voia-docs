@@ -480,7 +480,9 @@ function populateExecutiveSummary(data) {
         }
     ];
     
-    let tableHTML = '';
+    // Clear existing content
+    tableBody.textContent = '';
+    
     metrics.forEach(metric => {
         const c1Display = metric.format === 'decimal' ? parseFloat(metric.c1).toFixed(1) : metric.c1;
         const c2Display = metric.format === 'decimal' ? parseFloat(metric.c2).toFixed(1) : metric.c2;
@@ -498,17 +500,41 @@ function populateExecutiveSummary(data) {
             changeClass = 'text-muted';
         }
         
-        tableHTML += `
-            <tr>
-                <td><strong>${metric.name}</strong></td>
-                <td class="text-center">${c1Display}</td>
-                <td class="text-center">${c2Display}</td>
-                <td class="text-center ${changeClass}"><strong>${changeDisplay}</strong></td>
-            </tr>
-        `;
+        // Create row using safe DOM methods
+        const row = document.createElement('tr');
+        
+        // Name column
+        const nameCell = document.createElement('td');
+        const nameStrong = document.createElement('strong');
+        nameStrong.textContent = metric.name;
+        nameCell.appendChild(nameStrong);
+        
+        // C1 column
+        const c1Cell = document.createElement('td');
+        c1Cell.className = 'text-center';
+        c1Cell.textContent = c1Display;
+        
+        // C2 column
+        const c2Cell = document.createElement('td');
+        c2Cell.className = 'text-center';
+        c2Cell.textContent = c2Display;
+        
+        // Change column
+        const changeCell = document.createElement('td');
+        changeCell.className = `text-center ${changeClass}`;
+        const changeStrong = document.createElement('strong');
+        changeStrong.textContent = changeDisplay;
+        changeCell.appendChild(changeStrong);
+        
+        // Append all cells to row
+        row.appendChild(nameCell);
+        row.appendChild(c1Cell);
+        row.appendChild(c2Cell);
+        row.appendChild(changeCell);
+        
+        // Append row to table body
+        tableBody.appendChild(row);
     });
-    
-    tableBody.innerHTML = tableHTML;
 }
 
 // Populate company comparison table
