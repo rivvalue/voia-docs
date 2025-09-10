@@ -240,7 +240,10 @@ function addMessage(sender, message) {
     const chatMessages = document.getElementById('chatMessages');
     const messageElement = document.createElement('div');
     messageElement.className = `chat-message ${sender === 'ai' ? 'assistant' : 'user'}`;
-    messageElement.innerHTML = formatMessage(message);
+    
+    // Safe DOM manipulation - use textContent then apply formatting
+    const formattedContent = formatMessageSafe(message);
+    messageElement.appendChild(formattedContent);
     
     chatMessages.appendChild(messageElement);
     chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -254,11 +257,125 @@ function addMessage(sender, message) {
 }
 
 function formatMessage(message) {
-    // Convert markdown-style formatting to HTML
+    // Convert markdown-style formatting to HTML (legacy function - use formatMessageSafe instead)
     return message
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/\*(.*?)\*/g, '<em>$1</em>')
         .replace(/\n/g, '<br>');
+}
+
+function formatMessageSafe(message) {
+    // Safe formatting using DOM methods to prevent XSS
+    const container = document.createElement('span');
+    
+    // Split message by newlines and handle each line
+    const lines = message.split('\n');
+    
+    for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+        const lineContainer = document.createElement('span');
+        
+        // Process bold and italic formatting safely
+        const parts = [];
+        let currentIndex = 0;
+        
+        // Find bold patterns (**text**)
+        const boldRegex = /\*\*(.*?)\*\*/g;
+        let match;
+        while ((match = boldRegex.exec(line)) !== null) {
+            // Add text before the match
+            if (match.index > currentIndex) {
+                parts.push({
+                    type: 'text',
+                    content: line.slice(currentIndex, match.index)
+                });
+            }
+            // Add bold content
+            parts.push({
+                type: 'bold',
+                content: match[1]
+            });
+            currentIndex = match.index + match[0].length;
+        }
+        
+        // Add remaining text
+        if (currentIndex < line.length) {
+            parts.push({
+                type: 'text',
+                content: line.slice(currentIndex)
+            });
+        }
+        
+        // If no formatting found, treat entire line as text
+        if (parts.length === 0) {
+            parts.push({
+                type: 'text',
+                content: line
+            });
+        }
+        
+        // Process italic patterns within each part
+        const processedParts = [];
+        parts.forEach(part => {
+            if (part.type === 'text') {
+                const italicRegex = /\*(.*?)\*/g;
+                let italicMatch;
+                let lastIndex = 0;
+                while ((italicMatch = italicRegex.exec(part.content)) !== null) {
+                    // Add text before italic
+                    if (italicMatch.index > lastIndex) {
+                        processedParts.push({
+                            type: 'text',
+                            content: part.content.slice(lastIndex, italicMatch.index)
+                        });
+                    }
+                    // Add italic content
+                    processedParts.push({
+                        type: 'italic',
+                        content: italicMatch[1]
+                    });
+                    lastIndex = italicMatch.index + italicMatch[0].length;
+                }
+                // Add remaining text
+                if (lastIndex < part.content.length) {
+                    processedParts.push({
+                        type: 'text',
+                        content: part.content.slice(lastIndex)
+                    });
+                }
+            } else {
+                processedParts.push(part);
+            }
+        });
+        
+        // Create DOM elements for each part
+        processedParts.forEach(part => {
+            let element;
+            switch (part.type) {
+                case 'bold':
+                    element = document.createElement('strong');
+                    element.textContent = part.content;
+                    break;
+                case 'italic':
+                    element = document.createElement('em');
+                    element.textContent = part.content;
+                    break;
+                default:
+                    element = document.createTextNode(part.content);
+                    break;
+            }
+            lineContainer.appendChild(element);
+        });
+        
+        container.appendChild(lineContainer);
+        
+        // Add line break if not the last line
+        if (i < lines.length - 1) {
+            container.appendChild(document.createElement('br'));
+        }
+    }
+    
+    return container;
 }
 
 // Add missing helper functions
