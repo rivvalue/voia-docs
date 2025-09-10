@@ -1,5 +1,13 @@
 // Dashboard JavaScript functionality
 
+// HTML escape function to prevent XSS vulnerabilities
+function escapeHtml(text) {
+    if (text == null) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 let dashboardData = null;
 let charts = {};
 let campaignData = null;
@@ -1364,11 +1372,11 @@ function populateHighRiskAccounts() {
         <div class="risk-card p-3 mb-3 rounded">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h6 class="mb-1">${account.company_name}</h6>
-                    <small class="text-muted">NPS Score: ${account.nps_score}</small>
+                    <h6 class="mb-1">${escapeHtml(account.company_name)}</h6>
+                    <small class="text-muted">NPS Score: ${escapeHtml(account.nps_score)}</small>
                 </div>
                 <div class="text-end">
-                    <span class="badge bg-danger">${account.risk_level || 'High'} Risk</span>
+                    <span class="badge bg-danger">${escapeHtml(account.risk_level || 'High')} Risk</span>
                 </div>
             </div>
         </div>
@@ -1397,15 +1405,15 @@ function populateGrowthOpportunities() {
         
         return `
             <div class="company-opportunities-card p-3 mb-4 rounded" style="border: 1px solid #BDBDBD;">
-                <h6 class="mb-3" style="color: #E13A44; font-weight: bold;">${companyName}</h6>
+                <h6 class="mb-3" style="color: #E13A44; font-weight: bold;">${escapeHtml(companyName)}</h6>
                 ${opportunities.map(opp => `
                     <div class="opportunity-card p-2 mb-2 rounded" style="background-color: #E9E8E4; border-left: 3px solid #E13A44;">
                         <div class="d-flex justify-content-between align-items-start">
                             <div>
-                                <p class="mb-1" style="color: #000000;">${opp.description || 'No description available'}</p>
-                                <small class="text-muted">${opp.action || 'No action specified'}</small>
+                                <p class="mb-1" style="color: #000000;">${escapeHtml(opp.description || 'No description available')}</p>
+                                <small class="text-muted">${escapeHtml(opp.action || 'No action specified')}</small>
                             </div>
-                            <span class="badge bg-primary">${opp.type || 'unknown'}</span>
+                            <span class="badge bg-primary">${escapeHtml(opp.type || 'unknown')}</span>
                         </div>
                     </div>
                 `).join('')}
@@ -1611,8 +1619,8 @@ function populateAccountIntelligence() {
             return `
                 <span class="visual-indicator opportunity-indicator" 
                       style="background-color: ${visual.color}20; border: 2px solid ${visual.color}; padding: 4px 8px; margin: 2px; border-radius: 12px; display: inline-block;"
-                      title="${opp.type}${opp.count > 1 ? ` (${opp.count} opportunities)` : ''}">
-                    ${visual.label}${opp.count > 1 ? ` (${opp.count})` : ''}
+                      title="${escapeHtml(opp.type)}${opp.count > 1 ? ` (${opp.count} opportunities)` : ''}">
+                    ${escapeHtml(visual.label)}${opp.count > 1 ? ` (${opp.count})` : ''}
                 </span>
             `;
         }).join('');
@@ -1647,8 +1655,8 @@ function populateAccountIntelligence() {
             return `
                 <span class="visual-indicator risk-indicator" 
                       style="background-color: ${visual.color}20; border: 2px solid ${visual.color}; padding: 4px 8px; margin: 2px; border-radius: 12px; display: inline-block;"
-                      title="${risk.type} - ${risk.severity}${risk.count > 1 ? ` (${risk.count} instances)` : ''}">
-                    ${visual.label} ${intensity}${risk.count > 1 ? ` (${risk.count})` : ''}
+                      title="${escapeHtml(risk.type)} - ${escapeHtml(risk.severity)}${risk.count > 1 ? ` (${risk.count} instances)` : ''}">
+                    ${escapeHtml(visual.label)} ${intensity}${risk.count > 1 ? ` (${risk.count})` : ''}
                 </span>
             `;
         }).join('');
@@ -1657,7 +1665,7 @@ function populateAccountIntelligence() {
             <div class="account-visual-card card mb-3 ${balanceClass}" style="border-width: 2px;">
                 <div class="card-body p-3">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">${account.company_name}</h5>
+                        <h5 class="mb-0">${escapeHtml(account.company_name)}</h5>
                         <div class="d-flex align-items-center">
                             <span style="font-size: 1.2em; margin-right: 5px; color: ${balanceIconColor};">${balanceIcon}</span>
                             <span class="badge" style="background-color: ${balanceIconColor}20; color: ${balanceIconColor}; border: 1px solid ${balanceIconColor};">${balanceLabel}</span>
@@ -2473,7 +2481,7 @@ function checkAdminStatus() {
         .then(data => {
             if (data.valid && data.is_admin) {
                 const adminBtn = document.getElementById('adminLoginBtn');
-                adminBtn.innerHTML = `<i class="fas fa-check me-2"></i>Admin: ${data.email}`;
+                adminBtn.innerHTML = `<i class="fas fa-check me-2"></i>Admin: ${escapeHtml(data.email)}`;
                 adminBtn.classList.remove('btn-outline-secondary');
                 adminBtn.classList.add('btn-success');
                 adminBtn.onclick = adminLogout; // Change to logout function
@@ -2559,7 +2567,7 @@ function updateAdminUI(isAdmin, email = null) {
     
     if (isAdmin && email) {
         // Show admin logged in state
-        adminBtn.innerHTML = `<i class="fas fa-check me-2"></i>Admin: ${email}`;
+        adminBtn.innerHTML = `<i class="fas fa-check me-2"></i>Admin: ${escapeHtml(email)}`;
         adminBtn.classList.remove('btn-outline-secondary');
         adminBtn.classList.add('btn-success');
         adminBtn.onclick = adminLogout; // Change to logout function
@@ -3191,7 +3199,7 @@ function getValueClass(value) {
 
 function displayKPIOverviewError(message) {
     const tbody = document.getElementById("kpiOverviewTableBody");
-    tbody.innerHTML = `<tr><td colspan="9" class="text-center text-danger">${message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" class="text-center text-danger">${escapeHtml(message)}</td></tr>`;
 }
 
 // Two-tier navigation functionality
