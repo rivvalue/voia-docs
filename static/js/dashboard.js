@@ -3112,3 +3112,100 @@ function displayKPIOverviewError(message) {
     const tbody = document.getElementById("kpiOverviewTableBody");
     tbody.innerHTML = `<tr><td colspan="9" class="text-center text-danger">${message}</td></tr>`;
 }
+
+// Two-tier navigation functionality
+function switchPrimarySection(section) {
+    // Remove active class from all primary navigation buttons
+    document.querySelectorAll("#primaryNavigation .nav-link").forEach(link => {
+        link.classList.remove("active");
+    });
+    
+    // Add active class to clicked primary navigation button
+    document.getElementById(section + "-primary").classList.add("active");
+    
+    // Hide all secondary navigation sections
+    document.querySelectorAll(".secondary-nav").forEach(nav => {
+        nav.classList.add("d-none");
+    });
+    
+    // Show the appropriate secondary navigation
+    const targetSecondaryNav = document.getElementById(section + "SecondaryNav");
+    if (targetSecondaryNav) {
+        targetSecondaryNav.classList.remove("d-none");
+    }
+    
+    // Handle tab content based on section
+    switch(section) {
+        case "insights":
+            // Show overview tab by default for insights
+            showTab("overview-tab", "overview");
+            break;
+        case "management":
+            // Show campaign management tab by default
+            showTab("campaign-management-tab", "campaign-management");
+            break;
+        case "admin":
+            // Show admin tools tab by default
+            showTab("admin-tools-tab", "admin-tools");
+            break;
+    }
+}
+
+// Helper function to show a specific tab
+function showTab(tabId, contentId) {
+    // Hide all tab content
+    document.querySelectorAll(".tab-pane").forEach(pane => {
+        pane.classList.remove("show", "active");
+    });
+    
+    // Remove active from all secondary nav links
+    document.querySelectorAll(".secondary-nav .nav-link").forEach(link => {
+        link.classList.remove("active");
+        link.setAttribute("aria-selected", "false");
+    });
+    
+    // Show target tab content
+    const targetContent = document.getElementById(contentId);
+    if (targetContent) {
+        targetContent.classList.add("show", "active");
+    }
+    
+    // Activate target tab
+    const targetTab = document.getElementById(tabId);
+    if (targetTab) {
+        targetTab.classList.add("active");
+        targetTab.setAttribute("aria-selected", "true");
+    }
+}
+
+// Update admin UI for both admin button locations
+function updateAdminUI(isLoggedIn) {
+    const adminBtn = document.getElementById("adminLoginBtn");
+    const exportBtn = document.getElementById("exportDataBtn");
+    const adminBtn2 = document.getElementById("adminLoginBtn2");
+    const exportBtn2 = document.getElementById("exportDataBtn2");
+    
+    if (isLoggedIn) {
+        if (adminBtn) {
+            adminBtn.textContent = "Admin Logout";
+            adminBtn.onclick = adminLogout;
+        }
+        if (exportBtn) exportBtn.classList.remove("d-none");
+        if (adminBtn2) {
+            adminBtn2.innerHTML = "<i class=\"fas fa-sign-out-alt me-2\"></i>Admin Logout";
+            adminBtn2.onclick = adminLogout;
+        }
+        if (exportBtn2) exportBtn2.classList.remove("d-none");
+    } else {
+        if (adminBtn) {
+            adminBtn.innerHTML = "<i class=\"fas fa-key me-2 d-none d-sm-inline\"></i><i class=\"fas fa-key d-sm-none\"></i><span class=\"d-none d-sm-inline\">Admin Login</span>";
+            adminBtn.onclick = adminLogin;
+        }
+        if (exportBtn) exportBtn.classList.add("d-none");
+        if (adminBtn2) {
+            adminBtn2.innerHTML = "<i class=\"fas fa-sign-in-alt me-2\"></i>Admin Login";
+            adminBtn2.onclick = adminLogin;
+        }
+        if (exportBtn2) exportBtn2.classList.add("d-none");
+    }
+}

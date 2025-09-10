@@ -1932,3 +1932,134 @@ a:hover {
         padding: 6px 3px;
     }
 }
+
+/* Two-Tier Navigation Styling */
+.two-tier-navigation {
+    margin-bottom: 1.5rem;
+}
+
+.primary-nav {
+    background-color: #f8f9fa;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #dee2e6;
+}
+
+.primary-nav .nav-link {
+    font-weight: 600;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+    border-radius: 0.375rem;
+    margin: 0 0.25rem;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+
+.primary-nav .nav-link:hover {
+    color: var(--primary-red);
+    background-color: rgba(225, 58, 68, 0.1);
+    border-color: rgba(225, 58, 68, 0.2);
+    transform: translateY(-1px);
+}
+
+.primary-nav .nav-link.active {
+    color: white;
+    background-color: var(--primary-red);
+    border-color: var(--primary-red);
+    box-shadow: 0 2px 4px rgba(225, 58, 68, 0.3);
+}
+
+.secondary-nav {
+    border-bottom: 2px solid var(--medium-gray);
+}
+
+.secondary-nav .nav-link {
+    font-size: 0.9rem;
+    color: #6c757d;
+    border: none;
+    border-bottom: 3px solid transparent;
+    border-radius: 0;
+    padding: 0.75rem 1rem;
+    margin: 0 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.secondary-nav .nav-link:hover {
+    color: var(--primary-red);
+    border-bottom-color: rgba(225, 58, 68, 0.3);
+    background-color: rgba(225, 58, 68, 0.05);
+}
+
+.secondary-nav .nav-link.active {
+    color: var(--primary-red);
+    border-bottom-color: var(--primary-red);
+    background-color: transparent;
+    font-weight: 600;
+}
+
+/* Responsive design for two-tier navigation */
+@media (max-width: 768px) {
+    .primary-nav .nav-link {
+        font-size: 0.8rem;
+        padding: 0.5rem 1rem;
+        margin: 0 0.1rem;
+    }
+    
+    .secondary-nav .nav-link {
+        font-size: 0.8rem;
+        padding: 0.5rem 0.5rem;
+        margin: 0 0.25rem;
+    }
+    
+    .primary-nav .nav-link i {
+        margin-right: 0.25rem !important;
+    }
+    
+    .secondary-nav .nav-link i {
+        margin-right: 0.25rem !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .primary-nav {
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .primary-nav .nav-link {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+        margin: 0;
+    }
+    
+    .secondary-nav .nav-link {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.5rem;
+        margin: 0;
+    }
+    
+    /* Stack secondary nav on very small screens */
+    .secondary-nav {
+        flex-wrap: wrap;
+    }
+    
+    .secondary-nav .nav-item {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+}
+
+/* Ensure smooth transitions */
+.tab-pane {
+    transition: opacity 0.2s ease-in-out;
+}
+
+.tab-pane.fade {
+    opacity: 0;
+}
+
+.tab-pane.fade.show {
+    opacity: 1;
+}
