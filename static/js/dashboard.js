@@ -1879,18 +1879,18 @@ function loadSurveyResponses(page = 1) {
                 
                 return `
                     <tr>
-                        <td>${response.company_name}</td>
-                        <td>${response.tenure_with_fc || 'N/A'}</td>
+                        <td>${escapeHtml(response.company_name)}</td>
+                        <td>${escapeHtml(response.tenure_with_fc) || 'N/A'}</td>
                         <td>
                             <span class="badge ${response.nps_score >= 9 ? 'bg-success' : 
                                                 response.nps_score >= 7 ? 'bg-secondary' : 'bg-danger'}">
-                                ${response.nps_score}
+                                ${escapeHtml(response.nps_score)}
                             </span>
                         </td>
-                        <td>${response.nps_category}</td>
-                        <td class="${sentimentClass}">${response.sentiment_label || 'N/A'}</td>
+                        <td>${escapeHtml(response.nps_category)}</td>
+                        <td class="${sentimentClass}">${escapeHtml(response.sentiment_label) || 'N/A'}</td>
                         <td class="${riskClass}">
-                            ${riskLevel}
+                            ${escapeHtml(riskLevel)}
                         </td>
                         <td>${response.created_at ? new Date(response.created_at).toLocaleDateString() : 'N/A'}</td>
                     </tr>
@@ -2258,14 +2258,14 @@ function populateTenureNpsTable(tenureData) {
         
         return `
             <tr>
-                <td><strong>${tenure.tenure_group}</strong></td>
-                <td>${tenure.total_responses}</td>
-                <td>${tenure.avg_nps}</td>
-                <td><span class="badge ${npsBadgeClass}">${tenure.tenure_nps > 0 ? '+' : ''}${tenure.tenure_nps}</span></td>
+                <td><strong>${escapeHtml(tenure.tenure_group)}</strong></td>
+                <td>${escapeHtml(tenure.total_responses)}</td>
+                <td>${escapeHtml(tenure.avg_nps)}</td>
+                <td><span class="badge ${npsBadgeClass}">${tenure.tenure_nps > 0 ? '+' : ''}${escapeHtml(tenure.tenure_nps)}</span></td>
                 <td><small>${distributionText}</small></td>
-                <td><span class="badge ${riskBadgeClass}">${tenure.risk_level}</span></td>
-                <td>${tenure.latest_response || 'N/A'}</td>
-                <td>${churnRiskDisplay}</td>
+                <td><span class="badge ${riskBadgeClass}">${escapeHtml(tenure.risk_level)}</span></td>
+                <td>${escapeHtml(tenure.latest_response) || 'N/A'}</td>
+                <td>${escapeHtml(churnRiskDisplay)}</td>
             </tr>
         `;
     }).join('');
@@ -2343,14 +2343,14 @@ function populateCompanyNpsTable(companyData) {
         
         return `
             <tr>
-                <td><strong>${company.company_name}</strong></td>
-                <td>${company.total_responses}</td>
-                <td>${company.avg_nps}</td>
-                <td><span class="badge ${npsBadgeClass}">${company.company_nps > 0 ? '+' : ''}${company.company_nps}</span></td>
+                <td><strong>${escapeHtml(company.company_name)}</strong></td>
+                <td>${escapeHtml(company.total_responses)}</td>
+                <td>${escapeHtml(company.avg_nps)}</td>
+                <td><span class="badge ${npsBadgeClass}">${company.company_nps > 0 ? '+' : ''}${escapeHtml(company.company_nps)}</span></td>
                 <td><small>${distributionText}</small></td>
-                <td><span class="badge ${riskBadgeClass}">${company.risk_level}</span></td>
-                <td>${company.latest_response || 'N/A'}</td>
-                <td>${churnRiskDisplay}</td>
+                <td><span class="badge ${riskBadgeClass}">${escapeHtml(company.risk_level)}</span></td>
+                <td>${escapeHtml(company.latest_response) || 'N/A'}</td>
+                <td>${escapeHtml(churnRiskDisplay)}</td>
             </tr>
         `;
     }).join('');
