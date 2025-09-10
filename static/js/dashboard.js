@@ -527,14 +527,16 @@ function populateCompanyComparison(data) {
     });
     
     tableBody.innerHTML = tableHTML;
-    
-    // Run color override multiple times to catch dynamically loaded content
+}
+
+// Run color override multiple times to catch dynamically loaded content
+function runColorOverride() {
     setTimeout(forceRemoveYellowColors, 100);
     setTimeout(forceRemoveYellowColors, 500);
     setTimeout(forceRemoveYellowColors, 1000);
     setTimeout(forceRemoveYellowColors, 2000);
     setTimeout(forceRemoveYellowColors, 5000);
-});
+}
 
 // Direct company NPS data loading as fallback
 function loadCompanyNpsDataDirect() {
