@@ -1758,51 +1758,90 @@ function populateAccountRiskFactors() {
     const container = document.getElementById('accountRiskFactors');
     const companiesWithRiskFactors = dashboardData.account_risk_factors || [];
     
+    // Clear container safely
+    container.textContent = '';
+    
     if (companiesWithRiskFactors.length === 0) {
-        container.innerHTML = '<p class="text-muted">No account risk factors identified.</p>';
+        const noDataMsg = document.createElement('p');
+        noDataMsg.className = 'text-muted';
+        noDataMsg.textContent = 'No account risk factors identified.';
+        container.appendChild(noDataMsg);
         return;
     }
     
-    const html = companiesWithRiskFactors.map(company => {
+    companiesWithRiskFactors.forEach(company => {
         // Ensure company has a name and risk factors array
         if (!company.company_name || !company.risk_factors || !Array.isArray(company.risk_factors)) {
-            return '';
+            return;
         }
         
-        const riskFactorsHtml = company.risk_factors.map(risk => {
+        // Create company container
+        const companyDiv = document.createElement('div');
+        companyDiv.className = 'company-risk-factors mb-4';
+        
+        // Create company name header
+        const companyHeader = document.createElement('h6');
+        companyHeader.className = 'company-name text-dark mb-3';
+        companyHeader.textContent = company.company_name; // Safe text content
+        companyDiv.appendChild(companyHeader);
+        
+        // Create risk factors
+        company.risk_factors.forEach(risk => {
             const severityClass = risk.severity === 'Critical' ? 'danger' : 
                                  risk.severity === 'High' ? 'danger' : 
                                  risk.severity === 'Medium' ? 'secondary' : 'secondary';
             
-            return `
-                <div class="risk-factor-item mb-3 p-3 border rounded">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h6 class="risk-type mb-1">${risk.type}</h6>
-                        <span class="badge bg-${severityClass}">${risk.severity}</span>
-                    </div>
-                    <p class="risk-description text-muted mb-2">${risk.description}</p>
-                    <small class="risk-action text-primary"><strong>Recommended Action:</strong> ${risk.action}</small>
-                    ${risk.count > 1 ? `<div class="text-end"><small class="text-muted">${risk.count} occurrences</small></div>` : ''}
-                </div>
-            `;
-        }).join('');
+            // Create risk factor container
+            const riskDiv = document.createElement('div');
+            riskDiv.className = 'risk-factor-item mb-3 p-3 border rounded';
+            
+            // Create header row with type and severity
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'd-flex justify-content-between align-items-start mb-2';
+            
+            const typeHeader = document.createElement('h6');
+            typeHeader.className = 'risk-type mb-1';
+            typeHeader.textContent = risk.type; // Safe text content
+            
+            const severityBadge = document.createElement('span');
+            severityBadge.className = `badge bg-${severityClass}`;
+            severityBadge.textContent = risk.severity; // Safe text content
+            
+            headerDiv.appendChild(typeHeader);
+            headerDiv.appendChild(severityBadge);
+            riskDiv.appendChild(headerDiv);
+            
+            // Create description
+            const descriptionP = document.createElement('p');
+            descriptionP.className = 'risk-description text-muted mb-2';
+            descriptionP.textContent = risk.description; // Safe text content
+            riskDiv.appendChild(descriptionP);
+            
+            // Create action
+            const actionSmall = document.createElement('small');
+            actionSmall.className = 'risk-action text-primary';
+            const actionStrong = document.createElement('strong');
+            actionStrong.textContent = 'Recommended Action: ';
+            actionSmall.appendChild(actionStrong);
+            actionSmall.appendChild(document.createTextNode(risk.action)); // Safe text content
+            riskDiv.appendChild(actionSmall);
+            
+            // Add count if more than 1
+            if (risk.count > 1) {
+                const countDiv = document.createElement('div');
+                countDiv.className = 'text-end';
+                const countSmall = document.createElement('small');
+                countSmall.className = 'text-muted';
+                countSmall.textContent = `${risk.count} occurrences`; // Safe text content
+                countDiv.appendChild(countSmall);
+                riskDiv.appendChild(countDiv);
+            }
+            
+            companyDiv.appendChild(riskDiv);
+        });
         
-        return `
-            <div class="company-risk-factors mb-4">
-                <h6 class="company-name text-dark mb-3">
-                    ${company.company_name}
-                </h6>
-                ${riskFactorsHtml}
-            </div>
-        `;
-    }).join('');
-    
-    if (html === '') {
-        container.innerHTML = '<p class="text-muted">No account risk factors identified.</p>';
-        return;
-    }
-    
-    container.innerHTML = html;
+        container.appendChild(companyDiv);
+    });
 }
 
 // Pagination state for all tables
