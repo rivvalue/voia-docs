@@ -280,6 +280,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Check admin status on page load
     checkAdminStatus();
+    
+    // Setup tab event listeners
+    setupTabEventListeners();
+});
 
 // ============================================================================
 // CAMPAIGN COMPARISON FUNCTIONALITY
