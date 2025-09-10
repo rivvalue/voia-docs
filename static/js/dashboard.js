@@ -187,9 +187,17 @@ async function applyCampaignFilter() {
     createTenureChart();
     createGrowthFactorChart();
     
-    // Also refresh Overview tab chart if visible
+    // Also refresh Overview tab chart if visible - but wait for data to load
     console.log('🎨 About to call createThemesChart from applyCampaignFilter');
-    setTimeout(() => createThemesChart(), 100);
+    // Use a longer delay and verify data exists before creating chart
+    setTimeout(() => {
+        if (dashboardData && dashboardData.key_themes) {
+            createThemesChart();
+        } else {
+            console.log('⏳ Dashboard data not ready, retrying themes chart...');
+            setTimeout(() => createThemesChart(), 500);
+        }
+    }, 200);
 }
 
 // Clear campaign filter
@@ -987,6 +995,12 @@ function createThemesChart() {
     console.log('🎨 createThemesChart() called');
     console.log('📊 dashboardData available:', !!dashboardData);
     console.log('📊 dashboardData.key_themes:', dashboardData?.key_themes?.length || 'undefined');
+    
+    // Ensure we have dashboard data before proceeding
+    if (!dashboardData) {
+        console.warn('⚠️ Dashboard data not loaded yet, skipping themes chart');
+        return;
+    }
     
     const chartElement = document.getElementById('themesChart');
     console.log('🎯 Chart element found:', !!chartElement);
