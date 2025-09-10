@@ -2911,8 +2911,8 @@ function updateCampaignsTable(campaigns) {
             
         return `
             <tr>
-                <td><strong>${campaign.name}</strong></td>
-                <td>${campaign.description || '<em>No description</em>'}</td>
+                <td><strong>${escapeHtml(campaign.name)}</strong></td>
+                <td>${escapeHtml(campaign.description) || '<em>No description</em>'}</td>
                 <td>${formatDate(campaign.start_date)}</td>
                 <td>${formatDate(campaign.end_date)}</td>
                 <td>${statusBadge}</td>
