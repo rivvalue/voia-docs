@@ -761,11 +761,29 @@ function loadDashboardData() {
 
 function populateDashboard() {
     console.log('populateDashboard called with data:', dashboardData);
-    // Update key metrics
-    document.getElementById('totalResponses').textContent = dashboardData.total_responses || 0;
-    document.getElementById('npsScore').textContent = dashboardData.nps_score || 0;
-    document.getElementById('recentResponses').textContent = dashboardData.recent_responses || 0;
-    document.getElementById('highRiskCount').textContent = dashboardData.high_risk_accounts?.length || 0;
+    console.log('KPI values:', {
+        total_responses: dashboardData?.total_responses,
+        nps_score: dashboardData?.nps_score,
+        recent_responses: dashboardData?.recent_responses
+    });
+    
+    // Update key metrics with detailed debugging
+    const totalEl = document.getElementById('totalResponses');
+    const npsEl = document.getElementById('npsScore');
+    const recentEl = document.getElementById('recentResponses');
+    const riskEl = document.getElementById('highRiskCount');
+    
+    console.log('DOM elements found:', {
+        totalResponses: !!totalEl,
+        npsScore: !!npsEl,
+        recentResponses: !!recentEl,
+        highRiskCount: !!riskEl
+    });
+    
+    if (totalEl) totalEl.textContent = dashboardData?.total_responses || 0;
+    if (npsEl) npsEl.textContent = dashboardData?.nps_score || 0;
+    if (recentEl) recentEl.textContent = dashboardData?.recent_responses || 0;
+    if (riskEl) riskEl.textContent = dashboardData?.high_risk_accounts?.length || 0;
     
     // Growth potential as percentage
     const growthPotential = dashboardData.growth_factor_analysis?.total_growth_potential || 0;
