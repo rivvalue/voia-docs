@@ -275,8 +275,258 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // Load campaign comparison options
+    loadComparisonCampaignOptions();
+    
     // Check admin status on page load
     checkAdminStatus();
+
+// ============================================================================
+// CAMPAIGN COMPARISON FUNCTIONALITY
+// ============================================================================
+
+// Global variables for comparison
+let comparisonCampaigns = [];
+
+// Load campaign options for comparison dropdowns
+async function loadComparisonCampaignOptions() {
+    try {
+        const response = await fetch('/api/campaigns/filter-options');
+        if (response.ok) {
+            const data = await response.json();
+            comparisonCampaigns = data.campaigns;
+            populateComparisonDropdowns();
+        }
+    } catch (error) {
+        console.error('Error loading comparison campaign options:', error);
+    }
+}
+
+// Populate both comparison dropdowns
+function populateComparisonDropdowns() {
+    const campaign1Select = document.getElementById('campaign1Select');
+    const campaign2Select = document.getElementById('campaign2Select');
+    
+    if (!campaign1Select || !campaign2Select) return;
+    
+    // Clear existing options
+    campaign1Select.innerHTML = '<option value="">Select first campaign</option>';
+    campaign2Select.innerHTML = '<option value="">Select second campaign</option>';
+    
+    // Add campaign options to both dropdowns
+    comparisonCampaigns.forEach(campaign => {
+        const status = campaign.status === 'active' ? 'Active' : 'Closed';
+        const optionText = `${campaign.name} (${formatDate(campaign.start_date)} - ${formatDate(campaign.end_date)}) - ${status}`;
+        
+        // Campaign 1 dropdown
+        const option1 = document.createElement('option');
+        option1.value = campaign.id;
+        option1.textContent = optionText;
+        campaign1Select.appendChild(option1);
+        
+        // Campaign 2 dropdown
+        const option2 = document.createElement('option');
+        option2.value = campaign.id;
+        option2.textContent = optionText;
+        campaign2Select.appendChild(option2);
+    });
+}
+
+// Update comparison when selections change
+async function updateComparison() {
+    const campaign1Id = document.getElementById('campaign1Select')?.value;
+    const campaign2Id = document.getElementById('campaign2Select')?.value;
+    
+    const resultsDiv = document.getElementById('comparisonResults');
+    const messageDiv = document.getElementById('noComparisonMessage');
+    
+    if (!campaign1Id || !campaign2Id || campaign1Id === campaign2Id) {
+        // Hide results and show message
+        if (resultsDiv) resultsDiv.style.display = 'none';
+        if (messageDiv) messageDiv.style.display = 'block';
+        return;
+    }
+    
+    try {
+        // Fetch comparison data
+        const response = await fetch(`/api/campaigns/comparison?campaign1=${campaign1Id}&campaign2=${campaign2Id}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch comparison data');
+        }
+        
+        const comparisonData = await response.json();
+        
+        // Update headers
+        document.getElementById('campaign1Header').textContent = comparisonData.campaign1.name;
+        document.getElementById('campaign2Header').textContent = comparisonData.campaign2.name;
+        
+        // Populate executive summary table
+        populateExecutiveSummary(comparisonData);
+        
+        // Populate company comparison table
+        populateCompanyComparison(comparisonData);
+        
+        // Show results and hide message
+        if (resultsDiv) resultsDiv.style.display = 'block';
+        if (messageDiv) messageDiv.style.display = 'none';
+        
+    } catch (error) {
+        console.error('Error loading comparison data:', error);
+        // Show error message or fallback
+        if (messageDiv) {
+            messageDiv.innerHTML = `
+                <i class="fas fa-exclamation-triangle fa-4x text-warning mb-3"></i>
+                <h5 class="text-warning">Error Loading Comparison</h5>
+                <p class="text-muted">Failed to load comparison data. Please try again.</p>
+            `;
+            messageDiv.style.display = 'block';
+        }
+        if (resultsDiv) resultsDiv.style.display = 'none';
+    }
+}
+
+// Populate executive summary table
+function populateExecutiveSummary(data) {
+    const tableBody = document.getElementById('summaryTable');
+    if (!tableBody) return;
+    
+    const c1 = data.campaign1.data;
+    const c2 = data.campaign2.data;
+    
+    // Calculate changes
+    const metrics = [
+        {
+            name: 'Total Responses',
+            c1: c1.total_responses,
+            c2: c2.total_responses,
+            change: c2.total_responses - c1.total_responses,
+            format: 'number'
+        },
+        {
+            name: 'NPS Score',
+            c1: c1.nps_score,
+            c2: c2.nps_score,
+            change: c2.nps_score - c1.nps_score,
+            format: 'decimal'
+        },
+        {
+            name: 'Companies Analyzed',
+            c1: c1.companies_analyzed,
+            c2: c2.companies_analyzed,
+            change: c2.companies_analyzed - c1.companies_analyzed,
+            format: 'number'
+        },
+        {
+            name: 'Critical Risk Companies',
+            c1: c1.critical_risk_companies,
+            c2: c2.critical_risk_companies,
+            change: c2.critical_risk_companies - c1.critical_risk_companies,
+            format: 'number'
+        },
+        {
+            name: 'Risk-Heavy Accounts',
+            c1: c1.risk_heavy_accounts,
+            c2: c2.risk_heavy_accounts,
+            change: c2.risk_heavy_accounts - c1.risk_heavy_accounts,
+            format: 'number'
+        },
+        {
+            name: 'Opportunity-Heavy Accounts',
+            c1: c1.opportunity_heavy_accounts,
+            c2: c2.opportunity_heavy_accounts,
+            change: c2.opportunity_heavy_accounts - c1.opportunity_heavy_accounts,
+            format: 'number'
+        }
+    ];
+    
+    let tableHTML = '';
+    metrics.forEach(metric => {
+        const c1Display = metric.format === 'decimal' ? parseFloat(metric.c1).toFixed(1) : metric.c1;
+        const c2Display = metric.format === 'decimal' ? parseFloat(metric.c2).toFixed(1) : metric.c2;
+        
+        let changeDisplay = '';
+        let changeClass = '';
+        if (metric.change > 0) {
+            changeDisplay = `+${metric.format === 'decimal' ? metric.change.toFixed(1) : metric.change}`;
+            changeClass = metric.name === 'Critical Risk Companies' || metric.name === 'Risk-Heavy Accounts' ? 'text-danger' : 'text-success';
+        } else if (metric.change < 0) {
+            changeDisplay = metric.format === 'decimal' ? metric.change.toFixed(1) : metric.change;
+            changeClass = metric.name === 'Critical Risk Companies' || metric.name === 'Risk-Heavy Accounts' ? 'text-success' : 'text-danger';
+        } else {
+            changeDisplay = '0';
+            changeClass = 'text-muted';
+        }
+        
+        tableHTML += `
+            <tr>
+                <td><strong>${metric.name}</strong></td>
+                <td class="text-center">${c1Display}</td>
+                <td class="text-center">${c2Display}</td>
+                <td class="text-center ${changeClass}"><strong>${changeDisplay}</strong></td>
+            </tr>
+        `;
+    });
+    
+    tableBody.innerHTML = tableHTML;
+}
+
+// Populate company comparison table
+function populateCompanyComparison(data) {
+    const tableBody = document.getElementById('companyTable');
+    if (!tableBody) return;
+    
+    let tableHTML = '';
+    data.company_details.forEach(company => {
+        const c1 = company.campaign1;
+        const c2 = company.campaign2;
+        
+        // Determine status
+        let status = 'No Change';
+        let statusClass = 'text-muted';
+        
+        if (c1.balance !== c2.balance) {
+            if (c2.balance === 'opportunity_heavy' && c1.balance !== 'opportunity_heavy') {
+                status = 'Improved';
+                statusClass = 'text-success';
+            } else if (c2.balance === 'risk_heavy' && c1.balance !== 'risk_heavy') {
+                status = 'Worsened';
+                statusClass = 'text-danger';
+            } else if (c2.balance === 'balanced' && c1.balance === 'risk_heavy') {
+                status = 'Improved';
+                statusClass = 'text-success';
+            } else {
+                status = 'Changed';
+                statusClass = 'text-warning';
+            }
+        } else if (c2.risk_count < c1.risk_count) {
+            status = 'Less Risk';
+            statusClass = 'text-success';
+        } else if (c2.opportunity_count > c1.opportunity_count) {
+            status = 'More Opps';
+            statusClass = 'text-success';
+        }
+        
+        // Format balance for display
+        const formatBalance = (balance) => {
+            if (balance === 'N/A') return 'N/A';
+            return balance.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+        };
+        
+        tableHTML += `
+            <tr>
+                <td><strong>${company.company_name}</strong></td>
+                <td class="text-center">${c1.risk_count}</td>
+                <td class="text-center">${c1.opportunity_count}</td>
+                <td class="text-center">${formatBalance(c1.balance)}</td>
+                <td class="text-center">${c2.risk_count}</td>
+                <td class="text-center">${c2.opportunity_count}</td>
+                <td class="text-center">${formatBalance(c2.balance)}</td>
+                <td class="text-center ${statusClass}"><strong>${status}</strong></td>
+            </tr>
+        `;
+    });
+    
+    tableBody.innerHTML = tableHTML;
     
     // Run color override multiple times to catch dynamically loaded content
     setTimeout(forceRemoveYellowColors, 100);
