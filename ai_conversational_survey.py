@@ -393,29 +393,31 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         has_reasoning = self.extracted_data.get('nps_reasoning') is not None or self.extracted_data.get('compliment_feedback') is not None or self.extracted_data.get('complaint_feedback') is not None or self.extracted_data.get('additional_comments') is not None
         has_tenure = self.extracted_data.get('tenure_with_fc') is not None
         
-        # Additional data points
+        # ALL rating categories for complete data
         has_satisfaction = self.extracted_data.get('satisfaction_rating') is not None
         has_service = self.extracted_data.get('service_rating') is not None
+        has_product_value = self.extracted_data.get('product_value_rating') is not None
+        has_pricing = self.extracted_data.get('pricing_rating') is not None
         has_improvement = self.extracted_data.get('improvement_feedback') is not None
         
-        # BALANCED COMPLETION LOGIC: Get key data but prevent loops
+        # COMPREHENSIVE COMPLETION LOGIC: Get all rating data for complete analytics
         # Core data: NPS + tenure + reasoning  
         has_core = has_nps and has_tenure and has_reasoning
         
-        # Prefer to get at least one service rating
-        has_service_feedback = has_satisfaction or has_service or has_improvement
+        # Require ALL major rating categories for complete analysis
+        has_all_ratings = has_satisfaction and has_service and has_product_value and has_pricing
         
-        # BALANCED APPROACH: Try to get service feedback but don't loop forever
-        has_sufficient_data = has_core and has_service_feedback
+        # COMPLETE APPROACH: Try to get all ratings plus improvement feedback
+        has_sufficient_data = has_core and has_all_ratings and has_improvement
         
-        # Progressive completion thresholds
-        enough_steps = self.step_count >= 5  # Allow a bit more time for service questions
-        force_complete = self.step_count >= 7  # Still force completion to prevent loops
+        # Progressive completion thresholds - allow more steps for complete data
+        enough_steps = self.step_count >= 8  # Allow more time for all rating questions
+        force_complete = self.step_count >= 10  # Force completion to prevent endless loops
         
         # Complete if we have sufficient data OR enough steps OR force
         completion_ready = has_sufficient_data or enough_steps or force_complete
         
-        print(f"COMPLETION CHECK: NPS={has_nps}, Tenure={has_tenure}, Reasoning={has_reasoning}, Service={has_service_feedback}, Steps={self.step_count}, Ready={completion_ready}")
+        print(f"COMPLETION CHECK: NPS={has_nps}, Tenure={has_tenure}, Reasoning={has_reasoning}, AllRatings={has_all_ratings}, Steps={self.step_count}, Ready={completion_ready}")
         
         return completion_ready
     
@@ -423,7 +425,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         """Determine what question should be asked next based on collected data"""
         data = self.extracted_data
         
-        # Check what we have and what we need
+        # Check what we have and what we need - systematic collection of ALL ratings
         if not data.get('tenure_with_fc'):
             return "Ask about business relationship tenure with Archelo Group (how long working together)"
         elif not data.get('nps_score'):
@@ -434,6 +436,10 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             return "Ask for overall satisfaction rating (1-5) with Archelo Group"
         elif not data.get('service_rating'):
             return "Ask for professional services quality rating (1-5) from Archelo Group"
+        elif not data.get('product_value_rating'):
+            return "Ask for product/solution value rating (1-5) from Archelo Group"
+        elif not data.get('pricing_rating'):
+            return "Ask for pricing value rating (1-5) for Archelo Group services"
         elif not data.get('improvement_feedback'):
             return "Ask what Archelo Group could do better or improve"
         else:
