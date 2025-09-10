@@ -525,6 +525,52 @@
                             <small>Compare key metrics and account intelligence between different campaigns</small>
                         </div>
                         <div class="card-body">
+                            <!-- KPI Overview Table -->
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><i class="fas fa-trending-up me-2"></i>Campaign KPI Overview</h5>
+                                    <small class="text-muted">Track key performance indicators across all campaigns</small>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-borderless" id="kpiOverviewTable">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 12%;">Campaign</th>
+                                                    <th style="width: 10%;" class="text-center">Responses</th>
+                                                    <th style="width: 10%;" class="text-center">NPS Score</th>
+                                                    <th style="width: 10%;" class="text-center">Companies</th>
+                                                    <th style="width: 10%;" class="text-center">Critical Risk</th>
+                                                    <th style="width: 12%;" class="text-center">Satisfaction</th>
+                                                    <th style="width: 12%;" class="text-center">Product Value</th>
+                                                    <th style="width: 12%;" class="text-center">Pricing</th>
+                                                    <th style="width: 12%;" class="text-center">Service</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="kpiOverviewTableBody">
+                                                <tr>
+                                                    <td colspan="9" class="text-center text-muted">
+                                                        <i class="fas fa-spinner fa-spin me-2"></i>Loading KPI overview...
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    
+                                    <!-- Overall Delta Summary -->
+                                    <div class="row mt-3" id="overallDeltaSummary" style="display: none;">
+                                        <div class="col-12">
+                                            <div class="alert alert-info mb-0">
+                                                <h6 class="alert-heading mb-2"><i class="fas fa-chart-line me-2"></i>Overall Progress (H1 2025 → H2 2025)</h6>
+                                                <div class="row" id="deltaMetrics">
+                                                    <!-- Will be populated by JavaScript -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <!-- Campaign Selection -->
                             <div class="row mb-4">
                                 <div class="col-md-6">
