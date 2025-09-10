@@ -440,6 +440,34 @@ function populateExecutiveSummary(data) {
             c2: c2.opportunity_heavy_accounts,
             change: c2.opportunity_heavy_accounts - c1.opportunity_heavy_accounts,
             format: 'number'
+        },
+        {
+            name: 'Satisfaction Rating',
+            c1: c1.average_ratings?.satisfaction || 0,
+            c2: c2.average_ratings?.satisfaction || 0,
+            change: (c2.average_ratings?.satisfaction || 0) - (c1.average_ratings?.satisfaction || 0),
+            format: 'decimal'
+        },
+        {
+            name: 'Product Value Rating',
+            c1: c1.average_ratings?.product_value || 0,
+            c2: c2.average_ratings?.product_value || 0,
+            change: (c2.average_ratings?.product_value || 0) - (c1.average_ratings?.product_value || 0),
+            format: 'decimal'
+        },
+        {
+            name: 'Pricing Rating',
+            c1: c1.average_ratings?.pricing || 0,
+            c2: c2.average_ratings?.pricing || 0,
+            change: (c2.average_ratings?.pricing || 0) - (c1.average_ratings?.pricing || 0),
+            format: 'decimal'
+        },
+        {
+            name: 'Service Rating',
+            c1: c1.average_ratings?.service || 0,
+            c2: c2.average_ratings?.service || 0,
+            change: (c2.average_ratings?.service || 0) - (c1.average_ratings?.service || 0),
+            format: 'decimal'
         }
     ];
     
