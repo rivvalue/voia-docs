@@ -1384,7 +1384,8 @@ def get_campaign_comparison():
                     'opportunity_heavy_accounts': sum(1 for company in data1.get('account_intelligence', []) if company.get('balance') == 'opportunity_heavy'),
                     'balanced_accounts': sum(1 for company in data1.get('account_intelligence', []) if company.get('balance') == 'balanced'),
                     'total_risks': sum(company.get('risk_count', 0) for company in data1.get('account_intelligence', [])),
-                    'total_opportunities': sum(company.get('opportunity_count', 0) for company in data1.get('account_intelligence', []))
+                    'total_opportunities': sum(company.get('opportunity_count', 0) for company in data1.get('account_intelligence', [])),
+                    'average_ratings': data1.get('average_ratings', {'satisfaction': 0, 'product_value': 0, 'pricing': 0, 'service': 0})
                 }
             },
             'campaign2': {
@@ -1402,7 +1403,8 @@ def get_campaign_comparison():
                     'opportunity_heavy_accounts': sum(1 for company in data2.get('account_intelligence', []) if company.get('balance') == 'opportunity_heavy'),
                     'balanced_accounts': sum(1 for company in data2.get('account_intelligence', []) if company.get('balance') == 'balanced'),
                     'total_risks': sum(company.get('risk_count', 0) for company in data2.get('account_intelligence', [])),
-                    'total_opportunities': sum(company.get('opportunity_count', 0) for company in data2.get('account_intelligence', []))
+                    'total_opportunities': sum(company.get('opportunity_count', 0) for company in data2.get('account_intelligence', [])),
+                    'average_ratings': data2.get('average_ratings', {'satisfaction': 0, 'product_value': 0, 'pricing': 0, 'service': 0})
                 }
             },
             'company_details': []
