@@ -18,15 +18,15 @@ def generate_session_secret():
 def check_requirements():
     """Check if all required software is installed"""
     requirements = {
-        'python': 'python --version',
-        'pip': 'pip --version',
-        'git': 'git --version'
+        'python': ['python', '--version'],
+        'pip': ['pip', '--version'],
+        'git': ['git', '--version']
     }
     
     missing = []
     for name, command in requirements.items():
         try:
-            subprocess.run(command.split(), capture_output=True, check=True)
+            subprocess.run(command, capture_output=True, check=True)
             print(f"✓ {name} is installed")
         except (subprocess.CalledProcessError, FileNotFoundError):
             missing.append(name)
