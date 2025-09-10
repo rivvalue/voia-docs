@@ -1449,3 +1449,71 @@ def get_campaign_comparison():
     except Exception as e:
         logger.error(f"Error getting campaign comparison: {e}")
         return jsonify({'error': 'Failed to load comparison data'}), 500
+
+@app.route('/api/campaigns/kpi-overview')
+def get_campaigns_kpi_overview():
+    """Get KPI overview for all campaigns (public endpoint)"""
+    try:
+        campaigns = Campaign.query.order_by(Campaign.start_date.asc()).all()
+        
+        overview_data = []
+        for campaign in campaigns:
+            # Get dashboard data for this campaign
+            data = get_dashboard_data(campaign_id=campaign.id)
+            
+            # Extract key KPIs
+            kpi_data = {
+                'id': campaign.id,
+                'name': campaign.name,
+                'status': campaign.status,
+                'start_date': campaign.start_date.isoformat() if campaign.start_date else None,
+                'end_date': campaign.end_date.isoformat() if campaign.end_date else None,
+                'total_responses': data.get('total_responses', 0),
+                'nps_score': data.get('nps_score', 0),
+                'companies_analyzed': len(data.get('account_intelligence', [])),
+                'critical_risk_companies': sum(1 for company in data.get('account_intelligence', []) if company.get('critical_risks', 0) > 0),
+                'average_ratings': data.get('average_ratings', {'satisfaction': 0, 'product_value': 0, 'pricing': 0, 'service': 0})
+            }
+            overview_data.append(kpi_data)
+        
+        # Calculate deltas between consecutive campaigns
+        for i in range(1, len(overview_data)):
+            current = overview_data[i]
+            previous = overview_data[i-1]
+            
+            current['deltas'] = {
+                'total_responses': current['total_responses'] - previous['total_responses'],
+                'nps_score': round(current['nps_score'] - previous['nps_score'], 1),
+                'companies_analyzed': current['companies_analyzed'] - previous['companies_analyzed'],
+                'critical_risk_companies': current['critical_risk_companies'] - previous['critical_risk_companies'],
+                'satisfaction': round(current['average_ratings']['satisfaction'] - previous['average_ratings']['satisfaction'], 1),
+                'product_value': round(current['average_ratings']['product_value'] - previous['average_ratings']['product_value'], 1),
+                'pricing': round(current['average_ratings']['pricing'] - previous['average_ratings']['pricing'], 1),
+                'service': round(current['average_ratings']['service'] - previous['average_ratings']['service'], 1)
+            }
+        
+        # Calculate overall delta (first to last campaign)
+        overall_delta = None
+        if len(overview_data) >= 2:
+            first = overview_data[0]
+            last = overview_data[-1]
+            overall_delta = {
+                'total_responses': last['total_responses'] - first['total_responses'],
+                'nps_score': round(last['nps_score'] - first['nps_score'], 1),
+                'companies_analyzed': last['companies_analyzed'] - first['companies_analyzed'],
+                'critical_risk_companies': last['critical_risk_companies'] - first['critical_risk_companies'],
+                'satisfaction': round(last['average_ratings']['satisfaction'] - first['average_ratings']['satisfaction'], 1),
+                'product_value': round(last['average_ratings']['product_value'] - first['average_ratings']['product_value'], 1),
+                'pricing': round(last['average_ratings']['pricing'] - first['average_ratings']['pricing'], 1),
+                'service': round(last['average_ratings']['service'] - first['average_ratings']['service'], 1)
+            }
+        
+        return jsonify({
+            'success': True,
+            'campaigns': overview_data,
+            'overall_delta': overall_delta
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting campaigns KPI overview: {e}")
+        return jsonify({'error': str(e)}), 500
