@@ -114,39 +114,74 @@
         </div>
     </div>
 
-    <!-- Navigation Tabs -->
-    <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist" style="font-family: var(--font-family-headings); border-bottom: 2px solid var(--medium-gray);">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
-                <i class="fas fa-tachometer-alt me-2"></i>Overview
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="intelligence-tab" data-bs-toggle="tab" data-bs-target="#intelligence" type="button" role="tab" aria-controls="intelligence" aria-selected="false">
-                <i class="fas fa-brain me-2"></i>Account Intelligence
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="analytics" aria-selected="false">
-                <i class="fas fa-chart-line me-2"></i>Analytics
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="survey-insights-tab" data-bs-toggle="tab" data-bs-target="#survey-insights" type="button" role="tab" aria-controls="survey-insights" aria-selected="false">
-                <i class="fas fa-comments me-2"></i>Survey Insights
-            </button>
-        </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="comparison-tab" data-bs-toggle="tab" data-bs-target="#comparison" type="button" role="tab" aria-controls="comparison" aria-selected="false">
-                <i class="fas fa-chart-line me-2"></i>Executive Summary
-            </button>
-        </li>
-        <li class="nav-item" role="presentation" id="campaign-management-nav">
-            <button class="nav-link" id="campaign-management-tab" data-bs-toggle="tab" data-bs-target="#campaign-management" type="button" role="tab" aria-controls="campaign-management" aria-selected="false">
-                <i class="fas fa-calendar-alt me-2"></i>Campaign Management
-            </button>
-        </li>
-    </ul>
+    <!-- Two-Tier Navigation -->
+    <div class="two-tier-navigation mb-4">
+        <!-- Primary Navigation -->
+        <ul class="nav nav-pills primary-nav mb-3" id="primaryNavigation" role="tablist" style="font-family: var(--font-family-headings);">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="insights-primary" data-primary-target="insights" type="button" role="tab" onclick="switchPrimarySection('insights')">
+                    <i class="fas fa-chart-bar me-2"></i>INSIGHTS
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="management-primary" data-primary-target="management" type="button" role="tab" onclick="switchPrimarySection('management')">
+                    <i class="fas fa-cogs me-2"></i>MANAGEMENT
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="admin-primary" data-primary-target="admin" type="button" role="tab" onclick="switchPrimarySection('admin')">
+                    <i class="fas fa-shield-alt me-2"></i>ADMIN
+                </button>
+            </li>
+        </ul>
+        
+        <!-- Secondary Navigation - Insights -->
+        <ul class="nav nav-tabs secondary-nav" id="insightsSecondaryNav" role="tablist" style="font-family: var(--font-family-headings); border-bottom: 2px solid var(--medium-gray);">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
+                    <i class="fas fa-tachometer-alt me-2"></i>Overview
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="intelligence-tab" data-bs-toggle="tab" data-bs-target="#intelligence" type="button" role="tab" aria-controls="intelligence" aria-selected="false">
+                    <i class="fas fa-brain me-2"></i>Account Intelligence
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="analytics" aria-selected="false">
+                    <i class="fas fa-chart-line me-2"></i>Analytics
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="survey-insights-tab" data-bs-toggle="tab" data-bs-target="#survey-insights" type="button" role="tab" aria-controls="survey-insights" aria-selected="false">
+                    <i class="fas fa-comments me-2"></i>Survey Insights
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="comparison-tab" data-bs-toggle="tab" data-bs-target="#comparison" type="button" role="tab" aria-controls="comparison" aria-selected="false">
+                    <i class="fas fa-chart-line me-2"></i>Executive Summary
+                </button>
+            </li>
+        </ul>
+        
+        <!-- Secondary Navigation - Management -->
+        <ul class="nav nav-tabs secondary-nav d-none" id="managementSecondaryNav" role="tablist" style="font-family: var(--font-family-headings); border-bottom: 2px solid var(--medium-gray);">
+            <li class="nav-item" role="presentation" id="campaign-management-nav">
+                <button class="nav-link active" id="campaign-management-tab" data-bs-toggle="tab" data-bs-target="#campaign-management" type="button" role="tab" aria-controls="campaign-management" aria-selected="true">
+                    <i class="fas fa-calendar-alt me-2"></i>Campaign Management
+                </button>
+            </li>
+        </ul>
+        
+        <!-- Secondary Navigation - Admin -->
+        <ul class="nav nav-tabs secondary-nav d-none" id="adminSecondaryNav" role="tablist" style="font-family: var(--font-family-headings); border-bottom: 2px solid var(--medium-gray);">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="admin-tools-tab" data-bs-toggle="tab" data-bs-target="#admin-tools" type="button" role="tab" aria-controls="admin-tools" aria-selected="true">
+                    <i class="fas fa-tools me-2"></i>Admin Tools
+                </button>
+            </li>
+        </ul>
+    </div>
 
     <!-- Tab Content -->
     <div class="tab-content" id="dashboardTabContent">
@@ -792,6 +827,51 @@
                     </div>
                 </div>
             </div>
+            </div>
+        </div>
+        
+        <!-- Admin Tools Tab -->
+        <div class="tab-pane fade" id="admin-tools" role="tabpanel" aria-labelledby="admin-tools-tab">
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header" style="background: linear-gradient(135deg, rgba(225, 58, 68, 0.6) 0%, rgba(197, 45, 54, 0.6) 100%); color: white;">
+                            <h4 class="mb-0"><i class="fas fa-tools me-2"></i>Admin Tools</h4>
+                            <small>Administrative functions and system management</small>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="card">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-user-circle fa-3x text-muted mb-3"></i>
+                                            <h5>Export Response Data</h5>
+                                            <p class="text-muted">Export customer response data for analysis</p>
+                                            <button class="btn btn-outline-primary" onclick="exportUserData()">
+                                                <i class="fas fa-download me-2"></i>Export Data
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="card">
+                                        <div class="card-body text-center">
+                                            <i class="fas fa-key fa-3x text-muted mb-3"></i>
+                                            <h5>Admin Access</h5>
+                                            <p class="text-muted">Login to access advanced admin features</p>
+                                            <button class="btn btn-outline-primary" onclick="adminLogin()" id="adminLoginBtn2">
+                                                <i class="fas fa-sign-in-alt me-2"></i>Admin Login
+                                            </button>
+                                            <button class="btn btn-outline-secondary d-none" onclick="exportData()" id="exportDataBtn2">
+                                                <i class="fas fa-database me-2"></i>Export Full Data
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
