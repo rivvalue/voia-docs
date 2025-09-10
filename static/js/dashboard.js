@@ -622,18 +622,67 @@ function loadCompanyNpsDataDirect() {
             console.log('Direct API response:', data);
             if (data.success && data.data) {
                 console.log('Found table, populating with', data.data.length, 'companies');
-                tbody.innerHTML = data.data.map(company => `
-                    <tr>
-                        <td><strong>${company.company_name}</strong></td>
-                        <td>${company.total_responses}</td>
-                        <td>${company.avg_nps}</td>
-                        <td><span class="badge bg-primary">${company.company_nps}</span></td>
-                        <td><small>${company.promoters}P / ${company.passives}Pa / ${company.detractors}D</small></td>
-                        <td><span class="badge" style="background-color: #8A8A8A; color: white;">${company.risk_level}</span></td>
-                        <td>${company.latest_response || 'N/A'}</td>
-                        <td>${company.latest_churn_risk || 'N/A'}</td>
-                    </tr>
-                `).join('');
+                // Clear existing content safely
+                tbody.innerHTML = '';
+                
+                // Create rows using safe DOM methods
+                data.data.forEach(company => {
+                    const row = document.createElement('tr');
+                    
+                    // Company name with bold formatting
+                    const nameCell = document.createElement('td');
+                    const nameStrong = document.createElement('strong');
+                    nameStrong.textContent = company.company_name;
+                    nameCell.appendChild(nameStrong);
+                    row.appendChild(nameCell);
+                    
+                    // Total responses
+                    const responsesCell = document.createElement('td');
+                    responsesCell.textContent = company.total_responses;
+                    row.appendChild(responsesCell);
+                    
+                    // Average NPS
+                    const avgNpsCell = document.createElement('td');
+                    avgNpsCell.textContent = company.avg_nps;
+                    row.appendChild(avgNpsCell);
+                    
+                    // Company NPS badge
+                    const npsCell = document.createElement('td');
+                    const npsBadge = document.createElement('span');
+                    npsBadge.className = 'badge bg-primary';
+                    npsBadge.textContent = company.company_nps;
+                    npsCell.appendChild(npsBadge);
+                    row.appendChild(npsCell);
+                    
+                    // Distribution (P/Pa/D)
+                    const distCell = document.createElement('td');
+                    const distSmall = document.createElement('small');
+                    distSmall.textContent = `${company.promoters}P / ${company.passives}Pa / ${company.detractors}D`;
+                    distCell.appendChild(distSmall);
+                    row.appendChild(distCell);
+                    
+                    // Risk level badge
+                    const riskCell = document.createElement('td');
+                    const riskBadge = document.createElement('span');
+                    riskBadge.className = 'badge';
+                    riskBadge.style.backgroundColor = '#8A8A8A';
+                    riskBadge.style.color = 'white';
+                    riskBadge.textContent = company.risk_level;
+                    riskCell.appendChild(riskBadge);
+                    row.appendChild(riskCell);
+                    
+                    // Latest response
+                    const responseCell = document.createElement('td');
+                    responseCell.textContent = company.latest_response || 'N/A';
+                    row.appendChild(responseCell);
+                    
+                    // Latest churn risk
+                    const churnCell = document.createElement('td');
+                    churnCell.textContent = company.latest_churn_risk || 'N/A';
+                    row.appendChild(churnCell);
+                    
+                    tbody.appendChild(row);
+                });
             }
         })
         .catch(error => {
