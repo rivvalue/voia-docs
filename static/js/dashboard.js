@@ -1983,49 +1983,90 @@ function updateActiveCampaignBanner(data) {
 function updateCompanyPaginationControls(pagination) {
     const controls = document.getElementById('companyPaginationControls');
     
+    // Clear existing controls safely
+    while (controls.firstChild) {
+        controls.removeChild(controls.firstChild);
+    }
+    
     if (!pagination || pagination.pages <= 1) {
-        controls.innerHTML = '';
         return;
     }
     
-    let html = '';
-    
     // Previous button
+    const prevLi = document.createElement('li');
     if (pagination.has_prev) {
-        html += `
-            <li class="page-item">
-                <a class="page-link" href="#" onclick="loadCompanyNpsData(${pagination.page - 1}); return false;">
-                    <i class="fas fa-chevron-left"></i>
-                </a>
-            </li>
-        `;
+        prevLi.className = 'page-item';
+        const prevLink = document.createElement('a');
+        prevLink.className = 'page-link';
+        prevLink.href = '#';
+        prevLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            loadCompanyNpsData(pagination.page - 1);
+        });
+        const prevIcon = document.createElement('i');
+        prevIcon.className = 'fas fa-chevron-left';
+        prevLink.appendChild(prevIcon);
+        prevLi.appendChild(prevLink);
     } else {
-        html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-left"></i></span></li>';
+        prevLi.className = 'page-item disabled';
+        const prevSpan = document.createElement('span');
+        prevSpan.className = 'page-link';
+        const prevIcon = document.createElement('i');
+        prevIcon.className = 'fas fa-chevron-left';
+        prevSpan.appendChild(prevIcon);
+        prevLi.appendChild(prevSpan);
     }
+    controls.appendChild(prevLi);
     
     // Page numbers
     for (let i = 1; i <= pagination.pages; i++) {
+        const pageLi = document.createElement('li');
         if (i === pagination.page) {
-            html += `<li class="page-item active"><span class="page-link">${i}</span></li>`;
+            pageLi.className = 'page-item active';
+            const pageSpan = document.createElement('span');
+            pageSpan.className = 'page-link';
+            pageSpan.textContent = i.toString();
+            pageLi.appendChild(pageSpan);
         } else {
-            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadCompanyNpsData(${i}); return false;">${i}</a></li>`;
+            pageLi.className = 'page-item';
+            const pageLink = document.createElement('a');
+            pageLink.className = 'page-link';
+            pageLink.href = '#';
+            pageLink.textContent = i.toString();
+            pageLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                loadCompanyNpsData(i);
+            });
+            pageLi.appendChild(pageLink);
         }
+        controls.appendChild(pageLi);
     }
     
     // Next button
+    const nextLi = document.createElement('li');
     if (pagination.has_next) {
-        html += `
-            <li class="page-item">
-                <a class="page-link" href="#" onclick="loadCompanyNpsData(${pagination.page + 1}); return false;">
-                    <i class="fas fa-chevron-right"></i>
-                </a>
-            </li>
-        `;
+        nextLi.className = 'page-item';
+        const nextLink = document.createElement('a');
+        nextLink.className = 'page-link';
+        nextLink.href = '#';
+        nextLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            loadCompanyNpsData(pagination.page + 1);
+        });
+        const nextIcon = document.createElement('i');
+        nextIcon.className = 'fas fa-chevron-right';
+        nextLink.appendChild(nextIcon);
+        nextLi.appendChild(nextLink);
     } else {
-        html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-right"></i></span></li>';
+        nextLi.className = 'page-item disabled';
+        const nextSpan = document.createElement('span');
+        nextSpan.className = 'page-link';
+        const nextIcon = document.createElement('i');
+        nextIcon.className = 'fas fa-chevron-right';
+        nextSpan.appendChild(nextIcon);
+        nextLi.appendChild(nextSpan);
     }
-    
-    controls.innerHTML = html;
+    controls.appendChild(nextLi);
 }
 
 // Tenure pagination functions
