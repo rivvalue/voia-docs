@@ -3128,10 +3128,19 @@ function switchPrimarySection(section) {
         nav.classList.add("d-none");
     });
     
-    // Show the appropriate secondary navigation
-    const targetSecondaryNav = document.getElementById(section + "SecondaryNav");
-    if (targetSecondaryNav) {
-        targetSecondaryNav.classList.remove("d-none");
+    // Show the appropriate secondary navigation and related sections
+    if (section === "insights") {
+        const insightsSection = document.getElementById("insightsSection");
+        if (insightsSection) insightsSection.classList.remove("d-none");
+    } else {
+        // Hide insights section when not in insights
+        const insightsSection = document.getElementById("insightsSection");
+        if (insightsSection) insightsSection.classList.add("d-none");
+        
+        const targetSecondaryNav = document.getElementById(section + "SecondaryNav");
+        if (targetSecondaryNav) {
+            targetSecondaryNav.classList.remove("d-none");
+        }
     }
     
     // Handle tab content based on section

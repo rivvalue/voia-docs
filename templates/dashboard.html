@@ -71,49 +71,6 @@
 
 <!-- Dashboard content -->
 <div class="d-none" id="dashboardContent">
-    <!-- Global Campaign Filter -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);">
-                <div class="card-body py-3">
-                    <div class="row align-items-center">
-                        <div class="col-md-6">
-                            <h6 class="mb-0"><i class="fas fa-filter me-2 text-primary"></i>Campaign Analytics Filter</h6>
-                            <small class="text-muted">Compare KPIs across different campaigns</small>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="d-flex gap-2 align-items-center">
-                                <label for="campaignFilter" class="form-label mb-0 me-2">Campaign:</label>
-                                <select class="form-select" id="campaignFilter" onchange="applyCampaignFilter()">
-                                    <option value="">Select Campaign</option>
-                                    <!-- Will be populated by JavaScript -->
-                                </select>
-                                <button class="btn btn-outline-secondary btn-sm" onclick="clearCampaignFilter()" title="Clear Filter">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Selected Campaign Info -->
-                    <div id="selectedCampaignInfo" class="mt-3" style="display: none;">
-                        <div class="alert alert-info mb-0 py-2" style="background: rgba(13, 110, 253, 0.1); border: 1px solid rgba(13, 110, 253, 0.2);">
-                            <i class="fas fa-info-circle me-2"></i>
-                            <strong>Viewing:</strong> <span id="selectedCampaignName">Campaign Name</span>
-                            <span class="ms-2 text-muted">|</span>
-                            <span class="ms-2" id="selectedCampaignDates">Jan 1 - Dec 31, 2024</span>
-                            <span class="ms-2 text-muted">|</span>
-                            <span class="ms-2 badge" id="selectedCampaignStatus" style="background-color: #28a745; color: white;">Active</span>
-                            <div class="mt-1">
-                                <small class="text-muted" id="selectedCampaignDesc">Campaign description</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Two-Tier Navigation -->
     <div class="two-tier-navigation mb-4">
         <!-- Primary Navigation -->
@@ -136,33 +93,78 @@
         </ul>
         
         <!-- Secondary Navigation - Insights -->
-        <ul class="nav nav-tabs secondary-nav" id="insightsSecondaryNav" role="tablist" style="font-family: var(--font-family-headings); border-bottom: 2px solid var(--medium-gray);">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
-                    <i class="fas fa-tachometer-alt me-2"></i>Overview
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="intelligence-tab" data-bs-toggle="tab" data-bs-target="#intelligence" type="button" role="tab" aria-controls="intelligence" aria-selected="false">
-                    <i class="fas fa-brain me-2"></i>Account Intelligence
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="analytics" aria-selected="false">
-                    <i class="fas fa-chart-line me-2"></i>Analytics
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="survey-insights-tab" data-bs-toggle="tab" data-bs-target="#survey-insights" type="button" role="tab" aria-controls="survey-insights" aria-selected="false">
-                    <i class="fas fa-comments me-2"></i>Survey Insights
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="comparison-tab" data-bs-toggle="tab" data-bs-target="#comparison" type="button" role="tab" aria-controls="comparison" aria-selected="false">
-                    <i class="fas fa-chart-line me-2"></i>Executive Summary
-                </button>
-            </li>
-        </ul>
+        <div id="insightsSection">
+            <!-- Campaign Analytics Filter (Only for Insights) -->
+            <div class="row mb-3">
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);">
+                        <div class="card-body py-3">
+                            <div class="row align-items-center">
+                                <div class="col-md-6">
+                                    <h6 class="mb-0"><i class="fas fa-filter me-2 text-primary"></i>Campaign Analytics Filter</h6>
+                                    <small class="text-muted">Compare KPIs across different campaigns</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="d-flex gap-2 align-items-center">
+                                        <label for="campaignFilter" class="form-label mb-0 me-2">Campaign:</label>
+                                        <select class="form-select" id="campaignFilter" onchange="applyCampaignFilter()">
+                                            <option value="">Select Campaign</option>
+                                            <!-- Will be populated by JavaScript -->
+                                        </select>
+                                        <button class="btn btn-outline-secondary btn-sm" onclick="clearCampaignFilter()" title="Clear Filter">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Selected Campaign Info -->
+                            <div id="selectedCampaignInfo" class="mt-3" style="display: none;">
+                                <div class="alert alert-info mb-0 py-2" style="background: rgba(13, 110, 253, 0.1); border: 1px solid rgba(13, 110, 253, 0.2);">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Viewing:</strong> <span id="selectedCampaignName">Campaign Name</span>
+                                    <span class="ms-2 text-muted">|</span>
+                                    <span class="ms-2" id="selectedCampaignDates">Jan 1 - Dec 31, 2024</span>
+                                    <span class="ms-2 text-muted">|</span>
+                                    <span class="ms-2 badge" id="selectedCampaignStatus" style="background-color: #28a745; color: white;">Active</span>
+                                    <div class="mt-1">
+                                        <small class="text-muted" id="selectedCampaignDesc">Campaign description</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <ul class="nav nav-tabs secondary-nav" id="insightsSecondaryNav" role="tablist" style="font-family: var(--font-family-headings); border-bottom: 2px solid var(--medium-gray);">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
+                        <i class="fas fa-tachometer-alt me-2"></i>Overview
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="intelligence-tab" data-bs-toggle="tab" data-bs-target="#intelligence" type="button" role="tab" aria-controls="intelligence" aria-selected="false">
+                        <i class="fas fa-brain me-2"></i>Account Intelligence
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="analytics" aria-selected="false">
+                        <i class="fas fa-chart-line me-2"></i>Analytics
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="survey-insights-tab" data-bs-toggle="tab" data-bs-target="#survey-insights" type="button" role="tab" aria-controls="survey-insights" aria-selected="false">
+                        <i class="fas fa-comments me-2"></i>Survey Insights
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="comparison-tab" data-bs-toggle="tab" data-bs-target="#comparison" type="button" role="tab" aria-controls="comparison" aria-selected="false">
+                        <i class="fas fa-chart-line me-2"></i>Executive Summary
+                    </button>
+                </li>
+            </ul>
+        </div>
         
         <!-- Secondary Navigation - Management -->
         <ul class="nav nav-tabs secondary-nav d-none" id="managementSecondaryNav" role="tablist" style="font-family: var(--font-family-headings); border-bottom: 2px solid var(--medium-gray);">
