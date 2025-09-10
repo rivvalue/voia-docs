@@ -1461,18 +1461,24 @@ def get_campaigns_kpi_overview():
             # Get dashboard data for this campaign
             data = get_dashboard_data(campaign_id=campaign.id)
             
-            # Extract key KPIs
+            # Extract key KPIs and convert all numeric values to float
+            avg_ratings = data.get('average_ratings', {'satisfaction': 0, 'product_value': 0, 'pricing': 0, 'service': 0})
             kpi_data = {
                 'id': campaign.id,
                 'name': campaign.name,
                 'status': campaign.status,
                 'start_date': campaign.start_date.isoformat() if campaign.start_date else None,
                 'end_date': campaign.end_date.isoformat() if campaign.end_date else None,
-                'total_responses': data.get('total_responses', 0),
-                'nps_score': data.get('nps_score', 0),
+                'total_responses': int(data.get('total_responses', 0)),
+                'nps_score': float(data.get('nps_score', 0)),
                 'companies_analyzed': len(data.get('account_intelligence', [])),
                 'critical_risk_companies': sum(1 for company in data.get('account_intelligence', []) if company.get('critical_risks', 0) > 0),
-                'average_ratings': data.get('average_ratings', {'satisfaction': 0, 'product_value': 0, 'pricing': 0, 'service': 0})
+                'average_ratings': {
+                    'satisfaction': float(avg_ratings.get('satisfaction', 0)),
+                    'product_value': float(avg_ratings.get('product_value', 0)),
+                    'pricing': float(avg_ratings.get('pricing', 0)),
+                    'service': float(avg_ratings.get('service', 0))
+                }
             }
             overview_data.append(kpi_data)
         
@@ -1498,14 +1504,14 @@ def get_campaigns_kpi_overview():
             first = overview_data[0]
             last = overview_data[-1]
             overall_delta = {
-                'total_responses': last['total_responses'] - first['total_responses'],
-                'nps_score': round(last['nps_score'] - first['nps_score'], 1),
-                'companies_analyzed': last['companies_analyzed'] - first['companies_analyzed'],
-                'critical_risk_companies': last['critical_risk_companies'] - first['critical_risk_companies'],
-                'satisfaction': round(last['average_ratings']['satisfaction'] - first['average_ratings']['satisfaction'], 1),
-                'product_value': round(last['average_ratings']['product_value'] - first['average_ratings']['product_value'], 1),
-                'pricing': round(last['average_ratings']['pricing'] - first['average_ratings']['pricing'], 1),
-                'service': round(last['average_ratings']['service'] - first['average_ratings']['service'], 1)
+                'total_responses': int(last['total_responses']) - int(first['total_responses']),
+                'nps_score': round(float(last['nps_score']) - float(first['nps_score']), 1),
+                'companies_analyzed': int(last['companies_analyzed']) - int(first['companies_analyzed']),
+                'critical_risk_companies': int(last['critical_risk_companies']) - int(first['critical_risk_companies']),
+                'satisfaction': round(float(last['average_ratings']['satisfaction']) - float(first['average_ratings']['satisfaction']), 1),
+                'product_value': round(float(last['average_ratings']['product_value']) - float(first['average_ratings']['product_value']), 1),
+                'pricing': round(float(last['average_ratings']['pricing']) - float(first['average_ratings']['pricing']), 1),
+                'service': round(float(last['average_ratings']['service']) - float(first['average_ratings']['service']), 1)
             }
         
         return jsonify({
