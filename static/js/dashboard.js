@@ -3143,6 +3143,27 @@ function switchPrimarySection(section) {
         case "management":
             // Show campaign management tab by default
             showTab("campaign-management-tab", "campaign-management");
+            // Check admin status and update campaign access
+            setTimeout(() => {
+                const token = localStorage.getItem('authToken');
+                if (token) {
+                    // Verify token is still valid and user is admin
+                    fetch('/auth/verify-token', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token: token })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        updateCampaignAccess(data.valid && data.is_admin);
+                    })
+                    .catch(() => {
+                        updateCampaignAccess(false);
+                    });
+                } else {
+                    updateCampaignAccess(false);
+                }
+            }, 100);
             break;
         case "admin":
             // Show admin tools tab by default
@@ -3196,6 +3217,12 @@ function updateAdminUI(isLoggedIn) {
             adminBtn2.onclick = adminLogout;
         }
         if (exportBtn2) exportBtn2.classList.remove("d-none");
+        
+        // Also update campaign access if we're currently in management section
+        const managementPrimary = document.getElementById("management-primary");
+        if (managementPrimary && managementPrimary.classList.contains("active")) {
+            updateCampaignAccess(true);
+        }
     } else {
         if (adminBtn) {
             adminBtn.innerHTML = "<i class=\"fas fa-key me-2 d-none d-sm-inline\"></i><i class=\"fas fa-key d-sm-none\"></i><span class=\"d-none d-sm-inline\">Admin Login</span>";
@@ -3207,5 +3234,11 @@ function updateAdminUI(isLoggedIn) {
             adminBtn2.onclick = adminLogin;
         }
         if (exportBtn2) exportBtn2.classList.add("d-none");
+        
+        // Also update campaign access if we're currently in management section
+        const managementPrimary = document.getElementById("management-primary");
+        if (managementPrimary && managementPrimary.classList.contains("active")) {
+            updateCampaignAccess(false);
+        }
     }
 }
