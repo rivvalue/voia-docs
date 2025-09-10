@@ -782,8 +782,43 @@ function createSentimentChart() {
     }
     
     const sentimentData = dashboardData.sentiment_distribution || [];
-    const labels = sentimentData.map(item => item.sentiment.charAt(0).toUpperCase() + item.sentiment.slice(1));
-    const data = sentimentData.map(item => item.count);
+    
+    // Filter out items with missing sentiment data and add null checks
+    const validSentimentData = sentimentData.filter(item => item.sentiment && typeof item.sentiment === 'string');
+    
+    if (validSentimentData.length === 0) {
+        console.warn('No valid sentiment data available for chart');
+        // Create empty chart with message
+        charts.sentimentChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['No Data'],
+                datasets: [{
+                    label: 'Responses',
+                    data: [0],
+                    backgroundColor: ['#E9E8E4'],
+                    borderWidth: 1,
+                    borderColor: '#E9E8E4'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: getMobileChartConfig().maintainAspectRatio,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false }
+                },
+                scales: {
+                    y: { beginAtZero: true, max: 1 },
+                    x: { display: false }
+                }
+            }
+        });
+        return;
+    }
+    
+    const labels = validSentimentData.map(item => item.sentiment.charAt(0).toUpperCase() + item.sentiment.slice(1));
+    const data = validSentimentData.map(item => item.count || 0);
     const colors = ['#8A8A8A', '#BDBDBD', '#E13A44']; // Dark Gray (Positive), Medium Gray (Neutral), Red (Negative)
     
     // Get mobile-responsive configuration
