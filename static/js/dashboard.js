@@ -5,6 +5,7 @@ let charts = {};
 let campaignData = null;
 let availableCampaigns = [];
 let selectedCampaignId = null;
+let kpiOverviewData = null;
 
 // Mobile detection and responsive configuration
 function isMobile() {
@@ -2565,6 +2566,8 @@ function adminLogout() {
 document.addEventListener('DOMContentLoaded', function() {
     checkAdminStatus();
     loadCampaignFilterOptions();
+    // Load KPI overview for Executive Summary tab
+    loadKPIOverview();
 });
 
 // ============================================================================
@@ -2975,3 +2978,137 @@ function setupTabEventListeners() {
 }
 
 
+
+// KPI Overview functions
+async function loadKPIOverview() {
+    try {
+        const response = await fetch("/api/campaigns/kpi-overview");
+        const data = await response.json();
+        
+        if (data.success) {
+            kpiOverviewData = data;
+            displayKPIOverview(data);
+        } else {
+            console.error("Failed to load KPI overview:", data.error);
+            displayKPIOverviewError("Failed to load KPI overview data");
+        }
+    } catch (error) {
+        console.error("Error loading KPI overview:", error);
+        displayKPIOverviewError("Error loading KPI overview data");
+    }
+}
+
+function displayKPIOverview(data) {
+    const tbody = document.getElementById("kpiOverviewTableBody");
+    const overallDeltaSummary = document.getElementById("overallDeltaSummary");
+    
+    if (!data.campaigns || data.campaigns.length === 0) {
+        tbody.innerHTML = "<tr><td colspan=\"9\" class=\"text-center text-muted\">No campaign data available</td></tr>";
+        return;
+    }
+    
+    // Clear loading state
+    tbody.innerHTML = "";
+    
+    // Populate table rows
+    data.campaigns.forEach((campaign, index) => {
+        const row = document.createElement("tr");
+        
+        const deltaClass = index > 0 ? "fw-bold" : "";
+        const deltaDisplay = campaign.deltas ? true : false;
+        
+        row.innerHTML = `
+            <td>
+                <div class="d-flex align-items-center">
+                    <span class="badge badge-${campaign.status === "active" ? "success" : "secondary"} me-2">${campaign.status}</span>
+                    <strong>${campaign.name}</strong>
+                </div>
+            </td>
+            <td class="text-center">
+                <div>${campaign.total_responses}</div>
+                ${deltaDisplay ? `<small class="text-muted ${deltaClass}">(${formatDelta(campaign.deltas.total_responses)})</small>` : ""}
+            </td>
+            <td class="text-center">
+                <div>${campaign.nps_score}</div>
+                ${deltaDisplay ? `<small class="text-muted ${deltaClass}">(${formatDelta(campaign.deltas.nps_score, true)})</small>` : ""}
+            </td>
+            <td class="text-center">
+                <div>${campaign.companies_analyzed}</div>
+                ${deltaDisplay ? `<small class="text-muted ${deltaClass}">(${formatDelta(campaign.deltas.companies_analyzed)})</small>` : ""}
+            </td>
+            <td class="text-center">
+                <div class="${campaign.critical_risk_companies > 0 ? "text-danger" : "text-success"}">${campaign.critical_risk_companies}</div>
+                ${deltaDisplay ? `<small class="text-muted ${deltaClass}">(${formatDelta(campaign.deltas.critical_risk_companies)})</small>` : ""}
+            </td>
+            <td class="text-center">
+                <div>${campaign.average_ratings.satisfaction.toFixed(1)}</div>
+                ${deltaDisplay ? `<small class="text-muted ${deltaClass}">(${formatDelta(campaign.deltas.satisfaction, true)})</small>` : ""}
+            </td>
+            <td class="text-center">
+                <div>${campaign.average_ratings.product_value.toFixed(1)}</div>
+                ${deltaDisplay ? `<small class="text-muted ${deltaClass}">(${formatDelta(campaign.deltas.product_value, true)})</small>` : ""}
+            </td>
+            <td class="text-center">
+                <div>${campaign.average_ratings.pricing.toFixed(1)}</div>
+                ${deltaDisplay ? `<small class="text-muted ${deltaClass}">(${formatDelta(campaign.deltas.pricing, true)})</small>` : ""}
+            </td>
+            <td class="text-center">
+                <div>${campaign.average_ratings.service.toFixed(1)}</div>
+                ${deltaDisplay ? `<small class="text-muted ${deltaClass}">(${formatDelta(campaign.deltas.service, true)})</small>` : ""}
+            </td>
+        `;
+        
+        tbody.appendChild(row);
+    });
+    
+    // Display overall delta summary if available
+    if (data.overall_delta) {
+        displayOverallDelta(data.overall_delta);
+        overallDeltaSummary.style.display = "block";
+    }
+}
+
+function displayOverallDelta(delta) {
+    const deltaMetrics = document.getElementById("deltaMetrics");
+    
+    const metrics = [
+        { label: "Responses", value: delta.total_responses, icon: "users" },
+        { label: "NPS Score", value: delta.nps_score, icon: "star", isDecimal: true },
+        { label: "Companies", value: delta.companies_analyzed, icon: "building" },
+        { label: "Critical Risk", value: delta.critical_risk_companies, icon: "exclamation-triangle" },
+        { label: "Satisfaction", value: delta.satisfaction, icon: "smile", isDecimal: true },
+        { label: "Product Value", value: delta.product_value, icon: "gem", isDecimal: true },
+        { label: "Pricing", value: delta.pricing, icon: "dollar-sign", isDecimal: true },
+        { label: "Service", value: delta.service, icon: "headset", isDecimal: true }
+    ];
+    
+    deltaMetrics.innerHTML = metrics.map(metric => `
+        <div class="col-sm-6 col-lg-3 mb-2">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-${metric.icon} me-2 text-primary"></i>
+                <div>
+                    <div class="fw-bold ${getValueClass(metric.value)}">${formatDelta(metric.value, metric.isDecimal)}</div>
+                    <small class="text-muted">${metric.label}</small>
+                </div>
+            </div>
+        </div>
+    `).join("");
+}
+
+function formatDelta(value, isDecimal = false) {
+    if (value === 0) return "±0";
+    const sign = value > 0 ? "+" : "";
+    const formattedValue = isDecimal ? value.toFixed(1) : value;
+    return `${sign}${formattedValue}`;
+}
+
+function getValueClass(value) {
+    if (value > 0) return "text-success";
+    if (value < 0) return "text-danger";
+    return "text-muted";
+}
+
+function displayKPIOverviewError(message) {
+    const tbody = document.getElementById("kpiOverviewTableBody");
+    tbody.innerHTML = `<tr><td colspan="9" class="text-center text-danger">${message}</td></tr>`;
+}
