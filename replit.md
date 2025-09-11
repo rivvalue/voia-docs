@@ -22,6 +22,50 @@ The system is a Flask web application utilizing a multi-tiered architecture. The
 
 ✅ **Clone Deployment Preparation** - Created comprehensive deployment guide (CLONE_DEPLOYMENT_GUIDE.md), automated deployment script (deploy.py), and full development roadmap (FULL_VOC_ROADMAP.md) to support cloning current platform for full Voice of Client Agent development while maintaining original as demonstration system. Includes environment configuration templates and production deployment instructions.
 
+✅ **Conversational Survey Loop Analysis** - Diagnosed AI conversational agent looping issues caused by overly strict completion criteria requiring all 7 data fields (NPS + tenure + reasoning + 4 ratings + improvement). Identified that anti-loop protection triggers at step 8 while completion requires step 12, creating trapped loop scenarios. Proposed solution: relax completion to core data only (NPS + tenure + reasoning) with optional additional ratings collection.
+
+## Future Implementation: Multi-Tenant Participant Management System (PLANNED)
+**Target: Q4 2025 - Q1 2026**
+
+### Core Requirements Defined:
+- **Business Account System**: Every Vocsa license customer gets unique business account
+- **Campaign Ownership**: All campaigns belong to one business account
+- **Participant Management**: Upload CSV (email, name, company), generate tokens, automated invitations
+- **Campaign Lifecycle**: Campaigns start inactive → participant upload → explicit activation → email automation
+- **Environment Separation**: Sandbox (demos/testing) vs Production (real surveys) campaigns
+- **Database Architecture**: Current DB becomes demo database, new production database for customers
+- **Access Strategy**: Single URL with user context routing (demo users → demo DB, customers → production DB)
+- **Pre-populated Account**: "Rivvalue Inc" business account for demo content management
+
+### Safest Implementation Roadmap (8-12 weeks):
+**Phase 1**: Foundation Without Breaking Anything (2-3 weeks)
+- Add new database schema (BusinessAccount, Participant tables) without changing existing
+- Create production database (empty, ready)
+- Add basic business account system alongside current functionality
+- Keep all existing public survey functionality unchanged
+
+**Phase 2**: Optional Enhanced Authentication (1-2 weeks)
+- Add business account login without affecting public access
+- Dual authentication: public (current) + business account (new)
+- Admin panel for Rivvalue demo management
+
+**Phase 3**: Basic Participant Management (2-3 weeks)
+- Campaign participant features for business accounts only
+- CSV upload and token generation
+- New participant-based campaigns as separate feature
+
+**Phase 4**: Token Access (1-2 weeks)
+- Add /participate?token=xyz alongside existing /survey
+- Parallel survey access methods
+- No interference between public and participant access
+
+**Phase 5**: Gradual Database Migration (2-3 weeks)
+- Move existing campaigns to "Rivvalue Inc" business account
+- Activate production database routing
+- Preserve all existing data and functionality
+
+**Implementation Principles**: Additive development, feature flags, data safety, user experience continuity, testing at every step
+
 Key architectural decisions include:
 - **UI/UX**: Multi-step survey forms with progressive disclosure, interactive dashboards, and a chat-style interface for conversational surveys. Branding includes Rivvalue Inc. logo, a professional blue color scheme, and specific taglines.
 - **Technical Implementations**:
