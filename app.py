@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from sqlalchemy.orm import DeclarativeBase
 from werkzeug.middleware.proxy_fix import ProxyFix
+from database_config import db_config
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -16,12 +17,18 @@ db = SQLAlchemy(model_class=Base)
 
 # Create the app
 app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET", "dev-secret-key")
+app.secret_key = os.environ.get("SESSION_SECRET")
+if not app.secret_key:
+    raise RuntimeError("SESSION_SECRET environment variable is required")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1, x_for=1, x_port=1)
 
 # Enable CORS for deployment compatibility
+# In development, we allow broader origins for Replit's architecture
+# In production, this should be restricted to specific domains
+app_env = os.environ.get('APP_ENV', 'demo')
+allowed_origins = ['*'] if app_env == 'demo' else [os.environ.get('ALLOWED_ORIGIN', 'https://your-domain.com')]
 CORS(app, 
-     origins=['*'],  # Allow all origins for development/deployment flexibility
+     origins=allowed_origins,
      methods=['GET', 'POST', 'OPTIONS'],
      allow_headers=['Content-Type', 'Authorization', 'Accept'],
      supports_credentials=True)
@@ -30,15 +37,12 @@ CORS(app,
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 
-# Configure the database
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "sqlite:///voc_agent.db")
-app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_recycle": 300,
-    "pool_pre_ping": True,
-    "pool_size": 20,  # Increase pool size for concurrent connections
-    "max_overflow": 50,  # Allow overflow connections
-    "pool_timeout": 30,  # Connection timeout
-}
+# Configure database using DatabaseConfig
+# Read environment setting and configure accordingly
+db_config.set_environment(app_env)
+
+app.config["SQLALCHEMY_DATABASE_URI"] = db_config.get_database_url()
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = db_config.get_engine_options()
 
 # Initialize the app with the extension
 db.init_app(app)
@@ -49,8 +53,27 @@ with app.app_context():
     import models_auth  # noqa: F401
     import routes  # noqa: F401
     from task_queue import start_task_queue
+    from business_accounts import business_account_manager
     
     db.create_all()
+    
+    # Validate database setup and create demo content
+    try:
+        # Ensure Rivvalue demo account exists
+        demo_setup = business_account_manager.ensure_demo_setup()
+        app.logger.info(f"Database validation passed. Rivvalue account: {demo_setup['account_name']}")
+        
+        # Log environment info
+        env_info = db_config.get_environment_info()
+        app.logger.info(f"Database environment: {env_info['current_environment']} - URL configured: {bool(env_info['database_url'])}")
+        
+        # Validate business accounts functionality
+        accounts = business_account_manager.list_business_accounts()
+        app.logger.info(f"Business accounts count: {len(accounts)}")
+        
+    except Exception as e:
+        app.logger.error(f"Database validation failed: {str(e)}")
+        # Continue startup but log the issue
     
     # Start the background task queue for AI processing
     start_task_queue()
