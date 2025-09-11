@@ -243,12 +243,14 @@ function updateSelectedCampaignInfo() {
             statusBadge.style.color = 'white';
         }
         
-        // Update days remaining if available from dashboard data
+        // Update days remaining/since ended if available from dashboard data
         const daysLeftSpan = document.getElementById('selectedCampaignDaysLeft');
         if (daysLeftSpan && dashboardData && dashboardData.active_campaign) {
             const daysRemaining = dashboardData.active_campaign.days_remaining || 0;
+            const daysSinceEnded = dashboardData.active_campaign.days_since_ended || 0;
             
             if (status === 'Active' && daysRemaining >= 0) {
+                // Show days remaining for active campaigns
                 if (daysRemaining > 30) {
                     daysLeftSpan.textContent = `${daysRemaining} days left`;
                     daysLeftSpan.className = 'ms-2 badge bg-success';
@@ -262,6 +264,21 @@ function updateSelectedCampaignInfo() {
                     daysLeftSpan.textContent = 'Campaign ended';
                     daysLeftSpan.className = 'ms-2 badge bg-secondary';
                 }
+                daysLeftSpan.style.display = 'inline';
+            } else if (status === 'Closed' && daysSinceEnded > 0) {
+                // Show days since ended for closed campaigns
+                if (daysSinceEnded === 1) {
+                    daysLeftSpan.textContent = `Ended 1 day ago`;
+                } else if (daysSinceEnded < 30) {
+                    daysLeftSpan.textContent = `Ended ${daysSinceEnded} days ago`;
+                } else if (daysSinceEnded < 365) {
+                    const months = Math.floor(daysSinceEnded / 30);
+                    daysLeftSpan.textContent = months === 1 ? `Ended 1 month ago` : `Ended ${months} months ago`;
+                } else {
+                    const years = Math.floor(daysSinceEnded / 365);
+                    daysLeftSpan.textContent = years === 1 ? `Ended 1 year ago` : `Ended ${years} years ago`;
+                }
+                daysLeftSpan.className = 'ms-2 badge bg-secondary';
                 daysLeftSpan.style.display = 'inline';
             } else {
                 daysLeftSpan.style.display = 'none';

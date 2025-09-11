@@ -119,7 +119,8 @@ class Campaign(db.Model):
             'completed_at': self.completed_at.isoformat() if self.completed_at else None,
             'response_count': len(self.responses) if hasattr(self, 'responses') else 0,
             'is_active': self.is_active(),
-            'days_remaining': self.days_remaining()
+            'days_remaining': self.days_remaining(),
+            'days_since_ended': self.days_since_ended()
         }
     
     def is_active(self):
@@ -137,6 +138,15 @@ class Campaign(db.Model):
         if today > self.end_date:
             return 0
         return (self.end_date - today).days
+    
+    def days_since_ended(self):
+        """Calculate days since campaign ended"""
+        if self.status == 'active':
+            return 0
+        today = date.today()
+        if today <= self.end_date:
+            return 0
+        return (today - self.end_date).days
     
     def close_campaign(self):
         """Mark campaign as completed"""
