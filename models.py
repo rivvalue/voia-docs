@@ -309,3 +309,93 @@ class CampaignKPISnapshot(db.Model):
             'data_period_start': self.data_period_start.isoformat() if self.data_period_start else None,
             'data_period_end': self.data_period_end.isoformat() if self.data_period_end else None
         }
+
+
+# ==== NEW MULTI-TENANT MODELS FOR PARTICIPANT MANAGEMENT SYSTEM ====
+
+class BusinessAccount(db.Model):
+    """Business Account model for multi-tenant participant management"""
+    __tablename__ = 'business_accounts'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), nullable=False, index=True)
+    account_type = db.Column(db.String(20), nullable=False, default='customer', index=True)  # customer, demo
+    
+    # Contact information
+    contact_email = db.Column(db.String(200), nullable=True)
+    contact_name = db.Column(db.String(200), nullable=True)
+    
+    # Account status
+    status = db.Column(db.String(20), nullable=False, default='active', index=True)  # active, suspended, trial
+    
+    # Metadata
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'account_type': self.account_type,
+            'contact_email': self.contact_email,
+            'contact_name': self.contact_name,
+            'status': self.status,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+
+
+class Participant(db.Model):
+    """Participant model for campaign-based surveys with token authentication"""
+    __tablename__ = 'participants'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
+    campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=False, index=True)
+    
+    # Participant information
+    email = db.Column(db.String(200), nullable=False, index=True)
+    name = db.Column(db.String(200), nullable=False)
+    company_name = db.Column(db.String(200), nullable=True)
+    
+    # Token authentication
+    token = db.Column(db.String(255), nullable=True, unique=True, index=True)  # UUID token for survey access
+    
+    # Status tracking
+    status = db.Column(db.String(20), nullable=False, default='invited', index=True)  # invited, started, completed
+    
+    # Timestamps
+    invited_at = db.Column(db.DateTime, nullable=True, index=True)
+    started_at = db.Column(db.DateTime, nullable=True)
+    completed_at = db.Column(db.DateTime, nullable=True)
+    
+    # Relationships
+    business_account = db.relationship('BusinessAccount', backref='participants')
+    campaign = db.relationship('Campaign', backref='participants')
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'business_account_id': self.business_account_id,
+            'campaign_id': self.campaign_id,
+            'email': self.email,
+            'name': self.name,
+            'company_name': self.company_name,
+            'token': self.token,
+            'status': self.status,
+            'invited_at': self.invited_at.isoformat() if self.invited_at else None,
+            'started_at': self.started_at.isoformat() if self.started_at else None,
+            'completed_at': self.completed_at.isoformat() if self.completed_at else None,
+            'business_account_name': self.business_account.name if self.business_account else None,
+            'campaign_name': self.campaign.name if self.campaign else None
+        }
+    
+    def generate_token(self):
+        """Generate a unique token for participant survey access"""
+        import uuid
+        self.token = str(uuid.uuid4())
+        return self.token
+    
+    def is_completed(self):
+        """Check if participant has completed the survey"""
+        return self.status == 'completed' and self.completed_at is not None
