@@ -52,6 +52,10 @@ with app.app_context():
     import models  # noqa: F401
     import models_auth  # noqa: F401
     import routes  # noqa: F401
+    
+    # Register business authentication blueprint (Phase 2)
+    from business_auth_routes import business_auth_bp
+    app.register_blueprint(business_auth_bp)
     from task_queue import start_task_queue
     from business_accounts import business_account_manager
     
