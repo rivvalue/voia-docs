@@ -297,13 +297,13 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             1: ['terrible product', 'awful solution', 'horrible deliverables', 'worst outcome', 'useless product']
         }
         
-        # Pricing appreciation keywords
+        # Pricing appreciation keywords - expanded for better matching
         pricing_keywords = {
-            5: ['excellent value', 'outstanding value', 'great value', 'fantastic value', 'amazing value', 'perfect price'],
-            4: ['good value', 'fair value', 'reasonable price', 'worth it', 'good price'],
-            3: ['fair price', 'average price', 'okay price', 'standard pricing', 'acceptable price'],
-            2: ['expensive', 'pricey', 'costly', 'overpriced', 'high price'],
-            1: ['very expensive', 'too expensive', 'way overpriced', 'ridiculously expensive', 'unaffordable']
+            5: ['excellent value', 'outstanding value', 'great value', 'fantastic value', 'amazing value', 'perfect price', 'love the price', 'incredible value', 'bargain', 'cheap', 'inexpensive', 'very affordable'],
+            4: ['good value', 'fair value', 'reasonable price', 'worth it', 'good price', 'affordable', 'reasonably priced', 'decent value', 'fair pricing', 'competitive price'],
+            3: ['fair price', 'average price', 'okay price', 'standard pricing', 'acceptable price', 'normal price', 'moderate cost', 'typical pricing', 'middle range'],
+            2: ['expensive', 'pricey', 'costly', 'overpriced', 'high price', 'bit expensive', 'somewhat costly', 'higher than expected', 'steep price'],
+            1: ['very expensive', 'too expensive', 'way overpriced', 'ridiculously expensive', 'unaffordable', 'extremely expensive', 'outrageously priced', 'way too much', 'can\'t afford']
         }
         
         # Support services keywords
