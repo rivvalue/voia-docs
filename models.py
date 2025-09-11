@@ -1,6 +1,10 @@
 from app import db
 from datetime import datetime, date
 import json
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import UserMixin
+import uuid
+from sqlalchemy import or_, and_
 
 class SurveyResponse(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -38,7 +42,7 @@ class SurveyResponse(db.Model):
     
     # Campaign tracking
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=True, index=True)
-    campaign = db.relationship('Campaign', backref='responses')
+    campaign = db.relationship('Campaign', backref=db.backref('responses', lazy='dynamic'))
     
     # Metadata
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
@@ -117,7 +121,7 @@ class Campaign(db.Model):
             'client_identifier': self.client_identifier,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'completed_at': self.completed_at.isoformat() if self.completed_at else None,
-            'response_count': len(self.responses) if hasattr(self, 'responses') else 0,
+            'response_count': len(self.responses) if self.responses else 0,
             'is_active': self.is_active(),
             'days_remaining': self.days_remaining(),
             'days_since_ended': self.days_since_ended()
@@ -182,10 +186,10 @@ class Campaign(db.Model):
         query = Campaign.query.filter(
             Campaign.client_identifier == client_identifier,
             Campaign.status == 'active',
-            db.or_(
-                db.and_(Campaign.start_date <= start_date, Campaign.end_date >= start_date),
-                db.and_(Campaign.start_date <= end_date, Campaign.end_date >= end_date),
-                db.and_(Campaign.start_date >= start_date, Campaign.end_date <= end_date)
+            or_(
+                and_(Campaign.start_date <= start_date, Campaign.end_date >= start_date),
+                and_(Campaign.start_date <= end_date, Campaign.end_date >= end_date),
+                and_(Campaign.start_date >= start_date, Campaign.end_date <= end_date)
             )
         )
         
@@ -399,3 +403,233 @@ class Participant(db.Model):
     def is_completed(self):
         """Check if participant has completed the survey"""
         return self.status == 'completed' and self.completed_at is not None
+
+
+# ==== PHASE 2: BUSINESS ACCOUNT AUTHENTICATION MODELS ====
+
+class BusinessAccountUser(UserMixin, db.Model):
+    """User authentication model for business accounts (Phase 2)"""
+    __tablename__ = 'business_account_users'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
+    
+    # User credentials
+    email = db.Column(db.String(200), nullable=False, unique=True, index=True)
+    password_hash = db.Column(db.String(256), nullable=False)
+    
+    # User profile
+    first_name = db.Column(db.String(100), nullable=False)
+    last_name = db.Column(db.String(100), nullable=False)
+    
+    # User role and permissions
+    role = db.Column(db.String(50), nullable=False, default='admin', index=True)  # admin, viewer, manager
+    is_active = db.Column(db.Boolean, nullable=False, default=True, index=True)
+    
+    # Email verification
+    email_verified = db.Column(db.Boolean, nullable=False, default=False)
+    email_verification_token = db.Column(db.String(255), nullable=True)
+    
+    # Password reset
+    password_reset_token = db.Column(db.String(255), nullable=True)
+    password_reset_expires = db.Column(db.DateTime, nullable=True)
+    
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    last_login_at = db.Column(db.DateTime, nullable=True)
+    
+    # Relationships
+    business_account = db.relationship('BusinessAccount', backref='users')
+    
+    def set_password(self, password):
+        """Set password hash"""
+        self.password_hash = generate_password_hash(password)
+    
+    def check_password(self, password):
+        """Check password against hash"""
+        return check_password_hash(self.password_hash, password)
+    
+    def generate_password_reset_token(self):
+        """Generate password reset token"""
+        self.password_reset_token = str(uuid.uuid4())
+        self.password_reset_expires = datetime.utcnow() + datetime.timedelta(hours=24)
+        return self.password_reset_token
+    
+    def generate_email_verification_token(self):
+        """Generate email verification token"""
+        self.email_verification_token = str(uuid.uuid4())
+        return self.email_verification_token
+    
+    def verify_email(self):
+        """Mark email as verified"""
+        self.email_verified = True
+        self.email_verification_token = None
+    
+    def update_last_login(self):
+        """Update last login timestamp"""
+        self.last_login_at = datetime.utcnow()
+    
+    def get_full_name(self):
+        """Get full name"""
+        return f"{self.first_name} {self.last_name}"
+    
+    def has_permission(self, permission):
+        """Check if user has specific permission"""
+        role_permissions = {
+            'admin': ['view', 'create', 'edit', 'delete', 'manage_users', 'export_data'],
+            'manager': ['view', 'create', 'edit', 'export_data'],
+            'viewer': ['view']
+        }
+        return permission in role_permissions.get(self.role, [])
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'business_account_id': self.business_account_id,
+            'email': self.email,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'full_name': self.get_full_name(),
+            'role': self.role,
+            'is_active': self.is_active,
+            'email_verified': self.email_verified,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'last_login_at': self.last_login_at.isoformat() if self.last_login_at else None,
+            'business_account_name': self.business_account.name if self.business_account else None
+        }
+    
+    @staticmethod
+    def get_by_email(email):
+        """Get user by email"""
+        return BusinessAccountUser.query.filter_by(email=email).first()
+    
+    @staticmethod
+    def get_by_business_account(business_account_id):
+        """Get all users for a business account"""
+        return BusinessAccountUser.query.filter_by(business_account_id=business_account_id).all()
+
+
+class UserSession(db.Model):
+    """User session management for business account users (Phase 2)"""
+    __tablename__ = 'user_sessions'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('business_account_users.id'), nullable=False, index=True)
+    
+    # Session data
+    session_id = db.Column(db.String(255), nullable=False, unique=True, index=True)
+    session_data = db.Column(db.Text, nullable=True)  # JSON session data
+    
+    # Session tracking
+    ip_address = db.Column(db.String(45), nullable=True)  # IPv6 support
+    user_agent = db.Column(db.Text, nullable=True)
+    
+    # Session status
+    is_active = db.Column(db.Boolean, nullable=False, default=True, index=True)
+    
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    last_activity_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    expires_at = db.Column(db.DateTime, nullable=False, index=True)
+    
+    # Relationships
+    user = db.relationship('BusinessAccountUser', backref='sessions')
+    
+    def __init__(self, user_id, session_data=None, ip_address=None, user_agent=None, duration_hours=24):
+        self.user_id = user_id
+        self.session_id = str(uuid.uuid4())
+        self.session_data = session_data
+        self.ip_address = ip_address
+        self.user_agent = user_agent
+        self.expires_at = datetime.utcnow() + datetime.timedelta(hours=duration_hours)
+    
+    def is_expired(self):
+        """Check if session is expired"""
+        return datetime.utcnow() > self.expires_at
+    
+    def extend_session(self, hours=24):
+        """Extend session expiration"""
+        self.expires_at = datetime.utcnow() + datetime.timedelta(hours=hours)
+        self.last_activity_at = datetime.utcnow()
+    
+    def deactivate(self):
+        """Deactivate session"""
+        self.is_active = False
+    
+    def update_activity(self):
+        """Update last activity timestamp"""
+        self.last_activity_at = datetime.utcnow()
+    
+    def set_session_data(self, data):
+        """Set session data as JSON"""
+        import json
+        self.session_data = json.dumps(data) if data else None
+    
+    def get_session_data(self):
+        """Get session data from JSON"""
+        import json
+        return json.loads(self.session_data) if self.session_data else {}
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'session_id': self.session_id,
+            'session_data': self.get_session_data(),
+            'ip_address': self.ip_address,
+            'user_agent': self.user_agent,
+            'is_active': self.is_active,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'last_activity_at': self.last_activity_at.isoformat() if self.last_activity_at else None,
+            'expires_at': self.expires_at.isoformat() if self.expires_at else None,
+            'is_expired': self.is_expired()
+        }
+    
+    @staticmethod
+    def get_active_session(session_id):
+        """Get active session by session_id"""
+        return UserSession.query.filter_by(
+            session_id=session_id,
+            is_active=True
+        ).filter(UserSession.expires_at > datetime.utcnow()).first()
+    
+    @staticmethod
+    def cleanup_expired_sessions():
+        """Clean up expired sessions"""
+        expired_sessions = UserSession.query.filter(
+            UserSession.expires_at <= datetime.utcnow()
+        ).all()
+        
+        for session in expired_sessions:
+            session.deactivate()
+        
+        return len(expired_sessions)
+    
+    @staticmethod
+    def get_user_sessions(user_id, active_only=True):
+        """Get all sessions for a user"""
+        query = UserSession.query.filter_by(user_id=user_id)
+        
+        if active_only:
+            query = query.filter(
+                UserSession.is_active == True,
+                UserSession.expires_at > datetime.utcnow()
+            )
+        
+        return query.order_by(UserSession.last_activity_at.desc()).all()
+    
+    @staticmethod
+    def revoke_user_sessions(user_id, exclude_session_id=None):
+        """Revoke all sessions for a user (except optionally one)"""
+        query = UserSession.query.filter_by(user_id=user_id, is_active=True)
+        
+        if exclude_session_id:
+            query = query.filter(UserSession.session_id != exclude_session_id)
+        
+        sessions = query.all()
+        for session in sessions:
+            session.deactivate()
+        
+        return len(sessions)
