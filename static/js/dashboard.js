@@ -712,6 +712,9 @@ function loadDashboardData() {
         url += `?campaign_id=${selectedCampaignId}`;
     }
     
+    console.log('🔍 Frontend Debug - Calling URL:', url);
+    console.log('🔍 Frontend Debug - selectedCampaignId:', selectedCampaignId);
+    
     // Return the Promise to enable proper await behavior
     return fetch(url)
         .then(response => {
@@ -723,6 +726,7 @@ function loadDashboardData() {
         })
         .then(data => {
             console.log('Dashboard data received:', Object.keys(data));
+            console.log('🔍 Frontend Debug - Raw API Response average_ratings:', data.average_ratings);
             if (data.error) {
                 throw new Error(data.error);
             }
