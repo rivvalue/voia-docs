@@ -1187,6 +1187,8 @@ def finalize_conversation():
             existing_response.product_value_rating = structured_data.get('product_value_rating')
             existing_response.service_rating = structured_data.get('service_rating')
             existing_response.pricing_rating = structured_data.get('pricing_rating')
+            print(f"💾 DATABASE SAVE DEBUG - Setting pricing_rating to: {structured_data.get('pricing_rating')}")
+            print(f"💾 DATABASE SAVE DEBUG - Full structured_data: {structured_data}")
             existing_response.improvement_feedback = structured_data.get('improvement_feedback')
             existing_response.recommendation_reason = structured_data.get('recommendation_reason')
             existing_response.additional_comments = structured_data.get('additional_comments')
@@ -1197,6 +1199,8 @@ def finalize_conversation():
             response = existing_response
         else:
             # Create survey response record with normalized company name and campaign assignment
+            print(f"💾 NEW RESPONSE DEBUG - Creating new response with pricing_rating: {structured_data.get('pricing_rating')}")
+            print(f"💾 NEW RESPONSE DEBUG - Full structured_data: {structured_data}")
             response = SurveyResponse(
                 company_name=normalize_company_name(structured_data.get('company_name')),
                 respondent_name=structured_data.get('respondent_name'),

@@ -223,6 +223,12 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
                 else:
                     extracted['nps_category'] = 'Detractor'
             
+            # DEBUG: Log AI extraction results for pricing
+            if extracted.get('pricing_rating'):
+                print(f"🤖 AI PRICING DEBUG - AI extracted pricing_rating: {extracted['pricing_rating']}")
+            else:
+                print(f"🤖 AI PRICING DEBUG - AI found NO pricing_rating in: '{user_input[:100]}'")
+            
             return extracted
             
         except Exception as e:
@@ -336,7 +342,13 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         for rating, keywords in pricing_keywords.items():
             if any(keyword in text_lower for keyword in keywords):
                 extracted['pricing_rating'] = rating
+                print(f"🎯 PRICING DEBUG - Extracted pricing_rating: {rating} from text: '{user_input[:100]}'")
                 break
+        
+        if not extracted.get('pricing_rating'):
+            print(f"🚨 PRICING DEBUG - NO pricing rating found in text: '{user_input[:100]}'")
+            print(f"🚨 PRICING DEBUG - Text lower: '{text_lower[:100]}'")
+            print(f"🚨 PRICING DEBUG - Available pricing keywords: {list(pricing_keywords.keys())}")
         
         # Extract support ratings
         for rating, keywords in support_keywords.items():
