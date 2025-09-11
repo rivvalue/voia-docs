@@ -708,15 +708,29 @@ function loadDashboardData() {
     
     // Build URL with campaign filter if selected
     let url = '/api/dashboard_data';
+    const urlParams = new URLSearchParams();
+    
     if (selectedCampaignId) {
-        url += `?campaign_id=${selectedCampaignId}`;
+        urlParams.append('campaign_id', selectedCampaignId);
     }
+    
+    // Add cache-busting timestamp
+    urlParams.append('_t', Date.now());
+    
+    url += '?' + urlParams.toString();
     
     console.log('🔍 Frontend Debug - Calling URL:', url);
     console.log('🔍 Frontend Debug - selectedCampaignId:', selectedCampaignId);
     
     // Return the Promise to enable proper await behavior
-    return fetch(url)
+    return fetch(url, {
+        method: 'GET',
+        headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+        }
+    })
         .then(response => {
             console.log('API response status:', response.status);
             if (!response.ok) {
