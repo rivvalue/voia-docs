@@ -601,19 +601,6 @@ def get_dashboard_data(campaign_id=None):
             pricing_query = pricing_query.filter(SurveyResponse.campaign_id == campaign_id)
         avg_pricing = pricing_query.scalar() or 0
         
-        # DEPLOYMENT DEBUG: Log pricing calculation details
-        pricing_count_query = db.session.query(func.count(SurveyResponse.pricing_rating)).filter(
-            SurveyResponse.pricing_rating.isnot(None)
-        )
-        if campaign_id:
-            pricing_count_query = pricing_count_query.filter(SurveyResponse.campaign_id == campaign_id)
-        pricing_count = pricing_count_query.scalar() or 0
-        
-        print(f"🔧 DEPLOYMENT DEBUG - Campaign ID: {campaign_id}")
-        print(f"🔧 DEPLOYMENT DEBUG - Pricing Count: {pricing_count}")
-        print(f"🔧 DEPLOYMENT DEBUG - Avg Pricing Raw: {avg_pricing}")
-        print(f"🔧 DEPLOYMENT DEBUG - Avg Pricing Final: {float(avg_pricing) if avg_pricing else 0.0}")
-        
         # Tenure distribution with campaign filtering
         tenure_query = db.session.query(
             SurveyResponse.tenure_with_fc,
