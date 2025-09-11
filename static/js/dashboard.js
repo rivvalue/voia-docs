@@ -1014,6 +1014,15 @@ function createRatingsChart() {
     }
     
     const ratings = dashboardData.average_ratings || {};
+    console.log('Chart Data Debug - Full dashboardData:', dashboardData);
+    console.log('Chart Data Debug - ratings object:', ratings);
+    console.log('Chart Data Debug - individual values:', {
+        satisfaction: ratings.satisfaction,
+        product_value: ratings.product_value,
+        service: ratings.service,
+        pricing: ratings.pricing
+    });
+    
     const labels = ['Satisfaction', 'Product Value', 'Service', 'Pricing'];
     const data = [
         ratings.satisfaction || 0,
@@ -1021,6 +1030,9 @@ function createRatingsChart() {
         ratings.service || 0,
         ratings.pricing || 0
     ];
+    
+    console.log('Chart Data Debug - final data array:', data);
+    console.log('Chart Data Debug - data types:', data.map(v => typeof v));
     
     // Get mobile-responsive configuration
     const config = getMobileChartConfig();
