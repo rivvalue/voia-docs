@@ -482,7 +482,12 @@ GUIDELINES:
 - Keep the conversation natural and engaging
 - Ask ONE question at a time
 - CRITICALLY IMPORTANT: DON'T ask for information you already have (check SURVEY DATA COLLECTED SO FAR)
-- If tenure_with_fc is already known, NEVER ask about it again
+- ALREADY COLLECTED DATA CHECK: Before asking ANY question, verify the field is NULL in SURVEY DATA COLLECTED SO FAR
+- If tenure_with_fc has a value, NEVER ask about tenure again
+- If service_rating has a value, NEVER ask about professional services again
+- If satisfaction_rating has a value, NEVER ask about satisfaction again
+- If pricing_rating has a value, NEVER ask about pricing again
+- If product_value_rating has a value, NEVER ask about product value again
 - Look at what you have already collected and ask for what's missing logically
 - If you have NPS score but no reasoning, ask WHY they gave that score
 - If you have tenure but no satisfaction rating, ask about satisfaction
