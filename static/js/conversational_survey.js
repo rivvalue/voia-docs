@@ -434,7 +434,7 @@ function showTypingIndicator() {
         <div class="spinner-border spinner-border-sm" role="status">
             <span class="visually-hidden">Loading...</span>
         </div>
-        Voxa is typing...
+        Vocsa is typing...
     `;
     
     chatMessages.appendChild(typingElement);

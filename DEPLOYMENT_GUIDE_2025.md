@@ -1,10 +1,10 @@
 # Voice of Client Agent - Complete Deployment Guide (2025)
 
 ## Overview
-This deployment guide includes all recent enhancements and optimizations for the Rivvalue Inc. Voice of Client (VoC) Agent platform, featuring Voxa - the conversational AI assistant.
+This deployment guide includes all recent enhancements and optimizations for the Rivvalue Inc. Voice of Client (VoC) Agent platform, featuring Vocsa - the conversational AI assistant.
 
 ## Latest Features (July 2025)
-- **Voxa Conversational AI**: Advanced conversational surveys with natural language processing
+- **Vocsa Conversational AI**: Advanced conversational surveys with natural language processing
 - **Complete Rating System**: NPS, satisfaction, professional services, product value, pricing, and support ratings
 - **Business Relationship Analysis**: Tenure tracking and growth factor analysis using SaaS B2B lookup tables
 - **Enhanced Security**: JWT-based authentication with duplicate prevention and admin access control
@@ -215,7 +215,7 @@ sudo crontab -e
 
 ## Feature Configuration
 
-### 1. Voxa Conversational AI
+### 1. Vocsa Conversational AI
 The conversational AI system includes:
 - Natural language processing with OpenAI GPT-4o
 - 10-step conversation flow covering all rating dimensions
@@ -367,7 +367,7 @@ sudo -u postgres psql -d voc_agent -c "SELECT pg_size_pretty(pg_database_size('v
 
 ## Version History
 
-- **v1.0** (July 2025): Initial release with Voxa conversational AI
+- **v1.0** (July 2025): Initial release with Vocsa conversational AI
 - **v1.1** (July 2025): Added product value ratings and tenure analysis
 - **v1.2** (July 2025): Enhanced growth factor analysis with SaaS B2B lookup
 

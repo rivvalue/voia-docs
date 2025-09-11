@@ -1,7 +1,7 @@
 # Full Voice of Client Agent Development Roadmap
 
 ## Overview
-This roadmap outlines the transformation from the current Voxa demonstration platform into a full-featured Voice of Client Agent system.
+This roadmap outlines the transformation from the current Vocsa demonstration platform into a full-featured Voice of Client Agent system.
 
 ## Phase 1: Core Infrastructure (Weeks 1-2)
 
@@ -248,4 +248,4 @@ CREATE TABLE user_organizations (
 
 ---
 
-This roadmap transforms the current Voxa demonstration into an enterprise-grade Voice of Client Agent platform while maintaining the proven architecture and AI capabilities already developed.
+This roadmap transforms the current Vocsa demonstration into an enterprise-grade Voice of Client Agent platform while maintaining the proven architecture and AI capabilities already developed.

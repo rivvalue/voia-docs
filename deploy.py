@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Voxa Platform Deployment Script
-Automates the setup and deployment process for cloning the Voxa platform
+Vocsa Platform Deployment Script
+Automates the setup and deployment process for cloning the Vocsa platform
 """
 
 import os
@@ -128,7 +128,7 @@ def run_tests():
 
 def main():
     """Main deployment function"""
-    print("🚀 Voxa Platform Deployment Script")
+    print("🚀 Vocsa Platform Deployment Script")
     print("===================================\n")
     
     # Check requirements

@@ -1,7 +1,7 @@
 # Voice of Client
 
 ## Overview
-The Voice of Client (Voxa) is a Flask-based system designed for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. Its primary purpose is to transform raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. Voxa aims to provide businesses, specifically Rivvalue Inc., with a powerful tool for understanding customer sentiment, improving services, and fostering organic growth by leveraging AI for deeper analysis of customer interactions.
+The Voice of Client (Vocsa) is a Flask-based system designed for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. Its primary purpose is to transform raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. Vocsa aims to provide businesses, specifically Rivvalue Inc., with a powerful tool for understanding customer sentiment, improving services, and fostering organic growth by leveraging AI for deeper analysis of customer interactions.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
@@ -9,12 +9,12 @@ User interface tone: Thought leadership and research-oriented language, avoiding
 Project customization: Rivvalue Inc. branding and conversational AI surveys for enhanced user experience.
 
 ## System Architecture
-The system is a Flask web application utilizing a multi-tiered architecture. The frontend uses Jinja2 templates, Bootstrap 5 (dark theme), custom CSS, and vanilla JavaScript for dynamic elements and Chart.js for data visualization. The backend is built with Flask and SQLAlchemy ORM, designed to be scalable from SQLite (development) to PostgreSQL (production). AI integration is central, primarily leveraging OpenAI API for natural language processing, sentiment analysis, and conversational survey capabilities (Voxa). TextBlob is used for additional text analysis.
+The system is a Flask web application utilizing a multi-tiered architecture. The frontend uses Jinja2 templates, Bootstrap 5 (dark theme), custom CSS, and vanilla JavaScript for dynamic elements and Chart.js for data visualization. The backend is built with Flask and SQLAlchemy ORM, designed to be scalable from SQLite (development) to PostgreSQL (production). AI integration is central, primarily leveraging OpenAI API for natural language processing, sentiment analysis, and conversational survey capabilities (Vocsa). TextBlob is used for additional text analysis.
 
 ## Recent Changes (September 2025)
 ✅ **Professional Completion Experience Implementation** - Completely replaced all JavaScript alert popups with sophisticated completion screens in both traditional and conversational surveys. Added comprehensive "What's Next?" sections offering users choice to "Try Another Session" or "Contact Rivvalue" for full Voice of Client Agent service implementation. Integrated pre-filled email contact system with professional inquiry templates. Enhanced user experience with thought leadership messaging throughout completion flow.
 
-✅ **Cross-Survey Type Promotion** - Traditional survey completion now promotes conversational survey option and vice versa, encouraging users to experience both demonstration interfaces. Maintains consistent "Voxa Intelligence" branding while positioning current platform as research demonstration.
+✅ **Cross-Survey Type Promotion** - Traditional survey completion now promotes conversational survey option and vice versa, encouraging users to experience both demonstration interfaces. Maintains consistent "Vocsa Intelligence" branding while positioning current platform as research demonstration.
 
 ✅ **Validation Error UI Enhancement** - Replaced all validation alert popups with temporary, styled UI elements that appear within forms for 4 seconds. Professional error handling without interrupting user experience flow.
 
@@ -32,10 +32,10 @@ Key architectural decisions include:
     - **Authentication**: JWT token-based authentication with email validation and admin roles for data export protection, featuring server-side token generation for enhanced security. **Automatic token invalidation after survey completion prevents duplicate submissions.**
     - **Performance**: PostgreSQL migration, database indexing, connection pooling, asynchronous background task processing for AI analysis, and comprehensive rate limiting (IP-based).
 - **Security**: Token-based authentication, duplicate response prevention (via separate submit/overwrite endpoints), enhanced rate limiting, and robust input validation.
-- **Branding**: "Voxa - Voice Of Client" branding with "AI Powered Client Insights" subtitle and "Voxa: Hear what matters. Act on what counts." tagline.
+- **Branding**: "Vocsa - Voice Of Client" branding with "AI Powered Client Insights" subtitle and "Vocsa: Hear what matters. Act on what counts." tagline.
 
 ## External Dependencies
-- **OpenAI API**: For advanced AI functionalities including sentiment analysis, theme extraction, and the conversational survey system (Voxa).
+- **OpenAI API**: For advanced AI functionalities including sentiment analysis, theme extraction, and the conversational survey system (Vocsa).
 - **Bootstrap CDN**: For responsive UI components and styling.
 - **Chart.js CDN**: For interactive data visualizations on the dashboard.
 - **Font Awesome CDN**: For iconography.

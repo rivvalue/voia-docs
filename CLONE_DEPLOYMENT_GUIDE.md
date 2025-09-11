@@ -1,7 +1,7 @@
-# Voxa Platform Clone Deployment Guide
+# Vocsa Platform Clone Deployment Guide
 
 ## Overview
-This guide will help you clone the Voxa Intelligence platform to create a full-featured Voice of Client Agent system while keeping the original as a demonstration/sneak peek.
+This guide will help you clone the Vocsa Intelligence platform to create a full-featured Voice of Client Agent system while keeping the original as a demonstration/sneak peek.
 
 ## Prerequisites
 
