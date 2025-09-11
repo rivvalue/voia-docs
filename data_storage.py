@@ -656,10 +656,10 @@ def get_dashboard_data(campaign_id=None):
                 for theme, data in sorted(all_themes.items(), key=lambda x: x[1]['count'], reverse=True)[:10]
             ],
             'average_ratings': {
-                'satisfaction': round(avg_satisfaction, 1),
-                'product_value': round(avg_product_value, 1),
-                'service': round(avg_service, 1),
-                'pricing': round(avg_pricing, 1)
+                'satisfaction': float(round(avg_satisfaction, 1)),
+                'product_value': float(round(avg_product_value, 1)),
+                'service': float(round(avg_service, 1)),
+                'pricing': float(round(avg_pricing, 1))
             },
             'tenure_distribution': [
                 {'tenure': row.tenure_with_fc, 'count': row.count}
@@ -708,10 +708,10 @@ def convert_snapshot_to_dashboard_format(snapshot):
         
         # Convert ratings distribution to expected format
         average_ratings = {
-            'satisfaction': snapshot.avg_satisfaction_rating or 0,
-            'pricing': snapshot.avg_pricing_rating or 0,
-            'service': snapshot.avg_service_rating or 0,
-            'product_value': snapshot.avg_product_value_rating or 0
+            'satisfaction': float(snapshot.avg_satisfaction_rating or 0),
+            'pricing': float(snapshot.avg_pricing_rating or 0),
+            'service': float(snapshot.avg_service_rating or 0),
+            'product_value': float(snapshot.avg_product_value_rating or 0)
         }
         
         # Return comprehensive dashboard data from snapshot
