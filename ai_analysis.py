@@ -241,7 +241,7 @@ def assess_churn_risk(response, text):
     churn_keywords = ['churn', 'leave', 'switch', 'competitor', 'cancel', 'terminate', 'discontinue', 'end relationship', 'looking elsewhere', 'considering alternatives']
     
     # Additional high-risk indicators
-    high_risk_phrases = ['burden', 'caused us', 'issues caused', 'problems caused', 'damage', 'compensation', 'credits', 'refund', 'reimburse', 'waste of money', 'terrible experience', 'worst', 'useless', 'broken', 'unreliable', 'fed up', 'frustrated', 'disappointed', 'unacceptable']
+    high_risk_phrases = ['burden', 'caused us', 'issues caused', 'problems caused', 'damage', 'compensation', 'credits', 'refund', 'reimburse', 'waste of money', 'terrible experience', 'worst', 'useless', 'broken', 'unreliable', 'fed up', 'frustrated', 'disappointed', 'unacceptable', 'overpromised', 'overpromise', 'lacking', 'lie', 'lies', 'lying', 'deceived', 'deception', 'mislead', 'misleading', 'false', 'not delivered', 'failed to deliver', 'breach of trust']
     
     churn_detected = any(keyword in text_lower for keyword in churn_keywords)
     high_risk_detected = any(phrase in text_lower for phrase in high_risk_phrases)
@@ -468,7 +468,22 @@ def identify_account_risk_factors(response, text):
             
             ai_result = json.loads(ai_response.choices[0].message.content)
             ai_risk_factors = ai_result.get('risk_factors', [])
-            risk_factors.extend(ai_risk_factors)
+            
+            # Ensure consistent data structure - filter out strings and validate objects
+            for factor in ai_risk_factors:
+                if isinstance(factor, dict) and all(key in factor for key in ['type', 'description', 'severity']):
+                    # Ensure action field exists
+                    if 'action' not in factor:
+                        factor['action'] = 'Review and address this risk factor'
+                    risk_factors.append(factor)
+                elif isinstance(factor, str):
+                    # Convert string to proper object format
+                    risk_factors.append({
+                        'type': factor.replace('_', ' ').title(),
+                        'description': f'{factor.replace("_", " ").title()} identified in customer feedback',
+                        'severity': 'Medium',  # Default severity for string factors
+                        'action': f'Investigate and address {factor.replace("_", " ")} concerns'
+                    })
     except Exception as e:
         logger.warning(f"AI account risk factor identification failed: {e}")
     

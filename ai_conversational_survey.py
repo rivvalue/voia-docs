@@ -410,12 +410,12 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         # COMPLETE APPROACH: Try to get all ratings plus improvement feedback
         has_sufficient_data = has_core and has_all_ratings and has_improvement
         
-        # Progressive completion thresholds - allow more steps for complete data
-        enough_steps = self.step_count >= 8  # Allow more time for all rating questions
-        force_complete = self.step_count >= 10  # Force completion to prevent endless loops
+        # Progressive completion thresholds - prioritize complete data collection
+        # Only complete early if we have all required data, otherwise allow more steps
+        force_complete = self.step_count >= 12  # Allow more steps for complete rating collection
         
-        # Complete if we have sufficient data OR enough steps OR force
-        completion_ready = has_sufficient_data or enough_steps or force_complete
+        # CRITICAL FIX: Don't complete until we have all ratings OR force completion
+        completion_ready = has_sufficient_data or force_complete
         
         print(f"COMPLETION CHECK: NPS={has_nps}, Tenure={has_tenure}, Reasoning={has_reasoning}, AllRatings={has_all_ratings}, Steps={self.step_count}, Ready={completion_ready}")
         
