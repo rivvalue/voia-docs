@@ -182,12 +182,12 @@ async function applyCampaignFilter() {
     
     console.log('🎯 Campaign filter applied:', selectedCampaignId);
     
-    // Update selected campaign info display
-    updateSelectedCampaignInfo();
-    
     // Reload dashboard data with campaign filter
     console.log('📡 Loading dashboard data for campaign:', selectedCampaignId);
     await loadDashboardData();
+    
+    // Update selected campaign info display after data loads
+    updateSelectedCampaignInfo();
     
     // Refresh all charts immediately after data loads - no setTimeout delay
     createNpsChart();
@@ -243,11 +243,17 @@ function updateSelectedCampaignInfo() {
             statusBadge.style.color = 'white';
         }
         
-        // Update days remaining/since ended if available from dashboard data
+        // Update days remaining/since ended - compute from end date directly
         const daysLeftSpan = document.getElementById('selectedCampaignDaysLeft');
-        if (daysLeftSpan && dashboardData && dashboardData.active_campaign) {
-            const daysRemaining = dashboardData.active_campaign.days_remaining || 0;
-            const daysSinceEnded = dashboardData.active_campaign.days_since_ended || 0;
+        if (daysLeftSpan && endDate) {
+            // Compute days remaining/since ended from the selected campaign's end date
+            const today = new Date();
+            const campaignEndDate = new Date(endDate);
+            const diffTime = campaignEndDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            const daysRemaining = status === 'Active' ? Math.max(0, diffDays) : 0;
+            const daysSinceEnded = status === 'Closed' ? Math.max(0, -diffDays) : 0;
             
             if (status === 'Active' && daysRemaining >= 0) {
                 // Show days remaining for active campaigns
