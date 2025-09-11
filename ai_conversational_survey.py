@@ -1,7 +1,7 @@
 import os
 import json
 import uuid
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from openai import OpenAI
 
 def normalize_company_name(company_name):
@@ -21,6 +21,8 @@ class AIConversationalSurvey:
         self.extracted_data = {}
         self.step_count = 0
         self.is_complete = False
+        self.pending_field = None  # Track which rating field we're currently asking for
+        self.last_ai_question = None  # Track the last question asked
         
     def start_conversation(self, company_name: str, respondent_name: str) -> Dict[str, Any]:
         """Start a new AI-powered conversational survey"""
@@ -71,7 +73,7 @@ class AIConversationalSurvey:
         })
         
         # Extract data from user input
-        extracted = self._extract_survey_data_with_ai(user_input, context)
+        extracted = self._extract_survey_data_with_ai(user_input, context, self.pending_field, self.last_ai_question)
         
         # Track what was just extracted for debugging - but PREVENT overwrites of existing data
         newly_extracted = {}
@@ -147,11 +149,15 @@ class AIConversationalSurvey:
         # Always use the new Archelo Group introduction and go directly to NPS
         return f"Hi {respondent_name}, we'd love to hear from you.\n\nArchelo is on a mission to make workplace tools less painful, and your feedback makes us better.\n\nThis short conversation will help us understand what's working, what's not, and how to improve your experience with ArcheloFlow.\n\nOn a scale of 0-10, how likely are you to recommend Archelo Group to a friend or colleague?"
     
-    def _extract_survey_data_with_ai(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_survey_data_with_ai(self, user_input: str, context: Dict[str, Any], pending_field: Optional[str] = None, last_ai_question: Optional[str] = None) -> Dict[str, Any]:
         """Extract structured survey data from natural language using OpenAI"""
         try:
             # Get list of already captured data to prevent overwrites
             locked_fields = [key for key, value in self.extracted_data.items() if value is not None]
+            
+            # Add pending field context for numeric responses
+            pending_context = f"\n- PENDING FIELD: {pending_field} (we just asked for this rating)" if pending_field else ""
+            question_context = f"\n- LAST AI QUESTION: '{last_ai_question}'" if last_ai_question else ""
             
             prompt = f"""Extract survey data from this customer response: "{user_input}"
 
@@ -159,7 +165,9 @@ Context of conversation:
 - Company: {context.get('company_name', 'Unknown')}
 - Current extracted data: {json.dumps(self.extracted_data, indent=2)}
 - Conversation step: {self.step_count}
-- ALREADY CAPTURED (DO NOT RE-EXTRACT): {locked_fields}
+- ALREADY CAPTURED (DO NOT RE-EXTRACT): {locked_fields}{pending_context}{question_context}
+
+CRITICAL: If user responds with a single number 1-5 and we have a PENDING FIELD, assign that number to the pending field.
 
 CRITICAL INSTRUCTION: Only extract NEW information from this specific response. 
 DO NOT re-extract or change data that was already captured in previous responses.
@@ -223,14 +231,31 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
                 else:
                     extracted['nps_category'] = 'Detractor'
             
+            # Apply numeric fallback for 1-5 ratings if AI didn't catch it
+            if pending_field and pending_field in ['satisfaction_rating', 'service_rating', 'product_value_rating', 'pricing_rating', 'support_rating']:
+                numeric_match = self._extract_numeric_rating(user_input)
+                if numeric_match and not extracted.get(pending_field):
+                    extracted[pending_field] = numeric_match
+                    print(f"NUMERIC FALLBACK: Assigned {numeric_match} to {pending_field}")
+            
             return extracted
             
         except Exception as e:
             print(f"AI extraction error: {e}")
             # Use robust fallback extraction
-            return self._extract_survey_data_fallback(user_input)
+            return self._extract_survey_data_fallback(user_input, pending_field)
     
-    def _extract_survey_data_fallback(self, user_input: str) -> Dict[str, Any]:
+    def _extract_numeric_rating(self, user_input: str) -> Optional[int]:
+        """Extract numeric rating (1-5) from user input"""
+        import re
+        # Match patterns like "1", "2", "3/5", "4 stars", "5 points"
+        pattern = r'^\s*([1-5])(?:\s*(?:/\s*5|stars?|points?))?\s*$'
+        match = re.search(pattern, user_input.strip(), re.IGNORECASE)
+        if match:
+            return int(match.group(1))
+        return None
+    
+    def _extract_survey_data_fallback(self, user_input: str, pending_field: Optional[str] = None) -> Dict[str, Any]:
         """Enhanced rule-based extraction with intelligent pattern matching"""
         extracted = {}
         text_lower = user_input.lower()
@@ -238,8 +263,8 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         # Extract NPS score - only if we're in the NPS collection step and don't have it yet
         import re
         
-        # Extract NPS score if we don't have it yet and input looks like a number
-        if not self.extracted_data.get('nps_score') and re.search(r'\b([0-9]|10)\b', user_input):
+        # CRITICAL FIX: Only extract NPS when specifically asking for NPS
+        if not self.extracted_data.get('nps_score') and (pending_field == 'nps_score' or self.step_count <= 2) and re.search(r'\b([0-9]|10)\b', user_input):
             print(f"Attempting NPS extraction at step {self.step_count} for input: '{user_input}'")
             nps_patterns = [
                 r'(?:score|rating|give|rate).*?(10|[0-9])',  # Fixed: 10 before single digits
@@ -421,35 +446,40 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         
         return completion_ready
     
-    def _get_next_question_priority(self) -> str:
-        """Determine what question should be asked next based on collected data"""
+    def _get_next_question_priority(self) -> tuple:
+        """Determine what question should be asked next and which field it targets"""
         data = self.extracted_data
         
         # Check what we have and what we need - systematic collection of ALL ratings
         if not data.get('tenure_with_fc'):
-            return "Ask about business relationship tenure with Archelo Group (how long working together)"
+            return ("Ask about business relationship tenure with Archelo Group (how long working together)", "tenure_with_fc")
         elif not data.get('nps_score'):
-            return "Ask for NPS score (0-10 likelihood to recommend Archelo Group)"
+            return ("Ask for NPS score (0-10 likelihood to recommend Archelo Group)", "nps_score")
         elif not data.get('nps_reasoning') and not data.get('improvement_feedback'):
-            return "Ask WHY they gave that NPS score - what's their reasoning about Archelo Group"
+            return ("Ask WHY they gave that NPS score - what's their reasoning about Archelo Group", "nps_reasoning")
         elif not data.get('satisfaction_rating'):
-            return "Ask for overall satisfaction rating (1-5) with Archelo Group"
+            return ("Ask for overall satisfaction rating (1-5) with Archelo Group", "satisfaction_rating")
         elif not data.get('service_rating'):
-            return "Ask for professional services quality rating (1-5) from Archelo Group"
+            return ("Ask for professional services quality rating (1-5) from Archelo Group", "service_rating")
         elif not data.get('product_value_rating'):
-            return "Ask for product/solution value rating (1-5) from Archelo Group"
+            return ("Ask for product/solution value rating (1-5) from Archelo Group", "product_value_rating")
         elif not data.get('pricing_rating'):
-            return "Ask for pricing value rating (1-5) for Archelo Group services"
+            return ("Ask for pricing value rating (1-5) for Archelo Group services", "pricing_rating")
         elif not data.get('improvement_feedback'):
-            return "Ask what Archelo Group could do better or improve"
+            return ("Ask what Archelo Group could do better or improve", "improvement_feedback")
         else:
-            return "Wrap up the conversation - you have enough information"
+            return ("Wrap up the conversation - you have enough information", None)
     
     def _generate_ai_question(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
         """Generate next question using OpenAI"""
         try:
             # Format conversation history for context
             history_text = self._format_conversation_history()
+            
+            # Get priority and set pending field
+            priority_info = self._get_next_question_priority()
+            priority_text = priority_info[0] if isinstance(priority_info, tuple) else priority_info
+            self.pending_field = priority_info[1] if isinstance(priority_info, tuple) and len(priority_info) > 1 else None
             
             prompt = f"""You are conducting a customer feedback survey about Archelo Group (the supplier company). Focus on Archelo Group's service delivery, support quality, and business relationship aspects.
 
@@ -464,7 +494,7 @@ SURVEY DATA COLLECTED SO FAR:
 CONVERSATION STEP: {self.step_count}
 
 NEXT LOGICAL QUESTION PRIORITY:
-{self._get_next_question_priority()}
+{priority_text}
 
 YOUR ROLE: You are a helpful customer feedback specialist having a natural conversation. Your goal is to collect feedback about Archelo Group:
 1. Business relationship tenure - How long working with Archelo Group
@@ -522,6 +552,9 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 result = json.loads(content)
             else:
                 result = {'message': 'Thank you for your feedback!', 'is_complete': True, 'progress': 100}
+            
+            # Store the last AI question for context
+            self.last_ai_question = result.get('message', '')
             
             # Ensure progress is reasonable
             if result.get('progress', 0) < self.step_count * 15:
@@ -630,7 +663,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
             if extracted.get('nps_score') is not None or self.extracted_data.get('nps_score') is not None:
                 # We just got the NPS score, ask for reasoning
                 score = extracted.get('nps_score') or self.extracted_data.get('nps_score')
-                if score >= 9:
+                if score is not None and score >= 9:
                     return {
                         'message': f"Wonderful! A {score} is fantastic. What specifically about Archelo Group made your experience so great?",
                         'message_type': 'ai_question',
@@ -638,7 +671,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                         'progress': 40,
                         'is_complete': False
                     }
-                elif score >= 7:
+                elif score is not None and score >= 7:
                     return {
                         'message': f"Thanks for the {score}! What would it take to make you even more likely to recommend Archelo Group?",
                         'message_type': 'ai_question',
@@ -852,7 +885,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
 # Global instances for session persistence
 ai_conversation_instances = {}
 
-def start_ai_conversational_survey(company_name: str, respondent_name: str, tenure_with_fc: str = None) -> Dict[str, Any]:
+def start_ai_conversational_survey(company_name: str, respondent_name: str, tenure_with_fc: Optional[str] = None) -> Dict[str, Any]:
     """Start a new AI-powered conversational survey session"""
     conversation_id = str(uuid.uuid4())
     ai_survey = AIConversationalSurvey()
