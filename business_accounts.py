@@ -16,13 +16,12 @@ class BusinessAccountManager:
         if existing:
             return existing
             
-        rivvalue_account = BusinessAccount(
-            name="Rivvalue Inc",
-            account_type="demo",
-            contact_email="7amdoulilah@rivvalue.com",
-            contact_name="Rivvalue Team",
-            status="active"
-        )
+        rivvalue_account = BusinessAccount()
+        rivvalue_account.name = "Rivvalue Inc"
+        rivvalue_account.account_type = "demo"
+        rivvalue_account.contact_email = "7amdoulilah@rivvalue.com"
+        rivvalue_account.contact_name = "Rivvalue Team"
+        rivvalue_account.status = "active"
         
         db.session.add(rivvalue_account)
         db.session.commit()
@@ -38,22 +37,21 @@ class BusinessAccountManager:
         return BusinessAccount.query.get(account_id)
     
     def create_business_account(self, name: str, account_type: str = "customer", 
-                              contact_email: str = None, contact_name: str = None) -> BusinessAccount:
+                              contact_email: Optional[str] = None, contact_name: Optional[str] = None) -> BusinessAccount:
         """Create a new business account"""
-        account = BusinessAccount(
-            name=name,
-            account_type=account_type,
-            contact_email=contact_email,
-            contact_name=contact_name,
-            status="active"
-        )
+        account = BusinessAccount()
+        account.name = name
+        account.account_type = account_type
+        account.contact_email = contact_email
+        account.contact_name = contact_name
+        account.status = "active"
         
         db.session.add(account)
         db.session.commit()
         
         return account
     
-    def list_business_accounts(self, account_type: str = None) -> List[BusinessAccount]:
+    def list_business_accounts(self, account_type: Optional[str] = None) -> List[BusinessAccount]:
         """List all business accounts, optionally filtered by type"""
         query = BusinessAccount.query
         
