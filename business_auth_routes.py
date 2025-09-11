@@ -143,9 +143,9 @@ def admin_panel():
             # Rivvalue demo account - show demo campaign management
             from models import Campaign, SurveyResponse
             
-            # Get demo campaigns (for Rivvalue)
+            # Get demo campaigns (for Rivvalue) - now using proper business account ownership
             campaigns = Campaign.query.filter_by(
-                client_identifier='archelo_group'
+                business_account_id=business_account.id
             ).order_by(Campaign.created_at.desc()).limit(5).all()
             
             # Get recent demo responses

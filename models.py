@@ -106,6 +106,10 @@ class Campaign(db.Model):
     # Client tracking (for future multi-client support)
     client_identifier = db.Column(db.String(200), nullable=False, default='archelo_group', index=True)
     
+    # Business account ownership (Phase 2.5: Schema Fix)
+    business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=True, index=True)
+    business_account = db.relationship('BusinessAccount', backref=db.backref('campaigns', lazy='dynamic'))
+    
     # Metadata
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     completed_at = db.Column(db.DateTime, nullable=True)
@@ -119,6 +123,8 @@ class Campaign(db.Model):
             'end_date': self.end_date.isoformat() if self.end_date else None,
             'status': self.status,
             'client_identifier': self.client_identifier,
+            'business_account_id': self.business_account_id,
+            'business_account_name': self.business_account.name if self.business_account else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'completed_at': self.completed_at.isoformat() if self.completed_at else None,
             'response_count': self.responses.count(),
