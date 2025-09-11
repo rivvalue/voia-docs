@@ -66,6 +66,45 @@ The system is a Flask web application utilizing a multi-tiered architecture. The
 
 **Implementation Principles**: Additive development, feature flags, data safety, user experience continuity, testing at every step
 
+### Technical Architecture Specifications:
+
+**Database Schema Requirements:**
+- **BusinessAccount**: id, name, created_at, account_type (customer/demo)
+- **Participant**: id, business_account_id, campaign_id, email, name, company_name, token, status, invited_at, completed_at
+- **Campaign Updates**: Add business_account_id, environment_type (sandbox/production), status (draft/ready/active)
+- **SurveyResponse Updates**: Add participant_id for participant-linked responses
+
+**User Access Strategy:**
+- **Single URL Approach**: vocsa.com with smart user context routing
+- **Public Access**: /survey → Demo environment (Rivvalue campaigns)
+- **Customer Access**: Login → Production environment routing based on business account
+- **Participant Access**: /participate?token=xyz → Environment determined by token validation
+- **Admin Access**: /admin → Environment selection for Rivvalue team
+
+**Authentication Enhancement:**
+- **Dual Authentication**: Preserve current public email auth + new business account system
+- **Session Management**: Track business account context and environment state
+- **Token System**: UUID tokens per participant, one-time use, environment-specific validation
+
+**Problem Context - Conversational Survey Issues:**
+- **Root Cause**: Overly strict completion criteria requiring 7 fields (NPS + tenure + reasoning + 4 ratings + improvement)
+- **Current Issue**: Anti-loop protection at step 8, but completion requires step 12
+- **Proposed Solution**: Relax to core data only (NPS + tenure + reasoning), make ratings optional
+- **User Experience Enhancement**: Explicit notification of 4 rating questions after core collection
+
+**Risk Assessment:**
+- **Complexity**: High (7/10) - Multi-tenant transformation with database splitting
+- **Risk Level**: Medium-High (6/10) - Data security, regression prevention critical
+- **Timeline**: 8-12 weeks with conservative safety-first approach
+- **Critical Safeguards**: Preserve existing functionality, extensive testing, gradual rollout
+
+**Safety Validation Points:**
+- Phase 1: Database connections, environment routing, zero breaking changes
+- Phase 2: Dual authentication coexistence, user type detection
+- Phase 3: Participant workflows, campaign management isolation  
+- Phase 4: Token access, parallel survey methods
+- Phase 5: Data migration integrity, environment separation
+
 Key architectural decisions include:
 - **UI/UX**: Multi-step survey forms with progressive disclosure, interactive dashboards, and a chat-style interface for conversational surveys. Branding includes Rivvalue Inc. logo, a professional blue color scheme, and specific taglines.
 - **Technical Implementations**:
