@@ -1,5 +1,5 @@
 from app import db
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import json
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
@@ -121,7 +121,7 @@ class Campaign(db.Model):
             'client_identifier': self.client_identifier,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'completed_at': self.completed_at.isoformat() if self.completed_at else None,
-            'response_count': len(self.responses) if self.responses else 0,
+            'response_count': self.responses.count(),
             'is_active': self.is_active(),
             'days_remaining': self.days_remaining(),
             'days_since_ended': self.days_since_ended()
@@ -453,7 +453,7 @@ class BusinessAccountUser(UserMixin, db.Model):
     def generate_password_reset_token(self):
         """Generate password reset token"""
         self.password_reset_token = str(uuid.uuid4())
-        self.password_reset_expires = datetime.utcnow() + datetime.timedelta(hours=24)
+        self.password_reset_expires = datetime.utcnow() + timedelta(hours=24)
         return self.password_reset_token
     
     def generate_email_verification_token(self):
@@ -543,7 +543,7 @@ class UserSession(db.Model):
         self.session_data = session_data
         self.ip_address = ip_address
         self.user_agent = user_agent
-        self.expires_at = datetime.utcnow() + datetime.timedelta(hours=duration_hours)
+        self.expires_at = datetime.utcnow() + timedelta(hours=duration_hours)
     
     def is_expired(self):
         """Check if session is expired"""
@@ -551,7 +551,7 @@ class UserSession(db.Model):
     
     def extend_session(self, hours=24):
         """Extend session expiration"""
-        self.expires_at = datetime.utcnow() + datetime.timedelta(hours=hours)
+        self.expires_at = datetime.utcnow() + timedelta(hours=hours)
         self.last_activity_at = datetime.utcnow()
     
     def deactivate(self):
