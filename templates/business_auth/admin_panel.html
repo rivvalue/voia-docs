@@ -1,0 +1,500 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel - Vocsa Business Account{% endblock %}
+
+{% block page_class %}page-admin-panel{% endblock %}
+
+{% block content %}
+<style>
+/* Admin panel specific styling */
+.admin-header {
+    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+    color: white;
+    padding: 2rem 0;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+}
+
+.admin-welcome {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.admin-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.admin-actions {
+    text-align: right;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e3e6f0;
+    margin-bottom: 1.5rem;
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.stat-icon.primary {
+    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+    color: white;
+}
+
+.stat-icon.success {
+    background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%);
+    color: white;
+}
+
+.stat-icon.warning {
+    background: linear-gradient(135deg, #f6c23e 0%, #dda20a 100%);
+    color: white;
+}
+
+.stat-icon.info {
+    background: linear-gradient(135deg, #36b9cc 0%, #2c9faf 100%);
+    color: white;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.stat-label {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.admin-section {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e3e6f0;
+    margin-bottom: 2rem;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f8f9fa;
+}
+
+.section-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.campaign-item, .response-item {
+    padding: 1rem;
+    border: 1px solid #e3e6f0;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.campaign-item:hover, .response-item:hover {
+    border-color: #4e73df;
+    background-color: #f8f9fc;
+}
+
+.campaign-status {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.status-active {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.status-completed {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.btn-admin {
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-admin:hover {
+    transform: translateY(-1px);
+}
+
+.account-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.account-demo {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.account-customer {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.quick-action-btn {
+    padding: 1rem;
+    border: 2px solid #e3e6f0;
+    border-radius: 10px;
+    background: white;
+    color: #2c3e50;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.quick-action-btn:hover {
+    border-color: #4e73df;
+    background-color: #f8f9fc;
+    color: #4e73df;
+    transform: translateY(-2px);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+</style>
+
+<div class="container-fluid">
+    <!-- Admin Header -->
+    <div class="admin-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="admin-welcome">
+                        <div class="admin-avatar">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <div>
+                            <h2 class="mb-1">Welcome, {{ current_user.full_name }}</h2>
+                            <p class="mb-0 opacity-75">{{ business_account.name }} - {{ current_user.role|title }} Dashboard</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="admin-actions">
+                        <a href="{{ url_for('business_auth.logout') }}" class="btn btn-outline-light btn-admin">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Account Type Badge -->
+        <div class="account-badge {{ 'account-demo' if business_account.account_type == 'demo' else 'account-customer' }}">
+            <i class="fas fa-{{ 'flask' if business_account.account_type == 'demo' else 'building' }} me-2"></i>
+            {{ 'Demo Environment' if business_account.account_type == 'demo' else 'Customer Account' }}
+        </div>
+
+        <!-- Statistics Overview -->
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon primary">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="stat-number">{{ admin_data.stats.total_responses }}</h3>
+                    <p class="stat-label">Total Responses</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon success">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    <h3 class="stat-number">{{ admin_data.stats.total_campaigns }}</h3>
+                    <p class="stat-label">Total Campaigns</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon info">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <h3 class="stat-number">{{ admin_data.stats.get('active_campaigns', 0) }}</h3>
+                    <p class="stat-label">Active Campaigns</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon warning">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="stat-number">{{ admin_data.stats.get('total_participants', 0) }}</h3>
+                    <p class="stat-label">Total Participants</p>
+                </div>
+            </div>
+        </div>
+
+        {% if admin_data.account_type == 'demo' %}
+        <!-- Demo Account: Rivvalue Campaign Management -->
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Recent Campaigns -->
+                <div class="admin-section">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="fas fa-bullhorn"></i>
+                            Demo Campaigns
+                        </h3>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary btn-admin">
+                            <i class="fas fa-chart-bar me-2"></i>View Analytics
+                        </a>
+                    </div>
+                    
+                    {% if admin_data.campaigns %}
+                        {% for campaign in admin_data.campaigns %}
+                        <div class="campaign-item">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h5 class="mb-1">{{ campaign.name }}</h5>
+                                    <p class="text-muted mb-1">{{ campaign.description or 'No description' }}</p>
+                                    <small class="text-muted">
+                                        {{ campaign.start_date }} to {{ campaign.end_date }}
+                                        • {{ campaign.response_count }} responses
+                                    </small>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <span class="campaign-status {{ 'status-active' if campaign.is_active else 'status-completed' }}">
+                                        {{ 'Active' if campaign.is_active else 'Completed' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-bullhorn"></i>
+                            <h5>No Campaigns Found</h5>
+                            <p>Demo campaigns will appear here once created.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <!-- Recent Responses -->
+                <div class="admin-section">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="fas fa-comments"></i>
+                            Recent Responses
+                        </h3>
+                    </div>
+                    
+                    {% if admin_data.recent_responses %}
+                        {% for response in admin_data.recent_responses[:5] %}
+                        <div class="response-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">{{ response.respondent_name }}</h6>
+                                    <p class="mb-1 text-muted">{{ response.company_name }}</p>
+                                    <small class="text-muted">NPS: {{ response.nps_score }}/10</small>
+                                </div>
+                                <small class="text-muted">
+                                    {{ response.created_at[:10] if response.created_at else 'N/A' }}
+                                </small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-comments"></i>
+                            <h6>No Recent Responses</h6>
+                            <p class="small">Responses will appear here as they come in.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-bolt"></i>
+                    Quick Actions
+                </h3>
+            </div>
+            <div class="quick-actions">
+                <a href="{{ url_for('dashboard') }}" class="quick-action-btn">
+                    <i class="fas fa-chart-bar d-block mb-2"></i>
+                    <strong>View Dashboard</strong><br>
+                    <small>Analytics & Insights</small>
+                </a>
+                <a href="{{ url_for('conversational_survey') }}" class="quick-action-btn">
+                    <i class="fas fa-robot d-block mb-2"></i>
+                    <strong>Test AI Survey</strong><br>
+                    <small>Conversational Interface</small>
+                </a>
+                <a href="{{ url_for('survey') }}" class="quick-action-btn">
+                    <i class="fas fa-list d-block mb-2"></i>
+                    <strong>Test Form Survey</strong><br>
+                    <small>Traditional Interface</small>
+                </a>
+                <a href="{{ url_for('server_auth') }}" class="quick-action-btn">
+                    <i class="fas fa-key d-block mb-2"></i>
+                    <strong>Generate Token</strong><br>
+                    <small>Survey Access Token</small>
+                </a>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- Customer Account: Future Phase 3 Features -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-users"></i>
+                    Participant Management
+                </h3>
+            </div>
+            <div class="empty-state">
+                <i class="fas fa-construction"></i>
+                <h4>Coming Soon in Phase 3</h4>
+                <p>{{ admin_data.message }}</p>
+                <p class="text-muted">
+                    <strong>Planned Features:</strong><br>
+                    • CSV participant upload<br>
+                    • Token generation for participants<br>
+                    • Campaign-based survey management<br>
+                    • Participant tracking and analytics
+                </p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Session Info -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-info-circle"></i>
+                    Session Information
+                </h3>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Account:</strong> {{ business_account.name }}</p>
+                    <p><strong>User:</strong> {{ current_user.full_name }} ({{ current_user.email }})</p>
+                    <p><strong>Role:</strong> {{ current_user.role|title }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Account Type:</strong> {{ business_account.account_type|title }}</p>
+                    <p><strong>Status:</strong> 
+                        <span class="badge bg-success">{{ business_account.status|title }}</span>
+                    </p>
+                    <p><strong>Environment:</strong> 
+                        <span class="badge bg-info">{{ 'Demo' if business_account.account_type == 'demo' else 'Production' }}</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-refresh session status
+function checkSessionStatus() {
+    fetch('{{ url_for("business_auth.session_status") }}')
+        .then(response => response.json())
+        .then(data => {
+            if (!data.authenticated) {
+                alert('Your session has expired. Please log in again.');
+                window.location.href = '{{ url_for("business_auth.login") }}';
+            }
+        })
+        .catch(error => {
+            console.error('Session check failed:', error);
+        });
+}
+
+// Check session every 30 minutes
+setInterval(checkSessionStatus, 30 * 60 * 1000);
+
+// Add loading states to buttons
+document.querySelectorAll('.quick-action-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const icon = this.querySelector('i');
+        const originalClass = icon.className;
+        icon.className = 'fas fa-spinner fa-spin d-block mb-2';
+        
+        setTimeout(() => {
+            icon.className = originalClass;
+        }, 3000);
+    });
+});
+</script>
+{% endblock %}

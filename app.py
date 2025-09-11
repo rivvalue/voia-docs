@@ -54,8 +54,15 @@ with app.app_context():
     import routes  # noqa: F401
     
     # Register business authentication blueprint (Phase 2)
-    from business_auth_routes import business_auth_bp
+    from business_auth_routes import business_auth_bp, init_rivvalue_admin_user
     app.register_blueprint(business_auth_bp)
+    
+    # Initialize Rivvalue admin user (Phase 2)
+    try:
+        init_result = init_rivvalue_admin_user()
+        app.logger.info(f"Rivvalue admin user initialization: {init_result}")
+    except Exception as e:
+        app.logger.error(f"Failed to initialize admin user: {e}")
     from task_queue import start_task_queue
     from business_accounts import business_account_manager
     
