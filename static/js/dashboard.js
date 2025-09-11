@@ -243,6 +243,31 @@ function updateSelectedCampaignInfo() {
             statusBadge.style.color = 'white';
         }
         
+        // Update days remaining if available from dashboard data
+        const daysLeftSpan = document.getElementById('selectedCampaignDaysLeft');
+        if (daysLeftSpan && dashboardData && dashboardData.active_campaign) {
+            const daysRemaining = dashboardData.active_campaign.days_remaining || 0;
+            
+            if (status === 'Active' && daysRemaining >= 0) {
+                if (daysRemaining > 30) {
+                    daysLeftSpan.textContent = `${daysRemaining} days left`;
+                    daysLeftSpan.className = 'ms-2 badge bg-success';
+                } else if (daysRemaining > 7) {
+                    daysLeftSpan.textContent = `${daysRemaining} days left`;
+                    daysLeftSpan.className = 'ms-2 badge bg-warning';
+                } else if (daysRemaining > 0) {
+                    daysLeftSpan.textContent = `${daysRemaining} days left`;
+                    daysLeftSpan.className = 'ms-2 badge bg-danger';
+                } else {
+                    daysLeftSpan.textContent = 'Campaign ended';
+                    daysLeftSpan.className = 'ms-2 badge bg-secondary';
+                }
+                daysLeftSpan.style.display = 'inline';
+            } else {
+                daysLeftSpan.style.display = 'none';
+            }
+        }
+        
         document.getElementById('selectedCampaignDesc').textContent = 
             description || 'No description available';
         
@@ -261,26 +286,6 @@ function updateActiveCampaignBanner(data) {
     if (data.active_campaign && banner && nameSpan && datesSpan) {
         nameSpan.textContent = data.active_campaign.name;
         datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
-        
-        // Update days remaining display
-        const daysLeftSpan = document.getElementById('activeCampaignDaysLeft');
-        if (daysLeftSpan) {
-            const daysRemaining = data.active_campaign.days_remaining || 0;
-            
-            if (daysRemaining > 30) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-success ms-3';
-            } else if (daysRemaining > 7) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-warning ms-3';
-            } else if (daysRemaining > 0) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-danger ms-3';
-            } else {
-                daysLeftSpan.textContent = 'Campaign ended';
-                daysLeftSpan.className = 'badge bg-secondary ms-3';
-            }
-        }
         
         banner.style.display = 'block';
         console.log('Active campaign banner displayed:', data.active_campaign.name);
@@ -1521,26 +1526,6 @@ function updateActiveCampaignBanner(data) {
         nameSpan.textContent = data.active_campaign.name;
         datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
         
-        // Update days remaining display
-        const daysLeftSpan = document.getElementById('activeCampaignDaysLeft');
-        if (daysLeftSpan) {
-            const daysRemaining = data.active_campaign.days_remaining || 0;
-            
-            if (daysRemaining > 30) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-success ms-3';
-            } else if (daysRemaining > 7) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-warning ms-3';
-            } else if (daysRemaining > 0) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-danger ms-3';
-            } else {
-                daysLeftSpan.textContent = 'Campaign ended';
-                daysLeftSpan.className = 'badge bg-secondary ms-3';
-            }
-        }
-        
         banner.style.display = 'block';
         console.log('Active campaign banner displayed:', data.active_campaign.name);
     } else if (banner) {
@@ -2007,26 +1992,6 @@ function updateActiveCampaignBanner(data) {
         nameSpan.textContent = data.active_campaign.name;
         datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
         
-        // Update days remaining display
-        const daysLeftSpan = document.getElementById('activeCampaignDaysLeft');
-        if (daysLeftSpan) {
-            const daysRemaining = data.active_campaign.days_remaining || 0;
-            
-            if (daysRemaining > 30) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-success ms-3';
-            } else if (daysRemaining > 7) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-warning ms-3';
-            } else if (daysRemaining > 0) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-danger ms-3';
-            } else {
-                daysLeftSpan.textContent = 'Campaign ended';
-                daysLeftSpan.className = 'badge bg-secondary ms-3';
-            }
-        }
-        
         banner.style.display = 'block';
         console.log('Active campaign banner displayed:', data.active_campaign.name);
     } else if (banner) {
@@ -2104,26 +2069,6 @@ function updateActiveCampaignBanner(data) {
     if (data.active_campaign && banner && nameSpan && datesSpan) {
         nameSpan.textContent = data.active_campaign.name;
         datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
-        
-        // Update days remaining display
-        const daysLeftSpan = document.getElementById('activeCampaignDaysLeft');
-        if (daysLeftSpan) {
-            const daysRemaining = data.active_campaign.days_remaining || 0;
-            
-            if (daysRemaining > 30) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-success ms-3';
-            } else if (daysRemaining > 7) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-warning ms-3';
-            } else if (daysRemaining > 0) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-danger ms-3';
-            } else {
-                daysLeftSpan.textContent = 'Campaign ended';
-                daysLeftSpan.className = 'badge bg-secondary ms-3';
-            }
-        }
         
         banner.style.display = 'block';
         console.log('Active campaign banner displayed:', data.active_campaign.name);
@@ -2243,26 +2188,6 @@ function updateActiveCampaignBanner(data) {
     if (data.active_campaign && banner && nameSpan && datesSpan) {
         nameSpan.textContent = data.active_campaign.name;
         datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
-        
-        // Update days remaining display
-        const daysLeftSpan = document.getElementById('activeCampaignDaysLeft');
-        if (daysLeftSpan) {
-            const daysRemaining = data.active_campaign.days_remaining || 0;
-            
-            if (daysRemaining > 30) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-success ms-3';
-            } else if (daysRemaining > 7) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-warning ms-3';
-            } else if (daysRemaining > 0) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-danger ms-3';
-            } else {
-                daysLeftSpan.textContent = 'Campaign ended';
-                daysLeftSpan.className = 'badge bg-secondary ms-3';
-            }
-        }
         
         banner.style.display = 'block';
         console.log('Active campaign banner displayed:', data.active_campaign.name);
@@ -2724,26 +2649,6 @@ function updateActiveCampaignBanner(data) {
         nameSpan.textContent = data.active_campaign.name;
         datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
         
-        // Update days remaining display
-        const daysLeftSpan = document.getElementById('activeCampaignDaysLeft');
-        if (daysLeftSpan) {
-            const daysRemaining = data.active_campaign.days_remaining || 0;
-            
-            if (daysRemaining > 30) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-success ms-3';
-            } else if (daysRemaining > 7) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-warning ms-3';
-            } else if (daysRemaining > 0) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-danger ms-3';
-            } else {
-                daysLeftSpan.textContent = 'Campaign ended';
-                daysLeftSpan.className = 'badge bg-secondary ms-3';
-            }
-        }
-        
         banner.style.display = 'block';
         console.log('Active campaign banner displayed:', data.active_campaign.name);
     } else if (banner) {
@@ -2838,26 +2743,6 @@ function updateActiveCampaignBanner(data) {
         nameSpan.textContent = data.active_campaign.name;
         datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
         
-        // Update days remaining display
-        const daysLeftSpan = document.getElementById('activeCampaignDaysLeft');
-        if (daysLeftSpan) {
-            const daysRemaining = data.active_campaign.days_remaining || 0;
-            
-            if (daysRemaining > 30) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-success ms-3';
-            } else if (daysRemaining > 7) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-warning ms-3';
-            } else if (daysRemaining > 0) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-danger ms-3';
-            } else {
-                daysLeftSpan.textContent = 'Campaign ended';
-                daysLeftSpan.className = 'badge bg-secondary ms-3';
-            }
-        }
-        
         banner.style.display = 'block';
         console.log('Active campaign banner displayed:', data.active_campaign.name);
     } else if (banner) {
@@ -2894,26 +2779,6 @@ function updateActiveCampaignBanner(data) {
     if (data.active_campaign && banner && nameSpan && datesSpan) {
         nameSpan.textContent = data.active_campaign.name;
         datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
-        
-        // Update days remaining display
-        const daysLeftSpan = document.getElementById('activeCampaignDaysLeft');
-        if (daysLeftSpan) {
-            const daysRemaining = data.active_campaign.days_remaining || 0;
-            
-            if (daysRemaining > 30) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-success ms-3';
-            } else if (daysRemaining > 7) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-warning ms-3';
-            } else if (daysRemaining > 0) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-danger ms-3';
-            } else {
-                daysLeftSpan.textContent = 'Campaign ended';
-                daysLeftSpan.className = 'badge bg-secondary ms-3';
-            }
-        }
         
         banner.style.display = 'block';
         console.log('Active campaign banner displayed:', data.active_campaign.name);
@@ -2971,26 +2836,6 @@ function updateActiveCampaignBanner(data) {
     if (data.active_campaign && banner && nameSpan && datesSpan) {
         nameSpan.textContent = data.active_campaign.name;
         datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
-        
-        // Update days remaining display
-        const daysLeftSpan = document.getElementById('activeCampaignDaysLeft');
-        if (daysLeftSpan) {
-            const daysRemaining = data.active_campaign.days_remaining || 0;
-            
-            if (daysRemaining > 30) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-success ms-3';
-            } else if (daysRemaining > 7) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-warning ms-3';
-            } else if (daysRemaining > 0) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-danger ms-3';
-            } else {
-                daysLeftSpan.textContent = 'Campaign ended';
-                daysLeftSpan.className = 'badge bg-secondary ms-3';
-            }
-        }
         
         banner.style.display = 'block';
         console.log('Active campaign banner displayed:', data.active_campaign.name);
@@ -3060,26 +2905,6 @@ function updateActiveCampaignBanner(data) {
         nameSpan.textContent = data.active_campaign.name;
         datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
         
-        // Update days remaining display
-        const daysLeftSpan = document.getElementById('activeCampaignDaysLeft');
-        if (daysLeftSpan) {
-            const daysRemaining = data.active_campaign.days_remaining || 0;
-            
-            if (daysRemaining > 30) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-success ms-3';
-            } else if (daysRemaining > 7) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-warning ms-3';
-            } else if (daysRemaining > 0) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-danger ms-3';
-            } else {
-                daysLeftSpan.textContent = 'Campaign ended';
-                daysLeftSpan.className = 'badge bg-secondary ms-3';
-            }
-        }
-        
         banner.style.display = 'block';
         console.log('Active campaign banner displayed:', data.active_campaign.name);
     } else if (banner) {
@@ -3117,26 +2942,6 @@ function updateActiveCampaignBanner(data) {
     if (data.active_campaign && banner && nameSpan && datesSpan) {
         nameSpan.textContent = data.active_campaign.name;
         datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
-        
-        // Update days remaining display
-        const daysLeftSpan = document.getElementById('activeCampaignDaysLeft');
-        if (daysLeftSpan) {
-            const daysRemaining = data.active_campaign.days_remaining || 0;
-            
-            if (daysRemaining > 30) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-success ms-3';
-            } else if (daysRemaining > 7) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-warning ms-3';
-            } else if (daysRemaining > 0) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-danger ms-3';
-            } else {
-                daysLeftSpan.textContent = 'Campaign ended';
-                daysLeftSpan.className = 'badge bg-secondary ms-3';
-            }
-        }
         
         banner.style.display = 'block';
         console.log('Active campaign banner displayed:', data.active_campaign.name);
@@ -3255,26 +3060,6 @@ function updateActiveCampaignBanner(data) {
         nameSpan.textContent = data.active_campaign.name;
         datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
         
-        // Update days remaining display
-        const daysLeftSpan = document.getElementById('activeCampaignDaysLeft');
-        if (daysLeftSpan) {
-            const daysRemaining = data.active_campaign.days_remaining || 0;
-            
-            if (daysRemaining > 30) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-success ms-3';
-            } else if (daysRemaining > 7) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-warning ms-3';
-            } else if (daysRemaining > 0) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-danger ms-3';
-            } else {
-                daysLeftSpan.textContent = 'Campaign ended';
-                daysLeftSpan.className = 'badge bg-secondary ms-3';
-            }
-        }
-        
         banner.style.display = 'block';
         console.log('Active campaign banner displayed:', data.active_campaign.name);
     } else if (banner) {
@@ -3320,26 +3105,6 @@ function updateActiveCampaignBanner(data) {
     if (data.active_campaign && banner && nameSpan && datesSpan) {
         nameSpan.textContent = data.active_campaign.name;
         datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
-        
-        // Update days remaining display
-        const daysLeftSpan = document.getElementById('activeCampaignDaysLeft');
-        if (daysLeftSpan) {
-            const daysRemaining = data.active_campaign.days_remaining || 0;
-            
-            if (daysRemaining > 30) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-success ms-3';
-            } else if (daysRemaining > 7) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-warning ms-3';
-            } else if (daysRemaining > 0) {
-                daysLeftSpan.textContent = `${daysRemaining} days left`;
-                daysLeftSpan.className = 'badge bg-danger ms-3';
-            } else {
-                daysLeftSpan.textContent = 'Campaign ended';
-                daysLeftSpan.className = 'badge bg-secondary ms-3';
-            }
-        }
         
         banner.style.display = 'block';
         console.log('Active campaign banner displayed:', data.active_campaign.name);

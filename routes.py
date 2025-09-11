@@ -619,7 +619,8 @@ def dashboard_data():
                     'name': campaign.name,
                     'status': campaign.status,
                     'start_date': campaign.start_date.isoformat(),
-                    'end_date': campaign.end_date.isoformat()
+                    'end_date': campaign.end_date.isoformat(),
+                    'days_remaining': campaign.days_remaining()
                 }
         
         return jsonify(data)
