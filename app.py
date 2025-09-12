@@ -3,7 +3,7 @@ import logging
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-from flask_wtf.csrf import CSRFProtect
+from flask_wtf.csrf import CSRFProtect, generate_csrf
 from sqlalchemy.orm import DeclarativeBase
 from werkzeug.middleware.proxy_fix import ProxyFix
 from database_config import db_config
@@ -50,6 +50,11 @@ db.init_app(app)
 
 # Initialize CSRF protection
 csrf = CSRFProtect(app)
+
+# Make csrf_token available in all templates
+@app.context_processor
+def inject_csrf():
+    return dict(csrf_token=generate_csrf)
 
 with app.app_context():
     # Import models and routes

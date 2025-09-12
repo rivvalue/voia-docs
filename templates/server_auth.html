@@ -103,6 +103,7 @@
                 <div class="card-body p-5">
                     <!-- Server-side form submission -->
                     <form method="POST" action="{{ url_for('server_auth_generate') }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <div class="mb-4">
                             <!-- Email Banner with Logo -->
                             <div class="row align-items-center mb-4">
