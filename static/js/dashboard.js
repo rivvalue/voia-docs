@@ -320,6 +320,13 @@ function updateActiveCampaignBanner(data) {
 
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', function() {
+    // Only run dashboard JavaScript on dashboard pages
+    if (!document.body.classList.contains('page-dashboard') && 
+        !window.location.pathname.includes('/dashboard')) {
+        console.log('Dashboard JavaScript skipped - not on dashboard page');
+        return;
+    }
+    
     console.log('Dashboard JavaScript loaded and DOM ready');
     
     // Force remove yellow colors immediately
@@ -2819,6 +2826,12 @@ function adminLogout() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Only run dashboard JavaScript on dashboard pages
+    if (!document.body.classList.contains('page-dashboard') && 
+        !window.location.pathname.includes('/dashboard')) {
+        return;
+    }
+    
     checkAdminStatus();
     loadCampaignFilterOptions();
     // Load KPI overview for Executive Summary tab
