@@ -19,8 +19,6 @@ import uuid
 
 logger = logging.getLogger(__name__)
 
-# Debug routes removed for production
-
 def normalize_company_name(company_name):
     """Normalize company name for case-insensitive comparison"""
     if not company_name:
@@ -89,14 +87,10 @@ def ensure_trial_participant(email, name, company_name, campaign_id):
     ).first()
     
     if not campaign_association:
-        # For trial participants (source='trial'), use None for business_account_id
-        # For business participants, use campaign's business_account_id
-        trial_business_account_id = None if participant.source == 'trial' else campaign.business_account_id
-        
         campaign_association = CampaignParticipant(
             campaign_id=campaign_id,
             participant_id=participant.id,
-            business_account_id=trial_business_account_id,
+            business_account_id=campaign.business_account_id,
             status='started'  # Will be updated to 'completed' when survey is submitted
         )
         

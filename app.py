@@ -1,6 +1,6 @@
 import os
 import logging
-from flask import Flask, request
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_wtf.csrf import CSRFProtect, generate_csrf
@@ -54,7 +54,7 @@ csrf = CSRFProtect(app)
 # Make csrf_token available in all templates
 @app.context_processor
 def inject_csrf():
-    return dict(csrf_token=generate_csrf())
+    return dict(csrf_token=generate_csrf)
 
 with app.app_context():
     # Import models and routes
@@ -101,9 +101,6 @@ with app.app_context():
     
     # Start the background task queue for AI processing
     start_task_queue()
-    
-# Production logging can be disabled
-# app.logger.info("Flask app started successfully")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

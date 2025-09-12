@@ -426,5 +426,3 @@ def init_rivvalue_admin_user():
     except Exception as e:
         logger.error(f"Failed to initialize admin user: {e}")
         return False
-
-# Test routes removed for production
