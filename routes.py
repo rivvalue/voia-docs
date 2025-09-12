@@ -314,9 +314,14 @@ def submit_survey_form():
         else:
             nps_category = 'Detractor'
         
-        # Get active campaign for automatic assignment
-        active_campaign = Campaign.get_active_campaign('archelo_group')
-        campaign_id = active_campaign.id if active_campaign else None
+        # Get campaign and association data from session (new system)
+        association_id = session.get('association_id')
+        campaign_id = session.get('campaign_id')
+        
+        # Fallback to active campaign for backward compatibility (old system)
+        if not campaign_id:
+            active_campaign = Campaign.get_active_campaign('archelo_group')
+            campaign_id = active_campaign.id if active_campaign else None
         
         # Create survey response with normalized company name and campaign assignment
         response = SurveyResponse(
@@ -333,11 +338,20 @@ def submit_survey_form():
             improvement_feedback=data.get('improvement_feedback'),
             recommendation_reason=data.get('recommendation_reason'),
             additional_comments=data.get('additional_comments'),
-            campaign_id=campaign_id
+            campaign_id=campaign_id,
+            campaign_participant_id=association_id  # Link to campaign-participant association
         )
         
         db.session.add(response)
         db.session.commit()
+        
+        # Mark association as completed if using new token system
+        if association_id:
+            try:
+                import campaign_participant_token_system
+                campaign_participant_token_system.mark_survey_completed(association_id, response.id)
+            except Exception as e:
+                logger.error(f"Failed to mark association completed: {e}")
         
         # Queue AI analysis
         try:
@@ -461,6 +475,14 @@ def submit_survey():
             )
             db.session.add(response)
         db.session.commit()
+        
+        # Mark association as completed if using new token system
+        if association_id:
+            try:
+                import campaign_participant_token_system
+                campaign_participant_token_system.mark_survey_completed(association_id, response.id)
+            except Exception as e:
+                logger.error(f"Failed to mark association completed: {e}")
         
         # Queue AI analysis for background processing
         try:
@@ -1200,9 +1222,14 @@ def finalize_conversation():
         # Convert conversational data to structured survey format
         structured_data = finalize_ai_conversational_survey(survey_data)
         
-        # Get active campaign for automatic assignment
-        active_campaign = Campaign.get_active_campaign('archelo_group')
-        campaign_id = active_campaign.id if active_campaign else None
+        # Get campaign and association data from session (new system)
+        association_id = session.get('association_id')
+        campaign_id = session.get('campaign_id')
+        
+        # Fallback to active campaign for backward compatibility (old system)
+        if not campaign_id:
+            active_campaign = Campaign.get_active_campaign('archelo_group')
+            campaign_id = active_campaign.id if active_campaign else None
         
         # Check for existing response to update instead of creating duplicate
         existing_response = SurveyResponse.query.filter_by(
@@ -1225,6 +1252,9 @@ def finalize_conversation():
             # Update campaign if there's an active one, otherwise preserve existing
             if campaign_id:
                 existing_response.campaign_id = campaign_id
+            # Update association if available (new system)
+            if association_id:
+                existing_response.campaign_participant_id = association_id
 
             response = existing_response
         else:
@@ -1242,7 +1272,8 @@ def finalize_conversation():
                 improvement_feedback=structured_data.get('improvement_feedback'),
                 recommendation_reason=structured_data.get('recommendation_reason'),
                 additional_comments=structured_data.get('additional_comments'),
-                campaign_id=campaign_id
+                campaign_id=campaign_id,
+                campaign_participant_id=association_id  # Link to campaign-participant association
             )
             db.session.add(response)
         
@@ -1255,6 +1286,11 @@ def finalize_conversation():
             else:
                 response.nps_category = "Detractor"
         db.session.commit()
+        
+        # Mark association as completed if using new token system
+        if association_id:
+            import campaign_participant_token_system
+            campaign_participant_token_system.mark_survey_completed(association_id, response.id)
         
         # Queue AI analysis
         add_analysis_task(response.id)
