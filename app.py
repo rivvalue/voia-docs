@@ -51,10 +51,21 @@ db.init_app(app)
 # Initialize CSRF protection
 csrf = CSRFProtect(app)
 
-# Make csrf_token available in all templates
+# Make csrf_token and business auth state available in all templates
 @app.context_processor
 def inject_csrf():
-    return dict(csrf_token=generate_csrf)
+    from flask import session
+    
+    context = dict(csrf_token=generate_csrf)
+    
+    # Check business authentication state
+    context['is_business_authenticated'] = bool(session.get('business_user_id'))
+    
+    if context['is_business_authenticated']:
+        context['business_user_name'] = session.get('business_account_name', 'User')
+        context['business_account_name'] = session.get('business_account_name')
+    
+    return context
 
 with app.app_context():
     # Import models and routes

@@ -61,12 +61,32 @@
                             </a></li>
                         </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/business/login">Login</a>
+                    <!-- Business Authentication Status -->
+                    {% if is_business_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-2"></i>{{ business_user_name }}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('business_auth.admin_panel') }}">
+                                <i class="fas fa-cog me-2"></i>Admin Panel
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('business_auth.logout') }}">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </a></li>
+                        </ul>
                     </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/business/login">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                        </a>
+                    </li>
+                    {% endif %}
                     
-                    <!-- User Indicator -->
-                    {% if user_email %}
+                    <!-- User Indicator (for survey authentication) -->
+                    {% if user_email and not is_business_authenticated %}
                     <li class="nav-item">
                         <span class="navbar-text ms-3">
                             <i class="fas fa-user-circle me-2 text-success"></i>
