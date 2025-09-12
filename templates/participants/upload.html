@@ -61,7 +61,7 @@
                             <ul class="list-unstyled">
                                 <li><i class="fas fa-dot-circle text-danger me-2"></i><strong>email</strong> - Participant's email address</li>
                                 <li><i class="fas fa-dot-circle text-danger me-2"></i><strong>name</strong> - Participant's full name</li>
-                                <li><i class="fas fa-circle text-muted me-2"></i><strong>company_name</strong> - Optional company name</li>
+                                <li><i class="fas fa-dot-circle text-danger me-2"></i><strong>company_name</strong> - Participant's company name</li>
                             </ul>
                             
                             <div class="mt-3">
@@ -71,7 +71,7 @@
                                         email,name,company_name<br>
                                         john.doe@company.com,John Doe,ABC Corp<br>
                                         jane.smith@startup.io,Jane Smith,Startup Inc<br>
-                                        bob@freelance.com,Bob Johnson,
+                                        bob@freelance.com,Bob Johnson,Freelance Services
                                     </code>
                                 </div>
                             </div>
@@ -88,7 +88,7 @@
                         </div>
                         <div class="card-body">
                             <div class="d-flex align-items-start mb-3">
-                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 30px; height: 30px; font-size: 14px;">
+                                <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 30px; height: 30px; font-size: 14px;">
                                     1
                                 </div>
                                 <div>
@@ -98,7 +98,7 @@
                             </div>
                             
                             <div class="d-flex align-items-start mb-3">
-                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 30px; height: 30px; font-size: 14px;">
+                                <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 30px; height: 30px; font-size: 14px;">
                                     2
                                 </div>
                                 <div>
@@ -108,17 +108,17 @@
                             </div>
                             
                             <div class="d-flex align-items-start mb-3">
-                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 30px; height: 30px; font-size: 14px;">
+                                <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 30px; height: 30px; font-size: 14px;">
                                     3
                                 </div>
                                 <div>
                                     <strong>Token Generation</strong><br>
-                                    <small class="text-muted">Create unique survey links for each participant</small>
+                                    <small class="text-muted">Generate unified tokens for participant access</small>
                                 </div>
                             </div>
                             
                             <div class="d-flex align-items-start">
-                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 30px; height: 30px; font-size: 14px;">
+                                <div class="bg-secondary text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 30px; height: 30px; font-size: 14px;">
                                     4
                                 </div>
                                 <div>
@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Download CSV template
 function downloadTemplate() {
-    const csvContent = 'email,name,company_name\nexample@company.com,John Doe,Example Corp\njane@startup.io,Jane Smith,Startup Inc\nbob@freelance.com,Bob Johnson,';
+    const csvContent = 'email,name,company_name\nexample@company.com,John Doe,Example Corp\njane@startup.io,Jane Smith,Startup Inc\nbob@freelance.com,Bob Johnson,Freelance Services';
     
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);

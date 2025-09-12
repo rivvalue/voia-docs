@@ -170,6 +170,20 @@ def upload_participants():
         stream = io.StringIO(file.stream.read().decode("UTF8"), newline=None)
         csv_reader = csv.DictReader(stream)
         
+        # Validate CSV headers
+        required_columns = {'email', 'name', 'company_name'}
+        if csv_reader.fieldnames is None:
+            flash('CSV file appears to be empty or invalid.', 'error')
+            return redirect(url_for('participants.upload_participants'))
+        
+        actual_columns = set(csv_reader.fieldnames)
+        missing_columns = required_columns - actual_columns
+        
+        if missing_columns:
+            missing_text = ', '.join(missing_columns)
+            flash(f'CSV file is missing required columns: {missing_text}. Required columns are: email, name, company_name', 'error')
+            return redirect(url_for('participants.upload_participants'))
+        
         created_count = 0
         error_count = 0
         errors = []
