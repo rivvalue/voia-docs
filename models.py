@@ -358,6 +358,9 @@ class BusinessAccount(db.Model):
 class Participant(db.Model):
     """Participant model for campaign-based surveys with token authentication"""
     __tablename__ = 'participants'
+    __table_args__ = (
+        db.UniqueConstraint('business_account_id', 'campaign_id', 'email', name='uq_participant_campaign_email'),
+    )
     
     id = db.Column(db.Integer, primary_key=True)
     business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
@@ -375,6 +378,7 @@ class Participant(db.Model):
     status = db.Column(db.String(20), nullable=False, default='invited', index=True)  # invited, started, completed
     
     # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     invited_at = db.Column(db.DateTime, nullable=True, index=True)
     started_at = db.Column(db.DateTime, nullable=True)
     completed_at = db.Column(db.DateTime, nullable=True)
@@ -393,6 +397,7 @@ class Participant(db.Model):
             'company_name': self.company_name,
             'token': self.token,
             'status': self.status,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
             'invited_at': self.invited_at.isoformat() if self.invited_at else None,
             'started_at': self.started_at.isoformat() if self.started_at else None,
             'completed_at': self.completed_at.isoformat() if self.completed_at else None,

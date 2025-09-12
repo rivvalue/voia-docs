@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block title %}Bulk Upload Participants - {{ business_account.name }} - Vocsa{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-upload me-2"></i>Bulk Upload Participants
+                    </h4>
+                    <p class="text-muted mb-0 mt-2">Upload multiple participants to a campaign for {{ business_account.name }}</p>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('participants.upload_participants') }}" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="campaign_id" class="form-label">
+                                        <i class="fas fa-bullhorn me-2"></i>Campaign <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" id="campaign_id" name="campaign_id" required>
+                                        <option value="">Select a campaign...</option>
+                                        {% for campaign in campaigns %}
+                                        <option value="{{ campaign.id }}">
+                                            {{ campaign.name }} 
+                                            {% if campaign.status == 'active' %}
+                                                <span class="badge bg-success">Active</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ campaign.status|title }}</span>
+                                            {% endif %}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="form-text">
+                                        All participants will be added to this campaign
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="csv_file" class="form-label">
+                                        <i class="fas fa-file-csv me-2"></i>CSV File <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="file" class="form-control" id="csv_file" name="csv_file" 
+                                           accept=".csv" required>
+                                    <div class="form-text">
+                                        Upload a CSV file with participant information
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ url_for('participants.list_participants') }}" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left me-2"></i>Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-upload me-2"></i>Upload Participants
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- CSV Format Information -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h6 class="mb-0">
+                                <i class="fas fa-check-circle me-2"></i>Required CSV Format
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-2">Your CSV file must include these columns:</p>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-dot-circle text-danger me-2"></i><strong>email</strong> - Participant's email address</li>
+                                <li><i class="fas fa-dot-circle text-danger me-2"></i><strong>name</strong> - Participant's full name</li>
+                                <li><i class="fas fa-circle text-muted me-2"></i><strong>company_name</strong> - Optional company name</li>
+                            </ul>
+                            
+                            <div class="mt-3">
+                                <strong>Example CSV content:</strong>
+                                <div class="bg-light p-3 mt-2 rounded">
+                                    <code>
+                                        email,name,company_name<br>
+                                        john.doe@company.com,John Doe,ABC Corp<br>
+                                        jane.smith@startup.io,Jane Smith,Startup Inc<br>
+                                        bob@freelance.com,Bob Johnson,
+                                    </code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h6 class="mb-0">
+                                <i class="fas fa-info-circle me-2"></i>Upload Process
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 30px; height: 30px; font-size: 14px;">
+                                    1
+                                </div>
+                                <div>
+                                    <strong>File Validation</strong><br>
+                                    <small class="text-muted">Check CSV format and required columns</small>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 30px; height: 30px; font-size: 14px;">
+                                    2
+                                </div>
+                                <div>
+                                    <strong>Duplicate Check</strong><br>
+                                    <small class="text-muted">Skip participants already in the campaign</small>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 30px; height: 30px; font-size: 14px;">
+                                    3
+                                </div>
+                                <div>
+                                    <strong>Token Generation</strong><br>
+                                    <small class="text-muted">Create unique survey links for each participant</small>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex align-items-start">
+                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center me-3" style="width: 30px; height: 30px; font-size: 14px;">
+                                    4
+                                </div>
+                                <div>
+                                    <strong>Status Report</strong><br>
+                                    <small class="text-muted">Show creation results and any errors</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Download Template -->
+            <div class="card mt-4">
+                <div class="card-body text-center">
+                    <h6><i class="fas fa-download me-2"></i>Need a Template?</h6>
+                    <p class="text-muted mb-3">Download a sample CSV file to get started</p>
+                    <button type="button" class="btn btn-outline-primary" onclick="downloadTemplate()">
+                        <i class="fas fa-file-csv me-2"></i>Download CSV Template
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form handling
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const fileInput = document.getElementById('csv_file');
+    
+    // File upload validation
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                alert('Please select a CSV file.');
+                this.value = '';
+                return;
+            }
+            
+            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+                alert('File size must be less than 5MB.');
+                this.value = '';
+                return;
+            }
+        }
+    });
+    
+    form.addEventListener('submit', function(e) {
+        // Add loading state
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
+        submitBtn.disabled = true;
+    });
+});
+
+// Download CSV template
+function downloadTemplate() {
+    const csvContent = 'email,name,company_name\nexample@company.com,John Doe,Example Corp\njane@startup.io,Jane Smith,Startup Inc\nbob@freelance.com,Bob Johnson,';
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'participants_template.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+}
+</script>
+{% endblock %}

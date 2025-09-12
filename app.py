@@ -3,6 +3,7 @@ import logging
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from flask_wtf.csrf import CSRFProtect
 from sqlalchemy.orm import DeclarativeBase
 from werkzeug.middleware.proxy_fix import ProxyFix
 from database_config import db_config
@@ -47,6 +48,9 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = db_config.get_engine_options()
 # Initialize the app with the extension
 db.init_app(app)
 
+# Initialize CSRF protection
+csrf = CSRFProtect(app)
+
 with app.app_context():
     # Import models and routes
     import models  # noqa: F401
@@ -56,6 +60,10 @@ with app.app_context():
     # Register business authentication blueprint (Phase 2)
     from business_auth_routes import business_auth_bp, init_rivvalue_admin_user
     app.register_blueprint(business_auth_bp)
+    
+    # Register participant management blueprint (Phase 3)
+    from participant_routes import participant_bp
+    app.register_blueprint(participant_bp)
     
     # Initialize Rivvalue admin user (Phase 2)
     try:

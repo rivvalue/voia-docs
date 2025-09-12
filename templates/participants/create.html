@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Add Participant - {{ business_account.name }} - Vocsa{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-user-plus me-2"></i>Add New Participant
+                    </h4>
+                    <p class="text-muted mb-0 mt-2">Add a participant to a campaign for {{ business_account.name }}</p>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('participants.create_participant') }}">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="campaign_id" class="form-label">
+                                        <i class="fas fa-bullhorn me-2"></i>Campaign <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" id="campaign_id" name="campaign_id" required>
+                                        <option value="">Select a campaign...</option>
+                                        {% for campaign in campaigns %}
+                                        <option value="{{ campaign.id }}">
+                                            {{ campaign.name }} 
+                                            {% if campaign.status == 'active' %}
+                                                <span class="badge bg-success">Active</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ campaign.status|title }}</span>
+                                            {% endif %}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="form-text">
+                                        Select the campaign this participant will be invited to
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">
+                                        <i class="fas fa-envelope me-2"></i>Email Address <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                    <div class="form-text">
+                                        Participant's email address for survey invitation
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label">
+                                        <i class="fas fa-user me-2"></i>Full Name <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                    <div class="form-text">
+                                        Participant's full name
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="company_name" class="form-label">
+                                        <i class="fas fa-building me-2"></i>Company Name
+                                    </label>
+                                    <input type="text" class="form-control" id="company_name" name="company_name">
+                                    <div class="form-text">
+                                        Optional: Participant's company or organization
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ url_for('participants.list_participants') }}" class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left me-2"></i>Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-plus me-2"></i>Create Participant
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Information Card -->
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>How It Works
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="text-center mb-3">
+                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <h6 class="mt-2">1. Create</h6>
+                                <small class="text-muted">Add participant details and assign to a campaign</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center mb-3">
+                                <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-link"></i>
+                                </div>
+                                <h6 class="mt-2">2. Generate Token</h6>
+                                <small class="text-muted">Unique survey link is automatically created</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center mb-3">
+                                <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-paper-plane"></i>
+                                </div>
+                                <h6 class="mt-2">3. Send Invitation</h6>
+                                <small class="text-muted">Share the survey link with the participant</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form validation and enhancement
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    form.addEventListener('submit', function(e) {
+        // Add loading state
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating...';
+        submitBtn.disabled = true;
+    });
+    
+    // Auto-format email field
+    const emailField = document.getElementById('email');
+    emailField.addEventListener('blur', function() {
+        this.value = this.value.toLowerCase().trim();
+    });
+    
+    // Auto-format name field
+    const nameField = document.getElementById('name');
+    nameField.addEventListener('blur', function() {
+        // Capitalize first letter of each word
+        this.value = this.value.replace(/\w\S*/g, function(txt) {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        });
+    });
+});
+</script>
+{% endblock %}

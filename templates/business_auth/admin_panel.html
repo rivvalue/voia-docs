@@ -308,9 +308,14 @@
                             <i class="fas fa-bullhorn"></i>
                             Demo Campaigns
                         </h3>
-                        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary btn-admin">
-                            <i class="fas fa-chart-bar me-2"></i>View Analytics
-                        </a>
+                        <div class="btn-group" role="group">
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary btn-admin">
+                                <i class="fas fa-chart-bar me-2"></i>View Analytics
+                            </a>
+                            <a href="{{ url_for('participants.list_participants') }}" class="btn btn-primary btn-admin">
+                                <i class="fas fa-users me-2"></i>Manage Participants
+                            </a>
+                        </div>
                     </div>
                     
                     {% if admin_data.campaigns %}

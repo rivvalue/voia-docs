@@ -1,4 +1,4 @@
-modules = ["python-3.11", "postgresql-16"]
+modules = ["python-3.11", "postgresql-16", "python3"]
 
 [nix]
 channel = "stable-24_05"
@@ -40,6 +40,10 @@ externalPort = 3000
 [[ports]]
 localPort = 42097
 externalPort = 3001
+
+[[ports]]
+localPort = 45025
+externalPort = 3002
 
 [agent]
 integrations = ["python_openai==1.0.0", "styling_replit==1.0.0", "python_database==1.0.0", "python_log_in_with_replit==1.0.0"]
