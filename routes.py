@@ -485,8 +485,14 @@ def submit_survey_form():
 def submit_survey():
     """Handle authenticated survey submission and prevent duplicates"""
     try:
+        # Debug session contents
+        logger.info(f"Session contents: {dict(session)}")
+        logger.info(f"Auth token present: {bool(session.get('auth_token'))}")
+        logger.info(f"Auth email present: {bool(session.get('auth_email'))}")
+        
         # Check if user is authenticated via session
         if not session.get('auth_token'):
+            logger.warning("Missing auth_token in session")
             return jsonify({'error': 'Authentication required', 'code': 'AUTH_ERROR'}), 401
             
         # Accept both JSON and form data
@@ -502,6 +508,7 @@ def submit_survey():
         authenticated_email = session.get('auth_email')
         
         if not authenticated_email:
+            logger.warning("Missing auth_email in session")
             return jsonify({'error': 'Authentication failed'}), 401
         
         # Validate required fields
