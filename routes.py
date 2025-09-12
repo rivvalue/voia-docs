@@ -227,27 +227,35 @@ def survey():
     """Main survey page - check for token in URL"""
     token = request.args.get('token')
     if token:
-        # Verify token and store in session for form submission
-        import simple_token_system
-        verification = simple_token_system.verify_simple_token(token)
+        # Try CampaignParticipant token first (new system)
+        import campaign_participant_token_system
+        verification = campaign_participant_token_system.verify_campaign_participant_token(token)
         if verification.get('valid'):
-            email = verification.get('email')
-            
-            # Allow response updates - don't block existing responses
-            # existing_response = SurveyResponse.query.filter_by(respondent_email=email).first()
-            # if existing_response:
-            #     # Show completion message instead of survey form
-            #     return render_template('survey_completed.html', 
-            #                          email=email,
-            #                          user_email=email,
-            #                          completion_date=existing_response.created_at.strftime("%B %d, %Y"),
-            #                          show_alternatives=True)
-            
+            # Store campaign-participant association data in session
             session['auth_token'] = token
-            session['auth_email'] = email
-            return render_template('survey.html', authenticated=True, email=email, user_email=email)
+            session['auth_email'] = verification.get('email')
+            session['association_id'] = verification.get('association_id')
+            session['campaign_id'] = verification.get('campaign_id')
+            session['participant_id'] = verification.get('participant_id')
+            session['business_account_id'] = verification.get('business_account_id')
+            
+            return render_template('survey.html', authenticated=True, 
+                                 email=verification.get('email'), 
+                                 user_email=verification.get('email'),
+                                 participant_name=verification.get('participant_name'),
+                                 campaign_name=verification.get('campaign_name'))
         else:
-            return render_template('survey.html', authenticated=False, error="Invalid or expired token", user_email=None)
+            # Fallback to simple token system for backward compatibility
+            import simple_token_system
+            fallback_verification = simple_token_system.verify_simple_token(token)
+            if fallback_verification.get('valid'):
+                email = fallback_verification.get('email')
+                session['auth_token'] = token
+                session['auth_email'] = email
+                return render_template('survey.html', authenticated=True, email=email, user_email=email)
+            else:
+                error_msg = verification.get('error', 'Invalid or expired token')
+                return render_template('survey.html', authenticated=False, error=error_msg, user_email=None)
     else:
         # Check if already authenticated via session
         if session.get('auth_token'):
@@ -396,9 +404,14 @@ def submit_survey():
         else:
             nps_category = 'Detractor'
         
-        # Get active campaign for automatic assignment
-        active_campaign = Campaign.get_active_campaign('archelo_group')
-        campaign_id = active_campaign.id if active_campaign else None
+        # Get campaign and association data from session (new system)
+        association_id = session.get('association_id')
+        campaign_id = session.get('campaign_id')
+        
+        # Fallback to active campaign for backward compatibility (old system)
+        if not campaign_id:
+            active_campaign = Campaign.get_active_campaign('archelo_group')
+            campaign_id = active_campaign.id if active_campaign else None
         
         # Check for existing response to update instead of creating duplicate
         existing_response = SurveyResponse.query.filter_by(
@@ -422,6 +435,9 @@ def submit_survey():
             # Update campaign if there's an active one, otherwise preserve existing
             if campaign_id:
                 existing_response.campaign_id = campaign_id
+            # Update association if available (new system)
+            if association_id:
+                existing_response.campaign_participant_id = association_id
 
             response = existing_response
         else:
@@ -440,7 +456,8 @@ def submit_survey():
                 improvement_feedback=data.get('improvement_feedback'),
                 recommendation_reason=data.get('recommendation_reason'),
                 additional_comments=data.get('additional_comments'),
-                campaign_id=campaign_id
+                campaign_id=campaign_id,
+                campaign_participant_id=association_id  # Link to campaign-participant association
             )
             db.session.add(response)
         db.session.commit()
@@ -1032,27 +1049,35 @@ def conversational_survey():
     """AI-powered conversational survey page - check for token in URL"""
     token = request.args.get('token')
     if token:
-        # Verify token and store in session for survey submission
-        import simple_token_system
-        verification = simple_token_system.verify_simple_token(token)
+        # Try CampaignParticipant token first (new system)
+        import campaign_participant_token_system
+        verification = campaign_participant_token_system.verify_campaign_participant_token(token)
         if verification.get('valid'):
-            email = verification.get('email')
-            
-            # Allow response updates - don't block existing responses
-            # existing_response = SurveyResponse.query.filter_by(respondent_email=email).first()
-            # if existing_response:
-            #     # Show completion message instead of survey form
-            #     return render_template('conversational_survey_completed.html', 
-            #                          email=email,
-            #                          user_email=email,
-            #                          completion_date=existing_response.created_at.strftime("%B %d, %Y"),
-            #                          show_alternatives=True)
-            
+            # Store campaign-participant association data in session
             session['auth_token'] = token
-            session['auth_email'] = email
-            return render_template('conversational_survey.html', authenticated=True, email=email, user_email=email)
+            session['auth_email'] = verification.get('email')
+            session['association_id'] = verification.get('association_id')
+            session['campaign_id'] = verification.get('campaign_id')
+            session['participant_id'] = verification.get('participant_id')
+            session['business_account_id'] = verification.get('business_account_id')
+            
+            return render_template('conversational_survey.html', authenticated=True, 
+                                 email=verification.get('email'), 
+                                 user_email=verification.get('email'),
+                                 participant_name=verification.get('participant_name'),
+                                 campaign_name=verification.get('campaign_name'))
         else:
-            return render_template('conversational_survey.html', authenticated=False, error="Invalid or expired token", user_email=None)
+            # Fallback to simple token system for backward compatibility
+            import simple_token_system
+            fallback_verification = simple_token_system.verify_simple_token(token)
+            if fallback_verification.get('valid'):
+                email = fallback_verification.get('email')
+                session['auth_token'] = token
+                session['auth_email'] = email
+                return render_template('conversational_survey.html', authenticated=True, email=email, user_email=email)
+            else:
+                error_msg = verification.get('error', 'Invalid or expired token')
+                return render_template('conversational_survey.html', authenticated=False, error=error_msg, user_email=None)
     else:
         # Check if already authenticated via session
         if session.get('auth_token'):

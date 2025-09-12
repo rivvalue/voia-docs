@@ -43,6 +43,10 @@ class SurveyResponse(db.Model):
     
     # Campaign tracking
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=True, index=True)
+    
+    # Foreign key to CampaignParticipant for proper association tracking
+    campaign_participant_id = db.Column(db.Integer, db.ForeignKey('campaign_participants.id'), nullable=True, index=True)
+    
     campaign = db.relationship('Campaign', backref=db.backref('responses', lazy='dynamic'))
     campaign_participant = db.relationship('CampaignParticipant', foreign_keys='SurveyResponse.campaign_participant_id', backref='survey_responses')
     
