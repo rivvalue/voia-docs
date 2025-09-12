@@ -426,3 +426,14 @@ def init_rivvalue_admin_user():
     except Exception as e:
         logger.error(f"Failed to initialize admin user: {e}")
         return False
+
+# Simple test route to check if business auth is working in production
+@business_auth_bp.route('/test')
+def test():
+    """Simple test route to verify business auth is accessible"""
+    return f"""
+    <h1>Business Auth Test Route Working!</h1>
+    <p>If you can see this, the business auth routes are accessible.</p>
+    <p><a href="/business/login">Go to Login Page</a></p>
+    <p>Admin user in database: {BusinessAccountUser.get_by_email('7amdoulilah@rivvalue.com') is not None}</p>
+    """
