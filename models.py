@@ -127,7 +127,7 @@ class Campaign(db.Model):
             'business_account_name': self.business_account.name if self.business_account else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'completed_at': self.completed_at.isoformat() if self.completed_at else None,
-            'response_count': self.responses.count(),
+            'response_count': len([r for r in SurveyResponse.query.filter_by(campaign_id=self.id).all()]),
             'is_active': self.is_active(),
             'days_remaining': self.days_remaining(),
             'days_since_ended': self.days_since_ended()
@@ -475,6 +475,16 @@ class BusinessAccountUser(UserMixin, db.Model):
     def update_last_login(self):
         """Update last login timestamp"""
         self.last_login_at = datetime.utcnow()
+    
+    @property
+    def is_authenticated(self):
+        """Override UserMixin property"""
+        return True
+    
+    @property  
+    def is_anonymous(self):
+        """Override UserMixin property"""
+        return False
     
     def get_full_name(self):
         """Get full name"""
