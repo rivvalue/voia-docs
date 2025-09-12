@@ -19,22 +19,7 @@ import uuid
 
 logger = logging.getLogger(__name__)
 
-@app.route('/debug/routes')
-def debug_routes():
-    """Debug route to list all registered routes"""
-    rules = []
-    for rule in app.url_map.iter_rules():
-        methods = ','.join(rule.methods)
-        rules.append(f"{rule.endpoint}: {rule.rule} [{methods}]")
-    
-    rules_html = '<br>'.join(rules)
-    return f"""
-    <h1>Registered Routes Debug</h1>
-    <p>All routes registered in the application:</p>
-    <div style="font-family: monospace; font-size: 12px;">
-    {rules_html}
-    </div>
-    """
+# Debug routes removed for production
 
 def normalize_company_name(company_name):
     """Normalize company name for case-insensitive comparison"""
