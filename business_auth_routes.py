@@ -249,6 +249,12 @@ def admin_panel():
                 Campaign.business_account_id == business_account.id
             ).count()
             
+            # Add participant count for demo account
+            from models import Participant
+            total_participants = Participant.query.filter_by(
+                business_account_id=business_account.id
+            ).count()
+            
             admin_data = {
                 'account_type': 'demo',
                 'campaigns': [c.to_dict() for c in campaigns],
@@ -256,6 +262,7 @@ def admin_panel():
                 'stats': {
                     'total_responses': total_responses,
                     'total_campaigns': total_campaigns,
+                    'total_participants': total_participants,
                     'active_campaigns': len([c for c in campaigns if c.is_active()])
                 }
             }
