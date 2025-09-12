@@ -431,9 +431,17 @@ def init_rivvalue_admin_user():
 @business_auth_bp.route('/test')
 def test():
     """Simple test route to verify business auth is accessible"""
-    return f"""
-    <h1>Business Auth Test Route Working!</h1>
-    <p>If you can see this, the business auth routes are accessible.</p>
-    <p><a href="/business/login">Go to Login Page</a></p>
-    <p>Admin user in database: {BusinessAccountUser.get_by_email('7amdoulilah@rivvalue.com') is not None}</p>
-    """
+    logger.info("Business auth test route accessed")
+    try:
+        user_exists = BusinessAccountUser.get_by_email('7amdoulilah@rivvalue.com') is not None
+        logger.info(f"Admin user check: {user_exists}")
+        return f"""
+        <h1>Business Auth Test Route Working!</h1>
+        <p>If you can see this, the business auth routes are accessible.</p>
+        <p><a href="/business/login">Go to Login Page</a></p>
+        <p>Admin user in database: {user_exists}</p>
+        <p>Blueprint registered successfully!</p>
+        """
+    except Exception as e:
+        logger.error(f"Error in test route: {e}")
+        return f"Error: {e}"
