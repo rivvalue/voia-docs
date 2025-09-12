@@ -483,8 +483,8 @@ class BusinessAccountUser(UserMixin, db.Model):
     def has_permission(self, permission):
         """Check if user has specific permission"""
         role_permissions = {
-            'admin': ['view', 'create', 'edit', 'delete', 'manage_users', 'export_data'],
-            'manager': ['view', 'create', 'edit', 'export_data'],
+            'admin': ['view', 'create', 'edit', 'delete', 'manage_users', 'export_data', 'manage_participants'],
+            'manager': ['view', 'create', 'edit', 'export_data', 'manage_participants'],
             'viewer': ['view']
         }
         return permission in role_permissions.get(self.role, [])

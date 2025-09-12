@@ -15,6 +15,97 @@ business_auth_bp = Blueprint('business_auth', __name__, url_prefix='/business')
 
 logger = logging.getLogger(__name__)
 
+# ==== TENANT SCOPING HELPERS (PHASE 2.5 MINIMAL ACCOUNT MANAGEMENT) ====
+
+def current_tenant_id():
+    """Get current business account ID from session"""
+    return session.get('business_account_id')
+
+def get_current_business_account():
+    """Get current BusinessAccount object from session"""
+    business_account_id = current_tenant_id()
+    if not business_account_id:
+        return None
+    return BusinessAccount.query.get(business_account_id)
+
+def require_business_auth(f):
+    """Decorator to ensure valid business authentication with active account"""
+    from functools import wraps
+    
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Check if user is authenticated
+        business_user_id = session.get('business_user_id')
+        if not business_user_id:
+            if request.is_json:
+                return jsonify({'error': 'Business authentication required'}), 401
+            flash('Please log in to access this page.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get current business account
+        current_account = get_current_business_account()
+        if not current_account:
+            if request.is_json:
+                return jsonify({'error': 'Invalid session'}), 401
+            flash('Invalid session. Please log in again.', 'error')
+            session.clear()
+            return redirect(url_for('business_auth.login'))
+        
+        # Check account status
+        if current_account.status != 'active':
+            if current_account.status == 'suspended':
+                if request.is_json:
+                    return jsonify({'error': 'Account suspended'}), 403
+                flash('Your account has been suspended. Please contact support.', 'error')
+            elif current_account.status == 'trial':
+                if not request.is_json:
+                    flash('Your account is in trial mode.', 'info')
+            else:
+                if request.is_json:
+                    return jsonify({'error': 'Account not active'}), 403
+                flash('Your account is not active. Please contact support.', 'error')
+            
+            # For suspended/inactive accounts, block access
+            if current_account.status in ['suspended', 'inactive', 'closed']:
+                if request.is_json:
+                    return jsonify({'error': 'Account access blocked', 'status': current_account.status}), 403
+                return render_template('business_auth/account_status.html', 
+                                     account_status=current_account.status)
+        
+        return f(*args, **kwargs)
+    
+    return decorated_function
+
+def require_permission(permission):
+    """Decorator to check user permissions"""
+    from functools import wraps
+    
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            # First ensure business auth - check manually since we can't call decorator
+            business_user_id = session.get('business_user_id')
+            if not business_user_id:
+                flash('Please log in to access this page.', 'error')
+                return redirect(url_for('business_auth.login'))
+            
+            current_account = get_current_business_account()
+            if not current_account or current_account.status != 'active':
+                flash('Please log in to access this page.', 'error')
+                return redirect(url_for('business_auth.login'))
+            
+            # Get current user
+            business_user_id = session.get('business_user_id')
+            current_user = BusinessAccountUser.query.get(business_user_id)
+            
+            if not current_user or not current_user.has_permission(permission):
+                flash('You do not have permission to access this page.', 'error')
+                return redirect(url_for('business_auth.admin_panel'))
+            
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
 
 @business_auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -118,12 +209,9 @@ def logout():
 
 
 @business_auth_bp.route('/admin')
+@require_permission('manage_participants')
 def admin_panel():
     """Admin panel for Rivvalue demo campaign management"""
-    # Check business account authentication
-    if not is_business_authenticated():
-        flash('Please log in to access the admin panel.', 'error')
-        return redirect(url_for('business_auth.login'))
     
     try:
         # Get current business account context
@@ -148,14 +236,18 @@ def admin_panel():
                 business_account_id=business_account.id
             ).order_by(Campaign.created_at.desc()).limit(5).all()
             
-            # Get recent demo responses
-            recent_responses = SurveyResponse.query.filter(
-                SurveyResponse.campaign_id.isnot(None)
+            # Get recent demo responses (properly scoped to business account)
+            recent_responses = SurveyResponse.query.join(Campaign).filter(
+                Campaign.business_account_id == business_account.id
             ).order_by(SurveyResponse.created_at.desc()).limit(10).all()
             
-            # Basic stats for demo account
-            total_responses = SurveyResponse.query.count()
-            total_campaigns = Campaign.query.count()
+            # Basic stats for demo account (properly scoped to business account)
+            total_responses = SurveyResponse.query.join(Campaign).filter(
+                Campaign.business_account_id == business_account.id
+            ).count()
+            total_campaigns = Campaign.query.filter(
+                Campaign.business_account_id == business_account.id
+            ).count()
             
             admin_data = {
                 'account_type': 'demo',
@@ -191,14 +283,10 @@ def admin_panel():
 
 
 @business_auth_bp.route('/api/session-status')
+@require_business_auth
 def session_status():
     """Check business account session status"""
     try:
-        if not is_business_authenticated():
-            return jsonify({
-                'authenticated': False,
-                'message': 'Not authenticated'
-            })
         
         session_id = session.get('business_session_id')
         user_session = UserSession.get_active_session(session_id)
@@ -247,20 +335,6 @@ def is_business_authenticated():
     return True
 
 
-def require_business_auth():
-    """Decorator to require business account authentication"""
-    def decorator(f):
-        def decorated_function(*args, **kwargs):
-            if not is_business_authenticated():
-                if request.is_json:
-                    return jsonify({'error': 'Business authentication required'}), 401
-                else:
-                    flash('Please log in to access this page.', 'error')
-                    return redirect(url_for('business_auth.login'))
-            return f(*args, **kwargs)
-        decorated_function.__name__ = f.__name__
-        return decorated_function
-    return decorator
 
 
 def get_current_business_user():
@@ -272,26 +346,15 @@ def get_current_business_user():
     return BusinessAccountUser.query.get(user_id)
 
 
-def get_current_business_account():
-    """Get current business account"""
-    if not is_business_authenticated():
-        return None
-    
-    account_id = session.get('business_account_id')
-    return BusinessAccount.query.get(account_id)
 
 
 # Session cleanup utility
 @business_auth_bp.route('/api/cleanup-sessions', methods=['POST'])
+@require_permission('manage_users')
 def cleanup_expired_sessions():
     """Clean up expired sessions (admin only)"""
-    if not is_business_authenticated():
-        return jsonify({'error': 'Authentication required'}), 401
     
-    # Only allow admin users to cleanup sessions
-    current_user = get_current_business_user()
-    if not current_user or not current_user.has_permission('manage_users'):
-        return jsonify({'error': 'Admin access required'}), 403
+    # Permission already checked by decorator
     
     try:
         cleaned_count = UserSession.cleanup_expired_sessions()
@@ -334,7 +397,18 @@ def init_rivvalue_admin_user():
             is_active=True,
             email_verified=True
         )
-        admin_user.set_password('admin123')  # Default password - should be changed
+        # Generate secure temporary password
+        import secrets
+        import string
+        temp_password = ''.join(secrets.choice(string.ascii_letters + string.digits + '!@#$%^&*') for _ in range(16))
+        admin_user.set_password(temp_password)
+        
+        # Log that admin user was created (without exposing password)
+        logger.info(f"SECURITY: Admin user {admin_email} created with secure temporary password. Use admin panel to reset password.")
+        
+        # Store password securely in environment or secure storage for admin access
+        # For development: password should be retrieved through secure admin interface
+        print(f"\n=== ADMIN USER CREATED ===\nEmail: {admin_email}\nTemporary Password: {temp_password}\nPlease change immediately via admin panel!\n==========================\n")
         
         db.session.add(admin_user)
         db.session.commit()
