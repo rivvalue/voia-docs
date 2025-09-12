@@ -1399,6 +1399,31 @@ def finalize_conversation():
                 campaign_id=campaign_id,
                 campaign_participant_id=association_id  # Link to campaign-participant association
             )
+            
+            # Ensure trial participant exists and is associated with campaign
+            if campaign_id and not association_id:
+                # This is a trial user completing via public conversational survey - create participant record
+                try:
+                    participant, campaign_association = ensure_trial_participant(
+                        email=authenticated_email,
+                        name=structured_data.get('respondent_name'),
+                        company_name=structured_data.get('company_name'),
+                        campaign_id=campaign_id
+                    )
+                    
+                    # Link response to the campaign participant association
+                    response.campaign_participant_id = campaign_association.id
+                    
+                    # Mark association as completed
+                    campaign_association.status = 'completed'
+                    campaign_association.completed_at = datetime.utcnow()
+                    
+                    logger.info(f"Trial participant created and linked (conversational): {participant.email} -> campaign {campaign_id}")
+                    
+                except Exception as e:
+                    logger.error(f"Failed to create trial participant (conversational): {e}")
+                    # Continue without participant linkage to maintain backward compatibility
+            
             db.session.add(response)
         
         # Calculate NPS category
