@@ -1,10 +1,10 @@
 # Voice of Client Agent - AWS Deployment Guide
 
 ## Overview
-A production-ready customer feedback platform featuring **Vocsa**, an advanced conversational AI assistant. Supports both traditional NPS surveys and natural language conversations, with comprehensive AI-powered analysis and secure authentication for 500+ concurrent users.
+A production-ready customer feedback platform featuring **VOÏA**, an advanced conversational AI assistant. Supports both traditional NPS surveys and natural language conversations, with comprehensive AI-powered analysis and secure authentication for 500+ concurrent users.
 
 ## Features
-- **Vocsa Conversational AI**: Natural language surveys with intelligent conversation flow
+- **VOÏA Conversational AI**: Natural language surveys with intelligent conversation flow
 - **Traditional NPS Surveys**: Multi-step forms with progressive disclosure
 - **Complete Rating System**: Professional services, product value, pricing, and support ratings
 - **Business Relationship Analysis**: Tenure tracking and growth factor analysis

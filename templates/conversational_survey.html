@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}AI Survey - Vocsa - Voice Of Client Agent{% endblock %}
+{% block title %}AI Survey - VOÏA - Voice Of Client Agent{% endblock %}
 
 {% block page_class %}page-conversational{% endblock %}
 
@@ -14,8 +14,8 @@
                 <div class="card-header text-center">
                     <img src="{{ url_for('static', filename='rivvalue-logo.png') }}" alt="Rivvalue Inc." height="50" class="mb-3">
                     <h4>AI Powered Client Insights</h4>
-                    <p class="text-muted">Have a natural conversation with Vocsa to share your feedback</p>
-                    <p style="color: #E13A44; font-size: 1.1rem; font-weight: 500;"><em>Vocsa: Hear what matters. Act on what counts.</em></p>
+                    <p class="text-muted">Have a natural conversation with VOÏA to share your feedback</p>
+                    <p style="color: #E13A44; font-size: 1.1rem; font-weight: 500;"><em>VOÏA: Hear what matters. Act on what counts.</em></p>
                 </div>
             </div>
 
@@ -84,7 +84,7 @@
             <!-- Conversation Interface -->
             <div id="conversationInterface" class="card" style="display: none;">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5><i class="fas fa-robot me-2"></i>Vocsa</h5>
+                    <h5><i class="fas fa-robot me-2"></i>VOÏA</h5>
                     <div class="progress" style="width: 200px;">
                         <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
                              role="progressbar" style="width: 0%"></div>
@@ -108,7 +108,7 @@
                         </div>
                         <div class="form-text">
                             <i class="fas fa-lightbulb me-1"></i>
-                            Tip: Speak naturally! Vocsa understands conversational responses.
+                            Tip: Speak naturally! VOÏA understands conversational responses.
                         </div>
                     </div>
                 </div>
@@ -120,8 +120,8 @@
                     <div class="spinner-border text-primary mb-3" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
-                    <h5>Vocsa is processing your response...</h5>
-                    <p class="text-muted">Please wait while Vocsa analyzes your feedback</p>
+                    <h5>VOÏA is processing your response...</h5>
+                    <p class="text-muted">Please wait while VOÏA analyzes your feedback</p>
                 </div>
             </div>
 
@@ -132,7 +132,7 @@
                         <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
                     </div>
                     <h4 class="text-success mb-3">Thank you for sharing with us your feedback.</h4>
-                    <p class="lead mb-2">Your feedback has been successfully analyzed by Vocsa Intelligence.</p>
+                    <p class="lead mb-2">Your feedback has been successfully analyzed by VOÏA Intelligence.</p>
                     
                     <!-- Dashboard Button -->
                     <div class="mb-4">
@@ -153,10 +153,10 @@
                                 <button onclick="startNewSession()" class="btn btn-outline-primary btn-lg w-100">
                                     <i class="fas fa-redo me-2"></i>Try Another Session
                                 </button>
-                                <small class="text-muted d-block mt-2">Experience Vocsa with different scenarios</small>
+                                <small class="text-muted d-block mt-2">Experience VOÏA with different scenarios</small>
                             </div>
                             <div class="col-md-6">
-                                <a href="mailto:info@rivvalue.com?subject=Voice of Client Agent - Full Service Inquiry&body=Hi Rivvalue team,%0A%0AI just completed the Vocsa Intelligence demonstration and I'm interested in learning more about implementing the full Voice of Client Agent service for my organization.%0A%0APlease contact me to discuss how this can benefit our customer feedback strategy.%0A%0AThank you!" 
+                                <a href="mailto:info@rivvalue.com?subject=Voice of Client Agent - Full Service Inquiry&body=Hi Rivvalue team,%0A%0AI just completed the VOÏA Intelligence demonstration and I'm interested in learning more about implementing the full Voice of Client Agent service for my organization.%0A%0APlease contact me to discuss how this can benefit our customer feedback strategy.%0A%0AThank you!" 
                                    class="btn btn-primary btn-lg w-100">
                                     <i class="fas fa-envelope me-2"></i>Contact Rivvalue
                                 </a>
