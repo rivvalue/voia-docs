@@ -44,7 +44,7 @@ class SurveyResponse(db.Model):
     # Campaign tracking
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=True, index=True)
     campaign = db.relationship('Campaign', backref=db.backref('responses', lazy='dynamic'))
-    campaign_participant = db.relationship('CampaignParticipant', backref='survey_responses')
+    campaign_participant = db.relationship('CampaignParticipant', foreign_keys='SurveyResponse.campaign_participant_id', backref='survey_responses')
     
     # Metadata
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)

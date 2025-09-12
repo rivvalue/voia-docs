@@ -5,7 +5,7 @@ Provides CRUD operations for campaign participants with proper tenant scoping
 
 from flask import Blueprint, request, render_template, redirect, url_for, flash, jsonify
 from business_auth_routes import require_business_auth, require_permission, current_tenant_id, get_current_business_account
-from models import Participant, Campaign, BusinessAccount, db
+from models import Participant, Campaign, BusinessAccount, CampaignParticipant, db
 from datetime import datetime
 import logging
 import csv
@@ -303,3 +303,181 @@ def regenerate_token(participant_id):
         flash('Error regenerating token.', 'error')
     
     return redirect(url_for('participants.list_participants'))
+
+
+# ==============================================================================
+# CAMPAIGN-PARTICIPANT ASSOCIATION MANAGEMENT ROUTES
+# ==============================================================================
+
+@participant_bp.route('/campaigns/<int:campaign_id>/participants', methods=['GET', 'POST'])
+@require_business_auth
+@require_permission('manage_participants')
+def manage_campaign_participants(campaign_id):
+    """Manage participants for a specific campaign"""
+    
+    try:
+        current_account = get_current_business_account()
+        if not current_account or not current_account.id:
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get campaign (scoped to current business account)
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            flash('Campaign not found.', 'error')
+            return redirect(url_for('participants.list_participants'))
+        
+        if request.method == 'GET':
+            # Get current campaign participants
+            campaign_participants = CampaignParticipant.query.filter_by(
+                campaign_id=campaign_id,
+                business_account_id=current_account.id
+            ).all()
+            
+            # Get all available participants not in this campaign
+            assigned_participant_ids = [cp.participant_id for cp in campaign_participants]
+            available_participants = Participant.query.filter(
+                Participant.business_account_id == current_account.id,
+                ~Participant.id.in_(assigned_participant_ids) if assigned_participant_ids else True
+            ).order_by(Participant.name).all()
+            
+            # Prepare data for template
+            current_participants = []
+            for cp in campaign_participants:
+                participant_data = cp.participant.to_dict() if cp.participant else {}
+                participant_data.update({
+                    'association_id': cp.id,
+                    'token': cp.token,
+                    'status': cp.status,
+                    'invited_at': cp.invited_at.isoformat() if cp.invited_at else None,
+                    'started_at': cp.started_at.isoformat() if cp.started_at else None,
+                    'completed_at': cp.completed_at.isoformat() if cp.completed_at else None
+                })
+                current_participants.append(participant_data)
+            
+            return render_template('participants/campaign_participants.html',
+                                 campaign=campaign.to_dict(),
+                                 current_participants=current_participants,
+                                 available_participants=[p.to_dict() for p in available_participants],
+                                 business_account=current_account.to_dict())
+        
+        # Handle POST - Add participants to campaign
+        if request.method == 'POST':
+            # Validate campaign status - can only add participants if campaign is draft or ready
+            if campaign.status not in ['draft', 'ready']:
+                flash(f'Cannot add participants to {campaign.status} campaign. Campaign must be draft or ready.', 'error')
+                return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+            
+            participant_ids = request.form.getlist('participant_ids')
+            if not participant_ids:
+                flash('No participants selected.', 'error')
+                return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+            
+            added_count = 0
+            for participant_id in participant_ids:
+                try:
+                    # Verify participant exists and belongs to current business account
+                    participant = Participant.query.filter_by(
+                        id=int(participant_id),
+                        business_account_id=current_account.id
+                    ).first()
+                    
+                    if not participant:
+                        continue
+                    
+                    # Check if association already exists
+                    existing = CampaignParticipant.query.filter_by(
+                        campaign_id=campaign_id,
+                        participant_id=participant_id
+                    ).first()
+                    
+                    if existing:
+                        continue
+                    
+                    # Create campaign-participant association with token
+                    association = CampaignParticipant(
+                        campaign_id=campaign_id,
+                        participant_id=participant_id,
+                        business_account_id=current_account.id,
+                        token=str(uuid.uuid4()),
+                        status='pending'
+                    )
+                    
+                    db.session.add(association)
+                    added_count += 1
+                    
+                except ValueError:
+                    continue
+            
+            db.session.commit()
+            
+            if added_count > 0:
+                flash(f'Added {added_count} participant(s) to campaign {campaign.name}.', 'success')
+                logger.info(f"Added {added_count} participants to campaign {campaign.name} (ID: {campaign_id})")
+            else:
+                flash('No new participants were added.', 'warning')
+            
+            return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+            
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error managing campaign participants for campaign {campaign_id}: {e}")
+        flash('Error managing campaign participants.', 'error')
+        return redirect(url_for('participants.list_participants'))
+
+
+@participant_bp.route('/campaigns/<int:campaign_id>/participants/<int:association_id>/remove', methods=['POST'])
+@require_business_auth
+@require_permission('manage_participants')
+def remove_campaign_participant(campaign_id, association_id):
+    """Remove participant from campaign"""
+    
+    try:
+        current_account = get_current_business_account()
+        if not current_account or not current_account.id:
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('participants.list_participants'))
+        
+        # Get campaign (scoped to current business account)
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            flash('Campaign not found.', 'error')
+            return redirect(url_for('participants.list_participants'))
+        
+        # Validate campaign status - can only remove participants if campaign is not active
+        if campaign.status == 'active':
+            flash(f'Cannot remove participants from active campaign. Please wait until campaign is completed.', 'error')
+            return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+        
+        # Get association (scoped to current business account)
+        association = CampaignParticipant.query.filter_by(
+            id=association_id,
+            campaign_id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not association:
+            flash('Participant association not found.', 'error')
+            return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+        
+        participant_name = association.participant.name if association.participant else 'Unknown'
+        db.session.delete(association)
+        db.session.commit()
+        
+        logger.info(f"Removed participant {participant_name} from campaign {campaign.name} (ID: {campaign_id})")
+        flash(f'Removed {participant_name} from campaign {campaign.name}.', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error removing participant from campaign {campaign_id}: {e}")
+        flash('Error removing participant from campaign.', 'error')
+    
+    return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
