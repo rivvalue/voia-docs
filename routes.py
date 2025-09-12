@@ -26,6 +26,81 @@ def normalize_company_name(company_name):
     # Convert to title case for consistent display (first letter caps, rest lowercase)
     return company_name.strip().title()
 
+def ensure_trial_participant(email, name, company_name, campaign_id):
+    """
+    Ensure a trial participant exists and is associated with the campaign.
+    Creates participant with source='trial' if not exists, ensures campaign association.
+    Returns (participant, campaign_participant_association)
+    """
+    from models import Participant, CampaignParticipant, Campaign
+    from sqlalchemy import func
+    
+    # Normalize inputs
+    email = email.strip().lower()
+    company_name = normalize_company_name(company_name) if company_name else None
+    name = name.strip() if name else email.split('@')[0]
+    
+    # Get campaign to check business_account_id
+    campaign = Campaign.query.get(campaign_id)
+    if not campaign:
+        raise ValueError(f"Campaign {campaign_id} not found")
+    
+    # Look for existing participant by email (case-insensitive)
+    existing_participant = Participant.query.filter(
+        func.lower(Participant.email) == email
+    ).first()
+    
+    if existing_participant:
+        # Use existing participant if business_account_id matches campaign or participant is trial user
+        if (existing_participant.business_account_id == campaign.business_account_id or 
+            existing_participant.business_account_id is None):
+            participant = existing_participant
+        else:
+            # Different business context - create new trial participant
+            participant = None
+    else:
+        participant = None
+    
+    # Create new trial participant if needed
+    if not participant:
+        participant = Participant(
+            email=email,
+            name=name,
+            company_name=company_name,
+            source='trial',
+            business_account_id=None,  # Trial users have NULL business_account_id
+            status='invited'
+        )
+        
+        # Generate unique token for participant
+        participant.generate_token()
+        
+        db.session.add(participant)
+        db.session.flush()  # Get the participant ID
+        
+        logger.info(f"Created trial participant: {email} (ID: {participant.id})")
+    
+    # Ensure campaign association exists
+    campaign_association = CampaignParticipant.query.filter_by(
+        campaign_id=campaign_id,
+        participant_id=participant.id
+    ).first()
+    
+    if not campaign_association:
+        campaign_association = CampaignParticipant(
+            campaign_id=campaign_id,
+            participant_id=participant.id,
+            business_account_id=campaign.business_account_id,
+            status='started'  # Will be updated to 'completed' when survey is submitted
+        )
+        
+        db.session.add(campaign_association)
+        db.session.flush()  # Get the association ID
+        
+        logger.info(f"Created campaign association: participant {participant.id} -> campaign {campaign_id}")
+    
+    return participant, campaign_association
+
 @app.route('/')
 def index():
     """Landing page with survey overview"""
