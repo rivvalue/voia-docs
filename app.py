@@ -54,7 +54,7 @@ csrf = CSRFProtect(app)
 # Make csrf_token available in all templates
 @app.context_processor
 def inject_csrf():
-    return dict(csrf_token=generate_csrf)
+    return dict(csrf_token=generate_csrf())
 
 with app.app_context():
     # Import models and routes
