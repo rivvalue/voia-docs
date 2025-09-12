@@ -44,6 +44,7 @@ class SurveyResponse(db.Model):
     # Campaign tracking
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=True, index=True)
     campaign = db.relationship('Campaign', backref=db.backref('responses', lazy='dynamic'))
+    campaign_participant = db.relationship('CampaignParticipant', backref='survey_responses')
     
     # Metadata
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
@@ -383,11 +384,15 @@ class Participant(db.Model):
     __tablename__ = 'participants'
     __table_args__ = (
         db.UniqueConstraint('business_account_id', 'email', name='uq_participant_business_email'),
+        db.Index('idx_participant_business_email', 'business_account_id', 'email'),
     )
     
     id = db.Column(db.Integer, primary_key=True)
     business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=True, index=True)  # Now optional for decoupled management
+    
+    # Foreign key to CampaignParticipant for proper association tracking
+    campaign_participant_id = db.Column(db.Integer, db.ForeignKey('campaign_participants.id'), nullable=True, index=True)
     
     # Participant information
     email = db.Column(db.String(200), nullable=False, index=True)
@@ -444,6 +449,9 @@ class CampaignParticipant(db.Model):
     __tablename__ = 'campaign_participants'
     __table_args__ = (
         db.UniqueConstraint('campaign_id', 'participant_id', name='uq_campaign_participant'),
+        db.Index('idx_campaign_participant', 'campaign_id', 'participant_id'),
+        db.Index('idx_campaign_participant_token', 'token'),
+        db.Index('idx_campaign_participant_business', 'business_account_id'),
     )
     
     id = db.Column(db.Integer, primary_key=True)
@@ -465,7 +473,7 @@ class CampaignParticipant(db.Model):
     
     # Relationships
     campaign = db.relationship('Campaign', backref='campaign_participants')
-    participant = db.relationship('Participant', backref='campaign_participations')
+    participant = db.relationship('Participant', foreign_keys='CampaignParticipant.participant_id', backref='campaign_participations')
     business_account = db.relationship('BusinessAccount', backref='campaign_participants')
     
     def to_dict(self):
