@@ -102,7 +102,7 @@ class Campaign(db.Model):
     description = db.Column(db.Text, nullable=True)
     start_date = db.Column(db.Date, nullable=False, index=True)
     end_date = db.Column(db.Date, nullable=False, index=True)
-    status = db.Column(db.String(20), nullable=False, default='active', index=True)  # active, completed
+    status = db.Column(db.String(20), nullable=False, default='draft', index=True)  # draft, ready, active, completed
     
     # Client tracking (for future multi-client support)
     client_identifier = db.Column(db.String(200), nullable=False, default='archelo_group', index=True)
@@ -135,11 +135,19 @@ class Campaign(db.Model):
         }
     
     def is_active(self):
-        """Check if campaign is currently active (within date range and not completed)"""
-        if self.status != 'active':
+        """Check if campaign is currently active"""
+        return self.status == 'active'
+    
+    def is_ready_for_activation(self):
+        """Check if campaign can be activated (has participants and description)"""
+        if self.status != 'ready':
             return False
         today = date.today()
-        return self.start_date <= today <= self.end_date
+        return self.start_date == today and self.description and len(self.participants) > 0
+    
+    def can_modify_participants(self):
+        """Check if participants can be modified (only when not active)"""
+        return self.status in ['draft', 'ready']
     
     def days_remaining(self):
         """Calculate days remaining in campaign"""
@@ -163,6 +171,20 @@ class Campaign(db.Model):
         """Mark campaign as completed"""
         self.status = 'completed'
         self.completed_at = datetime.utcnow()
+    
+    def mark_ready(self):
+        """Mark campaign as ready for activation"""
+        if self.status == 'draft' and self.description and len(self.participants) > 0:
+            self.status = 'ready'
+            return True
+        return False
+    
+    def activate(self):
+        """Activate campaign if conditions are met"""
+        if self.status == 'ready' and not Campaign.get_active_campaign():
+            self.status = 'active'
+            return True
+        return False
     
     @staticmethod
     def get_active_campaign(client_identifier='archelo_group'):
@@ -360,12 +382,12 @@ class Participant(db.Model):
     """Participant model for campaign-based surveys with token authentication"""
     __tablename__ = 'participants'
     __table_args__ = (
-        db.UniqueConstraint('business_account_id', 'campaign_id', 'email', name='uq_participant_campaign_email'),
+        db.UniqueConstraint('business_account_id', 'email', name='uq_participant_business_email'),
     )
     
     id = db.Column(db.Integer, primary_key=True)
     business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
-    campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=False, index=True)
+    campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=True, index=True)  # Now optional for decoupled management
     
     # Participant information
     email = db.Column(db.String(200), nullable=False, index=True)
@@ -386,7 +408,7 @@ class Participant(db.Model):
     
     # Relationships
     business_account = db.relationship('BusinessAccount', backref='participants')
-    campaign = db.relationship('Campaign', backref='participants')
+    campaign = db.relationship('Campaign', backref='participants')  # Optional relationship now
     
     def to_dict(self):
         return {
@@ -417,6 +439,75 @@ class Participant(db.Model):
         return self.status == 'completed' and self.completed_at is not None
 
 
+class CampaignParticipant(db.Model):
+    """Association model for campaign-participant relationships with individual tokens"""
+    __tablename__ = 'campaign_participants'
+    __table_args__ = (
+        db.UniqueConstraint('campaign_id', 'participant_id', name='uq_campaign_participant'),
+    )
+    
+    id = db.Column(db.Integer, primary_key=True)
+    campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=False, index=True)
+    participant_id = db.Column(db.Integer, db.ForeignKey('participants.id'), nullable=False, index=True)
+    business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
+    
+    # Token authentication (unique per campaign-participant pair)
+    token = db.Column(db.String(255), nullable=True, unique=True, index=True)
+    
+    # Status tracking per campaign
+    status = db.Column(db.String(20), nullable=False, default='invited', index=True)  # invited, started, completed
+    
+    # Timestamps per campaign-participant relationship
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    invited_at = db.Column(db.DateTime, nullable=True, index=True)
+    started_at = db.Column(db.DateTime, nullable=True)
+    completed_at = db.Column(db.DateTime, nullable=True)
+    
+    # Relationships
+    campaign = db.relationship('Campaign', backref='campaign_participants')
+    participant = db.relationship('Participant', backref='campaign_participations')
+    business_account = db.relationship('BusinessAccount', backref='campaign_participants')
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'campaign_id': self.campaign_id,
+            'participant_id': self.participant_id,
+            'business_account_id': self.business_account_id,
+            'token': self.token,
+            'status': self.status,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'invited_at': self.invited_at.isoformat() if self.invited_at else None,
+            'started_at': self.started_at.isoformat() if self.started_at else None,
+            'completed_at': self.completed_at.isoformat() if self.completed_at else None,
+            'campaign_name': self.campaign.name if self.campaign else None,
+            'participant_email': self.participant.email if self.participant else None,
+            'participant_name': self.participant.name if self.participant else None
+        }
+    
+    def generate_token(self):
+        """Generate a unique token for this campaign-participant association"""
+        import uuid
+        self.token = str(uuid.uuid4())
+        return self.token
+    
+    def is_completed(self):
+        """Check if this campaign-participant assignment is completed"""
+        return self.status == 'completed' and self.completed_at is not None
+    
+    def mark_started(self):
+        """Mark participant as started for this campaign"""
+        if self.status == 'invited':
+            self.status = 'started'
+            self.started_at = datetime.utcnow()
+    
+    def mark_completed(self):
+        """Mark participant as completed for this campaign"""
+        if self.status in ['invited', 'started']:
+            self.status = 'completed'
+            self.completed_at = datetime.utcnow()
+
+
 # ==== PHASE 2: BUSINESS ACCOUNT AUTHENTICATION MODELS ====
 
 class BusinessAccountUser(UserMixin, db.Model):
@@ -436,7 +527,7 @@ class BusinessAccountUser(UserMixin, db.Model):
     
     # User role and permissions
     role = db.Column(db.String(50), nullable=False, default='admin', index=True)  # admin, viewer, manager
-    active_status = db.Column(db.Boolean, nullable=False, default=True, index=True)
+    is_active = db.Column(db.Boolean, nullable=False, default=True, index=True)  # TODO: Rename to avoid UserMixin conflict in future migration
     
     # Email verification
     email_verified = db.Column(db.Boolean, nullable=False, default=False)
