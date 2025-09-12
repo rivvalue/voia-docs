@@ -159,6 +159,7 @@
                                             <form method="POST" 
                                                   action="{{ url_for('participants.regenerate_token', participant_id=participant.id) }}" 
                                                   class="d-inline">
+                                                {{ csrf_token() }}
                                                 <button type="submit" class="btn btn-outline-warning btn-sm" 
                                                         title="Regenerate Token"
                                                         onclick="return confirm('Regenerate token for {{ participant.name }}?')">
@@ -169,6 +170,7 @@
                                             <form method="POST" 
                                                   action="{{ url_for('participants.delete_participant', participant_id=participant.id) }}" 
                                                   class="d-inline">
+                                                {{ csrf_token() }}
                                                 <button type="submit" class="btn btn-outline-danger btn-sm" 
                                                         title="Delete Participant"
                                                         onclick="return confirm('Delete {{ participant.name }}? This cannot be undone.')">
