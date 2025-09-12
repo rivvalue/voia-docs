@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Add Participant - {{ business_account.name }} - Vocsa{% endblock %}
+{% block title %}Add Participant - {{ business_account.name }} - VOÏA{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
@@ -11,36 +11,12 @@
                     <h4 class="mb-0">
                         <i class="fas fa-user-plus me-2"></i>Add New Participant
                     </h4>
-                    <p class="text-muted mb-0 mt-2">Add a participant to a campaign for {{ business_account.name }}</p>
+                    <p class="text-muted mb-0 mt-2">Add a new participant to {{ business_account.name }} - you can assign them to campaigns later</p>
                 </div>
                 <div class="card-body">
                     <form method="POST" action="{{ url_for('participants.create_participant') }}">
                         {{ csrf_token() }}
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="campaign_id" class="form-label">
-                                        <i class="fas fa-bullhorn me-2"></i>Campaign <span class="text-danger">*</span>
-                                    </label>
-                                    <select class="form-select" id="campaign_id" name="campaign_id" required>
-                                        <option value="">Select a campaign...</option>
-                                        {% for campaign in campaigns %}
-                                        <option value="{{ campaign.id }}">
-                                            {{ campaign.name }} 
-                                            {% if campaign.status == 'active' %}
-                                                <span class="badge bg-success">Active</span>
-                                            {% else %}
-                                                <span class="badge bg-secondary">{{ campaign.status|title }}</span>
-                                            {% endif %}
-                                        </option>
-                                        {% endfor %}
-                                    </select>
-                                    <div class="form-text">
-                                        Select the campaign this participant will be invited to
-                                    </div>
-                                </div>
-                            </div>
-                            
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="email" class="form-label">
