@@ -152,11 +152,15 @@ function submitSurvey() {
         additional_comments: document.getElementById('additionalComments').value.trim() || null
     };
     
+    // Get CSRF token from the form
+    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+    
     // Submit to server with session-based authentication
     fetch('/submit_survey', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
         },
         body: JSON.stringify(formData)
     })
