@@ -249,6 +249,16 @@ def delete_participant(participant_id):
             flash('Participant not found.', 'error')
             return redirect(url_for('participants.list_participants'))
         
+        # Check for existing campaign associations (prevent FK constraint violations)
+        existing_associations = CampaignParticipant.query.filter_by(participant_id=participant_id).all()
+        
+        if existing_associations:
+            # Show which campaigns they're associated with
+            campaign_names = [assoc.campaign.name for assoc in existing_associations]
+            campaigns_text = ', '.join(campaign_names)
+            flash(f'Cannot delete participant {participant.name} - they are associated with campaigns: {campaigns_text}. Remove from campaigns first.', 'error')
+            return redirect(url_for('participants.list_participants'))
+        
         participant_name = participant.name
         db.session.delete(participant)
         db.session.commit()
