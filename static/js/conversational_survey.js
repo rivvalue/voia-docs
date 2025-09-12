@@ -103,7 +103,13 @@ function startConversation() {
     console.log('Form values:', {companyName, respondentName, respondentEmail, tenureWithFc});
     
     if (!companyName || !respondentName || !respondentEmail || !tenureWithFc) {
-        alert('Please fill in all required fields.');
+        // Show error in UI instead of alert
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'alert alert-danger mt-3';
+        errorDiv.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Please fill in all required fields.';
+        const form = document.getElementById('setupForm');
+        form.appendChild(errorDiv);
+        setTimeout(() => errorDiv.remove(), 4000);
         return;
     }
     
@@ -118,11 +124,15 @@ function startConversation() {
     // Show loading state
     showLoadingState();
     
+    // Get CSRF token
+    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+    
     // Start conversation with AI
     fetch('/api/start_conversation', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
             // No Authorization header needed - server uses session
         },
         body: JSON.stringify({
@@ -157,8 +167,14 @@ function startConversation() {
     })
     .catch(error => {
         console.error('Error starting conversation:', error);
-        alert('Error starting conversation: ' + error.message);
+        // Show error in UI instead of alert
         showSurveySetup();
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'alert alert-danger mt-3';
+        errorDiv.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Error starting conversation: ' + error.message;
+        const form = document.getElementById('setupForm');
+        form.appendChild(errorDiv);
+        setTimeout(() => errorDiv.remove(), 4000);
     });
 }
 
@@ -179,11 +195,15 @@ function sendMessage() {
     // Show loading state
     showTypingIndicator();
     
+    // Get CSRF token
+    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+    
     // Send message to AI
     fetch('/api/conversation_response', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
             // No Authorization header needed - server uses session
         },
         body: JSON.stringify({
@@ -474,12 +494,16 @@ function finalizeSurvey() {
     // Show loading state
     showLoadingState();
     
+    // Get CSRF token
+    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+    
     // Finalize survey
     fetch('/api/finalize_conversation', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + conversationState.authToken
+            'Authorization': 'Bearer ' + conversationState.authToken,
+            'X-CSRFToken': csrfToken
         },
         body: JSON.stringify({
             conversation_id: conversationState.conversationId,

@@ -45,6 +45,7 @@
                 </div>
                 <div class="card-body">
                     <form id="setupForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <div class="mb-3">
                             <label for="companyName" class="form-label">Company Name</label>
                             <input type="text" class="form-control" id="companyName" required 
