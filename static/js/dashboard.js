@@ -3405,6 +3405,9 @@ function switchPrimarySection(section) {
     if (section === "insights") {
         const insightsSection = document.getElementById("insightsSection");
         if (insightsSection) insightsSection.classList.remove("d-none");
+        // Also show the insights secondary nav specifically
+        const insightsSecondaryNav = document.getElementById("insightsSecondaryNav");
+        if (insightsSecondaryNav) insightsSecondaryNav.classList.remove("d-none");
     } else {
         // Hide insights section when not in insights
         const insightsSection = document.getElementById("insightsSection");
