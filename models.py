@@ -480,7 +480,6 @@ class CampaignParticipant(db.Model):
     __table_args__ = (
         db.UniqueConstraint('campaign_id', 'participant_id', name='uq_campaign_participant'),
         db.Index('idx_campaign_participant', 'campaign_id', 'participant_id'),
-        db.Index('idx_campaign_participant_token', 'token'),
         db.Index('idx_campaign_participant_business', 'business_account_id'),
     )
     
@@ -489,8 +488,7 @@ class CampaignParticipant(db.Model):
     participant_id = db.Column(db.Integer, db.ForeignKey('participants.id'), nullable=False, index=True)
     business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
     
-    # Token authentication (unique per campaign-participant pair)
-    token = db.Column(db.String(255), nullable=True, unique=True, index=True)
+    # Note: Using unified token system - tokens stored at participant level, not per campaign association
     
     # Status tracking per campaign
     status = db.Column(db.String(20), nullable=False, default='invited', index=True)  # invited, started, completed
@@ -512,7 +510,7 @@ class CampaignParticipant(db.Model):
             'campaign_id': self.campaign_id,
             'participant_id': self.participant_id,
             'business_account_id': self.business_account_id,
-            'token': self.token,
+            'participant_token': self.participant.token if self.participant else None,  # Reference unified token
             'status': self.status,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'invited_at': self.invited_at.isoformat() if self.invited_at else None,
@@ -520,7 +518,8 @@ class CampaignParticipant(db.Model):
             'completed_at': self.completed_at.isoformat() if self.completed_at else None,
             'campaign_name': self.campaign.name if self.campaign else None,
             'participant_email': self.participant.email if self.participant else None,
-            'participant_name': self.participant.name if self.participant else None
+            'participant_name': self.participant.name if self.participant else None,
+            'participant_source': self.participant.source if self.participant else None  # Include origin tracking
         }
     
     def generate_token(self):

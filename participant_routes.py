@@ -420,14 +420,14 @@ def manage_campaign_participants(campaign_id):
                     if existing:
                         continue
                     
-                    # Create campaign-participant association with token
+                    # Create campaign-participant association (no separate token - uses participant's unified token)
                     association = CampaignParticipant(
                         campaign_id=campaign_id,
                         participant_id=participant_id,
                         business_account_id=current_account.id,
-                        token=str(uuid.uuid4()),
-                        status='pending'
+                        status='invited'  # Campaign-specific status tracking
                     )
+                    # Note: Using unified token system - no separate campaign tokens needed
                     
                     db.session.add(association)
                     added_count += 1
