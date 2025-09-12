@@ -20,6 +20,7 @@
                 </div>
 
                 <form id="surveyForm" method="POST" action="/submit_survey_form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <!-- Step 1: Basic Information -->
                     <div class="survey-step" id="step1">
                         <h5 class="mb-3">Basic Information</h5>
