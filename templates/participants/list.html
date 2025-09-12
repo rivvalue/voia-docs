@@ -157,7 +157,7 @@
                                     <td>
                                         <small class="text-muted">
                                             {% if participant.created_at %}
-                                                {{ moment(participant.created_at).format('MMM D, YYYY') }}
+                                                {{ participant.created_at.strftime('%b %d, %Y') }}
                                             {% else %}
                                                 -
                                             {% endif %}
