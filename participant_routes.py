@@ -101,14 +101,20 @@ def create_participant():
             flash(f'Participant with email {email} already exists in your account.', 'error')
             return redirect(url_for('participants.create_participant'))
         
-        # Create participant (campaign-independent)
+        # Create participant with origin tracking and unified token system
         participant = Participant(
             business_account_id=current_account.id,
             email=email,
             name=name,
-            company_name=company_name if company_name else None
+            company_name=company_name if company_name else None,
+            source='admin_single'  # Track that this was admin-created via single form
         )
-        # Note: No token or status - these will be managed per campaign association
+        
+        # Generate unified token for seamless UX
+        participant.generate_token()
+        
+        # Set appropriate status for business context
+        participant.set_appropriate_status_for_context(is_trial=False)
         
         db.session.add(participant)
         db.session.commit()
@@ -190,14 +196,20 @@ def upload_participants():
                     error_count += 1
                     continue
                 
-                # Create participant (campaign-independent)
+                # Create participant with origin tracking and unified token system
                 participant = Participant(
                     business_account_id=current_account.id,
                     email=email,
                     name=name,
-                    company_name=company_name if company_name else None
+                    company_name=company_name if company_name else None,
+                    source='admin_bulk'  # Track that this was admin-created via bulk upload
                 )
-                # Note: No token or status - these will be managed per campaign association
+                
+                # Generate unified token for seamless UX
+                participant.generate_token()
+                
+                # Set appropriate status for business context
+                participant.set_appropriate_status_for_context(is_trial=False)
                 db.session.add(participant)
                 created_count += 1
                 

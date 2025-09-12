@@ -384,15 +384,16 @@ class BusinessAccount(db.Model):
 
 
 class Participant(db.Model):
-    """Participant model for campaign-based surveys with token authentication"""
+    """Participant model for campaign-based surveys with token authentication and origin tracking"""
     __tablename__ = 'participants'
     __table_args__ = (
         db.UniqueConstraint('business_account_id', 'email', name='uq_participant_business_email'),
         db.Index('idx_participant_business_email', 'business_account_id', 'email'),
+        db.Index('idx_participant_source', 'source'),
     )
     
     id = db.Column(db.Integer, primary_key=True)
-    business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
+    business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=True, index=True)  # NULL for trial users
     # Note: No direct campaign relationship - associations managed via CampaignParticipant table
     
     # Participant information
@@ -400,11 +401,14 @@ class Participant(db.Model):
     name = db.Column(db.String(200), nullable=False)
     company_name = db.Column(db.String(200), nullable=True)
     
-    # Token authentication
+    # Origin tracking for management visibility
+    source = db.Column(db.String(20), nullable=False, default='trial', index=True)  # 'trial', 'admin_single', 'admin_bulk'
+    
+    # Token authentication (unified token system)
     token = db.Column(db.String(255), nullable=True, unique=True, index=True)  # UUID token for survey access
     
-    # Status tracking
-    status = db.Column(db.String(20), nullable=False, default='invited', index=True)  # invited, started, completed
+    # Status tracking (context-dependent)
+    status = db.Column(db.String(20), nullable=False, default='invited', index=True)  # invited, started, completed, created
     
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
@@ -423,13 +427,16 @@ class Participant(db.Model):
             'email': self.email,
             'name': self.name,
             'company_name': self.company_name,
+            'source': self.source,
             'token': self.token,
             'status': self.status,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'invited_at': self.invited_at.isoformat() if self.invited_at else None,
             'started_at': self.started_at.isoformat() if self.started_at else None,
             'completed_at': self.completed_at.isoformat() if self.completed_at else None,
-            'business_account_name': self.business_account.name if self.business_account else None
+            'business_account_name': self.business_account.name if self.business_account else None,
+            'is_trial_user': self.is_trial_user(),
+            'origin_badge': self.get_origin_badge()
         }
     
     def generate_token(self):
@@ -441,6 +448,30 @@ class Participant(db.Model):
     def is_completed(self):
         """Check if participant has completed the survey"""
         return self.status == 'completed' and self.completed_at is not None
+    
+    def is_trial_user(self):
+        """Check if participant is a trial user"""
+        return self.source == 'trial'
+    
+    def is_admin_created(self):
+        """Check if participant was created by admin"""
+        return self.source in ['admin_single', 'admin_bulk']
+    
+    def get_origin_badge(self):
+        """Get display badge for participant origin"""
+        origin_badges = {
+            'trial': {'text': 'Trial User', 'class': 'badge-info'},
+            'admin_single': {'text': 'Admin Created', 'class': 'badge-success'},
+            'admin_bulk': {'text': 'Bulk Upload', 'class': 'badge-warning'}
+        }
+        return origin_badges.get(self.source, {'text': 'Unknown', 'class': 'badge-secondary'})
+    
+    def set_appropriate_status_for_context(self, is_trial=False):
+        """Set appropriate status based on creation context"""
+        if is_trial:
+            self.status = 'invited'  # Trial users are immediately invited
+        else:
+            self.status = 'created'   # Business participants are created but not campaign-specific yet
 
 
 class CampaignParticipant(db.Model):
