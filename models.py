@@ -1,5 +1,6 @@
 from app import db
 from datetime import datetime, date, timedelta
+from sqlalchemy import or_, and_
 import json
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
@@ -435,7 +436,7 @@ class BusinessAccountUser(UserMixin, db.Model):
     
     # User role and permissions
     role = db.Column(db.String(50), nullable=False, default='admin', index=True)  # admin, viewer, manager
-    is_active = db.Column(db.Boolean, nullable=False, default=True, index=True)
+    active_status = db.Column(db.Boolean, nullable=False, default=True, index=True)
     
     # Email verification
     email_verified = db.Column(db.Boolean, nullable=False, default=False)
@@ -635,7 +636,7 @@ class UserSession(db.Model):
         
         if active_only:
             query = query.filter(
-                UserSession.is_active == True,
+                UserSession.is_active.is_(True),
                 UserSession.expires_at > datetime.utcnow()
             )
         
