@@ -115,12 +115,16 @@ def login():
         return render_template('business_auth/login.html')
     
     # Handle login submission
+    logger.info(f"LOGIN ATTEMPT: {request.method} from {request.remote_addr}")
     try:
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
         remember_me = request.form.get('remember_me') == 'on'
         
+        logger.info(f"Email: {email}, Password provided: {bool(password)}")
+        
         if not email or not password:
+            logger.warning("Missing email or password")
             flash('Email and password are required', 'error')
             return render_template('business_auth/login.html')
         
