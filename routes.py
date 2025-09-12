@@ -89,10 +89,14 @@ def ensure_trial_participant(email, name, company_name, campaign_id):
     ).first()
     
     if not campaign_association:
+        # For trial participants (source='trial'), use None for business_account_id
+        # For business participants, use campaign's business_account_id
+        trial_business_account_id = None if participant.source == 'trial' else campaign.business_account_id
+        
         campaign_association = CampaignParticipant(
             campaign_id=campaign_id,
             participant_id=participant.id,
-            business_account_id=campaign.business_account_id,
+            business_account_id=trial_business_account_id,
             status='started'  # Will be updated to 'completed' when survey is submitted
         )
         
@@ -485,14 +489,8 @@ def submit_survey_form():
 def submit_survey():
     """Handle authenticated survey submission and prevent duplicates"""
     try:
-        # Debug session contents
-        logger.info(f"Session contents: {dict(session)}")
-        logger.info(f"Auth token present: {bool(session.get('auth_token'))}")
-        logger.info(f"Auth email present: {bool(session.get('auth_email'))}")
-        
         # Check if user is authenticated via session
         if not session.get('auth_token'):
-            logger.warning("Missing auth_token in session")
             return jsonify({'error': 'Authentication required', 'code': 'AUTH_ERROR'}), 401
             
         # Accept both JSON and form data
@@ -508,7 +506,6 @@ def submit_survey():
         authenticated_email = session.get('auth_email')
         
         if not authenticated_email:
-            logger.warning("Missing auth_email in session")
             return jsonify({'error': 'Authentication failed'}), 401
         
         # Validate required fields
