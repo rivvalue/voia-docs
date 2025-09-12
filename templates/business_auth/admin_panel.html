@@ -126,16 +126,17 @@
 }
 
 .campaign-item, .response-item {
-    padding: 1rem;
-    border: 1px solid #e3e6f0;
-    border-radius: 10px;
-    margin-bottom: 1rem;
+    padding: var(--spacing-lg);
+    border: 1px solid var(--light-gray);
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--spacing-lg);
     transition: all 0.3s ease;
+    background: var(--primary-white);
 }
 
 .campaign-item:hover, .response-item:hover {
-    border-color: #4e73df;
-    background-color: #f8f9fc;
+    border-color: var(--primary-red);
+    background-color: var(--light-gray);
 }
 
 .campaign-status {
@@ -147,13 +148,13 @@
 }
 
 .status-active {
-    background-color: #d1ecf1;
-    color: #0c5460;
+    background-color: var(--red-light);
+    color: var(--primary-red);
 }
 
 .status-completed {
-    background-color: #d4edda;
-    color: #155724;
+    background-color: var(--light-gray);
+    color: var(--primary-black);
 }
 
 .btn-admin {
@@ -177,15 +178,15 @@
 }
 
 .account-demo {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeaa7;
+    background-color: var(--red-light);
+    color: var(--primary-red);
+    border: 1px solid var(--primary-red);
 }
 
 .account-customer {
-    background-color: #d1ecf1;
-    color: #0c5460;
-    border: 1px solid #bee5eb;
+    background-color: var(--light-gray);
+    color: var(--primary-black);
+    border: 1px solid var(--medium-gray);
 }
 
 .quick-actions {
@@ -196,27 +197,29 @@
 }
 
 .quick-action-btn {
-    padding: 1rem;
-    border: 2px solid #e3e6f0;
-    border-radius: 10px;
-    background: white;
-    color: #2c3e50;
+    padding: var(--spacing-lg);
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-xl);
+    background: var(--primary-white);
+    color: var(--primary-black);
     text-decoration: none;
     transition: all 0.3s ease;
     text-align: center;
+    font-family: var(--font-family-base);
 }
 
 .quick-action-btn:hover {
-    border-color: #4e73df;
-    background-color: #f8f9fc;
-    color: #4e73df;
+    border-color: var(--primary-red);
+    background-color: var(--red-light);
+    color: var(--primary-red);
     transform: translateY(-2px);
 }
 
 .empty-state {
     text-align: center;
-    padding: 3rem 1rem;
-    color: #6c757d;
+    padding: var(--spacing-3xl) var(--spacing-lg);
+    color: var(--gray-dark);
+    font-family: var(--font-family-base);
 }
 
 .empty-state i {
