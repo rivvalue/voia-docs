@@ -2,6 +2,7 @@ from flask import render_template, request, jsonify, flash, redirect, url_for, g
 from app import app, db
 from models import SurveyResponse, Campaign
 from data_storage import get_dashboard_data
+from sqlalchemy.orm import joinedload
 
 # Root route already exists - removed duplicate
 from models_auth import AuthToken
@@ -636,7 +637,9 @@ def survey_responses():
         page = request.args.get('page', 1, type=int)
         per_page = min(request.args.get('per_page', 10, type=int), 100)  # Max 100 per page
         
-        pagination = SurveyResponse.query.order_by(
+        pagination = SurveyResponse.query.options(
+            joinedload(SurveyResponse.campaign)
+        ).order_by(
             SurveyResponse.created_at.desc()
         ).paginate(
             page=page, 
@@ -665,7 +668,9 @@ def survey_responses():
 def export_data():
     """Export survey data as JSON - Admin access required"""
     try:
-        responses = SurveyResponse.query.all()
+        responses = SurveyResponse.query.options(
+            joinedload(SurveyResponse.campaign)
+        ).all()
         data = [response.to_dict() for response in responses]
         
         # Log admin access
@@ -1289,7 +1294,9 @@ def export_user_data():
             }), 400
         
         # Query only responses from this specific user
-        user_responses = SurveyResponse.query.filter_by(
+        user_responses = SurveyResponse.query.options(
+            joinedload(SurveyResponse.campaign)
+        ).filter_by(
             respondent_email=user_email
         ).all()
         

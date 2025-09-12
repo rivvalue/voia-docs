@@ -15,7 +15,7 @@ OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 openai_client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
 
 def analyze_survey_response(response_id):
-    """Perform comprehensive AI analysis on a survey response"""
+    """Perform comprehensive AI analysis on a survey response with consolidated OpenAI call"""
     try:
         response = SurveyResponse.query.get(response_id)
         if not response:
@@ -32,33 +32,25 @@ def analyze_survey_response(response_id):
         
         combined_text = " ".join(text_content)
         
-        # Perform sentiment analysis
-        sentiment_data = analyze_sentiment(combined_text)
+        # Perform consolidated AI analysis (single OpenAI call instead of 5)
+        if combined_text.strip() and openai_client:
+            analysis_results = perform_consolidated_ai_analysis(response, combined_text)
+        else:
+            # Fallback for empty text or no OpenAI client
+            analysis_results = perform_fallback_analysis(response, combined_text)
         
-        # Extract key themes
-        themes = extract_key_themes(combined_text, response.nps_score)
-        
-        # Assess churn risk
-        churn_analysis = assess_churn_risk(response, combined_text)
-        
-        # Identify growth opportunities
-        growth_opportunities = identify_growth_opportunities(response, combined_text)
-        
-        # Identify account risk factors
-        account_risk_factors = identify_account_risk_factors(response, combined_text)
-        
-        # Calculate growth factor based on NPS
+        # Calculate growth factor based on NPS (no OpenAI call needed)
         growth_factor_data = calculate_growth_factor(response.nps_score)
         
         # Update the response with analysis results
-        response.sentiment_score = sentiment_data['score']
-        response.sentiment_label = sentiment_data['label']
-        response.key_themes = json.dumps(themes)
-        response.churn_risk_score = churn_analysis['risk_score']
-        response.churn_risk_level = churn_analysis['risk_level']
-        response.churn_risk_factors = json.dumps(churn_analysis['risk_factors'])
-        response.growth_opportunities = json.dumps(growth_opportunities)
-        response.account_risk_factors = json.dumps(account_risk_factors)
+        response.sentiment_score = analysis_results['sentiment']['score']
+        response.sentiment_label = analysis_results['sentiment']['label']
+        response.key_themes = json.dumps(analysis_results['themes'])
+        response.churn_risk_score = analysis_results['churn']['risk_score']
+        response.churn_risk_level = analysis_results['churn']['risk_level']
+        response.churn_risk_factors = json.dumps(analysis_results['churn']['risk_factors'])
+        response.growth_opportunities = json.dumps(analysis_results['growth_opportunities'])
+        response.account_risk_factors = json.dumps(analysis_results['account_risk_factors'])
         response.growth_factor = growth_factor_data['growth_factor']
         response.growth_rate = growth_factor_data['growth_rate']
         response.growth_range = growth_factor_data['range']
@@ -72,6 +64,250 @@ def analyze_survey_response(response_id):
     except Exception as e:
         logger.error(f"Error analyzing response {response_id}: {e}")
         return False
+
+def perform_consolidated_ai_analysis(response, combined_text):
+    """Perform all AI analysis in a single OpenAI call for maximum efficiency"""
+    try:
+        # Build comprehensive context about the response
+        response_context = {
+            'nps_score': response.nps_score,
+            'satisfaction_rating': response.satisfaction_rating,
+            'service_rating': response.service_rating,
+            'product_value_rating': response.product_value_rating,
+            'pricing_rating': response.pricing_rating,
+            'company_name': response.company_name,
+            'tenure': response.tenure_with_fc
+        }
+        
+        # Create consolidated prompt that handles all analysis types
+        consolidated_prompt = f"""You are a comprehensive customer feedback analysis expert. Analyze this customer feedback and provide a complete analysis covering all aspects below.
+
+CUSTOMER FEEDBACK: "{combined_text}"
+
+CONTEXT:
+- NPS Score: {response.nps_score}/10
+- Company: {response.company_name}
+- Tenure: {response.tenure_with_fc}
+- Satisfaction Rating: {response.satisfaction_rating}/5
+- Service Rating: {response.service_rating}/5  
+- Product Value Rating: {response.product_value_rating}/5
+- Pricing Rating: {response.pricing_rating}/5
+
+ANALYSIS REQUIREMENTS:
+Provide a comprehensive JSON response with the following analysis:
+
+1. SENTIMENT ANALYSIS:
+   - score: float from -1.0 (very negative) to 1.0 (very positive)
+   - label: "positive", "negative", or "neutral"
+
+2. KEY THEMES:
+   - Array of themes found in feedback
+   - Each theme should have: theme name, sentiment
+   - Focus on product, service, pricing, support, quality, features
+
+3. CHURN RISK ASSESSMENT:
+   - risk_level: "Minimal", "Low", "Medium", or "High"  
+   - risk_score: integer 0-10
+   - risk_factors: array of specific risk indicators found
+
+4. GROWTH OPPORTUNITIES:
+   - Array of genuine growth opportunities (upsell, cross-sell, expansion)
+   - Only include positive signals from satisfied customers
+   - Each opportunity: type, description, action
+   - DO NOT include problems/issues as opportunities
+
+5. ACCOUNT RISK FACTORS:
+   - Array of account-specific risks (pricing concerns, service issues, etc.)
+   - Each factor: type, description, severity, action
+   - Focus on business relationship threats
+
+Return ONLY valid JSON in this exact format:
+{{
+  "sentiment": {{"score": 0.0, "label": "neutral"}},
+  "themes": [{{"theme": "string", "sentiment": "positive/negative/neutral"}}],
+  "churn": {{
+    "risk_level": "Minimal/Low/Medium/High",
+    "risk_score": 0,
+    "risk_factors": ["array of strings"]
+  }},
+  "growth_opportunities": [{{
+    "type": "string",
+    "description": "string", 
+    "action": "string"
+  }}],
+  "account_risk_factors": [{{
+    "type": "string",
+    "description": "string",
+    "severity": "Low/Medium/High/Critical",
+    "action": "string"
+  }}]
+}}"""
+
+        # Single OpenAI API call for all analysis
+        ai_response = openai_client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a comprehensive customer feedback analysis expert. Analyze feedback and provide structured analysis covering sentiment, themes, churn risk, growth opportunities, and account risk factors. Always return valid JSON."
+                },
+                {
+                    "role": "user", 
+                    "content": consolidated_prompt
+                }
+            ],
+            response_format={"type": "json_object"},
+            max_tokens=1500,
+            temperature=0.3
+        )
+        
+        # Parse the consolidated response
+        result = json.loads(ai_response.choices[0].message.content)
+        
+        # Add rule-based enhancements to AI analysis
+        result = enhance_analysis_with_rules(result, response, combined_text)
+        
+        return result
+        
+    except Exception as e:
+        logger.warning(f"Consolidated AI analysis failed: {e}")
+        # Fallback to rule-based analysis
+        return perform_fallback_analysis(response, combined_text)
+
+def enhance_analysis_with_rules(ai_result, response, text):
+    """Enhance AI analysis with rule-based logic for consistency"""
+    # Enhance churn risk with NPS-based rules
+    if response.nps_score <= 3 and ai_result['churn']['risk_score'] < 5:
+        ai_result['churn']['risk_score'] = max(5, ai_result['churn']['risk_score'])
+        ai_result['churn']['risk_level'] = 'High'
+        ai_result['churn']['risk_factors'].append('Critical NPS score')
+    elif response.nps_score <= 6 and ai_result['churn']['risk_score'] < 3:
+        ai_result['churn']['risk_score'] = max(3, ai_result['churn']['risk_score'])
+        if ai_result['churn']['risk_level'] == 'Minimal':
+            ai_result['churn']['risk_level'] = 'Medium'
+    
+    # Add growth opportunities for high NPS
+    if response.nps_score >= 9:
+        advocacy_opportunity = {
+            'type': 'advocacy',
+            'description': 'High NPS score - potential brand advocate',
+            'action': 'Engage for case studies, referrals, or testimonials'
+        }
+        # Check if similar opportunity already exists
+        existing_types = [opp.get('type', '') for opp in ai_result.get('growth_opportunities', [])]
+        if 'advocacy' not in existing_types:
+            ai_result['growth_opportunities'].append(advocacy_opportunity)
+    
+    # Add account risk factors for low ratings
+    low_ratings = []
+    if response.satisfaction_rating and response.satisfaction_rating <= 2:
+        low_ratings.append("satisfaction")
+    if response.service_rating and response.service_rating <= 2:
+        low_ratings.append("service")
+    if response.product_value_rating and response.product_value_rating <= 2:
+        low_ratings.append("product value")
+    if response.pricing_rating and response.pricing_rating <= 2:
+        low_ratings.append("pricing")
+        
+    if low_ratings:
+        rating_risk = {
+            'type': 'poor_ratings',
+            'description': f'Poor ratings in: {", ".join(low_ratings)}',
+            'severity': 'High',
+            'action': 'Address specific pain points in affected areas'
+        }
+        ai_result['account_risk_factors'].append(rating_risk)
+    
+    return ai_result
+
+def perform_fallback_analysis(response, combined_text):
+    """Fallback analysis when OpenAI is not available"""
+    # Use existing rule-based functions as fallback
+    sentiment_data = analyze_business_sentiment(combined_text)
+    themes = extract_themes_fallback(combined_text)
+    churn_analysis = assess_churn_risk_fallback(response, combined_text)
+    growth_opportunities = identify_growth_opportunities_fallback(response)
+    account_risk_factors = identify_account_risk_factors_fallback(response, combined_text)
+    
+    return {
+        'sentiment': sentiment_data,
+        'themes': themes,
+        'churn': churn_analysis,
+        'growth_opportunities': growth_opportunities,
+        'account_risk_factors': account_risk_factors
+    }
+
+def extract_themes_fallback(text):
+    """Fallback theme extraction using keywords"""
+    keywords = ['product', 'service', 'price', 'pricing', 'support', 'feature', 'quality', 'value', 'team']
+    themes = []
+    text_lower = text.lower()
+    
+    for keyword in keywords:
+        if keyword in text_lower:
+            themes.append({'theme': keyword, 'sentiment': 'neutral'})
+    
+    return themes
+
+def assess_churn_risk_fallback(response, text):
+    """Fallback churn risk assessment"""
+    risk_factors = []
+    risk_points = 0
+    text_lower = text.lower()
+    
+    # Check for churn indicators
+    churn_keywords = ['churn', 'leave', 'switch', 'competitor', 'cancel', 'terminate']
+    if any(keyword in text_lower for keyword in churn_keywords):
+        risk_points += 5
+        risk_factors.append("Explicit churn indicators detected")
+    
+    # NPS-based risk
+    if response.nps_score <= 6:
+        risk_points += 3
+        risk_factors.append("Low NPS score indicating dissatisfaction")
+    
+    # Convert to risk level
+    if risk_points >= 5:
+        risk_level = "High"
+    elif risk_points >= 3:
+        risk_level = "Medium"
+    elif risk_points >= 1:
+        risk_level = "Low"
+    else:
+        risk_level = "Minimal"
+    
+    return {
+        'risk_level': risk_level,
+        'risk_score': risk_points,
+        'risk_factors': risk_factors
+    }
+
+def identify_growth_opportunities_fallback(response):
+    """Fallback growth opportunity identification"""
+    opportunities = []
+    
+    if response.nps_score >= 9:
+        opportunities.append({
+            'type': 'advocacy',
+            'description': 'High NPS score - potential brand advocate',
+            'action': 'Engage for case studies, referrals, or testimonials'
+        })
+    
+    return opportunities
+
+def identify_account_risk_factors_fallback(response, text):
+    """Fallback account risk factor identification"""
+    risk_factors = []
+    
+    if response.nps_score <= 3:
+        risk_factors.append({
+            'type': 'critical_satisfaction',
+            'description': 'Critical NPS score - immediate attention required',
+            'severity': 'Critical',
+            'action': 'Schedule urgent customer success call within 24 hours'
+        })
+    
+    return risk_factors
 
 def analyze_sentiment(text):
     """Analyze sentiment using both OpenAI and TextBlob"""
