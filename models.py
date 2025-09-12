@@ -393,10 +393,7 @@ class Participant(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
-    campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=True, index=True)  # Now optional for decoupled management
-    
-    # Foreign key to CampaignParticipant for proper association tracking
-    campaign_participant_id = db.Column(db.Integer, db.ForeignKey('campaign_participants.id'), nullable=True, index=True)
+    # Note: No direct campaign relationship - associations managed via CampaignParticipant table
     
     # Participant information
     email = db.Column(db.String(200), nullable=False, index=True)
@@ -417,13 +414,12 @@ class Participant(db.Model):
     
     # Relationships
     business_account = db.relationship('BusinessAccount', backref='participants')
-    campaign = db.relationship('Campaign', backref='participants')  # Optional relationship now
+    # Note: Campaign relationships handled via CampaignParticipant association table
     
     def to_dict(self):
         return {
             'id': self.id,
             'business_account_id': self.business_account_id,
-            'campaign_id': self.campaign_id,
             'email': self.email,
             'name': self.name,
             'company_name': self.company_name,
@@ -433,8 +429,7 @@ class Participant(db.Model):
             'invited_at': self.invited_at.isoformat() if self.invited_at else None,
             'started_at': self.started_at.isoformat() if self.started_at else None,
             'completed_at': self.completed_at.isoformat() if self.completed_at else None,
-            'business_account_name': self.business_account.name if self.business_account else None,
-            'campaign_name': self.campaign.name if self.campaign else None
+            'business_account_name': self.business_account.name if self.business_account else None
         }
     
     def generate_token(self):
