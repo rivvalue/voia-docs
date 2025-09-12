@@ -70,13 +70,8 @@ def create_participant():
         if not current_account or not current_account.id:
             flash('Business account context not found.', 'error')
             return redirect(url_for('business_auth.login'))
-            
-        campaigns = Campaign.query.filter_by(
-            business_account_id=current_account.id
-        ).order_by(Campaign.name).all()
         
         return render_template('participants/create.html',
-                             campaigns=[c.to_dict() if c else {} for c in campaigns],
                              business_account=current_account.to_dict() if current_account else {})
     
     # Handle form submission
@@ -87,58 +82,40 @@ def create_participant():
             return redirect(url_for('business_auth.login'))
         
         # Extract form data
-        campaign_id = request.form.get('campaign_id')
         email = request.form.get('email', '').strip().lower()
         name = request.form.get('name', '').strip()
         company_name = request.form.get('company_name', '').strip()
         
         # Validate required fields
-        if not campaign_id or not email or not name:
-            flash('Campaign, email, and name are required.', 'error')
+        if not email or not name:
+            flash('Email and name are required.', 'error')
             return redirect(url_for('participants.create_participant'))
         
-        # Validate campaign belongs to current business account
-        campaign = Campaign.query.filter_by(
-            id=campaign_id, 
-            business_account_id=current_account.id
-        ).first()
-        
-        if not campaign:
-            flash('Invalid campaign selected.', 'error')
-            return redirect(url_for('participants.create_participant'))
-        
-        # Check for duplicate participant (email + campaign combination)
+        # Check for duplicate participant (email within business account)
         existing = Participant.query.filter_by(
             business_account_id=current_account.id,
-            campaign_id=campaign_id,
             email=email
         ).first()
         
         if existing:
-            flash(f'Participant {email} already exists for campaign {campaign.name}.', 'error')
+            flash(f'Participant with email {email} already exists in your account.', 'error')
             return redirect(url_for('participants.create_participant'))
         
-        # Create participant
+        # Create participant (campaign-independent)
         participant = Participant(
             business_account_id=current_account.id,
-            campaign_id=campaign_id,
             email=email,
             name=name,
-            company_name=company_name if company_name else None,
-            status='invited',
-            invited_at=datetime.utcnow()
+            company_name=company_name if company_name else None
         )
-        
-        # Generate token
-        participant.generate_token()
+        # Note: No token or status - these will be managed per campaign association
         
         db.session.add(participant)
         db.session.commit()
         
         account_name = current_account.name if current_account and hasattr(current_account, 'name') else 'Unknown'
-        campaign_name = campaign.name if campaign and hasattr(campaign, 'name') else 'Unknown'
-        logger.info(f"Created participant {email} for campaign {campaign_name} (Business Account: {account_name})")
-        flash(f'Participant {name} created successfully for campaign {campaign_name}.', 'success')
+        logger.info(f"Created participant {email} (Business Account: {account_name})")
+        flash(f'Participant {name} created successfully. You can now assign them to campaigns.', 'success')
         return redirect(url_for('participants.list_participants'))
         
     except Exception as e:
@@ -160,13 +137,8 @@ def upload_participants():
         if not current_account or not current_account.id:
             flash('Business account context not found.', 'error')
             return redirect(url_for('business_auth.login'))
-            
-        campaigns = Campaign.query.filter_by(
-            business_account_id=current_account.id
-        ).order_by(Campaign.name).all()
         
         return render_template('participants/upload.html',
-                             campaigns=[c.to_dict() if c else {} for c in campaigns],
                              business_account=current_account.to_dict() if current_account else {})
     
     # Handle CSV upload
@@ -176,17 +148,7 @@ def upload_participants():
             flash('Business account context not found.', 'error')
             return redirect(url_for('business_auth.login'))
             
-        campaign_id = request.form.get('campaign_id')
-        
-        # Validate campaign
-        campaign = Campaign.query.filter_by(
-            id=campaign_id,
-            business_account_id=current_account.id
-        ).first()
-        
-        if not campaign:
-            flash('Invalid campaign selected.', 'error')
-            return redirect(url_for('participants.upload_participants'))
+        # No campaign validation needed for independent participants
         
         # Process CSV file
         if 'csv_file' not in request.files:
@@ -217,30 +179,25 @@ def upload_participants():
                     error_count += 1
                     continue
                 
-                # Check for duplicate
+                # Check for duplicate participant (email within business account)
                 existing = Participant.query.filter_by(
                     business_account_id=current_account.id,
-                    campaign_id=campaign_id,
                     email=email
                 ).first()
                 
                 if existing:
-                    errors.append(f"Row {row_num}: Participant {email} already exists")
+                    errors.append(f"Row {row_num}: Participant {email} already exists in your account")
                     error_count += 1
                     continue
                 
-                # Create participant
+                # Create participant (campaign-independent)
                 participant = Participant(
                     business_account_id=current_account.id,
-                    campaign_id=campaign_id,
                     email=email,
                     name=name,
-                    company_name=company_name if company_name else None,
-                    status='invited',
-                    invited_at=datetime.utcnow()
+                    company_name=company_name if company_name else None
                 )
-                
-                participant.generate_token()
+                # Note: No token or status - these will be managed per campaign association
                 db.session.add(participant)
                 created_count += 1
                 
@@ -252,8 +209,7 @@ def upload_participants():
         
         # Show results
         if created_count > 0:
-            campaign_name = campaign.name if campaign and hasattr(campaign, 'name') else 'Unknown'
-            flash(f'Successfully created {created_count} participants for campaign {campaign_name}.', 'success')
+            flash(f'Successfully created {created_count} participants. You can now assign them to campaigns.', 'success')
         
         if error_count > 0:
             flash(f'{error_count} errors occurred during upload. Check the details below.', 'warning')
