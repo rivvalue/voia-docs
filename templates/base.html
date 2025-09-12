@@ -37,9 +37,6 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('index') }}">Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('auth') }}">Get Token</a>
-                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="tryNowDropdown" role="button" data-bs-toggle="dropdown">
                             Try now
@@ -53,6 +50,9 @@
                             </a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><h6 class="dropdown-header">Survey</h6></li>
+                            <li><a class="dropdown-item" href="{{ url_for('auth') }}">
+                                <i class="fas fa-key me-2"></i>Get Token
+                            </a></li>
                             <li><a class="dropdown-item" href="{{ url_for('conversational_survey') }}">
                                 <i class="fas fa-comments me-2"></i>AI Conversation
                             </a></li>
