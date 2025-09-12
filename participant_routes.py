@@ -87,8 +87,8 @@ def create_participant():
         company_name = request.form.get('company_name', '').strip()
         
         # Validate required fields
-        if not email or not name:
-            flash('Email and name are required.', 'error')
+        if not email or not name or not company_name:
+            flash('Email, name, and company name are required.', 'error')
             return redirect(url_for('participants.create_participant'))
         
         # Check for duplicate participant (email within business account)
@@ -180,8 +180,8 @@ def upload_participants():
                 name = row.get('name', '').strip()
                 company_name = row.get('company_name', '').strip()
                 
-                if not email or not name:
-                    errors.append(f"Row {row_num}: Email and name are required")
+                if not email or not name or not company_name:
+                    errors.append(f"Row {row_num}: Email, name, and company name are required")
                     error_count += 1
                     continue
                 
