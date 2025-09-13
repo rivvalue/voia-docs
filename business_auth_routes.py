@@ -426,3 +426,101 @@ def init_rivvalue_admin_user():
     except Exception as e:
         logger.error(f"Failed to initialize admin user: {e}")
         return False
+
+
+# ==== ADMIN ROUTES FOR SCHEDULER TESTING ====
+
+@business_auth_bp.route('/admin/scheduler/run', methods=['POST'])
+@require_business_auth
+@require_permission('admin')
+def force_scheduler_run():
+    """Force immediate scheduler run (admin only) for testing purposes"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            if request.is_json:
+                return jsonify({'error': 'Business account context not found'}), 400
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.admin_panel'))
+        
+        # Import task queue to access scheduler
+        from task_queue import task_queue
+        
+        logger.info(f"Admin forcing scheduler run - initiated by business account {current_account.id} ({current_account.name})")
+        
+        # Force immediate scheduler execution
+        success = task_queue.force_scheduler_run()
+        
+        if success:
+            message = "Scheduler executed successfully! Check campaign statuses for any automatic transitions."
+            if request.is_json:
+                return jsonify({
+                    'success': True,
+                    'message': message,
+                    'scheduler_stats': task_queue.get_stats()
+                })
+            flash(message, 'success')
+        else:
+            message = "Scheduler execution failed. Check server logs for details."
+            if request.is_json:
+                return jsonify({'error': message}), 500
+            flash(message, 'error')
+        
+        return redirect(url_for('business_auth.admin_panel'))
+        
+    except Exception as e:
+        logger.error(f"Error forcing scheduler run: {e}")
+        if request.is_json:
+            return jsonify({'error': 'Failed to execute scheduler'}), 500
+        flash('Failed to execute scheduler. Please try again.', 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+
+@business_auth_bp.route('/admin/scheduler/status')
+@require_business_auth
+@require_permission('admin')
+def scheduler_status():
+    """Get scheduler status and statistics (admin only)"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            if request.is_json:
+                return jsonify({'error': 'Business account context not found'}), 400
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.admin_panel'))
+        
+        # Import task queue to access scheduler stats
+        from task_queue import task_queue
+        
+        scheduler_stats = task_queue.get_stats()
+        
+        # Get campaign counts for current business account
+        from models import Campaign
+        campaign_counts = {
+            'draft': Campaign.query.filter_by(business_account_id=current_account.id, status='draft').count(),
+            'ready': Campaign.query.filter_by(business_account_id=current_account.id, status='ready').count(),
+            'active': Campaign.query.filter_by(business_account_id=current_account.id, status='active').count(),
+            'completed': Campaign.query.filter_by(business_account_id=current_account.id, status='completed').count()
+        }
+        
+        if request.is_json:
+            return jsonify({
+                'scheduler_stats': scheduler_stats,
+                'campaign_counts': campaign_counts,
+                'business_account': {
+                    'id': current_account.id,
+                    'name': current_account.name
+                }
+            })
+        
+        # For HTML requests, redirect to admin panel with flash message
+        flash(f"Scheduler Status: Running={scheduler_stats['running']}, Last Run={scheduler_stats['last_scheduler_run'] or 'Never'}", 'info')
+        flash(f"Campaign Counts: Draft={campaign_counts['draft']}, Ready={campaign_counts['ready']}, Active={campaign_counts['active']}, Completed={campaign_counts['completed']}", 'info')
+        return redirect(url_for('business_auth.admin_panel'))
+        
+    except Exception as e:
+        logger.error(f"Error getting scheduler status: {e}")
+        if request.is_json:
+            return jsonify({'error': 'Failed to get scheduler status'}), 500
+        flash('Failed to get scheduler status.', 'error')
+        return redirect(url_for('business_auth.admin_panel'))

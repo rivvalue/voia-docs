@@ -1,27 +1,30 @@
 import json
 import os
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from threading import Thread
 from queue import Queue, Empty
 from time import sleep
 from app import app, db
-from models import SurveyResponse
+from models import SurveyResponse, Campaign, BusinessAccount
 from ai_analysis import analyze_survey_response
 
 logger = logging.getLogger(__name__)
 
 class TaskQueue:
-    """Simple in-memory task queue for processing AI analysis tasks"""
+    """Simple in-memory task queue for processing AI analysis tasks with campaign scheduler"""
     
     def __init__(self, max_workers=5):
         self.task_queue = Queue()
         self.max_workers = max_workers
         self.workers = []
         self.running = False
+        self.scheduler_thread = None
+        self.last_scheduler_run = None
+        self.scheduler_interval = 300  # 5 minutes in seconds
         
     def start(self):
-        """Start the task queue workers"""
+        """Start the task queue workers and scheduler"""
         if self.running:
             return
             
@@ -32,11 +35,16 @@ class TaskQueue:
             worker = Thread(target=self._worker, args=(i,), daemon=True)
             worker.start()
             self.workers.append(worker)
+        
+        # Start the campaign scheduler
+        self.scheduler_thread = Thread(target=self._scheduler, daemon=True)
+        self.scheduler_thread.start()
+        logger.info("Campaign scheduler started")
     
     def stop(self):
-        """Stop the task queue workers"""
+        """Stop the task queue workers and scheduler"""
         self.running = False
-        logger.info("Stopping task queue")
+        logger.info("Stopping task queue and scheduler")
     
     def add_task(self, task_type, response_id, priority=1):
         """Add a task to the queue"""
@@ -101,16 +109,159 @@ class TaskQueue:
         except Exception as e:
             logger.error(f"Error processing task {task}: {e}")
     
+    def _scheduler(self):
+        """Background scheduler for campaign lifecycle management"""
+        logger.info("Campaign scheduler started")
+        
+        while self.running:
+            try:
+                sleep(60)  # Check every minute, but only run scheduler every 5 minutes
+                
+                if not self.running:
+                    break
+                
+                # Check if it's time to run the scheduler
+                now = datetime.utcnow()
+                if (self.last_scheduler_run is None or 
+                    (now - self.last_scheduler_run).total_seconds() >= self.scheduler_interval):
+                    
+                    logger.info("Running campaign scheduler...")
+                    
+                    with app.app_context():
+                        try:
+                            self._run_campaign_scheduler()
+                            self.last_scheduler_run = now
+                        except Exception as e:
+                            logger.error(f"Campaign scheduler error: {e}")
+                            # Continue running despite errors
+                            
+            except Exception as e:
+                logger.error(f"Scheduler thread error: {e}")
+                # Continue running despite errors
+                sleep(60)
+    
+    def _run_campaign_scheduler(self):
+        """Execute campaign lifecycle transitions with business account scoping"""
+        try:
+            today = date.today()
+            logger.info(f"Campaign scheduler running for date: {today}")
+            
+            # Get all business accounts
+            business_accounts = BusinessAccount.query.filter_by(status='active').all()
+            
+            for account in business_accounts:
+                try:
+                    self._process_account_campaigns(account, today)
+                except Exception as e:
+                    logger.error(f"Error processing campaigns for business account {account.id}: {e}")
+                    # Continue with other accounts
+                    
+        except Exception as e:
+            logger.error(f"Campaign scheduler failed: {e}")
+    
+    def _process_account_campaigns(self, business_account, today):
+        """Process campaign transitions for a specific business account"""
+        account_id = business_account.id
+        account_name = business_account.name
+        
+        logger.info(f"Processing campaigns for business account {account_id} ({account_name})")
+        
+        # Check for campaigns that need to be activated (ready -> active)
+        ready_campaigns = Campaign.query.filter_by(
+            business_account_id=account_id,
+            status='ready'
+        ).filter(Campaign.start_date <= today).all()
+        
+        # Check for campaigns that need to be completed (active -> completed)
+        expired_campaigns = Campaign.query.filter_by(
+            business_account_id=account_id,
+            status='active'
+        ).filter(Campaign.end_date < today).all()
+        
+        # Process activations (respecting single active campaign constraint)
+        if ready_campaigns:
+            self._process_campaign_activations(account_id, account_name, ready_campaigns, today)
+        
+        # Process completions
+        if expired_campaigns:
+            self._process_campaign_completions(account_id, account_name, expired_campaigns)
+    
+    def _process_campaign_activations(self, account_id, account_name, ready_campaigns, today):
+        """Process campaign activations with single active campaign constraint"""
+        # Check if there's already an active campaign for this business account
+        existing_active = Campaign.query.filter_by(
+            business_account_id=account_id,
+            status='active'
+        ).first()
+        
+        if existing_active:
+            logger.info(f"Cannot activate campaigns for account {account_id} ({account_name}): "
+                       f"Campaign '{existing_active.name}' is already active")
+            return
+        
+        # Activate the earliest ready campaign that meets criteria
+        for campaign in sorted(ready_campaigns, key=lambda c: c.start_date):
+            try:
+                # Double-check activation criteria
+                if (campaign.status == 'ready' and 
+                    campaign.start_date <= today and 
+                    campaign.description and 
+                    len(campaign.participants) > 0):
+                    
+                    # Activate the campaign
+                    campaign.status = 'active'
+                    db.session.commit()
+                    
+                    logger.info(f"Auto-activated campaign '{campaign.name}' (ID: {campaign.id}) "
+                               f"for business account {account_id} ({account_name})")
+                    
+                    # Only activate one campaign at a time
+                    break
+                    
+            except Exception as e:
+                logger.error(f"Failed to activate campaign {campaign.id}: {e}")
+                db.session.rollback()
+    
+    def _process_campaign_completions(self, account_id, account_name, expired_campaigns):
+        """Process campaign completions for expired campaigns"""
+        for campaign in expired_campaigns:
+            try:
+                # Complete the campaign
+                campaign.status = 'completed'
+                campaign.completed_at = datetime.utcnow()
+                db.session.commit()
+                
+                logger.info(f"Auto-completed campaign '{campaign.name}' (ID: {campaign.id}) "
+                           f"for business account {account_id} ({account_name}) - expired on {campaign.end_date}")
+                
+            except Exception as e:
+                logger.error(f"Failed to complete campaign {campaign.id}: {e}")
+                db.session.rollback()
+    
+    def force_scheduler_run(self):
+        """Force immediate scheduler run (for admin testing)"""
+        logger.info("Force running campaign scheduler...")
+        try:
+            with app.app_context():
+                self._run_campaign_scheduler()
+                self.last_scheduler_run = datetime.utcnow()
+                return True
+        except Exception as e:
+            logger.error(f"Forced scheduler run failed: {e}")
+            return False
+    
     def get_queue_size(self):
         """Get current queue size"""
         return self.task_queue.qsize()
     
     def get_stats(self):
-        """Get queue statistics"""
+        """Get queue and scheduler statistics"""
         return {
             'queue_size': self.task_queue.qsize(),
             'workers': len(self.workers),
-            'running': self.running
+            'running': self.running,
+            'last_scheduler_run': self.last_scheduler_run.isoformat() if self.last_scheduler_run else None,
+            'scheduler_interval': self.scheduler_interval
         }
 
 # Global task queue instance
