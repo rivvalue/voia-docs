@@ -83,7 +83,7 @@ def create_campaign():
             return render_template('campaigns/create.html',
                                  business_account=current_account.to_dict())
         
-        # Validate dates
+        # Validate dates and convert to date objects
         try:
             start_datetime = datetime.strptime(start_date, '%Y-%m-%d')
             end_datetime = datetime.strptime(end_date, '%Y-%m-%d')
@@ -92,6 +92,10 @@ def create_campaign():
                 flash('End date must be after start date.', 'error')
                 return render_template('campaigns/create.html',
                                      business_account=current_account.to_dict())
+            
+            # Convert to date objects for consistency
+            start_date_obj = start_datetime.date()
+            end_date_obj = end_datetime.date()
             
         except ValueError:
             flash('Invalid date format.', 'error')
@@ -102,8 +106,8 @@ def create_campaign():
         campaign = Campaign(
             name=name,
             description=description or None,
-            start_date=start_datetime,
-            end_date=end_datetime,
+            start_date=start_date_obj,
+            end_date=end_date_obj,
             business_account_id=current_account.id,
             status='draft'  # Initial status
         )
@@ -267,7 +271,7 @@ def activate_campaign(campaign_id):
             flash(f'Cannot activate campaign. Another campaign "{existing_active.name}" is already active. Only one campaign can be active at a time.', 'error')
             return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
-        # Check date constraints
+        # Check date constraints using consistent date handling
         today = datetime.now().date()
         if campaign.start_date > today:
             flash(f'Cannot activate campaign before start date ({campaign.start_date}). Please wait until the start date.', 'error')

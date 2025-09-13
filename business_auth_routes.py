@@ -355,6 +355,88 @@ def get_current_business_user():
 
 
 
+# Database health check utilities
+@business_auth_bp.route('/api/database-health', methods=['GET'])
+@require_permission('manage_campaigns')
+def database_health_check():
+    """Check database schema health including critical constraints (admin only)"""
+    
+    try:
+        health_status = {
+            'constraints': {},
+            'indexes': {},
+            'overall_status': 'healthy'
+        }
+        
+        # Check if the partial unique index for single active campaign exists
+        constraint_check_query = """
+        SELECT schemaname, tablename, indexname, indexdef
+        FROM pg_indexes 
+        WHERE tablename = 'campaigns' 
+        AND indexname = 'idx_single_active_campaign_per_account'
+        """
+        
+        from sqlalchemy import text
+        result = db.session.execute(text(constraint_check_query)).fetchall()
+        
+        if result:
+            health_status['constraints']['single_active_campaign_constraint'] = {
+                'status': 'present',
+                'index_name': result[0][2],
+                'definition': result[0][3]
+            }
+            
+            # Test the constraint by checking for violations
+            violation_check_query = """
+            SELECT business_account_id, COUNT(*) as active_campaigns
+            FROM campaigns 
+            WHERE status = 'active' 
+            GROUP BY business_account_id 
+            HAVING COUNT(*) > 1
+            """
+            
+            violations = db.session.execute(text(violation_check_query)).fetchall()
+            
+            if violations:
+                health_status['constraints']['single_active_campaign_constraint']['violations'] = [
+                    {'business_account_id': v[0], 'active_campaigns': v[1]} for v in violations
+                ]
+                health_status['overall_status'] = 'warning'
+            else:
+                health_status['constraints']['single_active_campaign_constraint']['violations'] = []
+                
+        else:
+            health_status['constraints']['single_active_campaign_constraint'] = {
+                'status': 'missing',
+                'message': 'Critical constraint not found in database'
+            }
+            health_status['overall_status'] = 'critical'
+        
+        # Check other important indexes
+        index_check_query = """
+        SELECT indexname, indexdef
+        FROM pg_indexes 
+        WHERE tablename = 'campaigns' 
+        AND indexname IN ('idx_campaign_business_status', 'idx_campaign_dates')
+        """
+        
+        indexes = db.session.execute(text(index_check_query)).fetchall()
+        for index in indexes:
+            health_status['indexes'][index[0]] = {
+                'status': 'present',
+                'definition': index[1]
+            }
+        
+        return jsonify(health_status)
+        
+    except Exception as e:
+        logger.error(f"Database health check error: {e}")
+        return jsonify({
+            'overall_status': 'error',
+            'message': f'Health check failed: {str(e)}'
+        }), 500
+
+
 # Session cleanup utility
 @business_auth_bp.route('/api/cleanup-sessions', methods=['POST'])
 @require_permission('manage_users')

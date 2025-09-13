@@ -110,7 +110,7 @@ class TaskQueue:
             logger.error(f"Error processing task {task}: {e}")
     
     def _scheduler(self):
-        """Background scheduler for campaign lifecycle management"""
+        """Background scheduler for campaign lifecycle management with DB advisory lock"""
         logger.info("Campaign scheduler started")
         
         while self.running:
@@ -125,12 +125,25 @@ class TaskQueue:
                 if (self.last_scheduler_run is None or 
                     (now - self.last_scheduler_run).total_seconds() >= self.scheduler_interval):
                     
-                    logger.info("Running campaign scheduler...")
-                    
                     with app.app_context():
                         try:
-                            self._run_campaign_scheduler()
-                            self.last_scheduler_run = now
+                            # Use PostgreSQL advisory lock to ensure only one scheduler runs across all processes
+                            # Lock ID: 123456 (arbitrary unique number for campaign scheduler)
+                            lock_acquired = self._acquire_scheduler_lock(123456)
+                            
+                            if lock_acquired:
+                                logger.debug("Campaign scheduler executing...")
+                                try:
+                                    changes_made = self._run_campaign_scheduler()
+                                    self.last_scheduler_run = now
+                                    if changes_made > 0:
+                                        logger.info(f"Campaign scheduler completed: {changes_made} campaigns processed")
+                                finally:
+                                    # Always release the lock
+                                    self._release_scheduler_lock(123456)
+                            else:
+                                logger.debug("Scheduler already running in another process, skipping...")
+                                
                         except Exception as e:
                             logger.error(f"Campaign scheduler error: {e}")
                             # Continue running despite errors
@@ -142,29 +155,33 @@ class TaskQueue:
     
     def _run_campaign_scheduler(self):
         """Execute campaign lifecycle transitions with business account scoping"""
+        changes_made = 0
         try:
             today = date.today()
-            logger.info(f"Campaign scheduler running for date: {today}")
+            logger.debug(f"Checking campaign transitions for date: {today}")
             
             # Get all business accounts
             business_accounts = BusinessAccount.query.filter_by(status='active').all()
             
             for account in business_accounts:
                 try:
-                    self._process_account_campaigns(account, today)
+                    account_changes = self._process_account_campaigns(account, today)
+                    changes_made += account_changes
                 except Exception as e:
                     logger.error(f"Error processing campaigns for business account {account.id}: {e}")
                     # Continue with other accounts
+            
+            return changes_made
                     
         except Exception as e:
             logger.error(f"Campaign scheduler failed: {e}")
+            return changes_made
     
     def _process_account_campaigns(self, business_account, today):
         """Process campaign transitions for a specific business account"""
         account_id = business_account.id
         account_name = business_account.name
-        
-        logger.info(f"Processing campaigns for business account {account_id} ({account_name})")
+        changes_made = 0
         
         # Check for campaigns that need to be activated (ready -> active)
         ready_campaigns = Campaign.query.filter_by(
@@ -178,16 +195,27 @@ class TaskQueue:
             status='active'
         ).filter(Campaign.end_date < today).all()
         
+        # Log only when there are campaigns to process
+        if ready_campaigns or expired_campaigns:
+            logger.debug(f"Processing campaigns for business account {account_id} ({account_name}): "
+                        f"{len(ready_campaigns)} ready, {len(expired_campaigns)} expired")
+        
         # Process activations (respecting single active campaign constraint)
         if ready_campaigns:
-            self._process_campaign_activations(account_id, account_name, ready_campaigns, today)
+            activation_changes = self._process_campaign_activations(account_id, account_name, ready_campaigns, today)
+            changes_made += activation_changes
         
         # Process completions
         if expired_campaigns:
-            self._process_campaign_completions(account_id, account_name, expired_campaigns)
+            completion_changes = self._process_campaign_completions(account_id, account_name, expired_campaigns)
+            changes_made += completion_changes
+        
+        return changes_made
     
     def _process_campaign_activations(self, account_id, account_name, ready_campaigns, today):
         """Process campaign activations with single active campaign constraint"""
+        changes_made = 0
+        
         # Check if there's already an active campaign for this business account
         existing_active = Campaign.query.filter_by(
             business_account_id=account_id,
@@ -195,9 +223,9 @@ class TaskQueue:
         ).first()
         
         if existing_active:
-            logger.info(f"Cannot activate campaigns for account {account_id} ({account_name}): "
-                       f"Campaign '{existing_active.name}' is already active")
-            return
+            logger.debug(f"Cannot activate campaigns for account {account_id} ({account_name}): "
+                        f"Campaign '{existing_active.name}' is already active")
+            return changes_made
         
         # Activate the earliest ready campaign that meets criteria
         for campaign in sorted(ready_campaigns, key=lambda c: c.start_date):
@@ -215,15 +243,20 @@ class TaskQueue:
                     logger.info(f"Auto-activated campaign '{campaign.name}' (ID: {campaign.id}) "
                                f"for business account {account_id} ({account_name})")
                     
+                    changes_made += 1
                     # Only activate one campaign at a time
                     break
                     
             except Exception as e:
                 logger.error(f"Failed to activate campaign {campaign.id}: {e}")
                 db.session.rollback()
+        
+        return changes_made
     
     def _process_campaign_completions(self, account_id, account_name, expired_campaigns):
         """Process campaign completions for expired campaigns"""
+        changes_made = 0
+        
         for campaign in expired_campaigns:
             try:
                 # Complete the campaign
@@ -234,18 +267,57 @@ class TaskQueue:
                 logger.info(f"Auto-completed campaign '{campaign.name}' (ID: {campaign.id}) "
                            f"for business account {account_id} ({account_name}) - expired on {campaign.end_date}")
                 
+                changes_made += 1
+                
             except Exception as e:
                 logger.error(f"Failed to complete campaign {campaign.id}: {e}")
                 db.session.rollback()
+        
+        return changes_made
     
+    def _acquire_scheduler_lock(self, lock_id):
+        """Acquire PostgreSQL advisory lock for scheduler"""
+        try:
+            from sqlalchemy import text
+            # Use PostgreSQL advisory lock to prevent multiple schedulers
+            result = db.session.execute(
+                text("SELECT pg_try_advisory_lock(:lock_id)"),
+                {"lock_id": lock_id}
+            ).scalar()
+            return result
+        except Exception as e:
+            logger.error(f"Failed to acquire scheduler lock: {e}")
+            return False
+    
+    def _release_scheduler_lock(self, lock_id):
+        """Release PostgreSQL advisory lock for scheduler"""
+        try:
+            from sqlalchemy import text
+            db.session.execute(
+                text("SELECT pg_advisory_unlock(:lock_id)"),
+                {"lock_id": lock_id}
+            )
+        except Exception as e:
+            logger.error(f"Failed to release scheduler lock: {e}")
+
     def force_scheduler_run(self):
-        """Force immediate scheduler run (for admin testing)"""
+        """Force immediate scheduler run (for admin testing) with lock protection"""
         logger.info("Force running campaign scheduler...")
         try:
             with app.app_context():
-                self._run_campaign_scheduler()
-                self.last_scheduler_run = datetime.utcnow()
-                return True
+                # Use advisory lock even for forced runs to prevent conflicts
+                lock_acquired = self._acquire_scheduler_lock(123456)
+                
+                if lock_acquired:
+                    try:
+                        self._run_campaign_scheduler()
+                        self.last_scheduler_run = datetime.utcnow()
+                        return True
+                    finally:
+                        self._release_scheduler_lock(123456)
+                else:
+                    logger.warning("Could not acquire scheduler lock for forced run")
+                    return False
         except Exception as e:
             logger.error(f"Forced scheduler run failed: {e}")
             return False

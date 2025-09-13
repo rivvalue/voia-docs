@@ -101,6 +101,16 @@ class SurveyResponse(db.Model):
 class Campaign(db.Model):
     """Campaign model for tracking feedback collection periods"""
     __tablename__ = 'campaigns'
+    __table_args__ = (
+        # Partial unique index to enforce single active campaign per business account
+        db.Index('idx_single_active_campaign_per_account', 
+                'business_account_id', 
+                unique=True, 
+                postgresql_where=db.text("status = 'active'")),
+        # Regular index for common queries
+        db.Index('idx_campaign_business_status', 'business_account_id', 'status'),
+        db.Index('idx_campaign_dates', 'start_date', 'end_date'),
+    )
     
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False, index=True)
