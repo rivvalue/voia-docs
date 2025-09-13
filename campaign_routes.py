@@ -172,3 +172,178 @@ def view_campaign(campaign_id):
         logger.error(f"Campaign view error: {e}")
         flash('Error loading campaign details.', 'error')
         return redirect(url_for('campaigns.list_campaigns'))
+
+
+@campaign_bp.route('/<int:campaign_id>/mark-ready', methods=['POST'])
+@require_business_auth
+@require_permission('manage_participants')
+def mark_ready(campaign_id):
+    """Mark campaign as ready for activation"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get campaign (scoped to current business account)
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            flash('Campaign not found.', 'error')
+            return redirect(url_for('campaigns.list_campaigns'))
+        
+        # Validate campaign can be marked ready
+        if campaign.status != 'draft':
+            flash(f'Campaign must be in draft status to mark as ready. Current status: {campaign.status}', 'error')
+            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
+        # Check if campaign has basic requirements
+        if not campaign.name or not campaign.description:
+            flash('Campaign must have name and description to be marked ready.', 'error')
+            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
+        # Check if campaign has participants
+        participant_count = CampaignParticipant.query.filter_by(
+            campaign_id=campaign_id,
+            business_account_id=current_account.id
+        ).count()
+        
+        if participant_count == 0:
+            flash('Campaign must have at least one participant to be marked ready.', 'error')
+            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
+        # Mark as ready
+        campaign.status = 'ready'
+        db.session.commit()
+        
+        logger.info(f"Campaign '{campaign.name}' (ID: {campaign_id}) marked as ready by business account {current_account.id}")
+        flash(f'Campaign "{campaign.name}" is now ready for activation!', 'success')
+        
+        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
+    except Exception as e:
+        logger.error(f"Error marking campaign as ready: {e}")
+        db.session.rollback()
+        flash('Failed to mark campaign as ready. Please try again.', 'error')
+        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+
+
+@campaign_bp.route('/<int:campaign_id>/activate', methods=['POST'])
+@require_business_auth
+@require_permission('manage_participants')
+def activate_campaign(campaign_id):
+    """Activate campaign (enforce single active campaign constraint)"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get campaign (scoped to current business account)
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            flash('Campaign not found.', 'error')
+            return redirect(url_for('campaigns.list_campaigns'))
+        
+        # Validate campaign can be activated
+        if campaign.status != 'ready':
+            flash(f'Campaign must be ready to activate. Current status: {campaign.status}', 'error')
+            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
+        # Enforce single active campaign constraint
+        existing_active = Campaign.query.filter_by(
+            business_account_id=current_account.id,
+            status='active'
+        ).first()
+        
+        if existing_active:
+            flash(f'Cannot activate campaign. Another campaign "{existing_active.name}" is already active. Only one campaign can be active at a time.', 'error')
+            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
+        # Check date constraints
+        today = datetime.now().date()
+        if campaign.start_date > today:
+            flash(f'Cannot activate campaign before start date ({campaign.start_date}). Please wait until the start date.', 'error')
+            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
+        if campaign.end_date < today:
+            flash(f'Cannot activate campaign past end date ({campaign.end_date}). Please update the campaign dates.', 'error')
+            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
+        # Activate campaign
+        campaign.status = 'active'
+        
+        # Set invitation timestamps for participants
+        campaign_participants = CampaignParticipant.query.filter_by(
+            campaign_id=campaign_id,
+            business_account_id=current_account.id
+        ).all()
+        
+        for cp in campaign_participants:
+            if cp.status == 'pending':
+                cp.status = 'invited'
+                cp.invited_at = datetime.utcnow()
+        
+        db.session.commit()
+        
+        logger.info(f"Campaign '{campaign.name}' (ID: {campaign_id}) activated by business account {current_account.id}")
+        flash(f'Campaign "{campaign.name}" is now active! Participants have been notified.', 'success')
+        
+        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
+    except Exception as e:
+        logger.error(f"Error activating campaign: {e}")
+        db.session.rollback()
+        flash('Failed to activate campaign. Please try again.', 'error')
+        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+
+
+@campaign_bp.route('/<int:campaign_id>/complete', methods=['POST'])
+@require_business_auth
+@require_permission('manage_participants')
+def complete_campaign(campaign_id):
+    """Complete campaign"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get campaign (scoped to current business account)
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            flash('Campaign not found.', 'error')
+            return redirect(url_for('campaigns.list_campaigns'))
+        
+        # Validate campaign can be completed
+        if campaign.status not in ['active']:
+            flash(f'Only active campaigns can be completed. Current status: {campaign.status}', 'error')
+            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
+        # Complete campaign
+        campaign.status = 'completed'
+        campaign.completed_at = datetime.utcnow()
+        
+        db.session.commit()
+        
+        logger.info(f"Campaign '{campaign.name}' (ID: {campaign_id}) completed by business account {current_account.id}")
+        flash(f'Campaign "{campaign.name}" has been completed!', 'success')
+        
+        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
+    except Exception as e:
+        logger.error(f"Error completing campaign: {e}")
+        db.session.rollback()
+        flash('Failed to complete campaign. Please try again.', 'error')
+        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
