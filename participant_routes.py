@@ -488,9 +488,10 @@ def remove_campaign_participant(campaign_id, association_id):
             flash('Campaign not found.', 'error')
             return redirect(url_for('participants.list_participants'))
         
-        # Validate campaign status - can only remove participants if campaign is not active
-        if campaign.status == 'active':
-            flash(f'Cannot remove participants from active campaign. Please wait until campaign is completed.', 'error')
+        # Validate campaign status - can only remove participants if campaign is draft or ready
+        if campaign.status in ['active', 'completed']:
+            status_msg = 'active and collecting responses' if campaign.status == 'active' else 'completed'
+            flash(f'Cannot remove participants from {status_msg} campaign. Participants can only be modified when campaign is in draft or ready status.', 'error')
             return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
         
         # Get association (scoped to current business account)

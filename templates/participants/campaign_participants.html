@@ -29,47 +29,88 @@
             </div>
 
             <!-- Add Participants Section -->
-            {% if available_participants %}
-            <div class="card mt-4">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="fas fa-user-plus me-2"></i>Add Participants to Campaign
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <form method="POST" action="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <div class="row">
-                            <div class="col-md-8">
-                                <div class="mb-3">
-                                    <label for="participant_ids" class="form-label">
-                                        <i class="fas fa-users me-2"></i>Select Participants
-                                    </label>
-                                    <select class="form-select" id="participant_ids" name="participant_ids" multiple required>
-                                        {% for participant in available_participants %}
-                                        <option value="{{ participant.id }}">
-                                            {{ participant.name }} ({{ participant.email }})
-                                            {% if participant.company_name %} - {{ participant.company_name }}{% endif %}
-                                        </option>
-                                        {% endfor %}
-                                    </select>
-                                    <div class="form-text">
-                                        Hold Ctrl/Cmd to select multiple participants
+            {% if campaign.status in ['draft', 'ready'] %}
+                {% if available_participants %}
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-user-plus me-2"></i>Add Participants to Campaign
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <label for="participant_ids" class="form-label">
+                                            <i class="fas fa-users me-2"></i>Select Participants
+                                        </label>
+                                        <select class="form-select" id="participant_ids" name="participant_ids" multiple required>
+                                            {% for participant in available_participants %}
+                                            <option value="{{ participant.id }}">
+                                                {{ participant.name }} ({{ participant.email }})
+                                                {% if participant.company_name %} - {{ participant.company_name }}{% endif %}
+                                            </option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="form-text">
+                                            Hold Ctrl/Cmd to select multiple participants
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">&nbsp;</label>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="fas fa-plus me-2"></i>Add Selected Participants
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label">&nbsp;</label>
-                                <div class="d-grid">
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="fas fa-plus me-2"></i>Add Selected Participants
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
-            </div>
+                {% else %}
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-user-plus me-2"></i>Add Participants to Campaign
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>All Available Participants Assigned:</strong> 
+                            All participants in your account are already assigned to this campaign.
+                            <a href="{{ url_for('participants.create_participant') }}" class="btn btn-sm btn-primary ms-2">
+                                <i class="fas fa-user-plus me-1"></i>Create New Participant
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% else %}
+                <!-- Campaign status prevents adding participants -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-muted">
+                            <i class="fas fa-user-plus me-2"></i>Add Participants to Campaign
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Participants Cannot Be Modified:</strong> 
+                            This campaign is {{ campaign.status }}. Participants can only be added or removed when the campaign is in draft or ready status.
+                            {% if campaign.status == 'active' %}
+                                <br><small class="text-muted">Campaign is currently collecting responses. Wait until completion to modify participants.</small>
+                            {% elif campaign.status == 'completed' %}
+                                <br><small class="text-muted">Campaign has finished. Participant list is now locked.</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
             {% endif %}
 
             <!-- Current Participants -->
@@ -157,6 +198,7 @@
                                     <td>
                                         <div class="btn-group-vertical btn-group-sm" role="group">
                                             <!-- Remove from Campaign -->
+                                            {% if campaign.status in ['draft', 'ready'] %}
                                             <form method="POST" action="{{ url_for('participants.remove_campaign_participant', campaign_id=campaign.id, association_id=participant.association_id) }}" 
                                                   onsubmit="return confirm('Remove {{ participant.name }} from this campaign?')" class="d-inline">
                                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -164,6 +206,12 @@
                                                     <i class="fas fa-times me-1"></i>Remove
                                                 </button>
                                             </form>
+                                            {% else %}
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" disabled 
+                                                    title="Cannot remove participants from {{ campaign.status }} campaign">
+                                                <i class="fas fa-lock me-1"></i>Locked
+                                            </button>
+                                            {% endif %}
                                         </div>
                                     </td>
                                 </tr>
@@ -188,13 +236,13 @@
                 </div>
             </div>
 
-            <!-- Campaign Info -->
+            <!-- Campaign Status Information -->
             <div class="row mt-4">
                 <div class="col-md-8">
                     <div class="card">
-                        <div class="card-header bg-info text-white">
+                        <div class="card-header bg-{% if campaign.status == 'active' %}success{% elif campaign.status == 'ready' %}warning{% elif campaign.status == 'draft' %}secondary{% elif campaign.status == 'completed' %}info{% else %}secondary{% endif %} text-white">
                             <h6 class="mb-0">
-                                <i class="fas fa-info-circle me-2"></i>Campaign Information
+                                <i class="fas fa-info-circle me-2"></i>Campaign Status & Participant Management
                             </h6>
                         </div>
                         <div class="card-body">
@@ -209,14 +257,56 @@
                             <hr>
                             <div class="row">
                                 <div class="col-sm-3">
-                                    <strong>Status:</strong>
+                                    <strong>Current Status:</strong>
                                 </div>
                                 <div class="col-sm-9">
-                                    <span class="badge bg-{% if campaign.status == 'active' %}success{% elif campaign.status == 'ready' %}warning{% elif campaign.status == 'draft' %}secondary{% else %}info{% endif %}">
-                                        {{ campaign.status|title }}
+                                    <span class="badge bg-{% if campaign.status == 'active' %}success{% elif campaign.status == 'ready' %}warning{% elif campaign.status == 'draft' %}secondary{% elif campaign.status == 'completed' %}info{% else %}secondary{% endif %} me-2">
+                                        {% if campaign.status == 'draft' %}
+                                            <i class="fas fa-edit me-1"></i>Draft
+                                        {% elif campaign.status == 'ready' %}
+                                            <i class="fas fa-check-circle me-1"></i>Ready
+                                        {% elif campaign.status == 'active' %}
+                                            <i class="fas fa-play-circle me-1"></i>Active
+                                        {% elif campaign.status == 'completed' %}
+                                            <i class="fas fa-flag-checkered me-1"></i>Completed
+                                        {% endif %}
                                     </span>
+                                    
+                                    <!-- Status explanation -->
+                                    {% if campaign.status == 'draft' %}
+                                        <span class="text-success">✓ Can add/remove participants</span>
+                                    {% elif campaign.status == 'ready' %}
+                                        <span class="text-success">✓ Can add/remove participants</span>
+                                    {% elif campaign.status == 'active' %}
+                                        <span class="text-warning">⚠️ Participant list locked - collecting responses</span>
+                                    {% elif campaign.status == 'completed' %}
+                                        <span class="text-muted">🔒 Participant list permanently locked</span>
+                                    {% endif %}
                                 </div>
                             </div>
+                            
+                            <!-- Detailed status explanation -->
+                            <hr>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="p-3 bg-light rounded">
+                                        {% if campaign.status == 'draft' %}
+                                            <strong class="text-primary">Draft Campaign:</strong>
+                                            <p class="mb-1 small">The campaign is being prepared. You can freely add or remove participants, modify campaign details, and prepare for launch.</p>
+                                        {% elif campaign.status == 'ready' %}
+                                            <strong class="text-warning">Ready for Activation:</strong>
+                                            <p class="mb-1 small">Campaign is prepared and ready to go live. You can still add or remove participants until the campaign is activated.</p>
+                                        {% elif campaign.status == 'active' %}
+                                            <strong class="text-success">Active Campaign:</strong>
+                                            <p class="mb-1 small">Campaign is live and collecting survey responses. Participant list is locked to maintain data integrity. Wait for completion to modify participants.</p>
+                                        {% elif campaign.status == 'completed' %}
+                                            <strong class="text-info">Completed Campaign:</strong>
+                                            <p class="mb-1 small">Campaign has finished. All data is preserved and participant list is permanently locked to maintain historical accuracy.</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <hr>
                             <div class="row">
                                 <div class="col-sm-3">
