@@ -263,20 +263,6 @@
             {{ 'Demo Environment' if business_account.account_type == 'demo' else 'Customer Account' }}
         </div>
 
-        <!-- Campaign Management Section -->
-        <div class="admin-section">
-            <div class="section-header">
-                <h3 class="section-title">
-                    <i class="fas fa-bullhorn"></i>
-                    Campaign Management
-                </h3>
-                <button class="btn btn-primary btn-admin" onclick="showCreateCampaignModal()">
-                    <i class="fas fa-plus me-2"></i>Create Campaign
-                </button>
-            </div>
-            <p class="text-muted mb-0">Create and manage survey campaigns for your business account.</p>
-        </div>
-
         <!-- Statistics Overview -->
         <div class="row">
             <div class="col-lg-3 col-md-6">
@@ -315,6 +301,20 @@
                     <p class="stat-label">Total Participants</p>
                 </div>
             </div>
+        </div>
+
+        <!-- Campaign Management Section -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-bullhorn"></i>
+                    Campaign Management
+                </h3>
+                <button class="btn btn-primary btn-admin" onclick="showCreateCampaignModal()">
+                    <i class="fas fa-plus me-2"></i>Create Campaign
+                </button>
+            </div>
+            <p class="text-muted mb-0">Create and manage survey campaigns for your business account.</p>
         </div>
 
         {% if admin_data.account_type == 'demo' %}
