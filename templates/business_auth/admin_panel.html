@@ -127,35 +127,193 @@
 }
 
 .campaign-item, .response-item {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-xl);
     border: 1px solid var(--light-gray);
     border-radius: var(--radius-xl);
     margin-bottom: var(--spacing-lg);
     transition: all 0.3s ease;
     background: var(--primary-white);
+    position: relative;
+    overflow: hidden;
 }
 
 .campaign-item:hover, .response-item:hover {
     border-color: var(--primary-red);
-    background-color: var(--light-gray);
+    background-color: rgba(var(--primary-red-rgb, 220, 53, 69), 0.02);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.campaign-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.campaign-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary-black);
+    margin: 0;
+    font-family: var(--font-family-headings);
+    line-height: 1.3;
+}
+
+.campaign-metric {
+    font-size: 0.95rem;
+    color: var(--gray-dark);
+    margin: 0.5rem 0 1.25rem 0;
+    font-family: var(--font-family-base);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.campaign-metric i {
+    opacity: 0.7;
+    font-size: 0.85rem;
+}
+
+.campaign-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.campaign-actions .btn {
+    padding: 0.5rem 1.2rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    border: 1.5px solid transparent;
+    text-decoration: none;
+}
+
+.campaign-primary-btn {
+    background: var(--primary-red);
+    color: var(--primary-white);
+    border-color: var(--primary-red) !important;
+}
+
+.campaign-primary-btn:hover {
+    background: var(--red-hover);
+    border-color: var(--red-hover) !important;
+    color: var(--primary-white);
+    transform: translateY(-1px);
+}
+
+.campaign-secondary-btn {
+    background: transparent;
+    color: var(--primary-red);
+    border-color: var(--primary-red) !important;
+}
+
+.campaign-secondary-btn:hover {
+    background: var(--red-light);
+    color: var(--primary-red);
+    border-color: var(--primary-red) !important;
+    transform: translateY(-1px);
+}
+
+.campaign-details-toggle {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(var(--primary-red-rgb, 220, 53, 69), 0.1);
+    color: var(--primary-red);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0.6;
+}
+
+.campaign-details-toggle:hover {
+    opacity: 1;
+    background: rgba(var(--primary-red-rgb, 220, 53, 69), 0.15);
+    transform: scale(1.1);
+}
+
+.campaign-expanded-details {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--light-gray);
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.campaign-expanded-details.show {
+    display: block;
+}
+
+.campaign-expanded-details .detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.campaign-expanded-details .detail-label {
+    color: var(--gray-dark);
+    font-weight: 500;
+}
+
+.campaign-expanded-details .detail-value {
+    color: var(--primary-black);
+    font-weight: 400;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .campaign-status {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.875rem;
     border-radius: 20px;
     font-size: 0.8rem;
     font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.campaign-status i {
+    font-size: 0.7rem;
 }
 
 .status-active {
-    background-color: var(--red-light);
-    color: var(--primary-red);
+    background-color: rgba(34, 197, 94, 0.1);
+    color: rgb(22, 163, 74);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.status-ready {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: rgb(37, 99, 235);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.status-draft {
+    background-color: rgba(251, 191, 36, 0.1);
+    color: rgb(217, 119, 6);
+    border: 1px solid rgba(251, 191, 36, 0.2);
 }
 
 .status-completed {
     background-color: var(--light-gray);
     color: var(--primary-black);
+    border: 1px solid var(--medium-gray);
 }
 
 .btn-admin {
@@ -341,61 +499,115 @@
                     
                     {% if admin_data.campaigns %}
                         {% for campaign in admin_data.campaigns %}
-                        <div class="campaign-item" style="cursor: pointer;" onclick="location.href='{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}'">
-                            <div class="row align-items-center">
-                                <div class="col-md-6">
-                                    <h5 class="mb-1">{{ campaign.name }}</h5>
-                                    <p class="text-muted mb-1">{{ campaign.description or 'No description' }}</p>
-                                    <small class="text-muted">
-                                        {{ campaign.start_date }} to {{ campaign.end_date }}
-                                        • {{ campaign.response_count }} responses
-                                        {% if campaign.status == 'draft' and campaign.days_until_start > 0 %}
-                                        • {{ campaign.days_until_start }} days until start
-                                        {% elif campaign.status == 'active' and campaign.days_remaining > 0 %}
-                                        • {{ campaign.days_remaining }} days remaining
-                                        {% elif campaign.status == 'completed' and campaign.days_since_ended > 0 %}
-                                        • Ended {{ campaign.days_since_ended }} days ago
-                                        {% endif %}
-                                    </small>
+                        <div class="campaign-item" onclick="toggleCampaignDetails('campaign-{{ campaign.id }}')">
+                            <!-- Details toggle button -->
+                            <button class="campaign-details-toggle" onclick="event.stopPropagation(); toggleCampaignDetails('campaign-{{ campaign.id }}')" title="Show more details">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            
+                            <!-- Campaign Header -->
+                            <div class="campaign-card-header">
+                                <h4 class="campaign-title">{{ campaign.name }}</h4>
+                                <span class="campaign-status 
+                                    {% if campaign.status == 'active' %}status-active
+                                    {% elif campaign.status == 'ready' %}status-ready
+                                    {% elif campaign.status == 'draft' %}status-draft
+                                    {% else %}status-completed
+                                    {% endif %}">
+                                    {% if campaign.status == 'active' %}
+                                        <i class="fas fa-play-circle"></i>Active
+                                    {% elif campaign.status == 'ready' %}
+                                        <i class="fas fa-check-circle"></i>Ready
+                                    {% elif campaign.status == 'draft' %}
+                                        <i class="fas fa-edit"></i>Draft
+                                    {% elif campaign.status == 'completed' %}
+                                        <i class="fas fa-flag-checkered"></i>Completed
+                                    {% else %}
+                                        {{ campaign.status|title }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                            
+                            <!-- Key Metric (based on campaign status) -->
+                            <div class="campaign-metric">
+                                {% if campaign.status == 'draft' and campaign.days_until_start > 0 %}
+                                    <i class="fas fa-calendar-alt"></i>
+                                    Starts in {{ campaign.days_until_start }} day{{ 's' if campaign.days_until_start != 1 else '' }}
+                                {% elif campaign.status == 'active' and campaign.days_remaining > 0 %}
+                                    <i class="fas fa-clock"></i>
+                                    {{ campaign.days_remaining }} day{{ 's' if campaign.days_remaining != 1 else '' }} remaining
+                                {% elif campaign.status == 'completed' %}
+                                    <i class="fas fa-chart-line"></i>
+                                    {{ campaign.response_count }} total responses
+                                {% else %}
+                                    <i class="fas fa-info-circle"></i>
+                                    {{ campaign.response_count }} responses collected
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Primary Actions (max 2 buttons based on status) -->
+                            <div class="campaign-actions" onclick="event.stopPropagation();">
+                                {% if campaign.status == 'active' %}
+                                    <a href="{{ url_for('dashboard') }}?campaign_id={{ campaign.id }}" class="btn campaign-primary-btn">
+                                        <i class="fas fa-chart-bar me-1"></i>View Analytics
+                                    </a>
+                                    <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" class="btn campaign-secondary-btn">
+                                        <i class="fas fa-users me-1"></i>Manage Participants
+                                    </a>
+                                {% elif campaign.status == 'completed' %}
+                                    <a href="{{ url_for('dashboard') }}?campaign_id={{ campaign.id }}" class="btn campaign-primary-btn">
+                                        <i class="fas fa-chart-bar me-1"></i>View Results
+                                    </a>
+                                    <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="btn campaign-secondary-btn">
+                                        <i class="fas fa-eye me-1"></i>View Details
+                                    </a>
+                                {% elif campaign.status == 'draft' %}
+                                    <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="btn campaign-primary-btn">
+                                        <i class="fas fa-edit me-1"></i>Edit Campaign
+                                    </a>
+                                    <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" class="btn campaign-secondary-btn">
+                                        <i class="fas fa-users me-1"></i>Add Participants
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="btn campaign-primary-btn">
+                                        <i class="fas fa-eye me-1"></i>View Details
+                                    </a>
+                                    <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" class="btn campaign-secondary-btn">
+                                        <i class="fas fa-users me-1"></i>Participants
+                                    </a>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Expanded Details (hidden by default) -->
+                            <div class="campaign-expanded-details" id="campaign-{{ campaign.id }}-details">
+                                <div class="detail-row">
+                                    <span class="detail-label">Description:</span>
+                                    <span class="detail-value">{{ campaign.description or 'No description provided' }}</span>
                                 </div>
-                                <div class="col-md-3 text-center">
-                                    <span class="campaign-status 
-                                        {% if campaign.status == 'active' %}status-active
-                                        {% elif campaign.status == 'ready' %}status-ready
-                                        {% elif campaign.status == 'draft' %}status-draft
-                                        {% else %}status-completed
-                                        {% endif %}">
-                                        {% if campaign.status == 'active' %}
-                                            <i class="fas fa-play-circle me-1"></i>Active
-                                        {% elif campaign.status == 'ready' %}
-                                            <i class="fas fa-check-circle me-1"></i>Ready
-                                        {% elif campaign.status == 'draft' %}
-                                            <i class="fas fa-edit me-1"></i>Draft
-                                        {% elif campaign.status == 'completed' %}
-                                            <i class="fas fa-flag-checkered me-1"></i>Completed
-                                        {% else %}
-                                            {{ campaign.status|title }}
-                                        {% endif %}
-                                    </span>
+                                <div class="detail-row">
+                                    <span class="detail-label">Duration:</span>
+                                    <span class="detail-value">{{ campaign.start_date }} to {{ campaign.end_date }}</span>
                                 </div>
-                                <div class="col-md-3 text-end">
-                                    <div class="btn-group-sm" role="group" onclick="event.stopPropagation();">
-                                        <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" 
-                                           class="btn btn-outline-primary btn-sm me-1" title="View Details">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        {% if campaign.status in ['active', 'completed'] %}
-                                        <a href="{{ url_for('dashboard') }}?campaign_id={{ campaign.id }}" 
-                                           class="btn btn-outline-success btn-sm me-1" title="View Analytics">
-                                            <i class="fas fa-chart-bar"></i>
-                                        </a>
-                                        {% endif %}
-                                        <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" 
-                                           class="btn btn-outline-secondary btn-sm" title="Manage Participants">
-                                            <i class="fas fa-users"></i>
-                                        </a>
-                                    </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Responses:</span>
+                                    <span class="detail-value">{{ campaign.response_count }} collected</span>
                                 </div>
+                                {% if campaign.status == 'active' and campaign.days_remaining > 0 %}
+                                <div class="detail-row">
+                                    <span class="detail-label">Time Remaining:</span>
+                                    <span class="detail-value">{{ campaign.days_remaining }} days</span>
+                                </div>
+                                {% elif campaign.status == 'draft' and campaign.days_until_start > 0 %}
+                                <div class="detail-row">
+                                    <span class="detail-label">Starts In:</span>
+                                    <span class="detail-value">{{ campaign.days_until_start }} days</span>
+                                </div>
+                                {% elif campaign.status == 'completed' and campaign.days_since_ended > 0 %}
+                                <div class="detail-row">
+                                    <span class="detail-label">Completed:</span>
+                                    <span class="detail-value">{{ campaign.days_since_ended }} days ago</span>
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                         {% endfor %}
@@ -561,6 +773,49 @@ document.querySelectorAll('.quick-action-btn').forEach(btn => {
         setTimeout(() => {
             icon.className = originalClass;
         }, 3000);
+    });
+});
+
+// Progressive disclosure for campaign details
+function toggleCampaignDetails(campaignId) {
+    const detailsElement = document.getElementById(campaignId + '-details');
+    const toggleButton = document.querySelector(`[onclick*="${campaignId}"] .campaign-details-toggle i`);
+    
+    if (!detailsElement || !toggleButton) return;
+    
+    const isExpanded = detailsElement.classList.contains('show');
+    
+    if (isExpanded) {
+        // Collapse
+        detailsElement.classList.remove('show');
+        toggleButton.className = 'fas fa-chevron-down';
+        detailsElement.style.maxHeight = '0';
+    } else {
+        // Expand
+        detailsElement.classList.add('show');
+        toggleButton.className = 'fas fa-chevron-up';
+        detailsElement.style.maxHeight = detailsElement.scrollHeight + 'px';
+    }
+}
+
+// Enhanced button interactions
+document.addEventListener('DOMContentLoaded', function() {
+    // Add smooth transitions to campaign cards
+    document.querySelectorAll('.campaign-item').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+    
+    // Prevent card click when clicking on action buttons
+    document.querySelectorAll('.campaign-actions a').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
     });
 });
 
