@@ -100,6 +100,22 @@ function forceRemoveYellowColors() {
 // CAMPAIGN ANALYTICS FILTERING
 // ============================================================================
 
+// Helper function to format campaign status for display
+function formatCampaignStatus(status) {
+    switch (status) {
+        case 'draft':
+            return 'Draft';
+        case 'ready':
+            return 'Ready';
+        case 'active':
+            return 'Active';
+        case 'completed':
+            return 'Completed';
+        default:
+            return 'Unknown';
+    }
+}
+
 // Load campaign options for analytics filtering
 async function loadCampaignFilterOptions() {
     try {
@@ -148,7 +164,7 @@ function populateCampaignFilterDropdown() {
         option.value = campaign.id;
         
         // Determine status
-        const status = campaign.status === 'active' ? 'Active' : 'Closed';
+        const status = formatCampaignStatus(campaign.status);
         
         // Format option text with status
         option.textContent = `${campaign.name} (${formatDate(campaign.start_date)} - ${formatDate(campaign.end_date)}) - ${status}`;
@@ -392,7 +408,7 @@ function populateComparisonDropdowns() {
     
     // Add campaign options to both dropdowns
     comparisonCampaigns.forEach(campaign => {
-        const status = campaign.status === 'active' ? 'Active' : 'Closed';
+        const status = formatCampaignStatus(campaign.status);
         const optionText = `${campaign.name} (${formatDate(campaign.start_date)} - ${formatDate(campaign.end_date)}) - ${status}`;
         
         // Campaign 1 dropdown
