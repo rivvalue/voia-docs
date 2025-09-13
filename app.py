@@ -81,6 +81,10 @@ with app.app_context():
     from participant_routes import participant_bp
     app.register_blueprint(participant_bp)
     
+    # Register campaign management blueprint (Phase 3 completion)
+    from campaign_routes import campaign_bp
+    app.register_blueprint(campaign_bp)
+    
     # Initialize Rivvalue admin user (Phase 2)
     try:
         init_result = init_rivvalue_admin_user()

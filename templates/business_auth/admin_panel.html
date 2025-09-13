@@ -310,9 +310,9 @@
                     <i class="fas fa-bullhorn"></i>
                     Campaign Management
                 </h3>
-                <button class="btn btn-primary btn-admin" onclick="showCreateCampaignModal()">
-                    <i class="fas fa-plus me-2"></i>Create Campaign
-                </button>
+                <a href="{{ url_for('campaigns.list_campaigns') }}" class="btn btn-primary btn-admin">
+                    <i class="fas fa-cogs me-2"></i>Manage Campaigns
+                </a>
             </div>
             <p class="text-muted mb-0">Create and manage survey campaigns for your business account.</p>
         </div>
