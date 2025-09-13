@@ -329,7 +329,7 @@
                             Demo Campaigns
                         </h3>
                         <div class="btn-group" role="group">
-                            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary btn-admin">
+                            <a href="{{ url_for('dashboard') }}{% if admin_data.campaigns %}{% for campaign in admin_data.campaigns %}{% if campaign.status == 'active' %}?campaign_id={{ campaign.id }}{% endif %}{% endfor %}{% endif %}" class="btn btn-outline-primary btn-admin">
                                 <i class="fas fa-chart-bar me-2"></i>View Analytics
                             </a>
                             <a href="{{ url_for('participants.list_participants') }}" class="btn btn-primary btn-admin">
@@ -453,7 +453,7 @@
                 </h3>
             </div>
             <div class="quick-actions">
-                <a href="{{ url_for('dashboard') }}" class="quick-action-btn">
+                <a href="{{ url_for('dashboard') }}{% if admin_data.campaigns %}{% for campaign in admin_data.campaigns %}{% if campaign.status == 'active' %}?campaign_id={{ campaign.id }}{% endif %}{% endfor %}{% endif %}" class="quick-action-btn">
                     <i class="fas fa-chart-bar d-block mb-2"></i>
                     <strong>View Dashboard</strong><br>
                     <small>Analytics & Insights</small>
