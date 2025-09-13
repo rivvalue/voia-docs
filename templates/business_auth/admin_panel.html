@@ -263,6 +263,20 @@
             {{ 'Demo Environment' if business_account.account_type == 'demo' else 'Customer Account' }}
         </div>
 
+        <!-- Campaign Management Section -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-bullhorn"></i>
+                    Campaign Management
+                </h3>
+                <button class="btn btn-primary btn-admin" onclick="showCreateCampaignModal()">
+                    <i class="fas fa-plus me-2"></i>Create Campaign
+                </button>
+            </div>
+            <p class="text-muted mb-0">Create and manage survey campaigns for your business account.</p>
+        </div>
+
         <!-- Statistics Overview -->
         <div class="row">
             <div class="col-lg-3 col-md-6">
@@ -475,6 +489,57 @@
 </div>
 {% endblock %}
 
+<!-- Campaign Creation Modal -->
+<div class="modal fade" id="createCampaignModal" tabindex="-1" aria-labelledby="createCampaignModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createCampaignModalLabel">
+                    <i class="fas fa-calendar-plus me-2"></i>Create New Campaign
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createCampaignForm">
+                    <div class="mb-3">
+                        <label for="campaignName" class="form-label">Campaign Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="campaignName" placeholder="e.g., Q2 Product Satisfaction" required>
+                        <div class="form-text">A clear, descriptive name for your campaign</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="campaignDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="campaignDescription" rows="3" placeholder="Optional description of campaign goals or focus areas"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="campaignStartDate" class="form-label">Start Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="campaignStartDate" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="campaignEndDate" class="form-label">End Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="campaignEndDate" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Important:</strong> Only one campaign can be active at a time. Survey responses during the campaign period will automatically be tagged to this campaign.
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="createCampaign()">
+                    <i class="fas fa-plus me-2"></i>Create Campaign
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% block scripts %}
 <script>
 // Auto-refresh session status
@@ -507,5 +572,64 @@ document.querySelectorAll('.quick-action-btn').forEach(btn => {
         }, 3000);
     });
 });
+
+// Add dashboard JavaScript functions for campaign management
+function showCreateCampaignModal() {
+    // Set default dates (start: today, end: 30 days from now)
+    const today = new Date();
+    const futureDate = new Date();
+    futureDate.setDate(today.getDate() + 30);
+    
+    document.getElementById('campaignStartDate').value = today.toISOString().split('T')[0];
+    document.getElementById('campaignEndDate').value = futureDate.toISOString().split('T')[0];
+    
+    // Reset form
+    document.getElementById('createCampaignForm').reset();
+    
+    // Show modal
+    new bootstrap.Modal(document.getElementById('createCampaignModal')).show();
+}
+
+async function createCampaign() {
+    const form = document.getElementById('createCampaignForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    
+    const formData = {
+        name: document.getElementById('campaignName').value,
+        description: document.getElementById('campaignDescription').value,
+        start_date: document.getElementById('campaignStartDate').value,
+        end_date: document.getElementById('campaignEndDate').value
+    };
+    
+    try {
+        const response = await fetch('/api/campaigns', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': localStorage.getItem('authToken')
+            },
+            body: JSON.stringify(formData)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            // Success
+            bootstrap.Modal.getInstance(document.getElementById('createCampaignModal')).hide();
+            alert('Campaign created successfully!');
+            // Refresh page to show updated data
+            window.location.reload();
+        } else {
+            // Error
+            alert('Error: ' + (result.error || 'Failed to create campaign'));
+        }
+    } catch (error) {
+        console.error('Error creating campaign:', error);
+        alert('Failed to create campaign. Please try again.');
+    }
+}
 </script>
 {% endblock %}
