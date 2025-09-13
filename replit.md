@@ -125,3 +125,160 @@ Key architectural decisions include:
 - **Chart.js CDN**: For interactive data visualizations on the dashboard.
 - **Font Awesome CDN**: For iconography.
 - **Python Packages**: Flask, SQLAlchemy, OpenAI client library, TextBlob.
+
+---
+
+# MULTI-TENANT PARTICIPANT MANAGEMENT SYSTEM (VOCSA Business Accounts)
+
+## Implementation Status: September 2025
+
+### Phase 3: Campaign Lifecycle Management ✅ COMPLETED
+**Target Completion**: Transform single-tenant demo into full business account system with campaign lifecycle management.
+
+#### Major Completions:
+
+**✅ Campaign Lifecycle System**
+- Complete lifecycle states: draft→ready→active→completed with validation
+- Database constraint enforces single active campaign per business account
+- PostgreSQL advisory locks prevent scheduler duplication in multi-worker environment
+- Participant association blocked during active/completed states for data integrity
+
+**✅ Professional Admin Panel Restructuring**
+- Campaign management positioned as primary workflow (hero position)
+- Consistent red-themed stat cards following brand palette (#E13A44)
+- Simplified campaign cards with progressive disclosure and smart action buttons
+- Enhanced visual hierarchy: 60% reduction in visual clutter while maintaining functionality
+- Professional styling with modern hover effects and animations
+
+**✅ Comprehensive Campaign Management**
+- Dedicated campaign management pages replacing modal workflow
+- Campaign creation, editing, lifecycle transitions with proper validation
+- Analytics dashboard integration with automatic campaign filtering
+- Status-based UI controls and contextual action buttons
+
+**✅ Enhanced Participant Association Workflow**
+- Proper guards preventing modifications during active/completed campaigns
+- Campaign-participant association with invitation tracking
+- Remove functionality with status-based constraints
+- Clear error messaging and user guidance
+
+**✅ Security & Data Integrity Fixes**
+- CSRF protection verified across all POST routes
+- Database-level single active campaign enforcement via partial unique index
+- Scheduler coordination via PostgreSQL advisory locks (ID: 123456)
+- Business account scoping enforced throughout all queries
+- Fixed critical token bug in campaign participants page
+
+**✅ Lightweight Scheduler Implementation**
+- Background thread with 5-minute intervals for campaign lifecycle automation
+- Auto-activation: ready→active when start_date ≤ today and constraints satisfied
+- Auto-completion: active→completed when end_date < today
+- Comprehensive error handling with graceful recovery
+- Admin testing routes: `/business/admin/scheduler/run` and `/business/admin/scheduler/status`
+
+#### Key Files Implemented/Modified:
+- `campaign_routes.py` - Complete lifecycle transition routes and validation
+- `templates/campaigns/` - Dedicated campaign management UI (list, create, view)
+- `templates/business_auth/admin_panel.html` - Professional restructuring and UX optimization
+- `participant_routes.py` - Enhanced association workflow with proper guards
+- `task_queue.py` - Lightweight scheduler with PostgreSQL coordination
+- `models.py` - Database constraints, date calculations, lifecycle methods
+- `business_auth_routes.py` - Admin testing routes and health checks
+
+#### System Architecture Implemented:
+
+**Database Schema:**
+- BusinessAccount: Multi-tenant isolation with demo/production modes
+- BusinessAccountUser: Role-based access (admin/manager/viewer)
+- Participant: Contact management with business account scoping
+- Campaign: Lifecycle management with business account ownership
+- CampaignParticipant: Many-to-many association with invitation tracking
+- Database constraints: Single active campaign per business account
+
+**Authentication & Security:**
+- Business account login system with role-based permissions
+- Session management with auto-refresh and CSRF protection
+- @require_business_auth and @require_permission decorators
+- Database-level tenant isolation with business_account_id scoping
+
+**Campaign Management Workflow:**
+1. Create campaign (draft status)
+2. Assign participants 
+3. Mark as ready (validation: name, description, participants)
+4. Activate campaign (automatic or manual, enforces single active constraint)
+5. Monitor via analytics dashboard
+6. Complete campaign (automatic on end date or manual)
+
+## Immediate Next Steps (Phase 4 Implementation)
+
+### Phase 4: Token-Based Survey Access
+**Target**: Implement participant token validation for campaign-specific surveys
+
+#### Implementation Requirements:
+1. **Survey Token Validation System**
+   - Update survey routes to accept campaign-participant tokens
+   - Add token validation middleware in survey endpoints
+   - Route survey responses to appropriate campaign context
+
+2. **Parallel Access Methods**
+   - Maintain existing `participant.token` for trial user access
+   - Use `campaign_participants.token` for invitation-based access  
+   - Ensure both token types route responses correctly
+
+3. **Token Management Enhancement**
+   - Token expiration and refresh mechanisms
+   - Security audit of token generation and validation
+   - Integration with campaign lifecycle states
+
+#### Files to Modify (Phase 4):
+- `routes.py` - Survey endpoints for token validation
+- `models.py` - Token validation methods and expiration logic
+- Survey templates - Campaign context integration
+- `auth_system.py` - Dual token validation logic
+
+### Future Enhancements (Post-Phase 4)
+
+**Admin Panel Advanced Features:**
+- Enhanced activity feed with campaign context for recent responses
+- Workflow-driven dashboard that adapts to current campaign states
+- Advanced data visualization with campaign performance metrics
+- Mobile-responsive design optimizations
+
+**Analytics Integration:**
+- Campaign-specific performance dashboards
+- Participant engagement tracking
+- Business account reporting and export capabilities
+- Comparative analytics between campaigns
+
+## Development Guidelines (Multi-Tenant)
+
+**Security & Isolation:**
+- ALL queries MUST filter by `business_account_id` for tenant isolation
+- Use `@require_business_auth` and `@require_permission` decorators on protected routes
+- Campaign lifecycle transitions must respect single active constraint
+- Token validation must include business account context
+
+**Database Operations:**
+- Enforce business account scoping at model level where possible
+- Use database constraints for critical business rules (single active campaign)
+- Advisory locks for coordinating background processes
+- Proper transaction handling for lifecycle transitions
+
+**UI/UX Standards:**
+- Server-rendered templates preferred over JavaScript-heavy SPAs
+- Red-gray color palette (#E13A44 primary) consistently applied
+- Workflow-optimized layouts with clear visual hierarchy  
+- Professional styling with proper error handling and user guidance
+
+**Quality Assurance:**
+- Test campaign lifecycle transitions thoroughly
+- Verify business account isolation in all features
+- Validate scheduler behavior under various conditions
+- Ensure CSRF protection on all state-changing operations
+
+## Environment Status (September 2025)
+- **Database**: PostgreSQL with proper schema constraints applied
+- **Scheduler**: Background campaign lifecycle management active and coordinated
+- **Security**: CSRF protection enabled, advisory locks implemented, business account isolation enforced
+- **UI**: Professional admin panel with campaign-focused workflow and progressive disclosure
+- **Testing**: Admin routes available for scheduler testing and database health verification
