@@ -387,7 +387,7 @@ def manage_campaign_participants(campaign_id):
                 participant_data = cp.participant.to_dict() if cp.participant else {}
                 participant_data.update({
                     'association_id': cp.id,
-                    'token': cp.token,
+                    'token': cp.participant.token if cp.participant else None,
                     'status': cp.status,
                     'invited_at': cp.invited_at.isoformat() if cp.invited_at else None,
                     'started_at': cp.started_at.isoformat() if cp.started_at else None,
