@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}Create Campaign - {{ business_account.name }}{% endblock %}
+
+{% block page_class %}page-create-campaign{% endblock %}
+
+{% block content %}
+<style>
+/* Create campaign specific styling */
+.form-header {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+    padding: 2rem 0;
+    border-radius: var(--radius-2xl);
+    margin-bottom: 2rem;
+}
+
+.form-container {
+    background: var(--primary-white);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+}
+
+.form-section {
+    margin-bottom: 2rem;
+}
+
+.form-section:last-child {
+    margin-bottom: 0;
+}
+
+.section-title {
+    color: var(--primary-black);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.alert-info {
+    background-color: rgba(225, 58, 68, 0.1);
+    border-color: var(--primary-red);
+    color: var(--primary-black);
+}
+</style>
+
+<div class="container">
+    <!-- Form Header -->
+    <div class="form-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-1">Create New Campaign</h1>
+                    <p class="mb-0 opacity-75">Set up a new survey campaign for {{ business_account.name }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('business_auth.admin_panel') }}">Admin Panel</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('campaigns.list_campaigns') }}">Campaigns</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Create Campaign</li>
+        </ol>
+    </nav>
+
+    <!-- Campaign Creation Form -->
+    <div class="form-container">
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <!-- Basic Information -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-info-circle"></i>Basic Information
+                </h3>
+                
+                <div class="mb-3">
+                    <label for="name" class="form-label">Campaign Name <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="name" name="name" 
+                           placeholder="e.g., Q2 2025 Product Satisfaction Survey" 
+                           required maxlength="200">
+                    <div class="form-text">A clear, descriptive name for your campaign</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="3" 
+                              placeholder="Optional description of campaign goals, focus areas, or target audience"></textarea>
+                    <div class="form-text">Optional details about this campaign's purpose and scope</div>
+                </div>
+            </div>
+
+            <!-- Schedule -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-calendar-alt"></i>Campaign Schedule
+                </h3>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="start_date" class="form-label">Start Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="start_date" name="start_date" required>
+                            <div class="form-text">When should this campaign begin?</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="end_date" class="form-label">End Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="end_date" name="end_date" required>
+                            <div class="form-text">When should this campaign end?</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info">
+                    <i class="fas fa-lightbulb me-2"></i>
+                    <strong>Next Steps:</strong> After creating your campaign, you'll be able to:
+                    <ul class="mb-0 mt-2">
+                        <li>Assign participants to the campaign</li>
+                        <li>Generate personalized survey tokens</li>
+                        <li>Schedule campaign activation and email invitations</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="d-flex justify-content-between">
+                <a href="{{ url_for('campaigns.list_campaigns') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Campaigns
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Create Campaign
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Set default dates (start: today, end: 30 days from now)
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date();
+    const futureDate = new Date();
+    futureDate.setDate(today.getDate() + 30);
+    
+    document.getElementById('start_date').value = today.toISOString().split('T')[0];
+    document.getElementById('end_date').value = futureDate.toISOString().split('T')[0];
+});
+
+// Date validation
+document.getElementById('end_date').addEventListener('change', function() {
+    const startDate = document.getElementById('start_date').value;
+    const endDate = this.value;
+    
+    if (startDate && endDate && new Date(endDate) <= new Date(startDate)) {
+        alert('End date must be after start date.');
+        this.value = '';
+    }
+});
+</script>
+{% endblock %}
