@@ -575,19 +575,37 @@ document.querySelectorAll('.quick-action-btn').forEach(btn => {
 
 // Add dashboard JavaScript functions for campaign management
 function showCreateCampaignModal() {
+    console.log('showCreateCampaignModal called');
+    
+    // Check if modal exists
+    const modal = document.getElementById('createCampaignModal');
+    const startDateField = document.getElementById('campaignStartDate');
+    const endDateField = document.getElementById('campaignEndDate');
+    const form = document.getElementById('createCampaignForm');
+    
+    console.log('Modal element:', modal);
+    console.log('Start date field:', startDateField);
+    console.log('End date field:', endDateField);
+    
+    if (!modal || !startDateField || !endDateField || !form) {
+        console.error('Campaign modal elements not found');
+        alert('Campaign creation modal not found. Please refresh the page.');
+        return;
+    }
+    
     // Set default dates (start: today, end: 30 days from now)
     const today = new Date();
     const futureDate = new Date();
     futureDate.setDate(today.getDate() + 30);
     
-    document.getElementById('campaignStartDate').value = today.toISOString().split('T')[0];
-    document.getElementById('campaignEndDate').value = futureDate.toISOString().split('T')[0];
+    startDateField.value = today.toISOString().split('T')[0];
+    endDateField.value = futureDate.toISOString().split('T')[0];
     
     // Reset form
-    document.getElementById('createCampaignForm').reset();
+    form.reset();
     
     // Show modal
-    new bootstrap.Modal(document.getElementById('createCampaignModal')).show();
+    new bootstrap.Modal(modal).show();
 }
 
 async function createCampaign() {
