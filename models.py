@@ -193,9 +193,32 @@ class Campaign(db.Model):
         return (self.start_date - today).days
     
     def close_campaign(self):
-        """Mark campaign as completed"""
+        """Mark campaign as completed and generate KPI snapshot"""
+        import logging
+        
+        logger = logging.getLogger(__name__)
+        
+        # Set completion status and timestamp
         self.status = 'completed'
         self.completed_at = datetime.utcnow()
+        
+        # Generate KPI snapshot to preserve analytics data
+        try:
+            # Import here to avoid circular imports (data_storage imports models)
+            from data_storage import generate_campaign_kpi_snapshot
+            
+            logger.info(f"Generating KPI snapshot for campaign '{self.name}' (ID: {self.id})")
+            snapshot = generate_campaign_kpi_snapshot(self.id)
+            
+            if snapshot:
+                logger.info(f"KPI snapshot successfully created for campaign '{self.name}' (ID: {self.id})")
+            else:
+                logger.warning(f"KPI snapshot generation returned None for campaign '{self.name}' (ID: {self.id})")
+                
+        except Exception as e:
+            logger.error(f"Failed to generate KPI snapshot for campaign '{self.name}' (ID: {self.id}): {e}")
+            # Don't raise the exception - campaign completion should succeed even if snapshot fails
+            # The snapshot can be generated manually later if needed
     
     def mark_ready(self):
         """Mark campaign as ready for activation"""

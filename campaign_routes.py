@@ -335,9 +335,8 @@ def complete_campaign(campaign_id):
             flash(f'Only active campaigns can be completed. Current status: {campaign.status}', 'error')
             return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
-        # Complete campaign
-        campaign.status = 'completed'
-        campaign.completed_at = datetime.utcnow()
+        # Complete campaign and generate KPI snapshot
+        campaign.close_campaign()
         
         db.session.commit()
         

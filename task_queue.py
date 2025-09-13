@@ -259,9 +259,8 @@ class TaskQueue:
         
         for campaign in expired_campaigns:
             try:
-                # Complete the campaign
-                campaign.status = 'completed'
-                campaign.completed_at = datetime.utcnow()
+                # Complete the campaign and generate KPI snapshot
+                campaign.close_campaign()
                 db.session.commit()
                 
                 logger.info(f"Auto-completed campaign '{campaign.name}' (ID: {campaign.id}) "
