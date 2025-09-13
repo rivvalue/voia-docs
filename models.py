@@ -146,7 +146,8 @@ class Campaign(db.Model):
             'response_count': len([r for r in SurveyResponse.query.filter_by(campaign_id=self.id).all()]),
             'is_active': self.is_active(),
             'days_remaining': self.days_remaining(),
-            'days_since_ended': self.days_since_ended()
+            'days_since_ended': self.days_since_ended(),
+            'days_until_start': self.days_until_start()
         }
     
     def is_active(self):
@@ -181,6 +182,15 @@ class Campaign(db.Model):
         if today <= self.end_date:
             return 0
         return (today - self.end_date).days
+    
+    def days_until_start(self):
+        """Calculate days until campaign starts"""
+        if self.status == 'active':
+            return 0
+        today = date.today()
+        if today >= self.start_date:
+            return 0
+        return (self.start_date - today).days
     
     def close_campaign(self):
         """Mark campaign as completed"""

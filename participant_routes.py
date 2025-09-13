@@ -463,7 +463,7 @@ def manage_campaign_participants(campaign_id):
         db.session.rollback()
         logger.error(f"Error managing campaign participants for campaign {campaign_id}: {e}")
         flash('Error managing campaign participants.', 'error')
-        return redirect(url_for('participants.list_participants'))
+        return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
 
 
 @participant_bp.route('/campaigns/<int:campaign_id>/participants/<int:association_id>/remove', methods=['POST'])
