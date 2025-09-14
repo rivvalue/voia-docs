@@ -1461,6 +1461,8 @@ def conversation_response():
 def finalize_conversation():
     """Finalize conversational survey and save to database"""
     try:
+        # Import models to avoid circular imports
+        from models import SurveyResponse, Campaign
         # Check if user is authenticated via session
         if not session.get('auth_token'):
             return jsonify({'error': 'Authentication required', 'code': 'AUTH_ERROR'}), 401
