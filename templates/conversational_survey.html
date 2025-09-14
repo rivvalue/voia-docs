@@ -49,17 +49,23 @@
                         <div class="mb-3">
                             <label for="companyName" class="form-label">Company Name</label>
                             <input type="text" class="form-control" id="companyName" required 
+                                   value="{{ participant_company or '' }}"
+                                   {% if participant_company %}readonly{% endif %}
                                    placeholder="Enter your company name">
                         </div>
                         <div class="mb-3">
                             <label for="respondentName" class="form-label">Your Name</label>
                             <input type="text" class="form-control" id="respondentName" required 
+                                   value="{{ participant_name or '' }}"
+                                   {% if participant_name %}readonly{% endif %}
                                    placeholder="Enter your full name">
                         </div>
                         <div class="mb-3">
                             <label for="respondentEmail" class="form-label">Email Address</label>
                             <input type="email" class="form-control" id="respondentEmail" required 
-                                   placeholder="Enter your email address" value="{{ email or '' }}">
+                                   value="{{ email or '' }}"
+                                   {% if email %}readonly{% endif %}
+                                   placeholder="Enter your email address">
                         </div>
                         <div class="mb-3">
                             <label for="tenureWithFc" class="form-label">How long have you been working with FC inc?</label>
