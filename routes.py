@@ -9,7 +9,7 @@ from models_auth import AuthToken
 from task_queue import add_analysis_task, get_queue_stats
 from rate_limiter import rate_limit
 from auth_system import require_auth, generate_user_token
-from business_auth_routes import require_business_auth, require_permission
+from business_auth_routes import require_business_auth, require_permission, get_current_business_account
 from conversational_survey import start_conversational_survey, process_conversation_response, finalize_conversational_survey
 from ai_conversational_survey import start_ai_conversational_survey, process_ai_conversation_response, finalize_ai_conversational_survey
 from datetime import datetime, timedelta, date
@@ -1676,10 +1676,20 @@ def get_campaign_comparison():
         return jsonify({'error': 'Failed to load comparison data'}), 500
 
 @app.route('/api/campaigns/kpi-overview')
+@require_business_auth
+@require_permission('manage_participants')
 def get_campaigns_kpi_overview():
-    """Get KPI overview for all campaigns (public endpoint)"""
+    """Get KPI overview for campaigns in current business account (protected endpoint)"""
     try:
-        campaigns = Campaign.query.order_by(Campaign.start_date.asc()).all()
+        # Get current business account for security isolation
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Invalid business account session'}), 401
+        
+        # Filter campaigns by business account to prevent data leakage
+        campaigns = Campaign.query.filter_by(
+            business_account_id=current_account.id
+        ).order_by(Campaign.start_date.asc()).all()
         
         overview_data = []
         for campaign in campaigns:
