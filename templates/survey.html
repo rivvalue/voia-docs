@@ -208,6 +208,14 @@
                         </div>
                         <h4 class="text-success mb-3">Thank you for sharing with us your feedback.</h4>
                         <p class="lead mb-2">Your feedback has been successfully analyzed by VOÏA Intelligence.</p>
+                        
+                        <!-- Dashboard Button -->
+                        <div class="mb-4">
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-chart-bar me-2"></i>View Analytics Dashboard
+                            </a>
+                        </div>
+                        
                         <p class="text-muted mb-4">This completes your demonstration of our Voice of Client Agent capabilities.</p>
                         
                         <!-- Next Steps Section -->
@@ -217,10 +225,10 @@
                             
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <button onclick="startNewTraditionalSession()" class="btn btn-outline-primary btn-lg w-100">
+                                    <button onclick="startNewSession()" class="btn btn-outline-primary btn-lg w-100">
                                         <i class="fas fa-redo me-2"></i>Try Another Session
                                     </button>
-                                    <small class="text-muted d-block mt-2">Experience traditional survey with different scenarios</small>
+                                    <small class="text-muted d-block mt-2">Experience VOÏA with different scenarios</small>
                                 </div>
                                 <div class="col-md-6">
                                     <a href="mailto:info@rivvalue.com?subject=Voice of Client Agent - Full Service Inquiry&body=Hi Rivvalue team,%0A%0AI just completed the VOÏA Intelligence demonstration and I'm interested in learning more about implementing the full Voice of Client Agent service for my organization.%0A%0APlease contact me to discuss how this can benefit our customer feedback strategy.%0A%0AThank you!" 
@@ -230,21 +238,10 @@
                                     <small class="text-muted d-block mt-2">Implement full VoC Agent for your business</small>
                                 </div>
                             </div>
-                            
-                            <!-- Additional Option for Conversational Survey -->
-                            <div class="mt-3">
-                                <a href="{{ url_for('conversational_survey') }}" class="btn btn-info btn-lg w-100">
-                                    <i class="fas fa-comments me-2"></i>Try Conversational Survey
-                                </a>
-                                <small class="text-muted d-block mt-2">Experience our AI-powered conversational interface</small>
-                            </div>
                         </div>
                         
                         <!-- Additional Options -->
                         <div class="mt-4">
-                            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary me-2">
-                                <i class="fas fa-chart-bar me-2"></i>View Analytics Dashboard
-                            </a>
                             <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
                                 <i class="fas fa-home me-2"></i>Return Home
                             </a>
