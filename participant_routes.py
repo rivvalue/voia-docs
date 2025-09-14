@@ -5,7 +5,9 @@ Provides CRUD operations for campaign participants with proper tenant scoping
 
 from flask import Blueprint, request, render_template, redirect, url_for, flash, jsonify
 from business_auth_routes import require_business_auth, require_permission, current_tenant_id, get_current_business_account
-from models import Participant, Campaign, BusinessAccount, CampaignParticipant, db
+from models import Participant, Campaign, BusinessAccount, CampaignParticipant, EmailDelivery, db
+from task_queue import add_email_task
+from email_service import email_service
 from datetime import datetime
 import logging
 import csv
@@ -102,13 +104,12 @@ def create_participant():
             return redirect(url_for('participants.create_participant'))
         
         # Create participant with origin tracking and unified token system
-        participant = Participant(
-            business_account_id=current_account.id,
-            email=email,
-            name=name,
-            company_name=company_name if company_name else None,
-            source='admin_single'  # Track that this was admin-created via single form
-        )
+        participant = Participant()
+        participant.business_account_id = current_account.id
+        participant.email = email
+        participant.name = name
+        participant.company_name = company_name if company_name else None
+        participant.source = 'admin_single'  # Track that this was admin-created via single form
         
         # Generate unified token for seamless UX
         participant.generate_token()
@@ -211,13 +212,12 @@ def upload_participants():
                     continue
                 
                 # Create participant with origin tracking and unified token system
-                participant = Participant(
-                    business_account_id=current_account.id,
-                    email=email,
-                    name=name,
-                    company_name=company_name if company_name else None,
-                    source='admin_bulk'  # Track that this was admin-created via bulk upload
-                )
+                participant = Participant()
+                participant.business_account_id = current_account.id
+                participant.email = email
+                participant.name = name
+                participant.company_name = company_name if company_name else None
+                participant.source = 'admin_bulk'  # Track that this was admin-created via bulk upload
                 
                 # Generate unified token for seamless UX
                 participant.generate_token()
@@ -348,7 +348,7 @@ def regenerate_token(participant_id):
 @participant_bp.route('/campaigns/<int:campaign_id>/participants', methods=['GET', 'POST'])
 @require_business_auth
 @require_permission('manage_participants')
-def manage_campaign_participants(campaign_id):
+def manage_campaign_participants(campaign_id: int):
     """Manage participants for a specific campaign"""
     
     try:
@@ -376,10 +376,15 @@ def manage_campaign_participants(campaign_id):
             
             # Get all available participants not in this campaign
             assigned_participant_ids = [cp.participant_id for cp in campaign_participants]
-            available_participants = Participant.query.filter(
-                Participant.business_account_id == current_account.id,
-                ~Participant.id.in_(assigned_participant_ids) if assigned_participant_ids else True
-            ).order_by(Participant.name).all()
+            if assigned_participant_ids:
+                available_participants = Participant.query.filter(
+                    Participant.business_account_id == current_account.id,
+                    ~Participant.id.in_(assigned_participant_ids)
+                ).order_by(Participant.name).all()
+            else:
+                available_participants = Participant.query.filter(
+                    Participant.business_account_id == current_account.id
+                ).order_by(Participant.name).all()
             
             # Prepare data for template
             current_participants = []
@@ -435,12 +440,11 @@ def manage_campaign_participants(campaign_id):
                         continue
                     
                     # Create campaign-participant association (no separate token - uses participant's unified token)
-                    association = CampaignParticipant(
-                        campaign_id=campaign_id,
-                        participant_id=participant_id,
-                        business_account_id=current_account.id,
-                        status='invited'  # Campaign-specific status tracking
-                    )
+                    association = CampaignParticipant()
+                    association.campaign_id = campaign_id
+                    association.participant_id = participant_id
+                    association.business_account_id = current_account.id
+                    association.status = 'invited'  # Campaign-specific status tracking
                     # Note: Using unified token system - no separate campaign tokens needed
                     
                     db.session.add(association)
@@ -518,3 +522,286 @@ def remove_campaign_participant(campaign_id, association_id):
         flash('Error removing participant from campaign.', 'error')
     
     return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+
+
+# ==============================================================================
+# INDIVIDUAL PARTICIPANT INVITATION ROUTES
+# ==============================================================================
+
+@participant_bp.route('/<int:participant_id>/send-invitation', methods=['POST'])
+@require_business_auth
+@require_permission('manage_participants')
+def send_individual_invitation(participant_id):
+    """Send email invitation to individual participant for all their active campaigns"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('participants.list_participants'))
+        
+        # Get participant (scoped to current business account)
+        participant = Participant.query.filter_by(
+            id=participant_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not participant:
+            flash('Participant not found.', 'error')
+            return redirect(url_for('participants.list_participants'))
+        
+        # Check if email service is configured
+        if not email_service.is_configured():
+            flash('Email service is not configured. Please configure SMTP settings first.', 'error')
+            return redirect(url_for('participants.list_participants'))
+        
+        # Get active campaigns for this participant
+        active_campaign_participants = CampaignParticipant.query.filter_by(
+            participant_id=participant_id,
+            business_account_id=current_account.id
+        ).join(Campaign).filter(
+            Campaign.status == 'active'
+        ).all()
+        
+        if not active_campaign_participants:
+            flash(f'Participant {participant.name} is not associated with any active campaigns.', 'warning')
+            return redirect(url_for('participants.list_participants'))
+        
+        # Send invitations for each active campaign
+        sent_count = 0
+        failed_count = 0
+        
+        for cp in active_campaign_participants:
+            try:
+                # Check if there's already a successful delivery for this campaign
+                existing_delivery = EmailDelivery.query.filter_by(
+                    campaign_participant_id=cp.id,
+                    email_type='participant_invitation',
+                    status='sent'
+                ).first()
+                
+                if existing_delivery:
+                    continue  # Skip if already sent successfully
+                
+                # Create EmailDelivery record for tracking
+                email_delivery = EmailDelivery()
+                email_delivery.business_account_id = current_account.id
+                email_delivery.campaign_id = cp.campaign_id
+                email_delivery.participant_id = participant_id
+                email_delivery.campaign_participant_id = cp.id
+                email_delivery.email_type = 'participant_invitation'
+                email_delivery.recipient_email = participant.email
+                email_delivery.recipient_name = participant.name
+                email_delivery.subject = f"Survey Invitation - {cp.campaign.name}"
+                email_delivery.status = 'pending'
+                
+                db.session.add(email_delivery)
+                db.session.flush()  # Get the ID
+                
+                # Prepare task data
+                task_data = {
+                    'participant_email': participant.email,
+                    'participant_name': participant.name,
+                    'campaign_name': cp.campaign.name,
+                    'survey_token': cp.token,
+                    'business_account_name': current_account.name,
+                    'email_delivery_id': email_delivery.id
+                }
+                
+                # Add to task queue
+                add_email_task('participant_invitation', task_data, priority=2)
+                
+                # Update campaign participant status
+                cp.status = 'invited'
+                cp.invited_at = datetime.utcnow()
+                
+                sent_count += 1
+                
+            except Exception as e:
+                logger.error(f"Failed to queue invitation for participant {participant.email} in campaign {cp.campaign.name}: {e}")
+                failed_count += 1
+        
+        db.session.commit()
+        
+        # Provide feedback to user
+        if sent_count > 0:
+            flash(f'Successfully queued {sent_count} invitation(s) for {participant.name}. Emails will be sent in the background.', 'success')
+        
+        if failed_count > 0:
+            flash(f'{failed_count} invitation(s) failed to queue for {participant.name}. Please check logs and try again.', 'error')
+        
+        if sent_count == 0 and failed_count == 0:
+            flash(f'All invitations for {participant.name} have already been sent successfully.', 'info')
+        
+        logger.info(f"Individual invitations queued for participant {participant.name} (ID: {participant_id}): {sent_count} successful, {failed_count} failed")
+        
+        return redirect(url_for('participants.list_participants'))
+        
+    except Exception as e:
+        logger.error(f"Error sending individual invitation for participant {participant_id}: {e}")
+        db.session.rollback()
+        flash('Failed to send invitation. Please try again.', 'error')
+        return redirect(url_for('participants.list_participants'))
+
+
+@participant_bp.route('/campaigns/<int:campaign_id>/participants/<int:participant_id>/send-invitation', methods=['POST'])
+@require_business_auth
+@require_permission('manage_participants')
+def send_campaign_participant_invitation(campaign_id, participant_id):
+    """Send email invitation to specific participant for specific campaign"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+        
+        # Get campaign (scoped to current business account)
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            flash('Campaign not found.', 'error')
+            return redirect(url_for('participants.list_participants'))
+        
+        # Get campaign-participant association
+        cp = CampaignParticipant.query.filter_by(
+            campaign_id=campaign_id,
+            participant_id=participant_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not cp or not cp.participant:
+            flash('Participant association not found.', 'error')
+            return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+        
+        # Validate campaign status
+        if campaign.status != 'active':
+            flash(f'Cannot send invitations for {campaign.status} campaign. Campaign must be active.', 'error')
+            return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+        
+        # Check if email service is configured
+        if not email_service.is_configured():
+            flash('Email service is not configured. Please configure SMTP settings first.', 'error')
+            return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+        
+        # Check if there's already a successful delivery
+        existing_delivery = EmailDelivery.query.filter_by(
+            campaign_participant_id=cp.id,
+            email_type='participant_invitation',
+            status='sent'
+        ).first()
+        
+        if existing_delivery:
+            flash(f'Invitation for {cp.participant.name} has already been sent successfully.', 'info')
+            return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+        
+        try:
+            # Create EmailDelivery record for tracking
+            email_delivery = EmailDelivery()
+            email_delivery.business_account_id = current_account.id
+            email_delivery.campaign_id = campaign_id
+            email_delivery.participant_id = participant_id
+            email_delivery.campaign_participant_id = cp.id
+            email_delivery.email_type = 'participant_invitation'
+            email_delivery.recipient_email = cp.participant.email
+            email_delivery.recipient_name = cp.participant.name
+            email_delivery.subject = f"Survey Invitation - {campaign.name}"
+            email_delivery.status = 'pending'
+            
+            db.session.add(email_delivery)
+            db.session.flush()  # Get the ID
+            
+            # Prepare task data
+            task_data = {
+                'participant_email': cp.participant.email,
+                'participant_name': cp.participant.name,
+                'campaign_name': campaign.name,
+                'survey_token': cp.token,
+                'business_account_name': current_account.name,
+                'email_delivery_id': email_delivery.id
+            }
+            
+            # Add to task queue
+            add_email_task('participant_invitation', task_data, priority=2)
+            
+            # Update campaign participant status
+            cp.status = 'invited'
+            cp.invited_at = datetime.utcnow()
+            
+            db.session.commit()
+            
+            flash(f'Successfully queued invitation for {cp.participant.name}. Email will be sent in the background.', 'success')
+            logger.info(f"Individual campaign invitation queued for participant {cp.participant.name} (ID: {participant_id}) in campaign {campaign.name} (ID: {campaign_id})")
+            
+        except Exception as e:
+            logger.error(f"Failed to queue invitation for participant {cp.participant.email} in campaign {campaign.name}: {e}")
+            flash(f'Failed to queue invitation for {cp.participant.name}. Please try again.', 'error')
+        
+        return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+        
+    except Exception as e:
+        logger.error(f"Error sending campaign participant invitation for participant {participant_id} in campaign {campaign_id}: {e}")
+        db.session.rollback()
+        flash('Failed to send invitation. Please try again.', 'error')
+        return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+
+
+@participant_bp.route('/<int:participant_id>/invitation-history')
+@require_business_auth
+@require_permission('manage_participants')
+def participant_invitation_history(participant_id):
+    """Get invitation history for a specific participant"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account context not found'}), 401
+        
+        # Get participant (scoped to current business account)
+        participant = Participant.query.filter_by(
+            id=participant_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not participant:
+            return jsonify({'error': 'Participant not found'}), 404
+        
+        # Get all email deliveries for this participant
+        email_deliveries = EmailDelivery.query.filter_by(
+            participant_id=participant_id,
+            business_account_id=current_account.id,
+            email_type='participant_invitation'
+        ).order_by(EmailDelivery.created_at.desc()).all()
+        
+        # Build history response
+        invitation_history = []
+        for delivery in email_deliveries:
+            history_item = {
+                'delivery_id': delivery.id,
+                'campaign_name': delivery.campaign.name if delivery.campaign else 'Unknown',
+                'campaign_id': delivery.campaign_id,
+                'status': delivery.status,
+                'subject': delivery.subject,
+                'created_at': delivery.created_at.isoformat() if delivery.created_at else None,
+                'sent_at': delivery.sent_at.isoformat() if delivery.sent_at else None,
+                'retry_count': delivery.retry_count,
+                'last_error': delivery.last_error
+            }
+            invitation_history.append(history_item)
+        
+        return jsonify({
+            'participant_id': participant_id,
+            'participant_name': participant.name,
+            'participant_email': participant.email,
+            'invitation_history': invitation_history,
+            'summary': {
+                'total_invitations': len(invitation_history),
+                'sent': len([h for h in invitation_history if h['status'] == 'sent']),
+                'pending': len([h for h in invitation_history if h['status'] in ['pending', 'sending']]),
+                'failed': len([h for h in invitation_history if h['status'] in ['failed', 'permanent_failure']])
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting invitation history for participant {participant_id}: {e}")
+        return jsonify({'error': 'Failed to get invitation history'}), 500

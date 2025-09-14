@@ -237,7 +237,8 @@ def admin_panel():
         # Admin panel data depends on account type
         if business_account.account_type == 'demo':
             # Rivvalue demo account - show demo campaign management
-            from models import Campaign, SurveyResponse
+            from models import Campaign, SurveyResponse, Participant, CampaignParticipant, EmailDelivery
+            from email_service import email_service
             
             # Get demo campaigns (for Rivvalue) - now using proper business account ownership
             campaigns = Campaign.query.filter_by(
@@ -258,21 +259,88 @@ def admin_panel():
             ).count()
             
             # Add participant count for demo account
-            from models import Participant
             total_participants = Participant.query.filter_by(
                 business_account_id=business_account.id
             ).count()
             
+            # Email delivery statistics
+            total_invitations = EmailDelivery.query.filter_by(
+                business_account_id=business_account.id,
+                email_type='participant_invitation'
+            ).count()
+            
+            sent_invitations = EmailDelivery.query.filter_by(
+                business_account_id=business_account.id,
+                email_type='participant_invitation',
+                status='sent'
+            ).count()
+            
+            failed_invitations = EmailDelivery.query.filter_by(
+                business_account_id=business_account.id,
+                email_type='participant_invitation',
+                status='failed'
+            ).count()
+            
+            pending_invitations = EmailDelivery.query.filter_by(
+                business_account_id=business_account.id,
+                email_type='participant_invitation',
+                status='pending'
+            ).count()
+            
+            # Get active campaigns with invitation status
+            active_campaigns = []
+            for campaign in campaigns:
+                if campaign.is_active():
+                    # Get participant count for this campaign
+                    participant_count = CampaignParticipant.query.filter_by(
+                        campaign_id=campaign.id,
+                        business_account_id=business_account.id
+                    ).count()
+                    
+                    # Get invitation statistics for this campaign
+                    campaign_invitations = EmailDelivery.query.filter_by(
+                        campaign_id=campaign.id,
+                        business_account_id=business_account.id,
+                        email_type='participant_invitation'
+                    ).count()
+                    
+                    campaign_sent = EmailDelivery.query.filter_by(
+                        campaign_id=campaign.id,
+                        business_account_id=business_account.id,
+                        email_type='participant_invitation',
+                        status='sent'
+                    ).count()
+                    
+                    campaign_data = campaign.to_dict()
+                    campaign_data.update({
+                        'participant_count': participant_count,
+                        'invitation_stats': {
+                            'total': campaign_invitations,
+                            'sent': campaign_sent,
+                            'pending': campaign_invitations - campaign_sent,
+                            'can_send_invitations': participant_count > 0 and email_service.is_configured()
+                        }
+                    })
+                    active_campaigns.append(campaign_data)
+            
             admin_data = {
                 'account_type': 'demo',
                 'campaigns': [c.to_dict() for c in campaigns],
+                'active_campaigns': active_campaigns,
                 'recent_responses': [r.to_dict() for r in recent_responses],
                 'stats': {
                     'total_responses': total_responses,
                     'total_campaigns': total_campaigns,
                     'total_participants': total_participants,
-                    'active_campaigns': len([c for c in campaigns if c.is_active()])
-                }
+                    'active_campaigns': len(active_campaigns),
+                    'email_stats': {
+                        'total_invitations': total_invitations,
+                        'sent_invitations': sent_invitations,
+                        'failed_invitations': failed_invitations,
+                        'pending_invitations': pending_invitations
+                    }
+                },
+                'email_configured': email_service.is_configured()
             }
         else:
             # Customer account - placeholder for future Phase 3
@@ -287,8 +355,8 @@ def admin_panel():
             }
         
         return render_template('business_auth/admin_panel.html',
-                             business_account=business_account.to_dict(),
-                             current_user=current_business_user.to_dict(),
+                             business_account=business_account.to_dict() if business_account else {},
+                             current_user=current_business_user.to_dict() if current_business_user else {},
                              admin_data=admin_data)
         
     except Exception as e:
@@ -485,15 +553,14 @@ def init_rivvalue_admin_user():
             return True
         
         # Create admin user
-        admin_user = BusinessAccountUser(
-            business_account_id=rivvalue_account.id,
-            email=admin_email,
-            first_name='Admin',
-            last_name='User',
-            role='admin',
-            is_active=True,
-            email_verified=True
-        )
+        admin_user = BusinessAccountUser()
+        admin_user.business_account_id = rivvalue_account.id
+        admin_user.email = admin_email
+        admin_user.first_name = 'Admin'
+        admin_user.last_name = 'User'
+        admin_user.role = 'admin'
+        admin_user.is_active = True
+        admin_user.email_verified = True
         # Generate secure temporary password
         import secrets
         import string

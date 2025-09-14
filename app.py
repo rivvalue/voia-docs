@@ -96,13 +96,6 @@ with app.app_context():
         app.logger.error(f"Database validation failed: {str(e)}")
         # Continue startup but log the issue
     
-    # Log all registered routes for debugging
-    app.logger.info("=== REGISTERED ROUTES ===")
-    for rule in app.url_map.iter_rules():
-        methods = ','.join(rule.methods - {'HEAD', 'OPTIONS'})
-        app.logger.info(f"Route: {rule.rule} | Methods: {methods} | Endpoint: {rule.endpoint}")
-    app.logger.info("=== END REGISTERED ROUTES ===")
-    
     # Start the background task queue for AI processing
     start_task_queue()
     
@@ -127,6 +120,13 @@ with app.app_context():
         app.logger.info(f"Rivvalue admin user initialization: {init_result}")
     except Exception as e:
         app.logger.error(f"Failed to initialize admin user: {e}")
+    
+    # Log all registered routes for debugging (after blueprint registration)
+    app.logger.info("=== REGISTERED ROUTES ===")
+    for rule in app.url_map.iter_rules():
+        methods = ','.join(rule.methods - {'HEAD', 'OPTIONS'})
+        app.logger.info(f"Route: {rule.rule} | Methods: {methods} | Endpoint: {rule.endpoint}")
+    app.logger.info("=== END REGISTERED ROUTES ===")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

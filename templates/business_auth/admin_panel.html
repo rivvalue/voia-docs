@@ -476,6 +476,48 @@
             </div>
         </div>
 
+        <!-- Email Invitations Statistics -->
+        {% if admin_data.stats.get('email_stats') %}
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon success">
+                        <i class="fas fa-envelope-open"></i>
+                    </div>
+                    <h3 class="stat-number">{{ admin_data.stats.email_stats.sent_invitations }}</h3>
+                    <p class="stat-label">Sent Invitations</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon info">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3 class="stat-number">{{ admin_data.stats.email_stats.pending_invitations }}</h3>
+                    <p class="stat-label">Pending Invitations</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3 class="stat-number">{{ admin_data.stats.email_stats.failed_invitations }}</h3>
+                    <p class="stat-label">Failed Invitations</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon primary">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3 class="stat-number">{{ admin_data.stats.email_stats.total_invitations }}</h3>
+                    <p class="stat-label">Total Invitations</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         {% if admin_data.account_type == 'demo' %}
         <!-- Demo Account: Rivvalue Campaign Management -->
         <div class="row">
