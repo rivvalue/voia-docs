@@ -936,6 +936,8 @@ def dashboard():
 def dashboard_data():
     """API endpoint for dashboard data with optional campaign filtering"""
     try:
+        # Import models to avoid circular imports
+        from models import Campaign
         from data_storage import get_dashboard_data
         
         # Get campaign filter parameter
@@ -1685,6 +1687,8 @@ def export_user_data():
 def get_campaign_filter_options():
     """Get campaigns for analytics filtering (secure business user authentication)"""
     try:
+        # Import models to avoid circular imports
+        from models import Campaign
         # Check if this is a business user session (not participant)
         current_business_user = get_current_business_user()
         
