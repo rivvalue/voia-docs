@@ -428,6 +428,9 @@ def survey():
 def submit_survey_form():
     """Handle server-side form submission (no JavaScript required)"""
     try:
+        # Import models to avoid circular imports
+        from models import SurveyResponse, Campaign
+        
         print("=== FORM SUBMISSION RECEIVED ===")
         
         # Check if user is authenticated via session
