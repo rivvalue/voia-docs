@@ -193,6 +193,10 @@ def logout():
                 user_session.deactivate()
                 db.session.commit()
         
+        # Clear accumulated flash messages from session to prevent them from showing on login page
+        from flask import get_flashed_messages
+        get_flashed_messages()  # This consumes and clears all existing flash messages
+        
         # Clear Flask session business account data
         business_keys = ['business_user_id', 'business_session_id', 'business_account_id', 
                         'business_account_name', 'user_role']
@@ -204,6 +208,10 @@ def logout():
         
     except Exception as e:
         logger.error(f"Business logout error: {e}")
+        # Even on error, clear flash messages to prevent accumulation
+        from flask import get_flashed_messages
+        get_flashed_messages()
+        flash('Logout completed. Please log in again if needed.', 'info')
     
     return redirect(url_for('business_auth.login'))
 
