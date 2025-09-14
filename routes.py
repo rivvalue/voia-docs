@@ -655,6 +655,8 @@ def submit_survey_form():
 def submit_survey():
     """Handle authenticated survey submission and prevent duplicates"""
     try:
+        # Import models to avoid circular imports
+        from models import SurveyResponse, Campaign
         # Check if user is authenticated via session
         if not session.get('auth_token'):
             return jsonify({'error': 'Authentication required', 'code': 'AUTH_ERROR'}), 401
@@ -815,6 +817,8 @@ def submit_survey():
 def submit_survey_overwrite():
     """Handle survey submission with overwrite capability"""
     try:
+        # Import models to avoid circular imports
+        from models import SurveyResponse, Campaign
         data = request.json
         if not data:
             return jsonify({'error': 'No JSON data provided'}), 400
@@ -1329,21 +1333,21 @@ def conversational_survey():
     """AI-powered conversational survey page - check for token in URL"""
     token = request.args.get('token')
     if token:
-        # Try CampaignParticipant token first (new system)
-        import campaign_participant_token_system
-        verification = campaign_participant_token_system.verify_campaign_participant_token(token)
-        if verification.get('valid'):
-            # Store campaign-participant association data in session
+        # Use centralized token verification (same as traditional survey)
+        verification = verify_survey_access(token)
+        if verification['valid']:
+            # Store authentication data in session
             session['auth_token'] = token
-            session['auth_email'] = verification.get('email')
+            session['auth_email'] = verification['email']
             session['association_id'] = verification.get('association_id')
             session['campaign_id'] = verification.get('campaign_id')
             session['participant_id'] = verification.get('participant_id')
             session['business_account_id'] = verification.get('business_account_id')
             
-            return render_template('conversational_survey.html', authenticated=True, 
-                                 email=verification.get('email'), 
-                                 user_email=verification.get('email'),
+            return render_template('conversational_survey.html', 
+                                 authenticated=verification['authenticated'], 
+                                 email=verification['email'], 
+                                 user_email=verification['email'],
                                  participant_name=verification.get('participant_name'),
                                  campaign_name=verification.get('campaign_name'))
         else:
