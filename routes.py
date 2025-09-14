@@ -8,7 +8,8 @@ from sqlalchemy.orm import joinedload
 from models_auth import AuthToken
 from task_queue import add_analysis_task, get_queue_stats
 from rate_limiter import rate_limit
-from auth_system import require_auth, generate_user_token, require_admin_auth
+from auth_system import require_auth, generate_user_token
+from business_auth_routes import require_business_auth, require_permission
 from conversational_survey import start_conversational_survey, process_conversation_response, finalize_conversational_survey
 from ai_conversational_survey import start_ai_conversational_survey, process_ai_conversation_response, finalize_ai_conversational_survey
 from datetime import datetime, timedelta, date
@@ -827,7 +828,8 @@ def survey_responses():
         return jsonify({'error': 'Failed to fetch survey responses'}), 500
 
 @app.route('/api/export_data')
-@require_admin_auth()
+@require_business_auth
+@require_permission('admin')
 def export_data():
     """Export survey data as JSON - Admin access required"""
     try:
@@ -864,7 +866,8 @@ def queue_status():
 
 # Campaign Management API Routes
 @app.route('/api/campaigns', methods=['GET'])
-@require_admin_auth()
+@require_business_auth
+@require_permission('admin')
 def list_campaigns():
     """List all campaigns for the client"""
     try:
@@ -886,7 +889,8 @@ def list_campaigns():
         return jsonify({'error': 'Failed to fetch campaigns'}), 500
 
 @app.route('/api/campaigns', methods=['POST'])
-@require_admin_auth()
+@require_business_auth
+@require_permission('admin')
 def create_campaign():
     """Create a new campaign"""
     try:
@@ -959,7 +963,8 @@ def create_campaign():
         return jsonify({'error': 'Failed to create campaign'}), 500
 
 @app.route('/api/campaigns/<int:campaign_id>/close', methods=['POST'])
-@require_admin_auth()
+@require_business_auth
+@require_permission('admin')
 def close_campaign(campaign_id):
     """Close a campaign manually"""
     try:
@@ -1020,7 +1025,8 @@ def get_active_campaign():
         return jsonify({'error': 'Failed to get active campaign'}), 500
 
 @app.route('/api/campaigns/stats', methods=['GET'])
-@require_admin_auth()
+@require_business_auth
+@require_permission('admin')
 def campaign_stats():
     """Get campaign statistics"""
     try:

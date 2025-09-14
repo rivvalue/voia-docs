@@ -367,8 +367,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load campaign comparison options
     loadComparisonCampaignOptions();
     
-    // Check admin status on page load
-    checkAdminStatus();
+    // Business authentication is handled server-side
     
     // Setup tab event listeners
     setupTabEventListeners();
@@ -2470,33 +2469,23 @@ function refreshData() {
 }
 
 function exportData() {
-    // Check if user has admin token
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-        alert('Download is only available to admin users. Please log in as Admin first.');
-        return;
-    }
+    // Use business authentication - server will handle authorization
     
     fetch('/api/export_data', {
         method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        }
+        credentials: 'include'  // Include session cookies for business authentication
     })
     .then(response => {
         if (response.status === 403) {
-            alert('Admin access required. This feature is only available to administrators.');
-            // Clear invalid token and hide export button
-            localStorage.removeItem('authToken');
-            updateAdminUI(false);
+            alert('Admin access required. Please log in to your business account.');
+            // Redirect to business login for authentication
+            window.location.href = '/business/login';
             return null;
         }
         if (response.status === 401) {
-            alert('Authentication failed. Please log in with an admin account.');
-            // Clear invalid token and hide export button
-            localStorage.removeItem('authToken');
-            updateAdminUI(false);
+            alert('Authentication required. Please log in to your business account.');
+            // Redirect to business login for authentication
+            window.location.href = '/business/login';
             return null;
         }
         if (!response.ok) {
@@ -2600,90 +2589,11 @@ function exportUserData() {
     });
 }
 
-// Admin login function
-function adminLogin() {
-    const email = prompt('Enter admin email address:');
-    if (!email) return;
-    
-    // Generate admin token
-    fetch('/auth/request-token', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: email })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.token) {
-            // Clear any existing token first
-            localStorage.removeItem('authToken');
-            
-            // Verify this is actually an admin token before storing
-            fetch('/auth/verify-token', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ token: data.token })
-            })
-            .then(response => response.json())
-            .then(verifyData => {
-                if (verifyData.valid && verifyData.is_admin) {
-                    localStorage.setItem('authToken', data.token);
-                    alert(`Admin login successful for ${email}! You can now export data.`);
-                    // Update button text and show export button
-                    updateAdminUI(true, email);
-                } else {
-                    alert(`Access denied. ${email} is not an admin user.`);
-                }
-            })
-            .catch(error => {
-                alert('Token verification failed.');
-            });
-        } else {
-            alert('Failed to generate admin token: ' + (data.error || 'Unknown error'));
-        }
-    })
-    .catch(error => {
-        console.error('Error generating admin token:', error);
-        alert('Error generating admin token. Please try again.');
-    });
+// Business authentication redirect function
+function redirectToBusinessLogin() {
+    window.location.href = '/business/login';
 }
 
-// Check admin login status on page load
-function checkAdminStatus() {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-        // Verify the token is still valid and is admin
-        fetch('/auth/verify-token', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ token: token })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.valid && data.is_admin) {
-                const adminBtn = document.getElementById('adminLoginBtn');
-                adminBtn.innerHTML = `<i class="fas fa-check me-2"></i>Admin: ${escapeHtml(data.email)}`;
-                adminBtn.classList.remove('btn-outline-secondary');
-                adminBtn.classList.add('btn-success');
-                adminBtn.onclick = adminLogout; // Change to logout function
-            } else {
-                // Token is invalid or not admin, clear it
-                localStorage.removeItem('authToken');
-                resetAdminButton();
-            }
-        })
-        .catch(error => {
-            // Token verification failed, clear it
-            localStorage.removeItem('authToken');
-            resetAdminButton();
-        });
-    }
-}
 
 // Update active campaign banner display
 function updateActiveCampaignBanner(data) {
@@ -2704,80 +2614,11 @@ function updateActiveCampaignBanner(data) {
 }
 
 
-function resetAdminButton() {
-    const adminBtn = document.getElementById('adminLoginBtn');
-    adminBtn.innerHTML = '<i class="fas fa-key me-2"></i>Admin Login';
-    adminBtn.classList.remove('btn-success');
-    adminBtn.classList.add('btn-outline-secondary');
-    adminBtn.onclick = adminLogin;
-}
 
 // Auto-refresh dashboard every 5 minutes
 setInterval(refreshData, 5 * 60 * 1000);
 
-// Check admin status on page load
-function checkAdminStatus() {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-        updateAdminUI(false);
-        return;
-    }
-    
-    // Verify the token is still valid
-    fetch('/auth/verify-token', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token: token })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.valid && data.is_admin) {
-            updateAdminUI(true, data.email || 'Admin');
-        } else {
-            localStorage.removeItem('authToken');
-            updateAdminUI(false);
-        }
-    })
-    .catch(error => {
-        console.error('Error verifying token:', error);
-        localStorage.removeItem('authToken');
-        updateAdminUI(false);
-    });
-}
 
-// Update admin UI elements
-function updateAdminUI(isAdmin, email = null) {
-    const adminBtn = document.getElementById('adminLoginBtn');
-    const exportBtn = document.getElementById('exportDataBtn');
-    
-    if (isAdmin && email) {
-        // Show admin logged in state
-        adminBtn.innerHTML = `<i class="fas fa-check me-2"></i>Admin: ${escapeHtml(email)}`;
-        adminBtn.classList.remove('btn-outline-secondary');
-        adminBtn.classList.add('btn-success');
-        adminBtn.onclick = adminLogout; // Change to logout function
-        
-        // Show export button
-        exportBtn.classList.remove('d-none');
-        
-        // Update campaign management access
-        updateCampaignAccess(true);
-    } else {
-        // Show logged out state
-        adminBtn.innerHTML = '<i class="fas fa-key me-2"></i>Admin Login';
-        adminBtn.classList.remove('btn-success');
-        adminBtn.classList.add('btn-outline-secondary');
-        adminBtn.onclick = adminLogin; // Change back to login function
-        
-        // Hide export button
-        exportBtn.classList.add('d-none');
-        
-        // Update campaign management access
-        updateCampaignAccess(false);
-    }
-}
 
 // Update active campaign banner display
 function updateActiveCampaignBanner(data) {
@@ -2797,24 +2638,6 @@ function updateActiveCampaignBanner(data) {
     }
 }
 
-// Control access to campaign management content
-function updateCampaignAccess(isAdmin) {
-    const adminRequiredDiv = document.getElementById('campaign-admin-required');
-    const adminContentDiv = document.getElementById('campaign-admin-content');
-    
-    if (isAdmin) {
-        // Show admin content, hide access required message
-        if (adminRequiredDiv) adminRequiredDiv.style.display = 'none';
-        if (adminContentDiv) {
-            adminContentDiv.style.display = 'block';
-            loadCampaignData(); // Load campaign data when admin logs in
-        }
-    } else {
-        // Show access required message, hide admin content
-        if (adminContentDiv) adminContentDiv.style.display = 'none';
-        if (adminRequiredDiv) adminRequiredDiv.style.display = 'block';
-    }
-}
 
 // Update active campaign banner display
 function updateActiveCampaignBanner(data) {
@@ -2834,11 +2657,9 @@ function updateActiveCampaignBanner(data) {
     }
 }
 
-// Admin logout function
-function adminLogout() {
-    localStorage.removeItem('authToken');
-    updateAdminUI(false);
-    alert('Admin logged out successfully.');
+// Business logout function
+function businessLogout() {
+    window.location.href = '/business/logout';
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -2848,7 +2669,6 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
     
-    checkAdminStatus();
     loadCampaignFilterOptions();
     // Load KPI overview for Executive Summary tab
     loadKPIOverview();
@@ -3238,30 +3058,7 @@ function setupTabEventListeners() {
                 createThemesChart();
             }
             
-            // Handle campaign management tab access
-            if (targetTab === '#campaign-management') {
-                setTimeout(() => {
-                    // Check current admin status and update access accordingly
-                    const token = localStorage.getItem('authToken');
-                    if (token) {
-                        // Verify token is still valid and user is admin
-                        fetch('/auth/verify-token', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ token: token })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            updateCampaignAccess(data.valid && data.is_admin);
-                        })
-                        .catch(() => {
-                            updateCampaignAccess(false);
-                        });
-                    } else {
-                        updateCampaignAccess(false);
-                    }
-                }, 100);
-            }
+            // Campaign management access will be handled by server-side business authentication
         });
     });
 }
@@ -3444,27 +3241,7 @@ function switchPrimarySection(section) {
         case "management":
             // Show campaign management tab by default
             showTab("campaign-management-tab", "campaign-management");
-            // Check admin status and update campaign access
-            setTimeout(() => {
-                const token = localStorage.getItem('authToken');
-                if (token) {
-                    // Verify token is still valid and user is admin
-                    fetch('/auth/verify-token', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ token: token })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        updateCampaignAccess(data.valid && data.is_admin);
-                    })
-                    .catch(() => {
-                        updateCampaignAccess(false);
-                    });
-                } else {
-                    updateCampaignAccess(false);
-                }
-            }, 100);
+            // Business authentication is handled server-side
             break;
         case "admin":
             // Show admin tools tab by default
@@ -3500,46 +3277,3 @@ function showTab(tabId, contentId) {
     }
 }
 
-// Update admin UI for both admin button locations
-function updateAdminUI(isLoggedIn) {
-    const adminBtn = document.getElementById("adminLoginBtn");
-    const exportBtn = document.getElementById("exportDataBtn");
-    const adminBtn2 = document.getElementById("adminLoginBtn2");
-    const exportBtn2 = document.getElementById("exportDataBtn2");
-    
-    if (isLoggedIn) {
-        if (adminBtn) {
-            adminBtn.textContent = "Admin Logout";
-            adminBtn.onclick = adminLogout;
-        }
-        if (exportBtn) exportBtn.classList.remove("d-none");
-        if (adminBtn2) {
-            adminBtn2.innerHTML = "<i class=\"fas fa-sign-out-alt me-2\"></i>Admin Logout";
-            adminBtn2.onclick = adminLogout;
-        }
-        if (exportBtn2) exportBtn2.classList.remove("d-none");
-        
-        // Also update campaign access if we're currently in management section
-        const managementPrimary = document.getElementById("management-primary");
-        if (managementPrimary && managementPrimary.classList.contains("active")) {
-            updateCampaignAccess(true);
-        }
-    } else {
-        if (adminBtn) {
-            adminBtn.innerHTML = "<i class=\"fas fa-key me-2 d-none d-sm-inline\"></i><i class=\"fas fa-key d-sm-none\"></i><span class=\"d-none d-sm-inline\">Admin Login</span>";
-            adminBtn.onclick = adminLogin;
-        }
-        if (exportBtn) exportBtn.classList.add("d-none");
-        if (adminBtn2) {
-            adminBtn2.innerHTML = "<i class=\"fas fa-sign-in-alt me-2\"></i>Admin Login";
-            adminBtn2.onclick = adminLogin;
-        }
-        if (exportBtn2) exportBtn2.classList.add("d-none");
-        
-        // Also update campaign access if we're currently in management section
-        const managementPrimary = document.getElementById("management-primary");
-        if (managementPrimary && managementPrimary.classList.contains("active")) {
-            updateCampaignAccess(false);
-        }
-    }
-}

@@ -43,11 +43,13 @@
                         <i class="fas fa-user-circle d-sm-none"></i>
                         <span class="d-none d-sm-inline">Export Response Data</span>
                     </button>
-                    <button class="btn btn-outline-secondary btn-sm dashboard-btn d-none" onclick="exportData()" id="exportDataBtn">
+                    {% if is_business_authenticated %}
+                    <button class="btn btn-outline-secondary btn-sm dashboard-btn" onclick="exportData()" id="exportDataBtn">
                         <i class="fas fa-download me-2 d-none d-sm-inline"></i>
                         <i class="fas fa-download d-sm-none"></i>
                         <span class="d-none d-sm-inline">Export Full Data</span>
                     </button>
+                    {% endif %}
                     </div>
                 </div>
                 <div class="col-12 col-md-4 text-center text-md-end">
@@ -689,15 +691,16 @@
 
         <!-- Campaign Management Tab -->
         <div class="tab-pane fade" id="campaign-management" role="tabpanel" aria-labelledby="campaign-management-tab">
-            <!-- Admin Access Required Message (shown to non-admin users) -->
-            <div id="campaign-admin-required" class="text-center py-5" style="display: none;">
+            {% if not is_business_authenticated %}
+            <!-- Business Login Required Message -->
+            <div class="text-center py-5">
                 <div class="card mx-auto" style="max-width: 500px;">
                     <div class="card-body">
                         <i class="fas fa-lock fa-4x text-muted mb-4"></i>
-                        <h4 class="text-muted mb-3">Administrator Access Required</h4>
+                        <h4 class="text-muted mb-3">Business Account Login Required</h4>
                         <p class="text-muted mb-4">
-                            Campaign Management is restricted to administrators only. 
-                            Please contact your system administrator to access campaign management features.
+                            Campaign Management requires business account authentication. 
+                            Please log in to your business account to access campaign management features.
                         </p>
                         <div class="alert alert-info">
                             <i class="fas fa-info-circle me-2"></i>
@@ -709,15 +712,17 @@
                                 <li>• Set campaign start and end dates</li>
                             </ul>
                         </div>
-                        <button class="btn btn-outline-primary" onclick="adminLogin()">
-                            <i class="fas fa-key me-2"></i>Admin Login
-                        </button>
+                        <a href="/business/login" class="btn btn-outline-primary">
+                            <i class="fas fa-sign-in-alt me-2"></i>Business Login
+                        </a>
                     </div>
                 </div>
             </div>
+            {% endif %}
 
-            <!-- Campaign Management Content (Admin Only) -->
-            <div id="campaign-admin-content" style="display: none;">
+            {% if is_business_authenticated %}
+            <!-- Campaign Management Content (Business Users Only) -->
+            <div id="campaign-admin-content">
                 <!-- Campaign Management Header -->
                 <div class="row mb-4">
                     <div class="col-12">
@@ -827,6 +832,7 @@
             </div>
             </div>
         </div>
+            {% endif %}
         
         <!-- Admin Tools Tab -->
         <div class="tab-pane fade" id="admin-tools" role="tabpanel" aria-labelledby="admin-tools-tab">
@@ -857,12 +863,20 @@
                                             <i class="fas fa-key fa-3x text-muted mb-3"></i>
                                             <h5>Admin Access</h5>
                                             <p class="text-muted">Login to access advanced admin features</p>
-                                            <button class="btn btn-outline-primary" onclick="adminLogin()" id="adminLoginBtn2">
-                                                <i class="fas fa-sign-in-alt me-2"></i>Admin Login
-                                            </button>
-                                            <button class="btn btn-outline-secondary d-none" onclick="exportData()" id="exportDataBtn2">
+                                            {% if is_business_authenticated %}
+                                            <button class="btn btn-outline-secondary" onclick="exportData()">
                                                 <i class="fas fa-database me-2"></i>Export Full Data
                                             </button>
+                                            <br><br>
+                                            <p class="text-success"><i class="fas fa-check-circle me-2"></i>Logged in as: {{ business_user_name }}</p>
+                                            <a href="/business/logout" class="btn btn-outline-danger btn-sm">
+                                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                            </a>
+                                            {% else %}
+                                            <a href="/business/login" class="btn btn-outline-primary">
+                                                <i class="fas fa-sign-in-alt me-2"></i>Business Login
+                                            </a>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </div>
