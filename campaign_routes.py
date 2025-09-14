@@ -162,6 +162,7 @@ def view_campaign(campaign_id):
                 participant_data = cp.participant.to_dict()
                 participant_data.update({
                     'association_id': cp.id,
+                    'token': cp.token,  # Add campaign-participant token
                     'status': cp.status,
                     'invited_at': cp.invited_at.isoformat() if cp.invited_at else None,
                     'completed_at': cp.completed_at.isoformat() if cp.completed_at else None
