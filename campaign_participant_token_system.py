@@ -6,7 +6,6 @@ Handles token generation and validation for campaign-participant associations
 import os
 import jwt
 from datetime import datetime, timedelta
-from models import CampaignParticipant, Campaign, Participant, db
 import logging
 
 logger = logging.getLogger(__name__)
@@ -15,6 +14,9 @@ logger = logging.getLogger(__name__)
 def create_campaign_participant_token(association_id):
     """Generate a JWT token for a campaign-participant association"""
     try:
+        # Import models here to avoid circular imports
+        from models import CampaignParticipant, db
+        
         # Get association with relationships
         association = CampaignParticipant.query.filter_by(id=association_id).first()
         if not association:
@@ -79,6 +81,9 @@ def create_campaign_participant_token(association_id):
 def verify_campaign_participant_token(jwt_token):
     """Verify a campaign-participant JWT token and return association data"""
     try:
+        # Import models here to avoid circular imports
+        from models import CampaignParticipant, db
+        
         if not jwt_token:
             return {'valid': False, 'error': 'No token provided'}
         
@@ -173,6 +178,9 @@ def generate_participant_survey_url(association_id, base_url="https://vocsa.repl
 def mark_survey_completed(association_id, survey_response_id):
     """Mark a campaign-participant association as completed"""
     try:
+        # Import models here to avoid circular imports
+        from models import CampaignParticipant, db
+        
         association = CampaignParticipant.query.filter_by(id=association_id).first()
         if not association:
             return False

@@ -11,7 +11,6 @@ from sqlalchemy import desc
 
 from business_auth_routes import require_business_auth, require_permission, get_current_business_account
 from models import Campaign, CampaignParticipant, Participant, BusinessAccount, db
-from campaign_participant_token_system import create_campaign_participant_token, generate_participant_survey_url
 
 # Create blueprint for campaign management
 campaign_bp = Blueprint('campaigns', __name__, url_prefix='/business/campaigns')
