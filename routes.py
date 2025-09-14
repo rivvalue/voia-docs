@@ -1,6 +1,6 @@
 from flask import render_template, request, jsonify, flash, redirect, url_for, g, session
 from app import app, db
-from models import SurveyResponse, Campaign
+# Models imported inside functions to avoid circular imports
 from data_storage import get_dashboard_data
 from sqlalchemy.orm import joinedload
 

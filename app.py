@@ -68,33 +68,15 @@ def inject_csrf():
     return context
 
 with app.app_context():
-    # Import models and routes
+    # Import models FIRST to avoid circular imports
     import models  # noqa: F401
     import models_auth  # noqa: F401
-    import routes  # noqa: F401
     
-    # Register business authentication blueprint (Phase 2)
-    from business_auth_routes import business_auth_bp, init_rivvalue_admin_user
-    app.register_blueprint(business_auth_bp)
+    # Create database tables before importing routes
+    db.create_all()
     
-    # Register participant management blueprint (Phase 3)
-    from participant_routes import participant_bp
-    app.register_blueprint(participant_bp)
-    
-    # Register campaign management blueprint (Phase 3 completion)
-    from campaign_routes import campaign_bp
-    app.register_blueprint(campaign_bp)
-    
-    # Initialize Rivvalue admin user (Phase 2)
-    try:
-        init_result = init_rivvalue_admin_user()
-        app.logger.info(f"Rivvalue admin user initialization: {init_result}")
-    except Exception as e:
-        app.logger.error(f"Failed to initialize admin user: {e}")
     from task_queue import start_task_queue
     from business_accounts import business_account_manager
-    
-    db.create_all()
     
     # Validate database setup and create demo content
     try:
@@ -123,6 +105,28 @@ with app.app_context():
     
     # Start the background task queue for AI processing
     start_task_queue()
+    
+    # Import routes LAST to avoid circular imports
+    import routes  # noqa: F401
+    
+    # Register business authentication blueprint (Phase 2)
+    from business_auth_routes import business_auth_bp, init_rivvalue_admin_user
+    app.register_blueprint(business_auth_bp)
+    
+    # Register participant management blueprint (Phase 3)
+    from participant_routes import participant_bp
+    app.register_blueprint(participant_bp)
+    
+    # Register campaign management blueprint (Phase 3 completion)
+    from campaign_routes import campaign_bp
+    app.register_blueprint(campaign_bp)
+    
+    # Initialize Rivvalue admin user (Phase 2)
+    try:
+        init_result = init_rivvalue_admin_user()
+        app.logger.info(f"Rivvalue admin user initialization: {init_result}")
+    except Exception as e:
+        app.logger.error(f"Failed to initialize admin user: {e}")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
