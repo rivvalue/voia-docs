@@ -177,8 +177,8 @@ class EmailService:
         """
         
         try:
-            # Generate survey URL
-            survey_url = url_for('survey_page', token=survey_token, _external=True)
+            # Generate survey URL (using the correct 'survey' route)
+            survey_url = url_for('survey', token=survey_token, _external=True)
             
             # Email subject
             subject = f"Your feedback is requested: {campaign_name}"

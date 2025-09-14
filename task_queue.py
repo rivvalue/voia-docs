@@ -8,6 +8,7 @@ from time import sleep
 from app import app, db
 from models import SurveyResponse, Campaign, BusinessAccount
 from ai_analysis import analyze_survey_response
+from email_service import email_service
 
 logger = logging.getLogger(__name__)
 
@@ -46,17 +47,31 @@ class TaskQueue:
         self.running = False
         logger.info("Stopping task queue and scheduler")
     
-    def add_task(self, task_type, response_id, priority=1):
-        """Add a task to the queue"""
+    def add_task(self, task_type, data_id=None, priority=1, task_data=None):
+        """Add a task to the queue
+        
+        Args:
+            task_type: Type of task ('ai_analysis', 'send_email', etc.)
+            data_id: ID for data-based tasks (response_id for AI analysis)
+            priority: Task priority (higher = more important)  
+            task_data: Additional data for the task (email details, etc.)
+        """
         task = {
             'type': task_type,
-            'response_id': response_id,
+            'data_id': data_id,  # Backward compatible with response_id
             'priority': priority,
-            'created_at': datetime.utcnow()
+            'created_at': datetime.utcnow(),
+            'task_data': task_data or {}
         }
         
         self.task_queue.put(task)
-        logger.info(f"Added task {task_type} for response {response_id}")
+        
+        # Log differently based on task type
+        if task_type == 'send_email':
+            email_type = task_data.get('email_type', 'unknown') if task_data else 'unknown'
+            logger.info(f"Added email task ({email_type}) to queue")
+        else:
+            logger.info(f"Added task {task_type} for data_id {data_id}")
     
     def _worker(self, worker_id):
         """Worker function that processes tasks from the queue"""
@@ -88,26 +103,74 @@ class TaskQueue:
         """Process a single task"""
         try:
             task_type = task['type']
-            response_id = task['response_id']
+            data_id = task.get('data_id') or task.get('response_id')  # Backward compatibility
+            task_data = task.get('task_data', {})
             
             if task_type == 'ai_analysis':
                 # Perform AI analysis
-                success = analyze_survey_response(response_id)
+                success = analyze_survey_response(data_id)
                 
                 if success:
-                    logger.info(f"Worker {worker_id} completed AI analysis for response {response_id}")
+                    logger.info(f"Worker {worker_id} completed AI analysis for response {data_id}")
                 else:
-                    logger.error(f"Worker {worker_id} failed AI analysis for response {response_id}")
+                    logger.error(f"Worker {worker_id} failed AI analysis for response {data_id}")
                     
                     # Mark as failed in database
-                    response = SurveyResponse.query.get(response_id)
+                    response = SurveyResponse.query.get(data_id)
                     if response:
                         response.analyzed_at = datetime.utcnow()
                         response.sentiment_label = 'analysis_failed'
                         db.session.commit()
                         
+            elif task_type == 'send_email':
+                # Process email sending task
+                success = self._process_email_task(task_data, worker_id)
+                
+                if success:
+                    email_type = task_data.get('email_type', 'unknown')
+                    logger.info(f"Worker {worker_id} completed email task ({email_type})")
+                else:
+                    logger.error(f"Worker {worker_id} failed email task")
+                        
         except Exception as e:
             logger.error(f"Error processing task {task}: {e}")
+    
+    def _process_email_task(self, task_data, worker_id):
+        """Process an email sending task"""
+        try:
+            email_type = task_data.get('email_type')
+            
+            if email_type == 'participant_invitation':
+                # Send participant invitation email
+                result = email_service.send_participant_invitation(
+                    participant_email=task_data['participant_email'],
+                    participant_name=task_data['participant_name'],
+                    campaign_name=task_data['campaign_name'],
+                    survey_token=task_data['survey_token'],
+                    business_account_name=task_data['business_account_name']
+                )
+                
+                return result['success']
+                
+            elif email_type == 'campaign_notification':
+                # Send campaign notification email
+                result = email_service.send_campaign_notification(
+                    notification_type=task_data['notification_type'],
+                    campaign_name=task_data['campaign_name'],
+                    campaign_id=task_data['campaign_id'],
+                    business_account_name=task_data['business_account_name'],
+                    additional_data=task_data.get('additional_data')
+                )
+                
+                return result['success']
+                
+            else:
+                logger.error(f"Unknown email type: {email_type}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Email task processing error: {e}")
+            return False
     
     def _scheduler(self):
         """Background scheduler for campaign lifecycle management with DB advisory lock"""
@@ -344,7 +407,42 @@ def start_task_queue():
 
 def add_analysis_task(response_id):
     """Add an AI analysis task to the queue"""
-    task_queue.add_task('ai_analysis', response_id)
+    task_queue.add_task('ai_analysis', data_id=response_id)
+
+def add_email_task(email_type, task_data, priority=2):
+    """Add an email task to the queue
+    
+    Args:
+        email_type: 'participant_invitation' or 'campaign_notification'
+        task_data: Dict with email-specific data
+        priority: Task priority (2 = high for emails, 1 = normal)
+    """
+    task_data['email_type'] = email_type
+    task_queue.add_task('send_email', priority=priority, task_data=task_data)
+
+def send_participant_invitation_async(participant_email, participant_name, 
+                                      campaign_name, survey_token, business_account_name):
+    """Queue participant invitation email for background sending"""
+    task_data = {
+        'participant_email': participant_email,
+        'participant_name': participant_name,
+        'campaign_name': campaign_name,
+        'survey_token': survey_token,
+        'business_account_name': business_account_name
+    }
+    add_email_task('participant_invitation', task_data)
+
+def send_campaign_notification_async(notification_type, campaign_name, campaign_id,
+                                     business_account_name, additional_data=None):
+    """Queue campaign notification email for background sending"""
+    task_data = {
+        'notification_type': notification_type,
+        'campaign_name': campaign_name,
+        'campaign_id': campaign_id,
+        'business_account_name': business_account_name,
+        'additional_data': additional_data
+    }
+    add_email_task('campaign_notification', task_data)
 
 def get_queue_stats():
     """Get queue statistics"""
