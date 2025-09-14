@@ -305,6 +305,37 @@ def survey_with_token(token):
     # Redirect to standard format with 302 (temporary redirect)
     return redirect(url_for('survey', token=token), code=302)
 
+@app.route('/survey<path:encoded_params>')
+def survey_url_encoded_flexible(encoded_params):
+    """Handle URL-encoded survey links where query parameters are encoded in the path"""
+    logger.info(f"URL-encoded survey route accessed: /survey{encoded_params}")
+    
+    # Flask automatically URL-decodes the path, so %3F becomes ? by the time we see it
+    # Check if this looks like query string parameters (starts with ?)
+    if encoded_params.startswith('?'):
+        logger.info(f"Detected query parameters in path: {encoded_params}")
+        
+        # Extract token from parameters (should be like "?token=abc123")
+        if encoded_params.startswith('?token='):
+            token = encoded_params[7:]  # Remove "?token=" prefix
+            
+            # Handle additional parameters if present
+            if '&' in token:
+                token = token.split('&')[0]
+            
+            logger.info(f"Extracted token from URL-encoded path: {token}")
+            
+            # Redirect to standard format with 302 (temporary redirect)
+            return redirect(url_for('survey', token=token), code=302)
+        
+        # If not a token parameter, fall through to 404
+        logger.warning(f"URL-encoded path doesn't contain token parameter: {encoded_params}")
+    
+    # If this doesn't look like query parameters, return 404
+    logger.warning(f"Unrecognized URL-encoded path pattern: {encoded_params}")
+    from flask import abort
+    abort(404)
+
 @app.route('/survey')
 def survey():
     """Main survey page - check for token in URL"""
