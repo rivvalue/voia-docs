@@ -832,3 +832,199 @@ class UserSession(db.Model):
             session.deactivate()
         
         return len(sessions)
+
+
+class EmailDelivery(db.Model):
+    """Email delivery tracking model for monitoring and retry logic"""
+    __tablename__ = 'email_deliveries'
+    __table_args__ = (
+        # Index for finding failed emails to retry
+        db.Index('idx_email_retry_status', 'status', 'retry_count', 'next_retry_at'),
+        # Index for business account scoping
+        db.Index('idx_email_business_account', 'business_account_id'),
+        # Index for campaign-specific email tracking
+        db.Index('idx_email_campaign', 'campaign_id'),
+        # Index for participant-specific email tracking
+        db.Index('idx_email_participant', 'participant_id'),
+        # Index for email type queries
+        db.Index('idx_email_type', 'email_type'),
+    )
+    
+    id = db.Column(db.Integer, primary_key=True)
+    
+    # Relationships and scoping
+    business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
+    campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=True, index=True)
+    participant_id = db.Column(db.Integer, db.ForeignKey('participants.id'), nullable=True, index=True)
+    campaign_participant_id = db.Column(db.Integer, db.ForeignKey('campaign_participants.id'), nullable=True, index=True)
+    
+    # Email details
+    email_type = db.Column(db.String(50), nullable=False, index=True)  # participant_invitation, campaign_notification, etc.
+    recipient_email = db.Column(db.String(200), nullable=False, index=True)
+    recipient_name = db.Column(db.String(200), nullable=True)
+    subject = db.Column(db.String(500), nullable=False)
+    
+    # Delivery tracking
+    status = db.Column(db.String(20), nullable=False, default='pending', index=True)  # pending, sending, sent, failed, permanent_failure
+    retry_count = db.Column(db.Integer, nullable=False, default=0, index=True)
+    max_retries = db.Column(db.Integer, nullable=False, default=3)
+    
+    # Timing
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    first_attempted_at = db.Column(db.DateTime, nullable=True)
+    last_attempted_at = db.Column(db.DateTime, nullable=True)
+    sent_at = db.Column(db.DateTime, nullable=True, index=True)
+    next_retry_at = db.Column(db.DateTime, nullable=True, index=True)
+    
+    # Error tracking
+    last_error = db.Column(db.Text, nullable=True)
+    error_history = db.Column(db.Text, nullable=True)  # JSON string of error attempts
+    
+    # Email content metadata (for debugging)
+    email_data = db.Column(db.Text, nullable=True)  # JSON string of email parameters
+    
+    # Relationships
+    business_account = db.relationship('BusinessAccount', backref='email_deliveries')
+    campaign = db.relationship('Campaign', backref='email_deliveries')
+    participant = db.relationship('Participant', backref='email_deliveries')
+    campaign_participant = db.relationship('CampaignParticipant', backref='email_deliveries')
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'business_account_id': self.business_account_id,
+            'campaign_id': self.campaign_id,
+            'participant_id': self.participant_id,
+            'campaign_participant_id': self.campaign_participant_id,
+            'email_type': self.email_type,
+            'recipient_email': self.recipient_email,
+            'recipient_name': self.recipient_name,
+            'subject': self.subject,
+            'status': self.status,
+            'retry_count': self.retry_count,
+            'max_retries': self.max_retries,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'first_attempted_at': self.first_attempted_at.isoformat() if self.first_attempted_at else None,
+            'last_attempted_at': self.last_attempted_at.isoformat() if self.last_attempted_at else None,
+            'sent_at': self.sent_at.isoformat() if self.sent_at else None,
+            'next_retry_at': self.next_retry_at.isoformat() if self.next_retry_at else None,
+            'last_error': self.last_error,
+            'error_history': json.loads(self.error_history) if self.error_history else [],
+            'email_data': json.loads(self.email_data) if self.email_data else None,
+            'business_account_name': self.business_account.name if self.business_account else None,
+            'campaign_name': self.campaign.name if self.campaign else None,
+            'participant_name': self.participant.name if self.participant else None
+        }
+    
+    def mark_sending(self):
+        """Mark email as currently being sent"""
+        self.status = 'sending'
+        if not self.first_attempted_at:
+            self.first_attempted_at = datetime.utcnow()
+        self.last_attempted_at = datetime.utcnow()
+    
+    def mark_sent(self):
+        """Mark email as successfully sent"""
+        self.status = 'sent'
+        self.sent_at = datetime.utcnow()
+        self.next_retry_at = None
+        self.last_error = None
+    
+    def mark_failed(self, error_message, is_permanent=False):
+        """Mark email as failed and calculate next retry time"""
+        self.status = 'permanent_failure' if is_permanent else 'failed'
+        self.last_error = error_message
+        
+        # Add to error history
+        error_entry = {
+            'timestamp': datetime.utcnow().isoformat(),
+            'retry_attempt': self.retry_count,
+            'error': error_message
+        }
+        
+        error_history = []
+        if self.error_history:
+            try:
+                error_history = json.loads(self.error_history)
+            except:
+                error_history = []
+        
+        error_history.append(error_entry)
+        self.error_history = json.dumps(error_history)
+        
+        # Calculate next retry time using exponential backoff if not permanent failure
+        if not is_permanent and self.retry_count < self.max_retries:
+            # Exponential backoff: 2^retry_count minutes, with jitter
+            import random
+            base_delay = 2 ** self.retry_count  # 1, 2, 4, 8 minutes
+            jitter = random.uniform(0.5, 1.5)  # Add randomness to prevent thundering herd
+            delay_minutes = base_delay * jitter
+            
+            self.next_retry_at = datetime.utcnow() + timedelta(minutes=delay_minutes)
+        else:
+            self.next_retry_at = None
+    
+    def increment_retry(self):
+        """Increment retry count and mark as pending for retry"""
+        self.retry_count += 1
+        self.status = 'pending'
+    
+    def should_retry(self):
+        """Check if this email should be retried"""
+        return (
+            self.status == 'failed' and 
+            self.retry_count < self.max_retries and
+            self.next_retry_at and 
+            self.next_retry_at <= datetime.utcnow()
+        )
+    
+    def get_error_history(self):
+        """Parse error history from JSON"""
+        if self.error_history:
+            try:
+                return json.loads(self.error_history)
+            except:
+                return []
+        return []
+    
+    def get_email_data(self):
+        """Parse email data from JSON"""
+        if self.email_data:
+            try:
+                return json.loads(self.email_data)
+            except:
+                return {}
+        return {}
+    
+    @staticmethod
+    def get_pending_retries():
+        """Get all emails that are ready for retry"""
+        return EmailDelivery.query.filter(
+            EmailDelivery.status == 'failed',
+            EmailDelivery.retry_count < EmailDelivery.max_retries,
+            EmailDelivery.next_retry_at <= datetime.utcnow()
+        ).all()
+    
+    @staticmethod
+    def get_delivery_stats(business_account_id=None, campaign_id=None):
+        """Get delivery statistics"""
+        query = EmailDelivery.query
+        
+        if business_account_id:
+            query = query.filter(EmailDelivery.business_account_id == business_account_id)
+        
+        if campaign_id:
+            query = query.filter(EmailDelivery.campaign_id == campaign_id)
+        
+        total = query.count()
+        sent = query.filter(EmailDelivery.status == 'sent').count()
+        failed = query.filter(EmailDelivery.status.in_(['failed', 'permanent_failure'])).count()
+        pending = query.filter(EmailDelivery.status == 'pending').count()
+        
+        return {
+            'total': total,
+            'sent': sent,
+            'failed': failed,
+            'pending': pending,
+            'success_rate': (sent / total * 100) if total > 0 else 0
+        }

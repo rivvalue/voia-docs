@@ -7,6 +7,7 @@ import smtplib
 import ssl
 import os
 import logging
+import json
 from datetime import datetime, timedelta
 from email.message import EmailMessage
 from email.mime.text import MIMEText
@@ -14,6 +15,8 @@ from email.mime.multipart import MIMEMultipart
 from typing import List, Dict, Optional, Union
 from flask import current_app, url_for, render_template_string
 import jwt
+from app import db
+from models import EmailDelivery
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +66,8 @@ class EmailService:
                    subject: str,
                    text_body: str,
                    html_body: Optional[str] = None,
-                   from_email: Optional[str] = None) -> Dict:
+                   from_email: Optional[str] = None,
+                   email_delivery_id: Optional[int] = None) -> Dict:
         """
         Send email with text and optional HTML content
         
@@ -73,23 +77,40 @@ class EmailService:
             text_body: Plain text body
             html_body: Optional HTML body
             from_email: Optional sender email (defaults to SMTP_USERNAME)
+            email_delivery_id: Optional EmailDelivery record ID for tracking
             
         Returns:
             Dict with success status and details
         """
         recipients: List[str] = []
+        email_delivery = None
+        
+        # Get EmailDelivery record if provided
+        if email_delivery_id:
+            try:
+                email_delivery = EmailDelivery.query.get(email_delivery_id)
+            except Exception as e:
+                logger.error(f"Failed to retrieve EmailDelivery {email_delivery_id}: {e}")
         
         if not self.is_configured():
+            error_msg = 'Email service not configured - missing SMTP settings'
+            if email_delivery:
+                email_delivery.mark_failed(error_msg, is_permanent=True)
+                db.session.commit()
             return {
                 'success': False,
-                'error': 'Email service not configured - missing SMTP settings'
+                'error': error_msg
             }
         
         # Additional safety checks for type assertions
         if not all([self.smtp_server, self.smtp_port, self.smtp_username, self.smtp_password]):
+            error_msg = 'Email service configuration incomplete'
+            if email_delivery:
+                email_delivery.mark_failed(error_msg, is_permanent=True)
+                db.session.commit()
             return {
                 'success': False,
-                'error': 'Email service configuration incomplete'
+                'error': error_msg
             }
         
         try:
@@ -98,6 +119,11 @@ class EmailService:
                 recipients = [to_emails]
             else:
                 recipients = list(to_emails)
+            
+            # Mark as sending if we have a delivery record
+            if email_delivery:
+                email_delivery.mark_sending()
+                db.session.commit()
             
             # Set sender email
             sender = from_email or self.smtp_username
@@ -136,32 +162,100 @@ class EmailService:
                 
                 server.send_message(msg)
                 
+                # Mark as successfully sent if we have a delivery record
+                if email_delivery:
+                    email_delivery.mark_sent()
+                    db.session.commit()
+                
                 logger.info(f"Email sent successfully to {len(recipients)} recipients: {subject}")
                 
                 return {
                     'success': True,
                     'recipients': recipients,
                     'subject': subject,
-                    'sent_at': datetime.utcnow().isoformat()
+                    'sent_at': datetime.utcnow().isoformat(),
+                    'email_delivery_id': email_delivery_id
                 }
                 
         except Exception as e:
             error_msg = f"Failed to send email '{subject}': {str(e)}"
             logger.error(error_msg)
             
+            # Mark as failed if we have a delivery record
+            if email_delivery:
+                # Check if this is a permanent failure
+                is_permanent = self._is_permanent_email_error(str(e))
+                email_delivery.mark_failed(error_msg, is_permanent=is_permanent)
+                db.session.commit()
+            
             return {
                 'success': False,
                 'error': error_msg,
                 'recipients': recipients,
-                'subject': subject
+                'subject': subject,
+                'email_delivery_id': email_delivery_id
             }
+    
+    def _is_permanent_email_error(self, error_message: str) -> bool:
+        """
+        Determine if an email error is permanent (should not retry) or temporary
+        
+        Args:
+            error_message: The error message from SMTP
+            
+        Returns:
+            True if the error is permanent, False if it should be retried
+        """
+        error_lower = error_message.lower()
+        
+        # Permanent failures (5xx SMTP codes and specific conditions)
+        permanent_indicators = [
+            # User/mailbox doesn't exist
+            '550', '551', '553',  # SMTP codes for permanent failure
+            'user unknown', 'mailbox unavailable', 'no such user',
+            'recipient address rejected', 'user does not exist',
+            'invalid recipient', 'undeliverable',
+            
+            # Domain/DNS issues that are likely permanent
+            'domain not found', 'no mail server',
+            
+            # Authentication issues (configuration problems)
+            'authentication failed', 'invalid login',
+            'smtp username/password not accepted',
+            
+            # Content/policy rejections
+            'spam', 'blocked', 'blacklisted', 'prohibited content',
+            'message rejected', 'policy violation'
+        ]
+        
+        # Check if any permanent indicators are present
+        for indicator in permanent_indicators:
+            if indicator in error_lower:
+                return True
+        
+        # Temporary failures (4xx codes and connection issues)
+        temporary_indicators = [
+            '421', '422', '431', '432', '433', '441', '442', '451', '452',  # SMTP 4xx codes
+            'temporary failure', 'try again', 'mailbox full',
+            'rate limit', 'connection timeout', 'network error',
+            'server temporarily unavailable', 'service unavailable'
+        ]
+        
+        # If it's explicitly temporary, return False
+        for indicator in temporary_indicators:
+            if indicator in error_lower:
+                return False
+        
+        # Default to temporary (retryable) for unknown errors
+        return False
 
     def send_participant_invitation(self, 
                                     participant_email: str,
                                     participant_name: str,
                                     campaign_name: str,
                                     survey_token: str,
-                                    business_account_name: str) -> Dict:
+                                    business_account_name: str,
+                                    email_delivery_id: Optional[int] = None) -> Dict:
         """
         Send survey invitation to a participant
         
@@ -171,6 +265,7 @@ class EmailService:
             campaign_name: Campaign name
             survey_token: JWT token for survey access
             business_account_name: Business account name
+            email_delivery_id: Optional EmailDelivery record ID for tracking
             
         Returns:
             Dict with success status and details
@@ -331,7 +426,8 @@ This is an automated message. If you have any questions, please contact the orga
                 to_emails=participant_email,
                 subject=subject,
                 text_body=text_body,
-                html_body=html_body
+                html_body=html_body,
+                email_delivery_id=email_delivery_id
             )
             
             # Add invitation-specific metadata
@@ -361,7 +457,8 @@ This is an automated message. If you have any questions, please contact the orga
                                    campaign_name: str,
                                    campaign_id: int,
                                    business_account_name: str,
-                                   additional_data: Optional[Dict] = None) -> Dict:
+                                   additional_data: Optional[Dict] = None,
+                                   email_delivery_id: Optional[int] = None) -> Dict:
         """
         Send campaign lifecycle notifications to admin emails
         
@@ -371,6 +468,7 @@ This is an automated message. If you have any questions, please contact the orga
             campaign_id: Campaign ID
             business_account_name: Business account name
             additional_data: Optional additional data for notification
+            email_delivery_id: Optional EmailDelivery record ID for tracking
             
         Returns:
             Dict with success status and details
@@ -455,7 +553,8 @@ VOÏA Campaign Management System
             result = self.send_email(
                 to_emails=self.admin_emails,
                 subject=subject,
-                text_body=text_body
+                text_body=text_body,
+                email_delivery_id=email_delivery_id
             )
             
             # Add notification-specific metadata

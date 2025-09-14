@@ -6,7 +6,7 @@ from threading import Thread
 from queue import Queue, Empty
 from time import sleep
 from app import app, db
-from models import SurveyResponse, Campaign, BusinessAccount
+from models import SurveyResponse, Campaign, BusinessAccount, EmailDelivery
 from ai_analysis import analyze_survey_response
 from email_service import email_service
 
@@ -136,41 +136,106 @@ class TaskQueue:
             logger.error(f"Error processing task {task}: {e}")
     
     def _process_email_task(self, task_data, worker_id):
-        """Process an email sending task"""
+        """Process an email sending task with delivery tracking"""
+        email_delivery = None
         try:
             email_type = task_data.get('email_type')
             
+            # Create EmailDelivery record for tracking
+            email_delivery = self._create_email_delivery_record(task_data)
+            if not email_delivery:
+                logger.error(f"Failed to create EmailDelivery record for {email_type}")
+                return False
+            
+            db.session.commit()
+            
             if email_type == 'participant_invitation':
-                # Send participant invitation email
+                # Send participant invitation email with delivery tracking
                 result = email_service.send_participant_invitation(
                     participant_email=task_data['participant_email'],
                     participant_name=task_data['participant_name'],
                     campaign_name=task_data['campaign_name'],
                     survey_token=task_data['survey_token'],
-                    business_account_name=task_data['business_account_name']
+                    business_account_name=task_data['business_account_name'],
+                    email_delivery_id=email_delivery.id
                 )
                 
                 return result['success']
                 
             elif email_type == 'campaign_notification':
-                # Send campaign notification email
+                # Send campaign notification email with delivery tracking
                 result = email_service.send_campaign_notification(
                     notification_type=task_data['notification_type'],
                     campaign_name=task_data['campaign_name'],
                     campaign_id=task_data['campaign_id'],
                     business_account_name=task_data['business_account_name'],
-                    additional_data=task_data.get('additional_data')
+                    additional_data=task_data.get('additional_data'),
+                    email_delivery_id=email_delivery.id
                 )
                 
                 return result['success']
                 
             else:
                 logger.error(f"Unknown email type: {email_type}")
+                if email_delivery:
+                    email_delivery.mark_failed(f"Unknown email type: {email_type}", is_permanent=True)
+                    db.session.commit()
                 return False
                 
         except Exception as e:
             logger.error(f"Email task processing error: {e}")
+            if email_delivery:
+                email_delivery.mark_failed(f"Task processing error: {str(e)}", is_permanent=False)
+                db.session.commit()
             return False
+    
+    def _create_email_delivery_record(self, task_data):
+        """Create EmailDelivery record for tracking"""
+        try:
+            email_type = task_data.get('email_type')
+            
+            # Extract common fields
+            business_account_id = task_data.get('business_account_id')
+            campaign_id = task_data.get('campaign_id')
+            participant_id = task_data.get('participant_id')
+            campaign_participant_id = task_data.get('campaign_participant_id')
+            
+            if email_type == 'participant_invitation':
+                recipient_email = task_data['participant_email']
+                recipient_name = task_data['participant_name']
+                subject = f"Your feedback is requested: {task_data['campaign_name']}"
+                
+            elif email_type == 'campaign_notification':
+                recipient_email = task_data.get('recipient_email')
+                recipient_name = task_data.get('recipient_name', 'Admin')
+                subject = f"Campaign notification: {task_data['campaign_name']}"
+                
+            else:
+                logger.error(f"Unknown email type for delivery record: {email_type}")
+                return None
+            
+            # Create EmailDelivery record
+            email_delivery = EmailDelivery(
+                business_account_id=business_account_id,
+                campaign_id=campaign_id,
+                participant_id=participant_id,
+                campaign_participant_id=campaign_participant_id,
+                email_type=email_type,
+                recipient_email=recipient_email,
+                recipient_name=recipient_name,
+                subject=subject,
+                status='pending',
+                retry_count=0,
+                max_retries=3,  # Default max retries
+                email_data=json.dumps(task_data)  # Store task data for debugging
+            )
+            
+            db.session.add(email_delivery)
+            return email_delivery
+            
+        except Exception as e:
+            logger.error(f"Failed to create EmailDelivery record: {e}")
+            return None
     
     def _scheduler(self):
         """Background scheduler for campaign lifecycle management with DB advisory lock"""
@@ -217,7 +282,7 @@ class TaskQueue:
                 sleep(60)
     
     def _run_campaign_scheduler(self):
-        """Execute campaign lifecycle transitions with business account scoping"""
+        """Execute campaign lifecycle transitions and email retries with business account scoping"""
         changes_made = 0
         try:
             today = date.today()
@@ -234,11 +299,64 @@ class TaskQueue:
                     logger.error(f"Error processing campaigns for business account {account.id}: {e}")
                     # Continue with other accounts
             
+            # Process email retries
+            try:
+                retry_changes = self._process_email_retries()
+                changes_made += retry_changes
+            except Exception as e:
+                logger.error(f"Error processing email retries: {e}")
+            
             return changes_made
                     
         except Exception as e:
             logger.error(f"Campaign scheduler failed: {e}")
             return changes_made
+    
+    def _process_email_retries(self):
+        """Process failed emails that are ready for retry"""
+        retry_count = 0
+        try:
+            # Get emails ready for retry
+            pending_retries = EmailDelivery.get_pending_retries()
+            
+            for email_delivery in pending_retries:
+                try:
+                    # Increment retry count
+                    email_delivery.increment_retry()
+                    
+                    # Parse email data to recreate task
+                    task_data = email_delivery.get_email_data()
+                    if not task_data:
+                        logger.error(f"No task data found for EmailDelivery {email_delivery.id}")
+                        continue
+                    
+                    # Add email_delivery_id to task data for tracking
+                    task_data['email_delivery_id'] = email_delivery.id
+                    
+                    # Add retry task to queue
+                    self.add_task(
+                        task_type='send_email',
+                        priority=2,  # Higher priority for retries
+                        task_data=task_data
+                    )
+                    
+                    retry_count += 1
+                    logger.info(f"Queued email retry {email_delivery.retry_count}/{email_delivery.max_retries} for delivery {email_delivery.id}")
+                    
+                except Exception as e:
+                    logger.error(f"Error processing retry for EmailDelivery {email_delivery.id}: {e}")
+                    # Mark as failed to avoid endless retry loops
+                    email_delivery.mark_failed(f"Retry processing error: {str(e)}", is_permanent=True)
+            
+            # Commit all changes
+            if retry_count > 0:
+                db.session.commit()
+                logger.info(f"Processed {retry_count} email retries")
+            
+        except Exception as e:
+            logger.error(f"Email retry processing failed: {e}")
+            
+        return retry_count
     
     def _process_account_campaigns(self, business_account, today):
         """Process campaign transitions for a specific business account"""
