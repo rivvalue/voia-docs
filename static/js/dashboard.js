@@ -2888,33 +2888,66 @@ async function createCampaign() {
         return;
     }
     
-    const formData = {
-        name: document.getElementById('campaignName').value,
-        description: document.getElementById('campaignDescription').value,
-        start_date: document.getElementById('campaignStartDate').value,
-        end_date: document.getElementById('campaignEndDate').value
-    };
+    // Get CSRF token from the form
+    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+    if (!csrfToken) {
+        showErrorMessage('CSRF token not found. Please refresh the page and try again.');
+        return;
+    }
+    
+    // Create FormData object from form
+    const formData = new FormData();
+    formData.append('name', document.getElementById('campaignName').value.trim());
+    formData.append('description', document.getElementById('campaignDescription').value.trim());
+    formData.append('start_date', document.getElementById('campaignStartDate').value);
+    formData.append('end_date', document.getElementById('campaignEndDate').value);
+    formData.append('csrf_token', csrfToken);
     
     try {
-        const response = await fetch('/api/campaigns', {
+        const response = await fetch('/business/campaigns/create', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': localStorage.getItem('authToken')
-            },
-            body: JSON.stringify(formData)
+            body: formData,
+            credentials: 'same-origin' // Include session cookies
         });
         
-        const result = await response.json();
-        
         if (response.ok) {
-            // Success
-            bootstrap.Modal.getInstance(document.getElementById('createCampaignModal')).hide();
-            showSuccessMessage('Campaign created successfully!');
-            loadCampaignData(); // Refresh data
+            // Check if response is a redirect (campaign creation successful)
+            if (response.redirected || response.url.includes('/business/campaigns')) {
+                // Success - close modal and refresh data
+                bootstrap.Modal.getInstance(document.getElementById('createCampaignModal')).hide();
+                showSuccessMessage('Campaign created successfully!');
+                loadCampaignData(); // Refresh data
+            } else {
+                // This shouldn't happen, but handle gracefully
+                const text = await response.text();
+                console.log('Unexpected success response:', text);
+                showSuccessMessage('Campaign created successfully!');
+                bootstrap.Modal.getInstance(document.getElementById('createCampaignModal')).hide();
+                loadCampaignData();
+            }
         } else {
-            // Error
-            showErrorMessage(result.error || 'Failed to create campaign');
+            // Error - try to parse error message from HTML response
+            const text = await response.text();
+            
+            // Look for flash messages in the HTML response
+            let errorMessage = 'Failed to create campaign. Please try again.';
+            
+            // Try to extract error message from HTML
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(text, 'text/html');
+            const alertElement = doc.querySelector('.alert-danger, .alert-error');
+            
+            if (alertElement) {
+                errorMessage = alertElement.textContent.trim();
+            } else if (text.includes('Campaign name, start date, and end date are required')) {
+                errorMessage = 'Campaign name, start date, and end date are required.';
+            } else if (text.includes('End date must be after start date')) {
+                errorMessage = 'End date must be after start date.';
+            } else if (text.includes('Invalid date format')) {
+                errorMessage = 'Invalid date format.';
+            }
+            
+            showErrorMessage(errorMessage);
         }
     } catch (error) {
         console.error('Error creating campaign:', error);

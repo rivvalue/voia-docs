@@ -924,6 +924,7 @@
                             </div>
                         </div>
                     </div>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="alert alert-warning">
                         <i class="fas fa-exclamation-triangle me-2"></i>
                         <strong>Important:</strong> Only one campaign can be active at a time. Survey responses during the campaign period will automatically be tagged to this campaign.
