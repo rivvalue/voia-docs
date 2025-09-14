@@ -20,6 +20,116 @@ import uuid
 
 logger = logging.getLogger(__name__)
 
+def is_jwt_token(token):
+    """Check if token is in JWT format (contains dots) vs UUID format"""
+    return '.' in token and len(token.split('.')) == 3
+
+def verify_survey_access(token):
+    """
+    Centralized token verification for survey access.
+    Returns verification result with user data or error details.
+    """
+    if not token:
+        return {
+            'valid': False,
+            'error': 'No token provided',
+            'authenticated': False
+        }
+    
+    # Try CampaignParticipant token first (new system) - only if it looks like JWT
+    if is_jwt_token(token):
+        import campaign_participant_token_system
+        verification = campaign_participant_token_system.verify_campaign_participant_token(token)
+        if verification.get('valid'):
+            # Store campaign-participant association data in session
+            session['auth_token'] = token
+            session['auth_email'] = verification.get('email')
+            session['association_id'] = verification.get('association_id')
+            session['campaign_id'] = verification.get('campaign_id')
+            session['participant_id'] = verification.get('participant_id')
+            session['business_account_id'] = verification.get('business_account_id')
+            
+            return {
+                'valid': True,
+                'authenticated': True,
+                'email': verification.get('email'),
+                'user_email': verification.get('email'),
+                'participant_name': verification.get('participant_name'),
+                'participant_company': verification.get('company_name'),
+                'campaign_name': verification.get('campaign_name'),
+                'token': token
+            }
+    
+    # Fallback to simple token system for backward compatibility
+    import simple_token_system
+    fallback_verification = simple_token_system.verify_simple_token(token)
+    if fallback_verification.get('valid'):
+        email = fallback_verification.get('email')
+        session['auth_token'] = token
+        session['auth_email'] = email
+        return {
+            'valid': True,
+            'authenticated': True,
+            'email': email,
+            'user_email': email,
+            'participant_name': None,
+            'participant_company': None,
+            'campaign_name': None,
+            'token': token
+        }
+    
+    # Final fallback: Check if token is a UUID from the database
+    from models import CampaignParticipant, Participant, Campaign
+    from datetime import datetime
+    from app import db
+    
+    # Try campaign-participant token first
+    uuid_participant = CampaignParticipant.query.filter_by(token=token).first()
+    if uuid_participant and uuid_participant.campaign.status in ['ready', 'active']:
+        # Found valid UUID token from campaign_participants table
+        participant = uuid_participant.participant
+        campaign = uuid_participant.campaign
+        
+        # Store session data
+        session['auth_token'] = token
+        session['auth_email'] = participant.email
+        session['association_id'] = uuid_participant.id
+        session['campaign_id'] = campaign.id
+        session['participant_id'] = participant.id
+        session['business_account_id'] = uuid_participant.business_account_id
+        
+        # Update status if first access
+        if uuid_participant.status == 'invited':
+            uuid_participant.status = 'started'
+            uuid_participant.started_at = datetime.utcnow()
+            db.session.commit()
+        
+        logger.info(f"Campaign-participant UUID token authentication successful for {participant.email}")
+        return {
+            'valid': True,
+            'authenticated': True,
+            'email': participant.email,
+            'user_email': participant.email,
+            'participant_name': participant.name,
+            'participant_company': participant.company_name,
+            'campaign_name': campaign.name,
+            'token': token
+        }
+    
+    # Token verification failed
+    error_msg = 'Invalid or expired token'
+    if is_jwt_token(token):
+        # Only show JWT-specific error for JWT tokens to avoid confusion
+        verification_result = campaign_participant_token_system.verify_campaign_participant_token(token)
+        error_msg = verification_result.get('error', error_msg)
+    
+    return {
+        'valid': False,
+        'authenticated': False,
+        'error': error_msg,
+        'token': token
+    }
+
 def normalize_company_name(company_name):
     """Normalize company name for case-insensitive comparison"""
     if not company_name:
@@ -338,87 +448,74 @@ def survey_url_encoded_flexible(encoded_params):
 
 @app.route('/survey')
 def survey():
-    """Main survey page - check for token in URL"""
+    """Main survey choice page - shows AI conversational vs traditional form options"""
     token = request.args.get('token')
+    
     if token:
-        # Try CampaignParticipant token first (new system)
-        import campaign_participant_token_system
-        verification = campaign_participant_token_system.verify_campaign_participant_token(token)
-        if verification.get('valid'):
-            # Store campaign-participant association data in session
-            session['auth_token'] = token
-            session['auth_email'] = verification.get('email')
-            session['association_id'] = verification.get('association_id')
-            session['campaign_id'] = verification.get('campaign_id')
-            session['participant_id'] = verification.get('participant_id')
-            session['business_account_id'] = verification.get('business_account_id')
-            
-            return render_template('survey.html', authenticated=True, 
-                                 email=verification.get('email'), 
-                                 user_email=verification.get('email'),
-                                 participant_name=verification.get('participant_name'),
-                                 campaign_name=verification.get('campaign_name'))
+        # Use centralized token verification
+        verification = verify_survey_access(token)
+        if verification['valid']:
+            return render_template('survey_choice.html', 
+                                 authenticated=verification['authenticated'],
+                                 email=verification['email'], 
+                                 user_email=verification['user_email'],
+                                 participant_name=verification['participant_name'],
+                                 participant_company=verification['participant_company'],
+                                 campaign_name=verification['campaign_name'])
         else:
-            # Fallback to simple token system for backward compatibility
-            import simple_token_system
-            fallback_verification = simple_token_system.verify_simple_token(token)
-            if fallback_verification.get('valid'):
-                email = fallback_verification.get('email')
-                session['auth_token'] = token
-                session['auth_email'] = email
-                return render_template('survey.html', authenticated=True, email=email, user_email=email)
-            else:
-                # Final fallback: Check if token is a UUID from the database
-                from models import CampaignParticipant, Participant, Campaign
-                from datetime import datetime
-                from app import db
-                
-                # Try campaign-participant token first
-                uuid_participant = CampaignParticipant.query.filter_by(token=token).first()
-                if uuid_participant and uuid_participant.campaign.status in ['ready', 'active']:
-                    # Found valid UUID token from campaign_participants table
-                    participant = uuid_participant.participant
-                    campaign = uuid_participant.campaign
-                    
-                    # Store session data
-                    session['auth_token'] = token
-                    session['auth_email'] = participant.email
-                    session['association_id'] = uuid_participant.id
-                    session['campaign_id'] = campaign.id
-                    session['participant_id'] = participant.id
-                    session['business_account_id'] = uuid_participant.business_account_id
-                    
-                    # Update status if first access
-                    if uuid_participant.status == 'invited':
-                        uuid_participant.status = 'started'
-                        uuid_participant.started_at = datetime.utcnow()
-                        db.session.commit()
-                    
-                    logger.info(f"Campaign-participant UUID token authentication successful for {participant.email}")
-                    return render_template('survey.html', authenticated=True, 
-                                         email=participant.email, 
-                                         user_email=participant.email,
-                                         participant_name=participant.name,
-                                         campaign_name=campaign.name)
-                else:
-                    error_msg = verification.get('error', 'Invalid or expired token')
-                    return render_template('survey.html', authenticated=False, error=error_msg, user_email=None)
+            return render_template('survey_choice.html', 
+                                 authenticated=False, 
+                                 error=verification['error'], 
+                                 user_email=None)
     else:
         # Check if already authenticated via session
         if session.get('auth_token'):
             email = session.get('auth_email')
-            
-            # Allow response updates - don't block existing responses
-            # existing_response = SurveyResponse.query.filter_by(respondent_email=email).first()
-            # if existing_response:
-            #     # Show completion message instead of survey form
-            #     return render_template('survey_completed.html', 
-            #                          email=email,
-            #                          user_email=email,
-            #                          completion_date=existing_response.created_at.strftime("%B %d, %Y"),
-            #                          show_alternatives=True)
-                                     
-            return render_template('survey.html', authenticated=True, email=email, user_email=email)
+            # For session-based access, we may not have all participant details
+            return render_template('survey_choice.html', 
+                                 authenticated=True, 
+                                 email=email, 
+                                 user_email=email,
+                                 participant_name=None,
+                                 participant_company=None,
+                                 campaign_name=None)
+        else:
+            # Redirect unauthenticated users to auth page instead of showing broken page
+            return redirect(url_for('server_auth'))
+
+@app.route('/survey_form')
+def survey_form():
+    """Traditional survey form page with pre-populated data"""
+    token = request.args.get('token')
+    
+    if token:
+        # Use centralized token verification
+        verification = verify_survey_access(token)
+        if verification['valid']:
+            return render_template('survey.html', 
+                                 authenticated=verification['authenticated'],
+                                 email=verification['email'], 
+                                 user_email=verification['user_email'],
+                                 participant_name=verification['participant_name'],
+                                 participant_company=verification['participant_company'],
+                                 campaign_name=verification['campaign_name'])
+        else:
+            return render_template('survey.html', 
+                                 authenticated=False, 
+                                 error=verification['error'], 
+                                 user_email=None)
+    else:
+        # Check if already authenticated via session
+        if session.get('auth_token'):
+            email = session.get('auth_email')
+            # For session-based access, we may not have all participant details
+            return render_template('survey.html', 
+                                 authenticated=True, 
+                                 email=email, 
+                                 user_email=email,
+                                 participant_name=None,
+                                 participant_company=None,
+                                 campaign_name=None)
         else:
             # Redirect unauthenticated users to auth page instead of showing broken page
             return redirect(url_for('server_auth'))

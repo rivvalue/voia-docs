@@ -26,15 +26,21 @@
                         <h5 class="mb-3">Basic Information</h5>
                         <div class="mb-3">
                             <label for="companyName" class="form-label">Company Name</label>
-                            <input type="text" class="form-control" id="companyName" required>
+                            <input type="text" class="form-control" id="companyName" name="company_name" 
+                                   value="{{ participant_company or '' }}" 
+                                   {% if participant_company %}readonly{% endif %} required>
                         </div>
                         <div class="mb-3">
                             <label for="respondentName" class="form-label">Your Name</label>
-                            <input type="text" class="form-control" id="respondentName" required>
+                            <input type="text" class="form-control" id="respondentName" name="respondent_name" 
+                                   value="{{ participant_name or '' }}" 
+                                   {% if participant_name %}readonly{% endif %} required>
                         </div>
                         <div class="mb-3">
                             <label for="respondentEmail" class="form-label">Email Address</label>
-                            <input type="email" class="form-control" id="respondentEmail" required>
+                            <input type="email" class="form-control" id="respondentEmail" name="respondent_email" 
+                                   value="{{ email or '' }}" 
+                                   {% if email %}readonly{% endif %} required>
                         </div>
                         <div class="mb-3">
                             <label for="tenureWithFc" class="form-label">How long have you been working with Archelo Group?</label>
