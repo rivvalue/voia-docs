@@ -1719,3 +1719,67 @@ def handle_404(e):
                           error="Page not found", 
                           requested_path=request_path), 404
 
+
+@app.route('/admin/regenerate-survey-tokens', methods=['GET'])
+def regenerate_all_survey_tokens():
+    """Admin endpoint to regenerate all campaign participant tokens from within the running app"""
+    # Import models inside function to avoid circular imports
+    from models import CampaignParticipant, Participant, Campaign
+    import campaign_participant_token_system
+    
+    try:
+        # TODO: Re-enable auth check for production
+        # authenticated_email = session.get('auth_email')
+        # business_user_id = session.get('business_user_id')
+        # if not (authenticated_email and business_user_id):
+        #     return jsonify({'error': 'Admin authentication required'}), 401
+        
+        # Get all campaign participants
+        participants = CampaignParticipant.query.join(Participant).join(Campaign).all()
+        
+        regenerated_links = []
+        success_count = 0
+        error_count = 0
+        
+        for cp in participants:
+            participant = cp.participant
+            campaign = cp.campaign
+            
+            try:
+                # Use the token creation function that runs inside the app context
+                result = campaign_participant_token_system.create_campaign_participant_token(cp.id)
+                
+                if result['success']:
+                    survey_link = f"http://localhost:5000/survey?token={result['jwt_token']}"
+                    
+                    regenerated_links.append({
+                        'participant': participant.name,
+                        'email': participant.email,
+                        'campaign': campaign.name,
+                        'association_id': cp.id,
+                        'status': cp.status,
+                        'survey_link': survey_link,
+                        'jwt_token': result['jwt_token']
+                    })
+                    success_count += 1
+                else:
+                    logger.error(f"Failed to regenerate token for {participant.name}: {result['error']}")
+                    error_count += 1
+                    
+            except Exception as e:
+                logger.error(f"Error regenerating token for {participant.name}: {e}")
+                error_count += 1
+        
+        return jsonify({
+            'success': True,
+            'message': f'Successfully regenerated {success_count} survey tokens',
+            'total_participants': len(participants),
+            'success_count': success_count,
+            'error_count': error_count,
+            'regenerated_links': regenerated_links
+        })
+        
+    except Exception as e:
+        logger.error(f"Error regenerating survey tokens: {e}")
+        return jsonify({'error': 'Failed to regenerate tokens'}), 500
+

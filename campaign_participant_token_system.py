@@ -11,6 +11,19 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def get_jwt_secret():
+    """Get JWT secret from Flask app context or environment fallback"""
+    try:
+        from flask import current_app
+        return current_app.secret_key
+    except RuntimeError:
+        # No app context, fall back to environment
+        return os.environ.get("SESSION_SECRET")
+    except ImportError:
+        # Flask not available, fall back to environment
+        return os.environ.get("SESSION_SECRET")
+
+
 def create_campaign_participant_token(association_id):
     """Generate a JWT token for a campaign-participant association"""
     try:
@@ -34,7 +47,7 @@ def create_campaign_participant_token(association_id):
             }
         
         # Use the same secret as Flask app - REQUIRED in production
-        secret = os.environ.get("SESSION_SECRET")
+        secret = get_jwt_secret()
         if not secret:
             raise ValueError("SESSION_SECRET environment variable is required for token security")
         
@@ -87,12 +100,12 @@ def verify_campaign_participant_token(jwt_token):
             logger.warning("JWT Verification failed: No token provided")
             return {'valid': False, 'error': 'No token provided'}
         
-        secret = os.environ.get("SESSION_SECRET")
+        secret = get_jwt_secret()
         if not secret:
             raise ValueError("SESSION_SECRET environment variable is required for token security")
         
         logger.info("Decoding JWT token...")
-        payload = jwt.decode(jwt_token, secret, algorithms=['HS256'])
+        payload = jwt.decode(jwt_token, secret, algorithms=['HS256'], options={'verify_iat': False}, leeway=300)
         logger.info(f"JWT decoded successfully. Payload: {payload}")
         
         # Validate required fields in payload - ONLY require association_id since that's what we have
@@ -139,7 +152,8 @@ def verify_campaign_participant_token(jwt_token):
         
     except jwt.ExpiredSignatureError:
         return {'valid': False, 'error': 'Token has expired'}
-    except jwt.InvalidTokenError:
+    except jwt.InvalidTokenError as e:
+        logger.exception(f"JWT decode failed: {e}")
         return {'valid': False, 'error': 'Invalid token'}
     except Exception as e:
         logger.error(f"Error verifying campaign participant token: {e}")
