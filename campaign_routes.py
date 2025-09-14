@@ -491,6 +491,10 @@ def send_bulk_invitations(campaign_id):
                     'campaign_name': campaign.name,
                     'survey_token': cp.token,  # Use campaign-participant token
                     'business_account_name': current_account.name,
+                    'business_account_id': current_account.id,  # Critical for tenant-specific email config
+                    'campaign_id': campaign.id,
+                    'participant_id': cp.participant_id,
+                    'campaign_participant_id': cp.id,
                     'email_delivery_id': email_delivery.id
                 }
                 

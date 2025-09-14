@@ -5,10 +5,12 @@ Provides login/logout routes for business account users without affecting public
 
 from flask import Blueprint, request, render_template, redirect, url_for, session, flash, jsonify
 from werkzeug.security import check_password_hash
-from models import BusinessAccountUser, UserSession, BusinessAccount, db
+from models import BusinessAccountUser, UserSession, BusinessAccount, EmailConfiguration, db
+from rate_limiter import rate_limit
 import logging
 from datetime import datetime, timedelta
 import json
+import re
 
 # Create blueprint for business account authentication
 business_auth_bp = Blueprint('business_auth', __name__, url_prefix='/business')
@@ -681,3 +683,245 @@ def scheduler_status():
             return jsonify({'error': 'Failed to get scheduler status'}), 500
         flash('Failed to get scheduler status.', 'error')
         return redirect(url_for('business_auth.admin_panel'))
+
+
+# ==== EMAIL CONFIGURATION ROUTES ====
+
+@business_auth_bp.route('/admin/email-config')
+@require_business_auth
+@require_permission('admin')
+def email_config():
+    """Email configuration management page"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.admin_panel'))
+        
+        # Get existing email configuration if any
+        email_config = current_account.get_email_configuration()
+        
+        return render_template('business_auth/email_config.html',
+                             email_config=email_config,
+                             business_account=current_account)
+    
+    except Exception as e:
+        logger.error(f"Error loading email configuration: {e}")
+        flash('Failed to load email configuration.', 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+
+@business_auth_bp.route('/admin/email-config/save', methods=['POST'])
+@require_business_auth
+@require_permission('admin')
+def save_email_config():
+    """Save email configuration"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.admin_panel'))
+        
+        # Get form data
+        smtp_server = request.form.get('smtp_server', '').strip()
+        smtp_port = request.form.get('smtp_port', '587')
+        smtp_username = request.form.get('smtp_username', '').strip()
+        smtp_password = request.form.get('smtp_password', '').strip()
+        use_tls = request.form.get('use_tls') == 'on'
+        use_ssl = request.form.get('use_ssl') == 'on'
+        sender_name = request.form.get('sender_name', '').strip()
+        sender_email = request.form.get('sender_email', '').strip()
+        reply_to_email = request.form.get('reply_to_email', '').strip()
+        admin_emails = request.form.get('admin_emails', '').strip()
+        
+        # Parse admin emails
+        admin_email_list = []
+        if admin_emails:
+            admin_email_list = [email.strip() for email in admin_emails.split(',') if email.strip()]
+        
+        # Validate port
+        try:
+            smtp_port = int(smtp_port)
+            if not (1 <= smtp_port <= 65535):
+                raise ValueError("Port must be between 1 and 65535")
+        except ValueError:
+            flash('Invalid SMTP port. Please enter a number between 1 and 65535.', 'error')
+            return redirect(url_for('business_auth.email_config'))
+        
+        # Get or create email configuration
+        email_config = current_account.get_email_configuration()
+        if not email_config:
+            email_config = EmailConfiguration(business_account_id=current_account.id)
+        
+        # Update configuration
+        email_config.smtp_server = smtp_server
+        email_config.smtp_port = smtp_port
+        email_config.smtp_username = smtp_username
+        email_config.use_tls = use_tls
+        email_config.use_ssl = use_ssl
+        email_config.sender_name = sender_name
+        email_config.sender_email = sender_email
+        email_config.reply_to_email = reply_to_email if reply_to_email else None
+        email_config.set_admin_emails(admin_email_list)
+        
+        # Update password only if provided
+        if smtp_password:
+            email_config.set_smtp_password(smtp_password)
+        
+        # Validate configuration
+        validation_errors = email_config.validate_configuration()
+        if validation_errors:
+            for error in validation_errors:
+                flash(error, 'error')
+            return redirect(url_for('business_auth.email_config'))
+        
+        # Save to database
+        if email_config.id is None:
+            db.session.add(email_config)
+        
+        db.session.commit()
+        
+        flash('Email configuration saved successfully!', 'success')
+        return redirect(url_for('business_auth.email_config'))
+    
+    except Exception as e:
+        logger.error(f"Error saving email configuration: {e}")
+        db.session.rollback()
+        flash('Failed to save email configuration. Please try again.', 'error')
+        return redirect(url_for('business_auth.email_config'))
+
+
+@business_auth_bp.route('/admin/email-config/test', methods=['POST'])
+@require_business_auth
+@require_permission('admin')
+@rate_limit(limit=10)  # 10 tests per minute per IP to prevent abuse
+def test_email_config():
+    """Test email configuration"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account context not found'}), 400
+        
+        # Import email service
+        from email_service import email_service
+        
+        # Test the configuration
+        test_result = email_service.test_configuration(business_account_id=current_account.id)
+        
+        # Update EmailConfiguration with test result if it exists
+        email_config = current_account.get_email_configuration()
+        if email_config:
+            email_config.set_test_result(test_result)
+            db.session.commit()
+        
+        return jsonify(test_result)
+    
+    except Exception as e:
+        logger.error(f"Error testing email configuration: {e}")
+        return jsonify({
+            'success': False,
+            'error': f'Failed to test email configuration: {str(e)}'
+        }), 500
+
+
+@business_auth_bp.route('/admin/email-config/send-test', methods=['POST'])
+@require_business_auth
+@require_permission('admin')
+@rate_limit(limit=5)  # 5 test emails per minute per IP to prevent spam
+def send_test_email():
+    """Send test email"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account context not found'}), 400
+        
+        # Get test email address from request
+        test_email = request.json.get('test_email', '').strip() if request.is_json else request.form.get('test_email', '').strip()
+        
+        # Enhanced email validation
+        if not test_email:
+            return jsonify({'error': 'Test email address is required'}), 400
+        
+        # Validate email format with regex
+        email_pattern = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+        if not email_pattern.match(test_email):
+            return jsonify({'error': 'Please enter a valid email address format'}), 400
+        
+        # Additional security: prevent potential injection
+        if len(test_email) > 320:  # RFC 5321 limit
+            return jsonify({'error': 'Email address too long'}), 400
+        
+        # Import email service
+        from email_service import email_service
+        
+        # Prepare test email content
+        subject = f"Test Email - {current_account.name} VOÏA Configuration"
+        text_body = f"""
+Hello,
+
+This is a test email to verify the email configuration for {current_account.name}.
+
+If you received this email, your SMTP configuration is working correctly!
+
+Configuration Details:
+- Business Account: {current_account.name}
+- Test Date: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC
+
+Best regards,
+VOÏA System
+"""
+        
+        html_body = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>VOÏA Test Email</title>
+    <style>
+        body {{ font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; }}
+        .header {{ background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }}
+        .success {{ color: #28a745; font-weight: bold; }}
+        .details {{ background: #e9ecef; padding: 15px; border-radius: 5px; margin: 20px 0; }}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>✅ VOÏA Email Configuration Test</h2>
+        <p class="success">Configuration test successful!</p>
+    </div>
+    
+    <p>Hello,</p>
+    
+    <p>This is a test email to verify the email configuration for <strong>{current_account.name}</strong>.</p>
+    
+    <p>If you received this email, your SMTP configuration is working correctly!</p>
+    
+    <div class="details">
+        <strong>Configuration Details:</strong><br>
+        • Business Account: {current_account.name}<br>
+        • Test Date: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC
+    </div>
+    
+    <p>Best regards,<br>
+    VOÏA System</p>
+</body>
+</html>
+"""
+        
+        # Send test email
+        result = email_service.send_email(
+            to_emails=test_email,
+            subject=subject,
+            text_body=text_body,
+            html_body=html_body,
+            business_account_id=current_account.id
+        )
+        
+        return jsonify(result)
+    
+    except Exception as e:
+        logger.error(f"Error sending test email: {e}")
+        return jsonify({
+            'success': False,
+            'error': f'Failed to send test email: {str(e)}'
+        }), 500

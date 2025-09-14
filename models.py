@@ -429,6 +429,216 @@ class BusinessAccount(db.Model):
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
+    
+    def get_email_configuration(self):
+        """Get email configuration for this business account"""
+        return EmailConfiguration.query.filter_by(business_account_id=self.id).first()
+    
+    def has_email_configuration(self):
+        """Check if business account has email configuration set up"""
+        return self.get_email_configuration() is not None
+
+
+class EmailConfiguration(db.Model):
+    """Email Configuration model for business account-specific SMTP settings"""
+    __tablename__ = 'email_configurations'
+    __table_args__ = (
+        # Only one email configuration per business account
+        db.UniqueConstraint('business_account_id', name='uq_email_config_business_account'),
+        db.Index('idx_email_config_business_account', 'business_account_id'),
+    )
+    
+    id = db.Column(db.Integer, primary_key=True)
+    business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
+    
+    # SMTP Configuration
+    smtp_server = db.Column(db.String(255), nullable=False)
+    smtp_port = db.Column(db.Integer, nullable=False, default=587)
+    smtp_username = db.Column(db.String(255), nullable=False)
+    smtp_password_encrypted = db.Column(db.Text, nullable=False)  # Encrypted password
+    use_tls = db.Column(db.Boolean, nullable=False, default=True)
+    use_ssl = db.Column(db.Boolean, nullable=False, default=False)
+    
+    # Sender Configuration
+    sender_name = db.Column(db.String(200), nullable=False)
+    sender_email = db.Column(db.String(200), nullable=False)
+    reply_to_email = db.Column(db.String(200), nullable=True)
+    
+    # Admin Notification Settings
+    admin_notification_emails = db.Column(db.Text, nullable=True)  # JSON array of admin emails
+    
+    # Configuration Status
+    is_active = db.Column(db.Boolean, nullable=False, default=True)
+    is_verified = db.Column(db.Boolean, nullable=False, default=False)  # Whether SMTP config has been tested
+    last_test_at = db.Column(db.DateTime, nullable=True)
+    last_test_result = db.Column(db.Text, nullable=True)  # JSON result of last test
+    
+    # Metadata
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    business_account = db.relationship('BusinessAccount', backref=db.backref('email_configuration', uselist=False))
+    
+    def __init__(self, **kwargs):
+        # Handle password encryption on initialization
+        if 'smtp_password' in kwargs:
+            self.set_smtp_password(kwargs.pop('smtp_password'))
+        super().__init__(**kwargs)
+    
+    def set_smtp_password(self, password):
+        """Encrypt and store SMTP password"""
+        if password:
+            self.smtp_password_encrypted = self._encrypt_password(password)
+    
+    def get_smtp_password(self):
+        """Decrypt and return SMTP password"""
+        if self.smtp_password_encrypted:
+            return self._decrypt_password(self.smtp_password_encrypted)
+        return None
+    
+    def _encrypt_password(self, password):
+        """Encrypt password using Fernet symmetric encryption"""
+        from cryptography.fernet import Fernet
+        import base64
+        import os
+        
+        # Get encryption key from environment or generate one
+        key = os.environ.get('EMAIL_ENCRYPTION_KEY')
+        if not key:
+            # In production, this should be set as an environment variable
+            # For development, we'll generate a consistent key based on SECRET_KEY
+            secret_key = os.environ.get('SESSION_SECRET', 'development-key').encode()
+            key = base64.urlsafe_b64encode(secret_key[:32].ljust(32, b'0'))
+        else:
+            key = key.encode()
+        
+        fernet = Fernet(key)
+        encrypted_password = fernet.encrypt(password.encode())
+        return base64.urlsafe_b64encode(encrypted_password).decode()
+    
+    def _decrypt_password(self, encrypted_password):
+        """Decrypt password using Fernet symmetric encryption"""
+        from cryptography.fernet import Fernet
+        import base64
+        import os
+        
+        try:
+            # Get encryption key
+            key = os.environ.get('EMAIL_ENCRYPTION_KEY')
+            if not key:
+                secret_key = os.environ.get('SESSION_SECRET', 'development-key').encode()
+                key = base64.urlsafe_b64encode(secret_key[:32].ljust(32, b'0'))
+            else:
+                key = key.encode()
+            
+            fernet = Fernet(key)
+            encrypted_data = base64.urlsafe_b64decode(encrypted_password.encode())
+            decrypted_password = fernet.decrypt(encrypted_data)
+            return decrypted_password.decode()
+        except Exception as e:
+            logger.error(f"Failed to decrypt email password: {e}")
+            return None
+    
+    def get_admin_emails(self):
+        """Parse admin notification emails from JSON"""
+        if self.admin_notification_emails:
+            try:
+                return json.loads(self.admin_notification_emails)
+            except:
+                return []
+        return []
+    
+    def set_admin_emails(self, emails):
+        """Set admin notification emails as JSON"""
+        if emails and isinstance(emails, list):
+            self.admin_notification_emails = json.dumps(emails)
+        else:
+            self.admin_notification_emails = None
+    
+    def get_last_test_result(self):
+        """Parse last test result from JSON"""
+        if self.last_test_result:
+            try:
+                return json.loads(self.last_test_result)
+            except:
+                return {}
+        return {}
+    
+    def set_test_result(self, result):
+        """Set test result as JSON and update verification status"""
+        self.last_test_at = datetime.utcnow()
+        self.last_test_result = json.dumps(result)
+        self.is_verified = result.get('success', False)
+    
+    def to_dict(self, include_password=False):
+        """Convert to dictionary representation"""
+        data = {
+            'id': self.id,
+            'business_account_id': self.business_account_id,
+            'business_account_name': self.business_account.name if self.business_account else None,
+            'smtp_server': self.smtp_server,
+            'smtp_port': self.smtp_port,
+            'smtp_username': self.smtp_username,
+            'use_tls': self.use_tls,
+            'use_ssl': self.use_ssl,
+            'sender_name': self.sender_name,
+            'sender_email': self.sender_email,
+            'reply_to_email': self.reply_to_email,
+            'admin_notification_emails': self.get_admin_emails(),
+            'is_active': self.is_active,
+            'is_verified': self.is_verified,
+            'last_test_at': self.last_test_at.isoformat() if self.last_test_at else None,
+            'last_test_result': self.get_last_test_result(),
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+        
+        if include_password:
+            data['smtp_password'] = self.get_smtp_password()
+        
+        return data
+    
+    def validate_configuration(self):
+        """Validate email configuration fields"""
+        errors = []
+        
+        if not self.smtp_server:
+            errors.append("SMTP server is required")
+        
+        if not self.smtp_port or not (1 <= self.smtp_port <= 65535):
+            errors.append("Valid SMTP port (1-65535) is required")
+        
+        if not self.smtp_username:
+            errors.append("SMTP username is required")
+        
+        if not self.smtp_password_encrypted:
+            errors.append("SMTP password is required")
+        
+        if not self.sender_name:
+            errors.append("Sender name is required")
+        
+        if not self.sender_email:
+            errors.append("Sender email is required")
+        elif '@' not in self.sender_email:
+            errors.append("Valid sender email is required")
+        
+        if self.reply_to_email and '@' not in self.reply_to_email:
+            errors.append("Valid reply-to email is required")
+        
+        return errors
+    
+    def is_valid(self):
+        """Check if configuration is valid"""
+        return len(self.validate_configuration()) == 0
+    
+    @staticmethod
+    def get_for_business_account(business_account_id):
+        """Get email configuration for a business account"""
+        return EmailConfiguration.query.filter_by(
+            business_account_id=business_account_id,
+            is_active=True
+        ).first()
 
 
 class Participant(db.Model):

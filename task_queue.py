@@ -157,7 +157,8 @@ class TaskQueue:
                     campaign_name=task_data['campaign_name'],
                     survey_token=task_data['survey_token'],
                     business_account_name=task_data['business_account_name'],
-                    email_delivery_id=email_delivery.id
+                    email_delivery_id=email_delivery.id,
+                    business_account_id=task_data.get('business_account_id')
                 )
                 
                 return result['success']
@@ -170,7 +171,8 @@ class TaskQueue:
                     campaign_id=task_data['campaign_id'],
                     business_account_name=task_data['business_account_name'],
                     additional_data=task_data.get('additional_data'),
-                    email_delivery_id=email_delivery.id
+                    email_delivery_id=email_delivery.id,
+                    business_account_id=task_data.get('business_account_id')
                 )
                 
                 return result['success']

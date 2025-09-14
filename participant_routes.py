@@ -719,6 +719,10 @@ def send_campaign_participant_invitation(campaign_id, participant_id):
                 'campaign_name': campaign.name,
                 'survey_token': cp.token,
                 'business_account_name': current_account.name,
+                'business_account_id': current_account.id,  # Critical for tenant-specific email config
+                'campaign_id': campaign.id,
+                'participant_id': participant_id,
+                'campaign_participant_id': cp.id,
                 'email_delivery_id': email_delivery.id
             }
             

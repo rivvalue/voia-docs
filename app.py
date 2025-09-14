@@ -51,6 +51,27 @@ db.init_app(app)
 # Initialize CSRF protection
 csrf = CSRFProtect(app)
 
+# CSRF error handler
+@app.errorhandler(400)
+def handle_csrf_error(e):
+    """Handle CSRF validation errors with user-friendly messages"""
+    from flask import request, jsonify, flash, redirect, url_for
+    
+    # Check if this is a CSRF error
+    if 'CSRFError' in str(type(e)) or 'csrf' in str(e).lower():
+        if request.is_json:
+            return jsonify({
+                'error': 'Security token validation failed. Please refresh the page and try again.',
+                'csrf_error': True
+            }), 400
+        else:
+            flash('Security token validation failed. Please try again.', 'error')
+            # Redirect back to the referring page or admin panel
+            return redirect(request.referrer or url_for('business_auth.admin_panel'))
+    
+    # For non-CSRF 400 errors, use default handling
+    return str(e), 400
+
 # Make csrf_token and business auth state available in all templates
 @app.context_processor
 def inject_csrf():
