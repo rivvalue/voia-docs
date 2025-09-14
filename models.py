@@ -531,7 +531,8 @@ class CampaignParticipant(db.Model):
     participant_id = db.Column(db.Integer, db.ForeignKey('participants.id'), nullable=False, index=True)
     business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
     
-    # Note: Using unified token system - tokens stored at participant level, not per campaign association
+    # Campaign-participant specific token for JWT authentication
+    token = db.Column(db.String(255), nullable=True, unique=True, index=True)  # UUID token for this association
     
     # Status tracking per campaign
     status = db.Column(db.String(20), nullable=False, default='invited', index=True)  # invited, started, completed
