@@ -372,9 +372,11 @@ def survey():
                 from models import CampaignParticipant, Participant, Campaign
                 from datetime import datetime
                 from app import db
+                
+                # Try campaign-participant token first
                 uuid_participant = CampaignParticipant.query.filter_by(token=token).first()
                 if uuid_participant and uuid_participant.campaign.status in ['ready', 'active']:
-                    # Found valid UUID token from database
+                    # Found valid UUID token from campaign_participants table
                     participant = uuid_participant.participant
                     campaign = uuid_participant.campaign
                     
@@ -392,13 +394,46 @@ def survey():
                         uuid_participant.started_at = datetime.utcnow()
                         db.session.commit()
                     
-                    logger.info(f"UUID token authentication successful for {participant.email}")
+                    logger.info(f"Campaign-participant UUID token authentication successful for {participant.email}")
                     return render_template('survey.html', authenticated=True, 
                                          email=participant.email, 
                                          user_email=participant.email,
                                          participant_name=participant.name,
                                          campaign_name=campaign.name)
                 else:
+                    # Try participant-level token (the one shown on web pages)
+                    participant = Participant.query.filter_by(token=token).first()
+                    if participant:
+                        # Find active campaign association for this participant
+                        active_association = CampaignParticipant.query.join(Campaign).filter(
+                            CampaignParticipant.participant_id == participant.id,
+                            Campaign.status.in_(['ready', 'active'])
+                        ).first()
+                        
+                        if active_association:
+                            campaign = active_association.campaign
+                            
+                            # Store session data
+                            session['auth_token'] = token
+                            session['auth_email'] = participant.email
+                            session['association_id'] = active_association.id
+                            session['campaign_id'] = campaign.id
+                            session['participant_id'] = participant.id
+                            session['business_account_id'] = active_association.business_account_id
+                            
+                            # Update status if first access
+                            if active_association.status == 'invited':
+                                active_association.status = 'started'
+                                active_association.started_at = datetime.utcnow()
+                                db.session.commit()
+                            
+                            logger.info(f"Participant UUID token authentication successful for {participant.email}")
+                            return render_template('survey.html', authenticated=True, 
+                                                 email=participant.email, 
+                                                 user_email=participant.email,
+                                                 participant_name=participant.name,
+                                                 campaign_name=campaign.name)
+                    
                     error_msg = verification.get('error', 'Invalid or expired token')
                     return render_template('survey.html', authenticated=False, error=error_msg, user_email=None)
     else:
