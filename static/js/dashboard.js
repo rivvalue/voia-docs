@@ -802,9 +802,6 @@ function loadDashboardData() {
             
             dashboardData = data;
             
-            // Display active campaign banner if showing active campaign data
-            updateActiveCampaignBanner(data);
-            
             // Show content BEFORE creating charts
             if (loadingElement) loadingElement.classList.add('d-none');
             if (contentElement) contentElement.classList.remove('d-none');
