@@ -1195,7 +1195,9 @@ def generate_campaign_kpi_snapshot(campaign_id):
                 try:
                     themes = json.loads(response.key_themes)
                     for theme in themes:
-                        consolidated_theme = consolidate_theme_name(theme)
+                        # Extract theme name from theme object (handle both dict and string formats)
+                        theme_name = theme.get('theme', 'unknown') if isinstance(theme, dict) else str(theme)
+                        consolidated_theme = consolidate_theme_name(theme_name)
                         all_themes[consolidated_theme] = all_themes.get(consolidated_theme, 0) + 1
                 except:
                     continue
