@@ -9,7 +9,7 @@ from models_auth import AuthToken
 from task_queue import add_analysis_task, get_queue_stats
 from rate_limiter import rate_limit
 from auth_system import require_auth, generate_user_token
-from business_auth_routes import require_business_auth, require_permission, get_current_business_account
+from business_auth_routes import require_business_auth, require_permission, get_current_business_account, get_current_business_user
 from conversational_survey import start_conversational_survey, process_conversation_response, finalize_conversational_survey
 from ai_conversational_survey import start_ai_conversational_survey, process_ai_conversation_response, finalize_ai_conversational_survey
 from datetime import datetime, timedelta, date
@@ -1507,12 +1507,25 @@ def export_user_data():
         }), 500
 
 @app.route('/api/campaigns/filter-options')
-@require_business_auth
 def get_campaign_filter_options():
-    """Get campaigns for analytics filtering (business account scoped)"""
+    """Get campaigns for analytics filtering (secure business user authentication)"""
     try:
-        business_account_id = session.get('business_account_id')
-        campaigns = Campaign.query.filter_by(business_account_id=business_account_id).order_by(Campaign.start_date.desc()).all()
+        # Check if this is a business user session (not participant)
+        current_business_user = get_current_business_user()
+        
+        if current_business_user:
+            # Business user - return their campaigns
+            business_account_id = current_business_user.business_account_id
+            campaigns = Campaign.query.filter_by(business_account_id=business_account_id).order_by(Campaign.start_date.desc()).all()
+        else:
+            # Public/participant user - return demo campaigns only (ExecutiveSummary access)
+            from models import BusinessAccount
+            demo_account = BusinessAccount.query.filter_by(name='Rivvalue Inc').first()
+            if demo_account:
+                campaigns = Campaign.query.filter_by(business_account_id=demo_account.id).order_by(Campaign.start_date.desc()).all()
+            else:
+                # No demo account found - return empty campaigns list
+                campaigns = []
         return jsonify({
             'campaigns': [
                 {
@@ -1531,20 +1544,33 @@ def get_campaign_filter_options():
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/campaigns/comparison')
-@require_business_auth
 def get_campaign_comparison():
-    """Get comparison data between two campaigns (business account scoped)"""
+    """Get comparison data between two campaigns (secure business user authentication)"""
     try:
-        business_account_id = session.get('business_account_id')
         campaign1_id = request.args.get('campaign1', type=int)
         campaign2_id = request.args.get('campaign2', type=int)
         
         if not campaign1_id or not campaign2_id:
             return jsonify({'error': 'Both campaign1 and campaign2 IDs required'}), 400
-            
-        # Get campaign details with business account verification
-        campaign1 = Campaign.query.filter_by(id=campaign1_id, business_account_id=business_account_id).first()
-        campaign2 = Campaign.query.filter_by(id=campaign2_id, business_account_id=business_account_id).first()
+        
+        # Check if this is a business user session (not participant)
+        current_business_user = get_current_business_user()
+        
+        if current_business_user:
+            # Business user - verify both campaigns belong to their account
+            business_account_id = current_business_user.business_account_id
+            campaign1 = Campaign.query.filter_by(id=campaign1_id, business_account_id=business_account_id).first()
+            campaign2 = Campaign.query.filter_by(id=campaign2_id, business_account_id=business_account_id).first()
+        else:
+            # Public/participant user - only allow demo account campaigns (ExecutiveSummary access)
+            from models import BusinessAccount
+            demo_account = BusinessAccount.query.filter_by(name='Rivvalue Inc').first()
+            if demo_account:
+                campaign1 = Campaign.query.filter_by(id=campaign1_id, business_account_id=demo_account.id).first()
+                campaign2 = Campaign.query.filter_by(id=campaign2_id, business_account_id=demo_account.id).first()
+            else:
+                # No demo account found - return error
+                return jsonify({'error': 'Demo account not available'}), 404
         
         if not campaign1 or not campaign2:
             return jsonify({'error': 'One or both campaigns not found or not accessible'}), 404

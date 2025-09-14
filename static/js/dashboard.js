@@ -852,6 +852,9 @@ function populateDashboard() {
     // Populate unified account intelligence
     populateAccountIntelligence();
     
+    // Load KPI overview data (Executive Summary)
+    loadKpiOverview();
+    
     // Skip legacy functions that don't work with new tab structure
     // populateGrowthOpportunities(); // Removed - element doesn't exist in new tabs
     // populateAccountRiskFactors();  // Removed - element doesn't exist in new tabs
@@ -2376,6 +2379,96 @@ function populateCompanyNpsTable(companyData) {
             </tr>
         `;
     }).join('');
+}
+
+// Load KPI overview data for Executive Summary
+async function loadKpiOverview() {
+    console.log('Loading KPI overview data...');
+    const tbody = document.getElementById('kpiOverviewTableBody');
+    
+    if (!tbody) {
+        console.error('kpiOverviewTableBody element not found!');
+        return;
+    }
+    
+    try {
+        // First, load available campaigns
+        const campaignResponse = await fetch('/api/campaigns/filter-options');
+        if (!campaignResponse.ok) {
+            throw new Error('Failed to load campaign options');
+        }
+        
+        const campaignData = await campaignResponse.json();
+        const campaigns = campaignData.campaigns || [];
+        
+        if (campaigns.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">No campaign data available</td></tr>';
+            return;
+        }
+        
+        // Build rows for each campaign with their individual KPI data
+        let kpiRows = [];
+        
+        for (const campaign of campaigns) {
+            // For each campaign, we'll extract KPI data from dashboard data or use comparison with self
+            // This leverages the fact that comparison endpoint provides comprehensive KPI metrics
+            
+            let campaignKpis = null;
+            
+            // Try to get KPI data by calling comparison endpoint with same campaign twice
+            if (campaigns.length >= 1) {
+                try {
+                    const comparisonResponse = await fetch(`/api/campaigns/comparison?campaign1=${campaign.id}&campaign2=${campaign.id}`);
+                    if (comparisonResponse.ok) {
+                        const comparisonData = await comparisonResponse.json();
+                        campaignKpis = comparisonData.campaign1?.data; // Same campaign data
+                    }
+                } catch (error) {
+                    console.warn(`Failed to load KPI data for campaign ${campaign.name}:`, error);
+                }
+            }
+            
+            // Format the row with available data or defaults
+            const row = {
+                name: campaign.name || 'Unknown',
+                status: formatCampaignStatus(campaign.status),
+                responses: campaignKpis?.total_responses || 0,
+                nps_score: campaignKpis?.nps_score || 0,
+                companies: campaignKpis?.companies_analyzed || 0,
+                critical_risk: campaignKpis?.critical_risk_companies || 0,
+                satisfaction: campaignKpis?.average_ratings?.satisfaction || 0,
+                product_value: campaignKpis?.average_ratings?.product_value || 0,
+                pricing: campaignKpis?.average_ratings?.pricing || 0,
+                service: campaignKpis?.average_ratings?.service || 0
+            };
+            
+            kpiRows.push(row);
+        }
+        
+        // Sort by responses (most active campaigns first)
+        kpiRows.sort((a, b) => b.responses - a.responses);
+        
+        // Generate table HTML
+        tbody.innerHTML = kpiRows.map(row => `
+            <tr>
+                <td><strong>${escapeHtml(row.name)}</strong><br><small class="text-muted">${row.status}</small></td>
+                <td class="text-center">${row.responses}</td>
+                <td class="text-center">${row.nps_score.toFixed(1)}</td>
+                <td class="text-center">${row.companies}</td>
+                <td class="text-center"><span class="badge ${row.critical_risk > 0 ? 'bg-danger' : 'bg-success'}">${row.critical_risk}</span></td>
+                <td class="text-center">${row.satisfaction.toFixed(1)}</td>
+                <td class="text-center">${row.product_value.toFixed(1)}</td>
+                <td class="text-center">${row.pricing.toFixed(1)}</td>
+                <td class="text-center">${row.service.toFixed(1)}</td>
+            </tr>
+        `).join('');
+        
+        console.log(`KPI overview loaded successfully with ${kpiRows.length} campaigns`);
+        
+    } catch (error) {
+        console.error('Error loading KPI overview:', error);
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error loading KPI overview data</td></tr>';
+    }
 }
 
 function refreshData() {
