@@ -4,12 +4,14 @@ Dedicated routes for campaign lifecycle management
 """
 
 import logging
+import uuid
 from datetime import datetime, timedelta
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from sqlalchemy import desc
 
 from business_auth_routes import require_business_auth, require_permission, get_current_business_account
 from models import Campaign, CampaignParticipant, Participant, BusinessAccount, db
+from campaign_participant_token_system import create_campaign_participant_token, generate_participant_survey_url
 
 # Create blueprint for campaign management
 campaign_bp = Blueprint('campaigns', __name__, url_prefix='/business/campaigns')
@@ -284,21 +286,65 @@ def activate_campaign(campaign_id):
         # Activate campaign
         campaign.status = 'active'
         
-        # Set invitation timestamps for participants
+        # Get all campaign-participant associations for token generation
         campaign_participants = CampaignParticipant.query.filter_by(
             campaign_id=campaign_id,
             business_account_id=current_account.id
         ).all()
         
-        for cp in campaign_participants:
-            if cp.status == 'pending':
-                cp.status = 'invited'
-                cp.invited_at = datetime.utcnow()
+        # Generate tokens for all associations that need them
+        token_success_count = 0
+        token_error_count = 0
+        batch_size = 100
+        total_participants = len(campaign_participants)
         
-        db.session.commit()
+        logger.info(f"Starting token generation for {total_participants} campaign participants")
         
+        # Process participants in batches
+        for i in range(0, total_participants, batch_size):
+            batch = campaign_participants[i:i + batch_size]
+            
+            for cp in batch:
+                try:
+                    # Generate association token if missing
+                    if not cp.token:
+                        cp.token = str(uuid.uuid4())
+                        logger.debug(f"Generated token for association {cp.id}: {cp.token}")
+                    
+                    # Update participant status and timestamps
+                    if cp.status == 'pending':
+                        cp.status = 'invited'
+                        cp.invited_at = datetime.utcnow()
+                    
+                    token_success_count += 1
+                    
+                except Exception as e:
+                    logger.error(f"Error generating token for association {cp.id}: {e}")
+                    token_error_count += 1
+                    # Continue processing other participants
+                    continue
+            
+            # Commit batch to avoid long-running transactions
+            try:
+                db.session.commit()
+                logger.debug(f"Committed batch {i//batch_size + 1} of {(total_participants + batch_size - 1)//batch_size}")
+            except Exception as e:
+                logger.error(f"Error committing batch {i//batch_size + 1}: {e}")
+                db.session.rollback()
+                token_error_count += len(batch)
+                continue
+        
+        # Log activation summary with token generation results
         logger.info(f"Campaign '{campaign.name}' (ID: {campaign_id}) activated by business account {current_account.id}")
-        flash(f'Campaign "{campaign.name}" is now active! Participants have been notified.', 'success')
+        logger.info(f"Token generation results: {token_success_count} successful, {token_error_count} failed")
+        
+        # Create detailed flash message with token generation summary
+        if token_error_count == 0:
+            flash(f'Campaign "{campaign.name}" is now active! All {token_success_count} participant tokens generated successfully.', 'success')
+        elif token_success_count > 0:
+            flash(f'Campaign "{campaign.name}" is now active! {token_success_count} participant tokens generated, {token_error_count} failed. Check logs for details.', 'warning')
+        else:
+            flash(f'Campaign "{campaign.name}" is active but token generation failed for all {token_error_count} participants. Check logs and retry.', 'error')
         
         return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
