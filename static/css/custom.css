@@ -1819,32 +1819,6 @@ a:hover {
 }
 
 
-/* KPI Overview Table Styling */
-#kpiOverviewTable {
-    font-size: 0.9rem;
-}
-
-#kpiOverviewTable thead th {
-    background-color: #f8f9fa;
-    border-bottom: 2px solid #dee2e6;
-    font-weight: 600;
-    color: #495057;
-    padding: 12px 8px;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-#kpiOverviewTable tbody td {
-    padding: 12px 8px;
-    vertical-align: middle;
-    border-bottom: 1px solid #f1f3f4;
-}
-
-#kpiOverviewTable tbody tr:hover {
-    background-color: #f8f9fa;
-    transition: background-color 0.2s ease;
-}
 
 /* Status badges for campaigns */
 .badge-success {
@@ -1863,75 +1837,8 @@ a:hover {
     border-radius: 12px;
 }
 
-/* Delta styling */
-#kpiOverviewTable small.text-muted {
-    display: block;
-    margin-top: 2px;
-    font-size: 0.75rem;
-}
 
-#kpiOverviewTable .fw-bold {
-    font-weight: 700 !important;
-}
 
-/* Overall delta summary styling */
-#overallDeltaSummary .alert-info {
-    background-color: #e7f3ff;
-    border-color: #b3d9ff;
-    color: #0c5aa6;
-}
-
-#overallDeltaSummary .alert-heading {
-    color: #0c5aa6;
-    font-weight: 600;
-}
-
-/* Delta metric cards in summary */
-#deltaMetrics .text-success {
-    color: #28a745 !important;
-    font-weight: 600;
-}
-
-#deltaMetrics .text-danger {
-    color: #dc3545 !important;
-    font-weight: 600;
-}
-
-#deltaMetrics .text-muted {
-    color: #6c757d !important;
-}
-
-/* Mobile responsiveness for KPI table */
-@media (max-width: 768px) {
-    #kpiOverviewTable {
-        font-size: 0.8rem;
-    }
-    
-    #kpiOverviewTable thead th,
-    #kpiOverviewTable tbody td {
-        padding: 8px 4px;
-    }
-    
-    #kpiOverviewTable .badge {
-        font-size: 0.7rem;
-        padding: 2px 6px;
-    }
-    
-    #deltaMetrics .col-sm-6 {
-        margin-bottom: 0.5rem;
-    }
-}
-
-@media (max-width: 576px) {
-    #kpiOverviewTable {
-        font-size: 0.75rem;
-    }
-    
-    #kpiOverviewTable thead th,
-    #kpiOverviewTable tbody td {
-        padding: 6px 3px;
-    }
-}
 
 /* Two-Tier Navigation Styling */
 .two-tier-navigation {

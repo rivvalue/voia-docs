@@ -316,23 +316,7 @@ function updateSelectedCampaignInfo() {
     }
 }
 
-// Update active campaign banner display
-function updateActiveCampaignBanner(data) {
-    const banner = document.getElementById('activeCampaignBanner');
-    const nameSpan = document.getElementById('activeCampaignName');
-    const datesSpan = document.getElementById('activeCampaignDates');
-    
-    if (data.active_campaign && banner && nameSpan && datesSpan) {
-        nameSpan.textContent = data.active_campaign.name;
-        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
-        
-        banner.style.display = 'block';
-        console.log('Active campaign banner displayed:', data.active_campaign.name);
-    } else if (banner) {
-        banner.style.display = 'none';
-        console.log('Active campaign banner hidden - showing all data');
-    }
-}
+
 
 // Initialize dashboard
 document.addEventListener('DOMContentLoaded', function() {
@@ -1561,23 +1545,7 @@ function getVisualIndicator(type, category) {
     }
 }
 
-// Update active campaign banner display
-function updateActiveCampaignBanner(data) {
-    const banner = document.getElementById('activeCampaignBanner');
-    const nameSpan = document.getElementById('activeCampaignName');
-    const datesSpan = document.getElementById('activeCampaignDates');
-    
-    if (data.active_campaign && banner && nameSpan && datesSpan) {
-        nameSpan.textContent = data.active_campaign.name;
-        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
-        
-        banner.style.display = 'block';
-        console.log('Active campaign banner displayed:', data.active_campaign.name);
-    } else if (banner) {
-        banner.style.display = 'none';
-        console.log('Active campaign banner hidden - showing all data');
-    }
-}
+
 
 function normalizeTypeForVisual(originalType) {
     const typeMap = {
@@ -2027,23 +1995,7 @@ function updateResponsesPaginationInfo(currentPage, totalPages, totalItems) {
     }
 }
 
-// Update active campaign banner display
-function updateActiveCampaignBanner(data) {
-    const banner = document.getElementById('activeCampaignBanner');
-    const nameSpan = document.getElementById('activeCampaignName');
-    const datesSpan = document.getElementById('activeCampaignDates');
-    
-    if (data.active_campaign && banner && nameSpan && datesSpan) {
-        nameSpan.textContent = data.active_campaign.name;
-        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
-        
-        banner.style.display = 'block';
-        console.log('Active campaign banner displayed:', data.active_campaign.name);
-    } else if (banner) {
-        banner.style.display = 'none';
-        console.log('Active campaign banner hidden - showing all data');
-    }
-}
+
 
 function updateResponsesPaginationControls(pagination) {
     const controls = document.getElementById('paginationControls');
@@ -2105,23 +2057,7 @@ function updateCompanyPaginationInfo(currentPage, totalPages, totalItems) {
     }
 }
 
-// Update active campaign banner display
-function updateActiveCampaignBanner(data) {
-    const banner = document.getElementById('activeCampaignBanner');
-    const nameSpan = document.getElementById('activeCampaignName');
-    const datesSpan = document.getElementById('activeCampaignDates');
-    
-    if (data.active_campaign && banner && nameSpan && datesSpan) {
-        nameSpan.textContent = data.active_campaign.name;
-        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
-        
-        banner.style.display = 'block';
-        console.log('Active campaign banner displayed:', data.active_campaign.name);
-    } else if (banner) {
-        banner.style.display = 'none';
-        console.log('Active campaign banner hidden - showing all data');
-    }
-}
+
 
 function updateCompanyPaginationControls(pagination) {
     const controls = document.getElementById('companyPaginationControls');
@@ -2224,23 +2160,7 @@ function updateTenurePaginationInfo(currentPage, totalPages, totalItems) {
     }
 }
 
-// Update active campaign banner display
-function updateActiveCampaignBanner(data) {
-    const banner = document.getElementById('activeCampaignBanner');
-    const nameSpan = document.getElementById('activeCampaignName');
-    const datesSpan = document.getElementById('activeCampaignDates');
-    
-    if (data.active_campaign && banner && nameSpan && datesSpan) {
-        nameSpan.textContent = data.active_campaign.name;
-        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
-        
-        banner.style.display = 'block';
-        console.log('Active campaign banner displayed:', data.active_campaign.name);
-    } else if (banner) {
-        banner.style.display = 'none';
-        console.log('Active campaign banner hidden - showing all data');
-    }
-}
+
 
 function updateTenurePaginationControls(pagination) {
     const controls = document.getElementById('tenurePaginationControls');
@@ -2595,23 +2515,7 @@ function redirectToBusinessLogin() {
 }
 
 
-// Update active campaign banner display
-function updateActiveCampaignBanner(data) {
-    const banner = document.getElementById('activeCampaignBanner');
-    const nameSpan = document.getElementById('activeCampaignName');
-    const datesSpan = document.getElementById('activeCampaignDates');
-    
-    if (data.active_campaign && banner && nameSpan && datesSpan) {
-        nameSpan.textContent = data.active_campaign.name;
-        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
-        
-        banner.style.display = 'block';
-        console.log('Active campaign banner displayed:', data.active_campaign.name);
-    } else if (banner) {
-        banner.style.display = 'none';
-        console.log('Active campaign banner hidden - showing all data');
-    }
-}
+
 
 
 
@@ -2620,42 +2524,10 @@ setInterval(refreshData, 5 * 60 * 1000);
 
 
 
-// Update active campaign banner display
-function updateActiveCampaignBanner(data) {
-    const banner = document.getElementById('activeCampaignBanner');
-    const nameSpan = document.getElementById('activeCampaignName');
-    const datesSpan = document.getElementById('activeCampaignDates');
-    
-    if (data.active_campaign && banner && nameSpan && datesSpan) {
-        nameSpan.textContent = data.active_campaign.name;
-        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
-        
-        banner.style.display = 'block';
-        console.log('Active campaign banner displayed:', data.active_campaign.name);
-    } else if (banner) {
-        banner.style.display = 'none';
-        console.log('Active campaign banner hidden - showing all data');
-    }
-}
 
 
-// Update active campaign banner display
-function updateActiveCampaignBanner(data) {
-    const banner = document.getElementById('activeCampaignBanner');
-    const nameSpan = document.getElementById('activeCampaignName');
-    const datesSpan = document.getElementById('activeCampaignDates');
-    
-    if (data.active_campaign && banner && nameSpan && datesSpan) {
-        nameSpan.textContent = data.active_campaign.name;
-        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
-        
-        banner.style.display = 'block';
-        console.log('Active campaign banner displayed:', data.active_campaign.name);
-    } else if (banner) {
-        banner.style.display = 'none';
-        console.log('Active campaign banner hidden - showing all data');
-    }
-}
+
+
 
 // Business logout function
 function businessLogout() {
@@ -2670,354 +2542,24 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     loadCampaignFilterOptions();
-    // Load KPI overview for Executive Summary tab
-    loadKPIOverview();
 });
 
-// ============================================================================
-// CAMPAIGN MANAGEMENT FUNCTIONALITY
-// ============================================================================
 
-// Load campaign data from API
-async function loadCampaignData() {
-    try {
-        const response = await fetch('/api/campaigns/stats', {
-            headers: {
-                'Authorization': localStorage.getItem('authToken')
-            }
-        });
-        
-        if (!response.ok) {
-            throw new Error(`Failed to load campaign data: ${response.status}`);
-        }
-        
-        campaignData = await response.json();
-        updateCampaignUI();
-        loadCampaignsList();
-    } catch (error) {
-        console.error('Error loading campaign data:', error);
-    }
-}
 
-// Update active campaign banner display
-function updateActiveCampaignBanner(data) {
-    const banner = document.getElementById('activeCampaignBanner');
-    const nameSpan = document.getElementById('activeCampaignName');
-    const datesSpan = document.getElementById('activeCampaignDates');
-    
-    if (data.active_campaign && banner && nameSpan && datesSpan) {
-        nameSpan.textContent = data.active_campaign.name;
-        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
-        
-        banner.style.display = 'block';
-        console.log('Active campaign banner displayed:', data.active_campaign.name);
-    } else if (banner) {
-        banner.style.display = 'none';
-        console.log('Active campaign banner hidden - showing all data');
-    }
-}
 
-// Update campaign UI with data
-function updateCampaignUI() {
-    if (!campaignData) return;
-    
-    // Update campaign stats cards
-    document.getElementById('totalCampaigns').textContent = campaignData.total_campaigns;
-    document.getElementById('activeCampaigns').textContent = campaignData.active_campaign ? '1' : '0';
-    document.getElementById('remainingCampaigns').textContent = campaignData.remaining_campaigns;
-    
-    // Calculate total responses for active campaign
-    let activeResponses = 0;
-    if (campaignData.active_campaign) {
-        const activeCampaignResponses = campaignData.campaign_responses.find(
-            c => c.campaign_id === campaignData.active_campaign.id
-        );
-        activeResponses = activeCampaignResponses ? activeCampaignResponses.response_count : 0;
-    }
-    document.getElementById('campaignResponses').textContent = activeResponses;
-    
-    // Update trends
-    document.getElementById('totalCampaignsTrend').textContent = `Created this year (max 4)`;
-    document.getElementById('activeCampaignsTrend').textContent = campaignData.active_campaign ? 'Currently collecting feedback' : 'No active campaign';
-    document.getElementById('remainingCampaignsTrend').textContent = campaignData.can_create_campaign ? 'Can create more' : 'Limit reached';
-    document.getElementById('campaignResponsesTrend').textContent = campaignData.active_campaign ? 'From active campaign' : 'No active campaign';
-    
-    // Show/hide active campaign status
-    const activeCampaignStatus = document.getElementById('activeCampaignStatus');
-    if (campaignData.active_campaign) {
-        activeCampaignStatus.style.display = 'block';
-        document.getElementById('activeCampaignName').textContent = campaignData.active_campaign.name;
-        document.getElementById('activeCampaignDates').textContent = 
-            `${formatDate(campaignData.active_campaign.start_date)} - ${formatDate(campaignData.active_campaign.end_date)}`;
-        document.getElementById('activeCampaignDesc').textContent = 
-            campaignData.active_campaign.description || 'No description provided';
-        document.getElementById('activeCampaignDaysLeft').textContent = 
-            `${campaignData.active_campaign.days_remaining} days remaining`;
-    } else {
-        activeCampaignStatus.style.display = 'none';
-    }
-    
-    // Update create campaign button state
-    const createBtn = document.getElementById('createCampaignBtn');
-    if (!campaignData.can_create_campaign) {
-        createBtn.disabled = true;
-        createBtn.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>Campaign Limit Reached';
-        createBtn.classList.remove('btn-primary');
-        createBtn.classList.add('btn-secondary');
-    }
-}
 
-// Update active campaign banner display
-function updateActiveCampaignBanner(data) {
-    const banner = document.getElementById('activeCampaignBanner');
-    const nameSpan = document.getElementById('activeCampaignName');
-    const datesSpan = document.getElementById('activeCampaignDates');
-    
-    if (data.active_campaign && banner && nameSpan && datesSpan) {
-        nameSpan.textContent = data.active_campaign.name;
-        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
-        
-        banner.style.display = 'block';
-        console.log('Active campaign banner displayed:', data.active_campaign.name);
-    } else if (banner) {
-        banner.style.display = 'none';
-        console.log('Active campaign banner hidden - showing all data');
-    }
-}
 
-// Load campaigns list
-async function loadCampaignsList() {
-    try {
-        const response = await fetch('/api/campaigns', {
-            headers: {
-                'Authorization': localStorage.getItem('authToken')
-            }
-        });
-        
-        if (!response.ok) {
-            throw new Error(`Failed to load campaigns: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        updateCampaignsTable(data.campaigns);
-    } catch (error) {
-        console.error('Error loading campaigns list:', error);
-    }
-}
 
-// Update active campaign banner display
-function updateActiveCampaignBanner(data) {
-    const banner = document.getElementById('activeCampaignBanner');
-    const nameSpan = document.getElementById('activeCampaignName');
-    const datesSpan = document.getElementById('activeCampaignDates');
-    
-    if (data.active_campaign && banner && nameSpan && datesSpan) {
-        nameSpan.textContent = data.active_campaign.name;
-        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
-        
-        banner.style.display = 'block';
-        console.log('Active campaign banner displayed:', data.active_campaign.name);
-    } else if (banner) {
-        banner.style.display = 'none';
-        console.log('Active campaign banner hidden - showing all data');
-    }
-}
 
-// Update campaigns table
-function updateCampaignsTable(campaigns) {
-    const tbody = document.getElementById('campaignsTable');
-    const noDataMsg = document.getElementById('noCampaignsMessage');
-    
-    if (campaigns.length === 0) {
-        tbody.innerHTML = '';
-        noDataMsg.style.display = 'block';
-        return;
-    }
-    
-    noDataMsg.style.display = 'none';
-    
-    tbody.innerHTML = campaigns.map(campaign => {
-        const statusBadge = campaign.status === 'active' ? 
-            '<span class="badge bg-success">Active</span>' : 
-            '<span class="badge bg-secondary">Completed</span>';
-            
-        const actions = campaign.status === 'active' ? 
-            `<button class="btn btn-sm btn-outline-danger" onclick="closeCampaign(${campaign.id})">
-                <i class="fas fa-stop me-1"></i>Close
-            </button>` : 
-            '<span class="text-muted">-</span>';
-            
-        return `
-            <tr>
-                <td><strong>${escapeHtml(campaign.name)}</strong></td>
-                <td>${escapeHtml(campaign.description) || '<em>No description</em>'}</td>
-                <td>${formatDate(campaign.start_date)}</td>
-                <td>${formatDate(campaign.end_date)}</td>
-                <td>${statusBadge}</td>
-                <td><span class="badge bg-info">${campaign.response_count || 0}</span></td>
-                <td>${actions}</td>
-            </tr>
-        `;
-    }).join('');
-}
 
-// Show create campaign modal
-function showCreateCampaignModal() {
-    // Set default dates (today to 30 days from now)
-    const today = new Date();
-    const endDate = new Date();
-    endDate.setDate(today.getDate() + 30);
-    
-    document.getElementById('campaignStartDate').value = today.toISOString().split('T')[0];
-    document.getElementById('campaignEndDate').value = endDate.toISOString().split('T')[0];
-    
-    // Clear form
-    document.getElementById('createCampaignForm').reset();
-    document.getElementById('campaignStartDate').value = today.toISOString().split('T')[0];
-    document.getElementById('campaignEndDate').value = endDate.toISOString().split('T')[0];
-    
-    // Show modal
-    new bootstrap.Modal(document.getElementById('createCampaignModal')).show();
-}
 
-// Create new campaign
-async function createCampaign() {
-    const form = document.getElementById('createCampaignForm');
-    if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-    }
-    
-    // Get CSRF token from the form
-    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
-    if (!csrfToken) {
-        showErrorMessage('CSRF token not found. Please refresh the page and try again.');
-        return;
-    }
-    
-    // Create FormData object from form
-    const formData = new FormData();
-    formData.append('name', document.getElementById('campaignName').value.trim());
-    formData.append('description', document.getElementById('campaignDescription').value.trim());
-    formData.append('start_date', document.getElementById('campaignStartDate').value);
-    formData.append('end_date', document.getElementById('campaignEndDate').value);
-    formData.append('csrf_token', csrfToken);
-    
-    try {
-        const response = await fetch('/business/campaigns/create', {
-            method: 'POST',
-            body: formData,
-            credentials: 'same-origin' // Include session cookies
-        });
-        
-        if (response.ok) {
-            // Check if response is a redirect (campaign creation successful)
-            if (response.redirected || response.url.includes('/business/campaigns')) {
-                // Success - close modal and refresh data
-                bootstrap.Modal.getInstance(document.getElementById('createCampaignModal')).hide();
-                showSuccessMessage('Campaign created successfully!');
-                loadCampaignData(); // Refresh data
-            } else {
-                // This shouldn't happen, but handle gracefully
-                const text = await response.text();
-                console.log('Unexpected success response:', text);
-                showSuccessMessage('Campaign created successfully!');
-                bootstrap.Modal.getInstance(document.getElementById('createCampaignModal')).hide();
-                loadCampaignData();
-            }
-        } else {
-            // Error - try to parse error message from HTML response
-            const text = await response.text();
-            
-            // Look for flash messages in the HTML response
-            let errorMessage = 'Failed to create campaign. Please try again.';
-            
-            // Try to extract error message from HTML
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(text, 'text/html');
-            const alertElement = doc.querySelector('.alert-danger, .alert-error');
-            
-            if (alertElement) {
-                errorMessage = alertElement.textContent.trim();
-            } else if (text.includes('Campaign name, start date, and end date are required')) {
-                errorMessage = 'Campaign name, start date, and end date are required.';
-            } else if (text.includes('End date must be after start date')) {
-                errorMessage = 'End date must be after start date.';
-            } else if (text.includes('Invalid date format')) {
-                errorMessage = 'Invalid date format.';
-            }
-            
-            showErrorMessage(errorMessage);
-        }
-    } catch (error) {
-        console.error('Error creating campaign:', error);
-        showErrorMessage('Failed to create campaign. Please try again.');
-    }
-}
 
-// Update active campaign banner display
-function updateActiveCampaignBanner(data) {
-    const banner = document.getElementById('activeCampaignBanner');
-    const nameSpan = document.getElementById('activeCampaignName');
-    const datesSpan = document.getElementById('activeCampaignDates');
-    
-    if (data.active_campaign && banner && nameSpan && datesSpan) {
-        nameSpan.textContent = data.active_campaign.name;
-        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
-        
-        banner.style.display = 'block';
-        console.log('Active campaign banner displayed:', data.active_campaign.name);
-    } else if (banner) {
-        banner.style.display = 'none';
-        console.log('Active campaign banner hidden - showing all data');
-    }
-}
 
-// Close campaign
-async function closeCampaign(campaignId) {
-    if (!confirm('Are you sure you want to close this campaign? This action cannot be undone.')) {
-        return;
-    }
-    
-    try {
-        const response = await fetch(`/api/campaigns/${campaignId}/close`, {
-            method: 'POST',
-            headers: {
-                'Authorization': localStorage.getItem('authToken')
-            }
-        });
-        
-        const result = await response.json();
-        
-        if (response.ok) {
-            showSuccessMessage('Campaign closed successfully!');
-            loadCampaignData(); // Refresh data
-        } else {
-            showErrorMessage(result.error || 'Failed to close campaign');
-        }
-    } catch (error) {
-        console.error('Error closing campaign:', error);
-        showErrorMessage('Failed to close campaign. Please try again.');
-    }
-}
 
-// Update active campaign banner display
-function updateActiveCampaignBanner(data) {
-    const banner = document.getElementById('activeCampaignBanner');
-    const nameSpan = document.getElementById('activeCampaignName');
-    const datesSpan = document.getElementById('activeCampaignDates');
-    
-    if (data.active_campaign && banner && nameSpan && datesSpan) {
-        nameSpan.textContent = data.active_campaign.name;
-        datesSpan.textContent = `${formatDate(data.active_campaign.start_date)} - ${formatDate(data.active_campaign.end_date)}`;
-        
-        banner.style.display = 'block';
-        console.log('Active campaign banner displayed:', data.active_campaign.name);
-    } else if (banner) {
-        banner.style.display = 'none';
-        console.log('Active campaign banner hidden - showing all data');
-    }
-}
+
+
+
+
 
 // Utility functions
 function formatDate(dateString) {
@@ -3098,139 +2640,11 @@ function setupTabEventListeners() {
 
 
 
-// KPI Overview functions
-async function loadKPIOverview() {
-    try {
-        const response = await fetch("/api/campaigns/kpi-overview");
-        const data = await response.json();
-        
-        if (data.success) {
-            kpiOverviewData = data;
-            displayKPIOverview(data);
-        } else {
-            console.error("Failed to load KPI overview:", data.error);
-            displayKPIOverviewError("Failed to load KPI overview data");
-        }
-    } catch (error) {
-        console.error("Error loading KPI overview:", error);
-        displayKPIOverviewError("Error loading KPI overview data");
-    }
-}
 
-function displayKPIOverview(data) {
-    const tbody = document.getElementById("kpiOverviewTableBody");
-    const overallDeltaSummary = document.getElementById("overallDeltaSummary");
-    
-    if (!data.campaigns || data.campaigns.length === 0) {
-        tbody.innerHTML = "<tr><td colspan=\"9\" class=\"text-center text-muted\">No campaign data available</td></tr>";
-        return;
-    }
-    
-    // Clear loading state
-    tbody.innerHTML = "";
-    
-    // Populate table rows
-    data.campaigns.forEach((campaign, index) => {
-        const row = document.createElement("tr");
-        
-        const deltaClass = index > 0 ? "fw-bold" : "";
-        const deltaDisplay = campaign.deltas ? true : false;
-        
-        row.innerHTML = `
-            <td>
-                <div class="d-flex align-items-center">
-                    <span class="badge badge-${campaign.status === "active" ? "success" : "secondary"} me-2">${campaign.status}</span>
-                    <strong>${campaign.name}</strong>
-                </div>
-            </td>
-            <td class="text-center">
-                <div>${campaign.total_responses}</div>
-                ${deltaDisplay ? `<small class="text-muted ${deltaClass}">(${formatDelta(campaign.deltas.total_responses)})</small>` : ""}
-            </td>
-            <td class="text-center">
-                <div>${campaign.nps_score}</div>
-                ${deltaDisplay ? `<small class="text-muted ${deltaClass}">(${formatDelta(campaign.deltas.nps_score, true)})</small>` : ""}
-            </td>
-            <td class="text-center">
-                <div>${campaign.companies_analyzed}</div>
-                ${deltaDisplay ? `<small class="text-muted ${deltaClass}">(${formatDelta(campaign.deltas.companies_analyzed)})</small>` : ""}
-            </td>
-            <td class="text-center">
-                <div class="${campaign.critical_risk_companies > 0 ? "text-danger" : "text-success"}">${campaign.critical_risk_companies}</div>
-                ${deltaDisplay ? `<small class="text-muted ${deltaClass}">(${formatDelta(campaign.deltas.critical_risk_companies)})</small>` : ""}
-            </td>
-            <td class="text-center">
-                <div>${campaign.average_ratings.satisfaction.toFixed(1)}</div>
-                ${deltaDisplay ? `<small class="text-muted ${deltaClass}">(${formatDelta(campaign.deltas.satisfaction, true)})</small>` : ""}
-            </td>
-            <td class="text-center">
-                <div>${campaign.average_ratings.product_value.toFixed(1)}</div>
-                ${deltaDisplay ? `<small class="text-muted ${deltaClass}">(${formatDelta(campaign.deltas.product_value, true)})</small>` : ""}
-            </td>
-            <td class="text-center">
-                <div>${campaign.average_ratings.pricing.toFixed(1)}</div>
-                ${deltaDisplay ? `<small class="text-muted ${deltaClass}">(${formatDelta(campaign.deltas.pricing, true)})</small>` : ""}
-            </td>
-            <td class="text-center">
-                <div>${campaign.average_ratings.service.toFixed(1)}</div>
-                ${deltaDisplay ? `<small class="text-muted ${deltaClass}">(${formatDelta(campaign.deltas.service, true)})</small>` : ""}
-            </td>
-        `;
-        
-        tbody.appendChild(row);
-    });
-    
-    // Display overall delta summary if available
-    if (data.overall_delta) {
-        displayOverallDelta(data.overall_delta);
-        overallDeltaSummary.style.display = "block";
-    }
-}
 
-function displayOverallDelta(delta) {
-    const deltaMetrics = document.getElementById("deltaMetrics");
-    
-    const metrics = [
-        { label: "Responses", value: delta.total_responses, icon: "users" },
-        { label: "NPS Score", value: delta.nps_score, icon: "star", isDecimal: true },
-        { label: "Companies", value: delta.companies_analyzed, icon: "building" },
-        { label: "Critical Risk", value: delta.critical_risk_companies, icon: "exclamation-triangle" },
-        { label: "Satisfaction", value: delta.satisfaction, icon: "smile", isDecimal: true },
-        { label: "Product Value", value: delta.product_value, icon: "gem", isDecimal: true },
-        { label: "Pricing", value: delta.pricing, icon: "dollar-sign", isDecimal: true },
-        { label: "Service", value: delta.service, icon: "headset", isDecimal: true }
-    ];
-    
-    deltaMetrics.innerHTML = metrics.map(metric => `
-        <div class="col-sm-6 col-lg-3 mb-2">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-${metric.icon} me-2 text-primary"></i>
-                <div>
-                    <div class="fw-bold ${getValueClass(metric.value)}">${formatDelta(metric.value, metric.isDecimal)}</div>
-                    <small class="text-muted">${metric.label}</small>
-                </div>
-            </div>
-        </div>
-    `).join("");
-}
 
-function formatDelta(value, isDecimal = false) {
-    if (value === 0) return "±0";
-    const sign = value > 0 ? "+" : "";
-    const formattedValue = isDecimal ? value.toFixed(1) : value;
-    return `${sign}${formattedValue}`;
-}
 
-function getValueClass(value) {
-    if (value > 0) return "text-success";
-    if (value < 0) return "text-danger";
-    return "text-muted";
-}
 
-function displayKPIOverviewError(message) {
-    const tbody = document.getElementById("kpiOverviewTableBody");
-    tbody.innerHTML = `<tr><td colspan="9" class="text-center text-danger">${escapeHtml(message)}</td></tr>`;
-}
 
 // Two-tier navigation functionality
 function switchPrimarySection(section) {
@@ -3270,11 +2684,6 @@ function switchPrimarySection(section) {
         case "insights":
             // Show overview tab by default for insights
             showTab("overview-tab", "overview");
-            break;
-        case "management":
-            // Show campaign management tab by default
-            showTab("campaign-management-tab", "campaign-management");
-            // Business authentication is handled server-side
             break;
         case "admin":
             // Show admin tools tab by default
