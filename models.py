@@ -1,11 +1,10 @@
 from app import db
 from datetime import datetime, date, timedelta
-from sqlalchemy import or_, and_
+from sqlalchemy import or_, and_, func, text
 import json
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 import uuid
-from sqlalchemy import or_, and_
 
 class SurveyResponse(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -126,6 +125,12 @@ class Campaign(db.Model):
     business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=True, index=True)
     business_account = db.relationship('BusinessAccount', backref=db.backref('campaigns', lazy='dynamic'))
     
+    # Add participants relationship through campaign_participants
+    participants = db.relationship('Participant', 
+                                 secondary='campaign_participants',
+                                 backref='campaigns',
+                                 lazy='dynamic')
+    
     # Metadata
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     completed_at = db.Column(db.DateTime, nullable=True)
@@ -159,7 +164,7 @@ class Campaign(db.Model):
         if self.status != 'ready':
             return False
         today = date.today()
-        return self.start_date == today and self.description and len(self.participants) > 0
+        return self.start_date == today and self.description and self.participants.count() > 0
     
     def can_modify_participants(self):
         """Check if participants can be modified (only when not active)"""
@@ -222,7 +227,7 @@ class Campaign(db.Model):
     
     def mark_ready(self):
         """Mark campaign as ready for activation"""
-        if self.status == 'draft' and self.description and len(self.participants) > 0:
+        if self.status == 'draft' and self.description and self.participants.count() > 0:
             self.status = 'ready'
             return True
         return False
@@ -532,7 +537,7 @@ class CampaignParticipant(db.Model):
     business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
     
     # Campaign-participant specific token for JWT authentication
-    token = db.Column(db.String(255), nullable=True, unique=True, index=True)  # UUID token for this association
+    token = db.Column(db.String(36), nullable=True, unique=True, index=True)  # UUID token for this association
     
     # Status tracking per campaign
     status = db.Column(db.String(20), nullable=False, default='invited', index=True)  # invited, started, completed
@@ -544,8 +549,8 @@ class CampaignParticipant(db.Model):
     completed_at = db.Column(db.DateTime, nullable=True)
     
     # Relationships
-    campaign = db.relationship('Campaign', backref='campaign_participants')
-    participant = db.relationship('Participant', foreign_keys='CampaignParticipant.participant_id', backref='campaign_participations')
+    campaign = db.relationship('Campaign', backref='campaign_participants', overlaps="participants")
+    participant = db.relationship('Participant', foreign_keys='CampaignParticipant.participant_id', backref='campaign_participations', overlaps="campaigns")
     business_account = db.relationship('BusinessAccount', backref='campaign_participants')
     
     def to_dict(self):
@@ -608,7 +613,7 @@ class BusinessAccountUser(UserMixin, db.Model):
     
     # User role and permissions
     role = db.Column(db.String(50), nullable=False, default='admin', index=True)  # admin, viewer, manager
-    is_active = db.Column(db.Boolean, nullable=False, default=True, index=True)  # TODO: Rename to avoid UserMixin conflict in future migration
+    is_active = db.Column(db.Boolean, nullable=False, default=True, index=True)  # Note: Conflicts with UserMixin but maintained for DB compatibility
     
     # Email verification
     email_verified = db.Column(db.Boolean, nullable=False, default=False)
@@ -787,13 +792,13 @@ class UserSession(db.Model):
         return UserSession.query.filter_by(
             session_id=session_id,
             is_active=True
-        ).filter(UserSession.expires_at > datetime.utcnow()).first()
+        ).filter(UserSession.expires_at > func.now()).first()
     
     @staticmethod
     def cleanup_expired_sessions():
         """Clean up expired sessions"""
         expired_sessions = UserSession.query.filter(
-            UserSession.expires_at <= datetime.utcnow()
+            UserSession.expires_at <= func.now()
         ).all()
         
         for session in expired_sessions:
@@ -808,8 +813,8 @@ class UserSession(db.Model):
         
         if active_only:
             query = query.filter(
-                UserSession.is_active.is_(True),
-                UserSession.expires_at > datetime.utcnow()
+                UserSession.is_active == True,
+                UserSession.expires_at > func.now()
             )
         
         return query.order_by(UserSession.last_activity_at.desc()).all()
