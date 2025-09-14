@@ -551,9 +551,12 @@ def get_dashboard_data(campaign_id=None):
         
         # Key themes aggregation
         all_themes = {}
-        responses_with_themes = SurveyResponse.query.filter(
+        themes_query = SurveyResponse.query.filter(
             SurveyResponse.key_themes.isnot(None)
-        ).all()
+        )
+        if campaign_id:
+            themes_query = themes_query.filter(SurveyResponse.campaign_id == campaign_id)
+        responses_with_themes = themes_query.all()
         
         for response in responses_with_themes:
             if response.key_themes:
