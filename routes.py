@@ -298,6 +298,13 @@ def server_auth_generate():
         }
         return render_template('server_auth.html', token_result=token_result)
 
+@app.route('/survey/<token>')
+def survey_with_token(token):
+    """Survey route variant for /survey/<token> format - redirects to query parameter format"""
+    logger.info(f"Survey route variant accessed: /survey/{token}")
+    # Redirect to standard format with 302 (temporary redirect)
+    return redirect(url_for('survey', token=token), code=302)
+
 @app.route('/survey')
 def survey():
     """Main survey page - check for token in URL"""
@@ -1661,4 +1668,23 @@ def get_campaign_comparison():
     except Exception as e:
         logger.error(f"Error getting campaign comparison: {e}")
         return jsonify({'error': 'Failed to load comparison data'}), 500
+
+# Error handlers for routing diagnostics
+@app.errorhandler(404)
+def handle_404(e):
+    """404 error handler with diagnostic logging for routing debugging"""
+    # Get detailed request information
+    request_path = request.path
+    full_url = request.url
+    method = request.method
+    referer = request.headers.get('Referer', 'No referer')
+    user_agent = request.headers.get('User-Agent', 'No user agent')
+    
+    # Log detailed 404 information for debugging
+    logger.warning(f"404 Error - Path: {request_path} | Full URL: {full_url} | Method: {method} | Referer: {referer} | User-Agent: {user_agent[:100]}...")
+    
+    # Return a proper 404 response
+    return render_template('404.html' if app.config.get('TEMPLATES_404_ENABLED') else 'index.html', 
+                          error="Page not found", 
+                          requested_path=request_path), 404
 

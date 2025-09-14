@@ -114,6 +114,13 @@ with app.app_context():
         app.logger.error(f"Database validation failed: {str(e)}")
         # Continue startup but log the issue
     
+    # Log all registered routes for debugging
+    app.logger.info("=== REGISTERED ROUTES ===")
+    for rule in app.url_map.iter_rules():
+        methods = ','.join(rule.methods - {'HEAD', 'OPTIONS'})
+        app.logger.info(f"Route: {rule.rule} | Methods: {methods} | Endpoint: {rule.endpoint}")
+    app.logger.info("=== END REGISTERED ROUTES ===")
+    
     # Start the background task queue for AI processing
     start_task_queue()
 
