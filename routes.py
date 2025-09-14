@@ -1507,10 +1507,12 @@ def export_user_data():
         }), 500
 
 @app.route('/api/campaigns/filter-options')
+@require_business_auth
 def get_campaign_filter_options():
-    """Get campaigns for analytics filtering (public endpoint)"""
+    """Get campaigns for analytics filtering (business account scoped)"""
     try:
-        campaigns = Campaign.query.order_by(Campaign.start_date.desc()).all()
+        business_account_id = session.get('business_account_id')
+        campaigns = Campaign.query.filter_by(business_account_id=business_account_id).order_by(Campaign.start_date.desc()).all()
         return jsonify({
             'campaigns': [
                 {
@@ -1529,21 +1531,23 @@ def get_campaign_filter_options():
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/campaigns/comparison')
+@require_business_auth
 def get_campaign_comparison():
-    """Get comparison data between two campaigns (public endpoint)"""
+    """Get comparison data between two campaigns (business account scoped)"""
     try:
+        business_account_id = session.get('business_account_id')
         campaign1_id = request.args.get('campaign1', type=int)
         campaign2_id = request.args.get('campaign2', type=int)
         
         if not campaign1_id or not campaign2_id:
             return jsonify({'error': 'Both campaign1 and campaign2 IDs required'}), 400
             
-        # Get campaign details
-        campaign1 = Campaign.query.get(campaign1_id)
-        campaign2 = Campaign.query.get(campaign2_id)
+        # Get campaign details with business account verification
+        campaign1 = Campaign.query.filter_by(id=campaign1_id, business_account_id=business_account_id).first()
+        campaign2 = Campaign.query.filter_by(id=campaign2_id, business_account_id=business_account_id).first()
         
         if not campaign1 or not campaign2:
-            return jsonify({'error': 'One or both campaigns not found'}), 404
+            return jsonify({'error': 'One or both campaigns not found or not accessible'}), 404
             
         # Get dashboard data for both campaigns
         data1 = get_dashboard_data(campaign_id=campaign1_id)
