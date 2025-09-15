@@ -110,7 +110,6 @@ def require_permission(permission):
             current_user = BusinessAccountUser.query.get(business_user_id)
             
             if not current_user or not current_user.has_permission(permission):
-                logger.info(f"PERMISSION DENIED: user={current_user.id if current_user else None}, permission={permission}, has_permission={current_user.has_permission(permission) if current_user else False}")
                 flash('You do not have permission to access this page.', 'error')
                 return redirect(url_for('business_auth.admin_panel'))
             
@@ -702,7 +701,6 @@ def scheduler_status():
 def email_config():
     """Email configuration management page"""
     try:
-        logger.info("EMAIL CONFIG ROUTE ACCESSED - DEBUG")
         current_account = get_current_business_account()
         if not current_account:
             logger.error("No current account found in email config route")
