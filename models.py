@@ -1256,6 +1256,9 @@ class AuditLog(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     
+    def __init__(self, **kwargs):
+        super(AuditLog, self).__init__(**kwargs)
+    
     # Multi-tenant scoping
     business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
     
@@ -1395,3 +1398,91 @@ class AuditLog(db.Model):
             'user_counts': user_counts,
             'date_range_days': days_back
         }
+
+
+class BrandingConfig(db.Model):
+    """Branding Configuration model for business account-specific branding settings"""
+    __tablename__ = 'branding_configs'
+    __table_args__ = (
+        # Only one branding configuration per business account
+        db.UniqueConstraint('business_account_id', name='uq_branding_config_business_account'),
+        db.Index('idx_branding_config_business_account', 'business_account_id'),
+    )
+    
+    id = db.Column(db.Integer, primary_key=True)
+    business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
+    
+    def __init__(self, **kwargs):
+        super(BrandingConfig, self).__init__(**kwargs)
+    
+    # Branding Configuration
+    company_display_name = db.Column(db.String(200), nullable=True)  # Fallback to business_account.name if empty
+    logo_filename = db.Column(db.String(255), nullable=True)  # Filename only, stored in /static/uploads/logos/{business_account_id}/
+    
+    # Metadata
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships
+    business_account = db.relationship('BusinessAccount', backref=db.backref('branding_config', uselist=False))
+    
+    def to_dict(self):
+        """Convert to dictionary representation"""
+        return {
+            'id': self.id,
+            'business_account_id': self.business_account_id,
+            'business_account_name': self.business_account.name if self.business_account else None,
+            'company_display_name': self.company_display_name,
+            'logo_filename': self.logo_filename,
+            'logo_url': self.get_logo_url(),
+            'display_name': self.get_company_display_name(),
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+    
+    def get_company_display_name(self):
+        """Get company display name with fallback to business account name"""
+        if self.company_display_name and self.company_display_name.strip():
+            return self.company_display_name.strip()
+        return self.business_account.name if self.business_account else 'Unknown Company'
+    
+    def get_logo_url(self):
+        """Get logo URL path with proper fallback"""
+        if self.logo_filename and self.business_account_id:
+            return f'/static/uploads/logos/{self.business_account_id}/{self.logo_filename}'
+        return None
+    
+    def has_logo(self):
+        """Check if branding config has a logo configured"""
+        return bool(self.logo_filename and self.logo_filename.strip())
+    
+    def get_logo_path(self):
+        """Get full filesystem path to logo file"""
+        import os
+        from flask import current_app
+        
+        if not self.has_logo():
+            return None
+        
+        # Construct full path: /static/uploads/logos/{business_account_id}/{filename}
+        static_dir = os.path.join(current_app.root_path, 'static')
+        logo_path = os.path.join(static_dir, 'uploads', 'logos', str(self.business_account_id), self.logo_filename)
+        return logo_path
+    
+    def logo_exists_on_filesystem(self):
+        """Check if logo file actually exists on filesystem"""
+        import os
+        logo_path = self.get_logo_path()
+        return logo_path and os.path.exists(logo_path)
+    
+    @staticmethod
+    def get_or_create_for_business_account(business_account_id):
+        """Get existing branding config or create a new one for business account"""
+        branding_config = BrandingConfig.query.filter_by(business_account_id=business_account_id).first()
+        
+        if not branding_config:
+            branding_config = BrandingConfig(business_account_id=business_account_id)
+            db.session.add(branding_config)
+            # Don't commit here - let caller handle the transaction
+        
+        return branding_config
