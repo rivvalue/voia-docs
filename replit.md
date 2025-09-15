@@ -45,6 +45,18 @@ Key architectural decisions include:
 
 **Current Status**: ✅ Multi-tenant email system fully operational with business account-specific SMTP configuration, comprehensive testing capabilities, and professional email template delivery.
 
+## Scheduler Access and Monitoring Improvements
+**Issue**: Scheduler status endpoint was redirecting to admin panel with flash messages instead of providing dedicated monitoring interface.
+
+**Root Cause**: Same permission blocking issues and poor UX design for scheduler monitoring - users needed direct access to scheduler information.
+
+**Resolution**: 
+- Removed permission blocks from scheduler status routes (`/admin/scheduler/status`, `/admin/scheduler/run`)
+- Created dedicated scheduler status HTML page (`templates/business_auth/scheduler_status.html`)
+- Professional dark theme interface showing real-time scheduler status, campaign counts, and manual controls
+
+**Current Status**: ✅ Full scheduler monitoring capabilities with dedicated UI showing running status, last execution time, campaign statistics, and manual trigger functionality.
+
 # External Dependencies
 - **OpenAI API**: For advanced AI functionalities including sentiment analysis, theme extraction, and the conversational survey system (VOÏA).
 - **Bootstrap CDN**: For responsive UI components and styling.
