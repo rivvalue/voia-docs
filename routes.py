@@ -1420,6 +1420,7 @@ def conversational_survey():
                                  email=verification['email'], 
                                  user_email=verification['email'],
                                  participant_name=verification.get('participant_name'),
+                                 participant_company=verification.get('participant_company'),
                                  campaign_name=verification.get('campaign_name'),
                                  branding=branding)
         else:
