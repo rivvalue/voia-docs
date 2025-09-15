@@ -702,8 +702,10 @@ def scheduler_status():
 def email_config():
     """Email configuration management page"""
     try:
+        logger.info("EMAIL CONFIG ROUTE ACCESSED - DEBUG")
         current_account = get_current_business_account()
         if not current_account:
+            logger.error("No current account found in email config route")
             flash('Business account context not found.', 'error')
             return redirect(url_for('business_auth.admin_panel'))
         
