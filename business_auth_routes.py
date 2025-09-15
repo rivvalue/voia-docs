@@ -693,6 +693,169 @@ def scheduler_status():
         return redirect(url_for('business_auth.admin_panel'))
 
 
+# ==== AUDIT LOGS ROUTES ====
+
+@business_auth_bp.route('/admin/audit-logs')
+@require_business_auth
+def audit_logs():
+    """Audit logs viewing page"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.admin_panel'))
+        
+        # Get filter parameters
+        action_type = request.args.get('action_type', '')
+        user_email = request.args.get('user_email', '')
+        days_back = int(request.args.get('days_back', '30'))
+        page = int(request.args.get('page', '1'))
+        per_page = 20
+        offset = (page - 1) * per_page
+        
+        # Get audit logs for this business account
+        from models import AuditLog
+        audit_logs = AuditLog.get_business_audit_logs(
+            business_account_id=current_account.id,
+            action_type=action_type if action_type else None,
+            user_email=user_email if user_email else None,
+            days_back=days_back,
+            limit=per_page,
+            offset=offset
+        )
+        
+        # Get audit statistics
+        audit_stats = AuditLog.get_audit_stats(
+            business_account_id=current_account.id,
+            days_back=days_back
+        )
+        
+        # Get available filter options
+        from sqlalchemy import distinct
+        available_actions = [row[0] for row in db.session.query(
+            distinct(AuditLog.action_type)
+        ).filter_by(business_account_id=current_account.id).all()]
+        
+        available_users = [row[0] for row in db.session.query(
+            distinct(AuditLog.user_email)
+        ).filter_by(business_account_id=current_account.id).filter(
+            AuditLog.user_email.isnot(None)
+        ).all()]
+        
+        # Calculate pagination info
+        total_count = AuditLog.query.filter_by(business_account_id=current_account.id).count()
+        has_next = total_count > (offset + per_page)
+        has_prev = page > 1
+        
+        return render_template('business_auth/audit_logs.html',
+                             audit_logs=[log.to_dict() for log in audit_logs],
+                             audit_stats=audit_stats,
+                             available_actions=sorted(available_actions),
+                             available_users=sorted(available_users),
+                             current_filters={
+                                 'action_type': action_type,
+                                 'user_email': user_email,
+                                 'days_back': days_back
+                             },
+                             pagination={
+                                 'page': page,
+                                 'per_page': per_page,
+                                 'has_next': has_next,
+                                 'has_prev': has_prev,
+                                 'next_page': page + 1 if has_next else None,
+                                 'prev_page': page - 1 if has_prev else None
+                             },
+                             business_account=current_account)
+    
+    except Exception as e:
+        logger.error(f"Error loading audit logs: {e}")
+        flash('Failed to load audit logs.', 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+@business_auth_bp.route('/admin/audit-logs/test')
+@require_business_auth
+@rate_limit(limit=10)  # 10 test entries per minute
+def test_audit_logs():
+    """Create test audit log entries for demo purposes"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account context not found'}), 400
+        
+        # Import audit utilities
+        from audit_utils import queue_audit_log
+        from datetime import datetime, timedelta
+        import random
+        
+        # Create several test audit entries
+        test_entries = [
+            {
+                'action_type': 'user_login',
+                'resource_name': None,
+                'user_email': 'test.user@company.com',
+                'user_name': 'Test User',
+                'details': {'login_time': datetime.utcnow().isoformat()}
+            },
+            {
+                'action_type': 'campaign_created',
+                'resource_type': 'campaign',
+                'resource_name': 'Demo Survey Q1 2025',
+                'resource_id': '999',
+                'user_email': 'admin@company.com',
+                'user_name': 'Admin User',
+                'details': {'start_date': '2025-01-01', 'end_date': '2025-03-31'}
+            },
+            {
+                'action_type': 'participants_uploaded',
+                'resource_type': 'campaign',
+                'resource_name': 'Demo Survey Q1 2025',
+                'user_email': 'admin@company.com',
+                'user_name': 'Admin User',
+                'details': {'count': 150, 'source': 'CSV upload'}
+            },
+            {
+                'action_type': 'email_config_saved',
+                'resource_type': 'email_config',
+                'user_email': 'admin@company.com',
+                'user_name': 'Admin User',
+                'details': {'fields_changed': ['smtp_server', 'sender_name']}
+            },
+            {
+                'action_type': 'survey_invitations_sent',
+                'resource_type': 'campaign',
+                'resource_name': 'Demo Survey Q1 2025',
+                'user_email': 'admin@company.com',
+                'user_name': 'Admin User',
+                'details': {'count': 150, 'batch_id': 'batch_001'}
+            }
+        ]
+        
+        # Add test entries to queue
+        created_count = 0
+        for entry in test_entries:
+            try:
+                queue_audit_log(
+                    business_account_id=current_account.id,
+                    **entry
+                )
+                created_count += 1
+            except Exception as e:
+                logger.error(f"Failed to create test audit entry: {e}")
+        
+        return jsonify({
+            'success': True,
+            'message': f'Created {created_count} test audit log entries',
+            'created_count': created_count
+        })
+    
+    except Exception as e:
+        logger.error(f"Error creating test audit logs: {e}")
+        return jsonify({
+            'success': False,
+            'error': f'Failed to create test audit logs: {str(e)}'
+        }), 500
+
+
 # ==== EMAIL CONFIGURATION ROUTES ====
 
 @business_auth_bp.route('/admin/email-config')

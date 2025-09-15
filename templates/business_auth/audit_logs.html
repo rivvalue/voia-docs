@@ -1,0 +1,448 @@
+{% extends "base.html" %}
+
+{% block title %}Account Activity Trail - VOÏA{% endblock %}
+
+{% block page_class %}page-audit-logs{% endblock %}
+
+{% block content %}
+<style>
+/* Audit logs specific styling */
+.audit-header {
+    background: linear-gradient(135deg, rgba(var(--primary-red-rgb, 220, 53, 69), 0.1) 0%, rgba(var(--red-hover-rgb, 200, 40, 55), 0.15) 100%);
+    border: 1px solid var(--red-light);
+    color: var(--primary-black);
+    padding: 2rem 0;
+    border-radius: var(--radius-2xl);
+    margin-bottom: 2rem;
+}
+
+.audit-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.audit-stat-card {
+    background: var(--primary-white);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--light-gray);
+    text-align: center;
+}
+
+.audit-stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-red);
+    margin: 0;
+}
+
+.audit-stat-label {
+    color: var(--gray-dark);
+    font-size: 0.875rem;
+    margin: 0.5rem 0 0;
+}
+
+.audit-filters {
+    background: var(--primary-white);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--light-gray);
+    margin-bottom: 2rem;
+}
+
+.audit-filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    align-items: end;
+}
+
+.audit-table-container {
+    background: var(--primary-white);
+    border-radius: var(--radius-lg);
+    padding: 0;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--light-gray);
+    overflow: hidden;
+}
+
+.audit-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.audit-table th {
+    background: var(--light-gray);
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: var(--primary-black);
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.audit-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--light-gray);
+    vertical-align: top;
+}
+
+.audit-table tr:hover {
+    background: rgba(var(--primary-red-rgb, 220, 53, 69), 0.05);
+}
+
+.audit-action-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.audit-action-badge.login { background: rgba(34, 197, 94, 0.1); color: rgb(34, 197, 94); }
+.audit-action-badge.logout { background: rgba(239, 68, 68, 0.1); color: rgb(239, 68, 68); }
+.audit-action-badge.campaign { background: rgba(59, 130, 246, 0.1); color: rgb(59, 130, 246); }
+.audit-action-badge.participants { background: rgba(168, 85, 247, 0.1); color: rgb(168, 85, 247); }
+.audit-action-badge.email { background: rgba(245, 158, 11, 0.1); color: rgb(245, 158, 11); }
+.audit-action-badge.default { background: rgba(107, 114, 128, 0.1); color: rgb(107, 114, 128); }
+
+.audit-time {
+    color: var(--gray-dark);
+    font-size: 0.8125rem;
+}
+
+.audit-user {
+    font-weight: 500;
+    color: var(--primary-black);
+}
+
+.audit-description {
+    color: var(--primary-black);
+    line-height: 1.4;
+}
+
+.audit-resource {
+    color: var(--gray-dark);
+    font-size: 0.8125rem;
+    font-style: italic;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding: 1rem;
+}
+
+.pagination-button {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--light-gray);
+    background: var(--primary-white);
+    color: var(--primary-black);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: all 0.2s;
+}
+
+.pagination-button:hover {
+    background: var(--primary-red);
+    color: var(--primary-white);
+    border-color: var(--primary-red);
+}
+
+.pagination-button.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.test-button {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-lg);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: 1rem;
+}
+
+.test-button:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--gray-dark);
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+}
+</style>
+
+<div class="container">
+    <!-- Header -->
+    <div class="audit-header text-center">
+        <h1 class="mb-3">
+            <i class="fas fa-clipboard-list me-2"></i>
+            Account Activity Trail
+        </h1>
+        <p class="mb-0">Track all activities and changes in your VOÏA account</p>
+    </div>
+
+    <!-- Statistics -->
+    <div class="audit-stats-grid">
+        <div class="audit-stat-card">
+            <div class="audit-stat-number">{{ audit_stats.total_actions or 0 }}</div>
+            <div class="audit-stat-label">Total Activities</div>
+        </div>
+        <div class="audit-stat-card">
+            <div class="audit-stat-number">{{ audit_stats.action_counts.keys()|length or 0 }}</div>
+            <div class="audit-stat-label">Activity Types</div>
+        </div>
+        <div class="audit-stat-card">
+            <div class="audit-stat-number">{{ audit_stats.user_counts.keys()|length or 0 }}</div>
+            <div class="audit-stat-label">Active Users</div>
+        </div>
+        <div class="audit-stat-card">
+            <div class="audit-stat-number">{{ audit_stats.date_range_days or 30 }}</div>
+            <div class="audit-stat-label">Days Shown</div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="audit-filters">
+        <form method="GET" class="audit-filters-grid">
+            <div>
+                <label for="action_type" class="form-label">Activity Type</label>
+                <select id="action_type" name="action_type" class="form-select">
+                    <option value="">All Activities</option>
+                    {% for action in available_actions %}
+                        <option value="{{ action }}" 
+                                {% if current_filters.action_type == action %}selected{% endif %}>
+                            {{ action.replace('_', ' ').title() }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div>
+                <label for="user_email" class="form-label">User</label>
+                <select id="user_email" name="user_email" class="form-select">
+                    <option value="">All Users</option>
+                    {% for user in available_users %}
+                        <option value="{{ user }}" 
+                                {% if current_filters.user_email == user %}selected{% endif %}>
+                            {{ user }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div>
+                <label for="days_back" class="form-label">Time Period</label>
+                <select id="days_back" name="days_back" class="form-select">
+                    <option value="7" {% if current_filters.days_back == 7 %}selected{% endif %}>Last 7 days</option>
+                    <option value="30" {% if current_filters.days_back == 30 %}selected{% endif %}>Last 30 days</option>
+                    <option value="90" {% if current_filters.days_back == 90 %}selected{% endif %}>Last 90 days</option>
+                    <option value="365" {% if current_filters.days_back == 365 %}selected{% endif %}>Last year</option>
+                </select>
+            </div>
+            
+            <div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-filter me-2"></i>Apply Filters
+                </button>
+                <button type="button" class="test-button" onclick="createTestAudits()">
+                    <i class="fas fa-vial me-2"></i>Create Test Data
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Audit Logs Table -->
+    <div class="audit-table-container">
+        {% if audit_logs %}
+            <table class="audit-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>User</th>
+                        <th>Activity</th>
+                        <th>Description</th>
+                        <th>Resource</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in audit_logs %}
+                    <tr>
+                        <td>
+                            <div class="audit-time">
+                                {{ log.formatted_time or log.created_at }}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="audit-user">
+                                {{ log.user_name or log.user_email or 'System' }}
+                            </div>
+                            {% if log.user_email and log.user_name %}
+                                <div style="font-size: 0.75rem; color: var(--gray-dark);">
+                                    {{ log.user_email }}
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% set action_class = 'default' %}
+                            {% if 'login' in log.action_type %}{% set action_class = 'login' %}
+                            {% elif 'logout' in log.action_type %}{% set action_class = 'logout' %}
+                            {% elif 'campaign' in log.action_type %}{% set action_class = 'campaign' %}
+                            {% elif 'participant' in log.action_type %}{% set action_class = 'participants' %}
+                            {% elif 'email' in log.action_type %}{% set action_class = 'email' %}
+                            {% endif %}
+                            
+                            <span class="audit-action-badge {{ action_class }}">
+                                {{ log.action_type.replace('_', ' ') }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="audit-description">
+                                {{ log.action_description }}
+                            </div>
+                        </td>
+                        <td>
+                            {% if log.resource_name %}
+                                <div class="audit-resource">
+                                    {{ log.resource_type or 'Resource' }}: {{ log.resource_name }}
+                                </div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <h3>No Activity Yet</h3>
+                <p>No audit logs found for the selected filters. Try adjusting your filters or create some test data to get started.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Pagination -->
+    {% if pagination.has_prev or pagination.has_next %}
+    <div class="pagination">
+        {% if pagination.has_prev %}
+            <a href="?page={{ pagination.prev_page }}&action_type={{ current_filters.action_type }}&user_email={{ current_filters.user_email }}&days_back={{ current_filters.days_back }}" 
+               class="pagination-button">
+                <i class="fas fa-chevron-left me-1"></i>Previous
+            </a>
+        {% else %}
+            <span class="pagination-button disabled">
+                <i class="fas fa-chevron-left me-1"></i>Previous
+            </span>
+        {% endif %}
+        
+        <span style="color: var(--gray-dark);">Page {{ pagination.page }}</span>
+        
+        {% if pagination.has_next %}
+            <a href="?page={{ pagination.next_page }}&action_type={{ current_filters.action_type }}&user_email={{ current_filters.user_email }}&days_back={{ current_filters.days_back }}" 
+               class="pagination-button">
+                Next<i class="fas fa-chevron-right ms-1"></i>
+            </a>
+        {% else %}
+            <span class="pagination-button disabled">
+                Next<i class="fas fa-chevron-right ms-1"></i>
+            </span>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Back to Admin -->
+    <div class="text-center mt-4">
+        <a href="{{ url_for('business_auth.admin_panel') }}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Admin Panel
+        </a>
+    </div>
+</div>
+
+<script>
+function createTestAudits() {
+    const button = event.target.closest('.test-button');
+    const originalText = button.innerHTML;
+    
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating...';
+    button.disabled = true;
+    
+    fetch('/business/admin/audit-logs/test', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success message
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
+            alert.style.zIndex = '9999';
+            alert.innerHTML = `
+                <i class="fas fa-check-circle me-2"></i>${data.message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alert);
+            
+            // Auto dismiss after 3 seconds
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.parentNode.removeChild(alert);
+                }
+            }, 3000);
+            
+            // Refresh page after short delay to show new data
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } else {
+            throw new Error(data.error || 'Failed to create test data');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to create test audit logs: ' + error.message);
+    })
+    .finally(() => {
+        button.innerHTML = originalText;
+        button.disabled = false;
+    });
+}
+
+// Auto-refresh page every 30 seconds to show new audit entries
+setInterval(() => {
+    // Only refresh if no user interaction in last 10 seconds
+    if (Date.now() - (window.lastUserInteraction || 0) > 10000) {
+        window.location.reload();
+    }
+}, 30000);
+
+// Track user interactions
+document.addEventListener('click', () => window.lastUserInteraction = Date.now());
+document.addEventListener('keypress', () => window.lastUserInteraction = Date.now());
+</script>
+
+{% endblock %}
