@@ -13,6 +13,7 @@ import logging
 import csv
 import io
 import uuid
+from audit_utils import queue_audit_log
 
 # Create blueprint for participant management
 participant_bp = Blueprint('participants', __name__, url_prefix='/business/participants')
@@ -119,6 +120,23 @@ def create_participant():
         
         db.session.add(participant)
         db.session.commit()
+        
+        # Audit logging for participant creation
+        try:
+            queue_audit_log(
+                business_account_id=current_account.id,
+                action_type='participant_created',
+                resource_type='participant',
+                resource_id=participant.id,
+                resource_name=participant.name,
+                details={
+                    'email': participant.email,
+                    'company_name': participant.company_name,
+                    'source': 'admin_single'
+                }
+            )
+        except Exception as audit_error:
+            logger.error(f"Failed to log participant creation audit: {audit_error}")
         
         account_name = current_account.name if current_account and hasattr(current_account, 'name') else 'Unknown'
         logger.info(f"Created participant {email} (Business Account: {account_name})")
@@ -233,6 +251,22 @@ def upload_participants():
         
         db.session.commit()
         
+        # Audit logging for bulk participant upload
+        if created_count > 0:
+            try:
+                queue_audit_log(
+                    business_account_id=current_account.id,
+                    action_type='participants_uploaded',
+                    resource_type='participant',
+                    details={
+                        'count': created_count,
+                        'errors': error_count,
+                        'source': 'admin_bulk'
+                    }
+                )
+            except Exception as audit_error:
+                logger.error(f"Failed to log bulk participant upload audit: {audit_error}")
+        
         # Show results
         if created_count > 0:
             flash(f'Successfully created {created_count} participants. You can now assign them to campaigns.', 'success')
@@ -286,8 +320,24 @@ def delete_participant(participant_id):
             return redirect(url_for('participants.list_participants'))
         
         participant_name = participant.name
+        participant_email = participant.email
         db.session.delete(participant)
         db.session.commit()
+        
+        # Audit logging for participant deletion
+        try:
+            queue_audit_log(
+                business_account_id=current_account.id,
+                action_type='participant_deleted',
+                resource_type='participant',
+                resource_id=participant_id,
+                resource_name=participant_name,
+                details={
+                    'email': participant_email
+                }
+            )
+        except Exception as audit_error:
+            logger.error(f"Failed to log participant deletion audit: {audit_error}")
         
         account_name = current_account.name if current_account and hasattr(current_account, 'name') else 'Unknown'
         logger.info(f"Deleted participant {participant_name} (ID: {participant_id}, Business Account: {account_name})")
@@ -327,6 +377,21 @@ def regenerate_token(participant_id):
         old_token = participant.token
         participant.generate_token()
         db.session.commit()
+        
+        # Audit logging for token regeneration
+        try:
+            queue_audit_log(
+                business_account_id=current_account.id,
+                action_type='participant_token_regenerated',
+                resource_type='participant',
+                resource_id=participant_id,
+                resource_name=participant.name,
+                details={
+                    'email': participant.email
+                }
+            )
+        except Exception as audit_error:
+            logger.error(f"Failed to log token regeneration audit: {audit_error}")
         
         account_name = current_account.name if current_account and hasattr(current_account, 'name') else 'Unknown'
         participant_name = participant.name if participant and hasattr(participant, 'name') else 'Unknown'
@@ -455,7 +520,22 @@ def manage_campaign_participants(campaign_id: int):
             
             db.session.commit()
             
+            # Audit logging for adding participants to campaign
             if added_count > 0:
+                try:
+                    queue_audit_log(
+                        business_account_id=current_account.id,
+                        action_type='participants_added',
+                        resource_type='campaign',
+                        resource_id=campaign_id,
+                        resource_name=campaign.name,
+                        details={
+                            'count': added_count
+                        }
+                    )
+                except Exception as audit_error:
+                    logger.error(f"Failed to log participants added to campaign audit: {audit_error}")
+                    
                 flash(f'Added {added_count} participant(s) to campaign {campaign.name}.', 'success')
                 logger.info(f"Added {added_count} participants to campaign {campaign.name} (ID: {campaign_id})")
             else:
@@ -510,8 +590,25 @@ def remove_campaign_participant(campaign_id, association_id):
             return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
         
         participant_name = association.participant.name if association.participant else 'Unknown'
+        participant_email = association.participant.email if association.participant else 'Unknown'
         db.session.delete(association)
         db.session.commit()
+        
+        # Audit logging for removing participant from campaign
+        try:
+            queue_audit_log(
+                business_account_id=current_account.id,
+                action_type='participants_removed',
+                resource_type='campaign',
+                resource_id=campaign_id,
+                resource_name=campaign.name,
+                details={
+                    'participant_name': participant_name,
+                    'participant_email': participant_email
+                }
+            )
+        except Exception as audit_error:
+            logger.error(f"Failed to log participant removal from campaign audit: {audit_error}")
         
         logger.info(f"Removed participant {participant_name} from campaign {campaign.name} (ID: {campaign_id})")
         flash(f'Removed {participant_name} from campaign {campaign.name}.', 'success')

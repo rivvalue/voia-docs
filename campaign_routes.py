@@ -117,6 +117,24 @@ def create_campaign():
         db.session.add(campaign)
         db.session.commit()
         
+        # Audit log campaign creation
+        try:
+            from audit_utils import queue_audit_log
+            queue_audit_log(
+                business_account_id=current_account.id,
+                action_type='campaign_created',
+                resource_type='campaign',
+                resource_id=campaign.id,
+                resource_name=campaign.name,
+                details={
+                    'start_date': start_date_obj.isoformat(),
+                    'end_date': end_date_obj.isoformat(),
+                    'status': 'draft'
+                }
+            )
+        except Exception as audit_error:
+            logger.error(f"Failed to audit campaign creation: {audit_error}")
+        
         logger.info(f"Campaign '{name}' created for business account {current_account.id}")
         flash(f'Campaign "{name}" created successfully!', 'success')
         
@@ -340,6 +358,24 @@ def activate_campaign(campaign_id):
         logger.info(f"Campaign '{campaign.name}' (ID: {campaign_id}) activated by business account {current_account.id}")
         logger.info(f"Token generation results: {token_success_count} successful, {token_error_count} failed")
         
+        # Audit log campaign activation
+        try:
+            from audit_utils import queue_audit_log
+            queue_audit_log(
+                business_account_id=current_account.id,
+                action_type='campaign_activated',
+                resource_type='campaign',
+                resource_id=campaign.id,
+                resource_name=campaign.name,
+                details={
+                    'participants_with_tokens': token_success_count,
+                    'token_generation_failures': token_error_count,
+                    'previous_status': 'ready'
+                }
+            )
+        except Exception as audit_error:
+            logger.error(f"Failed to audit campaign activation: {audit_error}")
+        
         # Create detailed flash message with token generation summary
         if token_error_count == 0:
             flash(f'Campaign "{campaign.name}" is now active! All {token_success_count} participant tokens generated successfully.', 'success')
@@ -387,6 +423,23 @@ def complete_campaign(campaign_id):
         campaign.close_campaign()
         
         db.session.commit()
+        
+        # Audit log campaign completion
+        try:
+            from audit_utils import queue_audit_log
+            queue_audit_log(
+                business_account_id=current_account.id,
+                action_type='campaign_completed',
+                resource_type='campaign',
+                resource_id=campaign.id,
+                resource_name=campaign.name,
+                details={
+                    'previous_status': 'active',
+                    'kpi_snapshot_generated': True
+                }
+            )
+        except Exception as audit_error:
+            logger.error(f"Failed to audit campaign completion: {audit_error}")
         
         logger.info(f"Campaign '{campaign.name}' (ID: {campaign_id}) completed by business account {current_account.id}")
         flash(f'Campaign "{campaign.name}" has been completed!', 'success')

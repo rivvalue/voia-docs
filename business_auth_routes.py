@@ -183,6 +183,19 @@ def login():
         logger.info(f"Business account user {email} logged in successfully")
         flash(f'Welcome back, {user.get_full_name()}!', 'success')
         
+        # Audit log successful login
+        try:
+            from audit_utils import audit_user_login
+            audit_user_login(
+                user_email=user.email,
+                user_name=user.get_full_name(),
+                business_account_id=user.business_account_id,
+                ip_address=request.environ.get('HTTP_X_FORWARDED_FOR', 
+                                             request.environ.get('REMOTE_ADDR', ''))[:45]
+            )
+        except Exception as audit_error:
+            logger.error(f"Failed to audit login for {email}: {audit_error}")
+        
         # Redirect to admin panel
         return redirect(url_for('business_auth.admin_panel'))
         
@@ -195,6 +208,22 @@ def login():
 @business_auth_bp.route('/logout')
 def logout():
     """Business account logout"""
+    # Capture user info before clearing session
+    user_email = None
+    user_name = None
+    business_account_id = session.get('business_account_id')
+    
+    try:
+        # Get user info for audit before clearing session
+        user_id = session.get('business_user_id')
+        if user_id:
+            user = BusinessAccountUser.query.get(user_id)
+            if user:
+                user_email = user.email
+                user_name = user.get_full_name()
+    except Exception as e:
+        logger.warning(f"Could not get user info for logout audit: {e}")
+    
     try:
         # Deactivate user session if exists
         session_id = session.get('business_session_id')
@@ -216,6 +245,20 @@ def logout():
         
         logger.info("Business account user logged out")
         flash('You have been logged out successfully.', 'info')
+        
+        # Audit log successful logout
+        if user_email and business_account_id:
+            try:
+                from audit_utils import audit_user_logout
+                audit_user_logout(
+                    user_email=user_email,
+                    user_name=user_name,
+                    business_account_id=business_account_id,
+                    ip_address=request.environ.get('HTTP_X_FORWARDED_FOR', 
+                                                 request.environ.get('REMOTE_ADDR', ''))[:45]
+                )
+            except Exception as audit_error:
+                logger.error(f"Failed to audit logout for {user_email}: {audit_error}")
         
     except Exception as e:
         logger.error(f"Business logout error: {e}")
@@ -951,6 +994,26 @@ def save_email_config():
         
         db.session.commit()
         
+        # Audit log email configuration save
+        try:
+            from audit_utils import audit_email_config_change
+            changed_fields = []
+            
+            # Determine which fields were changed (simple approach for now)
+            if smtp_server: changed_fields.append('smtp_server')
+            if sender_name: changed_fields.append('sender_name')
+            if sender_email: changed_fields.append('sender_email')
+            if smtp_password: changed_fields.append('smtp_password')
+            if reply_to_email: changed_fields.append('reply_to_email')
+            if admin_email_list: changed_fields.append('admin_emails')
+            
+            audit_email_config_change(
+                business_account_id=current_account.id,
+                config_fields_changed=changed_fields
+            )
+        except Exception as audit_error:
+            logger.error(f"Failed to audit email config save: {audit_error}")
+        
         flash('Email configuration saved successfully!', 'success')
         return redirect(url_for('business_auth.email_config'))
     
@@ -982,6 +1045,21 @@ def test_email_config():
         if email_config:
             email_config.set_test_result(test_result)
             db.session.commit()
+        
+        # Audit log email configuration test
+        try:
+            from audit_utils import queue_audit_log
+            queue_audit_log(
+                business_account_id=current_account.id,
+                action_type='email_config_tested',
+                resource_type='email_config',
+                details={
+                    'test_success': test_result.get('success', False),
+                    'smtp_server': email_config.smtp_server if email_config else 'unknown'
+                }
+            )
+        except Exception as audit_error:
+            logger.error(f"Failed to audit email config test: {audit_error}")
         
         return jsonify(test_result)
     
