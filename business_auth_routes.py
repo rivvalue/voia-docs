@@ -679,10 +679,11 @@ def scheduler_status():
                 }
             })
         
-        # For HTML requests, redirect to admin panel with flash message
-        flash(f"Scheduler Status: Running={scheduler_stats['running']}, Last Run={scheduler_stats['last_scheduler_run'] or 'Never'}", 'info')
-        flash(f"Campaign Counts: Draft={campaign_counts['draft']}, Ready={campaign_counts['ready']}, Active={campaign_counts['active']}, Completed={campaign_counts['completed']}", 'info')
-        return redirect(url_for('business_auth.admin_panel'))
+        # For HTML requests, show dedicated scheduler status page
+        return render_template('business_auth/scheduler_status.html',
+                             scheduler_stats=scheduler_stats,
+                             campaign_counts=campaign_counts,
+                             business_account=current_account)
         
     except Exception as e:
         logger.error(f"Error getting scheduler status: {e}")
