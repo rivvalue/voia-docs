@@ -722,7 +722,6 @@ def email_config():
 
 @business_auth_bp.route('/admin/email-config/save', methods=['POST'])
 @require_business_auth
-@require_permission('admin')
 def save_email_config():
     """Save email configuration"""
     try:
