@@ -131,6 +131,16 @@ class TaskQueue:
                     logger.info(f"Worker {worker_id} completed email task ({email_type})")
                 else:
                     logger.error(f"Worker {worker_id} failed email task")
+                    
+            elif task_type == 'audit_log':
+                # Process audit log writing task
+                success = self._process_audit_log_task(task_data, worker_id)
+                
+                if success:
+                    action_type = task_data.get('action_type', 'unknown')
+                    logger.debug(f"Worker {worker_id} completed audit log ({action_type})")
+                else:
+                    logger.error(f"Worker {worker_id} failed audit log task")
                         
         except Exception as e:
             logger.error(f"Error processing task {task}: {e}")
@@ -189,6 +199,24 @@ class TaskQueue:
             if email_delivery:
                 email_delivery.mark_failed(f"Task processing error: {str(e)}", is_permanent=False)
                 db.session.commit()
+            return False
+    
+    def _process_audit_log_task(self, task_data, worker_id):
+        """Process an audit log writing task"""
+        try:
+            from models import AuditLog
+            
+            # Create audit log entry
+            audit = AuditLog.create_audit_entry(**task_data)
+            db.session.add(audit)
+            db.session.commit()
+            
+            logger.debug(f"Audit log created: {audit.action_description}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Audit log task processing error: {e}")
+            # Don't let audit failures break the system - just log the error
             return False
     
     def _create_email_delivery_record(self, task_data):
