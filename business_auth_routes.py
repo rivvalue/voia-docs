@@ -92,9 +92,18 @@ def require_permission(permission):
                 return redirect(url_for('business_auth.login'))
             
             current_account = get_current_business_account()
-            if not current_account or current_account.status != 'active':
+            if not current_account:
                 flash('Please log in to access this page.', 'error')
                 return redirect(url_for('business_auth.login'))
+            
+            # Check account status - mirror require_business_auth logic
+            if current_account.status in ['suspended', 'inactive', 'closed']:
+                flash('Account access blocked. Please contact support.', 'error')
+                return redirect(url_for('business_auth.login'))
+            
+            # Allow active and trial accounts to proceed
+            if current_account.status == 'trial':
+                flash('Your account is in trial mode.', 'info')
             
             # Get current user
             business_user_id = session.get('business_user_id')
