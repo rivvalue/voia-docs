@@ -613,7 +613,8 @@ def init_rivvalue_admin_user():
         admin_user.first_name = 'Admin'
         admin_user.last_name = 'User'
         admin_user.role = 'admin'
-        admin_user.is_active = True
+        # Set active status - use setattr to avoid UserMixin property conflict
+        setattr(admin_user, 'is_active', True)
         admin_user.email_verified = True
         # Generate secure temporary password
         import secrets
@@ -1083,7 +1084,11 @@ def send_test_email():
             return jsonify({'error': 'Business account context not found'}), 400
         
         # Get test email address from request
-        test_email = request.json.get('test_email', '').strip() if request.is_json else request.form.get('test_email', '').strip()
+        # Get test email address from request with proper None handling
+        if request.is_json and request.json is not None:
+            test_email = request.json.get('test_email', '').strip()
+        else:
+            test_email = request.form.get('test_email', '').strip()
         
         # Enhanced email validation
         if not test_email:
@@ -1172,3 +1177,276 @@ VOÏA System
             'success': False,
             'error': f'Failed to send test email: {str(e)}'
         }), 500
+
+
+# ==== BRANDING CONFIGURATION ROUTES ====
+
+@business_auth_bp.route('/admin/brand-config')
+@require_business_auth
+def brand_config():
+    """Branding configuration management page"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            logger.error("No current account found in brand config route")
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.admin_panel'))
+        
+        # Get existing branding configuration if any
+        from models import BrandingConfig
+        branding_config = BrandingConfig.get_or_create_for_business_account(current_account.id)
+        
+        return render_template('business_auth/brand_config.html',
+                             branding_config=branding_config,
+                             business_account=current_account)
+    
+    except Exception as e:
+        logger.error(f"Error loading branding configuration: {e}")
+        flash('Failed to load branding configuration.', 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+
+@business_auth_bp.route('/admin/brand-config/save', methods=['POST'])
+@require_business_auth
+def save_brand_config():
+    """Save branding configuration with secure logo upload and image processing"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.admin_panel'))
+        
+        # Get form data
+        company_display_name = request.form.get('company_display_name', '').strip()
+        
+        # Get or create branding configuration
+        from models import BrandingConfig
+        branding_config = BrandingConfig.get_or_create_for_business_account(current_account.id)
+        
+        # Update configuration
+        branding_config.company_display_name = company_display_name if company_display_name else None
+        
+        # Handle logo upload
+        if 'logo_file' in request.files:
+            logo_file = request.files['logo_file']
+            if logo_file.filename:
+                try:
+                    # Process and validate the uploaded logo
+                    processed_filename = _process_logo_upload(logo_file, current_account.id, branding_config.logo_filename)
+                    if processed_filename:
+                        branding_config.logo_filename = processed_filename
+                except ValueError as ve:
+                    flash(str(ve), 'error')
+                    return redirect(url_for('business_auth.brand_config'))
+                except Exception as e:
+                    logger.error(f"Logo upload processing error: {e}")
+                    flash('Failed to process logo upload. Please try again with a different image.', 'error')
+                    return redirect(url_for('business_auth.brand_config'))
+        
+        # Save to database
+        if branding_config not in db.session:
+            db.session.add(branding_config)
+        
+        db.session.commit()
+        
+        logger.info(f"Branding configuration updated for business account: {current_account.name}")
+        flash('Branding configuration saved successfully!', 'success')
+        
+        # Audit log configuration update
+        try:
+            from audit_utils import queue_audit_log
+            queue_audit_log(
+                business_account_id=current_account.id,
+                action_type='branding_config_updated',
+                resource_type='branding_config',
+                details={
+                    'company_display_name': company_display_name,
+                    'logo_updated': 'logo_file' in request.files and request.files['logo_file'].filename != ''
+                }
+            )
+        except Exception as audit_error:
+            logger.error(f"Failed to audit branding config update: {audit_error}")
+        
+        return redirect(url_for('business_auth.brand_config'))
+    
+    except Exception as e:
+        logger.error(f"Error saving branding configuration: {e}")
+        db.session.rollback()
+        flash('Failed to save branding configuration. Please try again.', 'error')
+        return redirect(url_for('business_auth.brand_config'))
+
+
+def _process_logo_upload(logo_file, business_account_id, old_logo_filename=None):
+    """
+    Process and validate logo upload with secure handling and image resizing
+    
+    Args:
+        logo_file: FileStorage object from request
+        business_account_id: ID of the business account
+        old_logo_filename: Previous logo filename to clean up
+    
+    Returns:
+        str: New filename of the processed logo
+    
+    Raises:
+        ValueError: For validation errors that should be shown to user
+        Exception: For system errors
+    """
+    import os
+    import io
+    import imghdr
+    from werkzeug.utils import secure_filename
+    from PIL import Image, ImageOps
+    
+    # Validate file size first (5MB limit)
+    logo_file.seek(0, 2)  # Seek to end
+    file_size = logo_file.tell()
+    logo_file.seek(0)  # Reset to beginning
+    
+    if file_size > 5 * 1024 * 1024:
+        raise ValueError('File too large. Please upload a file smaller than 5MB.')
+    
+    if file_size == 0:
+        raise ValueError('File is empty. Please select a valid image file.')
+    
+    # Read file content for validation
+    file_content = logo_file.read()
+    logo_file.seek(0)  # Reset for later use
+    
+    # Validate file type by checking headers (more secure than just extension)
+    file_stream = io.BytesIO(file_content)
+    detected_format = imghdr.what(file_stream)
+    
+    # Allowed formats
+    allowed_formats = {'png', 'jpeg', 'gif', 'webp'}
+    allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'}
+    
+    # Get file extension
+    if '.' not in logo_file.filename:
+        raise ValueError('File must have a valid extension.')
+    
+    file_extension = logo_file.filename.rsplit('.', 1)[1].lower()
+    
+    if file_extension not in allowed_extensions:
+        raise ValueError('Invalid file type. Please upload PNG, JPG, JPEG, GIF, WEBP, or SVG files only.')
+    
+    # Special handling for SVG files (can't be processed by PIL)
+    if file_extension == 'svg':
+        # Basic SVG validation - check if it contains SVG tags
+        try:
+            content_str = file_content.decode('utf-8')
+            if '<svg' not in content_str.lower() or '</svg>' not in content_str.lower():
+                raise ValueError('Invalid SVG file format.')
+        except UnicodeDecodeError:
+            raise ValueError('Invalid SVG file - unable to read content.')
+        
+        # Create upload directory
+        upload_dir = os.path.join('static', 'uploads', 'logos', str(business_account_id))
+        os.makedirs(upload_dir, exist_ok=True)
+        
+        # Generate secure filename
+        timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
+        filename = f"{timestamp}_{secure_filename(logo_file.filename)}"
+        file_path = os.path.join(upload_dir, filename)
+        
+        # Save SVG file directly
+        with open(file_path, 'wb') as f:
+            f.write(file_content)
+        
+        # Clean up old file
+        _cleanup_old_logo(upload_dir, old_logo_filename)
+        
+        return filename
+    
+    # For raster images, validate format matches extension
+    if detected_format not in allowed_formats:
+        raise ValueError('Invalid or corrupted image file. Please try a different image.')
+    
+    # Additional security check - ensure detected format is reasonable
+    format_extension_map = {
+        'png': ['png'],
+        'jpeg': ['jpg', 'jpeg'],
+        'gif': ['gif'],
+        'webp': ['webp']
+    }
+    
+    if file_extension not in format_extension_map.get(detected_format, []):
+        raise ValueError(f'File extension .{file_extension} does not match the actual file format.')
+    
+    try:
+        # Process image with PIL
+        image = Image.open(file_stream)
+        
+        # Convert to RGB if necessary (for JPEG output)
+        if image.mode in ('RGBA', 'P'):
+            # Keep transparency for PNG, convert to RGB for others
+            if detected_format == 'png':
+                # Keep as RGBA for PNG
+                pass
+            else:
+                # Convert to RGB for other formats
+                rgb_image = Image.new('RGB', image.size, (255, 255, 255))
+                if image.mode == 'P':
+                    image = image.convert('RGBA')
+                rgb_image.paste(image, mask=image.split()[-1] if image.mode == 'RGBA' else None)
+                image = rgb_image
+        
+        # Get original dimensions
+        original_width, original_height = image.size
+        
+        # Target dimensions for email compatibility
+        max_width = 300
+        max_height = 100
+        
+        # Calculate new dimensions maintaining aspect ratio
+        width_ratio = max_width / original_width
+        height_ratio = max_height / original_height
+        ratio = min(width_ratio, height_ratio)
+        
+        new_width = int(original_width * ratio)
+        new_height = int(original_height * ratio)
+        
+        # Only resize if image is larger than target dimensions
+        if ratio < 1:
+            image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+            logger.info(f"Logo resized from {original_width}x{original_height} to {new_width}x{new_height}")
+        
+        # Create upload directory
+        upload_dir = os.path.join('static', 'uploads', 'logos', str(business_account_id))
+        os.makedirs(upload_dir, exist_ok=True)
+        
+        # Generate secure filename - always save as PNG for consistency
+        timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
+        base_filename = secure_filename(logo_file.filename)
+        # Remove extension and add .png
+        if '.' in base_filename:
+            base_filename = base_filename.rsplit('.', 1)[0]
+        filename = f"{timestamp}_{base_filename}.png"
+        file_path = os.path.join(upload_dir, filename)
+        
+        # Save the processed image as PNG
+        image.save(file_path, 'PNG', optimize=True)
+        
+        # Clean up old file
+        _cleanup_old_logo(upload_dir, old_logo_filename)
+        
+        logger.info(f"Logo uploaded and processed successfully: {filename}")
+        return filename
+        
+    except Exception as e:
+        logger.error(f"Image processing error: {e}")
+        raise Exception(f"Failed to process image: {str(e)}")
+
+
+def _cleanup_old_logo(upload_dir, old_logo_filename):
+    """Clean up old logo file"""
+    import os
+    
+    if old_logo_filename:
+        old_file_path = os.path.join(upload_dir, old_logo_filename)
+        if os.path.exists(old_file_path):
+            try:
+                os.remove(old_file_path)
+                logger.info(f"Old logo file removed: {old_logo_filename}")
+            except Exception as e:
+                logger.warning(f"Failed to remove old logo file {old_logo_filename}: {e}")

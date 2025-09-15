@@ -1410,7 +1410,7 @@ class BrandingConfig(db.Model):
     )
     
     id = db.Column(db.Integer, primary_key=True)
-    business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
+    business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False)
     
     def __init__(self, **kwargs):
         super(BrandingConfig, self).__init__(**kwargs)
