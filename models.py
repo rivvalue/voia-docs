@@ -1238,3 +1238,160 @@ class EmailDelivery(db.Model):
             'pending': pending,
             'success_rate': (sent / total * 100) if total > 0 else 0
         }
+
+
+class AuditLog(db.Model):
+    """Audit logging model for client-visible activity tracking"""
+    __tablename__ = 'audit_logs'
+    __table_args__ = (
+        # Primary index for business account scoping and time-based queries
+        db.Index('idx_audit_business_time', 'business_account_id', 'created_at'),
+        # Index for action-based filtering
+        db.Index('idx_audit_action', 'business_account_id', 'action_type'),
+        # Index for user-based filtering
+        db.Index('idx_audit_user', 'business_account_id', 'user_email'),
+        # Index for resource-based queries
+        db.Index('idx_audit_resource', 'business_account_id', 'resource_type', 'resource_id'),
+    )
+    
+    id = db.Column(db.Integer, primary_key=True)
+    
+    # Multi-tenant scoping
+    business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
+    
+    # User context (client-friendly)
+    user_email = db.Column(db.String(200), nullable=True, index=True)  # Who performed the action
+    user_name = db.Column(db.String(200), nullable=True)  # Full name for display
+    
+    # Action details (client-friendly language)
+    action_type = db.Column(db.String(50), nullable=False, index=True)  # login, campaign_created, participants_added, etc.
+    action_description = db.Column(db.String(500), nullable=False)  # "Campaign 'Q1 Survey' created"
+    
+    # Resource context
+    resource_type = db.Column(db.String(50), nullable=True, index=True)  # campaign, participant, email_config, etc.
+    resource_id = db.Column(db.String(50), nullable=True, index=True)  # ID of the affected resource
+    resource_name = db.Column(db.String(200), nullable=True)  # Human-readable resource name
+    
+    # Additional context (JSON for flexibility)
+    details = db.Column(db.Text, nullable=True)  # JSON string for additional details
+    
+    # Request context (minimal, client-relevant)
+    ip_address = db.Column(db.String(45), nullable=True)  # For security audit purposes
+    
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    
+    # Relationships
+    business_account = db.relationship('BusinessAccount', backref='audit_logs')
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'business_account_id': self.business_account_id,
+            'user_email': self.user_email,
+            'user_name': self.user_name,
+            'action_type': self.action_type,
+            'action_description': self.action_description,
+            'resource_type': self.resource_type,
+            'resource_id': self.resource_id,
+            'resource_name': self.resource_name,
+            'details': json.loads(self.details) if self.details else None,
+            'ip_address': self.ip_address,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'business_account_name': self.business_account.name if self.business_account else None,
+            'formatted_time': self.created_at.strftime('%B %d, %Y at %I:%M %p') if self.created_at else None
+        }
+    
+    def set_details(self, details_dict):
+        """Set details as JSON string"""
+        if details_dict:
+            self.details = json.dumps(details_dict)
+    
+    def get_details(self):
+        """Get details from JSON string"""
+        if self.details:
+            try:
+                return json.loads(self.details)
+            except:
+                return {}
+        return {}
+    
+    @staticmethod
+    def create_audit_entry(business_account_id, action_type, action_description, 
+                          user_email=None, user_name=None, resource_type=None, 
+                          resource_id=None, resource_name=None, details=None, ip_address=None):
+        """Create a new audit log entry"""
+        audit = AuditLog(
+            business_account_id=business_account_id,
+            user_email=user_email,
+            user_name=user_name,
+            action_type=action_type,
+            action_description=action_description,
+            resource_type=resource_type,
+            resource_id=str(resource_id) if resource_id else None,
+            resource_name=resource_name,
+            ip_address=ip_address
+        )
+        
+        if details:
+            audit.set_details(details)
+        
+        return audit
+    
+    @staticmethod
+    def get_business_audit_logs(business_account_id, action_type=None, user_email=None, 
+                               days_back=30, limit=100, offset=0):
+        """Get audit logs for a business account with filtering"""
+        query = AuditLog.query.filter_by(business_account_id=business_account_id)
+        
+        # Apply filters
+        if action_type:
+            query = query.filter(AuditLog.action_type == action_type)
+        
+        if user_email:
+            query = query.filter(AuditLog.user_email == user_email)
+        
+        if days_back:
+            cutoff_date = datetime.utcnow() - timedelta(days=days_back)
+            query = query.filter(AuditLog.created_at >= cutoff_date)
+        
+        # Order by newest first with pagination
+        return query.order_by(AuditLog.created_at.desc()).offset(offset).limit(limit).all()
+    
+    @staticmethod
+    def get_audit_stats(business_account_id, days_back=30):
+        """Get audit statistics for a business account"""
+        cutoff_date = datetime.utcnow() - timedelta(days=days_back) if days_back else None
+        
+        query = AuditLog.query.filter_by(business_account_id=business_account_id)
+        if cutoff_date:
+            query = query.filter(AuditLog.created_at >= cutoff_date)
+        
+        total_actions = query.count()
+        
+        # Count by action type
+        action_counts = {}
+        action_results = query.with_entities(
+            AuditLog.action_type, 
+            func.count(AuditLog.id)
+        ).group_by(AuditLog.action_type).all()
+        
+        for action_type, count in action_results:
+            action_counts[action_type] = count
+        
+        # Count by user
+        user_counts = {}
+        user_results = query.with_entities(
+            AuditLog.user_email,
+            func.count(AuditLog.id)
+        ).group_by(AuditLog.user_email).all()
+        
+        for user_email, count in user_results:
+            user_counts[user_email or 'System'] = count
+        
+        return {
+            'total_actions': total_actions,
+            'action_counts': action_counts,
+            'user_counts': user_counts,
+            'date_range_days': days_back
+        }
