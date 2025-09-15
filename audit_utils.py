@@ -58,14 +58,17 @@ def get_current_user_context():
             user_email = g.current_user.email
             user_name = g.current_user.get_full_name()
             business_account_id = g.current_user.business_account_id
-        elif session and 'user_id' in session:
-            # Fallback: get from session
+        elif session and 'business_user_id' in session:
+            # Fallback: get from business session
             try:
-                user = BusinessAccountUser.query.get(session['user_id'])
+                user = BusinessAccountUser.query.get(session['business_user_id'])
                 if user:
                     user_email = user.email
                     user_name = user.get_full_name()
                     business_account_id = user.business_account_id
+                # Also check session directly for business account
+                if not business_account_id and 'business_account_id' in session:
+                    business_account_id = session['business_account_id']
             except:
                 pass
                 
