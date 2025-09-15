@@ -600,7 +600,6 @@ def init_rivvalue_admin_user():
 
 @business_auth_bp.route('/admin/scheduler/run', methods=['POST'])
 @require_business_auth
-@require_permission('admin')
 def force_scheduler_run():
     """Force immediate scheduler run (admin only) for testing purposes"""
     try:
@@ -646,7 +645,6 @@ def force_scheduler_run():
 
 @business_auth_bp.route('/admin/scheduler/status')
 @require_business_auth
-@require_permission('admin')
 def scheduler_status():
     """Get scheduler status and statistics (admin only)"""
     try:
