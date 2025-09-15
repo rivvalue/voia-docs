@@ -38,6 +38,9 @@ CORS(app,
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 
+# Set maximum file upload size to 5MB for security
+app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024
+
 # Configure database using DatabaseConfig
 # Read environment setting and configure accordingly
 db_config.set_environment(app_env)

@@ -318,19 +318,19 @@
             <div class="form-group">
                 <label class="form-label" for="logo_file">Upload Logo</label>
                 <input type="file" class="form-control" id="logo_file" name="logo_file" 
-                       accept=".png,.jpg,.jpeg,.gif,.svg" aria-describedby="logoHelp">
+                       accept=".png,.jpg,.jpeg,.gif,.webp" aria-describedby="logoHelp">
                 <div class="help-text">
-                    Upload your company logo to personalize surveys and communications.
+                    Upload your company logo to personalize surveys and communications. Supported formats: PNG, JPG, JPEG, GIF, WEBP (max 5MB).
                 </div>
                 
                 <div class="upload-constraints">
                     <strong>Upload Requirements:</strong>
                     <ul>
-                        <li>Supported formats: PNG, JPG, JPEG, GIF, SVG</li>
+                        <li>Supported formats: PNG, JPG, JPEG, GIF, WEBP</li>
                         <li>Maximum file size: 5MB</li>
                         <li>Recommended dimensions: 400x200 pixels or similar ratio</li>
                         <li>Transparent background recommended for PNG files</li>
-                        <li>SVG format preferred for crisp display at all sizes</li>
+                        <li>PNG format recommended for logos with transparency</li>
                     </ul>
                 </div>
             </div>
@@ -365,15 +365,14 @@ document.getElementById('logo_file').addEventListener('change', function(e) {
         }
         
         // Validate file type
-        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/svg+xml'];
+        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
         if (!allowedTypes.includes(file.type)) {
-            alert('Invalid file type. Please upload PNG, JPG, JPEG, GIF, or SVG files only.');
+            alert('Invalid file type. Please upload PNG, JPG, JPEG, GIF, or WEBP files only.');
             this.value = '';
             return;
         }
         
-        // Show preview (for non-SVG images)
-        if (file.type !== 'image/svg+xml') {
+        // Show preview for images
             const reader = new FileReader();
             reader.onload = function(e) {
                 // Find the logo preview element and update it

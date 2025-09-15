@@ -1,17 +1,26 @@
 {% extends "base.html" %}
 
-{% block title %}Survey Submitted - Voxa{% endblock %}
+{% block title %}Survey Submitted - {% if branding and branding.company_name %}{{ branding.company_name }}{% else %}VOÏA{% endif %}{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-lg-8 mx-auto">
         <div class="card">
             <div class="card-body text-center">
+                {% if branding and branding.logo_url %}
+                    <div class="mb-4">
+                        <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}" class="img-fluid" style="max-height: 80px;">
+                    </div>
+                {% endif %}
                 <div class="success-icon mb-4">
                     <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
                 </div>
                 <h4 class="text-success mb-3">Thank you for sharing with us your feedback.</h4>
-                <p class="lead mb-2">Your feedback has been successfully analyzed by Voxa Intelligence.</p>
+                {% if branding and branding.company_name %}
+                    <p class="lead mb-2">Your feedback has been successfully analyzed by {{ branding.company_name }} Intelligence.</p>
+                {% else %}
+                    <p class="lead mb-2">Your feedback has been successfully analyzed by VOÏA Intelligence.</p>
+                {% endif %}
                 
                 <!-- Dashboard Button -->
                 <div class="mb-4">
@@ -49,7 +58,11 @@
                         <a href="{{ url_for('conversational_survey') }}" class="btn btn-outline-info">
                             <i class="fas fa-comments me-2"></i>Try Conversational Survey
                         </a>
-                        <small class="text-muted d-block mt-2">Experience natural conversation with Voxa Intelligence</small>
+                        {% if branding and branding.company_name %}
+                            <small class="text-muted d-block mt-2">Experience natural conversation with {{ branding.company_name }} Intelligence</small>
+                        {% else %}
+                            <small class="text-muted d-block mt-2">Experience natural conversation with VOÏA Intelligence</small>
+                        {% endif %}
                     </div>
                 </div>
                 

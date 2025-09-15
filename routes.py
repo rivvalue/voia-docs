@@ -20,6 +20,51 @@ import uuid
 
 logger = logging.getLogger(__name__)
 
+def get_branding_context(business_account_id=None):
+    """
+    Get branding context for templates including company name and logo URL.
+    
+    Args:
+        business_account_id: ID of the business account, if None will try to get from session
+    
+    Returns:
+        dict: Branding context with company_name, logo_url, and has_branding flag
+    """
+    branding_context = {
+        'company_name': 'VOÏA - Voice Of Client Agent',  # Default fallback
+        'logo_url': None,
+        'has_branding': False,
+        'branding_config': None
+    }
+    
+    try:
+        # Try to get business_account_id from parameter or session
+        if not business_account_id:
+            business_account_id = session.get('business_account_id')
+        
+        if business_account_id:
+            from models import BrandingConfig
+            branding_config = BrandingConfig.query.filter_by(business_account_id=business_account_id).first()
+            
+            if branding_config:
+                # Update context with custom branding
+                branding_context.update({
+                    'company_name': branding_config.get_company_display_name(),
+                    'logo_url': branding_config.get_logo_url(),
+                    'has_branding': branding_config.has_logo(),
+                    'branding_config': branding_config
+                })
+                
+                logger.info(f"Loaded branding for business account {business_account_id}: {branding_context['company_name']}")
+            else:
+                logger.info(f"No branding config found for business account {business_account_id}, using defaults")
+    
+    except Exception as e:
+        logger.warning(f"Error loading branding context: {e}")
+        # Keep default fallback values
+    
+    return branding_context
+
 def is_jwt_token(token):
     """Check if token is in JWT format (contains dots) vs UUID format"""
     return '.' in token and len(token.split('.')) == 3
@@ -455,22 +500,30 @@ def survey():
         # Use centralized token verification
         verification = verify_survey_access(token)
         if verification['valid']:
+            # Get branding context based on business_account_id from verification
+            branding = get_branding_context(verification.get('business_account_id'))
             return render_template('survey_choice.html', 
                                  authenticated=verification['authenticated'],
                                  email=verification['email'], 
                                  user_email=verification['user_email'],
                                  participant_name=verification['participant_name'],
                                  participant_company=verification['participant_company'],
-                                 campaign_name=verification['campaign_name'])
+                                 campaign_name=verification['campaign_name'],
+                                 branding=branding)
         else:
+            # Get default branding for unauthenticated users
+            branding = get_branding_context()
             return render_template('survey_choice.html', 
                                  authenticated=False, 
                                  error=verification['error'], 
-                                 user_email=None)
+                                 user_email=None,
+                                 branding=branding)
     else:
         # Check if already authenticated via session
         if session.get('auth_token'):
             email = session.get('auth_email')
+            # Get branding context from session
+            branding = get_branding_context()
             # For session-based access, we may not have all participant details
             return render_template('survey_choice.html', 
                                  authenticated=True, 
@@ -478,7 +531,8 @@ def survey():
                                  user_email=email,
                                  participant_name=None,
                                  participant_company=None,
-                                 campaign_name=None)
+                                 campaign_name=None,
+                                 branding=branding)
         else:
             # Redirect unauthenticated users to auth page instead of showing broken page
             return redirect(url_for('server_auth'))
@@ -492,22 +546,30 @@ def survey_form():
         # Use centralized token verification
         verification = verify_survey_access(token)
         if verification['valid']:
+            # Get branding context based on business_account_id from verification
+            branding = get_branding_context(verification.get('business_account_id'))
             return render_template('survey.html', 
                                  authenticated=verification['authenticated'],
                                  email=verification['email'], 
                                  user_email=verification['user_email'],
                                  participant_name=verification['participant_name'],
                                  participant_company=verification['participant_company'],
-                                 campaign_name=verification['campaign_name'])
+                                 campaign_name=verification['campaign_name'],
+                                 branding=branding)
         else:
+            # Get default branding for unauthenticated users
+            branding = get_branding_context()
             return render_template('survey.html', 
                                  authenticated=False, 
                                  error=verification['error'], 
-                                 user_email=None)
+                                 user_email=None,
+                                 branding=branding)
     else:
         # Check if already authenticated via session
         if session.get('auth_token'):
             email = session.get('auth_email')
+            # Get branding context from session
+            branding = get_branding_context()
             # For session-based access, we may not have all participant details
             return render_template('survey.html', 
                                  authenticated=True, 
@@ -515,7 +577,8 @@ def survey_form():
                                  user_email=email,
                                  participant_name=None,
                                  participant_company=None,
-                                 campaign_name=None)
+                                 campaign_name=None,
+                                 branding=branding)
         else:
             # Redirect unauthenticated users to auth page instead of showing broken page
             return redirect(url_for('server_auth'))
@@ -639,11 +702,15 @@ def submit_survey_form():
         print(f"=== TOKEN INVALIDATED FOR {authenticated_email} ===")
         logger.info(f"Form survey submitted by {authenticated_email} - Token invalidated")
         
+        # Get branding context for success page
+        branding = get_branding_context()
+        
         # Redirect to success page showing token was invalidated
         return render_template('survey_success.html', 
                              response_id=response.id,
                              analysis_status=analysis_status,
-                             email=authenticated_email)
+                             email=authenticated_email,
+                             branding=branding)
         
     except Exception as e:
         logger.error(f"Error in form survey submission: {e}")
@@ -1346,12 +1413,15 @@ def conversational_survey():
             session['participant_id'] = verification.get('participant_id')
             session['business_account_id'] = verification.get('business_account_id')
             
+            # Get branding context based on business_account_id from verification
+            branding = get_branding_context(verification.get('business_account_id'))
             return render_template('conversational_survey.html', 
                                  authenticated=verification['authenticated'], 
                                  email=verification['email'], 
                                  user_email=verification['email'],
                                  participant_name=verification.get('participant_name'),
-                                 campaign_name=verification.get('campaign_name'))
+                                 campaign_name=verification.get('campaign_name'),
+                                 branding=branding)
         else:
             # Fallback to simple token system for backward compatibility
             import simple_token_system
@@ -1360,10 +1430,14 @@ def conversational_survey():
                 email = fallback_verification.get('email')
                 session['auth_token'] = token
                 session['auth_email'] = email
-                return render_template('conversational_survey.html', authenticated=True, email=email, user_email=email)
+                # Get branding context for fallback verification
+                branding = get_branding_context()
+                return render_template('conversational_survey.html', authenticated=True, email=email, user_email=email, branding=branding)
             else:
                 error_msg = verification.get('error', 'Invalid or expired token')
-                return render_template('conversational_survey.html', authenticated=False, error=error_msg, user_email=None)
+                # Get default branding for error cases
+                branding = get_branding_context()
+                return render_template('conversational_survey.html', authenticated=False, error=error_msg, user_email=None, branding=branding)
     else:
         # Check if already authenticated via session
         if session.get('auth_token'):
@@ -1379,7 +1453,9 @@ def conversational_survey():
             #                          completion_date=existing_response.created_at.strftime("%B %d, %Y"),
             #                          show_alternatives=True)
                                      
-            return render_template('conversational_survey.html', authenticated=True, email=email, user_email=email)
+            # Get branding context from session
+            branding = get_branding_context()
+            return render_template('conversational_survey.html', authenticated=True, email=email, user_email=email, branding=branding)
         else:
             # Redirect unauthenticated users to auth page instead of showing broken page
             return redirect(url_for('server_auth'))

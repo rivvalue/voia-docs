@@ -16,7 +16,7 @@ from typing import List, Dict, Optional, Union
 from flask import current_app, url_for, render_template_string
 import jwt
 from app import db
-from models import EmailDelivery, EmailConfiguration
+from models import EmailDelivery, EmailConfiguration, BrandingConfig
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +95,40 @@ class EmailService:
                 logger.debug("Falling back to system default email configuration")
         
         return config
+    
+    def _get_branding_config(self, business_account_id: Optional[int] = None) -> Dict:
+        """Get branding configuration for a business account with fallbacks"""
+        branding = {
+            'company_name': 'VOÏA - Voice Of Client',
+            'logo_url': None,
+            'tagline': 'AI Powered Client Insights',
+            'has_custom_branding': False
+        }
+        
+        if business_account_id:
+            try:
+                branding_config = BrandingConfig.query.filter_by(business_account_id=business_account_id).first()
+                if branding_config:
+                    # Get company display name with fallback
+                    company_name = branding_config.get_company_display_name()
+                    if company_name and company_name != 'Unknown Company':
+                        branding['company_name'] = company_name
+                        branding['has_custom_branding'] = True
+                    
+                    # Get logo URL if available
+                    logo_url = branding_config.get_logo_url()
+                    if logo_url:
+                        branding['logo_url'] = logo_url
+                        branding['has_custom_branding'] = True
+                        
+                    logger.debug(f"Loaded branding config for business account {business_account_id}: {company_name}")
+                else:
+                    logger.debug(f"No branding config found for business account {business_account_id}, using defaults")
+            except Exception as e:
+                logger.error(f"Failed to load branding configuration for business account {business_account_id}: {e}")
+                logger.debug("Falling back to default VOÏA branding")
+        
+        return branding
     
     def is_configured(self, business_account_id: Optional[int] = None) -> bool:
         """Check if email service is properly configured for a business account or system default"""
@@ -415,17 +449,20 @@ class EmailService:
         """
         
         try:
+            # Get branding configuration for this business account
+            branding = self._get_branding_config(business_account_id)
+            
             # Generate survey URL (using the correct 'survey' route)
             survey_url = url_for('survey', token=survey_token, _external=True)
             
             # Email subject
             subject = f"Your feedback is requested: {campaign_name}"
             
-            # Text body
+            # Text body with branding support
             text_body = f"""
 Hello {participant_name},
 
-{business_account_name} is requesting your valuable feedback through our Voice of Client (VOÏA) system.
+{business_account_name} is requesting your valuable feedback through our Voice of Client system.
 
 Campaign: {campaign_name}
 
@@ -439,14 +476,20 @@ Your feedback helps improve services and experiences. The survey should take jus
 Thank you for your time and valuable insights!
 
 Best regards,
-The VOÏA Team
-AI Powered Client Insights
+The {branding['company_name']} Team
+{branding['tagline']}
 
 ---
 This is an automated message. If you have any questions, please contact the organization that sent this survey.
 """
             
-            # HTML body
+            # HTML body with branding support
+            logo_html = ""
+            if branding['logo_url']:
+                logo_url = branding['logo_url']
+                company_name = branding['company_name']
+                logo_html = f'<img src="{logo_url}" alt="{company_name}" style="max-height: 60px; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;">'
+            
             html_body = f"""
 <!DOCTYPE html>
 <html>
@@ -481,6 +524,13 @@ This is an automated message. If you have any questions, please contact the orga
             font-weight: bold;
             color: #E13A44;
             margin-bottom: 5px;
+        }}
+        .logo-image {{
+            max-height: 60px;
+            margin-bottom: 10px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }}
         .tagline {{
             font-size: 14px;
@@ -529,13 +579,14 @@ This is an automated message. If you have any questions, please contact the orga
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">VOÏA - Voice Of Client</div>
-            <div class="tagline">AI Powered Client Insights</div>
+            {logo_html}
+            <div class="logo">{branding['company_name']}</div>
+            <div class="tagline">{branding['tagline']}</div>
         </div>
         
         <h2>Hello {participant_name},</h2>
         
-        <p><strong>{business_account_name}</strong> is requesting your valuable feedback through our Voice of Client (VOÏA) system.</p>
+        <p><strong>{business_account_name}</strong> is requesting your valuable feedback through our Voice of Client system.</p>
         
         <div class="campaign-name">
             <strong>Campaign:</strong> {campaign_name}
@@ -554,7 +605,7 @@ This is an automated message. If you have any questions, please contact the orga
         <p>Thank you for your time and valuable insights!</p>
         
         <p>Best regards,<br>
-        The VOÏA Team</p>
+        The {branding['company_name']} Team</p>
         
         <div class="footer">
             This is an automated message. If you have any questions, please contact the organization that sent this survey.
@@ -626,6 +677,9 @@ This is an automated message. If you have any questions, please contact the orga
             }
         
         try:
+            # Get branding configuration for this business account
+            branding = self._get_branding_config(business_account_id)
+            
             # Prepare notification content based on type
             if notification_type == 'started':
                 subject = f"Campaign Started: {campaign_name}"
@@ -643,7 +697,7 @@ The campaign has been automatically activated and is now collecting responses.
 Dashboard: {url_for('business_auth.admin_panel', _external=True)}
 
 ---
-VOÏA Campaign Management System
+{branding['company_name']} Campaign Management System
 """
                 
             elif notification_type == 'completed':
@@ -664,7 +718,7 @@ The campaign has been automatically completed and final analytics are available.
 Dashboard: {url_for('business_auth.admin_panel', _external=True)}
 
 ---
-VOÏA Campaign Management System
+{branding['company_name']} Campaign Management System
 """
                 
             elif notification_type == 'error':
@@ -685,7 +739,7 @@ Please check the campaign status and take appropriate action.
 Dashboard: {url_for('business_auth.admin_panel', _external=True)}
 
 ---
-VOÏA Campaign Management System
+{branding['company_name']} Campaign Management System
 """
             
             else:

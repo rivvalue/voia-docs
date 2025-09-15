@@ -1294,7 +1294,6 @@ def _process_logo_upload(logo_file, business_account_id, old_logo_filename=None)
     """
     import os
     import io
-    import imghdr
     from werkzeug.utils import secure_filename
     from PIL import Image, ImageOps
     
@@ -1313,13 +1312,9 @@ def _process_logo_upload(logo_file, business_account_id, old_logo_filename=None)
     file_content = logo_file.read()
     logo_file.seek(0)  # Reset for later use
     
-    # Validate file type by checking headers (more secure than just extension)
-    file_stream = io.BytesIO(file_content)
-    detected_format = imghdr.what(file_stream)
-    
-    # Allowed formats
-    allowed_formats = {'png', 'jpeg', 'gif', 'webp'}
-    allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'}
+    # Allowed formats - only safe raster image formats
+    allowed_formats = {'PNG', 'JPEG', 'GIF', 'WEBP'}
+    allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
     
     # Get file extension
     if '.' not in logo_file.filename:
@@ -1328,54 +1323,41 @@ def _process_logo_upload(logo_file, business_account_id, old_logo_filename=None)
     file_extension = logo_file.filename.rsplit('.', 1)[1].lower()
     
     if file_extension not in allowed_extensions:
-        raise ValueError('Invalid file type. Please upload PNG, JPG, JPEG, GIF, WEBP, or SVG files only.')
+        raise ValueError('Invalid file type. Please upload PNG, JPG, JPEG, GIF, or WEBP files only.')
     
-    # Special handling for SVG files (can't be processed by PIL)
-    if file_extension == 'svg':
-        # Basic SVG validation - check if it contains SVG tags
-        try:
-            content_str = file_content.decode('utf-8')
-            if '<svg' not in content_str.lower() or '</svg>' not in content_str.lower():
-                raise ValueError('Invalid SVG file format.')
-        except UnicodeDecodeError:
-            raise ValueError('Invalid SVG file - unable to read content.')
+    # Validate image using Pillow - more secure than imghdr
+    try:
+        file_stream = io.BytesIO(file_content)
+        image = Image.open(file_stream)
         
-        # Create upload directory
-        upload_dir = os.path.join('static', 'uploads', 'logos', str(business_account_id))
-        os.makedirs(upload_dir, exist_ok=True)
+        # Verify the image can be loaded and get format
+        detected_format = image.format
+        image.verify()  # Verify the image integrity
         
-        # Generate secure filename
-        timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
-        filename = f"{timestamp}_{secure_filename(logo_file.filename)}"
-        file_path = os.path.join(upload_dir, filename)
+        # Reset stream for processing
+        file_stream.seek(0)
+        image = Image.open(file_stream)
         
-        # Save SVG file directly
-        with open(file_path, 'wb') as f:
-            f.write(file_content)
-        
-        # Clean up old file
-        _cleanup_old_logo(upload_dir, old_logo_filename)
-        
-        return filename
+    except Exception as e:
+        raise ValueError('Invalid or corrupted image file. Please upload a valid image.')
     
-    # For raster images, validate format matches extension
+    # Validate format is in allowed list
     if detected_format not in allowed_formats:
-        raise ValueError('Invalid or corrupted image file. Please try a different image.')
+        raise ValueError(f'Unsupported image format: {detected_format}. Please upload PNG, JPG, JPEG, GIF, or WEBP files only.')
     
-    # Additional security check - ensure detected format is reasonable
+    # Additional security check - ensure detected format matches extension
     format_extension_map = {
-        'png': ['png'],
-        'jpeg': ['jpg', 'jpeg'],
-        'gif': ['gif'],
-        'webp': ['webp']
+        'PNG': ['png'],
+        'JPEG': ['jpg', 'jpeg'],
+        'GIF': ['gif'],
+        'WEBP': ['webp']
     }
     
     if file_extension not in format_extension_map.get(detected_format, []):
-        raise ValueError(f'File extension .{file_extension} does not match the actual file format.')
+        raise ValueError(f'File extension .{file_extension} does not match the actual file format ({detected_format}).')
     
     try:
-        # Process image with PIL
-        image = Image.open(file_stream)
+        # Image already loaded and verified above, continue processing
         
         # Convert to RGB if necessary (for JPEG output)
         if image.mode in ('RGBA', 'P'):

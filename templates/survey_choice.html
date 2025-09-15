@@ -9,8 +9,22 @@
     <div class="col-lg-8 mx-auto">
         <div class="card">
             <div class="card-header text-center">
+                {% if branding and branding.logo_url %}
+                    <div class="mb-3">
+                        <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}" class="img-fluid" style="max-height: 60px;">
+                    </div>
+                {% endif %}
                 <h4 class="card-title mb-1">Welcome, {{ participant_name }}</h4>
                 <small class="text-muted">{{ participant_company }} - {{ campaign_name }}</small>
+                {% if branding and branding.company_name %}
+                    <div class="mt-2">
+                        <small class="text-muted">Powered by {{ branding.company_name }}</small>
+                    </div>
+                {% else %}
+                    <div class="mt-2">
+                        <small class="text-muted">Powered by VOÏA - Voice Of Client Agent</small>
+                    </div>
+                {% endif %}
             </div>
             <div class="card-body">
                 <h5 class="text-center mb-4">Choose Your Survey Experience</h5>
