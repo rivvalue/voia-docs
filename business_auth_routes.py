@@ -815,10 +815,11 @@ def audit_logs():
         flash('Failed to load audit logs.', 'error')
         return redirect(url_for('business_auth.admin_panel'))
 
-@business_auth_bp.route('/admin/audit-logs/test')
-@require_business_auth
-@rate_limit(limit=10)  # 10 test entries per minute
-def test_audit_logs():
+# Test audit logs route removed for production security
+# @business_auth_bp.route('/admin/audit-logs/test')
+# @require_business_auth
+# @rate_limit(limit=10)  # 10 test entries per minute
+# def test_audit_logs():
     """Create test audit log entries for demo purposes"""
     try:
         current_account = get_current_business_account()

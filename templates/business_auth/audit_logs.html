@@ -162,22 +162,6 @@
     pointer-events: none;
 }
 
-.test-button {
-    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
-    color: var(--primary-white);
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: var(--radius-lg);
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    margin-left: 1rem;
-}
-
-.test-button:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-lg);
-}
 
 .empty-state {
     text-align: center;
@@ -264,9 +248,6 @@
             <div>
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-filter me-2"></i>Apply Filters
-                </button>
-                <button type="button" class="test-button" onclick="createTestAudits()">
-                    <i class="fas fa-vial me-2"></i>Create Test Data
                 </button>
             </div>
         </form>
@@ -381,56 +362,6 @@
 </div>
 
 <script>
-function createTestAudits() {
-    const button = event.target.closest('.test-button');
-    const originalText = button.innerHTML;
-    
-    button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating...';
-    button.disabled = true;
-    
-    fetch('/business/admin/audit-logs/test', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Show success message
-            const alert = document.createElement('div');
-            alert.className = 'alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3';
-            alert.style.zIndex = '9999';
-            alert.innerHTML = `
-                <i class="fas fa-check-circle me-2"></i>${data.message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            `;
-            document.body.appendChild(alert);
-            
-            // Auto dismiss after 3 seconds
-            setTimeout(() => {
-                if (alert.parentNode) {
-                    alert.parentNode.removeChild(alert);
-                }
-            }, 3000);
-            
-            // Refresh page after short delay to show new data
-            setTimeout(() => {
-                window.location.reload();
-            }, 1500);
-        } else {
-            throw new Error(data.error || 'Failed to create test data');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Failed to create test audit logs: ' + error.message);
-    })
-    .finally(() => {
-        button.innerHTML = originalText;
-        button.disabled = false;
-    });
-}
 
 // Auto-refresh page every 30 seconds to show new audit entries
 setInterval(() => {
