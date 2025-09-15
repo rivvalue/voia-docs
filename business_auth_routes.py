@@ -802,7 +802,6 @@ def save_email_config():
 
 @business_auth_bp.route('/admin/email-config/test', methods=['POST'])
 @require_business_auth
-@require_permission('admin')
 @rate_limit(limit=10)  # 10 tests per minute per IP to prevent abuse
 def test_email_config():
     """Test email configuration"""
@@ -814,8 +813,8 @@ def test_email_config():
         # Import email service
         from email_service import email_service
         
-        # Test the configuration
-        test_result = email_service.test_configuration(business_account_id=current_account.id)
+        # Test the configuration using tenant-specific settings
+        test_result = email_service.test_connection_for_account(current_account.id)
         
         # Update EmailConfiguration with test result if it exists
         email_config = current_account.get_email_configuration()
@@ -835,7 +834,6 @@ def test_email_config():
 
 @business_auth_bp.route('/admin/email-config/send-test', methods=['POST'])
 @require_business_auth
-@require_permission('admin')
 @rate_limit(limit=5)  # 5 test emails per minute per IP to prevent spam
 def send_test_email():
     """Send test email"""

@@ -726,7 +726,7 @@ VOÏA Campaign Management System
 
     def test_connection(self) -> Dict:
         """
-        Test SMTP connection and configuration
+        Test SMTP connection and configuration using instance settings
         
         Returns:
             Dict with connection test results
@@ -777,6 +777,75 @@ VOÏA Campaign Management System
                 'configured': True,
                 'smtp_server': self.smtp_server,
                 'smtp_port': self.smtp_port
+            }
+
+    def test_connection_for_account(self, business_account_id: Optional[int] = None) -> Dict:
+        """
+        Test SMTP connection for a specific business account
+        
+        Args:
+            business_account_id: Optional business account ID for tenant-specific configuration
+        
+        Returns:
+            Dict with connection test results
+        """
+        
+        if not self.is_configured(business_account_id):
+            return {
+                'success': False,
+                'error': 'Email service not configured - missing SMTP settings',
+                'configured': False
+            }
+        
+        # Get the configuration for this business account
+        config = self._get_email_config(business_account_id)
+        
+        try:
+            # Validate required settings
+            required_settings = ['smtp_server', 'smtp_port', 'smtp_username', 'smtp_password']
+            missing_settings = [key for key in required_settings if not config.get(key)]
+            
+            if missing_settings:
+                return {
+                    'success': False,
+                    'error': f'Email service configuration incomplete - missing: {", ".join(missing_settings)}',
+                    'configured': True,
+                    'config_source': config.get('source', 'unknown')
+                }
+            
+            # Test SMTP connection with account-specific settings
+            context = ssl.create_default_context()
+            smtp_port = config['smtp_port'] or 587  # Default port fallback
+            
+            with smtplib.SMTP(str(config['smtp_server']), smtp_port) as server:
+                if config.get('use_tls', True):
+                    server.starttls(context=context)
+                server.login(str(config['smtp_username']), str(config['smtp_password']))
+                
+                logger.info(f"Email service connection test successful for business account {business_account_id}")
+                
+                return {
+                    'success': True,
+                    'configured': True,
+                    'config_source': config['source'],
+                    'smtp_server': config['smtp_server'],
+                    'smtp_port': config['smtp_port'],
+                    'sender_email': config.get('sender_email'),
+                    'admin_emails_count': len(config.get('admin_emails', [])),
+                    'test_time': datetime.utcnow().isoformat()
+                }
+                
+        except Exception as e:
+            error_msg = f"Email service connection test failed: {str(e)}"
+            logger.error(f"Connection test failed for business account {business_account_id}: {error_msg}")
+            
+            return {
+                'success': False,
+                'error': error_msg,
+                'configured': True,
+                'config_source': config.get('source', 'unknown'),
+                'smtp_server': config.get('smtp_server'),
+                'smtp_port': config.get('smtp_port')
             }
 
 # Global email service instance
