@@ -1,6 +1,7 @@
 from flask import render_template, request, jsonify, flash, redirect, url_for, g, session
 from app import app, db
 # Models imported inside functions to avoid circular imports
+from models import SurveyResponse, Participant, CampaignParticipant, Campaign
 from data_storage import get_dashboard_data
 from sqlalchemy.orm import joinedload
 
@@ -1482,11 +1483,14 @@ def start_conversation():
         if not company_name or not respondent_name or not respondent_email or not tenure_with_fc:
             return jsonify({'error': 'All fields are required'}), 400
         
-        # Debug logging
-        logger.info(f"Starting conversation for {respondent_name} with tenure: {tenure_with_fc}")
+        # Get business account ID from session for PromptTemplateService integration
+        business_account_id = session.get('business_account_id')
         
-        # Start conversation with AI, passing the tenure data
-        conversation_response = start_ai_conversational_survey(company_name, respondent_name, tenure_with_fc)
+        # Debug logging
+        logger.info(f"Starting conversation for {respondent_name} with tenure: {tenure_with_fc}, business_account_id: {business_account_id}")
+        
+        # Start conversation with AI, passing the tenure data and business_account_id
+        conversation_response = start_ai_conversational_survey(company_name, respondent_name, tenure_with_fc, business_account_id=business_account_id)
         
         return jsonify({
             'conversation_id': conversation_response['conversation_id'],
@@ -1526,6 +1530,8 @@ def conversation_response():
         # Add authenticated email and conversation_id to survey data
         survey_data['respondent_email'] = authenticated_email
         survey_data['conversation_id'] = conversation_id
+        # Add business_account_id for PromptTemplateService integration
+        survey_data['business_account_id'] = session.get('business_account_id')
         
         # Process response with AI
         ai_response = process_ai_conversation_response(user_input, survey_data)

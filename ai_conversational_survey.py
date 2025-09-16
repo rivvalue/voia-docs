@@ -1,8 +1,9 @@
 import os
 import json
 import uuid
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from openai import OpenAI
+from prompt_template_service import PromptTemplateService
 
 def normalize_company_name(company_name):
     """Normalize company name for case-insensitive comparison"""
@@ -14,13 +15,22 @@ def normalize_company_name(company_name):
 class AIConversationalSurvey:
     """OpenAI-powered conversational survey system with adaptive questioning"""
     
-    def __init__(self):
+    def __init__(self, business_account_id: Optional[int] = None):
         self.openai_client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
         self.conversation_history = []
         self.survey_data = {}
         self.extracted_data = {}
         self.step_count = 0
         self.is_complete = False
+        
+        # Initialize prompt template service for dynamic prompts
+        self.template_service = PromptTemplateService(business_account_id)
+        
+        # Debug logging for template mode
+        template_info = self.template_service.get_template_info()
+        print(f"TEMPLATE DEBUG: Initialized with business_account_id={business_account_id}")
+        print(f"TEMPLATE DEBUG: Mode={template_info['is_demo_mode']}, Company={template_info['company_name']}, Product={template_info['product_name']}")
+        print(f"TEMPLATE DEBUG: Tone={template_info['conversation_tone']}, MaxQuestions={template_info['max_questions']}")
         
     def start_conversation(self, company_name: str, respondent_name: str) -> Dict[str, Any]:
         """Start a new AI-powered conversational survey"""
@@ -101,11 +111,11 @@ class AIConversationalSurvey:
         print(f"Full extracted data: {self.extracted_data}")
         
         # ANTI-LOOP PROTECTION: Prevent infinite loops but allow service questions
-        if self.step_count > 8:
-            print("LOOP PROTECTION: Forcing completion after 8 steps")
+        if self.template_service.should_force_completion(self.step_count):
+            print(f"LOOP PROTECTION: Forcing completion after {self.step_count} steps (max: {self.template_service.get_max_questions()})")
             self.is_complete = True
             return {
-                'message': "Thank you so much for your detailed feedback about Archelo Group! Your insights are very valuable.",
+                'message': self.template_service.get_completion_message(),
                 'message_type': 'completion',
                 'step': 'forced_complete',
                 'progress': 100,
@@ -115,7 +125,7 @@ class AIConversationalSurvey:
         # Check if we have enough data to complete
         if self._check_completion_criteria():
             next_question = {
-                'message': "Thank you so much for taking the time to share your detailed feedback about Archelo Group! Your insights are incredibly valuable and will help us improve our service delivery. Have a wonderful day!",
+                'message': self.template_service.get_completion_message(),
                 'message_type': 'completion',
                 'step': 'complete',
                 'progress': 100,
@@ -143,15 +153,18 @@ class AIConversationalSurvey:
         return next_question
     
     def _generate_welcome_message(self, company_name: str, respondent_name: str) -> str:
-        """Generate personalized welcome message with Archelo Group introduction"""
-        # Always use the new Archelo Group introduction and go directly to NPS
-        return f"Hi {respondent_name}, we'd love to hear from you.\n\nArchelo is on a mission to make workplace tools less painful, and your feedback makes us better.\n\nThis short conversation will help us understand what's working, what's not, and how to improve your experience with ArcheloFlow.\n\nOn a scale of 0-10, how likely are you to recommend Archelo Group to a friend or colleague?"
+        """Generate personalized welcome message using template service"""
+        # Use template service for dynamic or demo-specific welcome messages
+        return self.template_service.generate_welcome_message(respondent_name)
     
     def _extract_survey_data_with_ai(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
         """Extract structured survey data from natural language using OpenAI"""
         try:
             # Get list of already captured data to prevent overwrites
             locked_fields = [key for key, value in self.extracted_data.items() if value is not None]
+            
+            # Get dynamic company name from template service
+            company_name = self.template_service.get_company_name()
             
             prompt = f"""Extract survey data from this customer response: "{user_input}"
 
@@ -165,7 +178,7 @@ CRITICAL INSTRUCTION: Only extract NEW information from this specific response.
 DO NOT re-extract or change data that was already captured in previous responses.
 
 Extract any of the following data present in the response:
-- Tenure with Archelo Group: Look for duration mentions like "6 months", "2 years", "less than 6 months", etc.
+- Tenure with {company_name}: Look for duration mentions like "6 months", "2 years", "less than 6 months", etc.
 - NPS score (0-10): Look for numbers, recommendations, likelihood scores
 - Satisfaction level (1-5): Look for satisfaction, happiness, contentment indicators
 - Service quality rating (1-5): Look for professional services, service delivery ratings
@@ -425,78 +438,49 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         """Determine what question should be asked next based on collected data"""
         data = self.extracted_data
         
+        # Get dynamic company name from template service
+        company_name = self.template_service.get_company_name()
+        
         # Check what we have and what we need - systematic collection of ALL ratings
         if not data.get('tenure_with_fc'):
-            return "Ask about business relationship tenure with Archelo Group (how long working together)"
+            return f"Ask about business relationship tenure with {company_name} (how long working together)"
         elif not data.get('nps_score'):
-            return "Ask for NPS score (0-10 likelihood to recommend Archelo Group)"
+            return f"Ask for NPS score (0-10 likelihood to recommend {company_name})"
         elif not data.get('nps_reasoning') and not data.get('improvement_feedback'):
-            return "Ask WHY they gave that NPS score - what's their reasoning about Archelo Group"
+            return f"Ask WHY they gave that NPS score - what's their reasoning about {company_name}"
         elif not data.get('satisfaction_rating'):
-            return "Ask for overall satisfaction rating (1-5) with Archelo Group"
+            return f"Ask for overall satisfaction rating (1-5) with {company_name}"
         elif not data.get('service_rating'):
-            return "Ask for professional services quality rating (1-5) from Archelo Group"
+            return f"Ask for professional services quality rating (1-5) from {company_name}"
         elif not data.get('product_value_rating'):
-            return "Ask for product/solution value rating (1-5) from Archelo Group"
+            return f"Ask for product/solution value rating (1-5) from {company_name}"
         elif not data.get('pricing_rating'):
-            return "Ask for pricing value rating (1-5) for Archelo Group services"
+            return f"Ask for pricing value rating (1-5) for {company_name} services"
         elif not data.get('improvement_feedback'):
-            return "Ask what Archelo Group could do better or improve"
+            return f"Ask what {company_name} could do better or improve"
         else:
             return "Wrap up the conversation - you have enough information"
     
     def _generate_ai_question(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
-        """Generate next question using OpenAI"""
+        """Generate next question using OpenAI with dynamic prompts"""
         try:
             # Format conversation history for context
             history_text = self._format_conversation_history()
             
-            prompt = f"""You are conducting a customer feedback survey about Archelo Group (the supplier company). Focus on Archelo Group's service delivery, support quality, and business relationship aspects.
-
-CONVERSATION HISTORY:
-{history_text}
+            # Generate dynamic system prompt using template service
+            system_prompt = self.template_service.generate_system_prompt(
+                extracted_data=self.extracted_data,
+                step_count=self.step_count,
+                conversation_history=history_text
+            )
+            
+            # Add customer's latest response and next question priority to the prompt
+            full_prompt = f"""{system_prompt}
 
 CUSTOMER'S LATEST RESPONSE: "{user_input}"
 
-SURVEY DATA COLLECTED SO FAR:
-{json.dumps(self.extracted_data, indent=2)}
-
-CONVERSATION STEP: {self.step_count}
-
 NEXT LOGICAL QUESTION PRIORITY:
 {self._get_next_question_priority()}
-
-YOUR ROLE: You are a helpful customer feedback specialist having a natural conversation. Your goal is to collect feedback about Archelo Group:
-1. Business relationship tenure - How long working with Archelo Group
-2. NPS score (0-10) - How likely to recommend Archelo Group
-3. Reason for their NPS score about Archelo Group
-4. Satisfaction level (1-5) - Overall satisfaction with Archelo Group
-5. Professional services quality rating (1-5) - Quality of Archelo Group's professional services
-6. Product value rating (1-5) - Value and quality of Archelo Group's products/solutions
-7. Pricing appreciation rating (1-5) - How they feel about Archelo Group's pricing value
-8. Support services rating (1-5) - Quality of Archelo Group's support and customer service
-9. Improvement suggestions - What could Archelo Group do better
-10. Additional feedback - Any other comments about Archelo Group
-
-GUIDELINES:
-- Keep the conversation natural and engaging
-- Ask ONE question at a time
-- CRITICALLY IMPORTANT: DON'T ask for information you already have (check SURVEY DATA COLLECTED SO FAR)
-- ALREADY COLLECTED DATA CHECK: Before asking ANY question, verify the field is NULL in SURVEY DATA COLLECTED SO FAR
-- If tenure_with_fc has a value, NEVER ask about tenure again
-- If service_rating has a value, NEVER ask about professional services again
-- If satisfaction_rating has a value, NEVER ask about satisfaction again
-- If pricing_rating has a value, NEVER ask about pricing again
-- If product_value_rating has a value, NEVER ask about product value again
-- Look at what you have already collected and ask for what's missing logically
-- If you have NPS score but no reasoning, ask WHY they gave that score
-- If you have tenure but no satisfaction rating, ask about satisfaction
-- Reference their previous responses to show you're listening
-- If they mention specific issues, ask thoughtful follow-ups
-- If they seem rushed, be more direct
-- If they're chatty, engage with their details
-- Move through the survey logically: tenure → NPS → reasoning → ratings → improvements
-- End gracefully when you have enough information (usually 4-6 exchanges)
 
 RESPONSE FORMAT - Return JSON:
 {{
@@ -511,7 +495,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
 
             response = self.openai_client.chat.completions.create(
                 model="gpt-4o",
-                messages=[{"role": "user", "content": prompt}],
+                messages=[{"role": "user", "content": full_prompt}],
                 response_format={"type": "json_object"},
                 max_tokens=300,
                 temperature=0.8
@@ -552,7 +536,8 @@ Be conversational, empathetic, and adaptive to their communication style."""
     def _generate_fallback_question(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
         """Fixed progression logic based on step count and missing data"""
         extracted = self.extracted_data
-        company_name = context.get('company_name', 'our service')
+        # Get dynamic company name from template service instead of hardcoded values
+        company_name = self.template_service.get_company_name()
         
         print(f"Fallback generation - Step: {self.step_count}, Extracted: {extracted}")
         print(f"Current extracted data: {self.extracted_data}")
@@ -567,7 +552,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
             score = self.extracted_data['nps_score']
             if score >= 9:
                 return {
-                    'message': f"Wonderful! A {score} is fantastic. What specifically about Archelo Group made your experience so great?",
+                    'message': f"Wonderful! A {score} is fantastic. What specifically about {company_name} made your experience so great?",
                     'message_type': 'ai_question',
                     'step': 'nps_reasoning',
                     'progress': 40,
@@ -575,7 +560,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 }
             elif score >= 7:
                 return {
-                    'message': f"Thanks for the {score}! What would it take to make you even more likely to recommend Archelo Group?",
+                    'message': f"Thanks for the {score}! What would it take to make you even more likely to recommend {company_name}?",
                     'message_type': 'ai_question',
                     'step': 'nps_reasoning',
                     'progress': 40,
@@ -583,7 +568,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 }
             else:
                 return {
-                    'message': f"I appreciate your honesty with the {score}. What are the main issues that are holding you back from recommending Archelo Group?",
+                    'message': f"I appreciate your honesty with the {score}. What are the main issues that are holding you back from recommending {company_name}?",
                     'message_type': 'ai_question',
                     'step': 'nps_reasoning',
                     'progress': 40,
@@ -592,10 +577,10 @@ Be conversational, empathetic, and adaptive to their communication style."""
         
         # Use step-based progression but check if we already have tenure data
         if self.step_count == 1:
-            # First question: Ask for tenure with Archelo Group ONLY if we don't have it
+            # First question: Ask for tenure with {company_name} ONLY if we don't have it
             if self.extracted_data.get('tenure_with_fc') is None:
                 return {
-                    'message': "How long have you been working with Archelo Group? Please choose from: Less than 6 months, 6 months - 1 year, 1-2 years, 2-3 years, 3-5 years, 5-10 years, or More than 10 years.",
+                    'message': "How long have you been working with {company_name}? Please choose from: Less than 6 months, 6 months - 1 year, 1-2 years, 2-3 years, 3-5 years, 5-10 years, or More than 10 years.",
                     'message_type': 'ai_question',
                     'step': 'tenure_collection',
                     'progress': 15,
@@ -605,7 +590,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 # We already have tenure, skip to NPS question
                 # Don't manipulate step count - let natural progression continue
                 return {
-                    'message': "On a scale of 0-10, how likely are you to recommend Archelo Group to a friend or colleague?",
+                    'message': "On a scale of 0-10, how likely are you to recommend {company_name} to a friend or colleague?",
                     'message_type': 'ai_question',
                     'step': 'nps_collection',
                     'progress': 25,
@@ -613,10 +598,10 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 }
 
         if self.step_count == 2:
-            # Second question: Ask for NPS about Archelo Group (the supplier) ONLY if we don't have it
+            # Second question: Ask for NPS about {company_name} (the supplier) ONLY if we don't have it
             if self.extracted_data.get('nps_score') is None:
                 return {
-                    'message': "On a scale of 0-10, how likely are you to recommend Archelo Group to a friend or colleague?",
+                    'message': "On a scale of 0-10, how likely are you to recommend {company_name} to a friend or colleague?",
                     'message_type': 'ai_question',
                     'step': 'nps_collection',
                     'progress': 25,
@@ -633,7 +618,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 score = extracted.get('nps_score') or self.extracted_data.get('nps_score')
                 if score is not None and score >= 9:
                     return {
-                        'message': f"Wonderful! A {score} is fantastic. What specifically about Archelo Group made your experience so great?",
+                        'message': f"Wonderful! A {score} is fantastic. What specifically about {company_name} made your experience so great?",
                         'message_type': 'ai_question',
                         'step': 'nps_reasoning',
                         'progress': 40,
@@ -641,7 +626,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                     }
                 elif score is not None and score >= 7:
                     return {
-                        'message': f"Thanks for the {score}! What would it take to make you even more likely to recommend Archelo Group?",
+                        'message': f"Thanks for the {score}! What would it take to make you even more likely to recommend {company_name}?",
                         'message_type': 'ai_question',
                         'step': 'nps_reasoning',
                         'progress': 40,
@@ -649,7 +634,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                     }
                 else:
                     return {
-                        'message': f"I appreciate your honesty with the {score}. What are the main issues that are holding you back from recommending Archelo Group?",
+                        'message': f"I appreciate your honesty with the {score}. What are the main issues that are holding you back from recommending {company_name}?",
                         'message_type': 'ai_question',
                         'step': 'nps_reasoning',
                         'progress': 40,
@@ -660,7 +645,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 # This response is the user's answer to the NPS reasoning question
                 # Move to satisfaction question
                 return {
-                    'message': "How would you describe your overall satisfaction with Archelo Group's service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
+                    'message': "How would you describe your overall satisfaction with {company_name}'s service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
                     'message_type': 'ai_question',
                     'step': 'satisfaction',
                     'progress': 40,
@@ -670,7 +655,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
         elif self.step_count == 4:
             # Fourth question: Overall satisfaction rating
             return {
-                'message': "How would you describe your overall satisfaction with Archelo Group's service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
+                'message': "How would you describe your overall satisfaction with {company_name}'s service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
                 'message_type': 'ai_question',
                 'step': 'satisfaction',
                 'progress': 45,
@@ -680,7 +665,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
         elif self.step_count == 5:
             # Fifth question: Professional services quality rating
             return {
-                'message': "How would you rate the quality of Archelo Group's professional services? Excellent, good, average, poor, or very poor?",
+                'message': "How would you rate the quality of {company_name}'s professional services? Excellent, good, average, poor, or very poor?",
                 'message_type': 'ai_question',
                 'step': 'service_quality',
                 'progress': 50,
@@ -690,7 +675,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
         elif self.step_count == 6:
             # Sixth question: Product value rating
             return {
-                'message': "How would you rate the value and quality of Archelo Group's products or solutions? Excellent, good, average, poor, or very poor?",
+                'message': "How would you rate the value and quality of {company_name}'s products or solutions? Excellent, good, average, poor, or very poor?",
                 'message_type': 'ai_question',
                 'step': 'product_value',
                 'progress': 55,
@@ -700,7 +685,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
         elif self.step_count == 7:
             # Seventh question: Pricing appreciation rating
             return {
-                'message': "How do you feel about Archelo Group's pricing? Do you find it excellent value, good value, fair, expensive, or very expensive?",
+                'message': "How do you feel about {company_name}'s pricing? Do you find it excellent value, good value, fair, expensive, or very expensive?",
                 'message_type': 'ai_question',
                 'step': 'pricing_value',
                 'progress': 65,
@@ -710,7 +695,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
         elif self.step_count == 8:
             # Eighth question: Support services rating
             return {
-                'message': "How would you rate Archelo Group's support and customer service? Excellent, good, average, poor, or very poor?",
+                'message': "How would you rate {company_name}'s support and customer service? Excellent, good, average, poor, or very poor?",
                 'message_type': 'ai_question',
                 'step': 'support_quality',
                 'progress': 75,
@@ -721,7 +706,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
             # Ninth question: Improvement suggestions
             if extracted.get('nps_score', 0) < 7:
                 return {
-                    'message': "What specific changes would make the biggest difference in improving your experience with Archelo Group?",
+                    'message': "What specific changes would make the biggest difference in improving your experience with {company_name}?",
                     'message_type': 'ai_question',
                     'step': 'improvement',
                     'progress': 85,
@@ -729,7 +714,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 }
             else:
                 return {
-                    'message': "Is there anything Archelo Group could do even better to enhance your experience?",
+                    'message': "Is there anything {company_name} could do even better to enhance your experience?",
                     'message_type': 'ai_question',
                     'step': 'improvement',
                     'progress': 85,
@@ -739,7 +724,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
         # Step 10 or higher: Complete the survey
         else:
             return {
-                'message': "Thank you so much for sharing your valuable feedback about Archelo Group! Your insights help improve their service for everyone.",
+                'message': "Thank you so much for sharing your valuable feedback about {company_name}! Your insights help improve their service for everyone.",
                 'message_type': 'conclusion',
                 'step': 'conclusion',
                 'progress': 100,
@@ -853,10 +838,10 @@ Be conversational, empathetic, and adaptive to their communication style."""
 # Global instances for session persistence
 ai_conversation_instances = {}
 
-def start_ai_conversational_survey(company_name: str, respondent_name: str, tenure_with_fc=None) -> Dict[str, Any]:
+def start_ai_conversational_survey(company_name: str, respondent_name: str, tenure_with_fc=None, business_account_id: Optional[int] = None) -> Dict[str, Any]:
     """Start a new AI-powered conversational survey session"""
     conversation_id = str(uuid.uuid4())
-    ai_survey = AIConversationalSurvey()
+    ai_survey = AIConversationalSurvey(business_account_id=business_account_id)
     
     # If tenure data is provided from the form, pre-populate it
     if tenure_with_fc:
@@ -888,7 +873,8 @@ def process_ai_conversation_response(user_input: str, context: Dict[str, Any]) -
         print(f"AVAILABLE INSTANCES: {ai_conversation_instances}")
         
         # RECOVERY: Recreate the conversation instance from context data
-        ai_survey = AIConversationalSurvey()
+        business_account_id = context.get('business_account_id')
+        ai_survey = AIConversationalSurvey(business_account_id=business_account_id)
         
         # Restore survey data from context
         company_name = context.get('company_name', '')
