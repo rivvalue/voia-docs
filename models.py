@@ -462,6 +462,21 @@ class BusinessAccount(db.Model):
             'license_expires_at': self.license_expires_at.isoformat() if self.license_expires_at else None,
             'current_users_count': self.current_users_count,  # Use dynamic property instead of static counter
             'license_status': self.license_status,
+            # Survey Customization Fields
+            'industry': self.industry,
+            'company_description': self.company_description,
+            'product_description': self.product_description,
+            'target_clients_description': self.target_clients_description,
+            'conversation_tone': self.conversation_tone,
+            'survey_goals': self.survey_goals,
+            'max_questions': self.max_questions,
+            'max_duration_seconds': self.max_duration_seconds,
+            'max_follow_ups_per_topic': self.max_follow_ups_per_topic,
+            'prioritized_topics': self.prioritized_topics,
+            'optional_topics': self.optional_topics,
+            'custom_end_message': self.custom_end_message,
+            'custom_system_prompt': self.custom_system_prompt,
+            'prompt_template_version': self.prompt_template_version,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
