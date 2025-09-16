@@ -425,6 +425,27 @@ class BusinessAccount(db.Model):
     license_expires_at = db.Column(db.DateTime, nullable=True, index=True)  # License expiration date
     license_status = db.Column(db.String(20), nullable=False, default='trial', index=True)  # trial, active, expired
     
+    # Survey Customization Fields (Phase 1: VOÏA Customizable Implementation)
+    # Company Profile for Survey Customization
+    industry = db.Column(db.String(100), nullable=True, index=True)  # Healthcare, SaaS, Retail, etc.
+    company_description = db.Column(db.Text, nullable=True)  # "We provide cloud-based accounting solutions..."
+    product_description = db.Column(db.Text, nullable=True)  # "Our flagship product ArcheloFlow helps..."
+    target_clients_description = db.Column(db.Text, nullable=True)  # "Small business owners, CFOs..."
+    conversation_tone = db.Column(db.String(50), nullable=True, default='professional')  # professional, warm, casual, formal
+    survey_goals = db.Column(db.JSON, nullable=True)  # ["NPS", "Product", "Support", "Pricing"]
+    
+    # Survey Control Parameters
+    max_questions = db.Column(db.Integer, nullable=True, default=8)  # Absolute hard stop (3-15 range)
+    max_duration_seconds = db.Column(db.Integer, nullable=True, default=120)  # Time limit (60-300 range)
+    max_follow_ups_per_topic = db.Column(db.Integer, nullable=True, default=2)  # Topic depth control (1-3 range)
+    prioritized_topics = db.Column(db.JSON, nullable=True)  # ["NPS", "Product Quality", "Support Experience"]
+    optional_topics = db.Column(db.JSON, nullable=True)  # ["Pricing Value"] - skip if time runs out
+    custom_end_message = db.Column(db.Text, nullable=True)  # Custom completion message
+    
+    # Advanced Customization (for power users)
+    custom_system_prompt = db.Column(db.Text, nullable=True)  # Override default template entirely
+    prompt_template_version = db.Column(db.String(10), nullable=True, default='v1.0')  # Track template versions
+    
     # Metadata
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
