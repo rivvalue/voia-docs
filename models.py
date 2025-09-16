@@ -197,6 +197,12 @@ class Campaign(db.Model):
             return 0
         return (self.start_date - today).days
     
+    @property
+    def participants_count(self):
+        """Get current count of participants for this campaign"""
+        from models import CampaignParticipant  # Import here to avoid circular imports
+        return CampaignParticipant.query.filter_by(campaign_id=self.id).count()
+    
     def close_campaign(self):
         """Mark campaign as completed and generate KPI snapshot"""
         import logging
@@ -414,6 +420,10 @@ class BusinessAccount(db.Model):
     # Account status
     status = db.Column(db.String(20), nullable=False, default='active', index=True)  # active, suspended, trial
     
+    # License management fields
+    license_expires_at = db.Column(db.DateTime, nullable=True, index=True)  # License expiration date
+    license_status = db.Column(db.String(20), nullable=False, default='trial', index=True)  # trial, active, expired
+    
     # Metadata
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -426,6 +436,9 @@ class BusinessAccount(db.Model):
             'contact_email': self.contact_email,
             'contact_name': self.contact_name,
             'status': self.status,
+            'license_expires_at': self.license_expires_at.isoformat() if self.license_expires_at else None,
+            'current_users_count': self.current_users_count,  # Use dynamic property instead of static counter
+            'license_status': self.license_status,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
@@ -437,6 +450,46 @@ class BusinessAccount(db.Model):
     def has_email_configuration(self):
         """Check if business account has email configuration set up"""
         return self.get_email_configuration() is not None
+    
+    @property
+    def current_users_count(self):
+        """Get current count of active users for this business account"""
+        from models import BusinessAccountUser  # Import here to avoid circular imports
+        return BusinessAccountUser.query.filter_by(
+            business_account_id=self.id,
+            is_active=True
+        ).count()
+    
+    def can_activate_campaign(self):
+        """Check if business account can activate another campaign (limit: 4 per year)"""
+        from datetime import date
+        
+        # Get current calendar year boundaries
+        current_year = date.today().year
+        year_start = date(current_year, 1, 1)
+        year_end = date(current_year, 12, 31)
+        
+        # Count ALL campaigns that started in current calendar year (regardless of status)
+        campaigns_this_year = Campaign.query.filter(
+            Campaign.business_account_id == self.id,
+            Campaign.start_date >= year_start,
+            Campaign.start_date <= year_end
+        ).count()
+        
+        return campaigns_this_year < 4
+    
+    def can_add_user(self):
+        """Check if business account can add another user (limit: 5 users)"""
+        return self.current_users_count < 5
+    
+    def can_add_participants(self, campaign_id, additional_count):
+        """Check if campaign can add more participants (limit: 500 per campaign)"""
+        from models import CampaignParticipant  # Import here to avoid circular imports
+        current_count = CampaignParticipant.query.filter_by(
+            campaign_id=campaign_id,
+            business_account_id=self.id
+        ).count()
+        return (current_count + additional_count) <= 500
 
 
 class EmailConfiguration(db.Model):

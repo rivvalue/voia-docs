@@ -303,8 +303,26 @@ def activate_campaign(campaign_id):
             flash(f'Cannot activate campaign past end date ({campaign.end_date}). Please update the campaign dates.', 'error')
             return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
+        # Check license limits before activation
+        if not current_account.can_activate_campaign():
+            # Get current campaigns count for error message (matching the business logic)
+            from datetime import date
+            current_year = date.today().year
+            year_start = date(current_year, 1, 1)
+            year_end = date(current_year, 12, 31)
+            campaigns_this_year = Campaign.query.filter(
+                Campaign.business_account_id == current_account.id,
+                Campaign.start_date >= year_start,
+                Campaign.start_date <= year_end
+            ).count()
+            
+            flash(f'Cannot activate campaign. Your account has reached the maximum limit of {campaigns_this_year}/4 campaigns per calendar year. Please contact support to upgrade your license.', 'error')
+            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
         # Activate campaign
         campaign.status = 'active'
+        
+        # Note: License tracking now uses time-scoped counting via can_activate_campaign() method
         
         # Get all campaign-participant associations for token generation
         campaign_participants = CampaignParticipant.query.filter_by(
