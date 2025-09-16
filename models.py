@@ -421,6 +421,7 @@ class BusinessAccount(db.Model):
     status = db.Column(db.String(20), nullable=False, default='active', index=True)  # active, suspended, trial
     
     # License management fields
+    license_activated_at = db.Column(db.DateTime, nullable=True, index=True)  # License activation date (start of license period)
     license_expires_at = db.Column(db.DateTime, nullable=True, index=True)  # License expiration date
     license_status = db.Column(db.String(20), nullable=False, default='trial', index=True)  # trial, active, expired
     
@@ -436,6 +437,7 @@ class BusinessAccount(db.Model):
             'contact_email': self.contact_email,
             'contact_name': self.contact_name,
             'status': self.status,
+            'license_activated_at': self.license_activated_at.isoformat() if self.license_activated_at else None,
             'license_expires_at': self.license_expires_at.isoformat() if self.license_expires_at else None,
             'current_users_count': self.current_users_count,  # Use dynamic property instead of static counter
             'license_status': self.license_status,
@@ -460,23 +462,75 @@ class BusinessAccount(db.Model):
             is_active=True
         ).count()
     
+    def get_license_period(self, reference_date=None):
+        """Calculate license period boundaries based on activation date
+        
+        Args:
+            reference_date: Date to check (defaults to today)
+            
+        Returns:
+            tuple: (period_start_date, period_end_date) or (None, None) if no valid license
+        """
+        from datetime import date, timedelta
+        
+        if reference_date is None:
+            reference_date = date.today()
+        
+        # If no license_activated_at, try to infer from license_expires_at
+        if not self.license_activated_at and self.license_expires_at:
+            # Infer activation as 1 year prior to expiration
+            expires_date = self.license_expires_at.date() if hasattr(self.license_expires_at, 'date') else self.license_expires_at
+            try:
+                # Try to subtract exactly 1 year, handling leap year edge cases
+                inferred_activation = expires_date.replace(year=expires_date.year - 1)
+            except ValueError:
+                # Handle Feb 29 leap year case - move to Feb 28
+                inferred_activation = expires_date.replace(year=expires_date.year - 1, day=28)
+            
+            return inferred_activation, expires_date
+        
+        # If we have license_activated_at, use it
+        if self.license_activated_at:
+            activation_date = self.license_activated_at.date() if hasattr(self.license_activated_at, 'date') else self.license_activated_at
+            
+            if self.license_expires_at:
+                expires_date = self.license_expires_at.date() if hasattr(self.license_expires_at, 'date') else self.license_expires_at
+                return activation_date, expires_date
+            else:
+                # If no expiration set, assume 1 year license
+                try:
+                    expires_date = activation_date.replace(year=activation_date.year + 1)
+                except ValueError:
+                    # Handle Feb 29 leap year case
+                    expires_date = activation_date.replace(year=activation_date.year + 1, day=28)
+                return activation_date, expires_date
+        
+        # No valid license period can be determined
+        return None, None
+    
     def can_activate_campaign(self):
-        """Check if business account can activate another campaign (limit: 4 per year)"""
+        """Check if business account can activate another campaign (limit: 4 per license period)"""
         from datetime import date
         
-        # Get current calendar year boundaries
-        current_year = date.today().year
-        year_start = date(current_year, 1, 1)
-        year_end = date(current_year, 12, 31)
+        # Get current license period boundaries
+        period_start, period_end = self.get_license_period()
         
-        # Count ALL campaigns that started in current calendar year (regardless of status)
-        campaigns_this_year = Campaign.query.filter(
+        # If no valid license period, default to trial behavior (allow campaigns)
+        if not period_start or not period_end:
+            # For trial accounts or accounts without proper license setup,
+            # we'll be more permissive and use calendar year as fallback
+            current_year = date.today().year
+            period_start = date(current_year, 1, 1)
+            period_end = date(current_year, 12, 31)
+        
+        # Count ALL campaigns that started in current license period (regardless of status)
+        campaigns_this_period = Campaign.query.filter(
             Campaign.business_account_id == self.id,
-            Campaign.start_date >= year_start,
-            Campaign.start_date <= year_end
+            Campaign.start_date >= period_start,
+            Campaign.start_date <= period_end
         ).count()
         
-        return campaigns_this_year < 4
+        return campaigns_this_period < 4
     
     def can_add_user(self):
         """Check if business account can add another user (limit: 5 users)"""
