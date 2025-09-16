@@ -1276,6 +1276,106 @@ def save_brand_config():
         return redirect(url_for('business_auth.brand_config'))
 
 
+@business_auth_bp.route('/admin/license-info')
+@require_business_auth
+def license_info():
+    """Display comprehensive license information for the business account"""
+    from datetime import date, timedelta
+    
+    try:
+        # Get current business account
+        business_account = get_current_business_account()
+        if not business_account:
+            flash('Business account not found.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get license period information
+        license_start, license_end = business_account.get_license_period()
+        
+        # Calculate usage statistics
+        campaigns_used = 0
+        campaigns_limit = 4
+        if license_start and license_end:
+            # Count campaigns in current license period
+            from models import Campaign
+            campaigns_used = Campaign.query.filter(
+                Campaign.business_account_id == business_account.id,
+                Campaign.start_date >= license_start,
+                Campaign.start_date <= license_end
+            ).count()
+        
+        # Calculate days until expiration and days since activation
+        days_until_expiry = None
+        days_since_activation = 0
+        expires_soon = False
+        license_status_display = business_account.license_status.title()
+        
+        # Calculate days since activation if license_start is available
+        if license_start:
+            today = date.today()
+            days_since_activation = (today - license_start).days
+        
+        if license_end:
+            today = date.today()
+            if license_end > today:
+                days_until_expiry = (license_end - today).days
+                expires_soon = days_until_expiry <= 30
+                if expires_soon and business_account.license_status == 'active':
+                    license_status_display = f"Active (Expires in {days_until_expiry} days)"
+            elif license_end < today:
+                license_status_display = "Expired"
+                days_until_expiry = 0
+        
+        # Get user usage statistics with defensive programming
+        users_used = getattr(business_account, 'current_users_count', 0)
+        users_limit = 5
+        
+        # Get active campaign participant count if applicable
+        active_participants = 0
+        active_campaign = None
+        try:
+            from models import Campaign, CampaignParticipant
+            active_campaign = Campaign.query.filter(
+                Campaign.business_account_id == business_account.id,
+                Campaign.status == 'active'
+            ).first()
+            
+            if active_campaign:
+                active_participants = CampaignParticipant.query.filter_by(
+                    campaign_id=active_campaign.id
+                ).count()
+        except Exception as e:
+            logger.warning(f"Could not fetch active campaign participants: {e}")
+        
+        # Prepare template context with defensive programming for optional methods
+        license_data = {
+            'business_account': business_account,
+            'license_start': license_start,
+            'license_end': license_end,
+            'license_status': license_status_display,
+            'expires_soon': expires_soon,
+            'days_until_expiry': days_until_expiry,
+            'days_since_activation': days_since_activation,
+            'campaigns_used': campaigns_used,
+            'campaigns_limit': campaigns_limit,
+            'campaigns_remaining': max(0, campaigns_limit - campaigns_used),
+            'users_used': users_used,
+            'users_limit': users_limit,
+            'users_remaining': max(0, users_limit - users_used),
+            'active_campaign': active_campaign,
+            'active_participants': active_participants,
+            'can_activate_campaign': getattr(business_account, 'can_activate_campaign', lambda: True)() if hasattr(business_account, 'can_activate_campaign') else True,
+            'can_add_user': getattr(business_account, 'can_add_user', lambda: True)() if hasattr(business_account, 'can_add_user') else True
+        }
+        
+        return render_template('business_auth/license_info.html', **license_data)
+        
+    except Exception as e:
+        logger.error(f"License info page error: {e}")
+        flash('Failed to load license information. Please try again.', 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+
 def _process_logo_upload(logo_file, business_account_id, old_logo_filename=None):
     """
     Process and validate logo upload with secure handling and image resizing

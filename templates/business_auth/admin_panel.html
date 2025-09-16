@@ -406,6 +406,9 @@
                 </div>
                 <div class="col-md-4">
                     <div class="admin-actions">
+                        <a href="{{ url_for('business_auth.license_info') }}" class="btn btn-outline-primary btn-admin me-2" title="View license information and usage statistics">
+                            <i class="fas fa-certificate me-2"></i>License Info
+                        </a>
                         <a href="{{ url_for('business_auth.audit_logs') }}" class="btn btn-outline-primary btn-admin me-2" title="View account activity trail">
                             <i class="fas fa-clipboard-list me-2"></i>Audit Trail
                         </a>
