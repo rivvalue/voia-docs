@@ -1042,6 +1042,9 @@ def dashboard_data():
 def survey_responses():
     """API endpoint for survey responses with pagination"""
     try:
+        # Import models to avoid circular imports
+        from models import SurveyResponse
+        
         page = request.args.get('page', 1, type=int)
         per_page = min(request.args.get('per_page', 10, type=int), 100)  # Max 100 per page
         
@@ -1805,6 +1808,9 @@ def get_campaign_filter_options():
 def get_campaign_comparison():
     """Get comparison data between two campaigns (secure business user authentication)"""
     try:
+        # Import models to avoid circular imports
+        from models import Campaign
+        
         campaign1_id = request.args.get('campaign1', type=int)
         campaign2_id = request.args.get('campaign2', type=int)
         
