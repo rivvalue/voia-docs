@@ -57,6 +57,46 @@ Key architectural decisions include:
 
 **Current Status**: ✅ Full scheduler monitoring capabilities with dedicated UI showing running status, last execution time, campaign statistics, and manual trigger functionality.
 
+## License Management System Implementation (September 2025)
+**Project Goal**: Development of enterprise-ready license management system with usage tracking and enforcement for multi-tenant business accounts.
+
+**Critical Business Logic Fix**: Anniversary-Based License Calculation
+- **Issue**: License year calculation was using calendar year (January-December), shortchanging customers who purchased licenses mid-year
+- **Solution**: Implemented anniversary-based licensing from activation date to expiration date
+- **Impact**: Customers now receive full 12-month license value regardless of purchase timing
+- **Technical Implementation**: Added `license_activated_at` field and `get_license_period()` method for proper license window calculations
+
+**System Components Implemented**: ✅
+1. **Database Foundation**:
+   - Added license fields to BusinessAccount model: `license_expires_at`, `license_activated_at`, `license_status`
+   - Proper database migration with edge case handling (leap years, different month lengths)
+
+2. **Usage Tracking & Enforcement**:
+   - Campaign activation limits: 4 per license period (anniversary-based)
+   - User count limits: 5 users per business account
+   - Participant limits: 500 per campaign
+   - Dynamic property-based counting to avoid drift and consistency issues
+
+3. **License Validation Integration**:
+   - Campaign activation enforcement (not creation) with user-friendly error messages
+   - User invitation limits with clear feedback
+   - Participant addition validation with proper error handling
+   - License period boundary checking with date arithmetic
+
+4. **Anniversary-Based Period Calculation**:
+   - Primary logic: Uses license_activated_at to license_expires_at as license window
+   - Legacy account support: Infers activation date for accounts with only expiration dates
+   - Trial account fallback: Uses calendar year behavior when no license dates set
+   - Comprehensive edge case handling including leap year scenarios
+
+**Current Status**: ✅ Production-ready license management foundation with anniversary-based calculation
+- License enforcement operational for campaign activation, user limits, and participants
+- Comprehensive testing suite covering all edge cases and boundary scenarios
+- Database migration completed with existing data preservation
+- User-friendly error messaging when license limits are reached
+
+**Next Phase**: Business license information page for account holders to view their license status, usage counters, and remaining quotas.
+
 # External Dependencies
 - **OpenAI API**: For advanced AI functionalities including sentiment analysis, theme extraction, and the conversational survey system (VOÏA).
 - **Bootstrap CDN**: For responsive UI components and styling.
