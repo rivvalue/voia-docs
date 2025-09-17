@@ -75,6 +75,14 @@ def create_campaign():
             return render_template('campaigns/create.html',
                                  business_account=current_account.to_dict())
         
+        # Check license limits before creation
+        from license_service import LicenseService
+        if not LicenseService.can_activate_campaign(current_account.id):
+            license_info = LicenseService.get_license_info(current_account.id)
+            flash(f'Cannot create campaign. Your {license_info["license_type"]} license allows {license_info["campaigns_limit"]} campaigns per year and you have already used {license_info["campaigns_used"]} campaigns. Please contact support to upgrade your license.', 'error')
+            return render_template('campaigns/create.html',
+                                 business_account=current_account.to_dict())
+        
         # Handle form submission
         name = request.form.get('name', '').strip()
         description = request.form.get('description', '').strip()
@@ -308,20 +316,12 @@ def activate_campaign(campaign_id):
             flash(f'Cannot activate campaign past end date ({campaign.end_date}). Please update the campaign dates.', 'error')
             return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
-        # Check license limits before activation
-        if not current_account.can_activate_campaign():
-            # Get current campaigns count for error message (matching the business logic)
-            from datetime import date
-            current_year = date.today().year
-            year_start = date(current_year, 1, 1)
-            year_end = date(current_year, 12, 31)
-            campaigns_this_year = Campaign.query.filter(
-                Campaign.business_account_id == current_account.id,
-                Campaign.start_date >= year_start,
-                Campaign.start_date <= year_end
-            ).count()
-            
-            flash(f'Cannot activate campaign. Your account has reached the maximum limit of {campaigns_this_year}/4 campaigns per calendar year. Please contact support to upgrade your license.', 'error')
+        # Check license limits before activation using new LicenseService
+        from license_service import LicenseService
+        if not LicenseService.can_activate_campaign(current_account.id):
+            # Get license info for detailed error message
+            license_info = LicenseService.get_license_info(current_account.id)
+            flash(f'Cannot activate campaign. Your {license_info["license_type"]} license allows {license_info["campaigns_limit"]} campaigns per license period and you have already used {license_info["campaigns_used"]} campaigns. Please contact support to upgrade your license.', 'error')
             return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
         # Activate campaign

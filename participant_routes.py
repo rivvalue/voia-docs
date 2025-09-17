@@ -84,6 +84,9 @@ def create_participant():
             flash('Business account context not found.', 'error')
             return redirect(url_for('business_auth.login'))
         
+        # Note: License limits are enforced per-campaign when participants are assigned to campaigns
+        # Standalone participant creation doesn't have global limits
+        
         # Extract form data
         email = request.form.get('email', '').strip().lower()
         name = request.form.get('name', '').strip()
@@ -203,11 +206,18 @@ def upload_participants():
             flash(f'CSV file is missing required columns: {missing_text}. Required columns are: email, name, company_name', 'error')
             return redirect(url_for('participants.upload_participants'))
         
+        # Count participants to be uploaded and check license limits
+        participant_rows = list(csv_reader)
+        participant_count = len(participant_rows)
+        
+        # Note: License limits are enforced per-campaign when participants are assigned to campaigns
+        # Standalone participant creation doesn't have global limits
+        
         created_count = 0
         error_count = 0
         errors = []
         
-        for row_num, row in enumerate(csv_reader, start=2):  # Start at 2 for header row
+        for row_num, row in enumerate(participant_rows, start=2):  # Start at 2 for header row
             try:
                 email = row.get('email', '').strip().lower()
                 name = row.get('name', '').strip()
@@ -656,7 +666,7 @@ def send_individual_invitation(participant_id):
             participant_id=participant_id,
             business_account_id=current_account.id
         ).join(Campaign).filter(
-            Campaign.status == 'active'
+            Campaign.status == 'active'  # type: ignore
         ).all()
         
         if not active_campaign_participants:

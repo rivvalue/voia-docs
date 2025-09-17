@@ -546,6 +546,132 @@
         </div>
         {% endif %}
 
+        <!-- License Information Section -->
+        {% if admin_data.license_info %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="admin-section">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="fas fa-certificate"></i>
+                            Current License Status
+                        </h3>
+                        <div>
+                            {% if admin_data.license_info.expires_soon %}
+                            <span class="badge bg-warning text-dark me-2">
+                                <i class="fas fa-exclamation-triangle me-1"></i>Expires Soon
+                            </span>
+                            {% endif %}
+                            <a href="{{ url_for('business_auth.license_info') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-info-circle me-1"></i>View Details
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <!-- License Type & Status -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="stat-card">
+                                <div class="stat-icon 
+                                    {% if admin_data.license_info.license_status == 'active' %}success
+                                    {% elif admin_data.license_info.license_status == 'trial' %}warning
+                                    {% else %}info
+                                    {% endif %}">
+                                    <i class="fas 
+                                        {% if admin_data.license_info.license_status == 'active' %}fa-check-circle
+                                        {% elif admin_data.license_info.license_status == 'trial' %}fa-hourglass-half
+                                        {% else %}fa-certificate
+                                        {% endif %}"></i>
+                                </div>
+                                <h3 class="stat-number">{{ admin_data.license_info.license_type|title }}</h3>
+                                <p class="stat-label">License Type</p>
+                                {% if admin_data.license_info.license_status == 'trial' %}
+                                <small class="text-muted">Trial Mode</small>
+                                {% elif admin_data.license_info.license_end %}
+                                <small class="text-muted">
+                                    {% if admin_data.license_info.days_remaining > 0 %}
+                                        {{ admin_data.license_info.days_remaining }} days remaining
+                                    {% elif admin_data.license_info.days_since_expired > 0 %}
+                                        Expired {{ admin_data.license_info.days_since_expired }} days ago
+                                    {% else %}
+                                        Expires today
+                                    {% endif %}
+                                </small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Campaign Usage -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="stat-card">
+                                <div class="stat-icon 
+                                    {% if admin_data.license_info.campaigns_remaining > 0 %}info
+                                    {% else %}warning
+                                    {% endif %}">
+                                    <i class="fas fa-bullhorn"></i>
+                                </div>
+                                <h3 class="stat-number">{{ admin_data.license_info.campaigns_used }}/{{ admin_data.license_info.campaigns_limit }}</h3>
+                                <p class="stat-label">Campaigns Used</p>
+                                <small class="text-muted">{{ admin_data.license_info.campaigns_remaining }} remaining</small>
+                            </div>
+                        </div>
+                        
+                        <!-- User Usage -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="stat-card">
+                                <div class="stat-icon 
+                                    {% if admin_data.license_info.users_remaining > 0 %}success
+                                    {% else %}warning
+                                    {% endif %}">
+                                    <i class="fas fa-user-friends"></i>
+                                </div>
+                                <h3 class="stat-number">{{ admin_data.license_info.users_used }}/{{ admin_data.license_info.users_limit }}</h3>
+                                <p class="stat-label">Team Members</p>
+                                <small class="text-muted">{{ admin_data.license_info.users_remaining }} remaining</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Participant Limit -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="stat-card">
+                                <div class="stat-icon primary">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <h3 class="stat-number">{{ admin_data.license_info.participants_limit }}</h3>
+                                <p class="stat-label">Max Participants</p>
+                                <small class="text-muted">Per campaign limit</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- License Upgrade Notice -->
+                    {% if admin_data.license_info.license_status == 'trial' or admin_data.license_info.campaigns_remaining <= 1 or admin_data.license_info.users_remaining <= 1 %}
+                    <div class="alert alert-warning mt-3" role="alert">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            <div class="flex-grow-1">
+                                {% if admin_data.license_info.license_status == 'trial' %}
+                                <strong>Trial Account:</strong> You're using a trial version. 
+                                {% elif admin_data.license_info.campaigns_remaining <= 1 %}
+                                <strong>Campaign Limit:</strong> You're approaching your campaign limit. 
+                                {% elif admin_data.license_info.users_remaining <= 1 %}
+                                <strong>User Limit:</strong> You're approaching your team member limit. 
+                                {% endif %}
+                                Consider upgrading for unlimited access to all features.
+                            </div>
+                            {% if current_user.role == 'platform_admin' %}
+                            <a href="{{ url_for('business_auth.admin_licenses') }}" class="btn btn-primary btn-sm ms-2">
+                                <i class="fas fa-arrow-up me-1"></i>Manage Licenses
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         {% if admin_data.account_type == 'demo' %}
         <!-- Demo Account: Rivvalue Campaign Management -->
         <div class="row">

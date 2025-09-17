@@ -374,6 +374,10 @@ def admin_panel():
         user_id = session.get('business_user_id')
         current_business_user = BusinessAccountUser.query.get(user_id)
         
+        # Get license information for this business account
+        from license_service import LicenseService
+        license_info = LicenseService.get_license_info(business_account.id)
+        
         # Admin panel data depends on account type
         if business_account.account_type == 'demo':
             # Rivvalue demo account - show demo campaign management
@@ -480,7 +484,8 @@ def admin_panel():
                         'pending_invitations': pending_invitations
                     }
                 },
-                'email_configured': email_service.is_configured()
+                'email_configured': email_service.is_configured(),
+                'license_info': license_info
             }
         else:
             # Customer account - placeholder for future Phase 3
@@ -491,7 +496,8 @@ def admin_panel():
                     'total_participants': 0,
                     'total_campaigns': 0,
                     'completed_surveys': 0
-                }
+                },
+                'license_info': license_info
             }
         
         return render_template('business_auth/admin_panel.html',
@@ -1451,7 +1457,7 @@ def license_info():
             'active_campaign': active_campaign,
             'active_participants': active_participants,
             'can_activate_campaign': getattr(business_account, 'can_activate_campaign', lambda: True)() if hasattr(business_account, 'can_activate_campaign') else True,
-            'can_add_user': getattr(business_account, 'can_add_user', lambda: True)() if hasattr(business_account, 'can_add_user') else True
+            'can_add_user': LicenseService.can_add_user(business_account.id)
         }
         
         return render_template('business_auth/license_info.html', **license_data)

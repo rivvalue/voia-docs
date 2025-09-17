@@ -640,41 +640,31 @@ class BusinessAccount(db.Model):
         return None, None
     
     def can_activate_campaign(self):
-        """Check if business account can activate another campaign (limit: 4 per license period)"""
-        from datetime import date
+        """Check if business account can activate another campaign (limit: 4 per license period)
         
-        # Get current license period boundaries
-        period_start, period_end = self.get_license_period()
-        
-        # If no valid license period, default to trial behavior (allow campaigns)
-        if not period_start or not period_end:
-            # For trial accounts or accounts without proper license setup,
-            # we'll be more permissive and use calendar year as fallback
-            current_year = date.today().year
-            period_start = date(current_year, 1, 1)
-            period_end = date(current_year, 12, 31)
-        
-        # Count ALL campaigns that started in current license period (regardless of status)
-        campaigns_this_period = Campaign.query.filter(
-            Campaign.business_account_id == self.id,
-            Campaign.start_date >= period_start,
-            Campaign.start_date <= period_end
-        ).count()
-        
-        return campaigns_this_period < 4
+        Legacy method - now uses LicenseService for comprehensive license management.
+        This method is kept for backward compatibility.
+        """
+        from license_service import LicenseService
+        return LicenseService.can_activate_campaign(self.id)
     
     def can_add_user(self):
-        """Check if business account can add another user (limit: 5 users)"""
-        return self.current_users_count < 5
+        """Check if business account can add another user (limit: 5 users)
+        
+        Legacy method - now uses LicenseService for comprehensive license management.
+        This method is kept for backward compatibility.
+        """
+        from license_service import LicenseService
+        return LicenseService.can_add_user(self.id)
     
     def can_add_participants(self, campaign_id, additional_count):
-        """Check if campaign can add more participants (limit: 500 per campaign)"""
-        from models import CampaignParticipant  # Import here to avoid circular imports
-        current_count = CampaignParticipant.query.filter_by(
-            campaign_id=campaign_id,
-            business_account_id=self.id
-        ).count()
-        return (current_count + additional_count) <= 500
+        """Check if campaign can add more participants (limit: 500 per campaign)
+        
+        Legacy method - now uses LicenseService for comprehensive license management.
+        This method is kept for backward compatibility.
+        """
+        from license_service import LicenseService
+        return LicenseService.can_add_participants(self.id, campaign_id, additional_count)
 
 
 class EmailConfiguration(db.Model):
