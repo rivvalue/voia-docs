@@ -429,7 +429,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         
         # Progressive completion thresholds - prioritize complete data collection
         # Only complete early if we have all required data, otherwise allow more steps
-        force_complete = self.step_count >= 12  # Allow more steps for complete rating collection
+        force_complete = self.step_count >= self.template_service.get_max_questions()  # Use campaign/business account max_questions setting
         
         # CRITICAL FIX: Don't complete until we have all ratings OR force completion
         completion_ready = has_sufficient_data or force_complete
