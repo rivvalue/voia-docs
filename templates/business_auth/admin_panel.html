@@ -418,7 +418,7 @@
                         <a href="{{ url_for('business_auth.brand_config') }}" class="btn btn-primary btn-admin me-2" title="Configure brand settings">
                             <i class="fas fa-paint-brush me-2"></i>Brand Settings
                         </a>
-                        {% if business_account.account_type == 'customer' %}
+                        {% if business_account.account_type in ['customer', 'demo'] %}
                         <a href="{{ url_for('business_auth.survey_config') }}" class="btn btn-primary btn-admin me-2" title="Customize survey experience and conversation settings">
                             <i class="fas fa-cog me-2"></i>Survey Customization
                         </a>
