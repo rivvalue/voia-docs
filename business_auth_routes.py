@@ -5,10 +5,11 @@ Provides login/logout routes for business account users without affecting public
 
 from flask import Blueprint, request, render_template, redirect, url_for, session, flash, jsonify
 from werkzeug.security import check_password_hash
-from models import BusinessAccountUser, UserSession, BusinessAccount, EmailConfiguration, db
+from models import BusinessAccountUser, UserSession, BusinessAccount, EmailConfiguration, LicenseHistory, db
 from rate_limiter import rate_limit
+from license_service import LicenseService
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import json
 import re
 
@@ -116,6 +117,91 @@ def require_permission(permission):
             return f(*args, **kwargs)
         return decorated_function
     return decorator
+
+
+def require_platform_admin(f):
+    """Decorator to require platform administrator permissions for cross-tenant operations"""
+    from functools import wraps
+    
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # First ensure business auth
+        business_user_id = session.get('business_user_id')
+        if not business_user_id:
+            if request.is_json:
+                return jsonify({'error': 'Authentication required'}), 401
+            flash('Please log in to access this page.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        current_account = get_current_business_account()
+        if not current_account:
+            if request.is_json:
+                return jsonify({'error': 'Invalid session'}), 401
+            flash('Please log in to access this page.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Check account status
+        if current_account.status in ['suspended', 'inactive', 'closed']:
+            if request.is_json:
+                return jsonify({'error': 'Account access blocked'}), 403
+            flash('Account access blocked. Please contact support.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get current user and check for platform admin permissions
+        current_user = BusinessAccountUser.query.get(business_user_id)
+        if not current_user:
+            if request.is_json:
+                return jsonify({'error': 'User not found'}), 401
+            flash('User session invalid. Please log in again.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Platform admin check - only allow users with platform_admin role or specific admin emails
+        if not current_user.is_platform_admin():
+            logger.warning(f"Platform admin access denied for user {current_user.email} from IP {request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', 'unknown'))[:45]}")
+            if request.is_json:
+                return jsonify({'error': 'Platform administrator access required'}), 403
+            flash('Platform administrator access required. This action requires cross-tenant permissions.', 'error')
+            return redirect(url_for('business_auth.admin_panel'))
+        
+        logger.info(f"Platform admin access granted to {current_user.email} for {request.endpoint}")
+        return f(*args, **kwargs)
+    
+    return decorated_function
+
+
+def validate_business_account_access(business_id, allow_platform_admin=False):
+    """Validate that current user can access the specified business account"""
+    try:
+        business_id = int(business_id)
+    except (ValueError, TypeError):
+        return False, None, "Invalid business account ID"
+    
+    # Get target business account
+    target_account = BusinessAccount.query.get(business_id)
+    if not target_account:
+        return False, None, "Business account not found"
+    
+    # Get current user and account context
+    current_user_id = session.get('business_user_id')
+    current_account_id = session.get('business_account_id')
+    
+    if not current_user_id or not current_account_id:
+        return False, None, "Authentication required"
+    
+    current_user = BusinessAccountUser.query.get(current_user_id)
+    if not current_user:
+        return False, None, "User not found"
+    
+    # Platform admins can access any business account
+    if allow_platform_admin and current_user.is_platform_admin():
+        return True, target_account, "Platform admin access"
+    
+    # Regular users can only access their own business account
+    if current_account_id != business_id:
+        logger.warning(f"Cross-tenant access attempt: User {current_user.email} (account {current_account_id}) tried to access account {business_id}")
+        return False, None, "Access denied - cannot access other business accounts"
+    
+    return True, target_account, "Same tenant access"
 
 
 @business_auth_bp.route('/login', methods=['GET', 'POST'])
@@ -1665,3 +1751,486 @@ def save_survey_config():
         db.session.rollback()
         flash('Failed to save survey configuration. Please try again.', 'error')
         return redirect(url_for('business_auth.survey_config'))
+
+
+# ==== LICENSE MANAGEMENT ROUTES ====
+
+@business_auth_bp.route('/admin/licenses/')
+@require_platform_admin
+def admin_licenses():
+    """List all business accounts with current license status (Platform Admin Only)"""
+    try:
+        # Get all business accounts with license information
+        business_accounts = BusinessAccount.query.order_by(BusinessAccount.name).all()
+        
+        licenses_data = []
+        for account in business_accounts:
+            try:
+                # Get current license information using LicenseService
+                current_license = LicenseService.get_current_license(account.id)
+                license_info = LicenseService.get_license_info(account.id)
+                
+                # Get usage statistics
+                campaigns_used = LicenseService.get_campaigns_used_in_current_period(account.id)
+                users_count = getattr(account, 'current_users_count', 0)
+                
+                account_data = {
+                    'id': account.id,
+                    'name': account.name,
+                    'account_type': account.account_type,
+                    'status': account.status,
+                    'current_license': current_license,
+                    'license_type': license_info.get('license_type', 'trial'),
+                    'license_status': license_info.get('license_status', 'trial'),
+                    'license_start': license_info.get('license_start'),
+                    'license_end': license_info.get('license_end'),
+                    'campaigns_used': campaigns_used,
+                    'campaigns_limit': license_info.get('campaigns_limit', 4),
+                    'users_count': users_count,
+                    'users_limit': license_info.get('users_limit', 5),
+                    'expires_soon': license_info.get('expires_soon', False),
+                    'days_remaining': license_info.get('days_remaining', 0)
+                }
+                licenses_data.append(account_data)
+                
+            except Exception as e:
+                logger.error(f"Error getting license data for account {account.id}: {e}")
+                # Add account with minimal data even if error
+                account_data = {
+                    'id': account.id,
+                    'name': account.name,
+                    'account_type': account.account_type,
+                    'status': account.status,
+                    'current_license': None,
+                    'license_type': 'unknown',
+                    'license_status': 'error',
+                    'license_start': None,
+                    'license_end': None,
+                    'campaigns_used': 0,
+                    'campaigns_limit': 0,
+                    'users_count': 0,
+                    'users_limit': 0,
+                    'expires_soon': False,
+                    'days_remaining': 0,
+                    'error': str(e)
+                }
+                licenses_data.append(account_data)
+        
+        return render_template('business_auth/admin_licenses.html',
+                             licenses_data=licenses_data,
+                             total_accounts=len(business_accounts))
+        
+    except Exception as e:
+        logger.error(f"Error loading admin licenses page: {e}")
+        flash('Failed to load license information. Please try again.', 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+
+@business_auth_bp.route('/admin/licenses/assign/<int:business_id>')
+@require_platform_admin
+def license_assignment_form(business_id):
+    """Show license assignment form for specific business account (Platform Admin Only)"""
+    try:
+        # Validate business account access (platform admin is allowed)
+        is_valid, business_account, message = validate_business_account_access(business_id, allow_platform_admin=True)
+        if not is_valid:
+            logger.warning(f"Unauthorized license assignment form access attempt: {message}")
+            flash('Access denied. You cannot access this business account.', 'error')
+            return redirect(url_for('business_auth.admin_licenses'))
+        
+        if not business_account:
+            flash('Business account not found.', 'error')
+            return redirect(url_for('business_auth.admin_licenses'))
+        
+        # Get current license information with error handling
+        try:
+            current_license = LicenseService.get_current_license(business_id)
+            license_info = LicenseService.get_license_info(business_id)
+        except Exception as license_error:
+            logger.error(f"Error retrieving license info for business_id {business_id}: {license_error}")
+            current_license = None
+            license_info = {'license_type': 'trial', 'license_status': 'error'}
+        
+        # Get available license types
+        try:
+            available_types = LicenseService.get_available_license_types()
+        except Exception as types_error:
+            logger.error(f"Error retrieving available license types: {types_error}")
+            available_types = ['core', 'plus', 'pro']  # Fallback
+        
+        # Get current usage statistics with error handling
+        try:
+            campaigns_used = LicenseService.get_campaigns_used_in_current_period(business_id)
+            users_count = getattr(business_account, 'current_users_count', 0)
+        except Exception as usage_error:
+            logger.error(f"Error retrieving usage statistics for business_id {business_id}: {usage_error}")
+            campaigns_used = 0
+            users_count = 0
+        
+        # Defensive data sanitization
+        template_data = {
+            'business_account': business_account,
+            'current_license': current_license,
+            'license_info': license_info,
+            'available_types': available_types,
+            'campaigns_used': max(0, campaigns_used),  # Ensure non-negative
+            'users_count': max(0, users_count)  # Ensure non-negative
+        }
+        
+        # Log platform admin access for audit
+        current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+        logger.info(f"Platform admin {current_user.email if current_user else 'unknown'} accessed license assignment form for business_id {business_id} ({business_account.name})")
+        
+        return render_template('business_auth/license_assignment_form.html', **template_data)
+        
+    except Exception as e:
+        logger.error(f"Error loading license assignment form for business_id {business_id}: {e}")
+        flash('Failed to load assignment form. Please try again.', 'error')
+        return redirect(url_for('business_auth.admin_licenses'))
+
+
+@business_auth_bp.route('/admin/licenses/assign', methods=['POST'])
+@require_platform_admin
+def process_license_assignment():
+    """Process license assignment form submission (Platform Admin Only)"""
+    try:
+        # Get form data with validation
+        business_id_str = request.form.get('business_id', '').strip()
+        license_type = request.form.get('license_type', '').strip().lower()
+        
+        # Comprehensive input validation
+        if not business_id_str or not license_type:
+            flash('Business account and license type are required.', 'error')
+            return redirect(url_for('business_auth.admin_licenses'))
+        
+        # Validate business_id is numeric
+        try:
+            business_id = int(business_id_str)
+            if business_id <= 0:
+                raise ValueError("Business ID must be positive")
+        except ValueError:
+            logger.warning(f"Invalid business_id provided in license assignment: '{business_id_str}'")
+            flash('Invalid business account ID.', 'error')
+            return redirect(url_for('business_auth.admin_licenses'))
+        
+        # Validate license type
+        valid_license_types = ['core', 'plus', 'pro', 'trial']
+        if license_type not in valid_license_types:
+            logger.warning(f"Invalid license_type provided: '{license_type}'")
+            flash('Invalid license type selected.', 'error')
+            return redirect(url_for('business_auth.admin_licenses'))
+        
+        # Validate business account access (platform admin is allowed)
+        is_valid, business_account, message = validate_business_account_access(business_id, allow_platform_admin=True)
+        if not is_valid:
+            logger.warning(f"Unauthorized license assignment attempt: {message} for business_id {business_id}")
+            flash('Access denied. You cannot assign licenses to this business account.', 'error')
+            return redirect(url_for('business_auth.admin_licenses'))
+        
+        if not business_account:
+            flash('Business account not found.', 'error')
+            return redirect(url_for('business_auth.admin_licenses'))
+        
+        # Get current user for audit trail
+        current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+        if not current_user:
+            logger.error("License assignment attempted without valid user session")
+            flash('Invalid user session. Please log in again.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        created_by = current_user.get_full_name()
+        
+        # Handle custom configuration for Pro licenses with comprehensive validation
+        custom_config = None
+        if license_type == 'pro':
+            custom_config = {}
+            
+            # Get and validate custom limits from form
+            try:
+                campaigns_limit = request.form.get('max_campaigns_per_year', '').strip()
+                users_limit = request.form.get('max_users', '').strip()
+                participants_limit = request.form.get('max_participants_per_campaign', '').strip()
+                
+                if campaigns_limit:
+                    campaigns_value = int(campaigns_limit)
+                    if campaigns_value < 1 or campaigns_value > 1000:
+                        flash('Maximum campaigns per year must be between 1 and 1000.', 'error')
+                        return redirect(url_for('business_auth.license_assignment_form', business_id=business_id))
+                    custom_config['max_campaigns_per_year'] = campaigns_value
+                
+                if users_limit:
+                    users_value = int(users_limit)
+                    if users_value < 1 or users_value > 10000:
+                        flash('Maximum users must be between 1 and 10,000.', 'error')
+                        return redirect(url_for('business_auth.license_assignment_form', business_id=business_id))
+                    custom_config['max_users'] = users_value
+                
+                if participants_limit:
+                    participants_value = int(participants_limit)
+                    if participants_value < 1 or participants_value > 1000000:
+                        flash('Maximum participants per campaign must be between 1 and 1,000,000.', 'error')
+                        return redirect(url_for('business_auth.license_assignment_form', business_id=business_id))
+                    custom_config['max_participants_per_campaign'] = participants_value
+                    
+            except ValueError:
+                flash('Custom limit values must be valid positive numbers.', 'error')
+                return redirect(url_for('business_auth.license_assignment_form', business_id=business_id))
+        
+        # Additional security: Re-validate the business account hasn't changed
+        fresh_business_account = BusinessAccount.query.get(business_id)
+        if not fresh_business_account or fresh_business_account.name != business_account.name:
+            logger.error(f"Business account validation failed during license assignment for business_id {business_id}")
+            flash('Business account validation failed. Please try again.', 'error')
+            return redirect(url_for('business_auth.admin_licenses'))
+        
+        # Log the assignment attempt for audit
+        logger.info(f"Platform admin {current_user.email} attempting to assign {license_type} license to business_id {business_id} ({business_account.name})")
+        
+        # Call LicenseService to assign license
+        success, license_record, message = LicenseService.assign_license_to_business(
+            business_id=business_id,
+            license_type=license_type,
+            custom_config=custom_config,
+            created_by=created_by
+        )
+        
+        if success:
+            flash(f'License assigned successfully: {message}', 'success')
+            logger.info(f"License {license_type} successfully assigned to business_id {business_id} by {current_user.email}")
+            
+            # Audit log successful assignment
+            try:
+                from audit_utils import audit_license_assignment
+                audit_license_assignment(
+                    admin_email=current_user.email,
+                    admin_name=created_by,
+                    business_account_id=business_id,
+                    business_account_name=business_account.name,
+                    license_type=license_type,
+                    custom_config=custom_config,
+                    success=True
+                )
+            except Exception as audit_error:
+                logger.error(f"Failed to audit license assignment: {audit_error}")
+        else:
+            flash(f'Failed to assign license: {message}', 'error')
+            logger.error(f"Failed to assign license {license_type} to business_id {business_id}: {message}")
+        
+        return redirect(url_for('business_auth.admin_licenses'))
+        
+    except Exception as e:
+        logger.error(f"Error processing license assignment: {e}")
+        flash('Failed to process license assignment. Please try again.', 'error')
+        return redirect(url_for('business_auth.admin_licenses'))
+
+
+@business_auth_bp.route('/admin/licenses/history/<int:business_id>')
+@require_platform_admin
+def license_history(business_id):
+    """Show license history timeline for specific business account (Platform Admin Only)"""
+    try:
+        # Validate business account access (platform admin is allowed)
+        is_valid, business_account, message = validate_business_account_access(business_id, allow_platform_admin=True)
+        if not is_valid:
+            logger.warning(f"Unauthorized license history access attempt: {message}")
+            flash('Access denied. You cannot view this business account license history.', 'error')
+            return redirect(url_for('business_auth.admin_licenses'))
+        
+        if not business_account:
+            flash('Business account not found.', 'error')
+            return redirect(url_for('business_auth.admin_licenses'))
+        
+        # Get license history with error handling
+        try:
+            license_history_records = LicenseService.get_license_history(business_id)
+            if not license_history_records:
+                license_history_records = []  # Ensure we have an empty list instead of None
+        except Exception as history_error:
+            logger.error(f"Error retrieving license history for business_id {business_id}: {history_error}")
+            license_history_records = []
+        
+        # Get current license for comparison with error handling
+        try:
+            current_license = LicenseService.get_current_license(business_id)
+        except Exception as current_error:
+            logger.error(f"Error retrieving current license for business_id {business_id}: {current_error}")
+            current_license = None
+        
+        # Sanitize and validate history records
+        safe_history = []
+        for record in license_history_records:
+            try:
+                # Ensure the record belongs to the correct business account
+                if hasattr(record, 'business_account_id') and record.business_account_id == business_id:
+                    safe_history.append(record)
+                else:
+                    logger.warning(f"License history record {getattr(record, 'id', 'unknown')} does not belong to business_id {business_id}")
+            except Exception as record_error:
+                logger.error(f"Error processing license history record: {record_error}")
+                continue
+        
+        template_data = {
+            'business_account': business_account,
+            'license_history': safe_history,
+            'current_license': current_license,
+            'history_count': len(safe_history)
+        }
+        
+        # Log platform admin access for audit
+        current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+        logger.info(f"Platform admin {current_user.email if current_user else 'unknown'} accessed license history for business_id {business_id} ({business_account.name})")
+        
+        return render_template('business_auth/license_history.html', **template_data)
+        
+    except Exception as e:
+        logger.error(f"Error loading license history for business_id {business_id}: {e}")
+        flash('Failed to load license history. Please try again.', 'error')
+        return redirect(url_for('business_auth.admin_licenses'))
+
+
+@business_auth_bp.route('/admin/licenses/dashboard')
+@require_platform_admin
+def license_dashboard():
+    """License management dashboard with overview statistics and quick actions (Platform Admin Only)"""
+    try:
+        # Log platform admin access for audit
+        current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+        logger.info(f"Platform admin {current_user.email if current_user else 'unknown'} accessed license dashboard")
+        
+        # Get overall statistics with error handling
+        try:
+            total_accounts = BusinessAccount.query.count()
+            if total_accounts < 0:
+                total_accounts = 0
+        except Exception as count_error:
+            logger.error(f"Error counting business accounts: {count_error}")
+            total_accounts = 0
+        
+        # Initialize statistics with safe defaults
+        license_distribution = {}
+        active_licenses = 0
+        expired_licenses = 0
+        trial_accounts = 0
+        total_campaigns_this_month = 0
+        total_users = 0
+        accounts_expiring_soon = []
+        accounts_processed = 0
+        accounts_with_errors = 0
+        
+        # Process all business accounts with comprehensive error handling
+        try:
+            business_accounts = BusinessAccount.query.all()
+        except Exception as query_error:
+            logger.error(f"Error querying business accounts: {query_error}")
+            business_accounts = []
+        
+        for account in business_accounts:
+            try:
+                # Validate account data
+                if not account or not hasattr(account, 'id'):
+                    logger.warning(f"Invalid account object encountered during dashboard processing")
+                    accounts_with_errors += 1
+                    continue
+                
+                accounts_processed += 1
+                
+                # Get license info with error handling
+                try:
+                    license_info = LicenseService.get_license_info(account.id)
+                    license_type = license_info.get('license_type', 'trial')
+                    license_status = license_info.get('license_status', 'trial')
+                    
+                    # Validate license type and status values
+                    valid_license_types = ['core', 'plus', 'pro', 'trial']
+                    valid_license_statuses = ['active', 'expired', 'trial', 'suspended']
+                    
+                    if license_type not in valid_license_types:
+                        logger.warning(f"Invalid license_type '{license_type}' for account {account.id}")
+                        license_type = 'trial'
+                    
+                    if license_status not in valid_license_statuses:
+                        logger.warning(f"Invalid license_status '{license_status}' for account {account.id}")
+                        license_status = 'trial'
+                    
+                except Exception as license_error:
+                    logger.error(f"Error getting license info for account {account.id}: {license_error}")
+                    license_type = 'trial'
+                    license_status = 'trial'
+                    license_info = {'license_type': 'trial', 'license_status': 'trial'}
+                
+                # Count license types safely
+                license_distribution[license_type] = license_distribution.get(license_type, 0) + 1
+                
+                # Count license statuses
+                if license_status == 'active':
+                    active_licenses += 1
+                elif license_status == 'expired':
+                    expired_licenses += 1
+                elif license_status == 'trial':
+                    trial_accounts += 1
+                
+                # Check for accounts expiring soon with validation
+                try:
+                    if license_info.get('expires_soon', False):
+                        days_remaining = license_info.get('days_remaining', 0)
+                        if isinstance(days_remaining, (int, float)) and days_remaining >= 0:
+                            accounts_expiring_soon.append({
+                                'id': account.id,
+                                'name': getattr(account, 'name', f'Account {account.id}'),
+                                'days_remaining': int(days_remaining),
+                                'license_type': license_type
+                            })
+                except Exception as expiry_error:
+                    logger.warning(f"Error processing expiry info for account {account.id}: {expiry_error}")
+                
+                # Add to usage statistics with validation
+                try:
+                    campaigns_used = LicenseService.get_campaigns_used_in_current_period(account.id)
+                    campaigns_used = max(0, int(campaigns_used)) if campaigns_used is not None else 0
+                    total_campaigns_this_month += campaigns_used
+                    
+                    users_count = getattr(account, 'current_users_count', 0)
+                    users_count = max(0, int(users_count)) if users_count is not None else 0
+                    total_users += users_count
+                    
+                except Exception as usage_error:
+                    logger.warning(f"Error getting usage statistics for account {account.id}: {usage_error}")
+                
+            except Exception as account_error:
+                logger.error(f"Error processing account {getattr(account, 'id', 'unknown')} for dashboard: {account_error}")
+                accounts_with_errors += 1
+                # Count as trial account if error
+                trial_accounts += 1
+        
+        # Get available license types for quick assignment with fallback
+        try:
+            available_types = LicenseService.get_available_license_types()
+            if not available_types:
+                available_types = ['core', 'plus', 'pro']  # Safe fallback
+        except Exception as types_error:
+            logger.error(f"Error getting available license types: {types_error}")
+            available_types = ['core', 'plus', 'pro']  # Safe fallback
+        
+        # Sanitize accounts_expiring_soon (limit to prevent UI issues)
+        accounts_expiring_soon = accounts_expiring_soon[:50]  # Limit to 50 entries
+        
+        dashboard_data = {
+            'total_accounts': max(0, total_accounts),
+            'active_licenses': max(0, active_licenses),
+            'expired_licenses': max(0, expired_licenses),
+            'trial_accounts': max(0, trial_accounts),
+            'license_distribution': license_distribution,
+            'total_campaigns_this_month': max(0, total_campaigns_this_month),
+            'total_users': max(0, total_users),
+            'accounts_expiring_soon': accounts_expiring_soon,
+            'available_types': available_types,
+            'accounts_processed': accounts_processed,
+            'accounts_with_errors': accounts_with_errors
+        }
+        
+        return render_template('business_auth/license_dashboard.html', **dashboard_data)
+        
+    except Exception as e:
+        logger.error(f"Error loading license dashboard: {e}")
+        flash('Failed to load license dashboard. Please try again.', 'error')
+        return redirect(url_for('business_auth.admin_panel'))

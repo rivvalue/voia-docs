@@ -1062,7 +1062,7 @@ class BusinessAccountUser(UserMixin, db.Model):
     last_name = db.Column(db.String(100), nullable=False)
     
     # User role and permissions
-    role = db.Column(db.String(50), nullable=False, default='admin', index=True)  # admin, viewer, manager
+    role = db.Column(db.String(50), nullable=False, default='admin', index=True)  # admin, viewer, manager, platform_admin
     is_active_user = db.Column(db.Boolean, nullable=False, default=True, index=True)  # Renamed to avoid conflict with UserMixin
     
     # Email verification
@@ -1128,9 +1128,24 @@ class BusinessAccountUser(UserMixin, db.Model):
         role_permissions = {
             'admin': ['view', 'create', 'edit', 'delete', 'manage_users', 'export_data', 'manage_participants'],
             'manager': ['view', 'create', 'edit', 'export_data', 'manage_participants'],
-            'viewer': ['view']
+            'viewer': ['view'],
+            'platform_admin': ['view', 'create', 'edit', 'delete', 'manage_users', 'export_data', 'manage_participants', 'platform_admin', 'manage_licenses', 'cross_tenant_access']
         }
         return permission in role_permissions.get(self.role, [])
+    
+    def is_platform_admin(self):
+        """Check if user is a platform administrator with cross-tenant permissions"""
+        # Platform admins are identified by:
+        # 1. Having 'platform_admin' role
+        # 2. Being specific admin emails (for backward compatibility)
+        platform_admin_emails = {
+            '7amdoulilah@rivvalue.com',  # Current admin
+            'admin@rivvalue.com',        # Generic admin
+            'platform@rivvalue.com'      # Platform admin
+        }
+        
+        return (self.role == 'platform_admin' or 
+                self.email.lower().strip() in platform_admin_emails)
     
     def to_dict(self):
         return {
