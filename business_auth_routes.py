@@ -147,7 +147,7 @@ def login():
             return render_template('business_auth/login.html')
         
         # Create user session
-        session_duration = 168 if remember_me else 24  # 7 days vs 24 hours
+        session_duration = 168  # Always 7 days (improved user experience)
         user_session = UserSession(
             user_id=user.id,
             ip_address=request.environ.get('HTTP_X_FORWARDED_FOR', 
