@@ -226,6 +226,31 @@ class Campaign(db.Model):
         from models import CampaignParticipant  # Import here to avoid circular imports
         return CampaignParticipant.query.filter_by(campaign_id=self.id).count()
     
+    def get_engagement_metrics(self):
+        """Get engagement metrics for this campaign"""
+        from models import EmailDelivery, SurveyResponse  # Import here to avoid circular imports
+        
+        # Count sent invitations
+        invitations_sent = EmailDelivery.query.filter_by(
+            campaign_id=self.id,
+            status='sent',
+            email_type='participant_invitation'
+        ).count()
+        
+        # Count completed surveys
+        surveys_completed = SurveyResponse.query.filter_by(campaign_id=self.id).count()
+        
+        # Calculate response rate
+        response_rate = None
+        if invitations_sent > 0:
+            response_rate = round((surveys_completed / invitations_sent) * 100, 1)
+        
+        return {
+            'invitations_sent': invitations_sent,
+            'surveys_completed': surveys_completed,
+            'response_rate': response_rate
+        }
+    
     def close_campaign(self):
         """Mark campaign as completed and generate KPI snapshot"""
         import logging

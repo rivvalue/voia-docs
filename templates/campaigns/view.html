@@ -177,6 +177,25 @@
                 {% endif %}
             </div>
         </div>
+        <!-- Engagement Metrics -->
+        <div class="info-item">
+            <div class="info-value">{{ campaign.engagement_metrics.invitations_sent }}</div>
+            <div class="info-label">📧 Invitations Sent</div>
+        </div>
+        <div class="info-item">
+            <div class="info-value">{{ campaign.engagement_metrics.surveys_completed }}</div>
+            <div class="info-label">✅ Surveys Completed</div>
+        </div>
+        <div class="info-item">
+            <div class="info-value">
+                {% if campaign.engagement_metrics.response_rate is not none %}
+                    {{ campaign.engagement_metrics.response_rate }}%
+                {% else %}
+                    N/A
+                {% endif %}
+            </div>
+            <div class="info-label">📊 Response Rate</div>
+        </div>
     </div>
 
     <!-- Campaign Details -->

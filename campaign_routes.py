@@ -36,7 +36,7 @@ def list_campaigns():
             business_account_id=current_account.id
         ).order_by(desc(Campaign.created_at)).all()
         
-        # Get participant counts for each campaign
+        # Get participant counts and engagement metrics for each campaign
         campaign_data = []
         for campaign in campaigns:
             participant_count = CampaignParticipant.query.filter_by(
@@ -46,6 +46,7 @@ def list_campaigns():
             
             campaign_dict = campaign.to_dict()
             campaign_dict['participant_count'] = participant_count
+            campaign_dict['engagement_metrics'] = campaign.get_engagement_metrics()
             campaign_data.append(campaign_dict)
         
         return render_template('campaigns/list.html',
@@ -189,8 +190,12 @@ def view_campaign(campaign_id):
                 })
                 participants_data.append(participant_data)
         
+        # Get campaign data with engagement metrics
+        campaign_data = campaign.to_dict()
+        campaign_data['engagement_metrics'] = campaign.get_engagement_metrics()
+        
         return render_template('campaigns/view.html',
-                             campaign=campaign.to_dict(),
+                             campaign=campaign_data,
                              participants=participants_data,
                              business_account=current_account.to_dict())
         

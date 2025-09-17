@@ -131,6 +131,28 @@
                         </div>
                     </div>
                     
+                    <!-- Engagement Metrics -->
+                    <div class="row text-center mb-3 py-2" style="background-color: #f8f9fa; border-radius: 8px;">
+                        <div class="col-4">
+                            <div class="small text-muted">📧 Sent</div>
+                            <div class="fw-bold">{{ campaign.engagement_metrics.invitations_sent }}</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="small text-muted">✅ Completed</div>
+                            <div class="fw-bold">{{ campaign.engagement_metrics.surveys_completed }}</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="small text-muted">Response Rate</div>
+                            <div class="fw-bold">
+                                {% if campaign.engagement_metrics.response_rate is not none %}
+                                    {{ campaign.engagement_metrics.response_rate }}%
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="d-flex gap-2" onclick="event.stopPropagation();">
                         <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="btn btn-outline-primary btn-sm">
                             <i class="fas fa-eye me-1"></i>View Details
