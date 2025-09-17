@@ -7,6 +7,7 @@ The Voice of Client (VOÏA) is a Flask-based system for comprehensive customer f
 - **SMTP Configuration**: Fully functional custom SMTP setup, testing, and validation for each business account
 - **Templates**: Professional VOÏA-branded email templates with responsive design and security features
 - **Campaign Automation**: Fully operational automated campaign lifecycle management with status transitions
+- **Phase 2 Complete**: Campaign-specific survey customization with hybrid business+campaign architecture
 
 # User Preferences
 Preferred communication style: Simple, everyday language.
@@ -30,6 +31,7 @@ Key architectural decisions include:
 - **Multi-Tenant Architecture**: Implementation of Business Accounts, Campaigns, and Participants with tenant isolation through `business_account_id` scoping, dual authentication, and a token system for participant survey access. Lightweight scheduler operational for campaign lifecycle automation.
 - **Email Delivery System**: Custom SMTP configuration per business account with encrypted password storage, connection testing, professional VOÏA-branded templates, background task processing, and comprehensive delivery tracking.
 - **Campaign Lifecycle Management**: Fully implemented automated status transitions (Draft → Ready → Active → Completed), operational scheduling engine with multi-tenant support, automatic KPI snapshot generation, and background task management for email retry processing.
+- **Hybrid Survey Customization**: Phase 2 implementation enabling campaign-specific survey personalization with business account defaults, supporting tailored AI conversations per campaign while maintaining consistent brand identity.
 
 # Recent Resolved Issues (September 2025)
 
@@ -96,6 +98,62 @@ Key architectural decisions include:
 - User-friendly error messaging when license limits are reached
 
 **Next Phase**: Business license information page for account holders to view their license status, usage counters, and remaining quotas.
+
+## Phase 2: Campaign-Specific Survey Customization Implementation (September 2025)
+**Project Goal**: Enable campaign-level survey personalization while maintaining consistent business identity, moving from business-only customization to hybrid business+campaign configuration.
+
+**Hybrid Architecture Design**: Campaign-first priority with business account fallback
+- **Campaign Level**: Product-specific descriptions, survey goals, timing controls, topic prioritization, custom messages
+- **Business Level**: Company identity, industry, default conversation tone, base customization
+- **Priority Flow**: Campaign Data → Business Account Data → Demo Mode Defaults
+
+**System Components Implemented**: ✅
+1. **Database Schema Enhancement**:
+   - Added 10 campaign-specific survey customization columns to campaigns table
+   - Fields: product_description, target_clients_description, survey_goals (JSON), max_questions, max_duration_seconds, max_follow_ups_per_topic, prioritized_topics (JSON), optional_topics (JSON), custom_end_message, custom_system_prompt
+   - Safe nullable columns with sensible defaults (8 questions, 120 seconds, 2 follow-ups)
+
+2. **Model Layer Updates**:
+   - Enhanced Campaign model with survey configuration fields and helper methods
+   - Added `get_survey_config()`, `has_campaign_customization()`, `get_effective_survey_goals()` methods
+   - JSON field handling for complex survey configuration data
+   - Full backward compatibility with existing campaigns
+
+3. **Data Migration & Population**:
+   - Comprehensive migration script populated all 7 existing campaigns with survey data from business accounts
+   - ArcheloFlow-specific branding applied: "Our flagship product ArcheloFlow helps streamline workplace operations"
+   - Survey goals configured: ["NPS", "Product Quality", "Support Experience"]
+   - Safe migration logic preserving existing data integrity
+
+4. **Hybrid Service Architecture**:
+   - Updated PromptTemplateService to support dual business_account_id + campaign_id initialization
+   - Implemented campaign-first data priority with graceful business account fallbacks
+   - Fixed critical demo mode bug that was preventing campaign customization from working
+   - Enhanced error handling and comprehensive logging for debugging
+
+5. **Campaign-Specific UI Implementation**:
+   - New routes: `/business/campaigns/<id>/survey-config` and `/survey-config/save`
+   - Professional survey configuration form with all customization options
+   - Multi-select handling for survey goals, prioritized topics, optional topics
+   - Live preview functionality for custom end messages
+   - Advanced toggle section for custom system prompts
+   - Integration with existing campaign management workflow
+
+6. **AI Conversation Integration**:
+   - Updated AI conversation routes to pass campaign_id to PromptTemplateService
+   - Modified AIConversationalSurvey class to support campaign-specific customization
+   - Live surveys now use campaign-specific product descriptions, goals, timing, and messaging
+   - Full backward compatibility with existing survey tokens and sessions
+
+**Current Status**: ✅ Production-ready hybrid campaign survey customization system
+- Database schema successfully updated with 7 existing campaigns migrated
+- Hybrid PromptTemplateService operational with proper priority logic (Campaign → Business → Demo)
+- Campaign-specific UI fully functional with professional survey configuration forms
+- AI conversations now deliver campaign-tailored survey experiences
+- Zero breaking changes - all existing functionality preserved
+- Comprehensive testing verified across all system components
+
+**Impact**: Users can now create highly personalized survey experiences for different campaigns while maintaining consistent business branding and identity across their organization.
 
 # External Dependencies
 - **OpenAI API**: For advanced AI functionalities including sentiment analysis, theme extraction, and the conversational survey system (VOÏA).
