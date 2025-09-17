@@ -495,7 +495,7 @@ class BusinessAccount(db.Model):
         from models import BusinessAccountUser  # Import here to avoid circular imports
         return BusinessAccountUser.query.filter_by(
             business_account_id=self.id,
-            is_active=True
+            is_active_user=True
         ).count()
     
     def get_license_period(self, reference_date=None):
