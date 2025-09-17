@@ -406,6 +406,17 @@
                 </div>
                 <div class="col-md-4">
                     <div class="admin-actions">
+                        <!-- License Management Section -->
+                        {% if current_user.role == 'platform_admin' %}
+                        <a href="{{ url_for('business_auth.licenses_dashboard') }}" class="btn btn-primary btn-admin me-2" title="License management dashboard and overview">
+                            <i class="fas fa-tachometer-alt me-2"></i>License Dashboard
+                        </a>
+                        <a href="{{ url_for('business_auth.licenses_overview') }}" class="btn btn-outline-primary btn-admin me-2" title="View all business accounts and license assignments">
+                            <i class="fas fa-building me-2"></i>Manage Licenses
+                        </a>
+                        {% endif %}
+                        
+                        <!-- Regular Admin Actions -->
                         <a href="{{ url_for('business_auth.license_info') }}" class="btn btn-outline-primary btn-admin me-2" title="View license information and usage statistics">
                             <i class="fas fa-certificate me-2"></i>License Info
                         </a>

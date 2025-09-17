@@ -1,0 +1,624 @@
+{% extends "base.html" %}
+
+{% block title %}Assign License - {{ business_account.name }}{% endblock %}
+
+{% block page_class %}page-license-assignment{% endblock %}
+
+{% block content %}
+<style>
+/* License Assignment Form specific styling */
+.assignment-header {
+    background: linear-gradient(135deg, rgba(var(--primary-red-rgb, 220, 53, 69), 0.1) 0%, rgba(var(--red-hover-rgb, 200, 40, 55), 0.15) 100%);
+    border: 1px solid var(--red-light);
+    color: var(--primary-black);
+    padding: 2rem 0;
+    border-radius: var(--radius-2xl);
+    margin-bottom: 2rem;
+}
+
+.license-option {
+    background: var(--primary-white);
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-lg);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.license-option:hover {
+    border-color: var(--primary-red);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.license-option.selected {
+    border-color: var(--primary-red);
+    background: rgba(var(--primary-red-rgb, 220, 53, 69), 0.05);
+    box-shadow: var(--shadow-lg);
+}
+
+.license-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.license-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.license-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--primary-white);
+}
+
+.license-icon.core {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+}
+
+.license-icon.plus {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.license-icon.pro {
+    background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+}
+
+.license-title {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--primary-black);
+    margin: 0;
+    font-family: var(--font-family-headings);
+}
+
+.license-subtitle {
+    font-size: var(--font-size-sm);
+    color: var(--gray-dark);
+    margin: 0;
+}
+
+.license-features {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+}
+
+.license-features li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: var(--font-size-sm);
+    color: var(--primary-black);
+}
+
+.license-features i {
+    color: var(--primary-red);
+    width: 16px;
+}
+
+.license-price {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--primary-red);
+    margin-top: 1rem;
+}
+
+.current-license-info {
+    background: var(--primary-white);
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+.license-comparison {
+    background: var(--light-gray);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+}
+
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.comparison-table th,
+.comparison-table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--medium-gray);
+}
+
+.comparison-table th {
+    background: var(--medium-gray);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+}
+
+.current-value {
+    color: var(--gray-dark);
+}
+
+.new-value {
+    color: var(--primary-red);
+    font-weight: 600;
+}
+
+.custom-limits {
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    background: var(--light-gray);
+    border-radius: var(--radius-lg);
+    display: none;
+}
+
+.custom-limits.show {
+    display: block;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.warning-banner {
+    background: rgba(253, 126, 20, 0.1);
+    border: 1px solid rgba(253, 126, 20, 0.3);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+    color: #fd7e14;
+}
+
+.warning-banner i {
+    margin-right: 0.5rem;
+}
+
+.action-buttons {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: flex-end;
+    margin-top: var(--spacing-2xl);
+}
+
+@media (max-width: 768px) {
+    .action-buttons {
+        flex-direction: column-reverse;
+    }
+}
+
+.usage-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+    margin: var(--spacing-lg) 0;
+}
+
+.usage-stat {
+    text-align: center;
+    padding: var(--spacing-md);
+    background: var(--light-gray);
+    border-radius: var(--radius-lg);
+}
+
+.usage-stat-value {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--primary-black);
+}
+
+.usage-stat-label {
+    font-size: var(--font-size-xs);
+    color: var(--gray-dark);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wide);
+}
+</style>
+
+<div class="container-fluid">
+    <!-- Assignment Header -->
+    <div class="assignment-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--primary-red); display: flex; align-items: center; justify-content: center; color: var(--primary-white); font-size: 1.5rem;">
+                            <i class="fas fa-edit"></i>
+                        </div>
+                        <div>
+                            <h2 class="mb-1">Assign License</h2>
+                            <p class="mb-0 opacity-75">{{ business_account.name }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="{{ url_for('business_auth.license_history', business_id=business_account.id) }}" class="btn btn-outline-primary me-2">
+                        <i class="fas fa-history me-2"></i>View History
+                    </a>
+                    <a href="{{ url_for('business_auth.licenses_overview') }}" class="btn btn-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Overview
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Current License Information -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-info-circle"></i>
+                    Current License Information
+                </h3>
+            </div>
+            <div class="current-license-info">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Account Details</h5>
+                        <p><strong>Business Name:</strong> {{ business_account.name }}</p>
+                        <p><strong>Email:</strong> {{ business_account.email }}</p>
+                        <p><strong>Account Type:</strong> {{ business_account.account_type|title }}</p>
+                        {% if current_license %}
+                        <p><strong>Current License:</strong> {{ current_license.type|title }}</p>
+                        {% if current_license.expiration_date %}
+                        <p><strong>Expires:</strong> {{ current_license.expiration_date.strftime('%B %d, %Y') }}</p>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Usage Statistics</h5>
+                        <div class="usage-stats">
+                            <div class="usage-stat">
+                                <div class="usage-stat-value">{{ usage_stats.users_count }}</div>
+                                <div class="usage-stat-label">Users</div>
+                            </div>
+                            <div class="usage-stat">
+                                <div class="usage-stat-value">{{ usage_stats.campaigns_count }}</div>
+                                <div class="usage-stat-label">Campaigns</div>
+                            </div>
+                            <div class="usage-stat">
+                                <div class="usage-stat-value">{{ usage_stats.responses_count }}</div>
+                                <div class="usage-stat-label">Responses</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- License Assignment Form -->
+        <form method="POST" action="{{ url_for('business_auth.assign_license', business_id=business_account.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+            <div class="admin-section">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="fas fa-certificate"></i>
+                        Select License Type
+                    </h3>
+                </div>
+
+                <!-- Core License -->
+                <label class="license-option" for="license_core">
+                    <input type="radio" id="license_core" name="license_type" value="core" {{ 'checked' if current_license and current_license.type == 'core' else '' }}>
+                    <div class="license-header">
+                        <div class="license-icon core">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div>
+                            <h4 class="license-title">Core License</h4>
+                            <p class="license-subtitle">Essential features for small teams</p>
+                        </div>
+                        <div class="ms-auto license-price">$20/month per editor</div>
+                    </div>
+                    <ul class="license-features">
+                        <li><i class="fas fa-check"></i> Up to 5 users</li>
+                        <li><i class="fas fa-check"></i> 10 campaigns per month</li>
+                        <li><i class="fas fa-check"></i> 1,000 responses per month</li>
+                        <li><i class="fas fa-check"></i> Basic analytics</li>
+                        <li><i class="fas fa-check"></i> Email support</li>
+                    </ul>
+                </label>
+
+                <!-- Plus License -->
+                <label class="license-option" for="license_plus">
+                    <input type="radio" id="license_plus" name="license_type" value="plus" {{ 'checked' if current_license and current_license.type == 'plus' else '' }}>
+                    <div class="license-header">
+                        <div class="license-icon plus">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div>
+                            <h4 class="license-title">Plus License</h4>
+                            <p class="license-subtitle">Advanced features for growing teams</p>
+                        </div>
+                        <div class="ms-auto license-price">$50/month per editor</div>
+                    </div>
+                    <ul class="license-features">
+                        <li><i class="fas fa-check"></i> Up to 15 users</li>
+                        <li><i class="fas fa-check"></i> 50 campaigns per month</li>
+                        <li><i class="fas fa-check"></i> 5,000 responses per month</li>
+                        <li><i class="fas fa-check"></i> Advanced analytics</li>
+                        <li><i class="fas fa-check"></i> Priority email support</li>
+                        <li><i class="fas fa-check"></i> Custom branding</li>
+                    </ul>
+                </label>
+
+                <!-- Pro License -->
+                <label class="license-option" for="license_pro">
+                    <input type="radio" id="license_pro" name="license_type" value="pro" {{ 'checked' if current_license and current_license.type == 'pro' else '' }}>
+                    <div class="license-header">
+                        <div class="license-icon pro">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div>
+                            <h4 class="license-title">Pro License</h4>
+                            <p class="license-subtitle">Custom limits for enterprise needs</p>
+                        </div>
+                        <div class="ms-auto license-price">Custom pricing</div>
+                    </div>
+                    <ul class="license-features">
+                        <li><i class="fas fa-check"></i> Custom user limits</li>
+                        <li><i class="fas fa-check"></i> Custom campaign limits</li>
+                        <li><i class="fas fa-check"></i> Custom response limits</li>
+                        <li><i class="fas fa-check"></i> Advanced analytics & reporting</li>
+                        <li><i class="fas fa-check"></i> Dedicated support</li>
+                        <li><i class="fas fa-check"></i> Custom branding & white-label</li>
+                        <li><i class="fas fa-check"></i> API access</li>
+                    </ul>
+                </label>
+
+                <!-- Pro Custom Limits (shown when Pro is selected) -->
+                <div class="custom-limits" id="proCustomLimits">
+                    <h5><i class="fas fa-cog"></i> Custom Limits Configuration</h5>
+                    <p class="text-muted">Set specific limits for this Pro license account.</p>
+                    
+                    <div class="form-row">
+                        <div class="mb-3">
+                            <label for="max_users" class="form-label">Maximum Users</label>
+                            <input type="number" class="form-control" id="max_users" name="max_users" 
+                                   min="1" value="{{ current_license.max_users if current_license and current_license.type == 'pro' else 25 }}">
+                            <div class="form-text">Number of users that can access the account</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="max_campaigns" class="form-label">Maximum Campaigns</label>
+                            <input type="number" class="form-control" id="max_campaigns" name="max_campaigns" 
+                                   min="1" value="{{ current_license.max_campaigns if current_license and current_license.type == 'pro' else 100 }}">
+                            <div class="form-text">Number of campaigns per month</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="mb-3">
+                            <label for="max_responses" class="form-label">Maximum Responses</label>
+                            <input type="number" class="form-control" id="max_responses" name="max_responses" 
+                                   min="1" value="{{ current_license.max_responses if current_license and current_license.type == 'pro' else 10000 }}">
+                            <div class="form-text">Number of responses per month</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="expiration_date" class="form-label">Expiration Date</label>
+                            <input type="date" class="form-control" id="expiration_date" name="expiration_date" 
+                                   value="{{ current_license.expiration_date.strftime('%Y-%m-%d') if current_license and current_license.expiration_date else '' }}">
+                            <div class="form-text">Leave empty for no expiration</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assignment Notes -->
+            <div class="admin-section">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="fas fa-comment"></i>
+                        Assignment Notes (Optional)
+                    </h3>
+                </div>
+                <div class="mb-3">
+                    <label for="notes" class="form-label">Notes</label>
+                    <textarea class="form-control" id="notes" name="notes" rows="3" 
+                              placeholder="Add any notes about this license assignment..."></textarea>
+                    <div class="form-text">These notes will be recorded in the license history.</div>
+                </div>
+            </div>
+
+            <!-- Warning for downgrades -->
+            <div class="warning-banner" id="downgradeWarning" style="display: none;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <strong>Warning:</strong> This license change may reduce the account's capabilities. 
+                Please ensure the current usage is within the new license limits before proceeding.
+            </div>
+
+            <!-- License Comparison Preview -->
+            <div class="license-comparison" id="licenseComparison" style="display: none;">
+                <h5><i class="fas fa-exchange-alt"></i> License Comparison</h5>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Current</th>
+                            <th>New</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>License Type</td>
+                            <td class="current-value">{{ current_license.type|title if current_license else 'None' }}</td>
+                            <td class="new-value" id="newLicenseType">-</td>
+                        </tr>
+                        <tr>
+                            <td>Max Users</td>
+                            <td class="current-value">{{ current_license.max_users if current_license else 'N/A' }}</td>
+                            <td class="new-value" id="newMaxUsers">-</td>
+                        </tr>
+                        <tr>
+                            <td>Max Campaigns</td>
+                            <td class="current-value">{{ current_license.max_campaigns if current_license else 'N/A' }}</td>
+                            <td class="new-value" id="newMaxCampaigns">-</td>
+                        </tr>
+                        <tr>
+                            <td>Max Responses</td>
+                            <td class="current-value">{{ current_license.max_responses if current_license else 'N/A' }}</td>
+                            <td class="new-value" id="newMaxResponses">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="{{ url_for('business_auth.licenses_overview') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Assign License
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const licenseOptions = document.querySelectorAll('input[name="license_type"]');
+    const proCustomLimits = document.getElementById('proCustomLimits');
+    const licenseComparison = document.getElementById('licenseComparison');
+    const downgradeWarning = document.getElementById('downgradeWarning');
+    
+    // License limits configuration
+    const licenseLimits = {
+        core: { users: 5, campaigns: 10, responses: 1000 },
+        plus: { users: 15, campaigns: 50, responses: 5000 },
+        pro: { users: 'custom', campaigns: 'custom', responses: 'custom' }
+    };
+    
+    // Current usage from backend
+    const currentUsage = {
+        users: {{ usage_stats.users_count }},
+        campaigns: {{ usage_stats.campaigns_count }},
+        responses: {{ usage_stats.responses_count }}
+    };
+
+    function updateLicenseSelection() {
+        const selectedLicense = document.querySelector('input[name="license_type"]:checked');
+        if (!selectedLicense) return;
+
+        const licenseType = selectedLicense.value;
+        
+        // Show/hide Pro custom limits
+        if (licenseType === 'pro') {
+            proCustomLimits.classList.add('show');
+        } else {
+            proCustomLimits.classList.remove('show');
+        }
+        
+        // Update license comparison
+        updateComparison(licenseType);
+        
+        // Check for downgrades
+        checkForDowngrade(licenseType);
+        
+        // Update selected styling
+        document.querySelectorAll('.license-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+        selectedLicense.closest('.license-option').classList.add('selected');
+    }
+    
+    function updateComparison(licenseType) {
+        const limits = licenseLimits[licenseType];
+        
+        document.getElementById('newLicenseType').textContent = licenseType.charAt(0).toUpperCase() + licenseType.slice(1);
+        
+        if (licenseType === 'pro') {
+            document.getElementById('newMaxUsers').textContent = document.getElementById('max_users').value || 'Custom';
+            document.getElementById('newMaxCampaigns').textContent = document.getElementById('max_campaigns').value || 'Custom';
+            document.getElementById('newMaxResponses').textContent = document.getElementById('max_responses').value || 'Custom';
+        } else {
+            document.getElementById('newMaxUsers').textContent = limits.users;
+            document.getElementById('newMaxCampaigns').textContent = limits.campaigns;
+            document.getElementById('newMaxResponses').textContent = limits.responses;
+        }
+        
+        licenseComparison.style.display = 'block';
+    }
+    
+    function checkForDowngrade(licenseType) {
+        let isDowngrade = false;
+        const limits = licenseLimits[licenseType];
+        
+        if (licenseType !== 'pro') {
+            if (currentUsage.users > limits.users ||
+                currentUsage.campaigns > limits.campaigns ||
+                currentUsage.responses > limits.responses) {
+                isDowngrade = true;
+            }
+        } else {
+            // For Pro licenses, check custom limits
+            const maxUsers = parseInt(document.getElementById('max_users').value) || 0;
+            const maxCampaigns = parseInt(document.getElementById('max_campaigns').value) || 0;
+            const maxResponses = parseInt(document.getElementById('max_responses').value) || 0;
+            
+            if (currentUsage.users > maxUsers ||
+                currentUsage.campaigns > maxCampaigns ||
+                currentUsage.responses > maxResponses) {
+                isDowngrade = true;
+            }
+        }
+        
+        downgradeWarning.style.display = isDowngrade ? 'block' : 'none';
+    }
+    
+    // Event listeners
+    licenseOptions.forEach(option => {
+        option.addEventListener('change', updateLicenseSelection);
+    });
+    
+    // Update Pro limits when changed
+    ['max_users', 'max_campaigns', 'max_responses'].forEach(fieldId => {
+        document.getElementById(fieldId).addEventListener('input', function() {
+            const selectedLicense = document.querySelector('input[name="license_type"]:checked');
+            if (selectedLicense && selectedLicense.value === 'pro') {
+                updateLicenseSelection();
+            }
+        });
+    });
+    
+    // Initialize
+    updateLicenseSelection();
+});
+</script>
+
+{% endblock %}

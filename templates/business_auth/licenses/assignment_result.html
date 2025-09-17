@@ -1,0 +1,530 @@
+{% extends "base.html" %}
+
+{% block title %}License Assignment {{ 'Successful' if success else 'Failed' }} - Vocsa Admin{% endblock %}
+
+{% block page_class %}page-license-result{% endblock %}
+
+{% block content %}
+<style>
+/* License Assignment Result specific styling */
+.result-header {
+    background: linear-gradient(135deg, 
+        {% if success %}
+            rgba(34, 197, 94, 0.1) 0%, rgba(22, 163, 74, 0.15) 100%
+        {% else %}
+            rgba(var(--primary-red-rgb, 220, 53, 69), 0.1) 0%, rgba(var(--red-hover-rgb, 200, 40, 55), 0.15) 100%
+        {% endif %}
+    );
+    border: 1px solid {{ '#22c55e' if success else 'var(--red-light)' }};
+    color: var(--primary-black);
+    padding: 2rem 0;
+    border-radius: var(--radius-2xl);
+    margin-bottom: 2rem;
+}
+
+.result-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--primary-white);
+    margin-bottom: 1rem;
+}
+
+.result-icon.success {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    animation: successPulse 2s ease-in-out;
+}
+
+.result-icon.error {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    animation: errorShake 0.5s ease-in-out;
+}
+
+@keyframes successPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+@keyframes errorShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.result-message {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.result-title {
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    color: {{ '#22c55e' if success else 'var(--primary-red)' }};
+    margin-bottom: 0.5rem;
+    font-family: var(--font-family-headings);
+}
+
+.result-subtitle {
+    font-size: var(--font-size-lg);
+    color: var(--gray-dark);
+    margin-bottom: 1rem;
+}
+
+.assignment-details {
+    background: var(--primary-white);
+    border: 1px solid var(--light-gray);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-weight: 600;
+    color: var(--primary-black);
+    font-size: var(--font-size-sm);
+}
+
+.detail-value {
+    color: var(--gray-dark);
+    font-size: var(--font-size-sm);
+}
+
+.detail-value.highlight {
+    color: var(--primary-red);
+    font-weight: 600;
+}
+
+.license-comparison {
+    background: var(--light-gray);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+}
+
+.comparison-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: var(--spacing-lg);
+    align-items: center;
+}
+
+.comparison-side {
+    text-align: center;
+    padding: var(--spacing-md);
+    background: var(--primary-white);
+    border-radius: var(--radius-lg);
+}
+
+.comparison-side.old {
+    opacity: 0.7;
+}
+
+.comparison-side.new {
+    border: 2px solid var(--primary-red);
+}
+
+.comparison-arrow {
+    font-size: var(--font-size-xl);
+    color: var(--primary-red);
+    text-align: center;
+}
+
+.license-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    white-space: nowrap;
+    margin-bottom: 0.5rem;
+}
+
+.license-core {
+    background-color: rgba(225, 58, 68, 0.1);
+    color: #E13A44;
+    border: 1px solid rgba(225, 58, 68, 0.2);
+}
+
+.license-plus {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+    border: 1px solid rgba(40, 167, 69, 0.2);
+}
+
+.license-pro {
+    background-color: rgba(111, 66, 193, 0.1);
+    color: #6f42c1;
+    border: 1px solid rgba(111, 66, 193, 0.2);
+}
+
+.error-details {
+    background: rgba(var(--primary-red-rgb, 220, 53, 69), 0.05);
+    border: 1px solid rgba(var(--primary-red-rgb, 220, 53, 69), 0.2);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+}
+
+.error-list {
+    list-style: none;
+    padding: 0;
+    margin: var(--spacing-sm) 0 0 0;
+}
+
+.error-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: var(--font-size-sm);
+    color: var(--primary-red);
+}
+
+.error-list i {
+    margin-top: 0.125rem;
+    flex-shrink: 0;
+}
+
+.next-steps {
+    background: var(--light-gray);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin: var(--spacing-xl) 0;
+}
+
+.next-steps h5 {
+    color: var(--primary-black);
+    margin-bottom: var(--spacing-md);
+}
+
+.next-steps ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.next-steps li {
+    margin-bottom: 0.5rem;
+    color: var(--gray-dark);
+}
+
+.action-buttons {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: var(--spacing-2xl);
+}
+
+.notification-banner {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+    color: #2563eb;
+}
+
+.notification-banner i {
+    margin-right: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .comparison-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+    
+    .comparison-arrow {
+        transform: rotate(90deg);
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+}
+
+.auto-redirect-notice {
+    font-size: var(--font-size-sm);
+    color: var(--gray-dark);
+    text-align: center;
+    margin-top: var(--spacing-lg);
+    padding: var(--spacing-sm);
+    background: rgba(59, 130, 246, 0.05);
+    border-radius: var(--radius-md);
+}
+
+.countdown {
+    font-weight: 600;
+    color: var(--primary-red);
+}
+</style>
+
+<div class="container-fluid">
+    <!-- Result Header -->
+    <div class="result-header">
+        <div class="container">
+            <div class="result-message">
+                <div class="result-icon {{ 'success' if success else 'error' }}">
+                    <i class="fas fa-{{ 'check' if success else 'times' }}"></i>
+                </div>
+                <h1 class="result-title">
+                    {% if success %}
+                        License Assignment Successful!
+                    {% else %}
+                        License Assignment Failed
+                    {% endif %}
+                </h1>
+                <p class="result-subtitle">
+                    {% if success %}
+                        The license has been successfully assigned to {{ business_account.name }}.
+                    {% else %}
+                        There was an issue assigning the license. Please review the details below.
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if success %}
+        <!-- Success Details -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-info-circle"></i>
+                    Assignment Details
+                </h3>
+            </div>
+            <div class="assignment-details">
+                <div class="detail-row">
+                    <span class="detail-label">Business Account:</span>
+                    <span class="detail-value">{{ business_account.name }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Email:</span>
+                    <span class="detail-value">{{ business_account.email }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Assignment Date:</span>
+                    <span class="detail-value">{{ assignment_date.strftime('%B %d, %Y at %I:%M %p') if assignment_date else 'Just now' }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Assigned By:</span>
+                    <span class="detail-value">{{ assigned_by or 'System Administrator' }}</span>
+                </div>
+                {% if assignment_notes %}
+                <div class="detail-row">
+                    <span class="detail-label">Notes:</span>
+                    <span class="detail-value">{{ assignment_notes }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- License Change Comparison -->
+        {% if previous_license %}
+        <div class="admin-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-exchange-alt"></i>
+                    License Change Summary
+                </h3>
+            </div>
+            <div class="license-comparison">
+                <div class="comparison-grid">
+                    <div class="comparison-side old">
+                        <h5>Previous License</h5>
+                        <div class="license-badge license-{{ previous_license.type }}">
+                            <i class="fas fa-{{ 'star' if previous_license.type == 'core' else 'plus' if previous_license.type == 'plus' else 'crown' }}"></i>
+                            {{ previous_license.type|title }}
+                        </div>
+                        <div class="text-muted small">
+                            {% if previous_license.max_users %}Max Users: {{ previous_license.max_users }}<br>{% endif %}
+                            {% if previous_license.max_campaigns %}Max Campaigns: {{ previous_license.max_campaigns }}<br>{% endif %}
+                            {% if previous_license.max_responses %}Max Responses: {{ previous_license.max_responses }}{% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="comparison-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                    
+                    <div class="comparison-side new">
+                        <h5>New License</h5>
+                        <div class="license-badge license-{{ new_license.type }}">
+                            <i class="fas fa-{{ 'star' if new_license.type == 'core' else 'plus' if new_license.type == 'plus' else 'crown' }}"></i>
+                            {{ new_license.type|title }}
+                        </div>
+                        <div class="text-muted small">
+                            {% if new_license.max_users %}Max Users: {{ new_license.max_users }}<br>{% endif %}
+                            {% if new_license.max_campaigns %}Max Campaigns: {{ new_license.max_campaigns }}<br>{% endif %}
+                            {% if new_license.max_responses %}Max Responses: {{ new_license.max_responses }}{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Next Steps -->
+        <div class="next-steps">
+            <h5><i class="fas fa-tasks me-2"></i>What Happens Next</h5>
+            <ul>
+                <li>The new license is active immediately</li>
+                <li>Users will have access to features based on the new license type</li>
+                {% if new_license.expiration_date %}
+                <li>This license will expire on {{ new_license.expiration_date.strftime('%B %d, %Y') }}</li>
+                {% endif %}
+                <li>You can track usage and modify limits as needed</li>
+                {% if notification_sent %}
+                <li>A notification email has been sent to the business account</li>
+                {% endif %}
+            </ul>
+        </div>
+
+        {% if notification_sent %}
+        <div class="notification-banner">
+            <i class="fas fa-envelope"></i>
+            <strong>Email Notification Sent:</strong> The business account has been notified of this license change.
+        </div>
+        {% endif %}
+
+        {% else %}
+        <!-- Error Details -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Error Details
+                </h3>
+            </div>
+            <div class="error-details">
+                <h5>The following issues prevented the license assignment:</h5>
+                {% if error_details %}
+                <ul class="error-list">
+                    {% for error in error_details %}
+                    <li>
+                        <i class="fas fa-times-circle"></i>
+                        {{ error }}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <ul class="error-list">
+                    <li>
+                        <i class="fas fa-times-circle"></i>
+                        {{ error_message or 'An unexpected error occurred during license assignment.' }}
+                    </li>
+                </ul>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Troubleshooting Steps -->
+        <div class="next-steps">
+            <h5><i class="fas fa-wrench me-2"></i>Troubleshooting Steps</h5>
+            <ul>
+                <li>Verify that the business account exists and is valid</li>
+                <li>Check that the selected license type is available</li>
+                <li>Ensure custom limits (for Pro licenses) are reasonable</li>
+                <li>Confirm you have the necessary permissions to assign licenses</li>
+                <li>Try refreshing the page and attempting the assignment again</li>
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            {% if success %}
+                <a href="{{ url_for('business_auth.license_history', business_id=business_account.id) }}" class="btn btn-outline-primary">
+                    <i class="fas fa-history me-2"></i>View License History
+                </a>
+                <a href="{{ url_for('business_auth.licenses_overview') }}" class="btn btn-primary">
+                    <i class="fas fa-list me-2"></i>Back to Overview
+                </a>
+                <a href="{{ url_for('business_auth.licenses_dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-chart-bar me-2"></i>Dashboard
+                </a>
+            {% else %}
+                <a href="{{ url_for('business_auth.assign_license', business_id=business_account.id) }}" class="btn btn-primary">
+                    <i class="fas fa-redo me-2"></i>Try Again
+                </a>
+                <a href="{{ url_for('business_auth.licenses_overview') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-list me-2"></i>Back to Overview
+                </a>
+                {% if support_email %}
+                <a href="mailto:{{ support_email }}?subject=License Assignment Error - {{ business_account.name }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-envelope me-2"></i>Contact Support
+                </a>
+                {% endif %}
+            {% endif %}
+        </div>
+
+        <!-- Auto-redirect Notice -->
+        {% if success and auto_redirect %}
+        <div class="auto-redirect-notice">
+            <i class="fas fa-info-circle me-2"></i>
+            You will be redirected to the license overview in <span class="countdown" id="countdown">{{ auto_redirect_delay or 10 }}</span> seconds.
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if success and auto_redirect %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let countdown = {{ auto_redirect_delay or 10 }};
+    const countdownElement = document.getElementById('countdown');
+    
+    const timer = setInterval(function() {
+        countdown--;
+        countdownElement.textContent = countdown;
+        
+        if (countdown <= 0) {
+            clearInterval(timer);
+            window.location.href = "{{ url_for('business_auth.licenses_overview') }}";
+        }
+    }, 1000);
+});
+</script>
+{% endif %}
+
+{% endblock %}
