@@ -240,15 +240,25 @@ class Campaign(db.Model):
         # Count completed surveys
         surveys_completed = SurveyResponse.query.filter_by(campaign_id=self.id).count()
         
-        # Calculate response rate
-        response_rate = None
+        # Get total participants count
+        total_participants = self.participants_count
+        
+        # Calculate participation rate (completed / total participants)
+        participation_rate = None
+        if total_participants > 0:
+            participation_rate = round((surveys_completed / total_participants) * 100, 1)
+        
+        # Calculate email success rate (completed / successfully sent)
+        email_success_rate = None
         if invitations_sent > 0:
-            response_rate = round((surveys_completed / invitations_sent) * 100, 1)
+            email_success_rate = round((surveys_completed / invitations_sent) * 100, 1)
         
         return {
             'invitations_sent': invitations_sent,
             'surveys_completed': surveys_completed,
-            'response_rate': response_rate
+            'total_participants': total_participants,
+            'participation_rate': participation_rate,
+            'email_success_rate': email_success_rate
         }
     
     def close_campaign(self):

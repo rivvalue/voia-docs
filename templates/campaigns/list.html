@@ -133,19 +133,29 @@
                     
                     <!-- Engagement Metrics -->
                     <div class="row text-center mb-3 py-2" style="background-color: #f8f9fa; border-radius: 8px;">
-                        <div class="col-4">
+                        <div class="col-3">
                             <div class="small text-muted">📧 Sent</div>
                             <div class="fw-bold">{{ campaign.engagement_metrics.invitations_sent }}</div>
                         </div>
-                        <div class="col-4">
+                        <div class="col-3">
                             <div class="small text-muted">✅ Completed</div>
                             <div class="fw-bold">{{ campaign.engagement_metrics.surveys_completed }}</div>
                         </div>
-                        <div class="col-4">
-                            <div class="small text-muted">Response Rate</div>
+                        <div class="col-3">
+                            <div class="small text-muted">📊 Participation</div>
                             <div class="fw-bold">
-                                {% if campaign.engagement_metrics.response_rate is not none %}
-                                    {{ campaign.engagement_metrics.response_rate }}%
+                                {% if campaign.engagement_metrics.participation_rate is not none %}
+                                    {{ campaign.engagement_metrics.participation_rate }}%
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="small text-muted">📤 Email Success</div>
+                            <div class="fw-bold">
+                                {% if campaign.engagement_metrics.email_success_rate is not none %}
+                                    {{ campaign.engagement_metrics.email_success_rate }}%
                                 {% else %}
                                     N/A
                                 {% endif %}

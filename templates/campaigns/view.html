@@ -188,13 +188,23 @@
         </div>
         <div class="info-item">
             <div class="info-value">
-                {% if campaign.engagement_metrics.response_rate is not none %}
-                    {{ campaign.engagement_metrics.response_rate }}%
+                {% if campaign.engagement_metrics.participation_rate is not none %}
+                    {{ campaign.engagement_metrics.participation_rate }}%
                 {% else %}
                     N/A
                 {% endif %}
             </div>
-            <div class="info-label">📊 Response Rate</div>
+            <div class="info-label">📊 Participation Rate</div>
+        </div>
+        <div class="info-item">
+            <div class="info-value">
+                {% if campaign.engagement_metrics.email_success_rate is not none %}
+                    {{ campaign.engagement_metrics.email_success_rate }}%
+                {% else %}
+                    N/A
+                {% endif %}
+            </div>
+            <div class="info-label">📤 Email Success Rate</div>
         </div>
     </div>
 
