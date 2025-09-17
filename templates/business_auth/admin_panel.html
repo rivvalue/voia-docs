@@ -418,6 +418,11 @@
                         <a href="{{ url_for('business_auth.brand_config') }}" class="btn btn-primary btn-admin me-2" title="Configure brand settings">
                             <i class="fas fa-paint-brush me-2"></i>Brand Settings
                         </a>
+                        {% if business_account.account_type == 'customer' %}
+                        <a href="{{ url_for('business_auth.survey_config') }}" class="btn btn-primary btn-admin me-2" title="Customize survey experience and conversation settings">
+                            <i class="fas fa-cog me-2"></i>Survey Customization
+                        </a>
+                        {% endif %}
                         <a href="{{ url_for('business_auth.logout') }}" class="btn btn-outline-dark btn-admin">
                             <i class="fas fa-sign-out-alt me-2"></i>Logout
                         </a>

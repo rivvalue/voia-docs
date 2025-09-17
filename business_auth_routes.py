@@ -1532,3 +1532,142 @@ def _cleanup_old_logo(upload_dir, old_logo_filename):
                 logger.info(f"Old logo file removed: {old_logo_filename}")
             except Exception as e:
                 logger.warning(f"Failed to remove old logo file {old_logo_filename}: {e}")
+
+
+# ==== SURVEY CUSTOMIZATION CONFIGURATION ROUTES ====
+
+@business_auth_bp.route('/admin/survey-config')
+@require_business_auth
+def survey_config():
+    """Survey customization configuration management page"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            logger.error("No current account found in survey config route")
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.admin_panel'))
+        
+        # Demo accounts cannot access survey customization
+        if current_account.account_type == 'demo':
+            flash('Survey customization is not available for demo accounts. Please upgrade your account.', 'warning')
+            return redirect(url_for('business_auth.admin_panel'))
+        
+        # Define available options for dropdowns
+        industry_options = [
+            'Healthcare', 'SaaS', 'Retail', 'Professional Services', 
+            'Restaurant', 'Manufacturing', 'Education', 'Finance', 'Other'
+        ]
+        
+        tone_options = [
+            'professional', 'warm', 'casual', 'formal'
+        ]
+        
+        topic_options = [
+            'NPS', 'Satisfaction', 'Product Quality', 'Service Rating', 
+            'Support Experience', 'Pricing Value', 'Improvement Suggestions'
+        ]
+        
+        return render_template('business_auth/survey_config.html',
+                             business_account=current_account,
+                             industry_options=industry_options,
+                             tone_options=tone_options,
+                             topic_options=topic_options)
+    
+    except Exception as e:
+        logger.error(f"Error loading survey configuration: {e}")
+        flash('Failed to load survey configuration.', 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+
+@business_auth_bp.route('/admin/survey-config/save', methods=['POST'])
+@require_business_auth
+def save_survey_config():
+    """Save survey customization configuration"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.admin_panel'))
+        
+        # Demo accounts cannot save survey customization
+        if current_account.account_type == 'demo':
+            flash('Survey customization is not available for demo accounts.', 'error')
+            return redirect(url_for('business_auth.admin_panel'))
+        
+        # Get form data
+        industry = request.form.get('industry', '').strip()
+        company_description = request.form.get('company_description', '').strip()
+        product_description = request.form.get('product_description', '').strip()
+        target_clients_description = request.form.get('target_clients_description', '').strip()
+        conversation_tone = request.form.get('conversation_tone', '').strip()
+        custom_end_message = request.form.get('custom_end_message', '').strip()
+        
+        # Survey control parameters
+        max_questions = request.form.get('max_questions', type=int)
+        max_duration_seconds = request.form.get('max_duration_seconds', type=int)
+        max_follow_ups_per_topic = request.form.get('max_follow_ups_per_topic', type=int)
+        
+        # Multi-select fields
+        survey_goals = request.form.getlist('survey_goals')
+        prioritized_topics = request.form.getlist('prioritized_topics')
+        optional_topics = request.form.getlist('optional_topics')
+        
+        # Validation
+        errors = []
+        
+        # Validate text fields lengths
+        if company_description and len(company_description) > 500:
+            errors.append("Company description must be 500 characters or less.")
+        if product_description and len(product_description) > 500:
+            errors.append("Product description must be 500 characters or less.")
+        if target_clients_description and len(target_clients_description) > 300:
+            errors.append("Target customers description must be 300 characters or less.")
+        if custom_end_message and len(custom_end_message) > 1000:
+            errors.append("Custom end message must be 1000 characters or less.")
+        
+        # Validate numeric ranges
+        if max_questions is not None and (max_questions < 3 or max_questions > 15):
+            errors.append("Maximum questions must be between 3 and 15.")
+        if max_duration_seconds is not None and (max_duration_seconds < 60 or max_duration_seconds > 300):
+            errors.append("Maximum duration must be between 60 and 300 seconds.")
+        if max_follow_ups_per_topic is not None and (max_follow_ups_per_topic < 1 or max_follow_ups_per_topic > 3):
+            errors.append("Maximum follow-ups per topic must be between 1 and 3.")
+        
+        if errors:
+            for error in errors:
+                flash(error, 'error')
+            return redirect(url_for('business_auth.survey_config'))
+        
+        # Update business account with survey customization fields
+        current_account.industry = industry if industry else None
+        current_account.company_description = company_description if company_description else None
+        current_account.product_description = product_description if product_description else None
+        current_account.target_clients_description = target_clients_description if target_clients_description else None
+        current_account.conversation_tone = conversation_tone if conversation_tone else 'professional'
+        current_account.custom_end_message = custom_end_message if custom_end_message else None
+        
+        # Survey control parameters
+        current_account.max_questions = max_questions if max_questions is not None else 8
+        current_account.max_duration_seconds = max_duration_seconds if max_duration_seconds is not None else 120
+        current_account.max_follow_ups_per_topic = max_follow_ups_per_topic if max_follow_ups_per_topic is not None else 2
+        
+        # JSON fields
+        current_account.survey_goals = survey_goals if survey_goals else None
+        current_account.prioritized_topics = prioritized_topics if prioritized_topics else None
+        current_account.optional_topics = optional_topics if optional_topics else None
+        
+        # Update timestamp
+        current_account.updated_at = datetime.utcnow()
+        
+        # Save to database
+        db.session.commit()
+        
+        logger.info(f"Survey configuration updated for business account: {current_account.name}")
+        flash('Survey configuration saved successfully! Your changes will be reflected in new survey sessions.', 'success')
+        return redirect(url_for('business_auth.survey_config'))
+        
+    except Exception as e:
+        logger.error(f"Error saving survey configuration: {e}")
+        db.session.rollback()
+        flash('Failed to save survey configuration. Please try again.', 'error')
+        return redirect(url_for('business_auth.survey_config'))
