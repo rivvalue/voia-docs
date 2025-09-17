@@ -20,6 +20,7 @@ from typing import Optional, Tuple, Dict, List, Any
 import logging
 from models import LicenseHistory, BusinessAccount, Campaign, db
 from sqlalchemy import and_, func
+from license_templates import LicenseTemplateManager, LicenseTemplate
 
 logger = logging.getLogger(__name__)
 
@@ -670,3 +671,207 @@ class LicenseService:
             logger.error(f"Failed to migrate legacy license for business_account_id {business_account_id}: {e}")
             db.session.rollback()
             return None
+    
+    # ==== LICENSE TEMPLATE INTEGRATION ====
+    
+    @staticmethod
+    def get_available_license_types() -> List[Dict[str, Any]]:
+        """
+        Get all available license types with their configurations.
+        
+        Returns:
+            list: List of dictionaries containing license type information including:
+                - license_type: Type identifier (core, plus, pro, trial)
+                - display_name: Human-readable name
+                - description: Template description
+                - max_campaigns_per_year: Campaign limit
+                - max_users: User limit
+                - max_participants_per_campaign: Participant limit
+                - is_custom: Whether template supports custom configuration
+                - is_trial: Whether this is a trial license
+                - features: List of features included
+        """
+        try:
+            return LicenseTemplateManager.get_available_license_types()
+        except Exception as e:
+            logger.error(f"Failed to get available license types: {e}")
+            return []
+    
+    @staticmethod
+    def get_standard_license_types() -> List[Dict[str, Any]]:
+        """
+        Get standard (non-trial) license types for business use.
+        
+        Returns:
+            list: List of standard license type configurations
+        """
+        try:
+            return LicenseTemplateManager.get_standard_license_types()
+        except Exception as e:
+            logger.error(f"Failed to get standard license types: {e}")
+            return []
+    
+    @staticmethod
+    def apply_license_template(
+        business_account_id: int,
+        license_type: str,
+        custom_config: Optional[Dict[str, Any]] = None,
+        duration_months: Optional[int] = None,
+        start_date: Optional[datetime] = None,
+        created_by: str = 'license_service'
+    ) -> Optional[LicenseHistory]:
+        """
+        Apply a license template to create a new license record for a business account.
+        
+        This method creates a new LicenseHistory record using the specified template
+        configuration. For Pro licenses, custom configuration can be provided to override
+        default template limits.
+        
+        Args:
+            business_account_id: Business account ID to create license for
+            license_type: Type of license template to apply (core, plus, pro, trial)
+            custom_config: Optional custom configuration for Pro licenses containing:
+                - max_campaigns_per_year: Custom campaign limit
+                - max_users: Custom user limit
+                - max_participants_per_campaign: Custom participant limit
+                - duration_months: Custom license duration
+            duration_months: License duration in months (overrides template default)
+            start_date: License start date (defaults to now)
+            created_by: Who created the license (for audit trail)
+            
+        Returns:
+            LicenseHistory: Created license record or None if failed
+            
+        Raises:
+            ValueError: If license type is invalid or custom config is invalid
+            
+        Example:
+            # Create Core license
+            license = LicenseService.apply_license_template(
+                business_account_id=123,
+                license_type='core'
+            )
+            
+            # Create Pro license with custom limits
+            license = LicenseService.apply_license_template(
+                business_account_id=123,
+                license_type='pro',
+                custom_config={
+                    'max_campaigns_per_year': 20,
+                    'max_users': 50,
+                    'max_participants_per_campaign': 15000
+                }
+            )
+        """
+        try:
+            # Validate business account exists
+            business_account = BusinessAccount.query.get(business_account_id)
+            if not business_account:
+                raise ValueError(f"Business account {business_account_id} not found")
+            
+            # Get and validate template
+            template = LicenseTemplateManager.get_template(license_type)
+            if not template:
+                raise ValueError(f"Invalid license type: {license_type}")
+            
+            # Create license configuration
+            if template.is_custom and custom_config:
+                # Pro license with custom configuration
+                license_config = LicenseTemplateManager.create_license_config(license_type, custom_config)
+                logger.info(f"Applying {license_type} template with custom config for business_account_id {business_account_id}")
+            else:
+                # Standard template configuration
+                license_config = template.to_dict()
+                logger.info(f"Applying {license_type} template for business_account_id {business_account_id}")
+            
+            # Calculate license dates
+            activation_date, expiration_date = LicenseTemplateManager.calculate_license_dates(
+                license_type=license_type,
+                start_date=start_date,
+                duration_months=duration_months or license_config.get('default_duration_months')
+            )
+            
+            # Check for existing active license
+            existing_license = LicenseService.get_current_license(business_account_id)
+            if existing_license and existing_license.is_active():
+                logger.warning(f"Business account {business_account_id} already has active license {existing_license.id}")
+                # Could optionally expire the existing license or raise an error
+                # For now, we'll create the new license anyway (admin override scenario)
+            
+            # Create new license record
+            license_record = LicenseHistory(
+                business_account_id=business_account_id,
+                license_type=license_config['license_type'],
+                status='active',
+                activated_at=activation_date,
+                expires_at=expiration_date,
+                max_campaigns_per_year=license_config['max_campaigns_per_year'],
+                max_users=license_config['max_users'],
+                max_participants_per_campaign=license_config['max_participants_per_campaign'],
+                created_by=created_by,
+                notes=f"Created from {template.display_name} template"
+            )
+            
+            # Save to database
+            db.session.add(license_record)
+            db.session.commit()
+            
+            logger.info(f"Successfully applied {license_type} template to business_account_id {business_account_id}, "
+                       f"license_id {license_record.id}, expires {expiration_date}")
+            
+            return license_record
+            
+        except ValueError as e:
+            logger.error(f"Validation error applying license template: {e}")
+            raise
+        except Exception as e:
+            logger.error(f"Failed to apply license template {license_type} to business_account_id {business_account_id}: {e}")
+            db.session.rollback()
+            return None
+    
+    @staticmethod
+    def validate_license_template_config(license_type: str, custom_config: Optional[Dict[str, Any]] = None) -> bool:
+        """
+        Validate a license template configuration without creating a license record.
+        
+        Args:
+            license_type: License type to validate
+            custom_config: Optional custom configuration for Pro licenses
+            
+        Returns:
+            bool: True if configuration is valid, False otherwise
+        """
+        try:
+            template = LicenseTemplateManager.get_template(license_type)
+            if not template:
+                return False
+            
+            if template.is_custom and custom_config:
+                # Validate custom config for Pro licenses
+                LicenseTemplateManager.create_license_config(license_type, custom_config)
+            
+            return True
+        except Exception as e:
+            logger.debug(f"License template validation failed: {e}")
+            return False
+    
+    @staticmethod
+    def get_license_template_comparison(license_types: Optional[List[str]] = None) -> Dict[str, Any]:
+        """
+        Get a comparison matrix of license templates.
+        
+        Args:
+            license_types: Optional list of license types to compare (defaults to all standard types)
+            
+        Returns:
+            dict: Comparison matrix with features and limits
+        """
+        try:
+            if license_types is None:
+                # Default to standard license types (exclude trial)
+                license_types = ['core', 'plus', 'pro']
+            
+            return LicenseTemplateManager.get_template_comparison(license_types)
+        except Exception as e:
+            logger.error(f"Failed to get license template comparison: {e}")
+            return {'license_types': [], 'features': {}, 'limits': {}, 'templates': {}}
