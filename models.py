@@ -680,6 +680,8 @@ class EmailConfiguration(db.Model):
             decrypted_password = fernet.decrypt(encrypted_data)
             return decrypted_password.decode()
         except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
             logger.error(f"Failed to decrypt email password: {e}")
             return None
     
@@ -966,7 +968,7 @@ class BusinessAccountUser(UserMixin, db.Model):
     
     # User role and permissions
     role = db.Column(db.String(50), nullable=False, default='admin', index=True)  # admin, viewer, manager
-    is_active = db.Column(db.Boolean, nullable=False, default=True, index=True)  # Note: Conflicts with UserMixin but maintained for DB compatibility
+    is_active_user = db.Column(db.Boolean, nullable=False, default=True, index=True)  # Renamed to avoid conflict with UserMixin
     
     # Email verification
     email_verified = db.Column(db.Boolean, nullable=False, default=False)
@@ -1044,7 +1046,7 @@ class BusinessAccountUser(UserMixin, db.Model):
             'last_name': self.last_name,
             'full_name': self.get_full_name(),
             'role': self.role,
-            'is_active': self.is_active,
+            'is_active': self.is_active_user,
             'email_verified': self.email_verified,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
@@ -1170,7 +1172,8 @@ class UserSession(db.Model):
                 UserSession.expires_at > func.now()
             )
         
-        return query.order_by(UserSession.last_activity_at.desc()).all()
+        from sqlalchemy import desc
+        return query.order_by(desc(UserSession.last_activity_at)).all()
     
     @staticmethod
     def revoke_user_sessions(user_id, exclude_session_id=None):
@@ -1355,7 +1358,7 @@ class EmailDelivery(db.Model):
         return EmailDelivery.query.filter(
             EmailDelivery.status == 'failed',
             EmailDelivery.retry_count < EmailDelivery.max_retries,
-            EmailDelivery.next_retry_at <= datetime.utcnow()
+            EmailDelivery.next_retry_at <= func.now()
         ).all()
     
     @staticmethod
@@ -1541,6 +1544,220 @@ class AuditLog(db.Model):
             'user_counts': user_counts,
             'date_range_days': days_back
         }
+
+
+class LicenseHistory(db.Model):
+    """License History model for tracking license periods and changes over time"""
+    __tablename__ = 'license_history'
+    __table_args__ = (
+        # Ensure business accounts don't have overlapping active licenses
+        db.Index('idx_license_history_business_status', 'business_account_id', 'status'),
+        db.Index('idx_license_history_dates', 'activated_at', 'expires_at'),
+        db.Index('idx_license_history_type', 'license_type'),
+    )
+    
+    id = db.Column(db.Integer, primary_key=True)
+    business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
+    
+    # License Details
+    license_type = db.Column(db.String(20), nullable=False, index=True)  # trial, standard, premium, enterprise
+    status = db.Column(db.String(20), nullable=False, index=True)  # active, expired, cancelled, suspended
+    
+    # License Period
+    activated_at = db.Column(db.DateTime, nullable=False, index=True)  # When license became active
+    expires_at = db.Column(db.DateTime, nullable=False, index=True)   # When license expires/expired
+    
+    # License Limits (stored here for historical accuracy)
+    max_campaigns_per_year = db.Column(db.Integer, nullable=False, default=4)
+    max_users = db.Column(db.Integer, nullable=False, default=5)
+    max_participants_per_campaign = db.Column(db.Integer, nullable=False, default=500)
+    
+    # Migration Metadata (for tracking data migration)
+    migrated_from_business_account = db.Column(db.Boolean, nullable=False, default=False)  # True if migrated from old schema
+    migration_notes = db.Column(db.Text, nullable=True)  # Notes about migration process
+    
+    # Audit Trail
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+    created_by = db.Column(db.String(200), nullable=True)  # User who created this license record
+    notes = db.Column(db.Text, nullable=True)  # General notes about this license period
+    
+    # Relationships
+    business_account = db.relationship('BusinessAccount', backref=db.backref('license_histories', lazy='dynamic', order_by='LicenseHistory.activated_at.desc()'))
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'business_account_id': self.business_account_id,
+            'business_account_name': self.business_account.name if self.business_account else None,
+            'license_type': self.license_type,
+            'status': self.status,
+            'activated_at': self.activated_at.isoformat() if self.activated_at else None,
+            'expires_at': self.expires_at.isoformat() if self.expires_at else None,
+            'max_campaigns_per_year': self.max_campaigns_per_year,
+            'max_users': self.max_users,
+            'max_participants_per_campaign': self.max_participants_per_campaign,
+            'migrated_from_business_account': self.migrated_from_business_account,
+            'migration_notes': self.migration_notes,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'created_by': self.created_by,
+            'notes': self.notes,
+            'is_active': self.is_active(),
+            'is_expired': self.is_expired(),
+            'days_remaining': self.days_remaining(),
+            'days_since_expired': self.days_since_expired()
+        }
+    
+    def is_active(self):
+        """Check if license is currently active"""
+        from datetime import datetime
+        now = datetime.utcnow()
+        return (self.status == 'active' and 
+                self.activated_at <= now <= self.expires_at)
+    
+    def is_expired(self):
+        """Check if license is expired"""
+        from datetime import datetime
+        now = datetime.utcnow()
+        return (now > self.expires_at or self.status == 'expired')
+    
+    def days_remaining(self):
+        """Calculate days remaining in license period"""
+        if not self.is_active():
+            return 0
+        from datetime import datetime
+        now = datetime.utcnow()
+        return max(0, (self.expires_at - now).days)
+    
+    def days_since_expired(self):
+        """Calculate days since license expired"""
+        if not self.is_expired():
+            return 0
+        from datetime import datetime
+        now = datetime.utcnow()
+        return max(0, (now - self.expires_at).days)
+    
+    def get_license_period_dates(self):
+        """Get license period as date objects for comparison"""
+        activated_date = self.activated_at.date() if hasattr(self.activated_at, 'date') else self.activated_at
+        expires_date = self.expires_at.date() if hasattr(self.expires_at, 'date') else self.expires_at
+        return activated_date, expires_date
+    
+    @staticmethod
+    def get_current_license(business_account_id):
+        """Get the current active license for a business account"""
+        from datetime import datetime
+        now = datetime.utcnow()
+        
+        return LicenseHistory.query.filter(
+            LicenseHistory.business_account_id == business_account_id,
+            LicenseHistory.status == 'active',
+            LicenseHistory.activated_at <= now,
+            LicenseHistory.expires_at >= now
+        ).first()
+    
+    @staticmethod
+    def get_license_for_date(business_account_id, reference_date):
+        """Get the license that was active on a specific date"""
+        from datetime import datetime
+        
+        # Convert date to datetime if needed
+        if hasattr(reference_date, 'date'):
+            check_datetime = reference_date
+        else:
+            check_datetime = datetime.combine(reference_date, datetime.min.time())
+        
+        return LicenseHistory.query.filter(
+            LicenseHistory.business_account_id == business_account_id,
+            LicenseHistory.activated_at <= check_datetime,
+            LicenseHistory.expires_at >= check_datetime
+        ).first()
+    
+    @staticmethod
+    def create_trial_license(business_account_id, activated_at=None, created_by='system_migration'):
+        """Create a trial license for a business account"""
+        from datetime import datetime, timedelta
+        
+        if activated_at is None:
+            activated_at = datetime.utcnow()
+        
+        # Trial licenses are valid for 1 year
+        expires_at = activated_at + timedelta(days=365)
+        
+        license_record = LicenseHistory()
+        license_record.business_account_id = business_account_id
+        license_record.license_type = 'trial'
+        license_record.status = 'active'
+        license_record.activated_at = activated_at
+        license_record.expires_at = expires_at
+        license_record.max_campaigns_per_year = 4
+        license_record.max_users = 5
+        license_record.max_participants_per_campaign = 500
+        license_record.created_by = created_by
+        license_record.notes = 'Trial license created during data migration'
+        
+        return license_record
+    
+    @staticmethod
+    def migrate_from_business_account(business_account, created_by='data_migration'):
+        """Create license history record from BusinessAccount legacy fields"""
+        from datetime import datetime, timedelta
+        
+        # Determine license type based on account status
+        if business_account.license_status == 'trial':
+            license_type = 'trial'
+        elif business_account.license_status == 'active':
+            license_type = 'standard'  # Default to standard for active licenses
+        else:
+            license_type = 'trial'  # Fallback to trial
+        
+        # Handle dates
+        if business_account.license_activated_at:
+            activated_at = business_account.license_activated_at
+        else:
+            # Use account creation date as fallback
+            activated_at = business_account.created_at
+        
+        if business_account.license_expires_at:
+            expires_at = business_account.license_expires_at
+        else:
+            # Default to 1 year from activation for trial/missing data
+            expires_at = activated_at + timedelta(days=365)
+        
+        # Determine current status
+        now = datetime.utcnow()
+        if business_account.license_status == 'expired' or now > expires_at:
+            status = 'expired'
+        elif business_account.license_status == 'trial' and now <= expires_at:
+            status = 'active'
+        elif business_account.license_status == 'active' and now <= expires_at:
+            status = 'active'
+        else:
+            status = 'expired'
+        
+        # Create migration notes
+        migration_notes = []
+        if not business_account.license_activated_at:
+            migration_notes.append(f"activated_at inferred from account created_at ({business_account.created_at})")
+        if not business_account.license_expires_at:
+            migration_notes.append("expires_at calculated as 1 year from activation (default trial period)")
+        
+        migration_notes_str = "; ".join(migration_notes) if migration_notes else None
+        
+        license_record = LicenseHistory()
+        license_record.business_account_id = business_account.id
+        license_record.license_type = license_type
+        license_record.status = status
+        license_record.activated_at = activated_at
+        license_record.expires_at = expires_at
+        license_record.max_campaigns_per_year = 4
+        license_record.max_users = 5
+        license_record.max_participants_per_campaign = 500
+        license_record.migrated_from_business_account = True
+        license_record.migration_notes = migration_notes_str
+        license_record.created_by = created_by
+        license_record.notes = f'Migrated from BusinessAccount.license_status="{business_account.license_status}"'
+        
+        return license_record
 
 
 class BrandingConfig(db.Model):
