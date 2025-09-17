@@ -792,12 +792,16 @@ class LicenseService:
                 duration_months=duration_months or license_config.get('default_duration_months')
             )
             
-            # Check for existing active license
+            # Check for existing active license and handle properly
             existing_license = LicenseService.get_current_license(business_account_id)
             if existing_license and existing_license.is_active():
-                logger.warning(f"Business account {business_account_id} already has active license {existing_license.id}")
-                # Could optionally expire the existing license or raise an error
-                # For now, we'll create the new license anyway (admin override scenario)
+                logger.info(f"Business account {business_account_id} has active license {existing_license.id} ({existing_license.license_type}), transitioning to {license_type}")
+                
+                # Deactivate existing license to maintain single-active-license invariant
+                existing_license.status = 'cancelled'
+                existing_license.notes = (existing_license.notes or '') + f'; Superseded by new {license_type} license on {datetime.utcnow()}'
+                
+                logger.info(f"Deactivated existing license {existing_license.id} to maintain single active license per account")
             
             # Create new license record
             license_record = LicenseHistory(

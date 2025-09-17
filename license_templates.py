@@ -341,6 +341,76 @@ class LicenseTemplateManager:
         return start_date, expiration_date
     
     @classmethod
+    def get_all_templates(cls) -> Dict[str, LicenseTemplate]:
+        """
+        Get all available license templates.
+        
+        Returns:
+            dict: Dictionary mapping license types to template objects
+        """
+        return cls._templates.copy()
+    
+    @classmethod
+    def create_license_from_template(cls, business_account_id: int, template_type: str, 
+                                   activation_date: Optional[datetime] = None,
+                                   created_by: Optional[str] = None,
+                                   custom_config: Optional[Dict[str, Any]] = None,
+                                   notes: Optional[str] = None) -> Dict[str, Any]:
+        """
+        Create a license configuration dictionary from template.
+        
+        This method creates a dictionary suitable for creating LicenseHistory records
+        without actually creating database records (avoids circular imports).
+        
+        Args:
+            business_account_id: ID of the business account
+            template_type: Type of license template to use
+            activation_date: When license becomes active (defaults to now)
+            created_by: User creating the license
+            custom_config: Custom configuration for Pro licenses
+            notes: Additional notes about the license
+            
+        Returns:
+            dict: Complete license data dictionary ready for LicenseHistory creation
+            
+        Raises:
+            ValueError: If template type is invalid or custom config is invalid
+        """
+        template = cls.get_template(template_type)
+        if not template:
+            raise ValueError(f"Invalid license type: {template_type}")
+        
+        if activation_date is None:
+            activation_date = datetime.utcnow()
+        
+        # Get license configuration (handles custom config for Pro licenses)
+        license_config = cls.create_license_config(template_type, custom_config)
+        
+        # Calculate expiration date
+        duration_months = custom_config.get('duration_months') if custom_config else None
+        start_date, expiration_date = cls.calculate_license_dates(
+            template_type, activation_date, duration_months
+        )
+        
+        # Create license data dictionary
+        license_data = {
+            'business_account_id': business_account_id,
+            'license_type': template_type,
+            'status': 'active',
+            'activated_at': start_date,
+            'expires_at': expiration_date,
+            'max_campaigns_per_year': license_config['max_campaigns_per_year'],
+            'max_users': license_config['max_users'], 
+            'max_participants_per_campaign': license_config['max_participants_per_campaign'],
+            'created_by': created_by,
+            'notes': notes,
+            'migrated_from_business_account': False,
+            'migration_notes': None
+        }
+        
+        return license_data
+
+    @classmethod
     def get_template_comparison(cls, license_types: List[str]) -> Dict[str, Any]:
         """
         Get a comparison matrix of multiple license templates.
