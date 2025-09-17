@@ -15,7 +15,7 @@ def normalize_company_name(company_name):
 class AIConversationalSurvey:
     """OpenAI-powered conversational survey system with adaptive questioning"""
     
-    def __init__(self, business_account_id: Optional[int] = None):
+    def __init__(self, business_account_id: Optional[int] = None, campaign_id: Optional[int] = None):
         self.openai_client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
         self.conversation_history = []
         self.survey_data = {}
@@ -23,12 +23,12 @@ class AIConversationalSurvey:
         self.step_count = 0
         self.is_complete = False
         
-        # Initialize prompt template service for dynamic prompts
-        self.template_service = PromptTemplateService(business_account_id)
+        # Initialize prompt template service for dynamic prompts with campaign-specific customization
+        self.template_service = PromptTemplateService(business_account_id, campaign_id)
         
         # Debug logging for template mode
         template_info = self.template_service.get_template_info()
-        print(f"TEMPLATE DEBUG: Initialized with business_account_id={business_account_id}")
+        print(f"TEMPLATE DEBUG: Initialized with business_account_id={business_account_id}, campaign_id={campaign_id}")
         print(f"TEMPLATE DEBUG: Mode={template_info['is_demo_mode']}, Company={template_info['company_name']}, Product={template_info['product_name']}")
         print(f"TEMPLATE DEBUG: Tone={template_info['conversation_tone']}, MaxQuestions={template_info['max_questions']}")
         
@@ -838,10 +838,10 @@ Be conversational, empathetic, and adaptive to their communication style."""
 # Global instances for session persistence
 ai_conversation_instances = {}
 
-def start_ai_conversational_survey(company_name: str, respondent_name: str, tenure_with_fc=None, business_account_id: Optional[int] = None) -> Dict[str, Any]:
+def start_ai_conversational_survey(company_name: str, respondent_name: str, tenure_with_fc=None, business_account_id: Optional[int] = None, campaign_id: Optional[int] = None) -> Dict[str, Any]:
     """Start a new AI-powered conversational survey session"""
     conversation_id = str(uuid.uuid4())
-    ai_survey = AIConversationalSurvey(business_account_id=business_account_id)
+    ai_survey = AIConversationalSurvey(business_account_id=business_account_id, campaign_id=campaign_id)
     
     # If tenure data is provided from the form, pre-populate it
     if tenure_with_fc:
@@ -874,7 +874,8 @@ def process_ai_conversation_response(user_input: str, context: Dict[str, Any]) -
         
         # RECOVERY: Recreate the conversation instance from context data
         business_account_id = context.get('business_account_id')
-        ai_survey = AIConversationalSurvey(business_account_id=business_account_id)
+        campaign_id = context.get('campaign_id')
+        ai_survey = AIConversationalSurvey(business_account_id=business_account_id, campaign_id=campaign_id)
         
         # Restore survey data from context
         company_name = context.get('company_name', '')

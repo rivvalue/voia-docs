@@ -758,3 +758,146 @@ def resend_failed_invitations(campaign_id):
         db.session.rollback()
         flash('Failed to resend invitations. Please try again.', 'error')
         return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+
+
+@campaign_bp.route('/<int:campaign_id>/survey-config')
+@require_business_auth
+@require_permission('manage_participants')
+def survey_config(campaign_id):
+    """Display campaign survey configuration form"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get campaign (scoped to current business account)
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            flash('Campaign not found.', 'error')
+            return redirect(url_for('campaigns.list_campaigns'))
+        
+        # Check if campaign can be modified
+        if campaign.status in ['active', 'completed']:
+            flash(f'Survey configuration cannot be modified for {campaign.status} campaigns.', 'warning')
+            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
+        return render_template('campaigns/survey_config.html',
+                             campaign=campaign.to_dict(),
+                             business_account=current_account.to_dict())
+        
+    except Exception as e:
+        logger.error(f"Survey config display error for campaign {campaign_id}: {e}")
+        flash('Error loading survey configuration.', 'error')
+        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+
+
+@campaign_bp.route('/<int:campaign_id>/survey-config/save', methods=['POST'])
+@require_business_auth
+@require_permission('manage_participants')
+def save_survey_config(campaign_id):
+    """Save campaign survey configuration"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get campaign (scoped to current business account)
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            flash('Campaign not found.', 'error')
+            return redirect(url_for('campaigns.list_campaigns'))
+        
+        # Check if campaign can be modified
+        if campaign.status in ['active', 'completed']:
+            flash(f'Survey configuration cannot be modified for {campaign.status} campaigns.', 'error')
+            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
+        # Product Focus section
+        campaign.product_description = request.form.get('product_description', '').strip() or None
+        campaign.target_clients_description = request.form.get('target_clients_description', '').strip() or None
+        
+        # Survey Goals (multi-select checkboxes)
+        survey_goals = request.form.getlist('survey_goals')
+        campaign.survey_goals = survey_goals if survey_goals else None
+        
+        # Survey Controls - validate numeric ranges
+        try:
+            max_questions = int(request.form.get('max_questions', 8))
+            if not (3 <= max_questions <= 15):
+                flash('Max questions must be between 3 and 15.', 'error')
+                return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
+            campaign.max_questions = max_questions
+            
+            max_duration = int(request.form.get('max_duration_seconds', 120))
+            if not (60 <= max_duration <= 300):
+                flash('Max duration must be between 60 and 300 seconds.', 'error')
+                return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
+            campaign.max_duration_seconds = max_duration
+            
+            max_follow_ups = int(request.form.get('max_follow_ups_per_topic', 2))
+            if not (1 <= max_follow_ups <= 3):
+                flash('Max follow-ups per topic must be between 1 and 3.', 'error')
+                return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
+            campaign.max_follow_ups_per_topic = max_follow_ups
+            
+        except ValueError:
+            flash('Invalid numeric values in survey controls.', 'error')
+            return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
+        
+        # Topic Prioritization - handle multi-select lists
+        prioritized_topics = [topic.strip() for topic in request.form.getlist('prioritized_topics') if topic.strip()]
+        campaign.prioritized_topics = prioritized_topics if prioritized_topics else None
+        
+        optional_topics = [topic.strip() for topic in request.form.getlist('optional_topics') if topic.strip()]
+        campaign.optional_topics = optional_topics if optional_topics else None
+        
+        # Customization section
+        campaign.custom_end_message = request.form.get('custom_end_message', '').strip() or None
+        campaign.custom_system_prompt = request.form.get('custom_system_prompt', '').strip() or None
+        
+        # Save changes
+        db.session.commit()
+        
+        # Audit log configuration update
+        try:
+            from audit_utils import queue_audit_log
+            queue_audit_log(
+                business_account_id=current_account.id,
+                action_type='campaign_survey_config_updated',
+                resource_type='campaign',
+                resource_id=campaign.id,
+                resource_name=campaign.name,
+                details={
+                    'has_product_description': bool(campaign.product_description),
+                    'has_target_clients': bool(campaign.target_clients_description),
+                    'survey_goals_count': len(campaign.survey_goals) if campaign.survey_goals else 0,
+                    'max_questions': campaign.max_questions,
+                    'max_duration_seconds': campaign.max_duration_seconds,
+                    'prioritized_topics_count': len(campaign.prioritized_topics) if campaign.prioritized_topics else 0,
+                    'has_custom_end_message': bool(campaign.custom_end_message),
+                    'has_custom_system_prompt': bool(campaign.custom_system_prompt)
+                }
+            )
+        except Exception as audit_error:
+            logger.error(f"Failed to audit survey config update: {audit_error}")
+        
+        logger.info(f"Survey configuration updated for campaign '{campaign.name}' (ID: {campaign_id}) by business account {current_account.id}")
+        flash('Survey configuration saved successfully!', 'success')
+        
+        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
+    except Exception as e:
+        logger.error(f"Error saving survey config for campaign {campaign_id}: {e}")
+        db.session.rollback()
+        flash('Failed to save survey configuration. Please try again.', 'error')
+        return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))

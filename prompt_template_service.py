@@ -6,36 +6,70 @@ Supports dual-mode operation: demo (hardcoded) vs customer (customized)
 
 import json
 from typing import Dict, Any, Optional
-from models import BusinessAccount
+from models import BusinessAccount, Campaign
 
 
 class PromptTemplateService:
     """Service for generating dynamic survey prompts based on business account configuration"""
     
-    def __init__(self, business_account_id: Optional[int] = None):
+    def __init__(self, business_account_id: Optional[int] = None, campaign_id: Optional[int] = None):
         """
-        Initialize prompt template service
+        Initialize prompt template service with hybrid business+campaign data support
         
         Args:
             business_account_id: ID of business account for customized prompts, 
                                None for demo mode
+            campaign_id: ID of campaign for campaign-specific customization,
+                        takes precedence over business account data
         """
         self.business_account_id = business_account_id
+        self.campaign_id = campaign_id
         self.business_account = None
+        self.campaign = None
         self.is_demo_mode = False
         
+        # Load campaign data first if provided
+        if campaign_id:
+            try:
+                self.campaign = Campaign.query.get(campaign_id)
+                if not self.campaign:
+                    # Log warning but continue - allows graceful degradation
+                    import logging
+                    logging.warning(f"Campaign ID {campaign_id} not found, falling back to business account only")
+                # If campaign exists and has a business account, load that too
+                elif self.campaign.business_account_id:
+                    self.business_account_id = self.campaign.business_account_id
+                    business_account_id = self.campaign.business_account_id
+            except Exception as e:
+                # Log error but continue - allows graceful degradation
+                import logging
+                logging.error(f"Error loading campaign {campaign_id}: {e}")
+                self.campaign = None
+        
+        # Load business account data
         if business_account_id:
             self.business_account = BusinessAccount.query.get(business_account_id)
-            # Check if this is demo account or missing customization
-            if (not self.business_account or 
-                self.business_account.account_type == 'demo' or
-                not self._has_customization()):
-                self.is_demo_mode = True
-        else:
-            self.is_demo_mode = True
+        
+        # Determine demo mode after loading both campaign and business account data
+        # Demo mode is only true if NEITHER campaign NOR business account have customization
+        # Priority: Campaign → Business → Demo
+        self.is_demo_mode = not (
+            (self.campaign and self.has_campaign_customization()) or 
+            (self.business_account and 
+             self.business_account.account_type != 'demo' and
+             bool(self.business_account.industry or
+                  self.business_account.company_description or
+                  self.business_account.product_description or
+                  self.business_account.target_clients_description))
+        )
     
     def _has_customization(self) -> bool:
-        """Check if business account has meaningful customization data"""
+        """Check if business account or campaign has meaningful customization data"""
+        # Check campaign customization first
+        if self.campaign and self.has_campaign_customization():
+            return True
+            
+        # Check business account customization
         if not self.business_account:
             return False
         
@@ -59,10 +93,21 @@ class PromptTemplateService:
         return "Archelo Group"  # Fallback
     
     def get_product_name(self) -> str:
-        """Get product/service name for survey context"""
+        """Get product/service name for survey context - campaign data takes precedence"""
         if self.is_demo_mode:
             return "ArcheloFlow"
         
+        # Check campaign product description first
+        if self.campaign and self.campaign.product_description:
+            product_desc = self.campaign.product_description.strip()
+            # Take first 3-5 words as product name if it's a description
+            words = product_desc.split()
+            if len(words) <= 5:
+                return product_desc
+            else:
+                return " ".join(words[:3]) + "..."
+        
+        # Fall back to business account product description
         if self.business_account and self.business_account.product_description:
             # Extract product name from description or use first few words
             product_desc = self.business_account.product_description.strip()
@@ -80,8 +125,27 @@ class PromptTemplateService:
         
         return "ArcheloFlow"  # Ultimate fallback
     
+    def has_campaign_customization(self) -> bool:
+        """Check if campaign has meaningful customization data"""
+        if not self.campaign:
+            return False
+        
+        # Campaign has customization if it has campaign-specific fields
+        return bool(
+            self.campaign.product_description or
+            self.campaign.target_clients_description or
+            self.campaign.survey_goals or
+            self.campaign.max_questions != 8 or  # Default is 8
+            self.campaign.max_duration_seconds != 120 or  # Default is 120
+            self.campaign.max_follow_ups_per_topic != 2 or  # Default is 2
+            self.campaign.prioritized_topics or
+            self.campaign.optional_topics or
+            self.campaign.custom_end_message or
+            self.campaign.custom_system_prompt
+        )
+    
     def get_conversation_tone(self) -> str:
-        """Get conversation tone setting"""
+        """Get conversation tone setting - always from business account for consistent identity"""
         if self.is_demo_mode:
             return "professional"
         
@@ -91,7 +155,7 @@ class PromptTemplateService:
         return "professional"  # Default
     
     def get_survey_goals(self) -> list:
-        """Get survey goals/objectives"""
+        """Get survey goals/objectives - campaign data takes precedence"""
         if self.is_demo_mode:
             return [
                 "Understand customer satisfaction with Archelo Group",
@@ -99,6 +163,13 @@ class PromptTemplateService:
                 "Measure likelihood to recommend our solutions"
             ]
         
+        # Check campaign survey goals first
+        if (self.campaign and 
+            self.campaign.survey_goals and 
+            isinstance(self.campaign.survey_goals, list)):
+            return self.campaign.survey_goals
+        
+        # Fall back to business account survey goals
         if (self.business_account and 
             self.business_account.survey_goals and 
             isinstance(self.business_account.survey_goals, list)):
@@ -113,20 +184,30 @@ class PromptTemplateService:
         ]
     
     def get_max_questions(self) -> int:
-        """Get maximum questions limit"""
+        """Get maximum questions limit - campaign data takes precedence"""
         if self.is_demo_mode:
             return 8  # Demo default
         
+        # Check campaign max questions first
+        if self.campaign and self.campaign.max_questions:
+            return self.campaign.max_questions
+        
+        # Fall back to business account
         if self.business_account and self.business_account.max_questions:
             return self.business_account.max_questions
         
         return 8  # Default
     
     def get_max_duration_seconds(self) -> int:
-        """Get maximum survey duration in seconds"""
+        """Get maximum survey duration in seconds - campaign data takes precedence"""
         if self.is_demo_mode:
             return 120  # 2 minutes default
         
+        # Check campaign max duration first
+        if self.campaign and self.campaign.max_duration_seconds:
+            return self.campaign.max_duration_seconds
+        
+        # Fall back to business account
         if self.business_account and self.business_account.max_duration_seconds:
             return self.business_account.max_duration_seconds
         
@@ -233,7 +314,7 @@ GUIDELINES:
 RESPONSE FORMAT: Return only the next question or response. No system messages or explanations."""
     
     def _get_prioritized_topics(self) -> str:
-        """Get prioritized survey topics based on business account settings"""
+        """Get prioritized survey topics - campaign data takes precedence"""
         company_name = self.get_company_name()
         
         base_topics = [
@@ -249,7 +330,22 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
             f"10. Additional feedback - Any other comments about {company_name}"
         ]
         
-        # Add custom prioritized topics if available
+        # Check campaign prioritized topics first
+        if (not self.is_demo_mode and 
+            self.campaign and 
+            self.campaign.prioritized_topics and 
+            isinstance(self.campaign.prioritized_topics, list)):
+            
+            custom_topics = []
+            for i, topic in enumerate(self.campaign.prioritized_topics[:5], 1):
+                custom_topics.append(f"{i}. {topic}")
+            
+            # Merge with base topics, prioritizing custom ones
+            remaining_base = base_topics[len(custom_topics):]
+            all_topics = custom_topics + remaining_base
+            return "\n".join(all_topics[:10])  # Max 10 topics
+        
+        # Fall back to business account prioritized topics
         if (not self.is_demo_mode and 
             self.business_account and 
             self.business_account.prioritized_topics and 
@@ -267,17 +363,45 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
         return "\n".join(base_topics)
     
     def get_completion_message(self) -> str:
-        """Get survey completion message"""
+        """Get survey completion message - campaign data takes precedence"""
         company_name = self.get_company_name()
         
         if self.is_demo_mode:
             return "Thank you so much for taking the time to share your detailed feedback about Archelo Group! Your insights are incredibly valuable and will help us improve our service delivery. Have a wonderful day!"
         
+        # Check campaign custom end message first
+        if (self.campaign and self.campaign.custom_end_message):
+            return self.campaign.custom_end_message
+        
+        # Fall back to business account custom end message
         if (self.business_account and 
             self.business_account.custom_end_message):
             return self.business_account.custom_end_message
         
         return f"Thank you so much for taking the time to share your detailed feedback about {company_name}! Your insights are incredibly valuable and will help us improve our service delivery. Have a wonderful day!"
+    
+    def get_effective_survey_config(self) -> Dict[str, Any]:
+        """Get merged survey configuration from campaign and business account data"""
+        return {
+            'company_name': self.get_company_name(),
+            'product_name': self.get_product_name(),
+            'conversation_tone': self.get_conversation_tone(),
+            'survey_goals': self.get_survey_goals(),
+            'max_questions': self.get_max_questions(),
+            'max_duration_seconds': self.get_max_duration_seconds(),
+            'completion_message': self.get_completion_message(),
+            'prioritized_topics': self._get_prioritized_topics(),
+            'is_demo_mode': self.is_demo_mode,
+            'has_campaign_customization': self.has_campaign_customization(),
+            'has_business_customization': self._has_customization(),
+            'campaign_id': self.campaign_id,
+            'business_account_id': self.business_account_id,
+            # Optional campaign-specific fields
+            'target_clients_description': self.campaign.target_clients_description if self.campaign else (self.business_account.target_clients_description if self.business_account else None),
+            'max_follow_ups_per_topic': self.campaign.max_follow_ups_per_topic if self.campaign else (self.business_account.max_follow_ups_per_topic if hasattr(self.business_account, 'max_follow_ups_per_topic') and self.business_account else 2),
+            'optional_topics': self.campaign.optional_topics if self.campaign else (self.business_account.optional_topics if hasattr(self.business_account, 'optional_topics') and self.business_account else None),
+            'custom_system_prompt': self.campaign.custom_system_prompt if self.campaign else None
+        }
     
     def should_force_completion(self, step_count: int) -> bool:
         """Check if survey should be force-completed based on limits"""
@@ -285,14 +409,41 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
         return step_count > max_questions
     
     def get_template_info(self) -> Dict[str, Any]:
-        """Get template configuration info for debugging"""
-        return {
+        """Get template configuration info for debugging - includes campaign and business account data"""
+        info = {
             'is_demo_mode': self.is_demo_mode,
             'business_account_id': self.business_account_id,
+            'campaign_id': self.campaign_id,
             'company_name': self.get_company_name(),
             'product_name': self.get_product_name(),
             'conversation_tone': self.get_conversation_tone(),
             'max_questions': self.get_max_questions(),
             'max_duration_seconds': self.get_max_duration_seconds(),
-            'has_customization': self._has_customization() if self.business_account else False
+            'has_business_customization': self._has_customization(),
+            'has_campaign_customization': self.has_campaign_customization(),
+            'data_source_priority': 'campaign -> business_account -> demo',
+            'campaign_exists': self.campaign is not None,
+            'business_account_exists': self.business_account is not None
         }
+        
+        # Add campaign-specific debug info if available
+        if self.campaign:
+            info['campaign_info'] = {
+                'name': self.campaign.name,
+                'status': self.campaign.status,
+                'has_product_description': bool(self.campaign.product_description),
+                'has_custom_goals': bool(self.campaign.survey_goals),
+                'has_custom_end_message': bool(self.campaign.custom_end_message),
+                'has_prioritized_topics': bool(self.campaign.prioritized_topics)
+            }
+        
+        # Add business account debug info if available
+        if self.business_account:
+            info['business_account_info'] = {
+                'name': self.business_account.name,
+                'account_type': getattr(self.business_account, 'account_type', 'unknown'),
+                'has_product_description': bool(getattr(self.business_account, 'product_description', None)),
+                'has_conversation_tone': bool(getattr(self.business_account, 'conversation_tone', None))
+            }
+        
+        return info

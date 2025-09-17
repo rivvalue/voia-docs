@@ -1,0 +1,522 @@
+{% extends "base.html" %}
+
+{% block title %}Survey Configuration - {{ campaign.name }}{% endblock %}
+
+{% block page_class %}page-survey-config{% endblock %}
+
+{% block content %}
+<style>
+/* Survey configuration specific styling */
+.form-header {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+    padding: 2rem 0;
+    border-radius: var(--radius-2xl);
+    margin-bottom: 2rem;
+}
+
+.form-container {
+    background: var(--primary-white);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+}
+
+.form-section {
+    margin-bottom: 2.5rem;
+    border: 1px solid var(--light-gray);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    background: var(--light-gray);
+}
+
+.form-section:last-child {
+    margin-bottom: 0;
+}
+
+.section-title {
+    color: var(--primary-black);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-description {
+    color: var(--gray-dark);
+    font-size: var(--font-size-sm);
+    margin-bottom: 1.5rem;
+    line-height: var(--line-height-relaxed);
+}
+
+.form-group-inline {
+    display: flex;
+    gap: 1rem;
+    align-items: end;
+}
+
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: var(--radius-md);
+    transition: background-color 0.2s;
+}
+
+.checkbox-item:hover {
+    background-color: var(--primary-white);
+}
+
+.multi-select-container {
+    border: 1px solid var(--medium-gray);
+    border-radius: var(--radius-md);
+    background: var(--primary-white);
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.multi-select-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+}
+
+.range-info {
+    font-size: var(--font-size-xs);
+    color: var(--gray-dark);
+    margin-left: 0.5rem;
+}
+
+.preview-container {
+    background: var(--primary-white);
+    border: 1px solid var(--medium-gray);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    margin-top: 0.5rem;
+    font-style: italic;
+    color: var(--gray-dark);
+}
+
+.alert-info {
+    background-color: rgba(225, 58, 68, 0.1);
+    border-color: var(--primary-red);
+    color: var(--primary-black);
+}
+
+.advanced-section {
+    border: 2px dashed var(--medium-gray);
+    background: rgba(189, 189, 189, 0.1);
+}
+
+.advanced-toggle {
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s;
+}
+
+.advanced-toggle:hover {
+    color: var(--primary-red);
+}
+
+.advanced-content {
+    display: none;
+    margin-top: 1rem;
+}
+
+.advanced-content.show {
+    display: block;
+}
+
+/* Status indicators */
+.config-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+.config-status.configured {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.config-status.default {
+    background-color: var(--light-gray);
+    color: var(--gray-dark);
+}
+</style>
+
+<div class="container">
+    <!-- Form Header -->
+    <div class="form-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-1">Survey Configuration</h1>
+                    <p class="mb-0 opacity-75">Customize survey behavior for "{{ campaign.name }}"</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    {% if campaign.has_campaign_customization %}
+                    <span class="config-status configured">
+                        <i class="fas fa-check-circle"></i>Customized
+                    </span>
+                    {% else %}
+                    <span class="config-status default">
+                        <i class="fas fa-cog"></i>Default Settings
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('business_auth.admin_panel') }}">Admin Panel</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('campaigns.list_campaigns') }}">Campaigns</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}">{{ campaign.name }}</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Survey Configuration</li>
+        </ol>
+    </nav>
+
+    <!-- Survey Configuration Form -->
+    <div class="form-container">
+        <form method="POST" action="{{ url_for('campaigns.save_survey_config', campaign_id=campaign.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <!-- Product Focus Section -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-bullseye"></i>Product Focus
+                </h3>
+                <p class="section-description">
+                    Define what your campaign surveys are about. This helps the AI ask more relevant questions and better understand your business context.
+                </p>
+                
+                <div class="mb-3">
+                    <label for="product_description" class="form-label">Product/Service Description</label>
+                    <textarea class="form-control" id="product_description" name="product_description" rows="3" 
+                              placeholder="Describe your main products or services (e.g., 'Cloud-based accounting software for small businesses')">{{ campaign.product_description or '' }}</textarea>
+                    <div class="form-text">Help the AI understand what you offer to ask better questions</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="target_clients_description" class="form-label">Target Clients</label>
+                    <textarea class="form-control" id="target_clients_description" name="target_clients_description" rows="2" 
+                              placeholder="Describe your ideal customers (e.g., 'Small business owners, CFOs, accounting firms')">{{ campaign.target_clients_description or '' }}</textarea>
+                    <div class="form-text">Who are you primarily serving? This helps tailor conversation tone and questions</div>
+                </div>
+            </div>
+
+            <!-- Survey Goals Section -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-target"></i>Survey Goals
+                </h3>
+                <p class="section-description">
+                    Select the key objectives for this campaign. The AI will prioritize these areas during conversations.
+                </p>
+                
+                <div class="checkbox-group">
+                    {% for goal in ['NPS', 'Product Quality', 'Support Experience', 'Pricing Perception', 'Service Quality', 'User Experience', 'Feature Requests', 'Overall Satisfaction'] %}
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="goal_{{ loop.index }}" name="survey_goals" value="{{ goal }}" 
+                               {% if campaign.survey_goals and goal in campaign.survey_goals %}checked{% endif %}
+                               {% if goal == 'NPS' %}checked{% endif %}>
+                        <label for="goal_{{ loop.index }}" class="form-check-label">{{ goal }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="form-text mt-2">NPS is recommended for all campaigns to track customer loyalty</div>
+            </div>
+
+            <!-- Survey Controls Section -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-sliders-h"></i>Survey Controls
+                </h3>
+                <p class="section-description">
+                    Set limits to keep conversations focused and manageable for your participants.
+                </p>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="max_questions" class="form-label">Max Questions</label>
+                            <div class="form-group-inline">
+                                <input type="number" class="form-control" id="max_questions" name="max_questions" 
+                                       value="{{ campaign.max_questions or 8 }}" min="3" max="15">
+                                <span class="range-info">(3-15)</span>
+                            </div>
+                            <div class="form-text">Hard limit on conversation length</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="max_duration_seconds" class="form-label">Max Duration (seconds)</label>
+                            <div class="form-group-inline">
+                                <input type="number" class="form-control" id="max_duration_seconds" name="max_duration_seconds" 
+                                       value="{{ campaign.max_duration_seconds or 120 }}" min="60" max="300">
+                                <span class="range-info">(60-300)</span>
+                            </div>
+                            <div class="form-text">Time limit for entire conversation</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="max_follow_ups_per_topic" class="form-label">Max Follow-ups per Topic</label>
+                            <div class="form-group-inline">
+                                <input type="number" class="form-control" id="max_follow_ups_per_topic" name="max_follow_ups_per_topic" 
+                                       value="{{ campaign.max_follow_ups_per_topic or 2 }}" min="1" max="3">
+                                <span class="range-info">(1-3)</span>
+                            </div>
+                            <div class="form-text">Control topic depth exploration</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Topic Prioritization Section -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-list-ol"></i>Topic Prioritization
+                </h3>
+                <p class="section-description">
+                    Choose which topics to cover first and which ones can be skipped if time runs out.
+                </p>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Prioritized Topics (cover first)</label>
+                            <div class="multi-select-container">
+                                {% for topic in ['NPS Score', 'Product Quality', 'Support Experience', 'Service Rating', 'Pricing Value', 'User Experience', 'Feature Requests', 'Improvement Suggestions'] %}
+                                <div class="multi-select-item">
+                                    <input type="checkbox" id="priority_{{ loop.index }}" name="prioritized_topics" value="{{ topic }}" 
+                                           {% if campaign.prioritized_topics and topic in campaign.prioritized_topics %}checked{% endif %}
+                                           {% if topic in ['NPS Score', 'Product Quality', 'Support Experience'] %}checked{% endif %}>
+                                    <label for="priority_{{ loop.index }}" class="form-check-label">{{ topic }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="form-text">These topics will be covered first and are most important</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Optional Topics (can be skipped)</label>
+                            <div class="multi-select-container">
+                                {% for topic in ['Pricing Value', 'Additional Comments', 'Feature Requests', 'Competitor Comparison', 'Usage Frequency', 'Referral Likelihood'] %}
+                                <div class="multi-select-item">
+                                    <input type="checkbox" id="optional_{{ loop.index }}" name="optional_topics" value="{{ topic }}" 
+                                           {% if campaign.optional_topics and topic in campaign.optional_topics %}checked{% endif %}
+                                           {% if topic == 'Pricing Value' %}checked{% endif %}>
+                                    <label for="optional_{{ loop.index }}" class="form-check-label">{{ topic }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="form-text">These topics will be skipped if time/questions run out</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customization Section -->
+            <div class="form-section">
+                <div class="mb-3">
+                    <label for="custom_end_message" class="form-label">Custom End Message</label>
+                    <textarea class="form-control" id="custom_end_message" name="custom_end_message" rows="3" 
+                              placeholder="Optional custom thank you message for survey completion">{{ campaign.custom_end_message or '' }}</textarea>
+                    <div class="form-text">Personalized message shown when participants complete the survey</div>
+                    {% if campaign.custom_end_message %}
+                    <div class="preview-container" id="end_message_preview">
+                        "{{ campaign.custom_end_message }}"
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Advanced Customization Section -->
+            <div class="form-section advanced-section">
+                <h3 class="section-title advanced-toggle" onclick="toggleAdvanced()">
+                    <i class="fas fa-code" id="advanced-icon"></i>Advanced Customization
+                    <small class="text-muted">(click to expand)</small>
+                </h3>
+                <div class="advanced-content" id="advanced-content">
+                    <p class="section-description">
+                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                        <strong>Advanced users only:</strong> Customize the AI system prompt for specialized survey behavior.
+                    </p>
+                    
+                    <div class="mb-3">
+                        <label for="custom_system_prompt" class="form-label">Custom System Prompt</label>
+                        <textarea class="form-control" id="custom_system_prompt" name="custom_system_prompt" rows="5" 
+                                  placeholder="Optional: Override the default AI system prompt with custom instructions">{{ campaign.custom_system_prompt or '' }}</textarea>
+                        <div class="form-text">
+                            Advanced: Custom instructions for the AI conversation engine. Leave blank to use intelligent defaults.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Information Alert -->
+            <div class="alert alert-info">
+                <i class="fas fa-lightbulb me-2"></i>
+                <strong>Configuration Tips:</strong>
+                <ul class="mb-0 mt-2">
+                    <li>Start with default settings and customize based on your needs</li>
+                    <li>Shorter surveys (5-8 questions) typically get better completion rates</li>
+                    <li>NPS score is recommended for all campaigns to track customer loyalty</li>
+                    <li>Use product description to help AI ask more relevant questions</li>
+                </ul>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="d-flex justify-content-between">
+                <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Campaign
+                </a>
+                <div>
+                    <button type="button" class="btn btn-outline-primary me-2" onclick="previewConfig()">
+                        <i class="fas fa-eye me-2"></i>Preview Changes
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Save Configuration
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Toggle advanced section
+function toggleAdvanced() {
+    const content = document.getElementById('advanced-content');
+    const icon = document.getElementById('advanced-icon');
+    
+    content.classList.toggle('show');
+    
+    if (content.classList.contains('show')) {
+        icon.className = 'fas fa-code-branch';
+    } else {
+        icon.className = 'fas fa-code';
+    }
+}
+
+// Preview end message as user types
+document.getElementById('custom_end_message').addEventListener('input', function() {
+    const preview = document.getElementById('end_message_preview');
+    const value = this.value.trim();
+    
+    if (value) {
+        if (!preview) {
+            const newPreview = document.createElement('div');
+            newPreview.id = 'end_message_preview';
+            newPreview.className = 'preview-container';
+            this.parentNode.appendChild(newPreview);
+        }
+        document.getElementById('end_message_preview').innerHTML = `"${value}"`;
+    } else if (preview) {
+        preview.remove();
+    }
+});
+
+// Validation for numeric inputs
+document.addEventListener('DOMContentLoaded', function() {
+    const maxQuestions = document.getElementById('max_questions');
+    const maxDuration = document.getElementById('max_duration_seconds');
+    const maxFollowUps = document.getElementById('max_follow_ups_per_topic');
+    
+    maxQuestions.addEventListener('change', function() {
+        if (this.value < 3 || this.value > 15) {
+            alert('Max questions must be between 3 and 15');
+            this.value = 8;
+        }
+    });
+    
+    maxDuration.addEventListener('change', function() {
+        if (this.value < 60 || this.value > 300) {
+            alert('Max duration must be between 60 and 300 seconds');
+            this.value = 120;
+        }
+    });
+    
+    maxFollowUps.addEventListener('change', function() {
+        if (this.value < 1 || this.value > 3) {
+            alert('Max follow-ups per topic must be between 1 and 3');
+            this.value = 2;
+        }
+    });
+});
+
+// Preview configuration changes
+function previewConfig() {
+    const form = document.querySelector('form');
+    const formData = new FormData(form);
+    
+    let summary = "Configuration Summary:\n\n";
+    
+    // Product focus
+    const productDesc = formData.get('product_description');
+    if (productDesc) {
+        summary += `Product: ${productDesc.substring(0, 100)}${productDesc.length > 100 ? '...' : ''}\n`;
+    }
+    
+    // Survey goals
+    const goals = formData.getAll('survey_goals');
+    if (goals.length > 0) {
+        summary += `Goals: ${goals.join(', ')}\n`;
+    }
+    
+    // Controls
+    summary += `Max Questions: ${formData.get('max_questions')}\n`;
+    summary += `Max Duration: ${formData.get('max_duration_seconds')} seconds\n`;
+    summary += `Max Follow-ups: ${formData.get('max_follow_ups_per_topic')}\n`;
+    
+    // Prioritized topics
+    const prioritized = formData.getAll('prioritized_topics');
+    if (prioritized.length > 0) {
+        summary += `Priority Topics: ${prioritized.join(', ')}\n`;
+    }
+    
+    // Optional topics
+    const optional = formData.getAll('optional_topics');
+    if (optional.length > 0) {
+        summary += `Optional Topics: ${optional.join(', ')}\n`;
+    }
+    
+    // Custom end message
+    const endMessage = formData.get('custom_end_message');
+    if (endMessage) {
+        summary += `\nCustom End Message:\n"${endMessage}"\n`;
+    }
+    
+    alert(summary);
+}
+</script>
+{% endblock %}

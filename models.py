@@ -131,6 +131,18 @@ class Campaign(db.Model):
                                  backref='campaigns',
                                  lazy='dynamic')
     
+    # Campaign-specific survey customization fields
+    product_description = db.Column(db.Text, nullable=True)
+    target_clients_description = db.Column(db.Text, nullable=True)
+    survey_goals = db.Column(db.JSON, nullable=True)
+    max_questions = db.Column(db.Integer, nullable=True, default=8)
+    max_duration_seconds = db.Column(db.Integer, nullable=True, default=120)
+    max_follow_ups_per_topic = db.Column(db.Integer, nullable=True, default=2)
+    prioritized_topics = db.Column(db.JSON, nullable=True)
+    optional_topics = db.Column(db.JSON, nullable=True)
+    custom_end_message = db.Column(db.Text, nullable=True)
+    custom_system_prompt = db.Column(db.Text, nullable=True)
+    
     # Metadata
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     completed_at = db.Column(db.DateTime, nullable=True)
@@ -152,7 +164,18 @@ class Campaign(db.Model):
             'is_active': self.is_active(),
             'days_remaining': self.days_remaining(),
             'days_since_ended': self.days_since_ended(),
-            'days_until_start': self.days_until_start()
+            'days_until_start': self.days_until_start(),
+            # Campaign-specific survey customization fields
+            'product_description': self.product_description,
+            'target_clients_description': self.target_clients_description,
+            'survey_goals': self.survey_goals,
+            'max_questions': self.max_questions,
+            'max_duration_seconds': self.max_duration_seconds,
+            'max_follow_ups_per_topic': self.max_follow_ups_per_topic,
+            'prioritized_topics': self.prioritized_topics,
+            'optional_topics': self.optional_topics,
+            'custom_end_message': self.custom_end_message,
+            'custom_system_prompt': self.custom_system_prompt
         }
     
     def is_active(self):
@@ -285,6 +308,43 @@ class Campaign(db.Model):
             query = query.filter(Campaign.id != exclude_id)
             
         return query.first() is not None
+    
+    def get_survey_config(self):
+        """Return all survey configuration as dict"""
+        return {
+            'product_description': self.product_description,
+            'target_clients_description': self.target_clients_description,
+            'survey_goals': self.survey_goals,
+            'max_questions': self.max_questions,
+            'max_duration_seconds': self.max_duration_seconds,
+            'max_follow_ups_per_topic': self.max_follow_ups_per_topic,
+            'prioritized_topics': self.prioritized_topics,
+            'optional_topics': self.optional_topics,
+            'custom_end_message': self.custom_end_message,
+            'custom_system_prompt': self.custom_system_prompt
+        }
+    
+    def has_campaign_customization(self):
+        """Return True if campaign has any customization data"""
+        return bool(
+            self.product_description or
+            self.target_clients_description or
+            self.survey_goals or
+            self.max_questions != 8 or  # Default is 8
+            self.max_duration_seconds != 120 or  # Default is 120
+            self.max_follow_ups_per_topic != 2 or  # Default is 2
+            self.prioritized_topics or
+            self.optional_topics or
+            self.custom_end_message or
+            self.custom_system_prompt
+        )
+    
+    def get_effective_survey_goals(self):
+        """Return survey_goals or default fallback"""
+        if self.survey_goals:
+            return self.survey_goals
+        # Default survey goals fallback
+        return ["NPS", "Product Quality", "Support Experience", "Overall Satisfaction"]
 
 
 class CampaignKPISnapshot(db.Model):

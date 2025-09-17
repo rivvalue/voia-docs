@@ -1483,14 +1483,15 @@ def start_conversation():
         if not company_name or not respondent_name or not respondent_email or not tenure_with_fc:
             return jsonify({'error': 'All fields are required'}), 400
         
-        # Get business account ID from session for PromptTemplateService integration
+        # Get business account ID and campaign ID from session for PromptTemplateService integration
         business_account_id = session.get('business_account_id')
+        campaign_id = session.get('campaign_id')
         
         # Debug logging
-        logger.info(f"Starting conversation for {respondent_name} with tenure: {tenure_with_fc}, business_account_id: {business_account_id}")
+        logger.info(f"Starting conversation for {respondent_name} with tenure: {tenure_with_fc}, business_account_id: {business_account_id}, campaign_id: {campaign_id}")
         
-        # Start conversation with AI, passing the tenure data and business_account_id
-        conversation_response = start_ai_conversational_survey(company_name, respondent_name, tenure_with_fc, business_account_id=business_account_id)
+        # Start conversation with AI, passing the tenure data, business_account_id, and campaign_id
+        conversation_response = start_ai_conversational_survey(company_name, respondent_name, tenure_with_fc, business_account_id=business_account_id, campaign_id=campaign_id)
         
         return jsonify({
             'conversation_id': conversation_response['conversation_id'],
@@ -1530,8 +1531,9 @@ def conversation_response():
         # Add authenticated email and conversation_id to survey data
         survey_data['respondent_email'] = authenticated_email
         survey_data['conversation_id'] = conversation_id
-        # Add business_account_id for PromptTemplateService integration
+        # Add business_account_id and campaign_id for PromptTemplateService integration
         survey_data['business_account_id'] = session.get('business_account_id')
+        survey_data['campaign_id'] = session.get('campaign_id')
         
         # Process response with AI
         ai_response = process_ai_conversation_response(user_input, survey_data)
