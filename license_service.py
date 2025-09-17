@@ -18,6 +18,7 @@ providing enhanced functionality through the license_history table structure.
 from datetime import datetime, date, timedelta
 from typing import Optional, Tuple, Dict, List, Any
 import logging
+import json
 from models import LicenseHistory, BusinessAccount, Campaign, db
 from sqlalchemy import and_, func
 from license_templates import LicenseTemplateManager, LicenseTemplate
@@ -875,3 +876,534 @@ class LicenseService:
         except Exception as e:
             logger.error(f"Failed to get license template comparison: {e}")
             return {'license_types': [], 'features': {}, 'limits': {}, 'templates': {}}
+    
+    # ==== COMPREHENSIVE LICENSE ASSIGNMENT LOGIC ====
+    
+    @staticmethod
+    def assign_license_to_business(
+        business_id: int, 
+        license_type: str,
+        custom_limits: Optional[Dict[str, Any]] = None,
+        assigned_by: Optional[str] = None,
+        start_date: Optional[datetime] = None,
+        duration_months: Optional[int] = None
+    ) -> Tuple[bool, Optional[LicenseHistory], str]:
+        """
+        Comprehensive license assignment method with validation and transition handling.
+        
+        Args:
+            business_id: Business account ID to assign license to
+            license_type: License type (core, plus, pro, trial)  
+            custom_limits: Optional custom limits for Pro licenses
+            assigned_by: User who is assigning the license (for audit trail)
+            start_date: License start date (defaults to now)
+            duration_months: License duration in months (defaults to template default)
+            
+        Returns:
+            tuple: (success: bool, license_record: LicenseHistory, message: str)
+            
+        Features:
+            - Comprehensive validation of all inputs
+            - Automatic handling of existing license transitions
+            - Proper audit trail integration
+            - Transaction safety with rollback on errors
+            - Clear success/error messaging
+        """
+        logger.info(f"Starting license assignment for business_id {business_id}, license_type {license_type}")
+        
+        try:
+            # Step 1: Validate the license assignment request
+            validation_success, validation_message = LicenseService.validate_license_assignment(
+                business_id, license_type, custom_limits
+            )
+            
+            if not validation_success:
+                logger.warning(f"License assignment validation failed for business_id {business_id}: {validation_message}")
+                return False, None, validation_message
+            
+            # Step 2: Get template and create license configuration
+            template = LicenseTemplateManager.get_template(license_type)
+            if not template:
+                return False, None, f"License template not found for type '{license_type}'"
+                
+            if custom_limits and template.is_custom:
+                license_config = LicenseTemplateManager.create_license_config(license_type, custom_limits)
+            else:
+                license_config = template.to_dict()
+            
+            # Step 3: Calculate license dates
+            activation_date, expiration_date = LicenseTemplateManager.calculate_license_dates(
+                license_type=license_type,
+                start_date=start_date,
+                duration_months=duration_months or license_config.get('default_duration_months')
+            )
+            
+            # Step 4: Handle existing license transitions with concurrency protection
+            # Use SELECT...FOR UPDATE to prevent race conditions during license assignment
+            business_account = BusinessAccount.query.with_for_update().get(business_id)
+            if not business_account:
+                return False, None, f"Business account {business_id} not found during assignment"
+            
+            # Get existing license with row-level locking to prevent concurrent modifications
+            existing_license = LicenseHistory.query.filter(
+                LicenseHistory.business_account_id == business_id,
+                LicenseHistory.status == 'active'
+            ).with_for_update().first()
+            
+            transition_message = ""
+            
+            if existing_license:
+                transition_success, transition_msg = LicenseService.handle_license_transitions(
+                    existing_license, license_type, assigned_by
+                )
+                if not transition_success:
+                    return False, None, f"License transition failed: {transition_msg}"
+                transition_message = f" (Previous {existing_license.license_type} license expired)"
+            
+            # Step 5: Create new license record with comprehensive audit trail
+            assignment_notes = f"License assigned by {assigned_by or 'System'}"
+            if custom_limits:
+                assignment_notes += f" with custom limits: {custom_limits}"
+            if transition_message:
+                assignment_notes += transition_message
+            
+            new_license = LicenseHistory(
+                business_account_id=business_id,
+                license_type=license_config['license_type'],
+                status='active',
+                activated_at=activation_date,
+                expires_at=expiration_date,
+                max_campaigns_per_year=license_config['max_campaigns_per_year'],
+                max_users=license_config['max_users'], 
+                max_participants_per_campaign=license_config['max_participants_per_campaign'],
+                created_by=assigned_by,
+                notes=assignment_notes
+            )
+            
+            # Step 6: Save to database with enhanced transaction safety and constraint handling
+            try:
+                db.session.add(new_license)
+                db.session.commit()
+            except Exception as db_error:
+                db.session.rollback()
+                if "duplicate key" in str(db_error).lower() or "unique constraint" in str(db_error).lower():
+                    logger.error(f"Concurrency conflict during license assignment for business_id {business_id}: {db_error}")
+                    return False, None, "License assignment failed due to concurrent modification. Please retry."
+                else:
+                    raise db_error
+            
+            # Step 7: Log success and create audit trail
+            success_message = (
+                f"Successfully assigned {license_type} license to business_id {business_id}. "
+                f"License ID: {new_license.id}, expires: {expiration_date.strftime('%Y-%m-%d')}{transition_message}"
+            )
+            
+            logger.info(success_message)
+            
+            # Optional: Create audit log entry
+            LicenseService._create_license_audit_log(
+                business_id=business_id,
+                action="license_assigned",
+                details={
+                    'license_id': new_license.id,
+                    'license_type': license_type,
+                    'custom_limits': custom_limits,
+                    'expires_at': expiration_date.isoformat(),
+                    'assigned_by': assigned_by
+                },
+                user_email=assigned_by
+            )
+            
+            return True, new_license, success_message
+            
+        except Exception as e:
+            logger.error(f"Failed to assign license {license_type} to business_id {business_id}: {e}")
+            db.session.rollback()
+            error_message = f"License assignment failed due to system error: {str(e)}"
+            return False, None, error_message
+    
+    @staticmethod
+    def validate_license_assignment(
+        business_id: int, 
+        license_type: str, 
+        custom_limits: Optional[Dict[str, Any]] = None
+    ) -> Tuple[bool, str]:
+        """
+        Comprehensive validation for license assignment requests.
+        
+        Args:
+            business_id: Business account ID to validate
+            license_type: License type to validate
+            custom_limits: Optional custom limits to validate
+            
+        Returns:
+            tuple: (is_valid: bool, error_message: str)
+            
+        Validation Checks:
+            - Business account existence
+            - License type validity
+            - Custom limits validation for Pro licenses
+            - Business account status checks
+        """
+        try:
+            # Check 1: Verify business account exists
+            business_account = BusinessAccount.query.get(business_id)
+            if not business_account:
+                return False, f"Business account {business_id} not found"
+            
+            # Check 2: Validate license type
+            if not LicenseTemplateManager.validate_license_type(license_type):
+                available_types = LicenseTemplateManager.get_available_license_types()
+                valid_types = ', '.join([t['license_type'] for t in available_types])
+                return False, f"Invalid license type '{license_type}'. Valid types: {valid_types}"
+            
+            # Check 3: Get template for additional validation
+            template = LicenseTemplateManager.get_template(license_type)
+            if not template:
+                return False, f"License template not found for type '{license_type}'"
+            
+            # Check 4: Validate custom limits for Pro licenses
+            if custom_limits:
+                if not template.is_custom:
+                    return False, f"Custom limits not supported for {license_type} license type"
+                
+                # Validate custom limit parameters
+                validation_errors = []
+                
+                if 'max_campaigns_per_year' in custom_limits:
+                    value = custom_limits['max_campaigns_per_year']
+                    if not isinstance(value, int) or value <= 0 or value > 1000:
+                        validation_errors.append("max_campaigns_per_year must be a positive integer between 1 and 1000")
+                
+                if 'max_users' in custom_limits:
+                    value = custom_limits['max_users']
+                    if not isinstance(value, int) or value <= 0 or value > 10000:
+                        validation_errors.append("max_users must be a positive integer between 1 and 10000")
+                
+                if 'max_participants_per_campaign' in custom_limits:
+                    value = custom_limits['max_participants_per_campaign']
+                    if not isinstance(value, int) or value <= 0 or value > 1000000:
+                        validation_errors.append("max_participants_per_campaign must be a positive integer between 1 and 1000000")
+                
+                if 'duration_months' in custom_limits:
+                    value = custom_limits['duration_months']
+                    if not isinstance(value, int) or value <= 0 or value > 120:
+                        validation_errors.append("duration_months must be a positive integer between 1 and 120")
+                
+                if validation_errors:
+                    return False, "Custom limits validation failed: " + "; ".join(validation_errors)
+            
+            # Check 5: Business account status validation
+            if hasattr(business_account, 'status') and business_account.status == 'suspended':
+                return False, f"Cannot assign license to suspended business account {business_id}"
+            
+            # Check 6: Downgrade usage validation - Critical for preventing unsafe downgrades
+            current_license = LicenseService.get_current_license(business_id)
+            if current_license:
+                downgrade_validation = LicenseService._validate_downgrade_usage(
+                    business_id, current_license, template
+                )
+                if not downgrade_validation[0]:
+                    return downgrade_validation  # Returns (False, error_message)
+            
+            # All validation checks passed
+            return True, "Validation successful"
+            
+        except Exception as e:
+            logger.error(f"License assignment validation error for business_id {business_id}: {e}")
+            return False, f"Validation error: {str(e)}"
+    
+    @staticmethod
+    def handle_license_transitions(
+        old_license: LicenseHistory, 
+        new_license_type: str,
+        assigned_by: Optional[str] = None
+    ) -> Tuple[bool, str]:
+        """
+        Handle transitions between existing and new licenses.
+        
+        Args:
+            old_license: Current active license to transition from
+            new_license_type: New license type being assigned
+            assigned_by: User performing the transition
+            
+        Returns:
+            tuple: (success: bool, message: str)
+            
+        Transition Handling:
+            - Properly expire existing active licenses
+            - Preserve historical records and audit trail
+            - Handle upgrade/downgrade scenarios
+            - Maintain data integrity
+        """
+        try:
+            if not old_license or not old_license.is_active():
+                return True, "No active license to transition from"
+            
+            # Determine transition type
+            transition_type = LicenseService._determine_transition_type(old_license.license_type, new_license_type)
+            
+            # Create transition notes
+            transition_notes = (
+                f"License transitioned from {old_license.license_type} to {new_license_type} "
+                f"({transition_type}) by {assigned_by or 'System'} on {datetime.utcnow().isoformat()}"
+            )
+            
+            # Expire the old license
+            old_license.status = 'expired'
+            old_license.notes = (old_license.notes or "") + f"\n{transition_notes}"
+            
+            # Log the transition
+            logger.info(f"License transition for business_account_id {old_license.business_account_id}: "
+                       f"{old_license.license_type} -> {new_license_type} ({transition_type})")
+            
+            # Create audit log for the transition
+            LicenseService._create_license_audit_log(
+                business_id=old_license.business_account_id,
+                action="license_transitioned",
+                details={
+                    'old_license_id': old_license.id,
+                    'old_license_type': old_license.license_type,
+                    'new_license_type': new_license_type,
+                    'transition_type': transition_type
+                },
+                user_email=assigned_by
+            )
+            
+            return True, f"Successfully transitioned from {old_license.license_type} to {new_license_type}"
+            
+        except Exception as e:
+            logger.error(f"License transition failed for license {old_license.id}: {e}")
+            return False, f"Transition error: {str(e)}"
+    
+    @staticmethod
+    def _determine_transition_type(old_license_type: str, new_license_type: str) -> str:
+        """
+        Determine the type of license transition (upgrade, downgrade, lateral).
+        
+        Args:
+            old_license_type: Current license type
+            new_license_type: New license type
+            
+        Returns:
+            str: Transition type ('upgrade', 'downgrade', 'lateral', 'renewal')
+        """
+        # Define license hierarchy for upgrade/downgrade determination
+        license_hierarchy = {
+            'trial': 1,
+            'core': 2,
+            'plus': 3,
+            'pro': 4
+        }
+        
+        old_level = license_hierarchy.get(old_license_type.lower(), 0)
+        new_level = license_hierarchy.get(new_license_type.lower(), 0)
+        
+        if old_license_type.lower() == new_license_type.lower():
+            return 'renewal'
+        elif new_level > old_level:
+            return 'upgrade'
+        elif new_level < old_level:
+            return 'downgrade'
+        else:
+            return 'lateral'
+    
+    @staticmethod  
+    def _create_license_audit_log(
+        business_id: int,
+        action: str, 
+        details: Dict[str, Any],
+        user_email: Optional[str] = None
+    ) -> None:
+        """
+        Create audit log entry for license operations.
+        
+        Args:
+            business_id: Business account ID
+            action: Action performed (e.g., 'license_assigned', 'license_transitioned')
+            details: Detailed information about the action
+            user_email: Email of user who performed the action
+        """
+        try:
+            # Import AuditLog here to avoid circular imports
+            from models import AuditLog
+            
+            # Generate human-readable action description
+            action_desc = LicenseService._generate_audit_description(action, details)
+            
+            audit_entry = AuditLog(
+                business_account_id=business_id,
+                user_email=user_email or 'System',
+                action_type=action,
+                action_description=action_desc,
+                resource_type='license',
+                resource_id=str(details.get('license_id')) if details.get('license_id') else None,
+                resource_name=f"{details.get('license_type', 'Unknown')} license",
+                details=json.dumps(details),
+                ip_address=None  # Could be passed as parameter if needed
+            )
+            
+            db.session.add(audit_entry)
+            # Note: commit is handled by the calling method
+            
+            logger.debug(f"Created audit log entry for {action} on business_id {business_id}")
+            
+        except Exception as e:
+            # Don't fail the main operation if audit logging fails
+            logger.warning(f"Failed to create audit log entry: {e}")
+    
+    @staticmethod
+    def _generate_audit_description(action: str, details: Dict[str, Any]) -> str:
+        """
+        Generate human-readable audit descriptions for license actions.
+        
+        Args:
+            action: Action type (e.g., 'license_assigned', 'license_transitioned')
+            details: Action details dictionary
+            
+        Returns:
+            str: Human-readable description of the action
+        """
+        try:
+            if action == 'license_assigned':
+                license_type = details.get('license_type', 'Unknown')
+                assigned_by = details.get('assigned_by', 'System')
+                return f"{license_type.title()} license assigned by {assigned_by}"
+            
+            elif action == 'license_transitioned':
+                old_type = details.get('old_license_type', 'Unknown')
+                new_type = details.get('new_license_type', 'Unknown')
+                transition_type = details.get('transition_type', 'changed')
+                return f"License {transition_type} from {old_type} to {new_type}"
+            
+            elif action == 'license_expired':
+                license_type = details.get('license_type', 'Unknown')
+                return f"{license_type.title()} license expired"
+            
+            else:
+                return f"License {action} completed"
+                
+        except Exception as e:
+            logger.warning(f"Failed to generate audit description: {e}")
+            return f"License {action} action"
+    
+    @staticmethod
+    def _validate_downgrade_usage(
+        business_id: int,
+        current_license: LicenseHistory, 
+        target_template: LicenseTemplate
+    ) -> Tuple[bool, str]:
+        """
+        Validate that current usage is compatible with target license limits.
+        Critical for preventing unsafe downgrades that would violate constraints.
+        
+        Args:
+            business_id: Business account ID to validate
+            current_license: Current active license
+            target_template: Target license template with limits
+            
+        Returns:
+            tuple: (is_safe: bool, error_message: str)
+            
+        Usage Checks:
+            - Current users vs target max_users limit
+            - Campaigns used in current period vs target max_campaigns limit  
+            - Max participants across active campaigns vs target limit
+        """
+        try:
+            # Determine if this is a downgrade by comparing license hierarchy
+            transition_type = LicenseService._determine_transition_type(
+                current_license.license_type, target_template.license_type
+            )
+            
+            # Only validate usage for downgrades - upgrades and lateral moves are safe
+            if transition_type != 'downgrade':
+                return True, "No downgrade usage validation needed"
+            
+            validation_errors = []
+            
+            # Check 1: Current users vs target max_users limit
+            try:
+                business_account = BusinessAccount.query.get(business_id)
+                if business_account and hasattr(business_account, 'current_users_count'):
+                    current_users = business_account.current_users_count
+                    if current_users > target_template.max_users:
+                        validation_errors.append(
+                            f"Current users ({current_users}) exceeds target limit ({target_template.max_users})"
+                        )
+            except Exception as e:
+                logger.warning(f"Could not validate user count for business_id {business_id}: {e}")
+            
+            # Check 2: Campaigns used in current license period vs target limit  
+            try:
+                period_start, period_end = LicenseService.get_license_period(business_id)
+                if period_start and period_end:
+                    campaigns_used = LicenseService.get_campaigns_used_in_current_period(
+                        business_id, period_start, period_end
+                    )
+                    if campaigns_used > target_template.max_campaigns_per_year:
+                        validation_errors.append(
+                            f"Campaigns used this period ({campaigns_used}) exceeds target limit ({target_template.max_campaigns_per_year})"
+                        )
+            except Exception as e:
+                logger.warning(f"Could not validate campaign usage for business_id {business_id}: {e}")
+            
+            # Check 3: Max participants across active campaigns vs target limit
+            try:
+                from models import CampaignParticipant, Campaign
+                max_participants_query = db.session.query(
+                    func.max(func.count(CampaignParticipant.id))
+                ).join(Campaign).filter(
+                    Campaign.business_account_id == business_id,
+                    Campaign.status.in_(['active', 'ready'])  # Only check active campaigns
+                ).group_by(Campaign.id)
+                
+                max_participants_result = max_participants_query.scalar()
+                max_participants_used = max_participants_result or 0
+                
+                if max_participants_used > target_template.max_participants_per_campaign:
+                    validation_errors.append(
+                        f"Max participants in active campaign ({max_participants_used}) exceeds target limit ({target_template.max_participants_per_campaign})"
+                    )
+            except Exception as e:
+                logger.warning(f"Could not validate participant usage for business_id {business_id}: {e}")
+            
+            # Return validation results
+            if validation_errors:
+                error_msg = (
+                    f"Cannot downgrade from {current_license.license_type} to {target_template.license_type} "
+                    f"due to current usage exceeding target limits: {'; '.join(validation_errors)}"
+                )
+                logger.warning(f"Downgrade blocked for business_id {business_id}: {error_msg}")
+                return False, error_msg
+            
+            return True, "Downgrade usage validation passed"
+            
+        except Exception as e:
+            logger.error(f"Downgrade validation error for business_id {business_id}: {e}")
+            return False, f"Downgrade validation failed: {str(e)}"
+    
+    @staticmethod
+    def get_license_assignment_history(business_id: int, limit: int = 50) -> List[Dict[str, Any]]:
+        """
+        Get the license assignment history for a business account.
+        
+        Args:
+            business_id: Business account ID
+            limit: Maximum number of records to return
+            
+        Returns:
+            list: List of license history records with assignment details
+        """
+        try:
+            license_records = LicenseHistory.query.filter_by(
+                business_account_id=business_id
+            ).order_by(
+                LicenseHistory.created_at.desc()
+            ).limit(limit).all()
+            
+            return [record.to_dict() for record in license_records]
+            
+        except Exception as e:
+            logger.error(f"Failed to get license assignment history for business_id {business_id}: {e}")
+            return []

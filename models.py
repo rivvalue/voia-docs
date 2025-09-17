@@ -1645,7 +1645,11 @@ class LicenseHistory(db.Model):
     """License History model for tracking license periods and changes over time"""
     __tablename__ = 'license_history'
     __table_args__ = (
-        # Ensure business accounts don't have overlapping active licenses
+        # CRITICAL: Prevent overlapping active licenses with partial unique index
+        # This creates a unique constraint only for active licenses per business account
+        db.Index('uq_license_history_active_per_business', 'business_account_id',
+               unique=True, postgresql_where=db.text("status = 'active'")),
+        # Performance indexes for common queries
         db.Index('idx_license_history_business_status', 'business_account_id', 'status'),
         db.Index('idx_license_history_dates', 'activated_at', 'expires_at'),
         db.Index('idx_license_history_type', 'license_type'),
@@ -1761,11 +1765,23 @@ class LicenseHistory(db.Model):
         else:
             check_datetime = datetime.combine(reference_date, datetime.min.time())
         
-        return LicenseHistory.query.filter(
+        # First try to get an active license for the date
+        active_license = LicenseHistory.query.filter(
             LicenseHistory.business_account_id == business_account_id,
+            LicenseHistory.status == 'active',
             LicenseHistory.activated_at <= check_datetime,
             LicenseHistory.expires_at >= check_datetime
         ).first()
+        
+        # If no active license found, get any license that was valid for that date
+        if not active_license:
+            return LicenseHistory.query.filter(
+                LicenseHistory.business_account_id == business_account_id,
+                LicenseHistory.activated_at <= check_datetime,
+                LicenseHistory.expires_at >= check_datetime
+            ).order_by(LicenseHistory.created_at.desc()).first()
+        
+        return active_license
     
     @staticmethod
     def create_trial_license(business_account_id, activated_at=None, created_by='system_migration'):
