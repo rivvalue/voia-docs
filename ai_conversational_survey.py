@@ -181,19 +181,27 @@ Context of conversation:
 CRITICAL INSTRUCTION: Only extract NEW information from this specific response. 
 DO NOT re-extract or change data that was already captured in previous responses.
 
+RATING EXTRACTION PRIORITY: If you see explicit ratings like "I rate them 3", "3 out of 5", "I'd give them a 4", extract these immediately.
+
 Extract any of the following data present in the response:
 - Tenure with {company_name}: Look for duration mentions like "6 months", "2 years", "less than 6 months", etc.
-- NPS score (0-10): Look for numbers, recommendations, likelihood scores
-- Satisfaction level (1-5): Look for satisfaction, happiness, contentment indicators
-- Service quality rating (1-5): Look for professional services, service delivery ratings
-- Product value rating (1-5): Look for product quality, solution value, deliverable satisfaction
-- Pricing rating (1-5): Look for pricing value, cost appreciation, pricing satisfaction
-- Support rating (1-5): Look for customer service, support quality, help desk ratings
+- NPS score (0-10): Numbers for recommendations, likelihood scores (0-10 only)
+- Satisfaction level (1-5): Explicit ratings like "I rate them 3", "3/5", satisfaction numbers (1-5 only)
+- Service quality rating (1-5): Service/professional ratings like "service is 4", "I rate their service 3" (1-5 only)  
+- Product value rating (1-5): Product/solution ratings like "product is 2", "I rate the value 4" (1-5 only)
+- Pricing rating (1-5): Pricing ratings like "price is fair, 3", "I rate pricing 2" (1-5 only)
+- Support rating (1-5): Support ratings like "support gets a 4", customer service numbers (1-5 only)
 - Improvement suggestions: Any feedback about what could be better
-- Compliments: What they liked or appreciated
+- Compliments: What they liked or appreciated  
 - Complaints: What they didn't like or found problematic
 - Reasons: Why they gave their rating or recommendation
 - Additional comments: Any other relevant feedback
+
+PATTERNS TO WATCH FOR:
+- "I rate [topic] X" or "I'd rate [topic] X" → extract rating X for that topic
+- "[Topic] is X" or "[Topic] gets X" → extract rating X 
+- "X out of 5" or "X/5" → extract rating X
+- Simple numbers in context → extract as ratings when topic is clear
 
 Return ONLY JSON in this format:
 {{
@@ -286,6 +294,151 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
                         break
                 if 'nps_score' in extracted:
                     break
+        
+        # CRITICAL FIX: Extract explicit numeric ratings for all categories 
+        # Patterns like "I rate them 3", "service is 4", "I'd give them a 2"
+        if re.search(r'\b[1-5]\b', user_input):
+            print(f"Attempting explicit rating extraction for input: '{user_input}'")
+            
+            # Generic rating patterns - catch "I rate X" statements
+            generic_rating_patterns = [
+                r'(?:i\s*rate.*?)([1-5])',
+                r'(?:i.*d\s*rate.*?)([1-5])',
+                r'(?:i.*d\s*give.*?)([1-5])',
+                r'(?:rate.*?)([1-5])',
+                r'(?:give.*?)([1-5])',
+                r'([1-5])(?:\s*out\s*of\s*5|/5)',
+                r'(?:is\s*a?\s*)([1-5])',
+                r'(?:gets\s*a?\s*)([1-5])',
+                r'([1-5])(?:\s*(?:stars?|points?))',
+                r'\b([1-5])\b'  # Any isolated 1-5 number
+            ]
+            
+            # Service-specific rating patterns
+            service_patterns = [
+                r'(?:service.*?)([1-5])',
+                r'(?:professional.*?)([1-5])',
+                r'(?:quality.*?)([1-5])'
+            ]
+            
+            # Satisfaction-specific patterns  
+            satisfaction_patterns = [
+                r'(?:satisfaction.*?)([1-5])',
+                r'(?:satisfied.*?)([1-5])',
+                r'(?:happy.*?)([1-5])'
+            ]
+            
+            # Product/value-specific patterns
+            product_patterns = [
+                r'(?:product.*?)([1-5])',
+                r'(?:solution.*?)([1-5])',
+                r'(?:value.*?)([1-5])',
+                r'(?:deliverable.*?)([1-5])'
+            ]
+            
+            # Pricing-specific patterns
+            pricing_patterns = [
+                r'(?:pric.*?)([1-5])',
+                r'(?:cost.*?)([1-5])',
+                r'(?:afford.*?)([1-5])'
+            ]
+            
+            # Support-specific patterns
+            support_patterns = [
+                r'(?:support.*?)([1-5])',
+                r'(?:help.*?)([1-5])',
+                r'(?:customer.*service.*?)([1-5])'
+            ]
+            
+            # Try service patterns first (most likely in this context)
+            for pattern in service_patterns:
+                matches = re.findall(pattern, user_input, re.IGNORECASE)
+                for match in matches:
+                    rating = int(match)
+                    if 1 <= rating <= 5 and not self.extracted_data.get('service_rating'):
+                        extracted['service_rating'] = rating
+                        print(f"SERVICE RATING CAPTURED (EXPLICIT): {rating} - LOCKED")
+                        break
+                if 'service_rating' in extracted:
+                    break
+            
+            # Try satisfaction patterns
+            if not extracted.get('satisfaction_rating'):
+                for pattern in satisfaction_patterns:
+                    matches = re.findall(pattern, user_input, re.IGNORECASE)
+                    for match in matches:
+                        rating = int(match)
+                        if 1 <= rating <= 5 and not self.extracted_data.get('satisfaction_rating'):
+                            extracted['satisfaction_rating'] = rating
+                            print(f"SATISFACTION RATING CAPTURED (EXPLICIT): {rating} - LOCKED")
+                            break
+                    if 'satisfaction_rating' in extracted:
+                        break
+            
+            # Try product patterns
+            if not extracted.get('product_value_rating'):
+                for pattern in product_patterns:
+                    matches = re.findall(pattern, user_input, re.IGNORECASE)
+                    for match in matches:
+                        rating = int(match)
+                        if 1 <= rating <= 5 and not self.extracted_data.get('product_value_rating'):
+                            extracted['product_value_rating'] = rating
+                            print(f"PRODUCT VALUE RATING CAPTURED (EXPLICIT): {rating} - LOCKED")
+                            break
+                    if 'product_value_rating' in extracted:
+                        break
+            
+            # Try pricing patterns
+            if not extracted.get('pricing_rating'):
+                for pattern in pricing_patterns:
+                    matches = re.findall(pattern, user_input, re.IGNORECASE)
+                    for match in matches:
+                        rating = int(match)
+                        if 1 <= rating <= 5 and not self.extracted_data.get('pricing_rating'):
+                            extracted['pricing_rating'] = rating
+                            print(f"PRICING RATING CAPTURED (EXPLICIT): {rating} - LOCKED")
+                            break
+                    if 'pricing_rating' in extracted:
+                        break
+            
+            # Try support patterns
+            if not extracted.get('support_rating'):
+                for pattern in support_patterns:
+                    matches = re.findall(pattern, user_input, re.IGNORECASE)
+                    for match in matches:
+                        rating = int(match)
+                        if 1 <= rating <= 5 and not self.extracted_data.get('support_rating'):
+                            extracted['support_rating'] = rating
+                            print(f"SUPPORT RATING CAPTURED (EXPLICIT): {rating} - LOCKED")
+                            break
+                    if 'support_rating' in extracted:
+                        break
+            
+            # Generic patterns as final fallback (infer from context)
+            if not any(extracted.get(key) for key in ['service_rating', 'satisfaction_rating', 'product_value_rating', 'pricing_rating', 'support_rating']):
+                for pattern in generic_rating_patterns:
+                    matches = re.findall(pattern, user_input, re.IGNORECASE)
+                    for match in matches:
+                        rating = int(match)
+                        if 1 <= rating <= 5:
+                            # Try to infer which rating based on conversation context/step
+                            # This is intelligent contextual assignment
+                            if self.step_count <= 4:  # Early in survey - likely satisfaction
+                                if not self.extracted_data.get('satisfaction_rating'):
+                                    extracted['satisfaction_rating'] = rating
+                                    print(f"SATISFACTION RATING INFERRED (GENERIC): {rating} - LOCKED")
+                            elif 'service' in text_lower or 'professional' in text_lower:
+                                if not self.extracted_data.get('service_rating'):
+                                    extracted['service_rating'] = rating
+                                    print(f"SERVICE RATING INFERRED (GENERIC): {rating} - LOCKED")
+                            else:
+                                # Default assignment to missing category
+                                if not self.extracted_data.get('service_rating'):
+                                    extracted['service_rating'] = rating
+                                    print(f"SERVICE RATING CAPTURED (DEFAULT): {rating} - LOCKED")
+                            break
+                    if any(extracted.get(key) for key in ['service_rating', 'satisfaction_rating', 'product_value_rating', 'pricing_rating', 'support_rating']):
+                        break
         
         # Enhanced satisfaction detection
         satisfaction_keywords = {
@@ -404,39 +557,83 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         return extracted
     
     def _check_completion_criteria(self) -> bool:
-        """Check if we have enough data to complete the survey"""
-        # Core requirements
+        """Check if we have enough data to complete the survey - USER EXPERIENCE FIRST"""
+        # Core requirements (minimum viable data)
         has_nps = self.extracted_data.get('nps_score') is not None
         has_reasoning = self.extracted_data.get('nps_reasoning') is not None or self.extracted_data.get('compliment_feedback') is not None or self.extracted_data.get('complaint_feedback') is not None or self.extracted_data.get('additional_comments') is not None
         has_tenure = self.extracted_data.get('tenure_with_fc') is not None
         
-        # ALL rating categories for complete data
-        has_satisfaction = self.extracted_data.get('satisfaction_rating') is not None
-        has_service = self.extracted_data.get('service_rating') is not None
-        has_product_value = self.extracted_data.get('product_value_rating') is not None
-        has_pricing = self.extracted_data.get('pricing_rating') is not None
-        has_improvement = self.extracted_data.get('improvement_feedback') is not None
+        # Check for user frustration signals
+        user_frustrated = self._detect_user_frustration()
         
-        # COMPREHENSIVE COMPLETION LOGIC: Get all rating data for complete analytics
-        # Core data: NPS + tenure + reasoning OR NPS deferred (for retry logic)
-        has_core = (has_nps or self.nps_deferred) and has_tenure and has_reasoning
+        # Question limit enforcement - respect configured limits STRICTLY
+        max_questions = self.template_service.get_max_questions()
+        at_question_limit = self.step_count >= max_questions
+        approaching_limit = self.step_count >= (max_questions - 1)  # Complete at limit-1 to avoid going over
         
-        # Require ALL major rating categories for complete analysis
-        has_all_ratings = has_satisfaction and has_service and has_product_value and has_pricing
+        # MINIMUM VIABLE DATA: NPS + some context is enough for valuable feedback
+        has_minimal_core = has_nps and (has_tenure or has_reasoning)
         
-        # COMPLETE APPROACH: Try to get all ratings plus improvement feedback
-        has_sufficient_data = has_core and has_all_ratings and has_improvement
+        # USER-FIRST COMPLETION LOGIC: Prioritize user experience over perfect data collection
+        # Complete survey if ANY of these conditions are met:
+        # 1. User shows frustration (immediate completion)
+        # 2. We've reached or approaching the question limit
+        # 3. We have core NPS data + some context (good enough)
+        # 4. We have NPS deferred + some other meaningful data
         
-        # Progressive completion thresholds - prioritize complete data collection
-        # Only complete early if we have all required data, otherwise allow more steps
-        force_complete = self.step_count >= self.template_service.get_max_questions()  # Use campaign/business account max_questions setting
+        completion_reasons = []
         
-        # CRITICAL FIX: Don't complete until we have all ratings OR force completion
-        completion_ready = has_sufficient_data or force_complete
+        if user_frustrated:
+            completion_reasons.append("USER_FRUSTRATED")
+        if at_question_limit:
+            completion_reasons.append("AT_QUESTION_LIMIT")
+        if approaching_limit and has_minimal_core:
+            completion_reasons.append("APPROACHING_LIMIT_WITH_CORE_DATA")
+        if has_minimal_core and self.step_count >= 3:  # Allow at least 3 questions for core data
+            completion_reasons.append("HAS_MINIMAL_CORE_DATA")
+        if self.nps_deferred and has_reasoning and self.step_count >= 2:
+            completion_reasons.append("NPS_DEFERRED_WITH_FEEDBACK")
         
-        print(f"COMPLETION CHECK: NPS={has_nps}, Tenure={has_tenure}, Reasoning={has_reasoning}, AllRatings={has_all_ratings}, Steps={self.step_count}, Ready={completion_ready}")
+        completion_ready = len(completion_reasons) > 0
+        
+        print(f"UX-FIRST COMPLETION CHECK: NPS={has_nps}, Tenure={has_tenure}, Reasoning={has_reasoning}, Frustrated={user_frustrated}, Steps={self.step_count}/{max_questions}, Ready={completion_ready}")
+        if completion_reasons:
+            print(f"COMPLETION REASONS: {', '.join(completion_reasons)}")
         
         return completion_ready
+    
+    def _detect_user_frustration(self) -> bool:
+        """Detect if user is showing frustration with the survey process"""
+        if not self.conversation_history:
+            return False
+        
+        # Check recent user messages for frustration signals
+        recent_messages = [msg for msg in self.conversation_history[-3:] if msg['sender'] == 'User']
+        
+        frustration_keywords = [
+            'repeating', 'repeat', 'over and over', 'again', 'already told you',
+            'already answered', 'already said', 'done', 'enough', 'stop',
+            'frustrated', 'annoying', 'irritating', 'waste of time',
+            'same question', 'asked this already', 'keep asking',
+            'how many times', 'told you already', 'finished', 'complete'
+        ]
+        
+        for message in recent_messages:
+            message_text = message['message'].lower()
+            if any(keyword in message_text for keyword in frustration_keywords):
+                print(f"FRUSTRATION DETECTED: '{message['message']}'")
+                return True
+        
+        # Check for pattern of very short responses after longer ones (user giving up)
+        if len(recent_messages) >= 2:
+            last_two = recent_messages[-2:]
+            if (len(last_two[0]['message']) > 20 and 
+                len(last_two[1]['message']) <= 5 and
+                last_two[1]['message'].lower().strip() in ['ok', 'fine', 'sure', 'yes', 'no', 'done']):
+                print(f"FRUSTRATION PATTERN: Long response followed by short dismissive response")
+                return True
+        
+        return False
     
     def _get_next_question_priority(self) -> str:
         """Determine what question should be asked next based on collected data"""
