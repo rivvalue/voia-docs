@@ -1547,10 +1547,7 @@ def survey_config():
             flash('Business account context not found.', 'error')
             return redirect(url_for('business_auth.admin_panel'))
         
-        # Demo accounts cannot access survey customization
-        if current_account.account_type == 'demo':
-            flash('Survey customization is not available for demo accounts. Please upgrade your account.', 'warning')
-            return redirect(url_for('business_auth.admin_panel'))
+        # Allow demo accounts to access survey customization for testing
         
         # Define available options for dropdowns
         industry_options = [
@@ -1589,10 +1586,7 @@ def save_survey_config():
             flash('Business account context not found.', 'error')
             return redirect(url_for('business_auth.admin_panel'))
         
-        # Demo accounts cannot save survey customization
-        if current_account.account_type == 'demo':
-            flash('Survey customization is not available for demo accounts.', 'error')
-            return redirect(url_for('business_auth.admin_panel'))
+        # Allow demo accounts to save survey customization for testing
         
         # Get form data
         industry = request.form.get('industry', '').strip()
