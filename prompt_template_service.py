@@ -51,16 +51,12 @@ class PromptTemplateService:
             self.business_account = BusinessAccount.query.get(business_account_id)
         
         # Determine demo mode after loading both campaign and business account data
-        # Demo mode is only true if NEITHER campaign NOR business account have customization
+        # Demo mode is only true if NEITHER campaign NOR business account exist
         # Priority: Campaign → Business → Demo
+        # FIXED: Less strict - prefer business account if it exists with non-demo account_type
         self.is_demo_mode = not (
             (self.campaign and self.has_campaign_customization()) or 
-            (self.business_account and 
-             self.business_account.account_type != 'demo' and
-             bool(self.business_account.industry or
-                  self.business_account.company_description or
-                  self.business_account.product_description or
-                  self.business_account.target_clients_description))
+            (self.business_account and self.business_account.account_type != 'demo')
         )
     
     def _has_customization(self) -> bool:

@@ -23,6 +23,10 @@ class AIConversationalSurvey:
         self.step_count = 0
         self.is_complete = False
         
+        # NPS retry tracking to prevent infinite loops
+        self.nps_retry_count = 0
+        self.nps_deferred = False
+        
         # Initialize prompt template service for dynamic prompts with campaign-specific customization
         self.template_service = PromptTemplateService(business_account_id, campaign_id)
         
@@ -414,8 +418,8 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         has_improvement = self.extracted_data.get('improvement_feedback') is not None
         
         # COMPREHENSIVE COMPLETION LOGIC: Get all rating data for complete analytics
-        # Core data: NPS + tenure + reasoning  
-        has_core = has_nps and has_tenure and has_reasoning
+        # Core data: NPS + tenure + reasoning OR NPS deferred (for retry logic)
+        has_core = (has_nps or self.nps_deferred) and has_tenure and has_reasoning
         
         # Require ALL major rating categories for complete analysis
         has_all_ratings = has_satisfaction and has_service and has_product_value and has_pricing
@@ -444,8 +448,25 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         # Check what we have and what we need - systematic collection of ALL ratings
         if not data.get('tenure_with_fc'):
             return f"Ask about business relationship tenure with {company_name} (how long working together)"
-        elif not data.get('nps_score'):
-            return f"Ask for NPS score (0-10 likelihood to recommend {company_name})"
+        elif not data.get('nps_score') and not self.nps_deferred:
+            # NPS retry logic - track attempts and defer after 2 failed attempts
+            if self.nps_retry_count >= 2:
+                self.nps_deferred = True
+                print(f"NPS DEFERRED: Failed to capture after {self.nps_retry_count} attempts")
+                # Move to next topic instead of retrying NPS
+                if not data.get('nps_reasoning') and not data.get('improvement_feedback'):
+                    return f"Let's move on - what do you think about your overall experience with {company_name}?"
+                elif not data.get('satisfaction_rating'):
+                    return f"On a scale of 1-5, how satisfied are you overall with {company_name}?"
+                elif not data.get('service_rating'):
+                    return f"How would you rate the professional services quality from {company_name} (1-5)?"
+                else:
+                    return f"What could {company_name} do better or improve?"
+            else:
+                # Track retry attempt
+                self.nps_retry_count += 1
+                print(f"NPS RETRY ATTEMPT {self.nps_retry_count}/2")
+                return f"Ask for NPS score (0-10 likelihood to recommend {company_name})"
         elif not data.get('nps_reasoning') and not data.get('improvement_feedback'):
             return f"Ask WHY they gave that NPS score - what's their reasoning about {company_name}"
         elif not data.get('satisfaction_rating'):
