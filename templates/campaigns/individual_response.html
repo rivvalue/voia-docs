@@ -482,7 +482,13 @@
                             {% endif %}
                             {% if message.timestamp %}
                             <div class="message-timestamp">
-                                {{ message.timestamp.strftime('%H:%M:%S') if message.timestamp else '' }}
+                                {% if message.timestamp %}
+                                    {% if message.timestamp == 'now' %}
+                                        Now
+                                    {% else %}
+                                        {{ message.timestamp.strftime('%H:%M:%S') if message.timestamp.strftime else message.timestamp }}
+                                    {% endif %}
+                                {% endif %}
                             </div>
                             {% endif %}
                         </div>
