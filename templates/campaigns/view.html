@@ -208,11 +208,29 @@
         </div>
     </div>
 
-    <!-- Campaign Details -->
+    <!-- Campaign Details with Tabs -->
     <div class="campaign-details">
-        <h3 class="mb-3">
-            <i class="fas fa-users me-2"></i>Campaign Participants
-        </h3>
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs mb-3" id="campaignTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="participants-tab" data-bs-toggle="tab" data-bs-target="#participants-pane" type="button" role="tab" aria-controls="participants-pane" aria-selected="true">
+                    <i class="fas fa-users me-2"></i>Campaign Participants
+                </button>
+            </li>
+            {% if campaign.status == 'active' or campaign.status == 'completed' %}
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="responses-tab" data-bs-toggle="tab" data-bs-target="#responses-pane" type="button" role="tab" aria-controls="responses-pane" aria-selected="false">
+                    <i class="fas fa-comments me-2"></i>Individual Responses
+                    <span class="badge bg-danger ms-1">{{ campaign.engagement_metrics.surveys_completed }}</span>
+                </button>
+            </li>
+            {% endif %}
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="campaignTabContent">
+            <!-- Participants Tab -->
+            <div class="tab-pane fade show active" id="participants-pane" role="tabpanel" aria-labelledby="participants-tab">
         
         {% if participants %}
             <div class="participant-list">
@@ -272,50 +290,93 @@
             </div>
         {% endif %}
 
-        <!-- Campaign Actions -->
-        <div class="action-buttons">
-            <h4 class="mb-3">Campaign Actions</h4>
-            
-            {% if campaign.status == 'draft' %}
-                <form method="POST" action="{{ url_for('campaigns.mark_ready', campaign_id=campaign.id) }}" style="display: inline;">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="btn btn-success me-2"
-                            {% if not campaign.description or participants|length == 0 %}disabled{% endif %}
-                            onclick="return confirm('Mark this campaign as ready for activation? You will not be able to modify participants after activation.');">
-                        <i class="fas fa-check me-2"></i>Mark as Ready
-                    </button>
-                </form>
-                {% if not campaign.description or participants|length == 0 %}
-                <small class="text-muted">
-                    Campaign needs description and at least one participant to be marked ready.
-                </small>
-                {% endif %}
-                
-            {% elif campaign.status == 'ready' %}
-                <form method="POST" action="{{ url_for('campaigns.activate_campaign', campaign_id=campaign.id) }}" style="display: inline;">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="btn btn-primary me-2"
-                            onclick="return confirm('Activate this campaign? Participants will be notified and the campaign will begin collecting responses.');">
-                        <i class="fas fa-play me-2"></i>Activate Campaign
-                    </button>
-                </form>
-                <small class="text-info">Campaign is ready for activation</small>
-                
-            {% elif campaign.status == 'active' %}
-                <form method="POST" action="{{ url_for('campaigns.complete_campaign', campaign_id=campaign.id) }}" style="display: inline;">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="btn btn-warning me-2"
-                            onclick="return confirm('Complete this campaign early? This will stop response collection and mark the campaign as finished.');">
-                        <i class="fas fa-stop me-2"></i>Complete Campaign
-                    </button>
-                </form>
-                <small class="text-success">Campaign is currently active and collecting responses</small>
-                
-            {% elif campaign.status == 'completed' %}
-                <div class="alert alert-success">
-                    <i class="fas fa-flag-checkered me-2"></i>
-                    <strong>Campaign Completed:</strong> This campaign finished on {{ campaign.completed_at[:10] if campaign.completed_at else campaign.end_date }}
+                    <!-- Campaign Actions -->
+                    <div class="action-buttons">
+                        <h4 class="mb-3">Campaign Actions</h4>
+                        
+                        {% if campaign.status == 'draft' %}
+                            <form method="POST" action="{{ url_for('campaigns.mark_ready', campaign_id=campaign.id) }}" style="display: inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-success me-2"
+                                        {% if not campaign.description or participants|length == 0 %}disabled{% endif %}
+                                        onclick="return confirm('Mark this campaign as ready for activation? You will not be able to modify participants after activation.');">
+                                    <i class="fas fa-check me-2"></i>Mark as Ready
+                                </button>
+                            </form>
+                            {% if not campaign.description or participants|length == 0 %}
+                            <small class="text-muted">
+                                Campaign needs description and at least one participant to be marked ready.
+                            </small>
+                            {% endif %}
+                            
+                        {% elif campaign.status == 'ready' %}
+                            <form method="POST" action="{{ url_for('campaigns.activate_campaign', campaign_id=campaign.id) }}" style="display: inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-primary me-2"
+                                        onclick="return confirm('Activate this campaign? Participants will be notified and the campaign will begin collecting responses.');">
+                                    <i class="fas fa-play me-2"></i>Activate Campaign
+                                </button>
+                            </form>
+                            <small class="text-info">Campaign is ready for activation</small>
+                            
+                        {% elif campaign.status == 'active' %}
+                            <form method="POST" action="{{ url_for('campaigns.complete_campaign', campaign_id=campaign.id) }}" style="display: inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-warning me-2"
+                                        onclick="return confirm('Complete this campaign early? This will stop response collection and mark the campaign as finished.');">
+                                    <i class="fas fa-stop me-2"></i>Complete Campaign
+                                </button>
+                            </form>
+                            <small class="text-success">Campaign is currently active and collecting responses</small>
+                            
+                        {% elif campaign.status == 'completed' %}
+                            <div class="alert alert-success">
+                                <i class="fas fa-flag-checkered me-2"></i>
+                                <strong>Campaign Completed:</strong> This campaign finished on {{ campaign.completed_at[:10] if campaign.completed_at else campaign.end_date }}
+                            </div>
+                        {% endif %}
+                    </div>
                 </div>
+            
+            <!-- Individual Responses Tab -->
+            {% if campaign.status == 'active' or campaign.status == 'completed' %}
+            <div class="tab-pane fade" id="responses-pane" role="tabpanel" aria-labelledby="responses-tab">
+                <div class="text-center py-4">
+                    <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">Individual Response Viewer</h4>
+                    <p class="text-muted mb-4">View and analyze individual participant responses and conversation transcripts.</p>
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <div class="row text-center">
+                                        <div class="col-md-6 mb-3">
+                                            <h5 class="text-primary">{{ campaign.engagement_metrics.surveys_completed }}</h5>
+                                            <small class="text-muted">Total Responses</small>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <h5 class="text-success">
+                                                {% if campaign.engagement_metrics.participation_rate %}
+                                                    {{ campaign.engagement_metrics.participation_rate }}%
+                                                {% else %}
+                                                    N/A
+                                                {% endif %}
+                                            </h5>
+                                            <small class="text-muted">Response Rate</small>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="d-grid">
+                                        <a href="{{ url_for('campaigns.campaign_responses', campaign_id=campaign.id) }}" class="btn btn-danger">
+                                            <i class="fas fa-eye me-2"></i>View All Individual Responses
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             {% endif %}
         </div>
     </div>

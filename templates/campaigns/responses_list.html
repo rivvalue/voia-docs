@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+
+{% block title %}{{ campaign.name }} - Individual Responses{% endblock %}
+
+{% block page_class %}page-campaign-responses{% endblock %}
+
+{% block content %}
+<style>
+/* Campaign responses specific styling */
+.response-header {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+    padding: 1.5rem 0;
+    border-radius: var(--radius-2xl);
+    margin-bottom: 2rem;
+}
+
+.search-container {
+    background: var(--primary-white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+    margin-bottom: 2rem;
+}
+
+.responses-table {
+    background: var(--primary-white);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+
+.response-row {
+    border-bottom: 1px solid var(--light-gray);
+    transition: background-color 0.2s ease;
+}
+
+.response-row:hover {
+    background-color: var(--light-gray);
+}
+
+.nps-score {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.nps-promoter {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.nps-passive {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.nps-detractor {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-weight: 500;
+    font-size: 0.8rem;
+}
+
+.status-completed {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-started {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.status-invited {
+    background-color: var(--light-gray);
+    color: var(--gray-dark);
+}
+
+.pagination-container {
+    background: var(--primary-white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-top: 2rem;
+    box-shadow: var(--shadow-md);
+    text-align: center;
+}
+</style>
+
+<div class="container">
+    <!-- Response Header -->
+    <div class="response-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-1">{{ campaign.name }} - Individual Responses</h1>
+                    <p class="mb-0 opacity-75">Review and analyze individual participant responses</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="btn btn-outline-light">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Campaign
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Container -->
+    <div class="search-container">
+        <form method="GET" action="{{ url_for('campaigns.campaign_responses', campaign_id=campaign.id) }}" class="row g-3">
+            <div class="col-md-8">
+                <div class="input-group">
+                    <span class="input-group-text">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text" 
+                           class="form-control" 
+                           name="search" 
+                           value="{{ search_query or '' }}" 
+                           placeholder="Search participants, companies, or conversation content..."
+                           autocomplete="off">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-grid gap-2 d-md-flex">
+                    <button type="submit" class="btn btn-danger flex-fill">
+                        <i class="fas fa-search me-2"></i>Search
+                    </button>
+                    {% if search_query %}
+                    <a href="{{ url_for('campaigns.campaign_responses', campaign_id=campaign.id) }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-2"></i>Clear
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Summary -->
+    {% if pagination.total > 0 %}
+    <div class="mb-3">
+        <span class="text-muted">
+            Showing {{ ((pagination.page - 1) * pagination.per_page) + 1 }} to 
+            {{ pagination.page * pagination.per_page if pagination.page * pagination.per_page < pagination.total else pagination.total }} 
+            of {{ pagination.total }} responses
+            {% if search_query %} (filtered by "{{ search_query }}"){% endif %}
+        </span>
+    </div>
+    {% endif %}
+
+    <!-- Responses Table -->
+    <div class="responses-table">
+        {% if responses %}
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Participant</th>
+                        <th>Company</th>
+                        <th>NPS Score</th>
+                        <th>Status</th>
+                        <th>Response Date</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for response in responses %}
+                    <tr class="response-row">
+                        <td>
+                            <div>
+                                <strong>{{ response.participant_name or response.respondent_name or 'Unknown' }}</strong>
+                                <br>
+                                <small class="text-muted">{{ response.participant_email or response.respondent_email or 'No email' }}</small>
+                            </div>
+                        </td>
+                        <td>{{ response.participant_company or response.company_name or 'Unknown' }}</td>
+                        <td>
+                            <span class="nps-score nps-{{ response.nps_category.lower() if response.nps_category else 'unknown' }}">
+                                {{ response.nps_score if response.nps_score is not none else 'N/A' }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-badge status-{{ response.completion_status or 'unknown' }}">
+                                {{ response.completion_status or 'Unknown' }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if response.created_at %}
+                                {{ moment(response.created_at).format('MMM DD, YYYY HH:mm') }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            {% if response.campaign_participant and response.campaign_participant.participant %}
+                            <a href="{{ url_for('campaigns.individual_response', 
+                                              campaign_id=campaign.id, 
+                                              participant_id=response.campaign_participant.participant.id) }}{% if search_query %}?search={{ search_query }}{% endif %}" 
+                               class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-eye me-1"></i>View Details
+                            </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">No Responses Found</h4>
+            <p class="text-muted">
+                {% if search_query %}
+                    No responses match your search criteria. Try adjusting your search terms.
+                {% else %}
+                    This campaign doesn't have any participant responses yet.
+                {% endif %}
+            </p>
+            {% if search_query %}
+            <a href="{{ url_for('campaigns.campaign_responses', campaign_id=campaign.id) }}" class="btn btn-outline-danger">
+                <i class="fas fa-times me-2"></i>Clear Search
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Pagination -->
+    {% if pagination.pages > 1 %}
+    <div class="pagination-container">
+        <nav aria-label="Response pagination">
+            <ul class="pagination justify-content-center mb-0">
+                <!-- Previous Page -->
+                <li class="page-item {{ 'disabled' if not pagination.has_prev else '' }}">
+                    {% if pagination.has_prev %}
+                    <a class="page-link" href="{{ url_for('campaigns.campaign_responses', campaign_id=campaign.id, page=pagination.prev_num, search=search_query) }}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                    {% else %}
+                    <span class="page-link"><i class="fas fa-chevron-left"></i></span>
+                    {% endif %}
+                </li>
+                
+                <!-- Page Numbers -->
+                {% for page_num in pagination.iter_pages() %}
+                    {% if page_num %}
+                        {% if page_num != pagination.page %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ url_for('campaigns.campaign_responses', campaign_id=campaign.id, page=page_num, search=search_query) }}">
+                                {{ page_num }}
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                        {% endif %}
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">…</span>
+                    </li>
+                    {% endif %}
+                {% endfor %}
+                
+                <!-- Next Page -->
+                <li class="page-item {{ 'disabled' if not pagination.has_next else '' }}">
+                    {% if pagination.has_next %}
+                    <a class="page-link" href="{{ url_for('campaigns.campaign_responses', campaign_id=campaign.id, page=pagination.next_num, search=search_query) }}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                    {% else %}
+                    <span class="page-link"><i class="fas fa-chevron-right"></i></span>
+                    {% endif %}
+                </li>
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Auto-submit search form on enter key
+document.querySelector('input[name="search"]').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        this.closest('form').submit();
+    }
+});
+</script>
+{% endblock %}

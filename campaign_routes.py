@@ -10,9 +10,10 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from sqlalchemy import desc
 
 from business_auth_routes import require_business_auth, require_permission, get_current_business_account
-from models import Campaign, CampaignParticipant, Participant, BusinessAccount, EmailDelivery, db
+from models import Campaign, CampaignParticipant, Participant, BusinessAccount, EmailDelivery, SurveyResponse, db
 from task_queue import add_email_task
 from email_service import email_service
+from sqlalchemy import func, text
 
 # Create blueprint for campaign management
 campaign_bp = Blueprint('campaigns', __name__, url_prefix='/business/campaigns')
@@ -906,3 +907,222 @@ def save_survey_config(campaign_id):
         db.session.rollback()
         flash('Failed to save survey configuration. Please try again.', 'error')
         return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
+
+
+@campaign_bp.route('/<int:campaign_id>/responses')
+@require_business_auth
+@require_permission('manage_participants')
+def campaign_responses(campaign_id):
+    """List all participant responses within a specific campaign"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            if request.is_json:
+                return jsonify({'error': 'Business account context not found'}), 401
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get campaign (scoped to current business account)
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            if request.is_json:
+                return jsonify({'error': 'Campaign not found'}), 404
+            flash('Campaign not found.', 'error')
+            return redirect(url_for('campaigns.list_campaigns'))
+        
+        # Get pagination parameters
+        page = request.args.get('page', 1, type=int)
+        per_page = min(request.args.get('per_page', 20, type=int), 100)
+        search_query = request.args.get('search', '').strip()
+        
+        # Build query for survey responses in this campaign
+        # Join with campaign participants to get participant details
+        response_query = SurveyResponse.query.join(
+            CampaignParticipant, SurveyResponse.campaign_participant_id == CampaignParticipant.id
+        ).join(
+            Participant, CampaignParticipant.participant_id == Participant.id
+        ).filter(
+            SurveyResponse.campaign_id == campaign_id,
+            CampaignParticipant.business_account_id == current_account.id
+        )
+        
+        # Apply search filter if provided
+        if search_query:
+            # Search in participant name, email, company name, and conversation history
+            search_filter = db.or_(
+                Participant.name.ilike(f'%{search_query}%'),
+                Participant.email.ilike(f'%{search_query}%'),
+                Participant.company_name.ilike(f'%{search_query}%'),
+                SurveyResponse.conversation_history.ilike(f'%{search_query}%')
+            )
+            response_query = response_query.filter(search_filter)
+        
+        # Add ordering by creation date (newest first)
+        response_query = response_query.order_by(desc(SurveyResponse.created_at))
+        
+        # Execute pagination
+        pagination = response_query.paginate(
+            page=page,
+            per_page=per_page,
+            error_out=False,
+            max_per_page=100
+        )
+        
+        # Prepare response data
+        responses_data = []
+        for response in pagination.items:
+            response_dict = response.to_dict()
+            # Add participant details
+            if response.campaign_participant and response.campaign_participant.participant:
+                participant = response.campaign_participant.participant
+                response_dict.update({
+                    'participant_name': participant.name,
+                    'participant_email': participant.email,
+                    'participant_company': participant.company_name,
+                    'completion_status': response.campaign_participant.status,
+                    'completed_at': response.campaign_participant.completed_at.isoformat() if response.campaign_participant.completed_at else None
+                })
+            responses_data.append(response_dict)
+        
+        if request.is_json:
+            return jsonify({
+                'campaign': campaign.to_dict(),
+                'responses': responses_data,
+                'pagination': {
+                    'page': pagination.page,
+                    'pages': pagination.pages,
+                    'per_page': pagination.per_page,
+                    'total': pagination.total,
+                    'has_next': pagination.has_next,
+                    'has_prev': pagination.has_prev
+                },
+                'search_query': search_query
+            })
+        
+        # For HTML requests, render template
+        return render_template('campaigns/responses_list.html',
+                             campaign=campaign.to_dict(),
+                             responses=responses_data,
+                             pagination=pagination,
+                             search_query=search_query,
+                             business_account=current_account.to_dict())
+        
+    except Exception as e:
+        logger.error(f"Error loading campaign responses for campaign {campaign_id}: {e}")
+        if request.is_json:
+            return jsonify({'error': 'Failed to load campaign responses'}), 500
+        flash('Error loading campaign responses.', 'error')
+        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+
+
+@campaign_bp.route('/<int:campaign_id>/responses/<int:participant_id>')
+@require_business_auth
+@require_permission('manage_participants')
+def individual_response(campaign_id, participant_id):
+    """View individual participant response with full conversational transcript"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            if request.is_json:
+                return jsonify({'error': 'Business account context not found'}), 401
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get campaign (scoped to current business account)
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            if request.is_json:
+                return jsonify({'error': 'Campaign not found'}), 404
+            flash('Campaign not found.', 'error')
+            return redirect(url_for('campaigns.list_campaigns'))
+        
+        # Get participant (scoped to current business account)
+        participant = Participant.query.filter_by(
+            id=participant_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not participant:
+            if request.is_json:
+                return jsonify({'error': 'Participant not found'}), 404
+            flash('Participant not found.', 'error')
+            return redirect(url_for('campaigns.campaign_responses', campaign_id=campaign_id))
+        
+        # Get the survey response for this participant in this campaign
+        survey_response = SurveyResponse.query.join(
+            CampaignParticipant, SurveyResponse.campaign_participant_id == CampaignParticipant.id
+        ).filter(
+            SurveyResponse.campaign_id == campaign_id,
+            CampaignParticipant.participant_id == participant_id,
+            CampaignParticipant.business_account_id == current_account.id
+        ).first()
+        
+        if not survey_response:
+            if request.is_json:
+                return jsonify({'error': 'Survey response not found for this participant'}), 404
+            flash('Survey response not found for this participant.', 'error')
+            return redirect(url_for('campaigns.campaign_responses', campaign_id=campaign_id))
+        
+        # Get search highlighting parameter
+        search_query = request.args.get('search', '').strip()
+        
+        # Prepare comprehensive response data
+        response_data = survey_response.to_dict()
+        response_data.update({
+            'participant': participant.to_dict(),
+            'campaign': campaign.to_dict()
+        })
+        
+        # Parse conversation history for chat display
+        conversation_history = []
+        if survey_response.conversation_history:
+            try:
+                import json
+                conversation_history = json.loads(survey_response.conversation_history)
+                
+                # Apply search highlighting if search query provided
+                if search_query:
+                    for msg in conversation_history:
+                        if 'content' in msg and search_query.lower() in msg['content'].lower():
+                            # Simple highlighting by wrapping matches in <mark> tags
+                            content = msg['content']
+                            highlighted = content.replace(
+                                search_query, f'<mark>{search_query}</mark>'
+                            )
+                            msg['highlighted_content'] = highlighted
+                        else:
+                            msg['highlighted_content'] = msg.get('content', '')
+                            
+            except json.JSONDecodeError:
+                logger.warning(f"Failed to parse conversation_history for response {survey_response.id}")
+                conversation_history = []
+        
+        response_data['parsed_conversation_history'] = conversation_history
+        response_data['search_query'] = search_query
+        
+        if request.is_json:
+            return jsonify(response_data)
+        
+        # For HTML requests, render detailed response template
+        return render_template('campaigns/individual_response.html',
+                             response=response_data,
+                             participant=participant.to_dict(),
+                             campaign=campaign.to_dict(),
+                             conversation_history=conversation_history,
+                             search_query=search_query,
+                             business_account=current_account.to_dict())
+        
+    except Exception as e:
+        logger.error(f"Error loading individual response for participant {participant_id} in campaign {campaign_id}: {e}")
+        if request.is_json:
+            return jsonify({'error': 'Failed to load individual response'}), 500
+        flash('Error loading individual response.', 'error')
+        return redirect(url_for('campaigns.campaign_responses', campaign_id=campaign_id))

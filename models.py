@@ -7,6 +7,16 @@ from flask_login import UserMixin
 import uuid
 
 class SurveyResponse(db.Model):
+    __tablename__ = 'survey_responses'
+    __table_args__ = (
+        # Composite index for efficient business account and campaign filtering
+        db.Index('idx_survey_response_business_campaign', 'campaign_id', 'campaign_participant_id'),
+        # Index for common queries by email and creation date
+        db.Index('idx_survey_response_email_date', 'respondent_email', 'created_at'),
+        # Basic index on conversation_history for text search (will use ILIKE in queries)
+        db.Index('idx_survey_response_conversation', 'conversation_history'),
+    )
+    
     id = db.Column(db.Integer, primary_key=True)
     company_name = db.Column(db.String(200), nullable=False, index=True)
     respondent_name = db.Column(db.String(200), nullable=False)
@@ -39,6 +49,9 @@ class SurveyResponse(db.Model):
     growth_rate = db.Column(db.String(10))  # Expected organic growth rate (e.g., "25%")
     growth_range = db.Column(db.String(20))  # NPS range (e.g., "50-69")
     commercial_value = db.Column(db.Float)  # Commercial value of the client in dollars
+    
+    # Conversational transcript
+    conversation_history = db.Column(db.Text, nullable=True)  # JSON string of conversation transcript
     
     # Campaign tracking
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=True, index=True)
@@ -83,6 +96,7 @@ class SurveyResponse(db.Model):
             'commercial_value': self.commercial_value,
             'campaign_id': self.campaign_id,
             'campaign_name': self.campaign.name if self.campaign else None,
+            'conversation_history': json.loads(self.conversation_history) if self.conversation_history else [],
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'analyzed_at': self.analyzed_at.isoformat() if self.analyzed_at else None
         }
