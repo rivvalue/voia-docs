@@ -7,7 +7,7 @@ from flask_login import UserMixin
 import uuid
 
 class SurveyResponse(db.Model):
-    __tablename__ = 'survey_responses'
+    __tablename__ = 'survey_response'
     __table_args__ = (
         # Composite index for efficient business account and campaign filtering
         db.Index('idx_survey_response_business_campaign', 'campaign_id', 'campaign_participant_id'),
