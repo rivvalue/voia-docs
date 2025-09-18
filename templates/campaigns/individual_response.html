@@ -411,7 +411,7 @@
                     <span class="data-label">Submitted:</span>
                     <span class="data-value">
                         {% if response.created_at %}
-                            {{ moment(response.created_at).format('MMM DD, YYYY HH:mm') }}
+                            {{ response.created_at.strftime('%b %d, %Y %H:%M') if response.created_at else 'N/A' }}
                         {% else %}
                             N/A
                         {% endif %}
@@ -482,7 +482,7 @@
                             {% endif %}
                             {% if message.timestamp %}
                             <div class="message-timestamp">
-                                {{ moment(message.timestamp).format('HH:mm:ss') }}
+                                {{ message.timestamp.strftime('%H:%M:%S') if message.timestamp else '' }}
                             </div>
                             {% endif %}
                         </div>

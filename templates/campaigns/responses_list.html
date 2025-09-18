@@ -194,7 +194,7 @@
                         </td>
                         <td>
                             {% if response.created_at %}
-                                {{ moment(response.created_at).format('MMM DD, YYYY HH:mm') }}
+                                {{ response.created_at.strftime('%b %d, %Y %H:%M') if response.created_at else 'N/A' }}
                             {% else %}
                                 N/A
                             {% endif %}
