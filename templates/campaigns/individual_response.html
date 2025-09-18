@@ -411,7 +411,9 @@
                     <span class="data-label">Submitted:</span>
                     <span class="data-value">
                         {% if response.created_at %}
-                            {{ response.created_at.strftime('%b %d, %Y %H:%M') if response.created_at else 'N/A' }}
+                            {% set created_date = response.created_at[:10] if response.created_at else 'N/A' %}
+                            {% set created_time = response.created_at[11:16] if response.created_at and response.created_at|length > 16 else '' %}
+                            {{ created_date }} {{ created_time }}
                         {% else %}
                             N/A
                         {% endif %}
@@ -486,7 +488,7 @@
                                     {% if message.timestamp == 'now' %}
                                         Now
                                     {% else %}
-                                        {{ message.timestamp.strftime('%H:%M:%S') if message.timestamp.strftime else message.timestamp }}
+                                        {{ message.timestamp if message.timestamp and message.timestamp != 'now' else 'Now' }}
                                     {% endif %}
                                 {% endif %}
                             </div>
