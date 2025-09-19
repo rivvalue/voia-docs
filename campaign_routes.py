@@ -1027,6 +1027,7 @@ def campaign_responses(campaign_id):
 @require_business_auth
 def individual_response(campaign_id, participant_id):
     """View individual participant response with full conversational transcript"""
+    logger.info(f"INDIVIDUAL RESPONSE ROUTE HIT: campaign_id={campaign_id}, participant_id={participant_id}")
     try:
         current_account = get_current_business_account()
         if not current_account:
