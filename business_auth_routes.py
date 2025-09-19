@@ -2458,6 +2458,9 @@ def license_dashboard():
         current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
         logger.info(f"Platform admin {current_user.email if current_user else 'unknown'} accessed license dashboard")
         
+        # Pass user context to template
+        is_platform_admin = current_user.is_platform_admin() if current_user else False
+        
         # Get overall statistics with error handling
         try:
             total_accounts = BusinessAccount.query.count()
@@ -2600,7 +2603,8 @@ def license_dashboard():
             'accounts_processed': accounts_processed,
             'accounts_with_errors': accounts_with_errors,
             'alerts': [],  # Add empty alerts for now
-            'recent_activities': []  # Add empty activities for now
+            'recent_activities': [],  # Add empty activities for now
+            'is_platform_admin': is_platform_admin  # Platform admin status for conditional links
         }
         
         return render_template('business_auth/licenses/dashboard.html', **dashboard_data)
