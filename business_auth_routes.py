@@ -2026,6 +2026,74 @@ def save_survey_config():
 
 # ==== LICENSE MANAGEMENT ROUTES ====
 
+# Business account license overview routes (for regular business users)
+@business_auth_bp.route('/admin/licenses/overview')
+@require_business_auth
+def business_license_overview():
+    """View license overview for current business account"""
+    try:
+        # Get current business account
+        business_account = get_current_business_account()
+        if not business_account:
+            flash('Business account not found.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get filter parameter
+        filter_type = request.args.get('filter', 'overview').lower()
+        
+        # Get license information for current business account only
+        from license_service import LicenseService
+        
+        try:
+            current_license = LicenseService.get_current_license(business_account.id)
+            license_info = LicenseService.get_license_info(business_account.id)
+            
+            # Get usage statistics
+            campaigns_used = LicenseService.get_campaigns_used_in_current_period(business_account.id)
+            users_count = getattr(business_account, 'current_users_count', 0)
+            
+            account_data = {
+                'id': business_account.id,
+                'name': business_account.name,
+                'account_type': business_account.account_type,
+                'status': business_account.status,
+                'current_license': current_license,
+                'license_type': license_info.get('license_type', 'trial'),
+                'license_status': license_info.get('license_status', 'trial'),
+                'license_start': license_info.get('license_start'),
+                'license_end': license_info.get('license_end'),
+                'campaigns_used': campaigns_used,
+                'campaigns_limit': license_info.get('campaigns_limit', 4),
+                'users_count': users_count,
+                'users_limit': license_info.get('users_limit', 5),
+                'expires_soon': license_info.get('expires_soon', False),
+                'days_remaining': license_info.get('days_remaining', 0)
+            }
+            
+            # Set page context based on filter
+            page_title = "License Overview"
+            if filter_type == 'usage':
+                page_title = "License Usage Details"
+            elif filter_type == 'expiring':
+                page_title = "License Expiration Information"
+            
+            return render_template('business_auth/license_overview.html',
+                                 account_data=account_data,
+                                 filter_type=filter_type,
+                                 page_title=page_title)
+        
+        except Exception as license_error:
+            logger.error(f"Error retrieving license info for business account {business_account.id}: {license_error}")
+            flash('Failed to load license information. Please try again.', 'error')
+            return redirect(url_for('business_auth.admin_panel'))
+    
+    except Exception as e:
+        logger.error(f"Error loading business license overview: {e}")
+        flash('Failed to load license overview. Please try again.', 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+
+# Platform admin license management routes (for platform admins only)
 @business_auth_bp.route('/admin/licenses/')
 @require_platform_admin
 def admin_licenses():
