@@ -1,0 +1,573 @@
+{% extends "base.html" %}
+
+{% block title %}Business Account Onboarding - VOÏA Platform Admin{% endblock %}
+
+{% block page_class %}page-business-onboarding{% endblock %}
+
+{% block content %}
+<style>
+/* Business account onboarding specific styling */
+.onboarding-header {
+    background: linear-gradient(135deg, rgba(var(--primary-red-rgb, 225, 58, 68), 0.1) 0%, rgba(var(--red-hover-rgb, 197, 45, 54), 0.15) 100%);
+    border: 1px solid var(--red-light);
+    color: var(--primary-black);
+    padding: 2rem 0;
+    border-radius: var(--radius-2xl);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.onboarding-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: var(--primary-white);
+    font-size: 2rem;
+    box-shadow: var(--shadow-lg);
+}
+
+.onboarding-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-section {
+    background: var(--primary-white);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 2px solid var(--light-gray);
+}
+
+.section-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(var(--primary-red-rgb, 225, 58, 68), 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-red);
+    font-size: 1.2rem;
+}
+
+.section-title {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--primary-black);
+    margin: 0;
+    font-family: var(--font-family-headings);
+}
+
+.form-group {
+    margin-bottom: var(--spacing-lg);
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: var(--primary-black);
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wide);
+}
+
+.form-control {
+    width: 100%;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-base);
+    transition: all 0.3s ease;
+    font-family: var(--font-family-base);
+    background-color: var(--primary-white);
+    color: var(--primary-black);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 3px rgba(var(--primary-red-rgb, 225, 58, 68), 0.15);
+    transform: translateY(-1px);
+}
+
+.form-control:hover {
+    border-color: var(--medium-gray);
+}
+
+.form-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right var(--spacing-md) center;
+    background-repeat: no-repeat;
+    background-size: 16px 12px;
+    padding-right: calc(2.5rem + var(--spacing-lg));
+}
+
+.form-text {
+    color: var(--gray-dark);
+    font-size: var(--font-size-xs);
+    margin-top: var(--spacing-xs);
+    line-height: var(--line-height-normal);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+}
+
+.btn-submit {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+    border: 2px solid var(--primary-red);
+    padding: var(--spacing-lg) var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-family: var(--font-family-base);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wide);
+    min-width: 200px;
+    justify-content: center;
+}
+
+.btn-submit:hover {
+    background: linear-gradient(135deg, var(--red-hover) 0%, var(--primary-red) 100%);
+    border-color: var(--red-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-submit:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(var(--primary-red-rgb, 225, 58, 68), 0.25);
+}
+
+.btn-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-cancel {
+    background: transparent;
+    color: var(--gray-dark);
+    border: 2px solid var(--medium-gray);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-family: var(--font-family-base);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wide);
+    margin-right: var(--spacing-md);
+}
+
+.btn-cancel:hover {
+    background: var(--light-gray);
+    color: var(--primary-black);
+    border-color: var(--gray-dark);
+    transform: translateY(-1px);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-top: var(--spacing-xl);
+    border-top: 1px solid var(--light-gray);
+    margin-top: var(--spacing-xl);
+}
+
+.alert {
+    border-radius: var(--radius-lg);
+    border: none;
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    font-weight: 500;
+}
+
+.alert-success {
+    background: rgba(34, 197, 94, 0.1);
+    color: #15803d;
+    border-left: 4px solid #22c55e;
+}
+
+.alert-danger {
+    background: rgba(var(--primary-red-rgb, 225, 58, 68), 0.1);
+    color: var(--primary-red);
+    border-left: 4px solid var(--primary-red);
+}
+
+.alert-info {
+    background: rgba(59, 130, 246, 0.1);
+    color: #1d4ed8;
+    border-left: 4px solid #3b82f6;
+}
+
+.preview-section {
+    background: rgba(var(--primary-red-rgb, 225, 58, 68), 0.02);
+    border: 2px solid var(--red-light);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+.preview-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--primary-black);
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.info-box {
+    background: rgba(var(--primary-red-rgb, 225, 58, 68), 0.05);
+    border-left: 4px solid var(--primary-red);
+    padding: var(--spacing-lg);
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+    margin-bottom: var(--spacing-lg);
+}
+
+.breadcrumb {
+    margin-bottom: var(--spacing-xl);
+    padding: 0;
+    background: none;
+}
+
+.breadcrumb-item {
+    color: var(--gray-dark);
+    font-size: var(--font-size-sm);
+}
+
+.breadcrumb-item.active {
+    color: var(--primary-red);
+    font-weight: 600;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "›";
+    color: var(--medium-gray);
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+    
+    .btn-cancel {
+        margin-right: 0;
+    }
+}
+</style>
+
+<div class="onboarding-container">
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('business_auth.admin_panel') }}">
+                    <i class="fas fa-tachometer-alt me-2"></i>Admin Panel
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                Business Account Onboarding
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Onboarding Header -->
+    <div class="onboarding-header">
+        <div class="onboarding-icon">
+            <i class="fas fa-building"></i>
+        </div>
+        <h1>Business Account Onboarding</h1>
+        <p class="mb-0 opacity-75">Create a new business account and invite the account administrator</p>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'info-circle' if category == 'info' else 'check-circle' }} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Information Box -->
+    <div class="info-box">
+        <h6 class="mb-2">
+            <i class="fas fa-lightbulb me-2"></i>
+            What this creates:
+        </h6>
+        <ul class="mb-0 ps-4">
+            <li>A new business account with the selected license template</li>
+            <li>An admin user account for managing the business</li>
+            <li>An invitation email sent to the administrator with activation instructions</li>
+            <li>Immediate activation of the business account for use</li>
+        </ul>
+    </div>
+
+    <!-- Onboarding Form -->
+    <form method="POST" action="{{ url_for('business_auth.create_business_account_with_admin') }}" novalidate>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        
+        <!-- Business Information Section -->
+        <div class="form-section">
+            <div class="section-header">
+                <div class="section-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <h3 class="section-title">Business Account Information</h3>
+            </div>
+
+            <div class="form-group">
+                <label for="business_name" class="form-label">
+                    <i class="fas fa-briefcase me-2"></i>Business Name
+                </label>
+                <input type="text" 
+                       class="form-control" 
+                       id="business_name" 
+                       name="business_name" 
+                       placeholder="Enter the complete business name"
+                       required 
+                       maxlength="200">
+                <div class="form-text">This will be displayed throughout the platform and in communications</div>
+            </div>
+
+            <div class="form-group">
+                <label for="license_template" class="form-label">
+                    <i class="fas fa-certificate me-2"></i>License Template
+                </label>
+                <select class="form-control form-select" 
+                        id="license_template" 
+                        name="license_template" 
+                        required>
+                    <option value="">Select a license template...</option>
+                    {% if license_templates %}
+                        {% for template in license_templates %}
+                        <option value="{{ template.template_id }}">
+                            {{ template.name }} 
+                            ({{ template.max_responses_per_month }} responses/month, {{ template.max_active_campaigns }} campaigns)
+                        </option>
+                        {% endfor %}
+                    {% else %}
+                        <option value="" disabled>No license templates available</option>
+                    {% endif %}
+                </select>
+                <div class="form-text">Choose the license tier that best fits the business needs</div>
+            </div>
+        </div>
+
+        <!-- Administrator Information Section -->
+        <div class="form-section">
+            <div class="section-header">
+                <div class="section-icon">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h3 class="section-title">Account Administrator Information</h3>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="admin_first_name" class="form-label">
+                        <i class="fas fa-user me-2"></i>First Name
+                    </label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="admin_first_name" 
+                           name="admin_first_name" 
+                           placeholder="Administrator's first name"
+                           required 
+                           maxlength="50">
+                </div>
+
+                <div class="form-group">
+                    <label for="admin_last_name" class="form-label">
+                        <i class="fas fa-user me-2"></i>Last Name
+                    </label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="admin_last_name" 
+                           name="admin_last_name" 
+                           placeholder="Administrator's last name"
+                           required 
+                           maxlength="50">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="admin_email" class="form-label">
+                    <i class="fas fa-envelope me-2"></i>Email Address
+                </label>
+                <input type="email" 
+                       class="form-control" 
+                       id="admin_email" 
+                       name="admin_email" 
+                       placeholder="admin@company.com"
+                       required 
+                       maxlength="150">
+                <div class="form-text">The administrator will receive an invitation email at this address</div>
+            </div>
+        </div>
+
+        <!-- Preview Section -->
+        <div class="preview-section">
+            <h4 class="preview-title">
+                <i class="fas fa-eye me-2"></i>
+                Preview
+            </h4>
+            <p class="mb-0">
+                An invitation email will be sent to <strong><span id="email-preview">the administrator</span></strong> 
+                for the business account <strong><span id="business-preview">business name</span></strong>.
+                They will be able to activate their account and start using the platform immediately.
+            </p>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <a href="{{ url_for('business_auth.admin_panel') }}" class="btn-cancel">
+                <i class="fas fa-times me-2"></i>Cancel
+            </a>
+            <button type="submit" class="btn-submit" id="submit-btn">
+                <i class="fas fa-plus-circle me-2"></i>Create Business Account
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form validation and preview updates
+document.addEventListener('DOMContentLoaded', function() {
+    const businessNameField = document.getElementById('business_name');
+    const adminEmailField = document.getElementById('admin_email');
+    const businessPreview = document.getElementById('business-preview');
+    const emailPreview = document.getElementById('email-preview');
+    const submitBtn = document.getElementById('submit-btn');
+    const form = document.querySelector('form');
+
+    // Update preview text as user types
+    function updatePreview() {
+        const businessName = businessNameField.value.trim() || 'business name';
+        const adminEmail = adminEmailField.value.trim() || 'the administrator';
+        
+        businessPreview.textContent = businessName;
+        emailPreview.textContent = adminEmail;
+    }
+
+    // Add event listeners for real-time preview updates
+    businessNameField.addEventListener('input', updatePreview);
+    adminEmailField.addEventListener('input', updatePreview);
+
+    // Form submission handling
+    form.addEventListener('submit', function(e) {
+        const requiredFields = form.querySelectorAll('[required]');
+        let isValid = true;
+
+        // Check all required fields
+        requiredFields.forEach(function(field) {
+            if (!field.value.trim()) {
+                isValid = false;
+                field.classList.add('is-invalid');
+                field.focus();
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (adminEmailField.value && !emailRegex.test(adminEmailField.value)) {
+            isValid = false;
+            adminEmailField.classList.add('is-invalid');
+            alert('Please enter a valid email address.');
+            adminEmailField.focus();
+            e.preventDefault();
+            return;
+        }
+
+        if (!isValid) {
+            e.preventDefault();
+            alert('Please fill in all required fields.');
+            return;
+        }
+
+        // Show loading state
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Account...';
+        submitBtn.disabled = true;
+        
+        // Re-enable button after 10 seconds as fallback
+        setTimeout(function() {
+            submitBtn.innerHTML = '<i class="fas fa-plus-circle me-2"></i>Create Business Account';
+            submitBtn.disabled = false;
+        }, 10000);
+    });
+
+    // Auto-focus on business name field
+    businessNameField.focus();
+
+    // Real-time validation feedback
+    const allInputs = form.querySelectorAll('input, select');
+    allInputs.forEach(function(input) {
+        input.addEventListener('blur', function() {
+            if (this.hasAttribute('required') && !this.value.trim()) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+
+        input.addEventListener('input', function() {
+            if (this.classList.contains('is-invalid') && this.value.trim()) {
+                this.classList.remove('is-invalid');
+            }
+        });
+    });
+
+    // Initialize preview
+    updatePreview();
+});
+</script>
+{% endblock %}
