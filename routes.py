@@ -21,6 +21,12 @@ import uuid
 
 logger = logging.getLogger(__name__)
 
+# Health check endpoint to prevent 404 flood
+@app.route('/api', methods=['GET', 'HEAD'])
+def api_health_check():
+    """Simple API health check endpoint"""
+    return jsonify({'status': 'ok', 'service': 'voia'})
+
 def get_branding_context(business_account_id=None):
     """
     Get branding context for templates including company name and logo URL.
