@@ -2102,61 +2102,33 @@ def admin_licenses():
         # Get filter parameter
         filter_type = request.args.get('filter', 'all').lower()
         
-        # Get all business accounts with license information
-        business_accounts = BusinessAccount.query.order_by(BusinessAccount.name).all()
+        # Use bulk optimization method to fetch all license data efficiently
+        bulk_license_data = LicenseService.get_bulk_license_data()
         
+        # Transform bulk data to match original format
         licenses_data = []
-        for account in business_accounts:
-            try:
-                # Get current license information using LicenseService
-                current_license = LicenseService.get_current_license(account.id)
-                license_info = LicenseService.get_license_info(account.id)
-                
-                # Get usage statistics
-                campaigns_used = LicenseService.get_campaigns_used_in_current_period(account.id)
-                users_count = getattr(account, 'current_users_count', 0)
-                
-                account_data = {
-                    'id': account.id,
-                    'name': account.name,
-                    'account_type': account.account_type,
-                    'status': account.status,
-                    'current_license': current_license,
-                    'license_type': license_info.get('license_type', 'trial'),
-                    'license_status': license_info.get('license_status', 'trial'),
-                    'license_start': license_info.get('license_start'),
-                    'license_end': license_info.get('license_end'),
-                    'campaigns_used': campaigns_used,
-                    'campaigns_limit': license_info.get('campaigns_limit', 4),
-                    'users_count': users_count,
-                    'users_limit': license_info.get('users_limit', 5),
-                    'expires_soon': license_info.get('expires_soon', False),
-                    'days_remaining': license_info.get('days_remaining', 0)
-                }
-                licenses_data.append(account_data)
-                
-            except Exception as e:
-                logger.error(f"Error getting license data for account {account.id}: {e}")
-                # Add account with minimal data even if error
-                account_data = {
-                    'id': account.id,
-                    'name': account.name,
-                    'account_type': account.account_type,
-                    'status': account.status,
-                    'current_license': None,
-                    'license_type': 'unknown',
-                    'license_status': 'error',
-                    'license_start': None,
-                    'license_end': None,
-                    'campaigns_used': 0,
-                    'campaigns_limit': 0,
-                    'users_count': 0,
-                    'users_limit': 0,
-                    'expires_soon': False,
-                    'days_remaining': 0,
-                    'error': str(e)
-                }
-                licenses_data.append(account_data)
+        for account_id, data in bulk_license_data.items():
+            account = data['account']
+            license_info = data['license_info']
+            
+            account_data = {
+                'id': account.id,
+                'name': account.name,
+                'account_type': account.account_type,
+                'status': account.status,
+                'current_license': license_info.get('current_license'),
+                'license_type': license_info.get('license_type', 'trial'),
+                'license_status': license_info.get('license_status', 'trial'),
+                'license_start': license_info.get('license_start'),
+                'license_end': license_info.get('license_end'),
+                'campaigns_used': license_info.get('campaigns_used', 0),
+                'campaigns_limit': license_info.get('campaigns_limit', 4),
+                'users_count': license_info.get('users_used', 0),
+                'users_limit': license_info.get('users_limit', 5),
+                'expires_soon': license_info.get('expires_soon', False),
+                'days_remaining': license_info.get('days_remaining', 0)
+            }
+            licenses_data.append(account_data)
         
         # Apply filtering based on filter_type
         filtered_data = licenses_data
@@ -2177,7 +2149,7 @@ def admin_licenses():
         
         return render_template('business_auth/admin_licenses.html',
                              licenses_data=filtered_data,
-                             total_accounts=len(business_accounts),
+                             total_accounts=len(licenses_data),
                              filter_type=filter_type,
                              page_title=page_title)
         

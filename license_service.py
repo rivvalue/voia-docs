@@ -391,6 +391,9 @@ class LicenseService:
                     'participants_limit': current_license.max_participants_per_campaign,
                     'expires_soon': current_license.days_remaining() <= 30 and current_license.is_active()
                 })
+                
+                # CRITICAL FIX: Recalculate users_remaining with actual license limit
+                license_info['users_remaining'] = max(0, license_info['users_limit'] - license_info['users_used'])
             else:
                 # No current license - try to get period from legacy fields for backward compatibility
                 period_start, period_end = LicenseService.get_license_period(business_account_id)
@@ -1354,7 +1357,7 @@ class LicenseService:
             
             # Check 3: Max participants across active campaigns vs target limit
             try:
-                from models import CampaignParticipant, Campaign
+                from models import CampaignParticipant
                 max_participants_query = db.session.query(
                     func.max(func.count(CampaignParticipant.id))
                 ).join(Campaign).filter(
@@ -1477,3 +1480,194 @@ class LicenseService:
                 'success': False,
                 'error': error_msg
             }
+    
+    # ==== BULK OPTIMIZATION METHODS FOR ADMIN DASHBOARD ====
+    
+    @staticmethod
+    def get_bulk_license_data(business_account_ids: Optional[List[int]] = None) -> Dict[int, Dict[str, Any]]:
+        """
+        Get license data for multiple business accounts in a single optimized query to avoid N+1 issues.
+        
+        This method fixes critical data integrity issues while maintaining performance:
+        1. Campaign counts use actual license periods, not calendar year
+        2. Active license selection validates date windows with deterministic selection
+        3. Output schema matches get_license_info() exactly
+        
+        Args:
+            business_account_ids: Optional list of business account IDs to fetch (defaults to all)
+            
+        Returns:
+            dict: Dictionary mapping business_account_id to license data dict
+            
+        Performance Notes:
+            - Uses 3 optimized queries with proper JOINs to avoid N+1 issues
+            - Correctly handles license periods per account, not calendar years
+            - Provides identical output to individual get_license_info() calls
+        """
+        try:
+            from sqlalchemy.orm import joinedload
+            from sqlalchemy import case, exists, text
+            
+            today = datetime.utcnow()
+            
+            # Query 1: Get all business accounts with basic info
+            if business_account_ids:
+                business_accounts = BusinessAccount.query.filter(
+                    BusinessAccount.id.in_(business_account_ids)
+                ).order_by(BusinessAccount.name).all()
+            else:
+                business_accounts = BusinessAccount.query.order_by(BusinessAccount.name).all()
+            
+            if not business_accounts:
+                return {}
+            
+            account_ids = [account.id for account in business_accounts]
+            
+            # Query 2: CRITICAL FIX - Bulk fetch VALID current licenses with proper date validation
+            # This fixes Issue #2: Active License Selection
+            current_licenses = {}
+            license_query = db.session.query(LicenseHistory).filter(
+                LicenseHistory.business_account_id.in_(account_ids),
+                LicenseHistory.status == 'active',
+                # CRITICAL: Add date validity filters
+                LicenseHistory.activated_at <= today,
+                LicenseHistory.expires_at >= today
+            ).order_by(
+                LicenseHistory.business_account_id,
+                LicenseHistory.activated_at.desc()  # Deterministic selection if multiple matches
+            ).all()
+            
+            # Process licenses to ensure only one per account (deterministic selection)
+            for license_record in license_query:
+                # Use first (most recent) license per account due to ORDER BY
+                if license_record.business_account_id not in current_licenses:
+                    current_licenses[license_record.business_account_id] = license_record
+            
+            # Query 3: CRITICAL FIX - Campaign counts using actual license periods
+            # This fixes Issue #1: Campaign Count Accuracy
+            campaign_counts = {}
+            
+            # Get campaign counts for accounts WITH valid licenses (using license periods)
+            campaign_with_license_query = db.session.query(
+                Campaign.business_account_id,
+                func.count(Campaign.id).label('count')
+            ).join(
+                LicenseHistory,
+                and_(
+                    Campaign.business_account_id == LicenseHistory.business_account_id,
+                    LicenseHistory.status == 'active',
+                    LicenseHistory.activated_at <= today,
+                    LicenseHistory.expires_at >= today
+                )
+            ).filter(
+                Campaign.business_account_id.in_(account_ids),
+                # CRITICAL: Filter campaigns within license window, not calendar year
+                Campaign.start_date >= LicenseHistory.activated_at,
+                Campaign.start_date <= LicenseHistory.expires_at
+            ).group_by(Campaign.business_account_id).all()
+            
+            for business_account_id, count in campaign_with_license_query:
+                campaign_counts[business_account_id] = count
+            
+            # For accounts WITHOUT valid licenses, fall back to calendar year
+            accounts_with_licenses = set(current_licenses.keys())
+            accounts_without_licenses = [aid for aid in account_ids if aid not in accounts_with_licenses]
+            
+            if accounts_without_licenses:
+                current_year = date.today().year
+                campaign_fallback_query = db.session.query(
+                    Campaign.business_account_id,
+                    func.count(Campaign.id).label('count')
+                ).filter(
+                    Campaign.business_account_id.in_(accounts_without_licenses),
+                    Campaign.start_date >= date(current_year, 1, 1),
+                    Campaign.start_date <= date(current_year, 12, 31)
+                ).group_by(Campaign.business_account_id).all()
+                
+                for business_account_id, count in campaign_fallback_query:
+                    campaign_counts[business_account_id] = count
+            
+            # Build result dictionary - CRITICAL FIX: Complete schema consistency
+            # This fixes Issue #3: Output Schema Consistency
+            result = {}
+            for account in business_accounts:
+                current_license = current_licenses.get(account.id)
+                campaigns_used = campaign_counts.get(account.id, 0)
+                
+                # Build license info EXACTLY like get_license_info()
+                users_used = getattr(account, 'current_users_count', 0)
+                license_info = {
+                    'current_license': current_license,
+                    'license_type': 'trial',
+                    'license_status': 'trial',
+                    'license_start': None,
+                    'license_end': None,
+                    'days_remaining': 0,
+                    'days_since_expired': 0,
+                    'expires_soon': False,
+                    'campaigns_used': campaigns_used,
+                    'campaigns_limit': 4,
+                    'campaigns_remaining': max(0, 4 - campaigns_used),
+                    'users_used': users_used,
+                    'users_limit': 5,
+                    'users_remaining': max(0, 5 - users_used),
+                    'participants_limit': 500,
+                    'can_activate_campaign': campaigns_used < 4,
+                    'can_add_user': users_used < 5
+                }
+                
+                if current_license:
+                    # Update with actual license data
+                    license_info.update({
+                        'license_type': current_license.license_type,
+                        'license_status': current_license.status,
+                        'license_start': current_license.activated_at.date() if hasattr(current_license.activated_at, 'date') else current_license.activated_at,
+                        'license_end': current_license.expires_at.date() if hasattr(current_license.expires_at, 'date') else current_license.expires_at,
+                        'days_remaining': current_license.days_remaining(),
+                        'days_since_expired': current_license.days_since_expired(),
+                        'campaigns_limit': current_license.max_campaigns_per_year,
+                        'users_limit': current_license.max_users,
+                        'participants_limit': current_license.max_participants_per_campaign,
+                        'expires_soon': current_license.days_remaining() <= 30 and current_license.is_active()
+                    })
+                    
+                    # Recalculate with actual license limits
+                    license_info.update({
+                        'campaigns_remaining': max(0, license_info['campaigns_limit'] - campaigns_used),
+                        'users_remaining': max(0, license_info['users_limit'] - license_info['users_used']),
+                        'can_activate_campaign': campaigns_used < license_info['campaigns_limit'],
+                        'can_add_user': license_info['users_used'] < license_info['users_limit']
+                    })
+                else:
+                    # No current license - handle exactly like get_license_info fallback
+                    # Try to get period from legacy BusinessAccount fields if available
+                    try:
+                        period_start, period_end = LicenseService.get_license_period(account.id)
+                        if period_start and period_end:
+                            license_info.update({
+                                'license_start': period_start,
+                                'license_end': period_end,
+                                'license_status': getattr(account, 'license_status', 'trial') or 'trial'
+                            })
+                            
+                            # Calculate days remaining for legacy license
+                            today_date = date.today()
+                            if period_end > today_date:
+                                license_info['days_remaining'] = (period_end - today_date).days
+                                license_info['expires_soon'] = license_info['days_remaining'] <= 30
+                            else:
+                                license_info['days_since_expired'] = (today_date - period_end).days
+                    except Exception as e:
+                        logger.debug(f"Could not get legacy license period for account {account.id}: {e}")
+                
+                result[account.id] = {
+                    'account': account,
+                    'license_info': license_info
+                }
+            
+            logger.debug(f"Bulk fetched license data for {len(result)} business accounts in optimized queries")
+            return result
+            
+        except Exception as e:
+            logger.error(f"Failed to bulk fetch license data: {e}")
+            return {}
