@@ -8,6 +8,7 @@ import uuid
 from datetime import datetime, timedelta
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from sqlalchemy import desc
+from sqlalchemy.orm import joinedload
 
 from business_auth_routes import require_business_auth, require_permission, get_current_business_account
 from models import Campaign, CampaignParticipant, Participant, BusinessAccount, EmailDelivery, SurveyResponse, db
@@ -941,7 +942,9 @@ def campaign_responses(campaign_id):
         
         # Build query for survey responses in this campaign
         # Join with campaign participants to get participant details
-        response_query = SurveyResponse.query.join(
+        response_query = SurveyResponse.query.options(
+            joinedload(SurveyResponse.campaign_participant).joinedload(CampaignParticipant.participant)
+        ).join(
             CampaignParticipant, SurveyResponse.campaign_participant_id == CampaignParticipant.id
         ).join(
             Participant, CampaignParticipant.participant_id == Participant.id
