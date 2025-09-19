@@ -485,6 +485,56 @@ def toggle_user_status(user_id):
         return redirect(url_for('business_auth.manage_users'))
 
 
+@business_auth_bp.route('/users/<int:user_id>/reset-password', methods=['POST'])
+@require_business_auth
+@require_permission('manage_users')
+def reset_user_password(user_id):
+    """Generate password reset token for user (admin-triggered)"""
+    try:
+        current_user_id = session.get('business_user_id')
+        current_account_id = session.get('business_account_id')
+        
+        if not current_user_id or not current_account_id:
+            logger.warning("Missing user or account session data")
+            flash('Authentication required.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get user to reset password for
+        user_to_reset = BusinessAccountUser.query.filter_by(
+            id=user_id, 
+            business_account_id=current_account_id
+        ).first()
+        
+        if not user_to_reset:
+            flash('User not found.', 'error')
+            return redirect(url_for('business_auth.manage_users'))
+        
+        # Prevent resetting own password through admin interface
+        if user_id == current_user_id:
+            flash('You cannot reset your own password through this interface. Use the account settings instead.', 'error')
+            return redirect(url_for('business_auth.manage_users'))
+        
+        # Generate password reset token
+        reset_token = user_to_reset.generate_password_reset_token()
+        
+        # Save to database
+        db.session.commit()
+        
+        logger.info(f"Password reset token generated for user {user_id} ({user_to_reset.email}) by admin {current_user_id}")
+        
+        # TODO: Send password reset email (implement with email service)
+        # For now, show the token to the admin
+        flash(f'Password reset initiated for {user_to_reset.get_full_name()}. Reset token: {reset_token[:8]}... (expires in 24 hours)', 'success')
+        
+        return redirect(url_for('business_auth.manage_users'))
+    
+    except Exception as e:
+        logger.error(f"Error resetting password for user {user_id}: {e}")
+        db.session.rollback()
+        flash('Failed to reset password. Please try again.', 'error')
+        return redirect(url_for('business_auth.manage_users'))
+
+
 # ==== BUSINESS ACCOUNT ONBOARDING ROUTES (PHASE 1) ====
 
 @business_auth_bp.route('/admin/onboarding')

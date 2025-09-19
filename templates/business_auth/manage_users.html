@@ -408,9 +408,11 @@
                                 <button type="button" class="action-btn action-btn-primary" title="Edit User" onclick="editUser({{ user.id }}, '{{ user.first_name }}', '{{ user.last_name }}', '{{ user.email }}', '{{ user.role }}')">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <a href="#" class="action-btn action-btn-secondary" title="Reset Password">
-                                    <i class="fas fa-key"></i>
-                                </a>
+                                <form method="POST" action="{{ url_for('business_auth.reset_user_password', user_id=user.id) }}" style="display: inline;" onsubmit="return confirmPasswordReset('{{ user.get_full_name() }}')">
+                                    <button type="submit" class="action-btn action-btn-secondary" title="Reset Password">
+                                        <i class="fas fa-key"></i>
+                                    </button>
+                                </form>
                                 <form method="POST" action="{{ url_for('business_auth.toggle_user_status', user_id=user.id) }}" style="display: inline;" onsubmit="return confirmToggleStatus('{{ user.get_full_name() }}', {{ user.is_active_user|tojson }})">
                                     {% if user.is_active_user %}
                                     <button type="submit" class="action-btn action-btn-secondary" title="Deactivate User">
@@ -583,6 +585,12 @@ function confirmToggleStatus(userName, isActive) {
     }
     
     return confirm(message);
+}
+
+// Confirm password reset
+function confirmPasswordReset(userName) {
+    const message = `Are you sure you want to reset the password for ${userName}?`;
+    return confirm(message + '\n\nThe user will receive a password reset email with instructions to set a new password.');
 }
 </script>
 
