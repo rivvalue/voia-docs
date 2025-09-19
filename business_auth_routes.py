@@ -2031,6 +2031,9 @@ def save_survey_config():
 def admin_licenses():
     """List all business accounts with current license status (Platform Admin Only)"""
     try:
+        # Get filter parameter
+        filter_type = request.args.get('filter', 'all').lower()
+        
         # Get all business accounts with license information
         business_accounts = BusinessAccount.query.order_by(BusinessAccount.name).all()
         
@@ -2087,9 +2090,28 @@ def admin_licenses():
                 }
                 licenses_data.append(account_data)
         
+        # Apply filtering based on filter_type
+        filtered_data = licenses_data
+        page_title = "All Business Accounts"
+        
+        if filter_type == 'expiring':
+            filtered_data = [data for data in licenses_data if data.get('expires_soon', False)]
+            page_title = "Expiring Licenses"
+        elif filter_type == 'trial':
+            filtered_data = [data for data in licenses_data if data.get('license_type') == 'trial']
+            page_title = "Trial Accounts"
+        elif filter_type == 'usage':
+            # Show accounts with high usage (>80% of limits)
+            filtered_data = [data for data in licenses_data 
+                           if (data.get('campaigns_used', 0) / max(data.get('campaigns_limit', 1), 1) > 0.8) or
+                              (data.get('users_count', 0) / max(data.get('users_limit', 1), 1) > 0.8)]
+            page_title = "High Usage Accounts"
+        
         return render_template('business_auth/admin_licenses.html',
-                             licenses_data=licenses_data,
-                             total_accounts=len(business_accounts))
+                             licenses_data=filtered_data,
+                             total_accounts=len(business_accounts),
+                             filter_type=filter_type,
+                             page_title=page_title)
         
     except Exception as e:
         logger.error(f"Error loading admin licenses page: {e}")

@@ -199,7 +199,7 @@
                     </div>
                 </div>
                 <div class="col-md-4 text-end">
-                    <a href="{{ url_for('business_auth.admin_licenses') }}" class="btn btn-primary me-2">
+                    <a href="{{ url_for('business_auth.admin_licenses', filter='all') }}" class="btn btn-primary me-2">
                         <i class="fas fa-list me-2"></i>View All Accounts
                     </a>
                     <a href="{{ url_for('business_auth.admin_panel') }}" class="btn btn-outline-primary">
@@ -341,7 +341,7 @@
                             <i class="fas fa-history"></i>
                             Recent License Activity
                         </h3>
-                        <a href="{{ url_for('business_auth.admin_licenses') }}" class="btn btn-outline-primary btn-sm">
+                        <a href="{{ url_for('business_auth.admin_licenses', filter='all') }}" class="btn btn-outline-primary btn-sm">
                             <i class="fas fa-external-link-alt me-1"></i>View All
                         </a>
                     </div>
@@ -377,21 +377,21 @@
                 </h3>
             </div>
             <div class="quick-actions-grid">
-                <a href="{{ url_for('business_auth.admin_licenses') }}" class="dashboard-action-btn">
+                <a href="{{ url_for('business_auth.admin_licenses', filter='all') }}" class="dashboard-action-btn">
                     <i class="fas fa-list"></i>
                     <span>View All Accounts</span>
                 </a>
-                <a href="{{ url_for('business_auth.admin_licenses') }}" class="dashboard-action-btn">
+                <a href="{{ url_for('business_auth.admin_licenses', filter='expiring') }}" class="dashboard-action-btn">
                     <i class="fas fa-clock"></i>
                     <span>Expiring Licenses</span>
                 </a>
-                <a href="{{ url_for('business_auth.admin_licenses') }}" class="dashboard-action-btn">
+                <a href="{{ url_for('business_auth.admin_licenses', filter='trial') }}" class="dashboard-action-btn">
                     <i class="fas fa-flask"></i>
                     <span>Trial Accounts</span>
                 </a>
-                <a href="{{ url_for('business_auth.admin_licenses') }}" class="dashboard-action-btn">
+                <a href="{{ url_for('business_auth.admin_licenses', filter='usage') }}" class="dashboard-action-btn">
                     <i class="fas fa-chart-bar"></i>
-                    <span>Usage Reports</span>
+                    <span>High Usage Reports</span>
                 </a>
             </div>
         </div>
