@@ -1025,37 +1025,30 @@ def campaign_responses(campaign_id):
 
 @campaign_bp.route('/<int:campaign_id>/responses/<int:participant_id>')
 @require_business_auth
+@require_permission('manage_participants')
 def individual_response(campaign_id, participant_id):
     """View individual participant response with full conversational transcript"""
-    logger.info(f"INDIVIDUAL RESPONSE ROUTE HIT: campaign_id={campaign_id}, participant_id={participant_id}")
     try:
-        logger.info(f"Getting current business account...")
         current_account = get_current_business_account()
         if not current_account:
-            logger.warning("No current business account found")
             if request.is_json:
                 return jsonify({'error': 'Business account context not found'}), 401
             flash('Business account context not found.', 'error')
             return redirect(url_for('business_auth.login'))
-        logger.info(f"Current account: {current_account.id}")
         
         # Get campaign (scoped to current business account)
-        logger.info(f"Looking for campaign {campaign_id} in business account {current_account.id}")
         campaign = Campaign.query.filter_by(
             id=campaign_id,
             business_account_id=current_account.id
         ).first()
         
         if not campaign:
-            logger.warning(f"Campaign {campaign_id} not found for business account {current_account.id}")
             if request.is_json:
                 return jsonify({'error': 'Campaign not found'}), 404
             flash('Campaign not found.', 'error')
             return redirect(url_for('campaigns.list_campaigns'))
-        logger.info(f"Found campaign: {campaign.id}")
         
         # Get the survey response for this participant in this campaign through campaign_participants
-        logger.info(f"Looking for survey response for participant {participant_id} in campaign {campaign_id}")
         survey_response = SurveyResponse.query.join(
             CampaignParticipant, SurveyResponse.campaign_participant_id == CampaignParticipant.id
         ).join(
@@ -1067,12 +1060,10 @@ def individual_response(campaign_id, participant_id):
         ).first()
         
         if not survey_response:
-            logger.warning(f"Survey response not found for participant {participant_id} in campaign {campaign_id}")
             if request.is_json:
                 return jsonify({'error': 'Survey response not found for this participant'}), 404
             flash('Survey response not found for this participant.', 'error')
             return redirect(url_for('campaigns.campaign_responses', campaign_id=campaign_id))
-        logger.info(f"Found survey response: {survey_response.id}")
         
         # Get participant through the campaign_participants relationship  
         campaign_participant = CampaignParticipant.query.filter_by(
@@ -1082,14 +1073,12 @@ def individual_response(campaign_id, participant_id):
         ).first()
         
         if not campaign_participant:
-            logger.warning(f"Campaign participant relationship not found for participant {participant_id} in campaign {campaign_id}")
             if request.is_json:
                 return jsonify({'error': 'Participant not found in this campaign'}), 404
             flash('Participant not found in this campaign.', 'error')
             return redirect(url_for('campaigns.campaign_responses', campaign_id=campaign_id))
         
         participant = campaign_participant.participant
-        logger.info(f"Found participant: {participant.id} via campaign_participants")
         
         # Get search highlighting parameter
         search_query = request.args.get('search', '').strip()
@@ -1132,7 +1121,6 @@ def individual_response(campaign_id, participant_id):
             return jsonify(response_data)
         
         # For HTML requests, render detailed response template
-        logger.info(f"Rendering individual_response.html template for participant {participant_id}")
         return render_template('campaigns/individual_response.html',
                              response=response_data,
                              participant=participant.to_dict(),
