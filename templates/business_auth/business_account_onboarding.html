@@ -385,10 +385,10 @@
                         required>
                     <option value="">Select a license template...</option>
                     {% if license_templates %}
-                        {% for template in license_templates %}
-                        <option value="{{ template.template_id }}">
-                            {{ template.name }} 
-                            ({{ template.max_responses_per_month }} responses/month, {{ template.max_active_campaigns }} campaigns)
+                        {% for template_id, template in license_templates.items() %}
+                        <option value="{{ template_id }}">
+                            {{ template.display_name }} - {{ template.description }}
+                            ({{ template.max_campaigns_per_year }} campaigns/year, {{ template.max_users }} users, {{ template.max_participants_per_campaign }} participants/campaign)
                         </option>
                         {% endfor %}
                     {% else %}
