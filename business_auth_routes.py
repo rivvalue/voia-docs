@@ -1097,8 +1097,8 @@ def admin_panel():
             }
         
         return render_template('business_auth/admin_panel.html',
-                             business_account=business_account.to_dict() if business_account else {},
-                             current_user=current_business_user.to_dict() if current_business_user else {},
+                             business_account=business_account,
+                             current_user=current_business_user,
                              admin_data=admin_data)
         
     except Exception as e:
