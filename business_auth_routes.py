@@ -204,6 +204,59 @@ def validate_business_account_access(business_id, allow_platform_admin=False):
     return True, target_account, "Same tenant access"
 
 
+# ==== USER MANAGEMENT ROUTES (PHASE 2) ====
+
+@business_auth_bp.route('/users')
+@require_business_auth
+@require_permission('manage_users')
+def manage_users():
+    """User management page for business account admins"""
+    try:
+        current_user_id = session.get('business_user_id')
+        current_account_id = session.get('business_account_id')
+        
+        if not current_user_id or not current_account_id:
+            logger.warning("Missing user or account session data")
+            flash('Authentication required.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get current business account
+        business_account = BusinessAccount.query.get(current_account_id)
+        if not business_account:
+            logger.error(f"Business account {current_account_id} not found")
+            flash('Business account not found.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get current user
+        current_user = BusinessAccountUser.query.get(current_user_id)
+        if not current_user:
+            logger.error(f"Current user {current_user_id} not found")
+            flash('User not found.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get license information using LicenseService
+        from license_service import LicenseService
+        license_info = LicenseService.get_license_info(current_account_id)
+        
+        # Get all users for this business account
+        users = BusinessAccountUser.get_by_business_account(current_account_id)
+        users_count = len(users)
+        
+        logger.info(f"User {current_user.email} accessing user management for account {business_account.name}")
+        
+        return render_template('business_auth/manage_users.html',
+                             business_account=business_account,
+                             current_user=current_user,
+                             users=users,
+                             users_count=users_count,
+                             license_info=license_info)
+    
+    except Exception as e:
+        logger.error(f"Error loading user management page: {e}")
+        flash('Failed to load user management page.', 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+
 # ==== BUSINESS ACCOUNT ONBOARDING ROUTES (PHASE 1) ====
 
 @business_auth_bp.route('/admin/onboarding')

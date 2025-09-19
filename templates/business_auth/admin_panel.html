@@ -432,6 +432,11 @@
                         <a href="{{ url_for('business_auth.brand_config') }}" class="btn btn-primary btn-admin me-2" title="Configure brand settings">
                             <i class="fas fa-paint-brush me-2"></i>Brand Settings
                         </a>
+                        {% if current_user.has_permission('manage_users') %}
+                        <a href="{{ url_for('business_auth.manage_users') }}" class="btn btn-primary btn-admin me-2" title="Manage team members and users">
+                            <i class="fas fa-users me-2"></i>Manage Users
+                        </a>
+                        {% endif %}
                         {% if business_account.account_type in ['customer', 'demo'] %}
                         <a href="{{ url_for('business_auth.survey_config') }}" class="btn btn-primary btn-admin me-2" title="Customize survey experience and conversation settings">
                             <i class="fas fa-cog me-2"></i>Survey Customization
@@ -452,6 +457,22 @@
             <i class="fas fa-{{ 'flask' if business_account.account_type == 'demo' else 'building' }} me-2"></i>
             {{ 'Demo Environment' if business_account.account_type == 'demo' else 'Customer Account' }}
         </div>
+
+        <!-- Team Management Section (Admin Only) -->
+        {% if current_user.has_permission('manage_users') %}
+        <div class="admin-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-users"></i>
+                    Team Management
+                </h3>
+                <a href="{{ url_for('business_auth.manage_users') }}" class="btn btn-primary btn-admin">
+                    <i class="fas fa-user-plus me-2"></i>Manage Users
+                </a>
+            </div>
+            <p class="text-muted mb-0">Add and manage team members for your business account. Current usage: {{ admin_data.license_info.users_used if admin_data.license_info else 1 }}/{{ admin_data.license_info.users_limit if admin_data.license_info else 5 }} users.</p>
+        </div>
+        {% endif %}
 
         <!-- Campaign Management Section -->
         <div class="admin-section">

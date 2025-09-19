@@ -1,0 +1,462 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users - {{ business_account.name }}{% endblock %}
+
+{% block page_class %}page-manage-users{% endblock %}
+
+{% block content %}
+<style>
+/* User management specific styling */
+.users-header {
+    background: linear-gradient(135deg, rgba(var(--primary-red-rgb, 220, 53, 69), 0.1) 0%, rgba(var(--red-hover-rgb, 200, 40, 55), 0.15) 100%);
+    border: 1px solid var(--red-light);
+    color: var(--primary-black);
+    padding: 2rem 0;
+    border-radius: var(--radius-2xl);
+    margin-bottom: 2rem;
+}
+
+.license-usage-card {
+    background: var(--primary-white);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--light-gray);
+    margin-bottom: var(--spacing-xl);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.usage-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.usage-info h4 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-black);
+}
+
+.usage-info p {
+    margin: 0;
+    color: var(--gray-dark);
+    font-size: 0.9rem;
+}
+
+.usage-progress {
+    flex: 1;
+    margin-left: 1rem;
+}
+
+.progress-bar-custom {
+    height: 8px;
+    background: var(--light-gray);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.progress-fill.usage-low { background: #28a745; }
+.progress-fill.usage-medium { background: #fd7e14; }
+.progress-fill.usage-high { background: var(--primary-red); }
+
+.users-table {
+    background: var(--primary-white);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+}
+
+.users-table table {
+    margin: 0;
+    border-radius: 0;
+}
+
+.users-table th {
+    background: var(--light-gray);
+    color: var(--primary-black);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wide);
+    border-bottom: 2px solid var(--medium-gray);
+    padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.users-table td {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-bottom: 1px solid var(--light-gray);
+    vertical-align: middle;
+}
+
+.users-table tr:hover {
+    background-color: rgba(var(--primary-red-rgb, 220, 53, 69), 0.02);
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.user-details h6 {
+    margin: 0;
+    font-weight: 600;
+    color: var(--primary-black);
+}
+
+.user-details small {
+    color: var(--gray-dark);
+}
+
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.role-admin {
+    background-color: rgba(225, 58, 68, 0.1);
+    color: var(--primary-red);
+    border: 1px solid rgba(225, 58, 68, 0.2);
+}
+
+.role-user {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-active {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: rgb(22, 163, 74);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.status-inactive {
+    background-color: rgba(107, 114, 128, 0.1);
+    color: rgb(75, 85, 99);
+    border: 1px solid rgba(107, 114, 128, 0.2);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 6px;
+    border: 1.5px solid transparent;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.action-btn-primary {
+    background: var(--primary-red);
+    color: var(--primary-white);
+    border-color: var(--primary-red);
+}
+
+.action-btn-primary:hover {
+    background: var(--red-hover);
+    border-color: var(--red-hover);
+    color: var(--primary-white);
+    transform: translateY(-1px);
+}
+
+.action-btn-secondary {
+    background: transparent;
+    color: var(--gray-dark);
+    border-color: var(--medium-gray);
+}
+
+.action-btn-secondary:hover {
+    background: var(--light-gray);
+    color: var(--primary-black);
+    border-color: var(--gray-dark);
+}
+
+.btn-add-user {
+    background: var(--primary-red);
+    border-color: var(--primary-red);
+    color: var(--primary-white);
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-add-user:hover {
+    background: var(--red-hover);
+    border-color: var(--red-hover);
+    color: var(--primary-white);
+    transform: translateY(-1px);
+}
+
+.btn-add-user:disabled {
+    background: var(--medium-gray);
+    border-color: var(--medium-gray);
+    color: var(--gray-dark);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-3xl);
+    color: var(--gray-dark);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.license-limit-warning {
+    background-color: rgba(253, 126, 20, 0.1);
+    border: 1px solid rgba(253, 126, 20, 0.2);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    color: #fd7e14;
+    font-size: 0.9rem;
+}
+
+.license-limit-warning i {
+    margin-right: 0.5rem;
+}
+</style>
+
+<div class="container-fluid">
+    <!-- Users Header -->
+    <div class="users-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="d-flex align-items-center gap-3">
+                        <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--primary-red); display: flex; align-items: center; justify-content: center; color: var(--primary-white); font-size: 1.5rem;">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <h2 class="mb-1">Team Management</h2>
+                            <p class="mb-0 opacity-75">Manage users and team members for {{ business_account.name }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="{{ url_for('business_auth.admin_panel') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Admin Panel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- License Usage Card -->
+        <div class="license-usage-card">
+            <div class="usage-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="usage-info">
+                <h4>{{ users_count }}/{{ license_info.users_limit }} Users</h4>
+                <p>{{ license_info.license_type|title }} License - {{ license_info.users_remaining }} remaining</p>
+            </div>
+            <div class="usage-progress">
+                {% set usage_percent = (users_count / license_info.users_limit * 100) if license_info.users_limit > 0 else 0 %}
+                <div class="progress-bar-custom">
+                    <div class="progress-fill {{ 'usage-low' if usage_percent < 60 else 'usage-medium' if usage_percent < 90 else 'usage-high' }}" 
+                         style="width: {{ usage_percent }}%"></div>
+                </div>
+            </div>
+            <div class="ms-3">
+                {% if license_info.users_remaining > 0 %}
+                <button type="button" class="btn btn-add-user" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                    <i class="fas fa-plus me-2"></i>Add User
+                </button>
+                {% else %}
+                <button type="button" class="btn btn-add-user" disabled title="License limit reached">
+                    <i class="fas fa-ban me-2"></i>Limit Reached
+                </button>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- License Limit Warning -->
+        {% if usage_percent >= 90 %}
+        <div class="license-limit-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>License limit warning:</strong> 
+            {% if usage_percent >= 100 %}
+            You've reached your {{ license_info.license_type|title }} license limit. Contact support to upgrade your license.
+            {% else %}
+            You're approaching your {{ license_info.license_type|title }} license limit ({{ users_count }}/{{ license_info.users_limit }} users used).
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Users Table -->
+        <div class="users-table">
+            {% if users %}
+            <table class="table table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Last Login</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">
+                                    {{ user.first_name[:1]|upper }}{{ user.last_name[:1]|upper }}
+                                </div>
+                                <div class="user-details">
+                                    <h6>{{ user.get_full_name() }}</h6>
+                                    <small>{{ user.email }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="role-badge {{ 'role-admin' if user.role in ['business_account_admin', 'admin'] else 'role-user' }}">
+                                <i class="fas {{ 'fa-crown' if user.role in ['business_account_admin', 'admin'] else 'fa-user' }}"></i>
+                                {{ user.role.replace('_', ' ')|title }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-badge {{ 'status-active' if user.is_active_user else 'status-inactive' }}">
+                                <i class="fas {{ 'fa-check-circle' if user.is_active_user else 'fa-times-circle' }}"></i>
+                                {{ 'Active' if user.is_active_user else 'Inactive' }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if user.last_login_at %}
+                                {{ user.last_login_at.strftime('%b %d, %Y') }}
+                            {% else %}
+                                <span class="text-muted">Never</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                {% if user.id != current_user.id %}
+                                <a href="#" class="action-btn action-btn-primary" title="Edit User">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="#" class="action-btn action-btn-secondary" title="Reset Password">
+                                    <i class="fas fa-key"></i>
+                                </a>
+                                {% if user.is_active_user %}
+                                <a href="#" class="action-btn action-btn-secondary" title="Deactivate User">
+                                    <i class="fas fa-user-times"></i>
+                                </a>
+                                {% else %}
+                                <a href="#" class="action-btn action-btn-primary" title="Activate User">
+                                    <i class="fas fa-user-check"></i>
+                                </a>
+                                {% endif %}
+                                {% endif %}
+                                {% if user.id == current_user.id %}
+                                <span class="text-muted small">Current User</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-users"></i>
+                <h4>No users found</h4>
+                <p>Start building your team by adding the first user.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal (Placeholder for Phase 2) -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted">Add User functionality will be implemented in Phase 2.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
