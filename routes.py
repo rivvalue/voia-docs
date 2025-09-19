@@ -984,6 +984,41 @@ def submit_survey_overwrite():
         logger.error(f"Error submitting survey: {e}")
         return jsonify({'error': 'Failed to submit survey'}), 500
 
+@app.route('/survey-response/<int:response_id>')
+def public_survey_response(response_id):
+    """Public route for viewing trial survey response details"""
+    try:
+        # Import models to avoid circular imports
+        from models import SurveyResponse
+        
+        # Get the survey response by ID
+        response = SurveyResponse.query.get_or_404(response_id)
+        
+        # Security check: Only allow access to trial responses (campaign_participant_id IS NULL)
+        if response.campaign_participant_id is not None:
+            # This is a business response - redirect to login
+            logger.warning(f"Access denied to business response {response_id} - redirecting to login")
+            flash('This survey response requires authentication. Please log in to view.', 'info')
+            return redirect(url_for('business_auth.login'))
+        
+        # This is a trial response - allow public access
+        logger.info(f"Public access granted to trial response {response_id}")
+        
+        # Convert response to dict for template
+        response_data = response.to_dict()
+        
+        # Get default branding for public view (no business branding)
+        branding = get_branding_context()
+        
+        return render_template('public_survey_response.html', 
+                             response=response_data,
+                             branding=branding)
+    
+    except Exception as e:
+        logger.error(f"Error accessing survey response {response_id}: {e}")
+        flash('Survey response not found or unavailable.', 'error')
+        return redirect(url_for('dashboard'))
+
 @app.route('/dashboard')
 def dashboard():
     """Dashboard showing survey results and insights"""

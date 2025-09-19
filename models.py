@@ -95,6 +95,7 @@ class SurveyResponse(db.Model):
             'growth_range': self.growth_range,
             'commercial_value': self.commercial_value,
             'campaign_id': self.campaign_id,
+            'campaign_participant_id': self.campaign_participant_id,
             'campaign_name': self.campaign.name if self.campaign else None,
             'conversation_history': json.loads(self.conversation_history) if self.conversation_history else [],
             'created_at': self.created_at.isoformat() if self.created_at else None,

@@ -1,0 +1,501 @@
+{% extends "base.html" %}
+
+{% block title %}Survey Response Details - VOÏA{% endblock %}
+
+{% block page_class %}page-public-response{% endblock %}
+
+{% block content %}
+<style>
+/* Public survey response specific styling - clean and modern */
+.public-response-header {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    padding: 2rem 0;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
+
+.public-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    min-height: 70vh;
+}
+
+.public-data-panel {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    height: fit-content;
+    position: sticky;
+    top: 2rem;
+}
+
+.public-conversation-panel {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.public-section {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.public-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.public-section-title {
+    color: #28a745;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.public-section-title i {
+    margin-right: 0.5rem;
+}
+
+.public-data-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    padding: 0.25rem 0;
+}
+
+.public-data-label {
+    font-weight: 500;
+    color: #6c757d;
+}
+
+.public-data-value {
+    color: #495057;
+    font-weight: 500;
+}
+
+.public-nps-score {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.public-nps-promoter {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.public-nps-passive {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.public-nps-detractor {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.public-conversation {
+    max-height: 70vh;
+    overflow-y: auto;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.public-message {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.public-message-ai {
+    justify-content: flex-start;
+}
+
+.public-message-user {
+    justify-content: flex-end;
+    flex-direction: row-reverse;
+}
+
+.public-message-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.public-avatar-ai {
+    background-color: #28a745;
+    color: white;
+}
+
+.public-avatar-user {
+    background-color: #007bff;
+    color: white;
+}
+
+.public-message-content {
+    background: white;
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    max-width: 70%;
+    position: relative;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.public-message-ai .public-message-content {
+    border-bottom-left-radius: 4px;
+}
+
+.public-message-user .public-message-content {
+    border-bottom-right-radius: 4px;
+    background-color: #e3f2fd;
+}
+
+.public-message-timestamp {
+    font-size: 0.75rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+    opacity: 0.7;
+}
+
+.public-themes-list, .public-risk-factors-list, .public-opportunities-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.public-theme-tag, .public-risk-tag, .public-opportunity-tag {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.public-theme-tag {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.public-risk-tag {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.public-opportunity-tag {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.public-sentiment-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.public-sentiment-positive {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.public-sentiment-negative {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.public-sentiment-neutral {
+    background-color: #e9ecef;
+    color: #6c757d;
+}
+
+.public-back-button {
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+    .public-container {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .public-data-panel {
+        position: static;
+        order: 2;
+    }
+    
+    .public-conversation-panel {
+        order: 1;
+    }
+    
+    .public-message-content {
+        max-width: 85%;
+    }
+}
+</style>
+
+<div class="container">
+    <!-- Back button -->
+    <div class="public-back-button">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Response Header -->
+    <div class="public-response-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h2><i class="fas fa-comment-dots me-3"></i>Survey Response Details</h2>
+                    <p class="mb-0 fs-5">{{ response.respondent_name }} from {{ response.company_name }}</p>
+                </div>
+                <div class="col-md-4 text-center text-md-end">
+                    <span class="public-nps-score public-nps-{{ response.nps_category.lower() }}">
+                        NPS: {{ response.nps_score }}/10
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="public-container">
+        <!-- Analysis Data Panel -->
+        <div class="public-data-panel">
+            <!-- Basic Information -->
+            <div class="public-section">
+                <h5 class="public-section-title">
+                    <i class="fas fa-info-circle"></i>
+                    Response Information
+                </h5>
+                <div class="public-data-item">
+                    <span class="public-data-label">Respondent:</span>
+                    <span class="public-data-value">{{ response.respondent_name }}</span>
+                </div>
+                <div class="public-data-item">
+                    <span class="public-data-label">Company:</span>
+                    <span class="public-data-value">{{ response.company_name }}</span>
+                </div>
+                <div class="public-data-item">
+                    <span class="public-data-label">Email:</span>
+                    <span class="public-data-value">{{ response.respondent_email }}</span>
+                </div>
+                {% if response.tenure_with_fc %}
+                <div class="public-data-item">
+                    <span class="public-data-label">Tenure:</span>
+                    <span class="public-data-value">{{ response.tenure_with_fc }}</span>
+                </div>
+                {% endif %}
+                <div class="public-data-item">
+                    <span class="public-data-label">Date:</span>
+                    <span class="public-data-value">{{ response.created_at[:10] if response.created_at else 'Unknown' }}</span>
+                </div>
+            </div>
+
+            <!-- NPS and Ratings -->
+            <div class="public-section">
+                <h5 class="public-section-title">
+                    <i class="fas fa-star"></i>
+                    Ratings & Scores
+                </h5>
+                <div class="public-data-item">
+                    <span class="public-data-label">NPS Score:</span>
+                    <span class="public-data-value">
+                        <span class="public-nps-score public-nps-{{ response.nps_category.lower() }}">
+                            {{ response.nps_score }}/10 ({{ response.nps_category }})
+                        </span>
+                    </span>
+                </div>
+                {% if response.satisfaction_rating %}
+                <div class="public-data-item">
+                    <span class="public-data-label">Satisfaction:</span>
+                    <span class="public-data-value">{{ response.satisfaction_rating }}/5</span>
+                </div>
+                {% endif %}
+                {% if response.product_value_rating %}
+                <div class="public-data-item">
+                    <span class="public-data-label">Product Value:</span>
+                    <span class="public-data-value">{{ response.product_value_rating }}/5</span>
+                </div>
+                {% endif %}
+                {% if response.service_rating %}
+                <div class="public-data-item">
+                    <span class="public-data-label">Service Quality:</span>
+                    <span class="public-data-value">{{ response.service_rating }}/5</span>
+                </div>
+                {% endif %}
+                {% if response.pricing_rating %}
+                <div class="public-data-item">
+                    <span class="public-data-label">Pricing:</span>
+                    <span class="public-data-value">{{ response.pricing_rating }}/5</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Sentiment Analysis -->
+            {% if response.sentiment_label %}
+            <div class="public-section">
+                <h5 class="public-section-title">
+                    <i class="fas fa-brain"></i>
+                    AI Analysis
+                </h5>
+                <div class="public-data-item">
+                    <span class="public-data-label">Sentiment:</span>
+                    <span class="public-data-value">
+                        <span class="public-sentiment-indicator public-sentiment-{{ response.sentiment_label.lower() }}">
+                            {% if response.sentiment_label.lower() == 'positive' %}
+                                <i class="fas fa-smile"></i>
+                            {% elif response.sentiment_label.lower() == 'negative' %}
+                                <i class="fas fa-frown"></i>
+                            {% else %}
+                                <i class="fas fa-meh"></i>
+                            {% endif %}
+                            {{ response.sentiment_label }}
+                        </span>
+                    </span>
+                </div>
+                {% if response.sentiment_score %}
+                <div class="public-data-item">
+                    <span class="public-data-label">Sentiment Score:</span>
+                    <span class="public-data-value">{{ "%.2f"|format(response.sentiment_score) }}</span>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Key Themes -->
+            {% if response.key_themes and response.key_themes|length > 0 %}
+            <div class="public-section">
+                <h5 class="public-section-title">
+                    <i class="fas fa-tags"></i>
+                    Key Themes
+                </h5>
+                <div class="public-themes-list">
+                    {% for theme in response.key_themes %}
+                        <span class="public-theme-tag">{{ theme }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Growth Opportunities -->
+            {% if response.growth_opportunities and response.growth_opportunities|length > 0 %}
+            <div class="public-section">
+                <h5 class="public-section-title">
+                    <i class="fas fa-chart-line"></i>
+                    Growth Opportunities
+                </h5>
+                <div class="public-opportunities-list">
+                    {% for opportunity in response.growth_opportunities %}
+                        <span class="public-opportunity-tag">{{ opportunity }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Conversation Panel -->
+        <div class="public-conversation-panel">
+            <h5 class="public-section-title">
+                <i class="fas fa-comments"></i>
+                Conversation Transcript
+            </h5>
+            
+            {% if response.conversation_history and response.conversation_history|length > 0 %}
+            <div class="public-conversation">
+                {% for message in response.conversation_history %}
+                <div class="public-message public-message-{{ message.role }}">
+                    <div class="public-message-avatar public-avatar-{{ message.role }}">
+                        {% if message.role == 'ai' %}
+                            AI
+                        {% else %}
+                            {{ response.respondent_name[0]|upper if response.respondent_name else 'U' }}
+                        {% endif %}
+                    </div>
+                    <div class="public-message-content">
+                        <div class="message-text">{{ message.content }}</div>
+                        {% if message.timestamp %}
+                        <div class="public-message-timestamp">
+                            {{ message.timestamp }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                No conversation transcript available for this response.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Additional Comments -->
+    {% if response.improvement_feedback or response.recommendation_reason or response.additional_comments %}
+    <div class="mt-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-comment-alt me-2"></i>
+                    Additional Feedback
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if response.improvement_feedback %}
+                <div class="mb-3">
+                    <strong>Improvement Suggestions:</strong>
+                    <p class="mb-0 mt-1">{{ response.improvement_feedback }}</p>
+                </div>
+                {% endif %}
+                
+                {% if response.recommendation_reason %}
+                <div class="mb-3">
+                    <strong>Recommendation Reason:</strong>
+                    <p class="mb-0 mt-1">{{ response.recommendation_reason }}</p>
+                </div>
+                {% endif %}
+                
+                {% if response.additional_comments %}
+                <div class="mb-0">
+                    <strong>Additional Comments:</strong>
+                    <p class="mb-0 mt-1">{{ response.additional_comments }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Footer note -->
+<div class="container mt-4">
+    <div class="alert alert-light text-center">
+        <small class="text-muted">
+            <i class="fas fa-shield-alt me-1"></i>
+            This is a public view of a trial survey response. 
+            Business survey responses require authentication to access.
+        </small>
+    </div>
+</div>
+{% endblock %}

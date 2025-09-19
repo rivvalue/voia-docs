@@ -1932,7 +1932,7 @@ function loadSurveyResponses(page = 1) {
             const pagination = data.pagination;
             
             if (responses.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No survey responses yet.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No survey responses yet.</td></tr>';
                 updatePaginationInfo(0, 0, 0);
                 updatePaginationControls(null);
                 return;
@@ -1946,6 +1946,16 @@ function loadSurveyResponses(page = 1) {
                 
                 const sentimentClass = response.sentiment_label === 'positive' ? 'theme-positive' :
                                       response.sentiment_label === 'negative' ? 'theme-negative' : 'theme-neutral';
+                
+                // Check if this is a trial response (campaign_participant_id is null) for View Details button
+                const isTrialResponse = response.campaign_participant_id === null || response.campaign_participant_id === undefined;
+                const detailsButton = isTrialResponse ? 
+                    `<a href="/survey-response/${response.id}" class="btn btn-outline-primary btn-sm" title="View Details">
+                        <i class="fas fa-eye"></i>
+                    </a>` :
+                    `<span class="text-muted" title="Business response - authentication required">
+                        <i class="fas fa-lock"></i>
+                    </span>`;
                 
                 return `
                     <tr>
@@ -1963,6 +1973,7 @@ function loadSurveyResponses(page = 1) {
                             ${escapeHtml(riskLevel)}
                         </td>
                         <td>${response.created_at ? new Date(response.created_at).toLocaleDateString() : 'N/A'}</td>
+                        <td class="text-center">${detailsButton}</td>
                     </tr>
                 `;
             }).join('');
@@ -1978,7 +1989,7 @@ function loadSurveyResponses(page = 1) {
         .catch(error => {
             console.error('Error loading survey responses:', error);
             document.getElementById('responsesTable').innerHTML = 
-                '<tr><td colspan="7" class="text-center text-danger">Error loading responses.</td></tr>';
+                '<tr><td colspan="8" class="text-center text-danger">Error loading responses.</td></tr>';
             updateResponsesPaginationInfo(0, 0, 0);
             updateResponsesPaginationControls(null);
         });
