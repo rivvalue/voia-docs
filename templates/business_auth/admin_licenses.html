@@ -1,0 +1,238 @@
+{% extends "business_auth/base.html" %}
+
+{% block title %}{{ page_title }} - VOÏA Platform Admin{% endblock %}
+
+{% block content %}
+<div class="admin-panel">
+    <!-- Header -->
+    <div class="admin-header">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="admin-title">
+                    <i class="fas fa-shield-alt me-3"></i>{{ page_title }}
+                </h1>
+                <p class="admin-subtitle">Platform license management - {{ total_accounts }} total accounts</p>
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="{{ url_for('business_auth.license_dashboard') }}" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-arrow-left me-2"></i>Dashboard
+                </a>
+                <a href="{{ url_for('business_auth.admin_panel') }}" class="btn btn-primary">
+                    <i class="fas fa-home me-2"></i>Admin Panel
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Navigation -->
+    <div class="admin-section">
+        <div class="license-filters">
+            <a href="{{ url_for('business_auth.admin_licenses', filter='all') }}" 
+               class="filter-btn {% if filter_type == 'all' %}active{% endif %}">
+                <i class="fas fa-list"></i> All Accounts
+            </a>
+            <a href="{{ url_for('business_auth.admin_licenses', filter='expiring') }}" 
+               class="filter-btn {% if filter_type == 'expiring' %}active{% endif %}">
+                <i class="fas fa-exclamation-triangle"></i> Expiring Soon
+            </a>
+            <a href="{{ url_for('business_auth.admin_licenses', filter='trial') }}" 
+               class="filter-btn {% if filter_type == 'trial' %}active{% endif %}">
+                <i class="fas fa-flask"></i> Trial Accounts
+            </a>
+            <a href="{{ url_for('business_auth.admin_licenses', filter='usage') }}" 
+               class="filter-btn {% if filter_type == 'usage' %}active{% endif %}">
+                <i class="fas fa-chart-bar"></i> High Usage
+            </a>
+        </div>
+    </div>
+
+    <!-- Licenses Table -->
+    <div class="admin-section">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-table"></i>
+                Business Account Licenses
+            </h3>
+        </div>
+        
+        {% if licenses_data %}
+        <div class="table-responsive">
+            <table class="table table-dark table-striped">
+                <thead>
+                    <tr>
+                        <th>Business Account</th>
+                        <th>License Type</th>
+                        <th>Status</th>
+                        <th>Campaigns</th>
+                        <th>Users</th>
+                        <th>Expiration</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for account in licenses_data %}
+                    <tr>
+                        <td>
+                            <div class="account-info">
+                                <strong>{{ account.account_name }}</strong>
+                                <br>
+                                <small class="text-muted">ID: {{ account.account_id }}</small>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="license-badge license-{{ account.license_type }}">
+                                {{ account.license_type|title }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-badge status-{{ account.license_status }}">
+                                {{ account.license_status|title }}
+                            </span>
+                            {% if account.expires_soon and account.days_remaining and account.days_remaining > 0 %}
+                            <br><small class="text-warning">{{ account.days_remaining }} days left</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="usage-info">
+                                <strong>{{ account.campaigns_used|default(0) }}/{{ account.campaigns_limit|default('∞') }}</strong>
+                                {% if account.campaigns_limit %}
+                                <div class="progress progress-sm mt-1">
+                                    {% set usage_percent = ((account.campaigns_used|default(0) / account.campaigns_limit) * 100)|round(1) %}
+                                    <div class="progress-bar 
+                                        {% if usage_percent >= 90 %}bg-danger
+                                        {% elif usage_percent >= 75 %}bg-warning
+                                        {% else %}bg-success{% endif %}" 
+                                        style="width: {{ usage_percent }}%"></div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="usage-info">
+                                <strong>{{ account.users_count|default(0) }}/{{ account.users_limit|default('∞') }}</strong>
+                                {% if account.users_limit %}
+                                <div class="progress progress-sm mt-1">
+                                    {% set user_percent = ((account.users_count|default(0) / account.users_limit) * 100)|round(1) %}
+                                    <div class="progress-bar 
+                                        {% if user_percent >= 90 %}bg-danger
+                                        {% elif user_percent >= 75 %}bg-warning
+                                        {% else %}bg-info{% endif %}" 
+                                        style="width: {{ user_percent }}%"></div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            {% if account.license_end %}
+                            <div class="expiration-info">
+                                <strong>{{ account.license_end.strftime('%b %d, %Y') }}</strong>
+                                {% if account.expires_soon %}
+                                <br><small class="text-danger">Expires Soon!</small>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <span class="text-muted">No expiration</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{{ url_for('business_auth.license_assignment_form', business_id=account.account_id) }}" 
+                                   class="btn btn-sm btn-outline-primary" title="Manage License">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{{ url_for('business_auth.license_history', business_id=account.account_id) }}" 
+                                   class="btn btn-sm btn-outline-info" title="View History">
+                                    <i class="fas fa-history"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h4>No accounts found</h4>
+            <p class="text-muted">No business accounts match the current filter criteria.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.license-filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    background: var(--card-background);
+    color: var(--text-primary);
+    text-decoration: none;
+    border-radius: 5px;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    text-decoration: none;
+}
+
+.filter-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.license-badge, .status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.license-core { background: #6c757d; color: white; }
+.license-plus { background: #0dcaf0; color: white; }
+.license-pro { background: #198754; color: white; }
+.license-trial { background: #ffc107; color: #000; }
+
+.status-active { background: #198754; color: white; }
+.status-expired { background: #dc3545; color: white; }
+.status-trial { background: #ffc107; color: #000; }
+
+.usage-info .progress {
+    width: 60px;
+    height: 4px;
+}
+
+.progress-sm {
+    height: 4px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 5px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.account-info strong {
+    color: var(--text-primary);
+}
+
+.expiration-info strong {
+    color: var(--text-primary);
+}
+</style>
+{% endblock %}
