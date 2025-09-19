@@ -340,6 +340,151 @@ def add_user():
         return redirect(url_for('business_auth.manage_users'))
 
 
+@business_auth_bp.route('/users/<int:user_id>/edit', methods=['POST'])
+@require_business_auth
+@require_permission('manage_users')
+def edit_user(user_id):
+    """Edit user details (name, email, role)"""
+    try:
+        current_user_id = session.get('business_user_id')
+        current_account_id = session.get('business_account_id')
+        
+        if not current_user_id or not current_account_id:
+            logger.warning("Missing user or account session data")
+            flash('Authentication required.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get user to edit
+        user_to_edit = BusinessAccountUser.query.filter_by(
+            id=user_id, 
+            business_account_id=current_account_id
+        ).first()
+        
+        if not user_to_edit:
+            flash('User not found.', 'error')
+            return redirect(url_for('business_auth.manage_users'))
+        
+        # Get form data
+        email = request.form.get('email', '').strip().lower()
+        first_name = request.form.get('first_name', '').strip()
+        last_name = request.form.get('last_name', '').strip()
+        role = request.form.get('role', '').strip()
+        
+        # Validate input
+        if not email or not first_name or not last_name:
+            flash('All fields are required.', 'error')
+            return redirect(url_for('business_auth.manage_users'))
+        
+        # Validate email format
+        from email_validator import validate_email, EmailNotValidError
+        try:
+            valid_email = validate_email(email)
+            email = valid_email.email
+        except EmailNotValidError as e:
+            flash(f'Invalid email address: {str(e)}', 'error')
+            return redirect(url_for('business_auth.manage_users'))
+        
+        # Check if email is already taken by another user
+        existing_user = BusinessAccountUser.query.filter(
+            BusinessAccountUser.email == email,
+            BusinessAccountUser.id != user_id
+        ).first()
+        
+        if existing_user:
+            flash('A user with this email address already exists.', 'error')
+            return redirect(url_for('business_auth.manage_users'))
+        
+        # Validate role
+        allowed_roles = ['business_account_admin', 'admin', 'manager', 'viewer']
+        if role not in allowed_roles:
+            flash('Invalid role selected.', 'error')
+            return redirect(url_for('business_auth.manage_users'))
+        
+        # Update user
+        old_email = user_to_edit.email
+        user_to_edit.email = email
+        user_to_edit.first_name = first_name
+        user_to_edit.last_name = last_name
+        user_to_edit.role = role
+        user_to_edit.updated_at = datetime.utcnow()
+        
+        db.session.commit()
+        
+        logger.info(f"User {user_id} updated successfully. Email: {old_email} -> {email}, Role: {role}")
+        flash(f'User {user_to_edit.get_full_name()} has been updated successfully.', 'success')
+        
+        return redirect(url_for('business_auth.manage_users'))
+    
+    except Exception as e:
+        logger.error(f"Error editing user {user_id}: {e}")
+        db.session.rollback()
+        flash('Failed to update user. Please try again.', 'error')
+        return redirect(url_for('business_auth.manage_users'))
+
+
+@business_auth_bp.route('/users/<int:user_id>/toggle-status', methods=['POST'])
+@require_business_auth
+@require_permission('manage_users')
+def toggle_user_status(user_id):
+    """Activate or deactivate user with last admin protection"""
+    try:
+        current_user_id = session.get('business_user_id')
+        current_account_id = session.get('business_account_id')
+        
+        if not current_user_id or not current_account_id:
+            logger.warning("Missing user or account session data")
+            flash('Authentication required.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get user to toggle
+        user_to_toggle = BusinessAccountUser.query.filter_by(
+            id=user_id, 
+            business_account_id=current_account_id
+        ).first()
+        
+        if not user_to_toggle:
+            flash('User not found.', 'error')
+            return redirect(url_for('business_auth.manage_users'))
+        
+        # Prevent self-deactivation
+        if user_id == current_user_id:
+            flash('You cannot deactivate your own account.', 'error')
+            return redirect(url_for('business_auth.manage_users'))
+        
+        # Last admin protection - prevent deactivating the last admin
+        if user_to_toggle.is_active_user and user_to_toggle.role in ['business_account_admin', 'admin']:
+            # Count active admins
+            active_admins = BusinessAccountUser.query.filter_by(
+                business_account_id=current_account_id,
+                is_active_user=True
+            ).filter(
+                BusinessAccountUser.role.in_(['business_account_admin', 'admin'])
+            ).count()
+            
+            if active_admins <= 1:
+                flash('Cannot deactivate the last admin. Add another admin first.', 'error')
+                return redirect(url_for('business_auth.manage_users'))
+        
+        # Toggle status
+        new_status = not user_to_toggle.is_active_user
+        user_to_toggle.is_active_user = new_status
+        user_to_toggle.updated_at = datetime.utcnow()
+        
+        db.session.commit()
+        
+        status_text = 'activated' if new_status else 'deactivated'
+        logger.info(f"User {user_id} ({user_to_toggle.email}) {status_text} by user {current_user_id}")
+        flash(f'User {user_to_toggle.get_full_name()} has been {status_text}.', 'success')
+        
+        return redirect(url_for('business_auth.manage_users'))
+    
+    except Exception as e:
+        logger.error(f"Error toggling user status {user_id}: {e}")
+        db.session.rollback()
+        flash('Failed to update user status. Please try again.', 'error')
+        return redirect(url_for('business_auth.manage_users'))
+
+
 # ==== BUSINESS ACCOUNT ONBOARDING ROUTES (PHASE 1) ====
 
 @business_auth_bp.route('/admin/onboarding')
