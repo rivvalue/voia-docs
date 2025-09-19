@@ -406,8 +406,11 @@
                 </div>
                 <div class="col-md-4">
                     <div class="admin-actions">
-                        <!-- License Management Section -->
+                        <!-- Platform Admin Section -->
                         {% if current_user.role == 'platform_admin' %}
+                        <a href="{{ url_for('business_auth.business_account_onboarding') }}" class="btn btn-success btn-admin me-2" title="Create new business accounts with license assignment">
+                            <i class="fas fa-plus-circle me-2"></i>Onboard Business
+                        </a>
                         <a href="{{ url_for('business_auth.license_dashboard') }}" class="btn btn-primary btn-admin me-2" title="License management dashboard and overview">
                             <i class="fas fa-tachometer-alt me-2"></i>License Dashboard
                         </a>
