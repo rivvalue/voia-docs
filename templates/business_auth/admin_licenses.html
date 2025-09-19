@@ -57,7 +57,7 @@
         
         {% if licenses_data %}
         <div class="table-responsive">
-            <table class="table table-dark table-striped">
+            <table class="table table-custom-theme table-striped">
                 <thead>
                     <tr>
                         <th>Business Account</th>
@@ -162,6 +162,47 @@
 </div>
 
 <style>
+/* Custom table theme to match application colors */
+.table-custom-theme {
+    background: var(--primary-white);
+    color: var(--primary-black);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+}
+
+.table-custom-theme thead th {
+    background: var(--light-gray);
+    color: var(--primary-black);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wide);
+    border-bottom: 2px solid var(--medium-gray);
+    padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.table-custom-theme tbody td {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-bottom: 1px solid var(--light-gray);
+    vertical-align: middle;
+    background: var(--primary-white);
+    color: var(--primary-black);
+}
+
+.table-custom-theme tbody tr:hover {
+    background-color: rgba(225, 58, 68, 0.02);
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(233, 232, 228, 0.3);
+}
+
+.table-striped tbody tr:nth-of-type(odd):hover {
+    background-color: rgba(225, 58, 68, 0.05);
+}
+
 .license-filters {
     display: flex;
     gap: 10px;
@@ -171,50 +212,118 @@
 
 .filter-btn {
     padding: 8px 16px;
-    background: var(--card-background);
-    color: var(--text-primary);
+    background: var(--primary-white);
+    color: var(--primary-black);
     text-decoration: none;
-    border-radius: 5px;
-    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--light-gray);
     transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
 }
 
 .filter-btn:hover {
-    background: var(--primary-color);
-    color: white;
+    background: var(--primary-red);
+    color: var(--primary-white);
     text-decoration: none;
+    border-color: var(--primary-red);
+    transform: translateY(-1px);
 }
 
 .filter-btn.active {
-    background: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
+    background: var(--primary-red);
+    color: var(--primary-white);
+    border-color: var(--primary-red);
 }
 
 .license-badge, .status-badge {
-    padding: 4px 8px;
+    padding: 4px 12px;
     border-radius: 12px;
     font-size: 0.75rem;
-    font-weight: bold;
+    font-weight: 600;
     text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wide);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
 }
 
-.license-core { background: #6c757d; color: white; }
-.license-plus { background: #0dcaf0; color: white; }
-.license-pro { background: #198754; color: white; }
-.license-trial { background: #ffc107; color: #000; }
+/* License badges using application color palette */
+.license-core { 
+    background: rgba(225, 58, 68, 0.1);
+    color: var(--primary-red);
+    border: 1px solid rgba(225, 58, 68, 0.2);
+}
 
-.status-active { background: #198754; color: white; }
-.status-expired { background: #dc3545; color: white; }
-.status-trial { background: #ffc107; color: #000; }
+.license-plus { 
+    background: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+    border: 1px solid rgba(40, 167, 69, 0.2);
+}
+
+.license-pro { 
+    background: rgba(111, 66, 193, 0.1);
+    color: #6f42c1;
+    border: 1px solid rgba(111, 66, 193, 0.2);
+}
+
+.license-trial { 
+    background: rgba(253, 126, 20, 0.1);
+    color: #fd7e14;
+    border: 1px solid rgba(253, 126, 20, 0.2);
+}
+
+/* Status badges using application colors */
+.status-active { 
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.status-expired { 
+    background: rgba(225, 58, 68, 0.1);
+    color: var(--primary-red);
+    border: 1px solid rgba(225, 58, 68, 0.2);
+}
+
+.status-trial { 
+    background: rgba(253, 126, 20, 0.1);
+    color: #fd7e14;
+    border: 1px solid rgba(253, 126, 20, 0.2);
+}
+
+.usage-info {
+    font-size: var(--font-size-sm);
+}
 
 .usage-info .progress {
     width: 60px;
-    height: 4px;
+    height: 6px;
+    background: var(--light-gray);
+    border-radius: 3px;
 }
 
 .progress-sm {
-    height: 4px;
+    height: 6px;
+}
+
+.progress-bar {
+    border-radius: 3px;
+}
+
+.bg-success {
+    background-color: #28a745 !important;
+}
+
+.bg-warning {
+    background-color: #fd7e14 !important;
+}
+
+.bg-danger {
+    background-color: var(--primary-red) !important;
+}
+
+.bg-info {
+    background-color: #17a2b8 !important;
 }
 
 .action-buttons {
@@ -222,17 +331,56 @@
     gap: 5px;
 }
 
+.btn-outline-primary {
+    border-color: var(--primary-red);
+    color: var(--primary-red);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-red);
+    border-color: var(--primary-red);
+    color: var(--primary-white);
+}
+
+.btn-outline-info {
+    border-color: #17a2b8;
+    color: #17a2b8;
+}
+
+.btn-outline-info:hover {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    color: var(--primary-white);
+}
+
 .empty-state {
     text-align: center;
     padding: 60px 20px;
+    color: var(--gray-dark);
+}
+
+.empty-state i {
+    color: var(--medium-gray);
 }
 
 .account-info strong {
-    color: var(--text-primary);
+    color: var(--primary-black);
 }
 
 .expiration-info strong {
-    color: var(--text-primary);
+    color: var(--primary-black);
+}
+
+.text-muted {
+    color: var(--gray-dark) !important;
+}
+
+.text-warning {
+    color: #fd7e14 !important;
+}
+
+.text-danger {
+    color: var(--primary-red) !important;
 }
 </style>
 {% endblock %}
