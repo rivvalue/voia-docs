@@ -2485,7 +2485,19 @@ def license_dashboard():
         # Sanitize accounts_expiring_soon (limit to prevent UI issues)
         accounts_expiring_soon = accounts_expiring_soon[:50]  # Limit to 50 entries
         
+        # Structure data to match template expectations
+        license_stats = {
+            'total_accounts': max(0, total_accounts),
+            'core_licenses': license_distribution.get('core', 0),
+            'plus_licenses': license_distribution.get('plus', 0),
+            'pro_licenses': license_distribution.get('pro', 0),
+            'trial_accounts': license_distribution.get('trial', 0),
+            'expiring_soon': len(accounts_expiring_soon),
+            'account_growth': 0  # Could calculate this from historical data later
+        }
+        
         dashboard_data = {
+            'license_stats': license_stats,
             'total_accounts': max(0, total_accounts),
             'active_licenses': max(0, active_licenses),
             'expired_licenses': max(0, expired_licenses),
@@ -2496,7 +2508,9 @@ def license_dashboard():
             'accounts_expiring_soon': accounts_expiring_soon,
             'available_types': available_types,
             'accounts_processed': accounts_processed,
-            'accounts_with_errors': accounts_with_errors
+            'accounts_with_errors': accounts_with_errors,
+            'alerts': [],  # Add empty alerts for now
+            'recent_activities': []  # Add empty activities for now
         }
         
         return render_template('business_auth/licenses/dashboard.html', **dashboard_data)
