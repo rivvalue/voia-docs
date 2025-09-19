@@ -2499,7 +2499,7 @@ def license_dashboard():
             'accounts_with_errors': accounts_with_errors
         }
         
-        return render_template('business_auth/license_dashboard.html', **dashboard_data)
+        return render_template('business_auth/licenses/dashboard.html', **dashboard_data)
         
     except Exception as e:
         logger.error(f"Error loading license dashboard: {e}")
