@@ -257,6 +257,89 @@ def manage_users():
         return redirect(url_for('business_auth.admin_panel'))
 
 
+@business_auth_bp.route('/users/add', methods=['POST'])
+@require_business_auth
+@require_permission('manage_users')
+def add_user():
+    """Add new user to business account with license validation"""
+    try:
+        current_user_id = session.get('business_user_id')
+        current_account_id = session.get('business_account_id')
+        
+        if not current_user_id or not current_account_id:
+            logger.warning("Missing user or account session data")
+            flash('Authentication required.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get form data
+        email = request.form.get('email', '').strip().lower()
+        first_name = request.form.get('first_name', '').strip()
+        last_name = request.form.get('last_name', '').strip()
+        role = request.form.get('role', 'manager').strip()
+        
+        # Validate input
+        if not email or not first_name or not last_name:
+            flash('All fields are required.', 'error')
+            return redirect(url_for('business_auth.manage_users'))
+        
+        # Validate email format
+        from email_validator import validate_email, EmailNotValidError
+        try:
+            valid_email = validate_email(email)
+            email = valid_email.email
+        except EmailNotValidError as e:
+            flash(f'Invalid email address: {str(e)}', 'error')
+            return redirect(url_for('business_auth.manage_users'))
+        
+        # Check if user already exists
+        existing_user = BusinessAccountUser.get_by_email(email)
+        if existing_user:
+            flash('A user with this email address already exists.', 'error')
+            return redirect(url_for('business_auth.manage_users'))
+        
+        # Check license limits
+        from license_service import LicenseService
+        if not LicenseService.can_add_user(current_account_id):
+            license_info = LicenseService.get_license_info(current_account_id)
+            flash(f'Cannot add user: License limit reached ({license_info.get("users_used", 0)}/{license_info.get("users_limit", 5)} users). Contact support to upgrade your license.', 'error')
+            return redirect(url_for('business_auth.manage_users'))
+        
+        # Validate role
+        allowed_roles = ['business_account_admin', 'admin', 'manager', 'viewer']
+        if role not in allowed_roles:
+            role = 'manager'  # Default to manager
+        
+        # Create new user
+        new_user = BusinessAccountUser()
+        new_user.business_account_id = current_account_id
+        new_user.email = email
+        new_user.first_name = first_name
+        new_user.last_name = last_name
+        new_user.role = role
+        new_user.is_active_user = True
+        new_user.email_verified = False  # Will be verified when they activate account
+        
+        # Generate invitation token
+        invitation_token = new_user.generate_invitation_token()
+        
+        # Save to database
+        db.session.add(new_user)
+        db.session.commit()
+        
+        logger.info(f"User {email} created successfully for business account {current_account_id} by user {current_user_id}")
+        
+        # TODO: Send invitation email (implement in next phases)
+        flash(f'User {new_user.get_full_name()} has been added successfully! Invitation token: {invitation_token[:8]}...', 'success')
+        
+        return redirect(url_for('business_auth.manage_users'))
+    
+    except Exception as e:
+        logger.error(f"Error adding user: {e}")
+        db.session.rollback()
+        flash('Failed to add user. Please try again.', 'error')
+        return redirect(url_for('business_auth.manage_users'))
+
+
 # ==== BUSINESS ACCOUNT ONBOARDING ROUTES (PHASE 1) ====
 
 @business_auth_bp.route('/admin/onboarding')
