@@ -1054,24 +1054,12 @@ def individual_response(campaign_id, participant_id):
             return redirect(url_for('campaigns.list_campaigns'))
         logger.info(f"Found campaign: {campaign.id}")
         
-        # Get participant (scoped to current business account)
-        logger.info(f"Looking for participant {participant_id} in business account {current_account.id}")
-        participant = Participant.query.filter_by(
-            id=participant_id,
-            business_account_id=current_account.id
-        ).first()
-        
-        if not participant:
-            logger.warning(f"Participant {participant_id} not found for business account {current_account.id}")
-            if request.is_json:
-                return jsonify({'error': 'Participant not found'}), 404
-            flash('Participant not found.', 'error')
-            return redirect(url_for('campaigns.campaign_responses', campaign_id=campaign_id))
-        logger.info(f"Found participant: {participant.id}")
-        
-        # Get the survey response for this participant in this campaign
+        # Get the survey response for this participant in this campaign through campaign_participants
+        logger.info(f"Looking for survey response for participant {participant_id} in campaign {campaign_id}")
         survey_response = SurveyResponse.query.join(
             CampaignParticipant, SurveyResponse.campaign_participant_id == CampaignParticipant.id
+        ).join(
+            Participant, CampaignParticipant.participant_id == Participant.id
         ).filter(
             SurveyResponse.campaign_id == campaign_id,
             CampaignParticipant.participant_id == participant_id,
@@ -1085,6 +1073,23 @@ def individual_response(campaign_id, participant_id):
             flash('Survey response not found for this participant.', 'error')
             return redirect(url_for('campaigns.campaign_responses', campaign_id=campaign_id))
         logger.info(f"Found survey response: {survey_response.id}")
+        
+        # Get participant through the campaign_participants relationship  
+        campaign_participant = CampaignParticipant.query.filter_by(
+            participant_id=participant_id,
+            campaign_id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign_participant:
+            logger.warning(f"Campaign participant relationship not found for participant {participant_id} in campaign {campaign_id}")
+            if request.is_json:
+                return jsonify({'error': 'Participant not found in this campaign'}), 404
+            flash('Participant not found in this campaign.', 'error')
+            return redirect(url_for('campaigns.campaign_responses', campaign_id=campaign_id))
+        
+        participant = campaign_participant.participant
+        logger.info(f"Found participant: {participant.id} via campaign_participants")
         
         # Get search highlighting parameter
         search_query = request.args.get('search', '').strip()
