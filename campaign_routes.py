@@ -943,7 +943,7 @@ def campaign_responses(campaign_id):
         # Build query for survey responses in this campaign
         # Join with campaign participants to get participant details
         response_query = SurveyResponse.query.options(
-            joinedload(SurveyResponse.campaign_participant).joinedload(CampaignParticipant.participant)
+            joinedload('campaign_participant').joinedload('participant')
         ).join(
             CampaignParticipant, SurveyResponse.campaign_participant_id == CampaignParticipant.id
         ).join(
