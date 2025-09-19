@@ -647,6 +647,276 @@ This is an automated message. If you have any questions, please contact the orga
                 'participant_email': participant_email
             }
 
+    def send_business_account_invitation(self, 
+                                         user_email: str,
+                                         user_first_name: str,
+                                         user_last_name: str,
+                                         business_account_name: str,
+                                         invitation_token: str,
+                                         email_delivery_id: Optional[int] = None) -> Dict:
+        """
+        Send business account activation invitation using platform-level SMTP configuration
+        
+        Args:
+            user_email: New business user's email
+            user_first_name: User's first name
+            user_last_name: User's last name
+            business_account_name: Name of the business account
+            invitation_token: Secure UUID token for account activation
+            email_delivery_id: Optional EmailDelivery record ID for tracking
+            
+        Returns:
+            Dict with success status and details
+        """
+        
+        try:
+            # Always use platform-level configuration for system emails (no business_account_id)
+            platform_config = self._get_email_config(None)
+            platform_branding = self._get_branding_config(None)
+            
+            # Generate activation URL
+            from flask import url_for
+            activation_url = url_for('business_auth.activate_account', token=invitation_token, _external=True)
+            
+            # Email subject
+            subject = f"Welcome to {platform_branding['company_name']} - Activate Your Business Account"
+            
+            # User's full name
+            user_full_name = f"{user_first_name} {user_last_name}"
+            
+            # Text body for business account invitation
+            text_body = f"""
+Welcome to {platform_branding['company_name']}!
+
+Dear {user_full_name},
+
+You have been invited to join {business_account_name} on our Voice of Client (VOÏA) platform as a business account administrator.
+
+To activate your account and set up your password, please click the link below:
+{activation_url}
+
+This secure activation link will expire in 24 hours for security purposes.
+
+Once activated, you'll have access to:
+• Create and manage feedback campaigns
+• Analyze client responses and insights
+• Configure your business account settings
+• Manage participant lists and invitations
+
+If you have any questions or need assistance, please contact our support team.
+
+Welcome aboard!
+
+Best regards,
+The {platform_branding['company_name']} Team
+{platform_branding['tagline']}
+
+---
+This is an automated system message. Please do not reply to this email.
+If you did not expect this invitation, please ignore this message.
+"""
+            
+            # HTML body for business account invitation
+            html_body = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome to {platform_branding['company_name']}</title>
+    <style>
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }}
+        .container {{
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+        .header {{
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #E13A44;
+        }}
+        .logo {{
+            font-size: 28px;
+            font-weight: bold;
+            color: #E13A44;
+            margin-bottom: 5px;
+        }}
+        .tagline {{
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }}
+        .welcome-message {{
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            border-left: 4px solid #28a745;
+            margin: 20px 0;
+        }}
+        .business-account {{
+            background-color: #e7f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+            margin: 20px 0;
+            font-weight: 500;
+        }}
+        .cta-button {{
+            display: inline-block;
+            background-color: #E13A44;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+        }}
+        .cta-button:hover {{
+            background-color: #c12e38;
+        }}
+        .features {{
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }}
+        .feature-list {{
+            list-style: none;
+            padding: 0;
+        }}
+        .feature-list li {{
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }}
+        .feature-list li:before {{
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+        }}
+        .footer {{
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            font-size: 12px;
+            color: #666;
+        }}
+        .security-notice {{
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 15px 0;
+            font-size: 14px;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">{platform_branding['company_name']}</div>
+            <div class="tagline">{platform_branding['tagline']}</div>
+        </div>
+        
+        <div class="welcome-message">
+            <h2 style="margin-top: 0; color: #28a745;">Welcome to the Team!</h2>
+            <p>Dear <strong>{user_full_name}</strong>,</p>
+            <p>You have been invited to join <strong>{business_account_name}</strong> on our Voice of Client (VOÏA) platform as a business account administrator.</p>
+        </div>
+        
+        <div class="business-account">
+            <strong>Business Account:</strong> {business_account_name}
+        </div>
+        
+        <p style="text-align: center;">
+            <a href="{activation_url}" class="cta-button">Activate Your Account</a>
+        </p>
+        
+        <div class="security-notice">
+            <strong>Security Notice:</strong> This activation link will expire in 24 hours for your security.
+        </div>
+        
+        <div class="features">
+            <h3 style="margin-top: 0;">What You Can Do:</h3>
+            <ul class="feature-list">
+                <li>Create and manage feedback campaigns</li>
+                <li>Analyze client responses and insights</li>
+                <li>Configure your business account settings</li>
+                <li>Manage participant lists and invitations</li>
+                <li>Access comprehensive reporting dashboards</li>
+                <li>Customize survey workflows and branding</li>
+            </ul>
+        </div>
+        
+        <div style="margin: 30px 0; padding: 20px; background-color: #e7f3ff; border-radius: 5px;">
+            <p style="margin: 0;"><strong>Need Help?</strong></p>
+            <p style="margin: 5px 0 0 0;">Our support team is here to help you get started. Contact us anytime with questions.</p>
+        </div>
+        
+        <div class="footer">
+            <p>Best regards,<br>
+            The {platform_branding['company_name']} Team</p>
+            <hr style="margin: 15px 0;">
+            <p><em>This is an automated system message. Please do not reply to this email.<br>
+            If you did not expect this invitation, please ignore this message.</em></p>
+        </div>
+    </div>
+</body>
+</html>
+"""
+            
+            # Send email using platform-level configuration (business_account_id=None ensures platform SMTP)
+            result = self.send_email(
+                to_emails=user_email,
+                subject=subject,
+                text_body=text_body,
+                html_body=html_body,
+                email_delivery_id=email_delivery_id,
+                business_account_id=None  # Force platform-level configuration
+            )
+            
+            # Add invitation-specific metadata
+            if result['success']:
+                result.update({
+                    'email_type': 'business_account_invitation',
+                    'user_email': user_email,
+                    'user_name': user_full_name,
+                    'business_account_name': business_account_name,
+                    'invitation_token': invitation_token,
+                    'activation_url': activation_url
+                })
+                
+                logger.info(f"Business account invitation sent successfully to {user_email} for {business_account_name}")
+            
+            return result
+            
+        except Exception as e:
+            error_msg = f"Failed to send business account invitation to {user_email}: {str(e)}"
+            logger.error(error_msg)
+            
+            return {
+                'success': False,
+                'error': error_msg,
+                'email_type': 'business_account_invitation',
+                'user_email': user_email,
+                'business_account_name': business_account_name
+            }
+
     def send_campaign_notification(self,
                                    notification_type: str,
                                    campaign_name: str,
@@ -749,11 +1019,20 @@ Dashboard: {url_for('business_auth.admin_panel', _external=True)}
                 }
             
             # Send to all admin emails
+            email_config = self._get_email_config(business_account_id)
+            admin_emails = email_config.get('admin_emails', [])
+            if not admin_emails:
+                return {
+                    'success': False,
+                    'error': 'No admin emails configured for notifications'
+                }
+            
             result = self.send_email(
-                to_emails=self.admin_emails,
+                to_emails=admin_emails,
                 subject=subject,
                 text_body=text_body,
-                email_delivery_id=email_delivery_id
+                email_delivery_id=email_delivery_id,
+                business_account_id=business_account_id
             )
             
             # Add notification-specific metadata
@@ -794,8 +1073,11 @@ Dashboard: {url_for('business_auth.admin_panel', _external=True)}
             }
         
         try:
+            # Get default email configuration
+            email_config = self._get_email_config()
+            
             # Additional safety checks for type assertions  
-            if not all([self.smtp_server, self.smtp_port, self.smtp_username, self.smtp_password]):
+            if not all([email_config['smtp_server'], email_config['smtp_port'], email_config['smtp_username'], email_config['smtp_password']]):
                 return {
                     'success': False,
                     'error': 'Email service configuration incomplete',
@@ -804,20 +1086,21 @@ Dashboard: {url_for('business_auth.admin_panel', _external=True)}
             
             # Test SMTP connection
             context = ssl.create_default_context()
-            smtp_port = self.smtp_port or 587  # Default port fallback
+            smtp_port = email_config['smtp_port'] or 587  # Default port fallback
             
-            with smtplib.SMTP(str(self.smtp_server), smtp_port) as server:
-                server.starttls(context=context)
-                server.login(str(self.smtp_username), str(self.smtp_password))
+            with smtplib.SMTP(str(email_config['smtp_server']), smtp_port) as server:
+                if email_config.get('use_tls', True):
+                    server.starttls(context=context)
+                server.login(str(email_config['smtp_username']), str(email_config['smtp_password']))
                 
                 logger.info("Email service connection test successful")
                 
                 return {
                     'success': True,
                     'configured': True,
-                    'smtp_server': self.smtp_server,
-                    'smtp_port': self.smtp_port,
-                    'admin_emails_count': len(self.admin_emails),
+                    'smtp_server': email_config['smtp_server'],
+                    'smtp_port': email_config['smtp_port'],
+                    'admin_emails_count': len(email_config.get('admin_emails', [])),
                     'test_time': datetime.utcnow().isoformat()
                 }
                 
@@ -825,12 +1108,13 @@ Dashboard: {url_for('business_auth.admin_panel', _external=True)}
             error_msg = f"Email service connection test failed: {str(e)}"
             logger.error(error_msg)
             
+            email_config = self._get_email_config()
             return {
                 'success': False,
                 'error': error_msg,
                 'configured': True,
-                'smtp_server': self.smtp_server,
-                'smtp_port': self.smtp_port
+                'smtp_server': email_config.get('smtp_server'),
+                'smtp_port': email_config.get('smtp_port')
             }
 
     def test_connection_for_account(self, business_account_id: Optional[int] = None) -> Dict:

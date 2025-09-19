@@ -1411,3 +1411,69 @@ class LicenseService:
         except Exception as e:
             logger.error(f"Failed to get license assignment history for business_id {business_id}: {e}")
             return []
+    
+    @staticmethod
+    def assign_license_from_template(
+        business_account_id: int,
+        template_id: str,
+        assigned_by_user_id: Optional[int] = None,
+        notes: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Assign a license to a business account using a template ID.
+        
+        Args:
+            business_account_id: Business account ID to assign license to
+            template_id: License template ID (e.g., 'core', 'plus', 'pro', 'trial')
+            assigned_by_user_id: User ID who is assigning the license 
+            notes: Optional notes for the assignment
+            
+        Returns:
+            dict: Result with success status and details
+        """
+        try:
+            # Get the template to determine license type
+            template = LicenseTemplateManager.get_template(template_id)
+            if not template:
+                return {
+                    'success': False,
+                    'error': f'License template not found: {template_id}'
+                }
+            
+            # Convert user ID to string for assigned_by field
+            assigned_by = str(assigned_by_user_id) if assigned_by_user_id else "system"
+            
+            # Call the main assignment method
+            success, license_record, message = LicenseService.assign_license_to_business(
+                business_id=business_account_id,
+                license_type=template.license_type,
+                assigned_by=assigned_by
+            )
+            
+            if success and license_record:
+                # Update notes if provided
+                if notes:
+                    license_record.notes = notes
+                    db.session.commit()
+                
+                logger.info(f"Successfully assigned {template_id} license to business account {business_account_id}")
+                return {
+                    'success': True,
+                    'message': message,
+                    'license_id': license_record.id,
+                    'license_type': license_record.license_type
+                }
+            else:
+                logger.error(f"Failed to assign {template_id} license to business account {business_account_id}: {message}")
+                return {
+                    'success': False,
+                    'error': message
+                }
+                
+        except Exception as e:
+            error_msg = f"Error assigning license from template {template_id} to business account {business_account_id}: {str(e)}"
+            logger.error(error_msg)
+            return {
+                'success': False,
+                'error': error_msg
+            }

@@ -4,7 +4,7 @@ Provides login/logout routes for business account users without affecting public
 """
 
 from flask import Blueprint, request, render_template, redirect, url_for, session, flash, jsonify
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 from models import BusinessAccountUser, UserSession, BusinessAccount, EmailConfiguration, LicenseHistory, db
 from rate_limiter import rate_limit
 from license_service import LicenseService
@@ -203,6 +203,271 @@ def validate_business_account_access(business_id, allow_platform_admin=False):
     
     return True, target_account, "Same tenant access"
 
+
+# ==== BUSINESS ACCOUNT ONBOARDING ROUTES (PHASE 1) ====
+
+@business_auth_bp.route('/admin/onboarding')
+@require_platform_admin
+def business_account_onboarding():
+    """Platform admin business account onboarding page"""
+    try:
+        from license_templates import LicenseTemplateManager
+        
+        # Get available license templates
+        license_templates = LicenseTemplateManager.get_all_templates()
+        
+        return render_template('business_auth/business_account_onboarding.html',
+                             license_templates=license_templates)
+    
+    except Exception as e:
+        logger.error(f"Error loading business account onboarding page: {e}")
+        flash('Failed to load onboarding page.', 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+
+@business_auth_bp.route('/admin/onboarding/create', methods=['POST'])
+@require_platform_admin
+def create_business_account_with_admin():
+    """Create business account with admin user and send invitation"""
+    try:
+        # Get form data
+        business_name = request.form.get('business_name', '').strip()
+        license_template_id = request.form.get('license_template', '').strip()
+        admin_first_name = request.form.get('admin_first_name', '').strip()
+        admin_last_name = request.form.get('admin_last_name', '').strip()
+        admin_email = request.form.get('admin_email', '').strip().lower()
+        
+        # Validate required fields
+        if not all([business_name, license_template_id, admin_first_name, admin_last_name, admin_email]):
+            flash('All fields are required.', 'error')
+            return redirect(url_for('business_auth.business_account_onboarding'))
+        
+        # Validate email format
+        email_pattern = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+        if not email_pattern.match(admin_email):
+            flash('Please provide a valid email address.', 'error')
+            return redirect(url_for('business_auth.business_account_onboarding'))
+        
+        # Check if email already exists
+        existing_user = BusinessAccountUser.query.filter_by(email=admin_email).first()
+        if existing_user:
+            flash(f'A user with email {admin_email} already exists.', 'error')
+            return redirect(url_for('business_auth.business_account_onboarding'))
+        
+        # Create business account
+        business_account = BusinessAccount(
+            name=business_name,
+            account_type='customer',
+            status='active',
+            contact_email=admin_email,
+            contact_name=f"{admin_first_name} {admin_last_name}"
+        )
+        
+        db.session.add(business_account)
+        db.session.flush()  # Get the ID
+        
+        # Assign license using LicenseService
+        from license_service import LicenseService
+        from license_templates import LicenseTemplateManager
+        
+        license_template = LicenseTemplateManager.get_template(license_template_id)
+        if not license_template:
+            flash('Invalid license template selected.', 'error')
+            db.session.rollback()
+            return redirect(url_for('business_auth.business_account_onboarding'))
+        
+        # Assign license to the business account
+        license_result = LicenseService.assign_license_from_template(
+            business_account_id=business_account.id,
+            template_id=license_template_id,
+            assigned_by_user_id=session.get('business_user_id'),
+            notes=f"Initial license assignment for business account onboarding"
+        )
+        
+        if not license_result.get('success'):
+            flash(f'Failed to assign license: {license_result.get("error", "Unknown error")}', 'error')
+            db.session.rollback()
+            return redirect(url_for('business_auth.business_account_onboarding'))
+        
+        # Create admin user (not activated yet)
+        admin_user = BusinessAccountUser(
+            business_account_id=business_account.id,
+            email=admin_email,
+            first_name=admin_first_name,
+            last_name=admin_last_name,
+            role='business_account_admin',
+            is_active_user=True,
+            email_verified=False,
+            password_hash=generate_password_hash('temporary_password_to_be_changed')  # Temporary password
+        )
+        
+        # Generate invitation token
+        invitation_token = admin_user.generate_invitation_token()
+        
+        db.session.add(admin_user)
+        db.session.commit()
+        
+        # Send invitation email using platform-level email service
+        from email_service import EmailService
+        email_service = EmailService()
+        
+        email_result = email_service.send_business_account_invitation(
+            user_email=admin_email,
+            user_first_name=admin_first_name,
+            user_last_name=admin_last_name,
+            business_account_name=business_name,
+            invitation_token=invitation_token
+        )
+        
+        if email_result.get('success'):
+            logger.info(f"Business account '{business_name}' created successfully with admin user {admin_email}")
+            flash(f'Business account "{business_name}" created successfully! Invitation email sent to {admin_email}.', 'success')
+            
+            # Audit log the creation
+            try:
+                from audit_utils import queue_audit_log
+                queue_audit_log(
+                    business_account_id=business_account.id,
+                    action_type='business_account_created',
+                    resource_type='business_account',
+                    details={
+                        'business_name': business_name,
+                        'admin_email': admin_email,
+                        'license_template': license_template_id,
+                        'created_by': session.get('business_user_id')
+                    }
+                )
+            except Exception as audit_error:
+                logger.error(f"Failed to log business account creation audit: {audit_error}")
+        else:
+            logger.warning(f"Business account created but invitation email failed: {email_result.get('error')}")
+            flash(f'Business account "{business_name}" created successfully, but invitation email failed. Please manually send invitation to {admin_email}.', 'warning')
+        
+        # Redirect to license dashboard to show the new account
+        return redirect(url_for('business_auth.license_dashboard'))
+        
+    except Exception as e:
+        logger.error(f"Error creating business account: {e}")
+        db.session.rollback()
+        flash('Failed to create business account. Please try again.', 'error')
+        return redirect(url_for('business_auth.business_account_onboarding'))
+
+
+@business_auth_bp.route('/activate/<token>')
+def activate_account(token):
+    """Account activation page for business account admin users"""
+    try:
+        # Find user by invitation token
+        user = BusinessAccountUser.query.filter_by(invitation_token=token).first()
+        
+        if not user:
+            flash('Invalid activation link.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Check if token is valid and not expired
+        if not user.is_invitation_valid():
+            flash('Activation link has expired. Please contact support for a new invitation.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Check if already activated
+        if user.is_activated():
+            flash('Account already activated. Please log in.', 'info')
+            return redirect(url_for('business_auth.login'))
+        
+        return render_template('business_auth/activate_account.html',
+                             user=user,
+                             business_account=user.business_account,
+                             token=token)
+    
+    except Exception as e:
+        logger.error(f"Error loading activation page: {e}")
+        flash('Error loading activation page.', 'error')
+        return redirect(url_for('business_auth.login'))
+
+
+@business_auth_bp.route('/activate/<token>', methods=['POST'])
+def process_account_activation(token):
+    """Process account activation with password setup"""
+    try:
+        # Find user by invitation token
+        user = BusinessAccountUser.query.filter_by(invitation_token=token).first()
+        
+        if not user:
+            flash('Invalid activation link.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Check if token is valid and not expired
+        if not user.is_invitation_valid():
+            flash('Activation link has expired. Please contact support for a new invitation.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Check if already activated
+        if user.is_activated():
+            flash('Account already activated. Please log in.', 'info')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get form data
+        password = request.form.get('password', '').strip()
+        confirm_password = request.form.get('confirm_password', '').strip()
+        
+        # Validate password
+        if not password:
+            flash('Password is required.', 'error')
+            return render_template('business_auth/activate_account.html',
+                                 user=user,
+                                 business_account=user.business_account,
+                                 token=token)
+        
+        if len(password) < 8:
+            flash('Password must be at least 8 characters long.', 'error')
+            return render_template('business_auth/activate_account.html',
+                                 user=user,
+                                 business_account=user.business_account,
+                                 token=token)
+        
+        if password != confirm_password:
+            flash('Passwords do not match.', 'error')
+            return render_template('business_auth/activate_account.html',
+                                 user=user,
+                                 business_account=user.business_account,
+                                 token=token)
+        
+        # Activate account
+        user.activate_account(password)
+        db.session.commit()
+        
+        logger.info(f"Business account user {user.email} activated successfully")
+        flash(f'Welcome, {user.get_full_name()}! Your account has been activated successfully.', 'success')
+        
+        # Audit log the activation
+        try:
+            from audit_utils import queue_audit_log
+            queue_audit_log(
+                business_account_id=user.business_account_id,
+                action_type='user_account_activated',
+                resource_type='business_account_user',
+                details={
+                    'user_email': user.email,
+                    'user_name': user.get_full_name(),
+                    'business_account_name': user.business_account.name
+                }
+            )
+        except Exception as audit_error:
+            logger.error(f"Failed to log user activation audit: {audit_error}")
+        
+        # Redirect to login page
+        return redirect(url_for('business_auth.login'))
+        
+    except Exception as e:
+        logger.error(f"Error processing account activation: {e}")
+        flash('Failed to activate account. Please try again.', 'error')
+        return render_template('business_auth/activate_account.html',
+                             user=None,
+                             business_account=None,
+                             token=token)
+
+
+# ==== AUTHENTICATION ROUTES ====
 
 @business_auth_bp.route('/login', methods=['GET', 'POST'])
 def login():

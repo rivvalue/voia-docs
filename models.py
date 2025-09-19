@@ -1,6 +1,6 @@
 from app import db
 from datetime import datetime, date, timedelta
-from sqlalchemy import or_, and_, func, text
+from sqlalchemy import or_, and_, func, text, desc
 import json
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
@@ -1067,7 +1067,7 @@ class BusinessAccountUser(UserMixin, db.Model):
     last_name = db.Column(db.String(100), nullable=False)
     
     # User role and permissions
-    role = db.Column(db.String(50), nullable=False, default='admin', index=True)  # admin, viewer, manager, platform_admin
+    role = db.Column(db.String(50), nullable=False, default='business_account_admin', index=True)  # business_account_admin, admin, viewer, manager, platform_admin
     is_active_user = db.Column(db.Boolean, nullable=False, default=True, index=True)  # Renamed to avoid conflict with UserMixin
     
     # Email verification
@@ -1077,6 +1077,11 @@ class BusinessAccountUser(UserMixin, db.Model):
     # Password reset
     password_reset_token = db.Column(db.String(255), nullable=True)
     password_reset_expires = db.Column(db.DateTime, nullable=True)
+    
+    # Invitation flow (Phase 1: Business Account Onboarding)
+    invitation_token = db.Column(db.String(255), nullable=True, unique=True, index=True)
+    invited_at = db.Column(db.DateTime, nullable=True, index=True)
+    activated_at = db.Column(db.DateTime, nullable=True, index=True)
     
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
@@ -1110,6 +1115,39 @@ class BusinessAccountUser(UserMixin, db.Model):
         self.email_verified = True
         self.email_verification_token = None
     
+    def generate_invitation_token(self):
+        """Generate invitation token for account activation"""
+        self.invitation_token = str(uuid.uuid4())
+        self.invited_at = datetime.utcnow()
+        self.activated_at = None  # Reset activation status
+        return self.invitation_token
+    
+    def activate_account(self, password):
+        """Activate account with password during invitation flow"""
+        if not self.invitation_token:
+            raise ValueError("No invitation token found")
+        
+        # Set password and mark as activated
+        self.set_password(password)
+        self.activated_at = datetime.utcnow()
+        self.invitation_token = None  # Clear invitation token
+        self.email_verified = True  # Auto-verify email on activation
+        
+        return True
+    
+    def is_invitation_valid(self):
+        """Check if invitation token is valid and not expired (24 hours)"""
+        if not self.invitation_token or not self.invited_at:
+            return False
+        
+        # Check if invitation is within 24 hours
+        expiry_time = self.invited_at + timedelta(hours=24)
+        return datetime.utcnow() <= expiry_time
+    
+    def is_activated(self):
+        """Check if account has been activated"""
+        return self.activated_at is not None
+    
     def update_last_login(self):
         """Update last login timestamp"""
         self.last_login_at = datetime.utcnow()
@@ -1131,6 +1169,7 @@ class BusinessAccountUser(UserMixin, db.Model):
     def has_permission(self, permission):
         """Check if user has specific permission"""
         role_permissions = {
+            'business_account_admin': ['view', 'create', 'edit', 'delete', 'manage_users', 'export_data', 'manage_participants'],
             'admin': ['view', 'create', 'edit', 'delete', 'manage_users', 'export_data', 'manage_participants'],
             'manager': ['view', 'create', 'edit', 'export_data', 'manage_participants'],
             'viewer': ['view'],
@@ -1288,7 +1327,6 @@ class UserSession(db.Model):
                 UserSession.expires_at > func.now()
             )
         
-        from sqlalchemy import desc
         return query.order_by(desc(UserSession.last_activity_at)).all()
     
     @staticmethod
