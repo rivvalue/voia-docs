@@ -1025,7 +1025,6 @@ def campaign_responses(campaign_id):
 
 @campaign_bp.route('/<int:campaign_id>/responses/<int:participant_id>')
 @require_business_auth
-@require_permission('manage_participants')
 def individual_response(campaign_id, participant_id):
     """View individual participant response with full conversational transcript"""
     try:
