@@ -74,30 +74,30 @@
                     <tr>
                         <td>
                             <div class="account-info">
-                                <strong>{{ account.account_name }}</strong>
+                                <strong>{{ account.get('account_name', 'Unknown') }}</strong>
                                 <br>
-                                <small class="text-muted">ID: {{ account.account_id }}</small>
+                                <small class="text-muted">ID: {{ account.get('account_id', 'N/A') }}</small>
                             </div>
                         </td>
                         <td>
-                            <span class="license-badge license-{{ account.license_type }}">
-                                {{ account.license_type|title }}
+                            <span class="license-badge license-{{ account.get('license_type', 'trial') }}">
+                                {{ account.get('license_type', 'trial')|title }}
                             </span>
                         </td>
                         <td>
-                            <span class="status-badge status-{{ account.license_status }}">
-                                {{ account.license_status|title }}
+                            <span class="status-badge status-{{ account.get('license_status', 'trial') }}">
+                                {{ account.get('license_status', 'trial')|title }}
                             </span>
-                            {% if account.expires_soon and account.days_remaining and account.days_remaining > 0 %}
-                            <br><small class="text-warning">{{ account.days_remaining }} days left</small>
+                            {% if account.get('expires_soon') and account.get('days_remaining') and account.get('days_remaining') > 0 %}
+                            <br><small class="text-warning">{{ account.get('days_remaining') }} days left</small>
                             {% endif %}
                         </td>
                         <td>
                             <div class="usage-info">
-                                <strong>{{ account.campaigns_used|default(0) }}/{{ account.campaigns_limit|default('∞') }}</strong>
-                                {% if account.campaigns_limit %}
+                                <strong>{{ account.get('campaigns_used', 0) }}/{{ account.get('campaigns_limit', '∞') }}</strong>
+                                {% if account.get('campaigns_limit') %}
                                 <div class="progress progress-sm mt-1">
-                                    {% set usage_percent = ((account.campaigns_used|default(0) / account.campaigns_limit) * 100)|round(1) %}
+                                    {% set usage_percent = ((account.get('campaigns_used', 0) / account.get('campaigns_limit', 1)) * 100)|round(1) %}
                                     <div class="progress-bar 
                                         {% if usage_percent >= 90 %}bg-danger
                                         {% elif usage_percent >= 75 %}bg-warning
@@ -109,10 +109,10 @@
                         </td>
                         <td>
                             <div class="usage-info">
-                                <strong>{{ account.users_count|default(0) }}/{{ account.users_limit|default('∞') }}</strong>
-                                {% if account.users_limit %}
+                                <strong>{{ account.get('users_count', 0) }}/{{ account.get('users_limit', '∞') }}</strong>
+                                {% if account.get('users_limit') %}
                                 <div class="progress progress-sm mt-1">
-                                    {% set user_percent = ((account.users_count|default(0) / account.users_limit) * 100)|round(1) %}
+                                    {% set user_percent = ((account.get('users_count', 0) / account.get('users_limit', 1)) * 100)|round(1) %}
                                     <div class="progress-bar 
                                         {% if user_percent >= 90 %}bg-danger
                                         {% elif user_percent >= 75 %}bg-warning
@@ -123,10 +123,10 @@
                             </div>
                         </td>
                         <td>
-                            {% if account.license_end %}
+                            {% if account.get('license_end') %}
                             <div class="expiration-info">
-                                <strong>{{ account.license_end.strftime('%b %d, %Y') }}</strong>
-                                {% if account.expires_soon %}
+                                <strong>{{ account.get('license_end').strftime('%b %d, %Y') if account.get('license_end') else 'N/A' }}</strong>
+                                {% if account.get('expires_soon') %}
                                 <br><small class="text-danger">Expires Soon!</small>
                                 {% endif %}
                             </div>
@@ -136,11 +136,11 @@
                         </td>
                         <td>
                             <div class="action-buttons">
-                                <a href="{{ url_for('business_auth.license_assignment_form', business_id=account.account_id) }}" 
+                                <a href="{{ url_for('business_auth.license_assignment_form', business_id=account.get('account_id', 0)) }}" 
                                    class="btn btn-sm btn-outline-primary" title="Manage License">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="{{ url_for('business_auth.license_history', business_id=account.account_id) }}" 
+                                <a href="{{ url_for('business_auth.license_history', business_id=account.get('account_id', 0)) }}" 
                                    class="btn btn-sm btn-outline-info" title="View History">
                                     <i class="fas fa-history"></i>
                                 </a>
