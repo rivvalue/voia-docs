@@ -202,10 +202,10 @@
                             {% endif %}
                         </td>
                         <td class="text-end">
-                            {% if response.campaign_participant and response.campaign_participant.participant %}
+                            {% if response.participant_id %}
                             <a href="{{ url_for('campaigns.individual_response', 
                                               campaign_id=campaign.id, 
-                                              participant_id=response.campaign_participant.participant.id) }}{% if search_query %}?search={{ search_query }}{% endif %}" 
+                                              participant_id=response.participant_id) }}{% if search_query %}?search={{ search_query }}{% endif %}" 
                                class="btn btn-sm btn-outline-danger">
                                 <i class="fas fa-eye me-1"></i>View Details
                             </a>

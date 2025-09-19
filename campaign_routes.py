@@ -983,6 +983,7 @@ def campaign_responses(campaign_id):
             if response.campaign_participant and response.campaign_participant.participant:
                 participant = response.campaign_participant.participant
                 response_dict.update({
+                    'participant_id': participant.id,
                     'participant_name': participant.name,
                     'participant_email': participant.email,
                     'participant_company': participant.company_name,
