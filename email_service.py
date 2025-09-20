@@ -831,8 +831,8 @@ If you did not expect this invitation, please ignore this message.
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">{platform_branding['company_name']}</div>
-            <div class="tagline">{platform_branding['tagline']}</div>
+            <div class="logo">{branding['company_name']}</div>
+            <div class="tagline">{branding['tagline']}</div>
         </div>
         
         <div class="welcome-message">
@@ -872,7 +872,7 @@ If you did not expect this invitation, please ignore this message.
         
         <div class="footer">
             <p>Best regards,<br>
-            The {platform_branding['company_name']} Team</p>
+            The {branding['company_name']} Team</p>
             <hr style="margin: 15px 0;">
             <p><em>This is an automated system message. Please do not reply to this email.<br>
             If you did not expect this invitation, please ignore this message.</em></p>
