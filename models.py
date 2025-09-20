@@ -1060,7 +1060,7 @@ class BusinessAccountUser(UserMixin, db.Model):
     
     # User credentials
     email = db.Column(db.String(200), nullable=False, unique=True, index=True)
-    password_hash = db.Column(db.String(256), nullable=False)
+    password_hash = db.Column(db.String(256), nullable=True)
     
     # User profile
     first_name = db.Column(db.String(100), nullable=False)
@@ -1097,6 +1097,8 @@ class BusinessAccountUser(UserMixin, db.Model):
     
     def check_password(self, password):
         """Check password against hash"""
+        if self.password_hash is None:
+            return False  # Invited users without activated accounts cannot log in
         return check_password_hash(self.password_hash, password)
     
     def generate_password_reset_token(self):
