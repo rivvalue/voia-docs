@@ -1196,7 +1196,15 @@ class BusinessAccountUser(UserMixin, db.Model):
         
         # Check if invitation is within 24 hours
         expiry_time = self.invited_at + timedelta(hours=24)
-        return datetime.utcnow() <= expiry_time
+        
+        # Ensure both datetime objects have same timezone awareness
+        current_time = datetime.utcnow()
+        
+        # Convert to naive datetime if invited_at is timezone-aware
+        if hasattr(self.invited_at, 'tzinfo') and self.invited_at.tzinfo is not None:
+            expiry_time = expiry_time.replace(tzinfo=None)
+        
+        return current_time <= expiry_time
     
     def is_activated(self):
         """Check if account has been activated"""
