@@ -1,6 +1,10 @@
 import os
 import logging
 from flask import Flask
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_wtf.csrf import CSRFProtect, generate_csrf
@@ -10,6 +14,7 @@ from database_config import db_config
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 class Base(DeclarativeBase):
     pass
@@ -21,6 +26,11 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET")
 if not app.secret_key:
     raise RuntimeError("SESSION_SECRET environment variable is required")
+
+# Log environment variable status for debugging
+logger = logging.getLogger(__name__)
+logger.debug(f"EMAIL_ENCRYPTION_KEY loaded: {bool(os.environ.get('EMAIL_ENCRYPTION_KEY'))}")
+logger.debug(f"SESSION_SECRET loaded: {bool(os.environ.get('SESSION_SECRET'))}")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1, x_for=1, x_port=1)
 
 # Enable CORS for deployment compatibility

@@ -21,4 +21,6 @@ dependencies = [
     "flask-wtf>=1.2.2",
     "cryptography>=45.0.7",
     "pillow>=11.3.0",
+    "python-dotenv>=1.1.1",
+    "requests>=2.32.4",
 ]
