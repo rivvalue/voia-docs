@@ -73,7 +73,26 @@ class EmailService:
         if business_account_id:
             try:
                 email_config = EmailConfiguration.get_for_business_account(business_account_id)
-                if email_config and email_config.is_valid():
+                logger.debug(f"EmailConfiguration.get_for_business_account({business_account_id}) returned: {email_config is not None}")
+                
+                if email_config:
+                    # Test is_valid() step by step
+                    validation_errors = email_config.validate_configuration()
+                    logger.debug(f"Basic validation errors: {validation_errors}")
+                    
+                    if len(validation_errors) == 0:
+                        decrypted_password = email_config.get_smtp_password()
+                        logger.debug(f"Password decryption result: {decrypted_password is not None} (length: {len(decrypted_password) if decrypted_password else 0})")
+                        is_valid_result = email_config.is_valid()
+                        logger.debug(f"Final is_valid() result: {is_valid_result}")
+                    else:
+                        logger.error(f"CRITICAL: Basic validation failed for business_account_id {business_account_id}: {validation_errors}")
+                        is_valid_result = False
+                else:
+                    logger.error(f"CRITICAL: No EmailConfiguration record found for business_account_id {business_account_id}")
+                    is_valid_result = False
+                
+                if email_config and is_valid_result:
                     config.update({
                         'smtp_server': email_config.smtp_server,
                         'smtp_port': email_config.smtp_port,
@@ -87,11 +106,14 @@ class EmailService:
                         'admin_emails': email_config.get_admin_emails(),
                         'source': 'business_account'
                     })
-                    logger.debug(f"Using business account email configuration for account {business_account_id}")
+                    logger.debug(f"SUCCESS: Using business account email configuration for account {business_account_id}")
                 else:
-                    logger.debug(f"No valid business account email configuration found for account {business_account_id}, using defaults")
+                    logger.error(f"FAILED: Invalid business account email configuration for account {business_account_id}, falling back to system defaults")
             except Exception as e:
-                logger.error(f"Failed to load business account email configuration for account {business_account_id}: {e}")
+                logger.error(f"EXCEPTION: Failed to load business account email configuration for account {business_account_id}: {e}")
+                logger.error(f"Exception details: {type(e).__name__}: {str(e)}")
+                import traceback
+                logger.error(f"Traceback: {traceback.format_exc()}")
                 logger.debug("Falling back to system default email configuration")
         
         return config
