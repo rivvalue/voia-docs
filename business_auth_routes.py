@@ -328,8 +328,35 @@ def add_user():
         
         logger.info(f"User {email} created successfully for business account {current_account_id} by user {current_user_id}")
         
-        # TODO: Send invitation email (implement in next phases)
-        flash(f'User {new_user.get_full_name()} has been added successfully! Invitation token: {invitation_token[:8]}...', 'success')
+        # Send invitation email using business account's SMTP configuration
+        try:
+            from email_service import EmailService
+            email_service = EmailService()
+            
+            # Get business account details for email
+            business_account = BusinessAccount.query.get(current_account_id)
+            business_account_name = business_account.name if business_account else "VOÏA Platform"
+            
+            # Send invitation email using business account's SMTP settings
+            email_result = email_service.send_business_account_invitation(
+                user_email=email,
+                user_first_name=first_name,
+                user_last_name=last_name,
+                business_account_name=business_account_name,
+                invitation_token=invitation_token,
+                business_account_id=current_account_id  # Pass business account ID
+            )
+            
+            if email_result.get('success'):
+                flash(f'User {new_user.get_full_name()} has been added successfully! Invitation email sent to {email}.', 'success')
+                logger.info(f"Invitation email sent successfully to {email} for business account {current_account_id}")
+            else:
+                flash(f'User {new_user.get_full_name()} has been added, but invitation email failed to send. Invitation token: {invitation_token[:8]}...', 'warning')
+                logger.warning(f"Failed to send invitation email to {email}: {email_result.get('error', 'Unknown error')}")
+            
+        except Exception as email_error:
+            flash(f'User {new_user.get_full_name()} has been added, but invitation email failed to send. Invitation token: {invitation_token[:8]}...', 'warning')
+            logger.error(f"Exception sending invitation email to {email}: {email_error}")
         
         return redirect(url_for('business_auth.manage_users'))
     

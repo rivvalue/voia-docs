@@ -653,9 +653,10 @@ This is an automated message. If you have any questions, please contact the orga
                                          user_last_name: str,
                                          business_account_name: str,
                                          invitation_token: str,
-                                         email_delivery_id: Optional[int] = None) -> Dict:
+                                         email_delivery_id: Optional[int] = None,
+                                         business_account_id: Optional[int] = None) -> Dict:
         """
-        Send business account activation invitation using platform-level SMTP configuration
+        Send business account activation invitation using business account's SMTP configuration
         
         Args:
             user_email: New business user's email
@@ -664,29 +665,30 @@ This is an automated message. If you have any questions, please contact the orga
             business_account_name: Name of the business account
             invitation_token: Secure UUID token for account activation
             email_delivery_id: Optional EmailDelivery record ID for tracking
+            business_account_id: Business account ID to use their SMTP configuration
             
         Returns:
             Dict with success status and details
         """
         
         try:
-            # Always use platform-level configuration for system emails (no business_account_id)
-            platform_config = self._get_email_config(None)
-            platform_branding = self._get_branding_config(None)
+            # Use business account's SMTP configuration if provided, otherwise fall back to platform-level
+            email_config = self._get_email_config(business_account_id)
+            branding = self._get_branding_config(business_account_id)
             
             # Generate activation URL
             from flask import url_for
             activation_url = url_for('business_auth.activate_account', token=invitation_token, _external=True)
             
             # Email subject
-            subject = f"Welcome to {platform_branding['company_name']} - Activate Your Business Account"
+            subject = f"Welcome to {branding['company_name']} - Activate Your Business Account"
             
             # User's full name
             user_full_name = f"{user_first_name} {user_last_name}"
             
             # Text body for business account invitation
             text_body = f"""
-Welcome to {platform_branding['company_name']}!
+Welcome to {branding['company_name']}!
 
 Dear {user_full_name},
 
@@ -708,8 +710,8 @@ If you have any questions or need assistance, please contact our support team.
 Welcome aboard!
 
 Best regards,
-The {platform_branding['company_name']} Team
-{platform_branding['tagline']}
+The {branding['company_name']} Team
+{branding['tagline']}
 
 ---
 This is an automated system message. Please do not reply to this email.
@@ -723,7 +725,7 @@ If you did not expect this invitation, please ignore this message.
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to {platform_branding['company_name']}</title>
+    <title>Welcome to {branding['company_name']}</title>
     <style>
         body {{
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
