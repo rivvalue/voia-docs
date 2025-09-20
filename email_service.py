@@ -154,13 +154,19 @@ class EmailService:
     
     def is_configured(self, business_account_id: Optional[int] = None) -> bool:
         """Check if email service is properly configured for a business account or system default"""
+        logger.debug(f"is_configured() called with business_account_id={business_account_id}")
         config = self._get_email_config(business_account_id)
-        return all([
+        logger.debug(f"is_configured() got config with source: {config.get('source', 'unknown')}")
+        logger.debug(f"is_configured() SMTP settings: server={bool(config['smtp_server'])}, port={bool(config['smtp_port'])}, username={bool(config['smtp_username'])}, password={bool(config['smtp_password'])}")
+        
+        result = all([
             config['smtp_server'],
             config['smtp_port'],
             config['smtp_username'],
             config['smtp_password']
         ])
+        logger.debug(f"is_configured() returning: {result}")
+        return result
     
     def send_email(self, 
                    to_emails: Union[str, List[str]], 
