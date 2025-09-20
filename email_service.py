@@ -78,13 +78,10 @@ class EmailService:
                 if email_config:
                     # Test is_valid() step by step
                     validation_errors = email_config.validate_configuration()
-                    logger.debug(f"Basic validation errors: {validation_errors}")
                     
                     if len(validation_errors) == 0:
                         decrypted_password = email_config.get_smtp_password()
-                        logger.debug(f"Password decryption result: {decrypted_password is not None} (length: {len(decrypted_password) if decrypted_password else 0})")
                         is_valid_result = email_config.is_valid()
-                        logger.debug(f"Final is_valid() result: {is_valid_result}")
                     else:
                         logger.error(f"CRITICAL: Basic validation failed for business_account_id {business_account_id}: {validation_errors}")
                         is_valid_result = False
@@ -214,8 +211,8 @@ class EmailService:
         
         if not config_check:
             config_source = email_config.get('source', 'unknown')
-            error_msg = f'Email service not configured - missing SMTP settings (using {config_source} configuration)'
-            logger.error(f"CRITICAL: send_email config check failed for business_account_id={business_account_id}. Config source: {config_source}, server: {bool(email_config['smtp_server'])}, port: {bool(email_config['smtp_port'])}, username: {bool(email_config['smtp_username'])}, password: {bool(email_config['smtp_password'])}")
+            error_msg = 'Email service not configured - missing SMTP settings'
+            logger.warning(f"Email service not configured for business account {business_account_id}, using system defaults")
             if email_delivery:
                 email_delivery.mark_failed(error_msg, is_permanent=True)
                 db.session.commit()
@@ -228,7 +225,7 @@ class EmailService:
         if not all([email_config['smtp_server'], email_config['smtp_port'], 
                    email_config['smtp_username'], email_config['smtp_password']]):
             config_source = email_config.get('source', 'unknown')
-            error_msg = f'Email service configuration incomplete (using {config_source} configuration)'
+            error_msg = 'Email service configuration incomplete'
             if email_delivery:
                 email_delivery.mark_failed(error_msg, is_permanent=True)
                 db.session.commit()
@@ -315,7 +312,7 @@ class EmailService:
                 db.session.commit()
             
             config_source = email_config.get('source', 'unknown')
-            logger.info(f"Email sent successfully to {len(recipients)} recipients: {subject} (using {config_source} configuration)")
+            logger.info(f"Email sent successfully to {len(recipients)} recipients: {subject}")
             
             return {
                 'success': True,
@@ -414,7 +411,7 @@ class EmailService:
         if not self.is_configured(business_account_id):
             return {
                 'success': False,
-                'error': f'Email service not configured - missing SMTP settings (using {config_source} configuration)',
+                'error': 'Email service not configured - missing SMTP settings',
                 'configured': False,
                 'config_source': config_source
             }
@@ -435,7 +432,7 @@ class EmailService:
                         server.starttls(context=context)
                     server.login(str(email_config['smtp_username']), str(email_config['smtp_password']))
             
-            logger.info(f"Email configuration test successful (using {config_source} configuration)")
+            logger.info("Email configuration test successful")
             
             return {
                 'success': True,
@@ -449,7 +446,7 @@ class EmailService:
             }
             
         except Exception as e:
-            error_msg = f"Email configuration test failed (using {config_source} configuration): {str(e)}"
+            error_msg = f"Email configuration test failed: {str(e)}"
             logger.error(error_msg)
             
             return {
