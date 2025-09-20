@@ -746,11 +746,10 @@ class EmailConfiguration(db.Model):
         import base64
         import os
         
-        # Get encryption key from environment or generate one
+        # Always prefer dedicated EMAIL_ENCRYPTION_KEY for new encryptions
         key = os.environ.get('EMAIL_ENCRYPTION_KEY')
         if not key:
-            # In production, this should be set as an environment variable
-            # For development, we'll generate a consistent key based on SECRET_KEY
+            # Fallback to SESSION_SECRET for backward compatibility
             secret_key = os.environ.get('SESSION_SECRET', 'development-key').encode()
             key = base64.urlsafe_b64encode(secret_key[:32].ljust(32, b'0'))
         else:
@@ -761,29 +760,74 @@ class EmailConfiguration(db.Model):
         return base64.urlsafe_b64encode(encrypted_password).decode()
     
     def _decrypt_password(self, encrypted_password):
-        """Decrypt password using Fernet symmetric encryption"""
+        """Decrypt password using Fernet symmetric encryption with key migration support"""
         from cryptography.fernet import Fernet
         import base64
         import os
+        import logging
         
+        logger = logging.getLogger(__name__)
+        
+        # List of keys to try (current first, then fallbacks)
+        key_sources = []
+        
+        # Primary key: EMAIL_ENCRYPTION_KEY
+        primary_key = os.environ.get('EMAIL_ENCRYPTION_KEY')
+        if primary_key:
+            key_sources.append(('primary', primary_key.encode()))
+        
+        # Fallback key: EMAIL_ENCRYPTION_PREVIOUS_KEY for migration
+        previous_key = os.environ.get('EMAIL_ENCRYPTION_PREVIOUS_KEY')
+        if previous_key:
+            key_sources.append(('previous', previous_key.encode()))
+        
+        # Legacy fallback: SESSION_SECRET (current)
+        session_secret = os.environ.get('SESSION_SECRET', 'development-key').encode()
+        session_key = base64.urlsafe_b64encode(session_secret[:32].ljust(32, b'0'))
+        key_sources.append(('session_current', session_key))
+        
+        # Try each key source
+        for key_name, key in key_sources:
+            try:
+                fernet = Fernet(key)
+                encrypted_data = base64.urlsafe_b64decode(encrypted_password.encode())
+                decrypted_password = fernet.decrypt(encrypted_data).decode()
+                
+                # If we successfully decrypted with a non-primary key, migrate to primary
+                if key_name != 'primary' and primary_key:
+                    logger.info(f"Email password decrypted with {key_name} key, migrating to primary key")
+                    self._migrate_password_encryption(decrypted_password)
+                
+                return decrypted_password
+                
+            except Exception as e:
+                logger.debug(f"Failed to decrypt password with {key_name} key: {e}")
+                continue
+        
+        logger.error("Failed to decrypt email password with any available key")
+        return None
+    
+    def _migrate_password_encryption(self, decrypted_password):
+        """Migrate password to primary encryption key"""
         try:
-            # Get encryption key
-            key = os.environ.get('EMAIL_ENCRYPTION_KEY')
-            if not key:
-                secret_key = os.environ.get('SESSION_SECRET', 'development-key').encode()
-                key = base64.urlsafe_b64encode(secret_key[:32].ljust(32, b'0'))
-            else:
-                key = key.encode()
+            # Re-encrypt with primary key
+            new_encrypted = self._encrypt_password(decrypted_password)
             
-            fernet = Fernet(key)
-            encrypted_data = base64.urlsafe_b64decode(encrypted_password.encode())
-            decrypted_password = fernet.decrypt(encrypted_data)
-            return decrypted_password.decode()
+            # Update the stored encrypted password
+            self.smtp_password_encrypted = new_encrypted
+            
+            # Save to database
+            from app import db
+            db.session.commit()
+            
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.info(f"Successfully migrated email password encryption for business account {self.business_account_id}")
+            
         except Exception as e:
             import logging
             logger = logging.getLogger(__name__)
-            logger.error(f"Failed to decrypt email password: {e}")
-            return None
+            logger.error(f"Failed to migrate password encryption: {e}")
     
     def get_admin_emails(self):
         """Parse admin notification emails from JSON"""
@@ -874,8 +918,14 @@ class EmailConfiguration(db.Model):
         return errors
     
     def is_valid(self):
-        """Check if configuration is valid"""
-        return len(self.validate_configuration()) == 0
+        """Check if configuration is valid and password can be decrypted"""
+        # Check basic field validation
+        if len(self.validate_configuration()) > 0:
+            return False
+        
+        # Check that password can actually be decrypted
+        decrypted_password = self.get_smtp_password()
+        return decrypted_password is not None and len(decrypted_password) > 0
     
     @staticmethod
     def get_for_business_account(business_account_id):
