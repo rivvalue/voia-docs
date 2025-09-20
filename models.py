@@ -801,10 +801,12 @@ class EmailConfiguration(db.Model):
                 return decrypted_password
                 
             except Exception as e:
-                logger.debug(f"Failed to decrypt password with {key_name} key: {e}")
+                logger.error(f"Failed to decrypt password with {key_name} key: {str(e)[:100]}")
                 continue
         
-        logger.error("Failed to decrypt email password with any available key")
+        logger.error(f"CRITICAL: Failed to decrypt email password with any available key for business_account_id {getattr(self, 'business_account_id', 'unknown')}")
+        logger.error(f"Available keys tried: {[name for name, _ in key_sources]}")
+        logger.error(f"Encrypted password length: {len(encrypted_password)}")
         return None
     
     def _migrate_password_encryption(self, decrypted_password):
