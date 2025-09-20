@@ -919,14 +919,14 @@ If you did not expect this invitation, please ignore this message.
 </html>
 """
             
-            # Send email using platform-level configuration (business_account_id=None ensures platform SMTP)
+            # Send email using business account SMTP configuration  
             result = self.send_email(
                 to_emails=user_email,
                 subject=subject,
                 text_body=text_body,
                 html_body=html_body,
                 email_delivery_id=email_delivery_id,
-                business_account_id=None  # Force platform-level configuration
+                business_account_id=business_account_id
             )
             
             # Add invitation-specific metadata
