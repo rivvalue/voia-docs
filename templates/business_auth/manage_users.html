@@ -409,11 +409,13 @@
                                     <i class="fas fa-edit"></i>
                                 </button>
                                 <form method="POST" action="{{ url_for('business_auth.reset_user_password', user_id=user.id) }}" style="display: inline;" onsubmit="return confirmPasswordReset('{{ user.get_full_name() }}')">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                     <button type="submit" class="action-btn action-btn-secondary" title="Reset Password">
                                         <i class="fas fa-key"></i>
                                     </button>
                                 </form>
                                 <form method="POST" action="{{ url_for('business_auth.toggle_user_status', user_id=user.id) }}" style="display: inline;" onsubmit="return confirmToggleStatus('{{ user.get_full_name() }}', {{ user.is_active_user|tojson }})">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                     {% if user.is_active_user %}
                                     <button type="submit" class="action-btn action-btn-secondary" title="Deactivate User">
                                         <i class="fas fa-user-times"></i>
@@ -450,6 +452,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <form action="{{ url_for('business_auth.add_user') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="modal-header">
                     <h5 class="modal-title" id="addUserModalLabel">
                         <i class="fas fa-user-plus me-2"></i>Add New User
@@ -510,6 +513,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <form id="editUserForm" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <div class="modal-header">
                     <h5 class="modal-title" id="editUserModalLabel">
                         <i class="fas fa-edit me-2"></i>Edit User
