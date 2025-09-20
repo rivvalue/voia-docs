@@ -204,9 +204,18 @@ class EmailService:
             except Exception as e:
                 logger.error(f"Failed to retrieve EmailDelivery {email_delivery_id}: {e}")
         
-        if not self.is_configured(business_account_id):
+        # Check configuration using the SAME config object we just loaded (avoid double-call to _get_email_config)
+        config_check = all([
+            email_config['smtp_server'],
+            email_config['smtp_port'], 
+            email_config['smtp_username'],
+            email_config['smtp_password']
+        ])
+        
+        if not config_check:
             config_source = email_config.get('source', 'unknown')
             error_msg = f'Email service not configured - missing SMTP settings (using {config_source} configuration)'
+            logger.error(f"CRITICAL: send_email config check failed for business_account_id={business_account_id}. Config source: {config_source}, server: {bool(email_config['smtp_server'])}, port: {bool(email_config['smtp_port'])}, username: {bool(email_config['smtp_username'])}, password: {bool(email_config['smtp_password'])}")
             if email_delivery:
                 email_delivery.mark_failed(error_msg, is_permanent=True)
                 db.session.commit()
