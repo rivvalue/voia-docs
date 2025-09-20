@@ -328,6 +328,25 @@ def add_user():
         
         logger.info(f"User {email} created successfully for business account {current_account_id} by user {current_user_id}")
         
+        # Audit log the user creation
+        try:
+            from audit_utils import queue_audit_log
+            queue_audit_log(
+                business_account_id=current_account_id,
+                action_type='user_created',
+                resource_type='business_account_user',
+                resource_id=new_user.id,
+                resource_name=f"{first_name} {last_name}",
+                details={
+                    'user_email': email,
+                    'user_name': f"{first_name} {last_name}",
+                    'role': role,
+                    'created_by_user_id': current_user_id
+                }
+            )
+        except Exception as audit_error:
+            logger.error(f"Failed to create audit log for user creation: {audit_error}")
+        
         # Send invitation email using business account's SMTP configuration
         try:
             from email_service import EmailService
