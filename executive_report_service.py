@@ -199,7 +199,8 @@ class ExecutiveReportGenerator:
                 'sentiment_delta': None,
                 'churn_risk_delta': None,
                 'growth_score_delta': None,
-                'trend_direction': 'baseline'
+                'trend_direction': 'baseline',
+                'comparison_count': 0
             }
         
         # Get most recent previous campaign for comparison
