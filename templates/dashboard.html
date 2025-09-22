@@ -493,12 +493,42 @@
                 </div>
             </div>
 
+            <!-- Search Survey Responses -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row align-items-end">
+                                <div class="col-md-8">
+                                    <label for="responsesSearch" class="form-label">Search Survey Responses</label>
+                                    <input type="text" class="form-control" id="responsesSearch" 
+                                           placeholder="Search by company name, participant name, or email...">
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="btn-group w-100">
+                                        <button type="button" class="btn btn-primary" onclick="searchSurveyResponses()">
+                                            <i class="fas fa-search me-1"></i>Search
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="clearResponsesSearch()">
+                                            <i class="fas fa-times me-1"></i>Clear
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Recent Responses Table -->
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="card-title mb-0">Recent Survey Responses</h5>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Recent Survey Responses</h5>
+                                <small class="text-muted" id="responsesSearchInfo"></small>
+                            </div>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">

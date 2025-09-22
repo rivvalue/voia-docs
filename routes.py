@@ -1148,18 +1148,41 @@ def dashboard_data():
         return jsonify({'error': 'Failed to fetch dashboard data'}), 500
 
 @app.route('/api/survey_responses')
+@require_business_auth
 def survey_responses():
-    """API endpoint for survey responses with pagination"""
+    """API endpoint for survey responses with pagination and search"""
     try:
         # Import models to avoid circular imports
-        from models import SurveyResponse
+        from models import SurveyResponse, Campaign
+        from business_auth_routes import get_current_business_account
+        
+        current_account = get_current_business_account()
+        if not current_account or not current_account.id:
+            return jsonify({'error': 'Business account context not found'}), 401
         
         page = request.args.get('page', 1, type=int)
         per_page = min(request.args.get('per_page', 10, type=int), 100)  # Max 100 per page
+        search_query = request.args.get('search', '').strip()
         
-        pagination = SurveyResponse.query.options(
+        # Base query with business account scoping via campaign relationship
+        query = SurveyResponse.query.join(Campaign).filter(
+            Campaign.business_account_id == current_account.id
+        ).options(
             joinedload(SurveyResponse.campaign)
-        ).order_by(
+        )
+        
+        # Apply search filter if provided
+        if search_query:
+            search_term = f"%{search_query}%"
+            query = query.filter(
+                db.or_(
+                    SurveyResponse.company_name.ilike(search_term),
+                    SurveyResponse.respondent_name.ilike(search_term),
+                    SurveyResponse.respondent_email.ilike(search_term)
+                )
+            )
+        
+        pagination = query.order_by(
             SurveyResponse.created_at.desc()
         ).paginate(
             page=page, 
@@ -1177,7 +1200,8 @@ def survey_responses():
                 'total': pagination.total,
                 'has_next': pagination.has_next,
                 'has_prev': pagination.has_prev
-            }
+            },
+            'search_query': search_query
         })
     except Exception as e:
         logger.error(f"Error fetching survey responses: {e}")
