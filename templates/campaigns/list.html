@@ -407,7 +407,12 @@ function downloadExecutiveReport(campaignId, campaignName) {
             'Content-Type': 'application/json'
         }
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.executive_reports && data.executive_reports.length > 0) {
             const report = data.executive_reports[0]; // Get the latest report
@@ -440,12 +445,18 @@ function generateExecutiveReport(campaignId, campaignName) {
             'Content-Type': 'application/json'
         }
     })
-    .then(response => response.json())
-    .then(data => {
+    .then(response => {
         if (response.ok) {
+            return response.json().then(data => ({ success: true, data }));
+        } else {
+            return response.json().then(data => ({ success: false, data }));
+        }
+    })
+    .then(result => {
+        if (result.success) {
             alert(`Executive report generation started for "${campaignName}". You will be able to download it in a few minutes.`);
         } else {
-            alert('Failed to start executive report generation: ' + (data.error || 'Unknown error'));
+            alert('Failed to start executive report generation: ' + (result.data.error || 'Unknown error'));
         }
     })
     .catch(error => {
