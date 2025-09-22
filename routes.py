@@ -1,4 +1,4 @@
-from flask import render_template, request, jsonify, flash, redirect, url_for, g, session
+from flask import render_template, request, jsonify, flash, redirect, url_for, g, session, send_file
 from app import app, db
 # Models imported inside functions to avoid circular imports
 from models import SurveyResponse, Participant, CampaignParticipant, Campaign
@@ -7,7 +7,7 @@ from sqlalchemy.orm import joinedload
 
 # Root route already exists - removed duplicate
 from models_auth import AuthToken
-from task_queue import add_analysis_task, get_queue_stats
+from task_queue import add_analysis_task, get_queue_stats, add_export_task, get_export_job_status
 from rate_limiter import rate_limit
 from auth_system import require_auth, generate_user_token
 from business_auth_routes import require_business_auth, require_permission, get_current_business_account, get_current_business_user
@@ -16,6 +16,7 @@ from ai_conversational_survey import start_ai_conversational_survey, process_ai_
 from datetime import datetime, timedelta, date
 import json
 import logging
+import os
 import re
 import uuid
 
@@ -1243,6 +1244,132 @@ def queue_status():
     except Exception as e:
         logger.error(f"Error getting queue status: {e}")
         return jsonify({'error': 'Failed to get queue status'}), 500
+
+# Campaign Export API Routes
+@app.route('/api/campaigns/<int:campaign_id>/export', methods=['POST'])
+@require_business_auth
+@require_permission('admin')
+def start_campaign_export(campaign_id):
+    """Start asynchronous export for a campaign"""
+    try:
+        # Get current business account
+        current_account = get_current_business_account()
+        
+        # Verify campaign belongs to this business account
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            return jsonify({'error': 'Campaign not found'}), 404
+        
+        # Queue export task
+        job_id = add_export_task(campaign_id, current_account.id)
+        
+        logger.info(f"Export started for campaign {campaign_id} by business account {current_account.id} (job_id: {job_id})")
+        
+        return jsonify({
+            'success': True,
+            'job_id': job_id,
+            'message': 'Export started successfully',
+            'campaign_name': campaign.name
+        })
+        
+    except Exception as e:
+        logger.error(f"Error starting campaign export: {e}")
+        return jsonify({'error': 'Failed to start export'}), 500
+
+@app.route('/api/export-jobs/<job_id>/status', methods=['GET'])
+@require_business_auth
+def get_export_status(job_id):
+    """Get status of an export job"""
+    try:
+        # Get current business account
+        current_account = get_current_business_account()
+        
+        # Get job status
+        job_status = get_export_job_status(job_id)
+        
+        if not job_status:
+            return jsonify({'error': 'Export job not found'}), 404
+        
+        # Verify job belongs to this business account
+        if job_status['business_account_id'] != current_account.id:
+            return jsonify({'error': 'Export job not found'}), 404
+        
+        # Prepare response data
+        response_data = {
+            'job_id': job_status['job_id'],
+            'status': job_status['status'],
+            'created_at': job_status['created_at'].isoformat(),
+            'updated_at': job_status['updated_at'].isoformat(),
+            'progress': job_status.get('progress'),
+            'error': job_status.get('error')
+        }
+        
+        # Add download URL if completed
+        if job_status['status'] == 'completed' and job_status.get('file_path'):
+            response_data['download_url'] = url_for('download_export_file', job_id=job_id)
+        
+        return jsonify(response_data)
+        
+    except Exception as e:
+        logger.error(f"Error getting export status: {e}")
+        return jsonify({'error': 'Failed to get export status'}), 500
+
+@app.route('/api/export-files/<job_id>/download', methods=['GET'])
+@require_business_auth
+def download_export_file(job_id):
+    """Download completed export file"""
+    try:
+        # Get current business account
+        current_account = get_current_business_account()
+        
+        # Get job status
+        job_status = get_export_job_status(job_id)
+        
+        if not job_status:
+            return jsonify({'error': 'Export job not found'}), 404
+        
+        # Verify job belongs to this business account
+        if job_status['business_account_id'] != current_account.id:
+            return jsonify({'error': 'Export job not found'}), 404
+        
+        # Check if export is completed
+        if job_status['status'] != 'completed':
+            return jsonify({'error': f"Export not ready. Status: {job_status['status']}"}), 400
+        
+        # Check if file exists
+        file_path = job_status.get('file_path')
+        if not file_path or not os.path.exists(file_path):
+            return jsonify({'error': 'Export file not found'}), 404
+        
+        # Get campaign name for filename
+        campaign = Campaign.query.filter_by(
+            id=job_status['campaign_id'],
+            business_account_id=current_account.id
+        ).first()
+        
+        campaign_name = campaign.name if campaign else f"campaign_{job_status['campaign_id']}"
+        
+        # Create safe filename
+        safe_campaign_name = re.sub(r'[^\w\s-]', '', campaign_name).strip()
+        safe_campaign_name = re.sub(r'[-\s]+', '-', safe_campaign_name)
+        download_filename = f"campaign_export_{safe_campaign_name}_{job_id[:8]}.json"
+        
+        logger.info(f"Export file downloaded: {file_path} by business account {current_account.id}")
+        
+        return send_file(
+            file_path,
+            as_attachment=True,
+            download_name=download_filename,
+            mimetype='application/json'
+        )
+        
+    except Exception as e:
+        logger.error(f"Error downloading export file: {e}")
+        return jsonify({'error': 'Failed to download export file'}), 500
 
 # Campaign Management API Routes
 @app.route('/api/campaigns', methods=['GET'])
