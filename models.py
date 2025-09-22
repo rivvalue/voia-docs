@@ -158,6 +158,9 @@ class Campaign(db.Model):
     custom_end_message = db.Column(db.Text, nullable=True)
     custom_system_prompt = db.Column(db.Text, nullable=True)
     
+    # Anonymization setting
+    anonymize_responses = db.Column(db.Boolean, nullable=False, default=False)
+    
     # Metadata
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     completed_at = db.Column(db.DateTime, nullable=True)
@@ -190,7 +193,8 @@ class Campaign(db.Model):
             'prioritized_topics': self.prioritized_topics,
             'optional_topics': self.optional_topics,
             'custom_end_message': self.custom_end_message,
-            'custom_system_prompt': self.custom_system_prompt
+            'custom_system_prompt': self.custom_system_prompt,
+            'anonymize_responses': self.anonymize_responses
         }
     
     def is_active(self):
