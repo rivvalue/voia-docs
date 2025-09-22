@@ -91,8 +91,10 @@ class ExecutiveReportGenerator:
         previous_campaigns = self._get_previous_campaigns(campaign, business_account.id)
         delta_kpis = self._calculate_kpi_deltas(current_kpis, previous_campaigns)
         
-        # Generate visualizations
-        charts = self._generate_charts(responses, current_kpis)
+        # Generate visualizations with business account branding
+        branding_config = business_account.branding_config if hasattr(business_account, 'branding_config') else None
+        chart_colors = branding_config.get_chart_colors() if branding_config else ['#dc3545', '#28a745', '#6c757d', '#17a2b8', '#ffc107', '#fd7e14', '#6610f2', '#e83e8c']
+        charts = self._generate_charts(responses, current_kpis, chart_colors)
         
         # Get AI insights
         ai_insights = self._extract_ai_insights(responses)
@@ -233,26 +235,28 @@ class ExecutiveReportGenerator:
             'comparison_count': len(previous_campaigns)
         }
     
-    def _generate_charts(self, responses: List, kpis: Dict) -> Dict:
-        """Generate chart images for the report"""
+    def _generate_charts(self, responses: List, kpis: Dict, chart_colors: List) -> Dict:
+        """Generate chart images for the report with business account branding"""
         charts = {}
+        
+        # chart_colors is now guaranteed to be provided
         
         try:
             # NPS Distribution Chart
-            charts['nps_distribution'] = self._create_nps_distribution_chart(responses)
+            charts['nps_distribution'] = self._create_nps_distribution_chart(responses, chart_colors)
             
             # Sentiment Breakdown Chart
-            charts['sentiment_breakdown'] = self._create_sentiment_chart(kpis['sentiment_breakdown'])
+            charts['sentiment_breakdown'] = self._create_sentiment_chart(kpis['sentiment_breakdown'], chart_colors)
             
             # Response Timeline Chart
-            charts['response_timeline'] = self._create_response_timeline_chart(responses)
+            charts['response_timeline'] = self._create_response_timeline_chart(responses, chart_colors[0])
             
         except Exception as e:
             logger.error(f"Error generating charts: {e}")
         
         return charts
     
-    def _create_nps_distribution_chart(self, responses: List) -> str:
+    def _create_nps_distribution_chart(self, responses: List, chart_colors: List) -> str:
         """Create NPS distribution chart"""
         fig, ax = plt.subplots(figsize=(8, 4))
         
@@ -269,7 +273,11 @@ class ExecutiveReportGenerator:
             
             categories = ['Detractors\n(0-6)', 'Passives\n(7-8)', 'Promoters\n(9-10)']
             values = [detractors, passives, promoters]
-            colors = ['#ff6b6b', '#ffd93d', '#6bcf7f']
+            # Use brand colors if available, otherwise default colors
+            if chart_colors and len(chart_colors) >= 3:
+                colors = [chart_colors[2], chart_colors[3], chart_colors[1]]  # Red, secondary, green
+            else:
+                colors = ['#ff6b6b', '#ffd93d', '#6bcf7f']
             
             bars = ax.bar(categories, values, color=colors, alpha=0.8)
             ax.set_ylabel('Number of Responses')
@@ -284,7 +292,7 @@ class ExecutiveReportGenerator:
         plt.tight_layout()
         return self._fig_to_base64(fig)
     
-    def _create_sentiment_chart(self, sentiment_breakdown: Dict) -> str:
+    def _create_sentiment_chart(self, sentiment_breakdown: Dict, chart_colors: List) -> str:
         """Create sentiment breakdown pie chart"""
         fig, ax = plt.subplots(figsize=(6, 6))
         
@@ -294,7 +302,11 @@ class ExecutiveReportGenerator:
         if sum(values) == 0:
             ax.text(0.5, 0.5, 'No sentiment data available', ha='center', va='center', transform=ax.transAxes)
         else:
-            colors = ['#6bcf7f', '#ffd93d', '#ff6b6b']
+            # Use brand colors if available, otherwise default colors
+            if chart_colors and len(chart_colors) >= 3:
+                colors = [chart_colors[1], chart_colors[3], chart_colors[0]]  # Green, secondary, primary
+            else:
+                colors = ['#6bcf7f', '#ffd93d', '#ff6b6b']
             pie_result = ax.pie(values, labels=sentiments, colors=colors, autopct='%1.1f%%', startangle=90)
             # Handle both 2-tuple and 3-tuple returns from matplotlib
             if len(pie_result) == 3:
@@ -306,7 +318,7 @@ class ExecutiveReportGenerator:
         plt.tight_layout()
         return self._fig_to_base64(fig)
     
-    def _create_response_timeline_chart(self, responses: List) -> str:
+    def _create_response_timeline_chart(self, responses: List, primary_color: str = '#dc3545') -> str:
         """Create response timeline chart"""
         fig, ax = plt.subplots(figsize=(10, 4))
         
@@ -395,6 +407,10 @@ class ExecutiveReportGenerator:
     
     def _generate_pdf_report(self, report_data: Dict, campaign, business_account) -> str:
         """Generate the final PDF report"""
+        # Add branding data to report
+        branding_data = self._get_branding_data(business_account)
+        report_data.update(branding_data)
+        
         # Create HTML content from template
         html_content = self._render_html_template(report_data)
         
@@ -407,6 +423,57 @@ class ExecutiveReportGenerator:
         weasyprint.HTML(string=html_content).write_pdf(pdf_path)
         
         return pdf_path
+    
+    def _get_branding_data(self, business_account) -> Dict:
+        """Get branding data including logo and color palette"""
+        branding_data = {
+            'company_logo_base64': None,
+            'company_display_name': business_account.name,
+            'brand_colors': {
+                'primary': '#dc3545',
+                'secondary': '#6c757d', 
+                'accent': '#28a745',
+                'text': '#212529',
+                'background': '#ffffff'
+            }
+        }
+        
+        # Get branding configuration if available
+        if hasattr(business_account, 'branding_config') and business_account.branding_config:
+            branding_config = business_account.branding_config
+            
+            # Get company display name
+            branding_data['company_display_name'] = branding_config.get_company_display_name()
+            
+            # Get color palette
+            branding_data['brand_colors'] = branding_config.get_color_palette()
+            
+            # Convert logo to base64 for embedding
+            logo_path = branding_config.get_logo_path()
+            if logo_path and os.path.exists(logo_path):
+                try:
+                    with open(logo_path, 'rb') as logo_file:
+                        logo_data = logo_file.read()
+                        # Determine MIME type
+                        if logo_path.lower().endswith('.png'):
+                            mime_type = 'image/png'
+                        elif logo_path.lower().endswith('.jpg') or logo_path.lower().endswith('.jpeg'):
+                            mime_type = 'image/jpeg'
+                        elif logo_path.lower().endswith('.gif'):
+                            mime_type = 'image/gif'
+                        elif logo_path.lower().endswith('.svg'):
+                            mime_type = 'image/svg+xml'
+                        else:
+                            mime_type = 'image/png'  # Default
+                        
+                        # Create base64 data URL
+                        logo_base64 = base64.b64encode(logo_data).decode('utf-8')
+                        branding_data['company_logo_base64'] = f"data:{mime_type};base64,{logo_base64}"
+                        
+                except Exception as e:
+                    logger.warning(f"Failed to load logo file {logo_path}: {e}")
+        
+        return branding_data
     
     def _render_html_template(self, report_data: Dict) -> str:
         """Render HTML template with report data"""
@@ -435,14 +502,15 @@ class ExecutiveReportGenerator:
                 body {
                     font-family: Arial, sans-serif;
                     line-height: 1.6;
-                    color: #333;
+                    color: {{ brand_colors.text }};
                     margin: 0;
                     padding: 0;
+                    background-color: {{ brand_colors.background }};
                 }
                 
                 .header {
                     text-align: center;
-                    border-bottom: 3px solid #4a90e2;
+                    border-bottom: 3px solid {{ brand_colors.primary }};
                     padding-bottom: 20px;
                     margin-bottom: 30px;
                 }
@@ -484,8 +552,8 @@ class ExecutiveReportGenerator:
                 .section-title {
                     font-size: 20px;
                     font-weight: bold;
-                    color: #4a90e2;
-                    border-bottom: 2px solid #e0e0e0;
+                    color: {{ brand_colors.primary }};
+                    border-bottom: 2px solid {{ brand_colors.secondary }}55;
                     padding-bottom: 5px;
                     margin-bottom: 15px;
                 }
@@ -498,10 +566,11 @@ class ExecutiveReportGenerator:
                 }
                 
                 .kpi-card {
-                    background: #f8f9fa;
+                    background: {{ brand_colors.background }};
                     padding: 15px;
                     border-radius: 8px;
-                    border-left: 4px solid #4a90e2;
+                    border-left: 4px solid {{ brand_colors.primary }};
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
                 }
                 
                 .kpi-value {
@@ -578,10 +647,10 @@ class ExecutiveReportGenerator:
         <body>
             <!-- Header -->
             <div class="header">
-                {% if business_account.logo_url %}
-                <img src="{{ business_account.logo_url }}" alt="{{ business_account.name }}" class="logo">
+                {% if company_logo_base64 %}
+                <img src="{{ company_logo_base64 }}" alt="{{ company_display_name }}" class="logo">
                 {% endif %}
-                <div class="company-name">{{ business_account.name }}</div>
+                <div class="company-name">{{ company_display_name }}</div>
                 <div class="report-title">Executive Report</div>
                 <div class="campaign-name">{{ campaign.name }}</div>
                 <div class="report-date">Generated on {{ generated_at.strftime('%B %d, %Y at %I:%M %p UTC') }}</div>
