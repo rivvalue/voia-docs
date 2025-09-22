@@ -31,7 +31,7 @@
                                     <i class="fas fa-users fa-2x"></i>
                                 </div>
                                 <div>
-                                    <h5 class="mb-0">{{ participants|length }}</h5>
+                                    <h5 class="mb-0">{{ kpi_stats.total }}</h5>
                                     <small>Total Participants</small>
                                 </div>
                             </div>
@@ -46,7 +46,7 @@
                                     <i class="fas fa-check-circle fa-2x"></i>
                                 </div>
                                 <div>
-                                    <h5 class="mb-0">{{ participants|selectattr("status", "equalto", "completed")|list|length }}</h5>
+                                    <h5 class="mb-0">{{ kpi_stats.completed }}</h5>
                                     <small>Completed</small>
                                 </div>
                             </div>
@@ -61,7 +61,7 @@
                                     <i class="fas fa-clock fa-2x"></i>
                                 </div>
                                 <div>
-                                    <h5 class="mb-0">{{ participants|selectattr("status", "equalto", "created")|list|length + participants|selectattr("status", "equalto", "invited")|list|length }}</h5>
+                                    <h5 class="mb-0">{{ kpi_stats.active }}</h5>
                                     <small>Active</small>
                                 </div>
                             </div>
@@ -76,7 +76,7 @@
                                     <i class="fas fa-play-circle fa-2x"></i>
                                 </div>
                                 <div>
-                                    <h5 class="mb-0">{{ participants|selectattr("status", "equalto", "started")|list|length }}</h5>
+                                    <h5 class="mb-0">{{ kpi_stats.started }}</h5>
                                     <small>Started</small>
                                 </div>
                             </div>

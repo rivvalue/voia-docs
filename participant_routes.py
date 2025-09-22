@@ -56,6 +56,31 @@ def list_participants():
         # Get total count for pagination
         total_participants = query.count()
         
+        # Calculate KPI stats for ALL participants (not just paginated ones) 
+        # Base query for all participants in business account
+        all_participants_query = Participant.query.filter_by(business_account_id=current_account.id)
+        
+        # Apply same search filter to get totals for current search
+        if search_query:
+            search_term = f"%{search_query}%"
+            all_participants_query = all_participants_query.filter(
+                db.or_(
+                    Participant.name.ilike(search_term),
+                    Participant.email.ilike(search_term),
+                    Participant.company_name.ilike(search_term)
+                )
+            )
+        
+        # Calculate KPI stats
+        kpi_stats = {
+            'total': all_participants_query.count(),
+            'completed': all_participants_query.filter(Participant.status == 'completed').count(),
+            'started': all_participants_query.filter(Participant.status == 'started').count(),
+            'invited': all_participants_query.filter(Participant.status == 'invited').count(),
+            'created': all_participants_query.filter(Participant.status == 'created').count()
+        }
+        kpi_stats['active'] = kpi_stats['created'] + kpi_stats['invited']
+        
         # Apply pagination
         participants = query.order_by(Participant.created_at.desc()).offset(
             (page - 1) * per_page
@@ -82,6 +107,7 @@ def list_participants():
                              campaigns=[c.to_dict() if c else {} for c in campaigns],
                              business_account=current_account.to_dict() if current_account else {},
                              search_query=search_query,
+                             kpi_stats=kpi_stats,
                              pagination={
                                  'page': page,
                                  'per_page': per_page,
