@@ -168,15 +168,14 @@ class ExecutiveReportGenerator:
         """Get previous campaigns within the same license period for comparison"""
         from models import Campaign
         try:
-            from license_service import get_license_period_for_date
+            from license_service import LicenseService
         except ImportError:
             # Fallback if license_service not available
-            def get_license_period_for_date(business_account_id, date):
-                return None
+            return []
         
         # Get current license period
-        license_period = get_license_period_for_date(business_account_id, current_campaign.created_at)
-        if not license_period:
+        start_date, end_date = LicenseService.get_license_period(business_account_id, current_campaign.created_at.date())
+        if not start_date or not end_date:
             return []
         
         # Get previous campaigns in same license period
@@ -184,8 +183,8 @@ class ExecutiveReportGenerator:
             Campaign.business_account_id == business_account_id,
             Campaign.id != current_campaign.id,
             Campaign.status == 'completed',
-            Campaign.created_at >= license_period['start_date'],
-            Campaign.created_at <= license_period['end_date'],
+            Campaign.created_at >= start_date,
+            Campaign.created_at <= end_date,
             Campaign.created_at < current_campaign.created_at
         ).order_by(desc(Campaign.created_at)).all()
         
