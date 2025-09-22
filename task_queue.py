@@ -314,6 +314,25 @@ class TaskQueue:
             if success:
                 self._update_export_job_status(job_id, 'completed', file_path=export_file_path)
                 logger.info(f"Export completed for campaign {campaign_id}, file: {export_file_path}")
+                
+                # Add audit log for export completion
+                try:
+                    from audit_utils import queue_audit_log
+                    queue_audit_log(
+                        business_account_id=business_account_id,
+                        action_type='campaign_export_completed',
+                        resource_type='campaign',
+                        resource_id=campaign_id,
+                        resource_name=campaign.name,
+                        details={
+                            'job_id': job_id,
+                            'file_path': export_file_path,
+                            'export_type': 'campaign_data'
+                        }
+                    )
+                except Exception as e:
+                    logger.error(f"Failed to log export completion audit event: {e}")
+                
                 return True
             else:
                 self._update_export_job_status(job_id, 'failed', error='Export generation failed')

@@ -1271,6 +1271,23 @@ def start_campaign_export(campaign_id):
         
         logger.info(f"Export started for campaign {campaign_id} by business account {current_account.id} (job_id: {job_id})")
         
+        # Add audit log for export initiation
+        try:
+            from audit_utils import queue_audit_log
+            queue_audit_log(
+                business_account_id=current_account.id,
+                action_type='campaign_export_started',
+                resource_type='campaign',
+                resource_id=campaign_id,
+                resource_name=campaign.name,
+                details={
+                    'job_id': job_id,
+                    'export_type': 'campaign_data'
+                }
+            )
+        except Exception as e:
+            logger.error(f"Failed to log export audit event: {e}")
+        
         return jsonify({
             'success': True,
             'job_id': job_id,
@@ -1365,6 +1382,24 @@ def download_export_file(job_id):
         download_filename = f"campaign_export_{safe_campaign_name}_{job_id[:8]}.json"
         
         logger.info(f"Export file downloaded: {file_path} by business account {current_account.id}")
+        
+        # Add audit log for export download
+        try:
+            from audit_utils import queue_audit_log
+            queue_audit_log(
+                business_account_id=current_account.id,
+                action_type='campaign_export_downloaded',
+                resource_type='campaign',
+                resource_id=job_status['campaign_id'],
+                resource_name=campaign_name,
+                details={
+                    'job_id': job_id,
+                    'file_name': download_filename,
+                    'export_type': 'campaign_data'
+                }
+            )
+        except Exception as e:
+            logger.error(f"Failed to log export download audit event: {e}")
         
         return send_file(
             file_path,

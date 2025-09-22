@@ -4,6 +4,10 @@
 
 {% block page_class %}page-campaign-management{% endblock %}
 
+{% block head %}
+<meta name="csrf-token" content="{{ csrf_token() }}">
+{% endblock %}
+
 {% block content %}
 <style>
 /* Campaign management specific styling */
@@ -270,11 +274,15 @@ function startCampaignExport(campaignId, campaignName) {
     
     modal.show();
     
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+    
     // Start export
     fetch(`/api/campaigns/${campaignId}/export`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
         }
     })
     .then(response => response.json())
