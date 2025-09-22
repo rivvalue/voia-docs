@@ -307,6 +307,18 @@ class Campaign(db.Model):
             logger.error(f"Failed to generate KPI snapshot for campaign '{self.name}' (ID: {self.id}): {e}")
             # Don't raise the exception - campaign completion should succeed even if snapshot fails
             # The snapshot can be generated manually later if needed
+        
+        # Trigger automatic executive report generation
+        try:
+            from task_queue import task_queue
+            task_queue.add_task('executive_report', data_id=self.id, task_data={
+                'campaign_id': self.id,
+                'business_account_id': self.business_account_id
+            })
+            logger.info(f"Queued executive report generation for completed campaign '{self.name}' (ID: {self.id})")
+        except Exception as report_error:
+            logger.error(f"Failed to queue executive report for campaign '{self.name}' (ID: {self.id}): {report_error}")
+            # Don't raise - campaign completion should succeed even if report queueing fails
     
     def mark_ready(self):
         """Mark campaign as ready for activation"""
@@ -2082,3 +2094,43 @@ class BrandingConfig(db.Model):
             # Don't commit here - let caller handle the transaction
         
         return branding_config
+
+
+class ExecutiveReport(db.Model):
+    """Executive Report model for storing generated campaign reports"""
+    __tablename__ = 'executive_reports'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=False)
+    business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False)
+    file_path = db.Column(db.String(500), nullable=False)
+    status = db.Column(db.String(20), default='pending', nullable=False)  # pending, processing, completed, failed
+    generated_at = db.Column(db.DateTime, nullable=True)
+    file_size = db.Column(db.Integer, nullable=True)  # File size in bytes
+    download_count = db.Column(db.Integer, default=0, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    
+    # Relationships
+    campaign = db.relationship('Campaign', backref='executive_reports')
+    business_account = db.relationship('BusinessAccount', backref='executive_reports')
+    
+    # Ensure one report per campaign
+    __table_args__ = (
+        db.UniqueConstraint('campaign_id', 'business_account_id', name='_campaign_business_report_uc'),
+    )
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'campaign_id': self.campaign_id,
+            'business_account_id': self.business_account_id,
+            'file_path': self.file_path,
+            'status': self.status,
+            'generated_at': self.generated_at.isoformat() if self.generated_at else None,
+            'file_size': self.file_size,
+            'download_count': self.download_count,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'campaign_name': self.campaign.name if self.campaign else None
+        }

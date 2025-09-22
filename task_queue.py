@@ -75,6 +75,9 @@ class TaskQueue:
         if task_type == 'send_email':
             email_type = task_data.get('email_type', 'unknown') if task_data else 'unknown'
             logger.info(f"Added email task ({email_type}) to queue")
+        elif task_type == 'executive_report':
+            campaign_id = task_data.get('campaign_id', 'unknown') if task_data else 'unknown'
+            logger.info(f"Added executive report task for campaign {campaign_id} to queue")
         else:
             logger.info(f"Added task {task_type} for data_id {data_id}")
     
@@ -156,6 +159,16 @@ class TaskQueue:
                     logger.info(f"Worker {worker_id} completed campaign export for campaign {campaign_id}")
                 else:
                     logger.error(f"Worker {worker_id} failed campaign export task")
+                    
+            elif task_type == 'executive_report':
+                # Process executive report generation task
+                success = self._process_executive_report_task(task_data, worker_id)
+                
+                if success:
+                    campaign_id = task_data.get('campaign_id', 'unknown')
+                    logger.info(f"Worker {worker_id} completed executive report for campaign {campaign_id}")
+                else:
+                    logger.error(f"Worker {worker_id} failed executive report task")
                         
         except Exception as e:
             logger.error(f"Error processing task {task}: {e}")
@@ -482,6 +495,98 @@ class TaskQueue:
                 
             if jobs_to_remove:
                 logger.info(f"Cleaned up {len(jobs_to_remove)} old export jobs")
+    
+    def _process_executive_report_task(self, task_data, worker_id):
+        """Process executive report generation task"""
+        try:
+            # Get task parameters
+            campaign_id = task_data.get('campaign_id')
+            business_account_id = task_data.get('business_account_id')
+            
+            if not all([campaign_id, business_account_id]):
+                logger.error(f"Missing executive report task parameters: {task_data}")
+                return False
+            
+            # Generate executive report
+            from executive_report_service import generate_executive_report
+            
+            report_file_path = generate_executive_report(campaign_id, business_account_id)
+            
+            if report_file_path:
+                # Store report information in database
+                self._store_executive_report_info(campaign_id, business_account_id, report_file_path)
+                
+                logger.info(f"Executive report generated for campaign {campaign_id}: {report_file_path}")
+                
+                # Add audit log for report generation
+                try:
+                    from audit_utils import queue_audit_log
+                    from models import Campaign
+                    
+                    campaign = Campaign.query.get(campaign_id)
+                    
+                    queue_audit_log(
+                        business_account_id=business_account_id,
+                        action_type='executive_report_generated',
+                        resource_type='campaign',
+                        resource_id=campaign_id,
+                        resource_name=campaign.name if campaign else f'Campaign {campaign_id}',
+                        details={
+                            'file_path': report_file_path,
+                            'report_type': 'executive_report'
+                        }
+                    )
+                except Exception as e:
+                    logger.error(f"Failed to log executive report audit event: {e}")
+                
+                return True
+            else:
+                logger.error(f"Failed to generate executive report for campaign {campaign_id}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Executive report task error for campaign {campaign_id}: {e}")
+            return False
+    
+    def _store_executive_report_info(self, campaign_id, business_account_id, file_path):
+        """Store executive report information in the database"""
+        try:
+            from models import ExecutiveReport
+            from datetime import datetime
+            import os
+            
+            # Calculate file size
+            file_size = None
+            if os.path.exists(file_path):
+                file_size = os.path.getsize(file_path)
+            
+            # Create or update executive report record
+            report = ExecutiveReport.query.filter_by(
+                campaign_id=campaign_id,
+                business_account_id=business_account_id
+            ).first()
+            
+            if not report:
+                report = ExecutiveReport(
+                    campaign_id=campaign_id,
+                    business_account_id=business_account_id,
+                    file_path=file_path,
+                    generated_at=datetime.utcnow(),
+                    status='completed',
+                    file_size=file_size
+                )
+                db.session.add(report)
+            else:
+                report.file_path = file_path
+                report.generated_at = datetime.utcnow()
+                report.status = 'completed'
+                report.file_size = file_size
+            
+            db.session.commit()
+            logger.info(f"Executive report info stored for campaign {campaign_id}")
+            
+        except Exception as e:
+            logger.error(f"Failed to store executive report info: {e}")
     
     def _scheduler(self):
         """Background scheduler for campaign lifecycle management with DB advisory lock"""

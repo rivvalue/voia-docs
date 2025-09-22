@@ -72,13 +72,14 @@ class ExecutiveReportGenerator:
         """Collect all data needed for the executive report"""
         from models import SurveyResponse, Campaign
         from app import db
-        from data_storage import calculate_nps_score
+        # Note: NPS calculation handled directly in this function
         
-        # Get campaign responses
+        # Get campaign responses via CampaignParticipant
+        from models import CampaignParticipant
         responses = SurveyResponse.query.join(
-            SurveyResponse.campaign_participant
+            CampaignParticipant, SurveyResponse.campaign_participant_id == CampaignParticipant.id
         ).filter(
-            SurveyResponse.campaign_participant.has(campaign_id=campaign.id)
+            CampaignParticipant.campaign_id == campaign.id
         ).options(
             joinedload(SurveyResponse.campaign_participant)
         ).all()
@@ -166,7 +167,12 @@ class ExecutiveReportGenerator:
     def _get_previous_campaigns(self, current_campaign, business_account_id: int) -> List:
         """Get previous campaigns within the same license period for comparison"""
         from models import Campaign
-        from license_service import get_license_period_for_date
+        try:
+            from license_service import get_license_period_for_date
+        except ImportError:
+            # Fallback if license_service not available
+            def get_license_period_for_date(business_account_id, date):
+                return None
         
         # Get current license period
         license_period = get_license_period_for_date(business_account_id, current_campaign.created_at)
@@ -175,14 +181,12 @@ class ExecutiveReportGenerator:
         
         # Get previous campaigns in same license period
         previous_campaigns = Campaign.query.filter(
-            and_(
-                Campaign.business_account_id == business_account_id,
-                Campaign.id != current_campaign.id,
-                Campaign.status == 'completed',
-                Campaign.created_at >= license_period['start_date'],
-                Campaign.created_at <= license_period['end_date'],
-                Campaign.created_at < current_campaign.created_at
-            )
+            Campaign.business_account_id == business_account_id,
+            Campaign.id != current_campaign.id,
+            Campaign.status == 'completed',
+            Campaign.created_at >= license_period['start_date'],
+            Campaign.created_at <= license_period['end_date'],
+            Campaign.created_at < current_campaign.created_at
         ).order_by(desc(Campaign.created_at)).all()
         
         return previous_campaigns
@@ -297,7 +301,12 @@ class ExecutiveReportGenerator:
             ax.text(0.5, 0.5, 'No sentiment data available', ha='center', va='center', transform=ax.transAxes)
         else:
             colors = ['#6bcf7f', '#ffd93d', '#ff6b6b']
-            wedges, texts, autotexts = ax.pie(values, labels=sentiments, colors=colors, autopct='%1.1f%%', startangle=90)
+            pie_result = ax.pie(values, labels=sentiments, colors=colors, autopct='%1.1f%%', startangle=90)
+            # Handle both 2-tuple and 3-tuple returns from matplotlib
+            if len(pie_result) == 3:
+                wedges, texts, autotexts = pie_result
+            else:
+                wedges, texts = pie_result
             ax.set_title('Sentiment Distribution')
         
         plt.tight_layout()
