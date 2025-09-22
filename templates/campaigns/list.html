@@ -399,21 +399,37 @@ document.getElementById('exportProgressModal').addEventListener('hidden.bs.modal
 
 // Executive Report Functions
 function downloadExecutiveReport(campaignId, campaignName) {
+    console.log('Starting executive report download for campaign:', campaignId);
+    
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name=csrf-token]');
+    if (!csrfToken) {
+        alert('Security token not found. Please refresh the page and try again.');
+        return;
+    }
+    
+    console.log('CSRF token found:', csrfToken.getAttribute('content').substring(0, 10) + '...');
+    
     // Check if executive report is available
     fetch(`/api/campaigns/${campaignId}/executive-reports`, {
         method: 'GET',
         headers: {
-            'X-CSRFToken': document.querySelector('meta[name=csrf-token]').getAttribute('content'),
+            'X-CSRFToken': csrfToken.getAttribute('content'),
             'Content-Type': 'application/json'
         }
     })
     .then(response => {
+        console.log('Executive reports API response status:', response.status);
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            return response.text().then(text => {
+                console.error('API error response:', text);
+                throw new Error(`HTTP ${response.status}: ${text}`);
+            });
         }
         return response.json();
     })
     .then(data => {
+        console.log('Executive reports data:', data);
         if (data.executive_reports && data.executive_reports.length > 0) {
             const report = data.executive_reports[0]; // Get the latest report
             if (report.status === 'completed') {
@@ -438,10 +454,19 @@ function downloadExecutiveReport(campaignId, campaignName) {
 }
 
 function generateExecutiveReport(campaignId, campaignName) {
+    console.log('Starting executive report generation for campaign:', campaignId);
+    
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name=csrf-token]');
+    if (!csrfToken) {
+        alert('Security token not found. Please refresh the page and try again.');
+        return;
+    }
+    
     fetch(`/api/campaigns/${campaignId}/executive-reports/generate`, {
         method: 'POST',
         headers: {
-            'X-CSRFToken': document.querySelector('meta[name=csrf-token]').getAttribute('content'),
+            'X-CSRFToken': csrfToken.getAttribute('content'),
             'Content-Type': 'application/json'
         }
     })
