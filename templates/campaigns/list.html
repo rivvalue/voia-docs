@@ -181,8 +181,8 @@
                         </button>
                         {% endif %}
                         {% if campaign.status == 'completed' %}
-                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="downloadExecutiveReport({{ campaign.id }}, '{{ campaign.name|e }}')">
-                            <i class="fas fa-file-pdf me-1"></i>Executive Report
+                        <button type="button" id="execReportBtn_{{ campaign.id }}" class="btn btn-outline-primary btn-sm" onclick="downloadExecutiveReport({{ campaign.id }}, '{{ campaign.name|e }}')">
+                            <i class="fas fa-file-pdf me-1"></i><span id="execReportText_{{ campaign.id }}">Executive Report</span>
                         </button>
                         {% endif %}
                     </div>
@@ -398,6 +398,42 @@ document.getElementById('exportProgressModal').addEventListener('hidden.bs.modal
 });
 
 // Executive Report Functions
+function updateReportButtonText(campaignId, isAvailable) {
+    const textElement = document.getElementById(`execReportText_${campaignId}`);
+    if (textElement) {
+        textElement.textContent = isAvailable ? 'Executive Report Available' : 'Executive Report';
+    }
+}
+
+function checkReportStatus(campaignId) {
+    // Check report status without user interaction
+    fetch(`/business/api/campaigns/${campaignId}/executive-reports`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        }
+        return null;
+    })
+    .then(data => {
+        if (data && data.executive_reports && data.executive_reports.length > 0) {
+            const report = data.executive_reports[0];
+            if (report.status === 'completed') {
+                updateReportButtonText(campaignId, true);
+            }
+        }
+    })
+    .catch(error => {
+        // Silently fail for status checks
+        console.log('Status check failed for campaign', campaignId);
+    });
+}
+
 function downloadExecutiveReport(campaignId, campaignName) {
     console.log('Starting executive report download for campaign:', campaignId);
     
@@ -434,7 +470,8 @@ function downloadExecutiveReport(campaignId, campaignName) {
         if (data.executive_reports && data.executive_reports.length > 0) {
             const report = data.executive_reports[0]; // Get the latest report
             if (report.status === 'completed') {
-                // Direct download
+                // Update button text and download
+                updateReportButtonText(campaignId, true);
                 window.location.href = `/business/api/campaigns/${campaignId}/executive-reports/download`;
             } else if (report.status === 'processing') {
                 alert('Executive report is currently being generated. Please check back in a few minutes.');
@@ -491,5 +528,18 @@ function generateExecutiveReport(campaignId, campaignName) {
         alert('Failed to start executive report generation: ' + error.message);
     });
 }
+
+// Initialize report status checks when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Find all executive report buttons and check their status
+    const reportButtons = document.querySelectorAll('[id^="execReportBtn_"]');
+    reportButtons.forEach(button => {
+        const campaignId = button.id.replace('execReportBtn_', '');
+        // Check status with a small delay to avoid overwhelming the server
+        setTimeout(() => {
+            checkReportStatus(campaignId);
+        }, Math.random() * 2000); // Random delay up to 2 seconds
+    });
+});
 </script>
 {% endblock %}
