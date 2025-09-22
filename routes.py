@@ -21,6 +21,35 @@ import uuid
 
 logger = logging.getLogger(__name__)
 
+# Anonymization utility function
+def anonymize_response_data(campaign, response_data):
+    """
+    Anonymize response data if campaign requires it
+    
+    Args:
+        campaign: Campaign object with anonymize_responses setting
+        response_data: Dictionary with response data (company_name, respondent_name, respondent_email)
+    
+    Returns:
+        dict: Modified response data with anonymized values if needed
+    """
+    if campaign and campaign.anonymize_responses:
+        import hashlib
+        
+        # Create consistent hash from email for participant tracking
+        email_hash = hashlib.sha256(response_data['respondent_email'].encode()).hexdigest()[:8]
+        
+        # Anonymize identifying information
+        response_data.update({
+            'respondent_name': f"Participant-{email_hash}",
+            'respondent_email': f"participant-{email_hash}@anonymous.local",
+            'company_name': "Anonymous Company"
+        })
+        
+        logger.info(f"Response data anonymized for campaign {campaign.id}: {email_hash}")
+    
+    return response_data
+
 # Health check endpoint to prevent 404 flood
 @app.route('/api', methods=['GET', 'HEAD'])
 def api_health_check():
@@ -636,15 +665,29 @@ def submit_survey_form():
         campaign_id = session.get('campaign_id')
         
         # Fallback to active campaign for backward compatibility (old system)
+        campaign = None
         if not campaign_id:
             active_campaign = Campaign.get_active_campaign('archelo_group')
             campaign_id = active_campaign.id if active_campaign else None
+            campaign = active_campaign
+        else:
+            campaign = Campaign.query.get(campaign_id)
         
-        # Create survey response with normalized company name and campaign assignment
+        # Prepare response data for potential anonymization
+        response_data = {
+            'company_name': normalize_company_name(data['company_name']),
+            'respondent_name': data['respondent_name'],
+            'respondent_email': authenticated_email
+        }
+        
+        # Apply anonymization if campaign requires it
+        response_data = anonymize_response_data(campaign, response_data)
+        
+        # Create survey response with potentially anonymized data
         response = SurveyResponse(
-            company_name=normalize_company_name(data['company_name']),
-            respondent_name=data['respondent_name'],
-            respondent_email=authenticated_email,
+            company_name=response_data['company_name'],
+            respondent_name=response_data['respondent_name'],
+            respondent_email=response_data['respondent_email'],
             tenure_with_fc=data.get('tenure_with_fc'),
             nps_score=nps_score,
             nps_category=nps_category,
@@ -770,9 +813,23 @@ def submit_survey():
         campaign_id = session.get('campaign_id')
         
         # Fallback to active campaign for backward compatibility (old system)
+        campaign = None
         if not campaign_id:
             active_campaign = Campaign.get_active_campaign('archelo_group')
             campaign_id = active_campaign.id if active_campaign else None
+            campaign = active_campaign
+        else:
+            campaign = Campaign.query.get(campaign_id)
+        
+        # Prepare response data for potential anonymization
+        response_data = {
+            'company_name': normalize_company_name(data['company_name']),
+            'respondent_name': data['respondent_name'],
+            'respondent_email': authenticated_email
+        }
+        
+        # Apply anonymization if campaign requires it
+        response_data = anonymize_response_data(campaign, response_data)
         
         # Check for existing response to update instead of creating duplicate
         existing_response = SurveyResponse.query.filter_by(
@@ -781,8 +838,8 @@ def submit_survey():
         
         if existing_response:
             # Update existing response (preserve campaign if no active campaign)
-            existing_response.company_name = normalize_company_name(data['company_name'])
-            existing_response.respondent_name = data['respondent_name']
+            existing_response.company_name = response_data['company_name']
+            existing_response.respondent_name = response_data['respondent_name']
             existing_response.tenure_with_fc = data.get('tenure_with_fc')
             existing_response.nps_score = nps_score
             existing_response.nps_category = nps_category
@@ -802,11 +859,11 @@ def submit_survey():
 
             response = existing_response
         else:
-            # Create new survey response with authenticated email, normalized company name, and campaign assignment
+            # Create new survey response with potentially anonymized data
             response = SurveyResponse(
-                company_name=normalize_company_name(data['company_name']),
-                respondent_name=data['respondent_name'],
-                respondent_email=authenticated_email,  # Use authenticated email
+                company_name=response_data['company_name'],
+                respondent_name=response_data['respondent_name'],
+                respondent_email=response_data['respondent_email'],
                 tenure_with_fc=data.get('tenure_with_fc'),
                 nps_score=nps_score,
                 nps_category=nps_category,
@@ -923,10 +980,20 @@ def submit_survey_overwrite():
         active_campaign = Campaign.get_active_campaign('archelo_group')
         campaign_id = active_campaign.id if active_campaign else None
         
+        # Prepare response data for potential anonymization
+        response_data = {
+            'company_name': normalize_company_name(data['company_name']),
+            'respondent_name': data['respondent_name'],
+            'respondent_email': authenticated_email
+        }
+        
+        # Apply anonymization if campaign requires it
+        response_data = anonymize_response_data(active_campaign, response_data)
+        
         if existing_response:
-            # Update existing response with campaign assignment
-            existing_response.company_name = normalize_company_name(data['company_name'])
-            existing_response.respondent_name = data['respondent_name']
+            # Update existing response with potentially anonymized data
+            existing_response.company_name = response_data['company_name']
+            existing_response.respondent_name = response_data['respondent_name']
             existing_response.tenure_with_fc = data.get('tenure_with_fc')
             existing_response.nps_score = nps_score
             existing_response.nps_category = nps_category
@@ -946,11 +1013,11 @@ def submit_survey_overwrite():
             response = existing_response
             action = "updated"
         else:
-            # Create new response with campaign assignment
+            # Create new response with potentially anonymized data
             response = SurveyResponse(
-                company_name=normalize_company_name(data['company_name']),
-                respondent_name=data['respondent_name'],
-                respondent_email=authenticated_email,
+                company_name=response_data['company_name'],
+                respondent_name=response_data['respondent_name'],
+                respondent_email=response_data['respondent_email'],
                 tenure_with_fc=data.get('tenure_with_fc'),
                 nps_score=nps_score,
                 nps_category=nps_category,
@@ -1622,9 +1689,23 @@ def finalize_conversation():
         campaign_id = session.get('campaign_id')
         
         # Fallback to active campaign for backward compatibility (old system)
+        campaign = None
         if not campaign_id:
             active_campaign = Campaign.get_active_campaign('archelo_group')
             campaign_id = active_campaign.id if active_campaign else None
+            campaign = active_campaign
+        else:
+            campaign = Campaign.query.get(campaign_id)
+        
+        # Prepare response data for potential anonymization
+        response_data = {
+            'company_name': normalize_company_name(structured_data.get('company_name')),
+            'respondent_name': structured_data.get('respondent_name'),
+            'respondent_email': authenticated_email
+        }
+        
+        # Apply anonymization if campaign requires it
+        response_data = anonymize_response_data(campaign, response_data)
         
         # Check for existing response to update instead of creating duplicate
         existing_response = SurveyResponse.query.filter_by(
@@ -1632,9 +1713,9 @@ def finalize_conversation():
         ).first()
         
         if existing_response:
-            # Update existing response with campaign assignment
-            existing_response.company_name = normalize_company_name(structured_data.get('company_name'))
-            existing_response.respondent_name = structured_data.get('respondent_name')
+            # Update existing response with potentially anonymized data
+            existing_response.company_name = response_data['company_name']
+            existing_response.respondent_name = response_data['respondent_name']
             existing_response.tenure_with_fc = structured_data.get('tenure_with_fc')
             existing_response.nps_score = structured_data.get('nps_score')
             existing_response.satisfaction_rating = structured_data.get('satisfaction_rating')
@@ -1653,11 +1734,11 @@ def finalize_conversation():
 
             response = existing_response
         else:
-            # Create survey response record with normalized company name and campaign assignment
+            # Create survey response record with potentially anonymized data
             response = SurveyResponse(
-                company_name=normalize_company_name(structured_data.get('company_name')),
-                respondent_name=structured_data.get('respondent_name'),
-                respondent_email=authenticated_email,
+                company_name=response_data['company_name'],
+                respondent_name=response_data['respondent_name'],
+                respondent_email=response_data['respondent_email'],
                 tenure_with_fc=structured_data.get('tenure_with_fc'),
                 nps_score=structured_data.get('nps_score'),
                 satisfaction_rating=structured_data.get('satisfaction_rating'),
