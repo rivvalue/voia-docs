@@ -1347,8 +1347,8 @@ def init_rivvalue_admin_user():
         admin_user.first_name = 'Admin'
         admin_user.last_name = 'User'
         admin_user.role = 'admin'
-        # Set active status - use setattr to avoid UserMixin property conflict
-        setattr(admin_user, 'is_active', True)
+        # Set active status
+        admin_user.is_active_user = True
         admin_user.email_verified = True
         # Generate secure temporary password
         import secrets
