@@ -2962,3 +2962,144 @@ def license_dashboard():
         logger.error(f"Error loading license dashboard: {e}")
         flash('Failed to load license dashboard. Please try again.', 'error')
         return redirect(url_for('business_auth.admin_panel'))
+
+
+# ==== EXECUTIVE REPORT API ROUTES ====
+
+@business_auth_bp.route('/api/campaigns/<int:campaign_id>/executive-reports', methods=['GET'])
+@require_business_auth
+def get_executive_reports(campaign_id):
+    """Get executive reports for a campaign"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account context not found'}), 401
+        
+        # Verify campaign belongs to current business account
+        from models import Campaign
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            return jsonify({'error': 'Campaign not found'}), 404
+        
+        # Get executive reports for this campaign
+        from models import ExecutiveReport
+        reports = ExecutiveReport.query.filter_by(
+            campaign_id=campaign_id,
+            business_account_id=current_account.id
+        ).order_by(ExecutiveReport.created_at.desc()).all()
+        
+        return jsonify({
+            'executive_reports': [report.to_dict() for report in reports]
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting executive reports for campaign {campaign_id}: {e}")
+        return jsonify({'error': 'Failed to get executive reports'}), 500
+
+
+@business_auth_bp.route('/api/campaigns/<int:campaign_id>/executive-reports/download', methods=['GET'])
+@require_business_auth
+def download_executive_report(campaign_id):
+    """Download executive report for a campaign"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account context not found'}), 401
+        
+        # Verify campaign belongs to current business account
+        from models import Campaign
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            return jsonify({'error': 'Campaign not found'}), 404
+        
+        # Get executive report for this campaign
+        from models import ExecutiveReport
+        report = ExecutiveReport.query.filter_by(
+            campaign_id=campaign_id,
+            business_account_id=current_account.id,
+            status='completed'
+        ).order_by(ExecutiveReport.created_at.desc()).first()
+        
+        if not report:
+            return jsonify({'error': 'Executive report not found or not ready'}), 404
+        
+        # Check if file exists
+        import os
+        if not os.path.exists(report.file_path):
+            return jsonify({'error': 'Report file not found on disk'}), 404
+        
+        # Update download count
+        report.download_count += 1
+        db.session.commit()
+        
+        # Serve the file
+        from flask import send_file
+        filename = f"Executive_Report_{campaign.name}_{report.generated_at.strftime('%Y%m%d')}.pdf"
+        
+        return send_file(
+            report.file_path,
+            as_attachment=True,
+            download_name=filename,
+            mimetype='application/pdf'
+        )
+        
+    except Exception as e:
+        logger.error(f"Error downloading executive report for campaign {campaign_id}: {e}")
+        return jsonify({'error': 'Failed to download executive report'}), 500
+
+
+@business_auth_bp.route('/api/campaigns/<int:campaign_id>/executive-reports/generate', methods=['POST'])
+@require_business_auth
+def generate_executive_report_manually(campaign_id):
+    """Manually trigger executive report generation for a campaign"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account context not found'}), 401
+        
+        # Verify campaign belongs to current business account and user has admin permission
+        from models import Campaign
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            return jsonify({'error': 'Campaign not found'}), 404
+        
+        # Check if campaign is completed
+        if campaign.status != 'completed':
+            return jsonify({'error': 'Campaign must be completed to generate executive report'}), 400
+        
+        # Check if user has admin permission
+        business_user_id = session.get('business_user_id')
+        from models import BusinessAccountUser
+        user = BusinessAccountUser.query.get(business_user_id)
+        if not user or user.role != 'admin':
+            return jsonify({'error': 'Admin permission required'}), 403
+        
+        # Queue executive report generation with lazy import to avoid circular imports
+        from task_queue import task_queue
+        task_queue.add_task('executive_report', data_id=campaign.id, task_data={
+            'campaign_id': campaign.id,
+            'business_account_id': current_account.id
+        })
+        
+        logger.info(f"Manual executive report generation queued for campaign {campaign.id} by user {user.email}")
+        
+        return jsonify({
+            'message': 'Executive report generation started',
+            'campaign_id': campaign.id
+        })
+        
+    except Exception as e:
+        logger.error(f"Error generating executive report for campaign {campaign_id}: {e}")
+        return jsonify({'error': 'Failed to start executive report generation'}), 500
