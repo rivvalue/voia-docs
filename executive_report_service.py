@@ -132,23 +132,17 @@ class ExecutiveReportGenerator:
         growth_scores = []
         
         for response in responses:
-            if response.ai_analysis:
-                try:
-                    analysis = json.loads(response.ai_analysis)
-                    
-                    # Sentiment
-                    sentiment = analysis.get('sentiment', 'neutral').lower()
-                    if sentiment in sentiment_counts:
-                        sentiment_counts[sentiment] += 1
-                    
-                    # Churn risk and growth scores
-                    if 'churn_risk_score' in analysis:
-                        churn_risks.append(analysis['churn_risk_score'])
-                    if 'growth_opportunity_score' in analysis:
-                        growth_scores.append(analysis['growth_opportunity_score'])
-                        
-                except (json.JSONDecodeError, KeyError):
-                    continue
+            # Use individual AI analysis fields instead of single ai_analysis field
+            if response.sentiment_label:
+                sentiment = response.sentiment_label.lower()
+                if sentiment in sentiment_counts:
+                    sentiment_counts[sentiment] += 1
+            
+            # Churn risk and growth scores
+            if response.churn_risk_score is not None:
+                churn_risks.append(response.churn_risk_score)
+            if response.growth_factor is not None:
+                growth_scores.append(response.growth_factor)
         
         # Calculate percentages for sentiment
         sentiment_breakdown = {}
@@ -358,30 +352,36 @@ class ExecutiveReportGenerator:
         critical_issues = []
         
         for response in responses:
-            if response.ai_analysis:
+            # Use individual AI analysis fields instead of single ai_analysis field
+            if response.key_themes:
                 try:
-                    analysis = json.loads(response.ai_analysis)
-                    
-                    # Extract themes
-                    if 'themes' in analysis:
-                        for theme in analysis['themes']:
-                            theme_name = theme.get('theme', 'Unknown')
-                            if theme_name not in themes:
-                                themes[theme_name] = {'count': 0, 'impact': []}
-                            themes[theme_name]['count'] += 1
-                            if 'impact' in theme:
-                                themes[theme_name]['impact'].append(theme['impact'])
-                    
-                    # Extract high-impact items
-                    if analysis.get('churn_risk_score', 0) >= 8:
-                        critical_issues.append({
-                            'respondent': response.respondent_name,
-                            'issue': analysis.get('key_issues', ['High churn risk'])[0] if analysis.get('key_issues') else 'High churn risk',
-                            'score': analysis.get('churn_risk_score')
-                        })
-                    
-                except (json.JSONDecodeError, KeyError):
+                    # Parse themes from JSON field
+                    theme_list = json.loads(response.key_themes) if isinstance(response.key_themes, str) else response.key_themes
+                    for theme in theme_list:
+                        theme_name = theme if isinstance(theme, str) else theme.get('theme', 'Unknown')
+                        if theme_name not in themes:
+                            themes[theme_name] = {'count': 0, 'impact': []}
+                        themes[theme_name]['count'] += 1
+                except (json.JSONDecodeError, TypeError):
                     continue
+            
+            # Extract high-impact items based on churn risk
+            if response.churn_risk_score is not None and response.churn_risk_score >= 7.0:
+                # Extract critical issues from churn risk factors
+                issue_text = "High churn risk"
+                if response.churn_risk_factors:
+                    try:
+                        factors = json.loads(response.churn_risk_factors) if isinstance(response.churn_risk_factors, str) else response.churn_risk_factors
+                        if factors and len(factors) > 0:
+                            issue_text = factors[0] if isinstance(factors[0], str) else factors[0].get('factor', 'High churn risk')
+                    except (json.JSONDecodeError, TypeError, KeyError):
+                        pass
+                
+                critical_issues.append({
+                    'respondent': response.respondent_name,
+                    'issue': issue_text,
+                    'score': response.churn_risk_score
+                })
         
         # Sort themes by frequency and impact
         sorted_themes = sorted(themes.items(), key=lambda x: x[1]['count'], reverse=True)[:5]
@@ -390,7 +390,7 @@ class ExecutiveReportGenerator:
             'top_themes': sorted_themes,
             'critical_issues': critical_issues[:3],  # Top 3 critical issues
             'total_themes': len(themes),
-            'insights_available': len([r for r in responses if r.ai_analysis])
+            'insights_available': len([r for r in responses if r.sentiment_label or r.key_themes or r.churn_risk_score is not None])
         }
     
     def _generate_pdf_report(self, report_data: Dict, campaign, business_account) -> str:
