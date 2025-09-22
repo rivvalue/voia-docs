@@ -311,6 +311,88 @@
             </div>
         </div>
 
+        <!-- Color Palette -->
+        <div class="config-form-section">
+            <h3 class="section-title">🎨 Color Palette</h3>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label" for="primary_color">Primary Color</label>
+                        <input type="color" class="form-control" id="primary_color" name="primary_color" 
+                               value="{{ branding_config.primary_color if branding_config.primary_color else '#dc3545' }}" 
+                               style="height: 50px;">
+                        <div class="help-text">
+                            Main brand color used for headers, buttons, and accents.
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label" for="secondary_color">Secondary Color</label>
+                        <input type="color" class="form-control" id="secondary_color" name="secondary_color" 
+                               value="{{ branding_config.secondary_color if branding_config.secondary_color else '#6c757d' }}" 
+                               style="height: 50px;">
+                        <div class="help-text">
+                            Supporting color for borders and subtle elements.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label" for="accent_color">Accent Color</label>
+                        <input type="color" class="form-control" id="accent_color" name="accent_color" 
+                               value="{{ branding_config.accent_color if branding_config.accent_color else '#28a745' }}" 
+                               style="height: 50px;">
+                        <div class="help-text">
+                            Highlight color for success states and call-to-action elements.
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label" for="text_color">Text Color</label>
+                        <input type="color" class="form-control" id="text_color" name="text_color" 
+                               value="{{ branding_config.text_color if branding_config.text_color else '#212529' }}" 
+                               style="height: 50px;">
+                        <div class="help-text">
+                            Primary text color for readability.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label" for="background_color">Background Color</label>
+                        <input type="color" class="form-control" id="background_color" name="background_color" 
+                               value="{{ branding_config.background_color if branding_config.background_color else '#ffffff' }}" 
+                               style="height: 50px;">
+                        <div class="help-text">
+                            Background color for documents and reports.
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label">Color Preview</label>
+                        <div id="color-preview" style="height: 50px; border-radius: 8px; border: 2px solid #e0e0e0; display: flex;">
+                            <div id="preview-primary" style="flex: 1; background: {{ branding_config.primary_color if branding_config.primary_color else '#dc3545' }};"></div>
+                            <div id="preview-secondary" style="flex: 1; background: {{ branding_config.secondary_color if branding_config.secondary_color else '#6c757d' }};"></div>
+                            <div id="preview-accent" style="flex: 1; background: {{ branding_config.accent_color if branding_config.accent_color else '#28a745' }};"></div>
+                        </div>
+                        <div class="help-text">
+                            Live preview of your color palette.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Logo Upload -->
         <div class="config-form-section">
             <h3 class="section-title">🖼️ Company Logo</h3>
@@ -395,6 +477,22 @@ document.getElementById('logo_file').addEventListener('change', function(e) {
         }
     }
 });
+
+// Live color preview updates
+function updateColorPreview() {
+    const primaryColor = document.getElementById('primary_color').value;
+    const secondaryColor = document.getElementById('secondary_color').value;
+    const accentColor = document.getElementById('accent_color').value;
+    
+    document.getElementById('preview-primary').style.background = primaryColor;
+    document.getElementById('preview-secondary').style.background = secondaryColor;
+    document.getElementById('preview-accent').style.background = accentColor;
+}
+
+// Add event listeners for color inputs
+document.getElementById('primary_color').addEventListener('input', updateColorPreview);
+document.getElementById('secondary_color').addEventListener('input', updateColorPreview);
+document.getElementById('accent_color').addEventListener('input', updateColorPreview);
 
 // Form validation
 document.getElementById('brandConfigForm').addEventListener('submit', function(e) {

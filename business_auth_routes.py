@@ -1953,12 +1953,24 @@ def save_brand_config():
         # Get form data
         company_display_name = request.form.get('company_display_name', '').strip()
         
+        # Get color palette data
+        primary_color = request.form.get('primary_color', '#dc3545').strip()
+        secondary_color = request.form.get('secondary_color', '#6c757d').strip()
+        accent_color = request.form.get('accent_color', '#28a745').strip()
+        text_color = request.form.get('text_color', '#212529').strip()
+        background_color = request.form.get('background_color', '#ffffff').strip()
+        
         # Get or create branding configuration
         from models import BrandingConfig
         branding_config = BrandingConfig.get_or_create_for_business_account(current_account.id)
         
         # Update configuration
         branding_config.company_display_name = company_display_name if company_display_name else None
+        branding_config.primary_color = primary_color
+        branding_config.secondary_color = secondary_color
+        branding_config.accent_color = accent_color
+        branding_config.text_color = text_color
+        branding_config.background_color = background_color
         
         # Handle logo upload
         if 'logo_file' in request.files:
@@ -1995,7 +2007,14 @@ def save_brand_config():
                 resource_type='branding_config',
                 details={
                     'company_display_name': company_display_name,
-                    'logo_updated': 'logo_file' in request.files and request.files['logo_file'].filename != ''
+                    'logo_updated': 'logo_file' in request.files and request.files['logo_file'].filename != '',
+                    'colors_updated': {
+                        'primary_color': primary_color,
+                        'secondary_color': secondary_color,
+                        'accent_color': accent_color,
+                        'text_color': text_color,
+                        'background_color': background_color
+                    }
                 }
             )
         except Exception as audit_error:
