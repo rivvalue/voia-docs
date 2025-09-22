@@ -18,7 +18,7 @@
                                 Campaign Status: <span class="badge bg-{% if campaign.status == 'active' %}success{% elif campaign.status == 'ready' %}warning{% elif campaign.status == 'draft' %}secondary{% else %}info{% endif %}">
                                     {{ campaign.status|title }}
                                 </span>
-                                | {{ current_participants|length }} participants assigned
+                                | {{ campaign_stats.total }} participants assigned
                             </p>
                         </div>
                         <a href="{{ url_for('participants.list_participants') }}" class="btn btn-secondary">
@@ -360,9 +360,9 @@
                             </h6>
                         </div>
                         <div class="card-body">
-                            {% set invited_count = current_participants | selectattr('status', 'equalto', 'invited') | list | length %}
-                            {% set started_count = current_participants | selectattr('status', 'equalto', 'started') | list | length %}
-                            {% set completed_count = current_participants | selectattr('status', 'equalto', 'completed') | list | length %}
+                            {% set invited_count = campaign_stats.invited %}
+                            {% set started_count = campaign_stats.started %}
+                            {% set completed_count = campaign_stats.completed %}
                             
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Invited:</span>
@@ -379,7 +379,7 @@
                             <hr>
                             <div class="d-flex justify-content-between">
                                 <strong>Total:</strong>
-                                <strong><span class="badge bg-primary">{{ current_participants|length }}</span></strong>
+                                <strong><span class="badge bg-primary">{{ campaign_stats.total }}</span></strong>
                             </div>
                         </div>
                     </div>

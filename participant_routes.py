@@ -529,11 +529,19 @@ def manage_campaign_participants(campaign_id: int):
             
             campaign_participants = campaign_participants_query.all()
             
-            # Get all available participants not in this campaign (need to get all campaign participants, not just searched ones)
+            # Get all campaign participants for KPI calculations (not just searched ones)
             all_campaign_participants = CampaignParticipant.query.filter_by(
                 campaign_id=campaign_id,
                 business_account_id=current_account.id
             ).all()
+            
+            # Calculate KPI stats from ALL campaign participants
+            campaign_stats = {
+                'total': len(all_campaign_participants),
+                'invited': len([cp for cp in all_campaign_participants if cp.status == 'invited']),
+                'started': len([cp for cp in all_campaign_participants if cp.status == 'started']),
+                'completed': len([cp for cp in all_campaign_participants if cp.status == 'completed'])
+            }
             assigned_participant_ids = [cp.participant_id for cp in all_campaign_participants]
             if assigned_participant_ids:
                 available_participants = Participant.query.filter(
@@ -564,7 +572,8 @@ def manage_campaign_participants(campaign_id: int):
                                  current_participants=current_participants,
                                  available_participants=[p.to_dict() for p in available_participants],
                                  business_account=current_account.to_dict(),
-                                 search_query=search_query)
+                                 search_query=search_query,
+                                 campaign_stats=campaign_stats)
         
         # Handle POST - Add participants to campaign
         if request.method == 'POST':
