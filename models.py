@@ -2027,6 +2027,13 @@ class BrandingConfig(db.Model):
     company_display_name = db.Column(db.String(200), nullable=True)  # Fallback to business_account.name if empty
     logo_filename = db.Column(db.String(255), nullable=True)  # Filename only, stored in /static/uploads/logos/{business_account_id}/
     
+    # Color Palette Configuration
+    primary_color = db.Column(db.String(7), nullable=True, default='#dc3545')  # Hex color code (e.g., #dc3545)
+    secondary_color = db.Column(db.String(7), nullable=True, default='#6c757d')  # Hex color code  
+    accent_color = db.Column(db.String(7), nullable=True, default='#28a745')  # Hex color code for highlights
+    text_color = db.Column(db.String(7), nullable=True, default='#212529')  # Primary text color
+    background_color = db.Column(db.String(7), nullable=True, default='#ffffff')  # Background color
+    
     # Metadata
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -2044,6 +2051,12 @@ class BrandingConfig(db.Model):
             'logo_filename': self.logo_filename,
             'logo_url': self.get_logo_url(),
             'display_name': self.get_company_display_name(),
+            'primary_color': self.primary_color,
+            'secondary_color': self.secondary_color,
+            'accent_color': self.accent_color,
+            'text_color': self.text_color,
+            'background_color': self.background_color,
+            'color_palette': self.get_color_palette(),
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
@@ -2053,6 +2066,30 @@ class BrandingConfig(db.Model):
         if self.company_display_name and self.company_display_name.strip():
             return self.company_display_name.strip()
         return self.business_account.name if self.business_account else 'Unknown Company'
+    
+    def get_color_palette(self):
+        """Get color palette dictionary with defaults"""
+        return {
+            'primary': self.primary_color or '#dc3545',
+            'secondary': self.secondary_color or '#6c757d',
+            'accent': self.accent_color or '#28a745',
+            'text': self.text_color or '#212529',
+            'background': self.background_color or '#ffffff'
+        }
+    
+    def get_chart_colors(self):
+        """Get color palette optimized for charts"""
+        palette = self.get_color_palette()
+        return [
+            palette['primary'],
+            palette['accent'], 
+            palette['secondary'],
+            '#17a2b8',  # Info color
+            '#ffc107',  # Warning color
+            '#fd7e14',  # Orange
+            '#6610f2',  # Indigo
+            '#e83e8c'   # Pink
+        ]
     
     def get_logo_url(self):
         """Get logo URL path with proper fallback"""
