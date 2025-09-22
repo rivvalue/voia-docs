@@ -113,12 +113,45 @@
                 </div>
             {% endif %}
 
+            <!-- Search Campaign Participants -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <form method="GET" action="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}">
+                        <div class="row align-items-end">
+                            <div class="col-md-8">
+                                <label for="search" class="form-label">Search Campaign Participants</label>
+                                <input type="text" class="form-control" id="search" name="search" 
+                                       value="{{ search_query or '' }}" 
+                                       placeholder="Search participants by name, email, or company...">
+                            </div>
+                            <div class="col-md-4">
+                                <div class="btn-group w-100">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search me-1"></i>Search
+                                    </button>
+                                    {% if search_query %}
+                                    <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-1"></i>Clear
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <!-- Current Participants -->
             <div class="card mt-4">
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">
-                            <i class="fas fa-list me-2"></i>Current Participants ({{ current_participants|length }})
+                            <i class="fas fa-list me-2"></i>Current Participants
+                            {% if search_query %}
+                                <small class="text-muted">({{ current_participants|length }} found for "{{ search_query }}")</small>
+                            {% else %}
+                                <small class="text-muted">({{ current_participants|length }})</small>
+                            {% endif %}
                         </h5>
                         {% if current_participants %}
                         <div class="btn-group" role="group">

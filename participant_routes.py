@@ -481,14 +481,34 @@ def manage_campaign_participants(campaign_id: int):
             return redirect(url_for('participants.list_participants'))
         
         if request.method == 'GET':
-            # Get current campaign participants
-            campaign_participants = CampaignParticipant.query.filter_by(
+            # Get search parameter for current participants
+            search_query = request.args.get('search', '').strip()
+            
+            # Get current campaign participants with optional search
+            campaign_participants_query = CampaignParticipant.query.filter_by(
+                campaign_id=campaign_id,
+                business_account_id=current_account.id
+            ).join(Participant)
+            
+            # Apply search filter if provided
+            if search_query:
+                search_term = f"%{search_query}%"
+                campaign_participants_query = campaign_participants_query.filter(
+                    db.or_(
+                        Participant.name.ilike(search_term),
+                        Participant.email.ilike(search_term),
+                        Participant.company_name.ilike(search_term)
+                    )
+                )
+            
+            campaign_participants = campaign_participants_query.all()
+            
+            # Get all available participants not in this campaign (need to get all campaign participants, not just searched ones)
+            all_campaign_participants = CampaignParticipant.query.filter_by(
                 campaign_id=campaign_id,
                 business_account_id=current_account.id
             ).all()
-            
-            # Get all available participants not in this campaign
-            assigned_participant_ids = [cp.participant_id for cp in campaign_participants]
+            assigned_participant_ids = [cp.participant_id for cp in all_campaign_participants]
             if assigned_participant_ids:
                 available_participants = Participant.query.filter(
                     Participant.business_account_id == current_account.id,
@@ -517,7 +537,8 @@ def manage_campaign_participants(campaign_id: int):
                                  campaign=campaign.to_dict(),
                                  current_participants=current_participants,
                                  available_participants=[p.to_dict() for p in available_participants],
-                                 business_account=current_account.to_dict())
+                                 business_account=current_account.to_dict(),
+                                 search_query=search_query)
         
         # Handle POST - Add participants to campaign
         if request.method == 'POST':
