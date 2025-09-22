@@ -90,6 +90,7 @@ def create_campaign():
         description = request.form.get('description', '').strip()
         start_date = request.form.get('start_date', '').strip()
         end_date = request.form.get('end_date', '').strip()
+        anonymize_responses = bool(request.form.get('anonymize_responses'))
         
         # Validate required fields
         if not name or not start_date or not end_date:
@@ -124,6 +125,7 @@ def create_campaign():
         campaign.end_date = end_date_obj
         campaign.business_account_id = current_account.id
         campaign.status = 'draft'  # Initial status
+        campaign.anonymize_responses = anonymize_responses
         
         db.session.add(campaign)
         db.session.commit()
@@ -140,7 +142,8 @@ def create_campaign():
                 details={
                     'start_date': start_date_obj.isoformat(),
                     'end_date': end_date_obj.isoformat(),
-                    'status': 'draft'
+                    'status': 'draft',
+                    'anonymize_responses': anonymize_responses
                 }
             )
         except Exception as audit_error:

@@ -135,6 +135,33 @@
                 </div>
             </div>
 
+            <!-- Privacy Settings -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-shield-alt"></i>Privacy Settings
+                </h3>
+                
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="anonymize_responses" name="anonymize_responses" value="1">
+                        <label class="form-check-label" for="anonymize_responses">
+                            <strong>Anonymize Survey Responses</strong>
+                        </label>
+                    </div>
+                    <div class="form-text">
+                        When enabled, participant names and company names will be anonymized using secure hashing. 
+                        Anonymized participants will appear as "Participant-{hash}" in reports and analytics. 
+                        This cannot be changed after campaign creation.
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Important:</strong> Anonymization is permanent once enabled. You will not be able to 
+                    identify individual participants in reports, though you can still analyze sentiment trends and overall feedback.
+                </div>
+            </div>
+
             <!-- Form Actions -->
             <div class="d-flex justify-content-between">
                 <a href="{{ url_for('campaigns.list_campaigns') }}" class="btn btn-outline-secondary">
