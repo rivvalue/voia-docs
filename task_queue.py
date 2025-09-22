@@ -507,10 +507,11 @@ class TaskQueue:
                 logger.error(f"Missing executive report task parameters: {task_data}")
                 return False
             
-            # Generate executive report
-            from executive_report_service import generate_executive_report
+            # Use lazy import to avoid circular dependency and import correct class
+            from executive_report_service import ExecutiveReportGenerator
             
-            report_file_path = generate_executive_report(campaign_id, business_account_id)
+            generator = ExecutiveReportGenerator()
+            report_file_path = generator.generate_campaign_report(campaign_id, business_account_id)
             
             if report_file_path:
                 # Store report information in database
