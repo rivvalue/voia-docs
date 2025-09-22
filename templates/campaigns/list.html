@@ -175,6 +175,11 @@
                         <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" class="btn btn-outline-secondary btn-sm">
                             <i class="fas fa-users me-1"></i>Manage Participants
                         </a>
+                        {% if campaign.status in ['active', 'completed'] %}
+                        <button type="button" class="btn btn-outline-info btn-sm" onclick="startCampaignExport({{ campaign.id }}, '{{ campaign.name|e }}')">
+                            <i class="fas fa-download me-1"></i>Export Data
+                        </button>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -194,4 +199,193 @@
         </div>
     {% endif %}
 </div>
+
+<!-- Export Progress Modal -->
+<div class="modal fade" id="exportProgressModal" tabindex="-1" aria-labelledby="exportProgressModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exportProgressModalLabel">
+                    <i class="fas fa-download me-2"></i>Exporting Campaign Data
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeExportModal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="exportProgressContent">
+                    <div class="text-center mb-3">
+                        <h6 id="exportCampaignName">Campaign Name</h6>
+                        <small class="text-muted">Preparing your data export...</small>
+                    </div>
+                    
+                    <div class="progress mb-3">
+                        <div id="exportProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                    </div>
+                    
+                    <div id="exportStatus" class="text-center text-muted">
+                        <i class="fas fa-spinner fa-spin me-2"></i>Starting export...
+                    </div>
+                </div>
+                
+                <div id="exportCompleteContent" style="display: none;">
+                    <div class="text-center">
+                        <i class="fas fa-check-circle text-success mb-3" style="font-size: 3rem;"></i>
+                        <h5>Export Complete!</h5>
+                        <p class="text-muted mb-4">Your campaign data has been successfully exported.</p>
+                        <a id="downloadExportLink" href="#" class="btn btn-success btn-lg">
+                            <i class="fas fa-download me-2"></i>Download Export File
+                        </a>
+                    </div>
+                </div>
+                
+                <div id="exportErrorContent" style="display: none;">
+                    <div class="text-center">
+                        <i class="fas fa-exclamation-triangle text-danger mb-3" style="font-size: 3rem;"></i>
+                        <h5>Export Failed</h5>
+                        <p class="text-muted mb-4" id="exportErrorMessage">An error occurred while exporting your data.</p>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentExportJob = null;
+let exportCheckInterval = null;
+
+function startCampaignExport(campaignId, campaignName) {
+    // Show modal and reset state
+    const modal = new bootstrap.Modal(document.getElementById('exportProgressModal'));
+    document.getElementById('exportCampaignName').textContent = campaignName;
+    document.getElementById('exportProgressContent').style.display = 'block';
+    document.getElementById('exportCompleteContent').style.display = 'none';
+    document.getElementById('exportErrorContent').style.display = 'none';
+    document.getElementById('closeExportModal').style.display = 'block';
+    
+    // Reset progress
+    updateExportProgress(0, 'Starting export...');
+    
+    modal.show();
+    
+    // Start export
+    fetch(`/api/campaigns/${campaignId}/export`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            currentExportJob = data.job_id;
+            updateExportProgress(10, 'Export queued. Processing...');
+            
+            // Start checking export status
+            exportCheckInterval = setInterval(() => {
+                checkExportStatus(data.job_id);
+            }, 2000); // Check every 2 seconds
+        } else {
+            showExportError(data.error || 'Failed to start export');
+        }
+    })
+    .catch(error => {
+        console.error('Export start error:', error);
+        showExportError('Failed to start export: ' + error.message);
+    });
+}
+
+function checkExportStatus(jobId) {
+    fetch(`/api/export-jobs/${jobId}/status`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            clearInterval(exportCheckInterval);
+            showExportError(data.error);
+            return;
+        }
+        
+        switch (data.status) {
+            case 'queued':
+                updateExportProgress(15, 'Export queued...');
+                break;
+            case 'processing':
+                let progress = 30;
+                if (data.progress) {
+                    if (data.progress.includes('responses')) {
+                        progress = 50;
+                    } else if (data.progress.includes('participants')) {
+                        progress = 80;
+                    }
+                }
+                updateExportProgress(progress, data.progress || 'Processing data...');
+                break;
+            case 'completed':
+                clearInterval(exportCheckInterval);
+                updateExportProgress(100, 'Export completed!');
+                setTimeout(() => {
+                    showExportComplete(data.download_url);
+                }, 1000);
+                break;
+            case 'failed':
+                clearInterval(exportCheckInterval);
+                showExportError(data.error || 'Export failed');
+                break;
+        }
+    })
+    .catch(error => {
+        console.error('Export status check error:', error);
+        clearInterval(exportCheckInterval);
+        showExportError('Failed to check export status: ' + error.message);
+    });
+}
+
+function updateExportProgress(percentage, message) {
+    const progressBar = document.getElementById('exportProgressBar');
+    const statusText = document.getElementById('exportStatus');
+    
+    progressBar.style.width = percentage + '%';
+    progressBar.setAttribute('aria-valuenow', percentage);
+    
+    if (percentage >= 100) {
+        progressBar.classList.remove('progress-bar-striped', 'progress-bar-animated');
+        progressBar.classList.add('bg-success');
+        statusText.innerHTML = '<i class="fas fa-check me-2"></i>' + message;
+    } else {
+        statusText.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>' + message;
+    }
+}
+
+function showExportComplete(downloadUrl) {
+    document.getElementById('exportProgressContent').style.display = 'none';
+    document.getElementById('exportCompleteContent').style.display = 'block';
+    document.getElementById('closeExportModal').style.display = 'none';
+    
+    const downloadLink = document.getElementById('downloadExportLink');
+    downloadLink.href = downloadUrl;
+    downloadLink.onclick = function() {
+        // Close modal after download starts
+        setTimeout(() => {
+            bootstrap.Modal.getInstance(document.getElementById('exportProgressModal')).hide();
+        }, 500);
+    };
+}
+
+function showExportError(errorMessage) {
+    document.getElementById('exportProgressContent').style.display = 'none';
+    document.getElementById('exportErrorContent').style.display = 'block';
+    document.getElementById('exportErrorMessage').textContent = errorMessage;
+}
+
+// Clean up intervals when modal is hidden
+document.getElementById('exportProgressModal').addEventListener('hidden.bs.modal', function () {
+    if (exportCheckInterval) {
+        clearInterval(exportCheckInterval);
+        exportCheckInterval = null;
+    }
+    currentExportJob = null;
+});
+</script>
 {% endblock %}

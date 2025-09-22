@@ -1254,6 +1254,8 @@ def start_campaign_export(campaign_id):
     try:
         # Get current business account
         current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account not found'}), 401
         
         # Verify campaign belongs to this business account
         campaign = Campaign.query.filter_by(
@@ -1287,6 +1289,8 @@ def get_export_status(job_id):
     try:
         # Get current business account
         current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account not found'}), 401
         
         # Get job status
         job_status = get_export_job_status(job_id)
@@ -1325,6 +1329,8 @@ def download_export_file(job_id):
     try:
         # Get current business account
         current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account not found'}), 401
         
         # Get job status
         job_status = get_export_job_status(job_id)
