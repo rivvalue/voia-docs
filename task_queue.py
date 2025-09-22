@@ -1,12 +1,13 @@
 import json
 import os
 import logging
+import uuid
 from datetime import datetime, timedelta, date
-from threading import Thread
+from threading import Thread, Lock
 from queue import Queue, Empty
 from time import sleep
 from app import app, db
-from models import SurveyResponse, Campaign, BusinessAccount, EmailDelivery
+from models import SurveyResponse, Campaign, BusinessAccount, EmailDelivery, CampaignParticipant, Participant
 from ai_analysis import analyze_survey_response
 from email_service import email_service
 
@@ -23,6 +24,10 @@ class TaskQueue:
         self.scheduler_thread = None
         self.last_scheduler_run = None
         self.scheduler_interval = 300  # 5 minutes in seconds
+        
+        # Export job tracking
+        self.export_jobs = {}  # job_id -> job_status
+        self.export_jobs_lock = Lock()
         
     def start(self):
         """Start the task queue workers and scheduler"""
@@ -141,6 +146,16 @@ class TaskQueue:
                     logger.debug(f"Worker {worker_id} completed audit log ({action_type})")
                 else:
                     logger.error(f"Worker {worker_id} failed audit log task")
+                    
+            elif task_type == 'export_campaign':
+                # Process campaign export task
+                success = self._process_export_task(task_data, worker_id)
+                
+                if success:
+                    campaign_id = task_data.get('campaign_id', 'unknown')
+                    logger.info(f"Worker {worker_id} completed campaign export for campaign {campaign_id}")
+                else:
+                    logger.error(f"Worker {worker_id} failed campaign export task")
                         
         except Exception as e:
             logger.error(f"Error processing task {task}: {e}")
@@ -266,6 +281,188 @@ class TaskQueue:
         except Exception as e:
             logger.error(f"Failed to create EmailDelivery record: {e}")
             return None
+            
+    def _process_export_task(self, task_data, worker_id):
+        """Process a campaign export task with streaming to avoid memory issues"""
+        job_id = task_data.get('job_id')
+        campaign_id = task_data.get('campaign_id')
+        business_account_id = task_data.get('business_account_id')
+        
+        if not job_id or not campaign_id or not business_account_id:
+            logger.error(f"Export task missing required data: job_id={job_id}, campaign_id={campaign_id}, business_account_id={business_account_id}")
+            return False
+            
+        try:
+            # Update job status to processing
+            self._update_export_job_status(job_id, 'processing')
+            
+            # Verify campaign belongs to business account
+            campaign = Campaign.query.filter_by(
+                id=campaign_id, 
+                business_account_id=business_account_id
+            ).first()
+            
+            if not campaign:
+                logger.error(f"Campaign {campaign_id} not found for business account {business_account_id}")
+                self._update_export_job_status(job_id, 'failed', error='Campaign not found')
+                return False
+            
+            # Generate export file
+            export_file_path = f"/tmp/export_{job_id}.json"
+            success = self._generate_export_file(campaign, export_file_path, job_id)
+            
+            if success:
+                self._update_export_job_status(job_id, 'completed', file_path=export_file_path)
+                logger.info(f"Export completed for campaign {campaign_id}, file: {export_file_path}")
+                return True
+            else:
+                self._update_export_job_status(job_id, 'failed', error='Export generation failed')
+                return False
+                
+        except Exception as e:
+            logger.error(f"Export task error for job {job_id}: {e}")
+            self._update_export_job_status(job_id, 'failed', error=str(e))
+            return False
+    
+    def _generate_export_file(self, campaign, file_path, job_id):
+        """Generate export file with streaming to avoid memory issues"""
+        try:
+            export_data = {
+                'export_metadata': {
+                    'job_id': job_id,
+                    'campaign_id': campaign.id,
+                    'campaign_name': campaign.name,
+                    'business_account_id': campaign.business_account_id,
+                    'export_timestamp': datetime.utcnow().isoformat(),
+                    'export_version': '1.0'
+                },
+                'campaign': campaign.to_dict(),
+                'responses': [],
+                'participants': []
+            }
+            
+            # Stream survey responses in chunks
+            chunk_size = 100
+            offset = 0
+            response_count = 0
+            
+            while True:
+                # Get chunk of responses
+                response_chunk = SurveyResponse.query.filter_by(
+                    campaign_id=campaign.id
+                ).offset(offset).limit(chunk_size).all()
+                
+                if not response_chunk:
+                    break
+                    
+                # Add responses to export data
+                for response in response_chunk:
+                    export_data['responses'].append(response.to_dict())
+                    response_count += 1
+                
+                offset += chunk_size
+                
+                # Update progress
+                self._update_export_job_status(job_id, 'processing', 
+                                               progress=f"Processed {response_count} survey responses")
+            
+            # Stream participants in chunks  
+            offset = 0
+            participant_count = 0
+            
+            while True:
+                # Get chunk of campaign participants
+                participant_chunk = CampaignParticipant.query.filter_by(
+                    campaign_id=campaign.id
+                ).join(Participant).offset(offset).limit(chunk_size).all()
+                
+                if not participant_chunk:
+                    break
+                    
+                # Add participants to export data
+                for cp in participant_chunk:
+                    participant_data = cp.to_dict()
+                    if cp.participant:
+                        participant_data['participant_details'] = cp.participant.to_dict()
+                    export_data['participants'].append(participant_data)
+                    participant_count += 1
+                
+                offset += chunk_size
+                
+                # Update progress
+                self._update_export_job_status(job_id, 'processing', 
+                                               progress=f"Processed {participant_count} participants")
+            
+            # Write export file
+            with open(file_path, 'w') as f:
+                json.dump(export_data, f, indent=2, default=str)
+            
+            logger.info(f"Export file generated: {file_path} ({response_count} responses, {participant_count} participants)")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error generating export file {file_path}: {e}")
+            return False
+    
+    def _update_export_job_status(self, job_id, status, error=None, file_path=None, progress=None):
+        """Update export job status thread-safely"""
+        with self.export_jobs_lock:
+            if job_id in self.export_jobs:
+                self.export_jobs[job_id].update({
+                    'status': status,
+                    'updated_at': datetime.utcnow(),
+                    'error': error,
+                    'file_path': file_path,
+                    'progress': progress
+                })
+    
+    def create_export_job(self, campaign_id, business_account_id):
+        """Create a new export job and return job ID"""
+        job_id = str(uuid.uuid4())
+        
+        with self.export_jobs_lock:
+            self.export_jobs[job_id] = {
+                'job_id': job_id,
+                'campaign_id': campaign_id,
+                'business_account_id': business_account_id,
+                'status': 'queued',
+                'created_at': datetime.utcnow(),
+                'updated_at': datetime.utcnow(),
+                'error': None,
+                'file_path': None,
+                'progress': None
+            }
+        
+        return job_id
+    
+    def get_export_job_status(self, job_id):
+        """Get export job status"""
+        with self.export_jobs_lock:
+            return self.export_jobs.get(job_id)
+    
+    def cleanup_old_export_jobs(self, max_age_hours=24):
+        """Clean up old export jobs and their files"""
+        cutoff_time = datetime.utcnow() - timedelta(hours=max_age_hours)
+        
+        with self.export_jobs_lock:
+            jobs_to_remove = []
+            for job_id, job_data in self.export_jobs.items():
+                if job_data['updated_at'] < cutoff_time:
+                    # Clean up file if it exists
+                    if job_data.get('file_path') and os.path.exists(job_data['file_path']):
+                        try:
+                            os.remove(job_data['file_path'])
+                            logger.info(f"Cleaned up export file: {job_data['file_path']}")
+                        except Exception as e:
+                            logger.error(f"Error cleaning up export file {job_data['file_path']}: {e}")
+                    
+                    jobs_to_remove.append(job_id)
+            
+            for job_id in jobs_to_remove:
+                del self.export_jobs[job_id]
+                
+            if jobs_to_remove:
+                logger.info(f"Cleaned up {len(jobs_to_remove)} old export jobs")
     
     def _scheduler(self):
         """Background scheduler for campaign lifecycle management with DB advisory lock"""
@@ -595,3 +792,35 @@ def send_campaign_notification_async(notification_type, campaign_name, campaign_
 def get_queue_stats():
     """Get queue statistics"""
     return task_queue.get_stats()
+
+def add_export_task(campaign_id, business_account_id):
+    """Add a campaign export task to the queue
+    
+    Args:
+        campaign_id: ID of the campaign to export
+        business_account_id: ID of the business account (for security)
+        
+    Returns:
+        job_id: Unique identifier for tracking the export job
+    """
+    # Create export job and get job ID
+    job_id = task_queue.create_export_job(campaign_id, business_account_id)
+    
+    # Queue the export task
+    task_data = {
+        'job_id': job_id,
+        'campaign_id': campaign_id,
+        'business_account_id': business_account_id
+    }
+    task_queue.add_task('export_campaign', priority=1, task_data=task_data)
+    
+    logger.info(f"Added export task for campaign {campaign_id} (job_id: {job_id})")
+    return job_id
+
+def get_export_job_status(job_id):
+    """Get the status of an export job"""
+    return task_queue.get_export_job_status(job_id)
+
+def cleanup_export_jobs():
+    """Clean up old export jobs and files"""
+    task_queue.cleanup_old_export_jobs()
