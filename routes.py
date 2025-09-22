@@ -1248,9 +1248,8 @@ def queue_status():
 # Campaign Export API Routes
 @app.route('/api/campaigns/<int:campaign_id>/export', methods=['POST'])
 @require_business_auth
-@require_permission('admin')
 def start_campaign_export(campaign_id):
-    """Start asynchronous export for a campaign"""
+    """Start asynchronous export for a campaign - Business users can export their own campaign data"""
     try:
         # Get current business account
         current_account = get_current_business_account()
