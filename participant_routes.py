@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 @require_business_auth
 @require_permission('manage_participants')
 def list_participants():
-    """List all participants for current business account"""
+    """List all participants for current business account with search and pagination"""
     
     try:
         # Get current business account context
@@ -34,10 +34,37 @@ def list_participants():
             flash('Business account context not found.', 'error')
             return redirect(url_for('business_auth.login'))
         
-        # Get participants scoped to current business account
-        participants = Participant.query.filter_by(
-            business_account_id=current_account.id
-        ).order_by(Participant.created_at.desc()).all()
+        # Get search and pagination parameters
+        search_query = request.args.get('search', '').strip()
+        page = request.args.get('page', 1, type=int)
+        per_page = 20  # Number of participants per page
+        
+        # Base query scoped to current business account
+        query = Participant.query.filter_by(business_account_id=current_account.id)
+        
+        # Apply search filter if provided
+        if search_query:
+            search_term = f"%{search_query}%"
+            query = query.filter(
+                db.or_(
+                    Participant.name.ilike(search_term),
+                    Participant.email.ilike(search_term),
+                    Participant.company_name.ilike(search_term)
+                )
+            )
+        
+        # Get total count for pagination
+        total_participants = query.count()
+        
+        # Apply pagination
+        participants = query.order_by(Participant.created_at.desc()).offset(
+            (page - 1) * per_page
+        ).limit(per_page).all()
+        
+        # Calculate pagination info
+        total_pages = (total_participants + per_page - 1) // per_page
+        has_prev = page > 1
+        has_next = page < total_pages
         
         # Get campaigns for dropdown (scoped to current business account)
         campaigns = Campaign.query.filter_by(
@@ -53,7 +80,18 @@ def list_participants():
         return render_template('participants/list.html',
                              participants=participant_data,
                              campaigns=[c.to_dict() if c else {} for c in campaigns],
-                             business_account=current_account.to_dict() if current_account else {})
+                             business_account=current_account.to_dict() if current_account else {},
+                             search_query=search_query,
+                             pagination={
+                                 'page': page,
+                                 'per_page': per_page,
+                                 'total': total_participants,
+                                 'total_pages': total_pages,
+                                 'has_prev': has_prev,
+                                 'has_next': has_next,
+                                 'prev_page': page - 1 if has_prev else None,
+                                 'next_page': page + 1 if has_next else None
+                             })
         
     except Exception as e:
         logger.error(f"Error listing participants: {e}")
