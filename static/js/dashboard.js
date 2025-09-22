@@ -1922,17 +1922,37 @@ const responsesPerPage = 10;
 const companiesPerPage = 10;
 const tenureGroupsPerPage = 10;
 
-function loadSurveyResponses(page = 1) {
+function loadSurveyResponses(page = 1, searchQuery = '') {
     currentResponsesPage = page;
-    fetch(`/api/survey_responses?page=${page}&per_page=${responsesPerPage}`)
+    
+    // Build URL with search parameters
+    let url = `/api/survey_responses?page=${page}&per_page=${responsesPerPage}`;
+    if (searchQuery.trim()) {
+        url += `&search=${encodeURIComponent(searchQuery)}`;
+    }
+    
+    fetch(url)
         .then(response => response.json())
         .then(data => {
             const tbody = document.getElementById('responsesTable');
             const responses = data.responses || data; // Handle both old and new format
             const pagination = data.pagination;
             
+            // Update search info display
+            const searchInfo = document.getElementById('responsesSearchInfo');
+            if (data.search_query && data.search_query.trim()) {
+                searchInfo.textContent = `Found ${pagination ? pagination.total : responses.length} results for "${data.search_query}"`;
+                searchInfo.style.display = 'block';
+            } else {
+                searchInfo.textContent = '';
+                searchInfo.style.display = 'none';
+            }
+            
             if (responses.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No survey responses yet.</td></tr>';
+                const noResultsMsg = data.search_query && data.search_query.trim() 
+                    ? 'No survey responses found matching your search criteria.'
+                    : 'No survey responses yet.';
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted">${noResultsMsg}</td></tr>`;
                 updatePaginationInfo(0, 0, 0);
                 updatePaginationControls(null);
                 return;
@@ -2022,7 +2042,7 @@ function updateResponsesPaginationControls(pagination) {
     if (pagination.has_prev) {
         html += `
             <li class="page-item">
-                <a class="page-link" href="#" onclick="loadSurveyResponses(${pagination.page - 1}); return false;">
+                <a class="page-link" href="#" onclick="loadSurveyResponses(${pagination.page - 1}, getCurrentSearchQuery()); return false;">
                     <i class="fas fa-chevron-left"></i>
                 </a>
             </li>
@@ -2036,7 +2056,7 @@ function updateResponsesPaginationControls(pagination) {
         if (i === pagination.page) {
             html += `<li class="page-item active"><span class="page-link">${i}</span></li>`;
         } else {
-            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadSurveyResponses(${i}); return false;">${i}</a></li>`;
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadSurveyResponses(${i}, getCurrentSearchQuery()); return false;">${i}</a></li>`;
         }
     }
     
@@ -2044,7 +2064,7 @@ function updateResponsesPaginationControls(pagination) {
     if (pagination.has_next) {
         html += `
             <li class="page-item">
-                <a class="page-link" href="#" onclick="loadSurveyResponses(${pagination.page + 1}); return false;">
+                <a class="page-link" href="#" onclick="loadSurveyResponses(${pagination.page + 1}, getCurrentSearchQuery()); return false;">
                     <i class="fas fa-chevron-right"></i>
                 </a>
             </li>
@@ -2819,4 +2839,48 @@ function showTab(tabId, contentId) {
         targetTab.setAttribute("aria-selected", "true");
     }
 }
+
+// ============================================================================
+// SURVEY RESPONSES SEARCH FUNCTIONALITY
+// ============================================================================
+
+function getCurrentSearchQuery() {
+    const searchInput = document.getElementById('responsesSearch');
+    return searchInput ? searchInput.value.trim() : '';
+}
+
+function searchSurveyResponses() {
+    const searchQuery = getCurrentSearchQuery();
+    
+    // Reset to page 1 when performing a new search
+    currentResponsesPage = 1;
+    
+    // Load responses with search query
+    loadSurveyResponses(1, searchQuery);
+}
+
+function clearResponsesSearch() {
+    const searchInput = document.getElementById('responsesSearch');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    
+    // Reset to page 1 and clear search
+    currentResponsesPage = 1;
+    
+    // Load responses without search
+    loadSurveyResponses(1, '');
+}
+
+// Add Enter key support for search input
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('responsesSearch');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchSurveyResponses();
+            }
+        });
+    }
+});
 
