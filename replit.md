@@ -1,6 +1,19 @@
 # Overview
 The Voice of Client (VOÏA) is a Flask-based system designed for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. Its core purpose is to convert raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses, particularly Rivvalue Inc., with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project features a production-ready multi-tenant participant management system with extensive email delivery capabilities and AI-powered survey functionalities.
 
+# Recent Changes
+
+## September 23, 2025
+**Critical License Management Bug Fixes**
+- **Resolved License Template Regression**: Fixed critical same-day regression from commit a72ef98 that broke license template field naming throughout the system
+- **Template Field Standardization**: Updated license_info.html and license history templates to use correct LicenseHistory model field names:
+  - Changed `days_until_expiry` to `days_remaining()` method calls
+  - Changed `expiration_date` references to `expires_at` field
+  - Fixed license history banner display issues where expiration information wasn't showing
+- **Email Configuration Fix**: Resolved missing EmailConfiguration record for Videotron business account (ID 14) that was preventing invitation emails from sending
+- **License Lookup Verification**: Debugged and confirmed that LicenseService.get_current_license() and LicenseHistory.get_current_license() methods are working correctly with proper license detection
+- **System Stability**: All license-related functionality now displays correct expiration dates and license status information across the multi-tenant system
+
 # User Preferences
 Preferred communication style: Simple, everyday language.
 User interface tone: Thought leadership and research-oriented language, avoiding sales-oriented messaging.
