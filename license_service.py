@@ -319,6 +319,10 @@ class LicenseService:
         """
         Check if business account has access to transcript analysis add-on feature.
         
+        Uses date-based access control: checks if today falls within the
+        transcript_analysis_start_date and transcript_analysis_end_date range.
+        Falls back to has_transcript_analysis boolean for legacy compatibility.
+        
         Args:
             business_account_id: Business account ID to check
             
@@ -326,6 +330,8 @@ class LicenseService:
             bool: True if account can use transcript analysis, False otherwise
         """
         try:
+            from datetime import date
+            
             # Get current license
             current_license = LicenseService.get_current_license(business_account_id)
             
@@ -333,13 +339,25 @@ class LicenseService:
                 logger.warning(f"No active license found for business_account_id {business_account_id}")
                 return False
             
-            # Check if current license has transcript analysis add-on
-            has_feature = current_license.has_transcript_analysis
+            # New date-based access control
+            if current_license.transcript_analysis_start_date and current_license.transcript_analysis_end_date:
+                today = date.today()
+                has_date_access = (current_license.transcript_analysis_start_date <= today <= 
+                                 current_license.transcript_analysis_end_date)
+                
+                logger.debug(f"Transcript analysis date check for business_account_id {business_account_id}: "
+                            f"today={today}, start={current_license.transcript_analysis_start_date}, "
+                            f"end={current_license.transcript_analysis_end_date}, has_access={has_date_access}")
+                
+                return has_date_access
             
-            logger.debug(f"Transcript analysis check for business_account_id {business_account_id}: "
-                        f"license_type={current_license.license_type}, has_transcript_analysis={has_feature}")
+            # Legacy fallback to boolean field
+            has_legacy_access = current_license.has_transcript_analysis
             
-            return has_feature
+            logger.debug(f"Transcript analysis legacy check for business_account_id {business_account_id}: "
+                        f"license_type={current_license.license_type}, has_transcript_analysis={has_legacy_access}")
+            
+            return has_legacy_access
             
         except Exception as e:
             logger.error(f"Failed to check transcript analysis permission for business_account_id {business_account_id}: {e}")
@@ -436,6 +454,7 @@ class LicenseService:
                     })
                     
                     # Calculate days remaining for legacy license
+                    from datetime import date
                     today = date.today()
                     if period_end > today:
                         license_info['days_remaining'] = (period_end - today).days
@@ -453,8 +472,58 @@ class LicenseService:
             # Update capability checks
             license_info.update({
                 'can_activate_campaign': LicenseService.can_activate_campaign(business_account_id),
-                'can_add_user': LicenseService.can_add_user(business_account_id)
+                'can_add_user': LicenseService.can_add_user(business_account_id),
+                'can_use_transcript_analysis': LicenseService.can_use_transcript_analysis(business_account_id)
             })
+            
+            # Add transcript analysis add-on information
+            if current_license:
+                from datetime import date
+                today = date.today()
+                
+                # Determine transcript analysis status
+                has_addon = False
+                addon_status = 'inactive'
+                addon_start = None
+                addon_end = None
+                addon_price = None
+                addon_days_remaining = 0
+                
+                if current_license.transcript_analysis_start_date and current_license.transcript_analysis_end_date:
+                    # Date-based add-on
+                    addon_start = current_license.transcript_analysis_start_date
+                    addon_end = current_license.transcript_analysis_end_date
+                    addon_price = current_license.transcript_analysis_price
+                    
+                    if addon_start <= today <= addon_end:
+                        has_addon = True
+                        addon_status = 'active'
+                        addon_days_remaining = (addon_end - today).days
+                    elif today > addon_end:
+                        addon_status = 'expired'
+                    else:
+                        addon_status = 'scheduled'
+                        
+                elif current_license.has_transcript_analysis:
+                    # Legacy boolean-based add-on
+                    has_addon = True
+                    addon_status = 'active'
+                    addon_start = current_license.activated_at.date() if hasattr(current_license.activated_at, 'date') else current_license.activated_at
+                    addon_end = current_license.expires_at.date() if hasattr(current_license.expires_at, 'date') else current_license.expires_at
+                    if addon_end and isinstance(addon_end, date):
+                        addon_days_remaining = (addon_end - today).days if addon_end > today else 0
+                
+                license_info.update({
+                    'transcript_analysis': {
+                        'has_addon': has_addon,
+                        'status': addon_status,
+                        'start_date': addon_start,
+                        'end_date': addon_end,
+                        'price': float(addon_price) if addon_price else None,
+                        'days_remaining': addon_days_remaining,
+                        'expires_soon': addon_days_remaining <= 30 and addon_days_remaining > 0
+                    }
+                })
             
             logger.debug(f"Generated license info for business_account_id {business_account_id}: "
                         f"type={license_info['license_type']}, status={license_info['license_status']}, "
@@ -921,10 +990,11 @@ class LicenseService:
     def assign_license_to_business(
         business_id: int, 
         license_type: str,
-        custom_limits: Optional[Dict[str, Any]] = None,
-        assigned_by: Optional[str] = None,
+        custom_config: Optional[Dict[str, Any]] = None,
+        created_by: Optional[str] = None,
         start_date: Optional[datetime] = None,
-        duration_months: Optional[int] = None
+        duration_months: Optional[int] = None,
+        transcript_addon_config: Optional[Dict[str, Any]] = None
     ) -> Tuple[bool, Optional[LicenseHistory], str]:
         """
         Comprehensive license assignment method with validation and transition handling.
@@ -932,10 +1002,14 @@ class LicenseService:
         Args:
             business_id: Business account ID to assign license to
             license_type: License type (core, plus, pro, trial)  
-            custom_limits: Optional custom limits for Pro licenses
-            assigned_by: User who is assigning the license (for audit trail)
+            custom_config: Optional custom limits for Pro licenses
+            created_by: User who is assigning the license (for audit trail)
             start_date: License start date (defaults to now)
             duration_months: License duration in months (defaults to template default)
+            transcript_addon_config: Optional transcript analysis add-on configuration
+                - start_date: Start date for transcript analysis access
+                - end_date: End date for transcript analysis access  
+                - price: Custom price for the add-on
             
         Returns:
             tuple: (success: bool, license_record: LicenseHistory, message: str)
@@ -952,7 +1026,7 @@ class LicenseService:
         try:
             # Step 1: Validate the license assignment request
             validation_success, validation_message = LicenseService.validate_license_assignment(
-                business_id, license_type, custom_limits
+                business_id, license_type, custom_config
             )
             
             if not validation_success:
@@ -998,10 +1072,24 @@ class LicenseService:
                     return False, None, f"License transition failed: {transition_msg}"
                 transition_message = f" (Previous {existing_license.license_type} license expired)"
             
-            # Step 5: Create new license record with comprehensive audit trail
-            assignment_notes = f"License assigned by {assigned_by or 'System'}"
-            if custom_limits:
-                assignment_notes += f" with custom limits: {custom_limits}"
+            # Step 5: Process transcript analysis add-on configuration
+            transcript_start_date = None
+            transcript_end_date = None
+            transcript_price = None
+            
+            if transcript_addon_config:
+                transcript_start_date = transcript_addon_config.get('start_date')
+                transcript_end_date = transcript_addon_config.get('end_date')
+                transcript_price = transcript_addon_config.get('price')
+                logger.info(f"Transcript analysis add-on configured for business_id {business_id}: "
+                           f"start={transcript_start_date}, end={transcript_end_date}, price={transcript_price}")
+            
+            # Step 6: Create new license record with comprehensive audit trail
+            assignment_notes = f"License assigned by {created_by or 'System'}"
+            if custom_config:
+                assignment_notes += f" with custom limits: {custom_config}"
+            if transcript_addon_config:
+                assignment_notes += f" with transcript analysis add-on (${transcript_price or 0} from {transcript_start_date} to {transcript_end_date})"
             if transition_message:
                 assignment_notes += transition_message
             
@@ -1014,7 +1102,12 @@ class LicenseService:
                 max_campaigns_per_year=license_config['max_campaigns_per_year'],
                 max_users=license_config['max_users'], 
                 max_participants_per_campaign=license_config['max_participants_per_campaign'],
-                created_by=assigned_by,
+                # Transcript analysis add-on fields
+                transcript_analysis_start_date=transcript_start_date,
+                transcript_analysis_end_date=transcript_end_date,
+                transcript_analysis_price=transcript_price,
+                has_transcript_analysis=True if transcript_addon_config else False,
+                created_by=created_by,
                 notes=assignment_notes
             )
             

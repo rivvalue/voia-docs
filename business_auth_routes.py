@@ -2033,8 +2033,6 @@ def save_brand_config():
 @require_business_auth
 def license_info():
     """Display comprehensive license information for the business account"""
-    from datetime import date, timedelta
-    
     try:
         # Get current business account
         business_account = get_current_business_account()
@@ -2042,50 +2040,14 @@ def license_info():
             flash('Business account not found.', 'error')
             return redirect(url_for('business_auth.login'))
         
-        # Get license period information
-        license_start, license_end = business_account.get_license_period()
+        # Get comprehensive license information using LicenseService
+        from license_service import LicenseService
+        license_data = LicenseService.get_license_info(business_account.id)
         
-        # Calculate usage statistics
-        campaigns_used = 0
-        campaigns_limit = 4
-        if license_start and license_end:
-            # Count campaigns in current license period
-            from models import Campaign
-            campaigns_used = Campaign.query.filter(
-                Campaign.business_account_id == business_account.id,
-                Campaign.start_date >= license_start,
-                Campaign.start_date <= license_end
-            ).count()
+        # Add business account object to the context
+        license_data['business_account'] = business_account
         
-        # Calculate days until expiration and days since activation
-        days_until_expiry = None
-        days_since_activation = 0
-        expires_soon = False
-        license_status_display = business_account.license_status.title()
-        
-        # Calculate days since activation if license_start is available
-        if license_start:
-            today = date.today()
-            days_since_activation = (today - license_start).days
-        
-        if license_end:
-            today = date.today()
-            if license_end > today:
-                days_until_expiry = (license_end - today).days
-                expires_soon = days_until_expiry <= 30
-                if expires_soon and business_account.license_status == 'active':
-                    license_status_display = f"Active (Expires in {days_until_expiry} days)"
-            elif license_end < today:
-                license_status_display = "Expired"
-                days_until_expiry = 0
-        
-        # Get user usage statistics with defensive programming
-        users_used = getattr(business_account, 'current_users_count', 0)
-        users_limit = 5
-        
-        # Get active campaign participant count if applicable
-        active_participants = 0
-        active_campaign = None
+        # Get active campaign information for display
         try:
             from models import Campaign, CampaignParticipant
             active_campaign = Campaign.query.filter(
@@ -2093,33 +2055,22 @@ def license_info():
                 Campaign.status == 'active'
             ).first()
             
+            active_participants = 0
             if active_campaign:
                 active_participants = CampaignParticipant.query.filter_by(
                     campaign_id=active_campaign.id
                 ).count()
+                
+            license_data.update({
+                'active_campaign': active_campaign,
+                'active_participants': active_participants
+            })
         except Exception as e:
             logger.warning(f"Could not fetch active campaign participants: {e}")
-        
-        # Prepare template context with defensive programming for optional methods
-        license_data = {
-            'business_account': business_account,
-            'license_start': license_start,
-            'license_end': license_end,
-            'license_status': license_status_display,
-            'expires_soon': expires_soon,
-            'days_until_expiry': days_until_expiry,
-            'days_since_activation': days_since_activation,
-            'campaigns_used': campaigns_used,
-            'campaigns_limit': campaigns_limit,
-            'campaigns_remaining': max(0, campaigns_limit - campaigns_used),
-            'users_used': users_used,
-            'users_limit': users_limit,
-            'users_remaining': max(0, users_limit - users_used),
-            'active_campaign': active_campaign,
-            'active_participants': active_participants,
-            'can_activate_campaign': getattr(business_account, 'can_activate_campaign', lambda: True)() if hasattr(business_account, 'can_activate_campaign') else True,
-            'can_add_user': LicenseService.can_add_user(business_account.id)
-        }
+            license_data.update({
+                'active_campaign': None,
+                'active_participants': 0
+            })
         
         return render_template('business_auth/license_info.html', **license_data)
         
@@ -2717,6 +2668,50 @@ def process_license_assignment():
             flash('Business account validation failed. Please try again.', 'error')
             return redirect(url_for('business_auth.admin_licenses'))
         
+        # Handle transcript analysis add-on configuration
+        transcript_addon_config = None
+        if request.form.get('transcript_analysis_addon'):
+            transcript_addon_config = {}
+            
+            # Get and validate transcript analysis add-on fields
+            transcript_start_date = request.form.get('transcript_start_date', '').strip()
+            transcript_end_date = request.form.get('transcript_end_date', '').strip()
+            transcript_price = request.form.get('transcript_price', '').strip()
+            
+            if transcript_start_date:
+                from datetime import datetime
+                try:
+                    start_date = datetime.strptime(transcript_start_date, '%Y-%m-%d').date()
+                    transcript_addon_config['start_date'] = start_date
+                except ValueError:
+                    flash('Invalid transcript analysis start date format.', 'error')
+                    return redirect(url_for('business_auth.license_assignment_form', business_id=business_id))
+            
+            if transcript_end_date:
+                try:
+                    end_date = datetime.strptime(transcript_end_date, '%Y-%m-%d').date()
+                    transcript_addon_config['end_date'] = end_date
+                except ValueError:
+                    flash('Invalid transcript analysis end date format.', 'error')
+                    return redirect(url_for('business_auth.license_assignment_form', business_id=business_id))
+            
+            if transcript_price:
+                try:
+                    price = float(transcript_price)
+                    if price < 0:
+                        flash('Transcript analysis price must be non-negative.', 'error')
+                        return redirect(url_for('business_auth.license_assignment_form', business_id=business_id))
+                    transcript_addon_config['price'] = price
+                except ValueError:
+                    flash('Invalid transcript analysis price format.', 'error')
+                    return redirect(url_for('business_auth.license_assignment_form', business_id=business_id))
+            
+            # Validate date range if both dates are provided
+            if 'start_date' in transcript_addon_config and 'end_date' in transcript_addon_config:
+                if transcript_addon_config['start_date'] >= transcript_addon_config['end_date']:
+                    flash('Transcript analysis end date must be after start date.', 'error')
+                    return redirect(url_for('business_auth.license_assignment_form', business_id=business_id))
+        
         # Log the assignment attempt for audit
         logger.info(f"Platform admin {current_user.email} attempting to assign {license_type} license to business_id {business_id} ({business_account.name})")
         
@@ -2725,7 +2720,8 @@ def process_license_assignment():
             business_id=business_id,
             license_type=license_type,
             custom_config=custom_config,
-            created_by=created_by
+            created_by=created_by,
+            transcript_addon_config=transcript_addon_config
         )
         
         if success:

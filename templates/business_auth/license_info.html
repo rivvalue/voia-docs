@@ -549,6 +549,137 @@
             {% endif %}
         </div>
 
+        <!-- Transcript Analysis Add-on Section -->
+        {% if transcript_analysis %}
+        <div class="license-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-microphone-alt"></i>
+                    Transcript Analysis Add-on
+                </h3>
+            </div>
+
+            <!-- Add-on Status Badge -->
+            <div class="status-badge {{ 'active' if transcript_analysis.has_addon and transcript_analysis.status == 'active' else ('warning' if transcript_analysis.status == 'scheduled' else 'expired') }}">
+                <i class="fas fa-{{ 'check-circle' if transcript_analysis.status == 'active' else ('clock' if transcript_analysis.status == 'scheduled' else 'times-circle') }}"></i>
+                {% if transcript_analysis.status == 'active' %}
+                    Active - Transcript Analysis Available
+                {% elif transcript_analysis.status == 'scheduled' %}
+                    Scheduled - Starts Soon
+                {% elif transcript_analysis.status == 'expired' %}
+                    Expired - No Transcript Access
+                {% else %}
+                    Not Available
+                {% endif %}
+            </div>
+
+            {% if transcript_analysis.has_addon %}
+            <!-- Add-on Period Dates -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="license-date-card {{ 'success' if transcript_analysis.status == 'active' else 'warning' }}">
+                        <div class="license-date-icon">
+                            <i class="fas fa-play-circle"></i>
+                        </div>
+                        <div class="license-date-label">Add-on Start Date</div>
+                        <div class="license-date-value">
+                            {% if transcript_analysis.start_date %}
+                                {{ transcript_analysis.start_date.strftime('%B %d, %Y') if transcript_analysis.start_date is string == false else transcript_analysis.start_date }}
+                            {% else %}
+                                Not Set
+                            {% endif %}
+                        </div>
+                        <div class="license-date-meta">
+                            {% if transcript_analysis.status == 'active' %}
+                                Transcript analysis is currently active
+                            {% elif transcript_analysis.status == 'scheduled' %}
+                                Access will begin on this date
+                            {% else %}
+                                Access period has started
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="license-date-card {{ 'success' if transcript_analysis.days_remaining > 30 else ('warning' if transcript_analysis.days_remaining > 0 else 'danger') }}">
+                        <div class="license-date-icon">
+                            <i class="fas fa-stop-circle"></i>
+                        </div>
+                        <div class="license-date-label">Add-on End Date</div>
+                        <div class="license-date-value">
+                            {% if transcript_analysis.end_date %}
+                                {{ transcript_analysis.end_date.strftime('%B %d, %Y') if transcript_analysis.end_date is string == false else transcript_analysis.end_date }}
+                            {% else %}
+                                Not Set
+                            {% endif %}
+                        </div>
+                        <div class="license-date-meta">
+                            {% if transcript_analysis.days_remaining > 0 %}
+                                {{ transcript_analysis.days_remaining }} days remaining
+                            {% elif transcript_analysis.days_remaining == 0 %}
+                                Expires today
+                            {% else %}
+                                Access period has ended
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add-on Pricing Info -->
+            {% if transcript_analysis.price %}
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="info-content">
+                        <div class="info-label">Add-on Price</div>
+                        <div class="info-value">${{ "%.2f"|format(transcript_analysis.price) }}</div>
+                    </div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="info-content">
+                        <div class="info-label">Add-on Duration</div>
+                        <div class="info-value">
+                            {% if transcript_analysis.start_date and transcript_analysis.end_date %}
+                                {% set start_date = transcript_analysis.start_date if transcript_analysis.start_date is string == false else transcript_analysis.start_date %}
+                                {% set end_date = transcript_analysis.end_date if transcript_analysis.end_date is string == false else transcript_analysis.end_date %}
+                                Custom Period
+                            {% else %}
+                                Custom Duration
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Add-on Expiration Warning -->
+            {% if transcript_analysis.status == 'active' and transcript_analysis.expires_soon %}
+            <div class="alert alert-warning mt-3">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Add-on expires soon!</strong> Your transcript analysis add-on will expire in {{ transcript_analysis.days_remaining }} days.
+                <br><small>When the add-on expires, you won't be able to access transcript analysis features, but existing transcript data will be preserved.</small>
+            </div>
+            {% endif %}
+
+            {% else %}
+            <!-- No Add-on Available -->
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Transcript Analysis Not Available:</strong> This add-on feature is not included in your current license.
+                <br><small>Contact support to add transcript analysis capability to your account.</small>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
         <!-- Additional Information -->
         {% if business_account.license_status == 'trial' %}
         <div class="license-section">

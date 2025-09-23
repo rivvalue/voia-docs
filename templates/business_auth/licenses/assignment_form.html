@@ -438,6 +438,61 @@
                 </div>
             </div>
 
+            <!-- Add-on Features -->
+            <div class="admin-section">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="fas fa-plus-circle"></i>
+                        Add-on Features
+                    </h3>
+                    <p class="text-muted">Optional add-on features with custom pricing and duration</p>
+                </div>
+                
+                <!-- Transcript Analysis Add-on -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="transcript_analysis_addon" name="transcript_analysis_addon" value="1" 
+                                   {{ 'checked' if current_license and (current_license.transcript_analysis_start_date or current_license.has_transcript_analysis) else '' }}>
+                            <label class="form-check-label" for="transcript_analysis_addon">
+                                <strong>Transcript Analysis Add-on</strong>
+                            </label>
+                        </div>
+                        <small class="text-muted">AI-powered analysis of meeting transcripts and voice conversations</small>
+                    </div>
+                    <div class="card-body transcript-addon-config" style="{{ 'display: none;' if not (current_license and (current_license.transcript_analysis_start_date or current_license.has_transcript_analysis)) else '' }}">
+                        <div class="form-row">
+                            <div class="mb-3">
+                                <label for="transcript_start_date" class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="transcript_start_date" name="transcript_start_date" 
+                                       value="{{ current_license.transcript_analysis_start_date.strftime('%Y-%m-%d') if current_license and current_license.transcript_analysis_start_date else '' }}">
+                                <div class="form-text">When transcript analysis access begins</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="transcript_end_date" class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="transcript_end_date" name="transcript_end_date" 
+                                       value="{{ current_license.transcript_analysis_end_date.strftime('%Y-%m-%d') if current_license and current_license.transcript_analysis_end_date else '' }}">
+                                <div class="form-text">When transcript analysis access expires</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="transcript_price" class="form-label">Add-on Price (USD)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="transcript_price" name="transcript_price" 
+                                       min="0" step="0.01" placeholder="0.00"
+                                       value="{{ '%.2f'|format(current_license.transcript_analysis_price|float) if current_license and current_license.transcript_analysis_price else '' }}">
+                            </div>
+                            <div class="form-text">Custom pricing for this add-on period</div>
+                        </div>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Note:</strong> When the add-on expires, UI access to transcript features will be blocked, but existing transcript data will remain in the database for future access if the add-on is renewed.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Assignment Notes -->
             <div class="admin-section">
                 <div class="section-header">
@@ -529,6 +584,24 @@ document.addEventListener('DOMContentLoaded', function() {
         users: {{ usage_stats.users_count }},
         campaigns: {{ usage_stats.campaigns_count }}
     };
+    
+    // Transcript Analysis Add-on handling
+    const transcriptAddonCheckbox = document.getElementById('transcript_analysis_addon');
+    const transcriptAddonConfig = document.querySelector('.transcript-addon-config');
+    
+    function toggleTranscriptAddon() {
+        if (transcriptAddonCheckbox.checked) {
+            transcriptAddonConfig.style.display = 'block';
+        } else {
+            transcriptAddonConfig.style.display = 'none';
+            // Clear values when disabled
+            document.getElementById('transcript_start_date').value = '';
+            document.getElementById('transcript_end_date').value = '';
+            document.getElementById('transcript_price').value = '';
+        }
+    }
+    
+    transcriptAddonCheckbox.addEventListener('change', toggleTranscriptAddon);
 
     function updateLicenseSelection() {
         const selectedLicense = document.querySelector('input[name="license_type"]:checked');
