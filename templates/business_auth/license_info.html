@@ -413,7 +413,7 @@
                 </div>
                 
                 <div class="col-md-6">
-                    <div class="license-date-card {{ 'success' if days_until_expiry and days_until_expiry > 30 else ('warning' if days_until_expiry and days_until_expiry <= 30 and days_until_expiry > 0 else ('primary' if days_until_expiry is none and business_account.license_status == 'trial' else 'danger')) }}">
+                    <div class="license-date-card {{ 'success' if days_remaining and days_remaining > 30 else ('warning' if days_remaining and days_remaining <= 30 and days_remaining > 0 else ('primary' if days_remaining is none and business_account.license_status == 'trial' else 'danger')) }}">
                         <div class="license-date-icon">
                             <i class="fas fa-calendar-times"></i>
                         </div>
@@ -426,10 +426,10 @@
                             {% endif %}
                         </div>
                         <div class="license-date-meta">
-                            {% if days_until_expiry is not none %}
-                                {% if days_until_expiry > 0 %}
-                                    {{ days_until_expiry }} days remaining
-                                {% elif days_until_expiry == 0 %}
+                            {% if days_remaining is not none %}
+                                {% if days_remaining > 0 %}
+                                    {{ days_remaining }} days remaining
+                                {% elif days_remaining == 0 %}
                                     Expires today
                                 {% else %}
                                     Expired
@@ -696,7 +696,7 @@
                 <strong>Current limits:</strong> 4 campaigns per year, 5 users maximum.
             </div>
         </div>
-        {% elif expires_soon and days_until_expiry and days_until_expiry > 0 %}
+        {% elif expires_soon and days_remaining and days_remaining > 0 %}
         <div class="license-section">
             <div class="section-header">
                 <h3 class="section-title">
@@ -706,12 +706,12 @@
             </div>
             <div class="alert alert-warning">
                 <i class="fas fa-exclamation-triangle me-2"></i>
-                <strong>License expires soon!</strong> Your license will expire in {{ days_until_expiry }} days on {{ license_end.strftime('%B %d, %Y') }}.
+                <strong>License expires soon!</strong> Your license will expire in {{ days_remaining }} days on {{ license_end.strftime('%B %d, %Y') }}.
                 <br><br>
                 Please contact support to renew your license and avoid service interruption.
             </div>
         </div>
-        {% elif days_until_expiry is not none and days_until_expiry <= 0 %}
+        {% elif days_remaining is not none and days_remaining <= 0 %}
         <div class="license-section">
             <div class="section-header">
                 <h3 class="section-title">
