@@ -154,6 +154,3 @@ if __name__ == '__main__':
 else:
     # Called as module - just import app for Gunicorn
     from app import app  # noqa: F401
-
-# Import temporary route for Videotron invitation resend
-import temp_resend_route  # noqa: F401
