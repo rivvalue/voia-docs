@@ -2851,9 +2851,9 @@ def license_dashboard():
         accounts_processed = 0
         accounts_with_errors = 0
         
-        # Process all business accounts with comprehensive error handling
+        # Process customer business accounts only (exclude platform owner accounts)
         try:
-            business_accounts = BusinessAccount.query.all()
+            business_accounts = BusinessAccount.query.filter(BusinessAccount.account_type != 'demo').all()
         except Exception as query_error:
             logger.error(f"Error querying business accounts: {query_error}")
             business_accounts = []

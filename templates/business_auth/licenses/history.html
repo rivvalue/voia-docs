@@ -522,12 +522,12 @@
             </div>
             <p class="text-muted mb-3">Download license history data for record keeping or analysis.</p>
             <div class="d-flex gap-2">
-                <a href="{{ url_for('business_auth.export_license_history', business_id=business_account.id, format='csv') }}" class="btn btn-outline-primary">
+                <button class="btn btn-outline-primary" disabled title="Export feature coming soon">
                     <i class="fas fa-file-csv me-2"></i>Export as CSV
-                </a>
-                <a href="{{ url_for('business_auth.export_license_history', business_id=business_account.id, format='pdf') }}" class="btn btn-outline-primary">
+                </button>
+                <button class="btn btn-outline-primary" disabled title="Export feature coming soon">
                     <i class="fas fa-file-pdf me-2"></i>Export as PDF
-                </a>
+                </button>
             </div>
         </div>
         {% endif %}

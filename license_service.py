@@ -1634,13 +1634,16 @@ class LicenseService:
             
             today = datetime.utcnow()
             
-            # Query 1: Get all business accounts with basic info
+            # Query 1: Get customer business accounts only (exclude platform owner accounts)
             if business_account_ids:
                 business_accounts = BusinessAccount.query.filter(
-                    BusinessAccount.id.in_(business_account_ids)
+                    BusinessAccount.id.in_(business_account_ids),
+                    BusinessAccount.account_type != 'demo'
                 ).order_by(BusinessAccount.name).all()
             else:
-                business_accounts = BusinessAccount.query.order_by(BusinessAccount.name).all()
+                business_accounts = BusinessAccount.query.filter(
+                    BusinessAccount.account_type != 'demo'
+                ).order_by(BusinessAccount.name).all()
             
             if not business_accounts:
                 return {}
