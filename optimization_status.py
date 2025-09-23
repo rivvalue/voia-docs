@@ -78,20 +78,37 @@ class OptimizationStatusManager:
         }
     
     def validate_stage_1_gates(self) -> Dict[str, Any]:
-        """Validate Stage 1 success gates"""
-        perf_metrics = get_performance_metrics()
+        """Validate Stage 1 success gates - REQUIRES monitoring to be enabled"""
         
-        if perf_metrics.get('status') == 'no_data':
+        # CRITICAL FIX: Require monitoring to be enabled for any gate validation
+        monitoring_enabled = os.environ.get('PERF_MONITORING', 'false').lower() == 'true'
+        
+        if not monitoring_enabled:
             return {
-                'status': 'insufficient_data',
-                'message': 'Need more requests to validate gates',
+                'status': 'monitoring_required',
+                'message': 'Performance monitoring must be enabled (PERF_MONITORING=true) for Stage 1 gate validation',
                 'gates_passed': 0,
-                'total_gates': 3
+                'total_gates': 3,
+                'overall_success': False,
+                'blocking_issue': 'PERF_MONITORING=false'
             }
         
-        # Stage 1 Gate Thresholds
-        response_time_gate = perf_metrics.get('avg_response_time_ms', 0) < 1000  # < 1 second
-        error_rate_gate = perf_metrics.get('error_rate_percent', 0) < 5.0  # < 5% errors
+        perf_metrics = get_performance_metrics()
+        
+        # If monitoring is enabled but no data, we need more requests
+        if perf_metrics.get('status') == 'no_data' or perf_metrics.get('monitoring') == 'disabled':
+            return {
+                'status': 'insufficient_data',
+                'message': 'Monitoring enabled but need more requests to validate gates',
+                'gates_passed': 0,
+                'total_gates': 3,
+                'overall_success': False,
+                'monitoring_enabled': True
+            }
+        
+        # Stage 1 Gate Thresholds - only validate when we have real data
+        response_time_gate = perf_metrics.get('avg_response_time_ms', float('inf')) < 1000  # < 1 second
+        error_rate_gate = perf_metrics.get('error_rate_percent', 100) < 5.0  # < 5% errors
         monitoring_gate = perf_metrics.get('monitoring') != 'disabled'  # Monitoring working
         
         gates_passed = sum([response_time_gate, error_rate_gate, monitoring_gate])
@@ -101,13 +118,13 @@ class OptimizationStatusManager:
             'gates': {
                 'response_time_gate': {
                     'passed': response_time_gate,
-                    'current_value': perf_metrics.get('avg_response_time_ms', 0),
+                    'current_value': perf_metrics.get('avg_response_time_ms', 'no_data'),
                     'threshold': 1000,
                     'unit': 'ms'
                 },
                 'error_rate_gate': {
                     'passed': error_rate_gate,
-                    'current_value': perf_metrics.get('error_rate_percent', 0),
+                    'current_value': perf_metrics.get('error_rate_percent', 'no_data'),
                     'threshold': 5.0,
                     'unit': '%'
                 },
