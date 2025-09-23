@@ -224,6 +224,12 @@
                     <span class="badge bg-danger ms-1">{{ campaign.engagement_metrics.surveys_completed }}</span>
                 </button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="transcripts-tab" data-bs-toggle="tab" data-bs-target="#transcripts-pane" type="button" role="tab" aria-controls="transcripts-pane" aria-selected="false">
+                    <i class="fas fa-file-alt me-2"></i>Transcript Analysis
+                    <span class="badge bg-info ms-1" id="transcripts-count">0</span>
+                </button>
+            </li>
             {% endif %}
         </ul>
 
@@ -377,8 +383,280 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Transcript Analysis Tab -->
+            <div class="tab-pane fade" id="transcripts-pane" role="tabpanel" aria-labelledby="transcripts-tab">
+                <div class="row">
+                    <div class="col-md-6">
+                        <!-- Upload Transcript Section -->
+                        <div class="card h-100">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-upload me-2"></i>Upload Meeting Transcript
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="transcript-upload-form" enctype="multipart/form-data">
+                                    <div class="mb-3">
+                                        <label for="transcript-file" class="form-label">Select Transcript (.txt files only)</label>
+                                        <input type="file" class="form-control" id="transcript-file" name="transcript_file" accept=".txt" required>
+                                        <div class="form-text">Upload meeting transcripts to extract survey insights automatically.</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="participant-name" class="form-label">Participant Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="participant-name" name="participant_name" required placeholder="Enter participant's full name">
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="participant-email" class="form-label">Participant Email <span class="text-danger">*</span></label>
+                                        <input type="email" class="form-control" id="participant-email" name="participant_email" required placeholder="participant@company.com">
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="participant-company" class="form-label">Company Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="participant-company" name="participant_company" required placeholder="Enter company name">
+                                    </div>
+                                    
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-info">
+                                            <i class="fas fa-brain me-2"></i>Upload & Analyze with VOÏA
+                                        </button>
+                                    </div>
+                                </form>
+                                
+                                <!-- Upload Progress -->
+                                <div id="upload-progress" class="mt-3" style="display: none;">
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                    <small class="text-muted mt-1 d-block">Processing transcript with AI...</small>
+                                </div>
+                                
+                                <!-- Upload Status -->
+                                <div id="upload-status" class="mt-3"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <!-- Processed Transcripts Section -->
+                        <div class="card h-100">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-list me-2"></i>Processed Transcripts
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="transcripts-list">
+                                    <div class="text-center py-3">
+                                        <i class="fas fa-file-alt fa-2x text-muted mb-2"></i>
+                                        <p class="text-muted mb-0">No transcripts processed yet</p>
+                                        <small class="text-muted">Upload a transcript to get started</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Feature Information -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <div class="row align-items-center">
+                                <div class="col-md-1 text-center">
+                                    <i class="fas fa-info-circle fa-2x"></i>
+                                </div>
+                                <div class="col-md-11">
+                                    <h6 class="alert-heading mb-1">About Transcript Analysis</h6>
+                                    <p class="mb-0">VOÏA analyzes meeting transcripts to extract NPS scores, sentiment, themes, and actionable insights. Upload .txt files from phone calls, video meetings, or face-to-face discussions to automatically generate survey responses and integrate them with your campaign analytics.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             {% endif %}
         </div>
     </div>
 </div>
+
+<script>
+// Transcript upload and management functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadForm = document.getElementById('transcript-upload-form');
+    const uploadProgress = document.getElementById('upload-progress');
+    const uploadStatus = document.getElementById('upload-status');
+    const transcriptsList = document.getElementById('transcripts-list');
+    const transcriptsCount = document.getElementById('transcripts-count');
+    
+    // Load existing transcripts when tab is shown
+    document.getElementById('transcripts-tab').addEventListener('shown.bs.tab', function() {
+        loadTranscripts();
+    });
+    
+    // Handle transcript upload
+    if (uploadForm) {
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const fileInput = document.getElementById('transcript-file');
+            
+            if (!fileInput.files[0]) {
+                showUploadStatus('Please select a transcript file.', 'danger');
+                return;
+            }
+            
+            // Show progress
+            showProgress();
+            
+            // Upload transcript
+            fetch(`/business/api/campaigns/{{ campaign.id }}/transcripts/upload`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideProgress();
+                
+                if (data.success) {
+                    showUploadStatus('Transcript uploaded successfully! AI analysis is processing in the background.', 'success');
+                    uploadForm.reset();
+                    
+                    // Reload transcripts list after a short delay
+                    setTimeout(() => {
+                        loadTranscripts();
+                    }, 2000);
+                } else {
+                    showUploadStatus(data.error || 'Upload failed. Please try again.', 'danger');
+                }
+            })
+            .catch(error => {
+                hideProgress();
+                showUploadStatus('Network error. Please try again.', 'danger');
+                console.error('Upload error:', error);
+            });
+        });
+    }
+    
+    function showProgress() {
+        uploadProgress.style.display = 'block';
+        uploadStatus.innerHTML = '';
+        
+        // Animate progress bar
+        const progressBar = uploadProgress.querySelector('.progress-bar');
+        let width = 0;
+        const interval = setInterval(() => {
+            width += 10;
+            progressBar.style.width = width + '%';
+            if (width >= 90) {
+                clearInterval(interval);
+            }
+        }, 200);
+    }
+    
+    function hideProgress() {
+        uploadProgress.style.display = 'none';
+    }
+    
+    function showUploadStatus(message, type) {
+        uploadStatus.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+    }
+    
+    function loadTranscripts() {
+        fetch(`/business/api/campaigns/{{ campaign.id }}/transcripts`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayTranscripts(data.transcripts);
+                    updateTranscriptsCount(data.transcripts.length);
+                } else {
+                    console.error('Failed to load transcripts:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading transcripts:', error);
+            });
+    }
+    
+    function displayTranscripts(transcripts) {
+        if (transcripts.length === 0) {
+            transcriptsList.innerHTML = `
+                <div class="text-center py-3">
+                    <i class="fas fa-file-alt fa-2x text-muted mb-2"></i>
+                    <p class="text-muted mb-0">No transcripts processed yet</p>
+                    <small class="text-muted">Upload a transcript to get started</small>
+                </div>
+            `;
+            return;
+        }
+        
+        const transcriptsHtml = transcripts.map(transcript => `
+            <div class="transcript-item border-bottom pb-2 mb-2">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">${transcript.participant_name}</h6>
+                        <small class="text-muted d-block">${transcript.participant_email}</small>
+                        <small class="text-muted">${transcript.participant_company}</small>
+                    </div>
+                    <div class="text-end">
+                        <small class="text-muted d-block">${new Date(transcript.analyzed_at).toLocaleDateString()}</small>
+                        <div class="btn-group btn-group-sm mt-1">
+                            <button class="btn btn-outline-info btn-sm" onclick="downloadTranscript(${transcript.id})" title="Download transcript">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm" onclick="viewResponse(${transcript.id})" title="View analysis results">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                ${transcript.nps_score !== null ? `
+                    <div class="mt-2">
+                        <span class="badge bg-${transcript.nps_score >= 9 ? 'success' : transcript.nps_score >= 7 ? 'warning' : 'danger'}">
+                            NPS: ${transcript.nps_score}/10
+                        </span>
+                        <span class="badge bg-secondary ms-1">${transcript.sentiment_label}</span>
+                    </div>
+                ` : ''}
+            </div>
+        `).join('');
+        
+        transcriptsList.innerHTML = transcriptsHtml;
+    }
+    
+    function updateTranscriptsCount(count) {
+        transcriptsCount.textContent = count;
+    }
+    
+    // Global functions for transcript actions
+    window.downloadTranscript = function(transcriptId) {
+        window.location.href = `/business/api/transcripts/${transcriptId}/download`;
+    };
+    
+    window.viewResponse = function(transcriptId) {
+        // Find the transcript response and navigate to individual response view
+        fetch(`/business/api/campaigns/{{ campaign.id }}/transcripts`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const transcript = data.transcripts.find(t => t.id === transcriptId);
+                    if (transcript && transcript.participant_id) {
+                        window.location.href = `/business/campaigns/{{ campaign.id }}/responses/${transcript.participant_id}`;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error finding transcript response:', error);
+            });
+    };
+});
+</script>
 {% endblock %}
