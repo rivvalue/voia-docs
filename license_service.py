@@ -1574,7 +1574,7 @@ class LicenseService:
             success, license_record, message = LicenseService.assign_license_to_business(
                 business_id=business_account_id,
                 license_type=template.license_type,
-                assigned_by=assigned_by
+                created_by=assigned_by
             )
             
             if success and license_record:
