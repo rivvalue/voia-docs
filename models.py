@@ -62,6 +62,12 @@ class SurveyResponse(db.Model):
     campaign = db.relationship('Campaign', backref=db.backref('responses', lazy='dynamic'))
     campaign_participant = db.relationship('CampaignParticipant', foreign_keys='SurveyResponse.campaign_participant_id', backref='survey_responses')
     
+    # Transcript Analysis Fields
+    source_type = db.Column(db.String(20), nullable=False, default='conversational', index=True)  # 'conversational', 'traditional', 'transcript'
+    transcript_content = db.Column(db.Text, nullable=True)  # Original transcript text for transcript-sourced responses
+    transcript_hash = db.Column(db.String(64), nullable=True, index=True)  # SHA-256 hash for duplicate detection
+    transcript_filename = db.Column(db.String(255), nullable=True)  # Original filename for download
+    
     # Metadata
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     analyzed_at = db.Column(db.DateTime, index=True)
@@ -98,6 +104,8 @@ class SurveyResponse(db.Model):
             'campaign_participant_id': self.campaign_participant_id,
             'campaign_name': self.campaign.name if self.campaign else None,
             'conversation_history': json.loads(self.conversation_history) if self.conversation_history else [],
+            'source_type': self.source_type,
+            'transcript_filename': self.transcript_filename,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'analyzed_at': self.analyzed_at.isoformat() if self.analyzed_at else None
         }
