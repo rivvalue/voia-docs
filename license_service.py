@@ -1066,7 +1066,7 @@ class LicenseService:
             
             if existing_license:
                 transition_success, transition_msg = LicenseService.handle_license_transitions(
-                    existing_license, license_type, assigned_by
+                    existing_license, license_type, created_by
                 )
                 if not transition_success:
                     return False, None, f"License transition failed: {transition_msg}"
@@ -1138,11 +1138,11 @@ class LicenseService:
                 details={
                     'license_id': new_license.id,
                     'license_type': license_type,
-                    'custom_limits': custom_limits,
+                    'custom_limits': custom_config,
                     'expires_at': expiration_date.isoformat(),
-                    'assigned_by': assigned_by
+                    'assigned_by': created_by
                 },
-                user_email=assigned_by
+                user_email=created_by
             )
             
             return True, new_license, success_message
