@@ -133,34 +133,41 @@ class PerformanceMonitor:
                 self._trigger_rollback(failed_gates, metrics)
     
     def _trigger_rollback(self, failed_gates: list, metrics: Dict[str, Any]):
-        """Trigger automatic rollback when gates fail"""
-        logger.critical("AUTOMATIC ROLLBACK TRIGGERED")
-        logger.critical(f"Failed gates: {failed_gates}")
-        logger.critical(f"Metrics: {metrics}")
+        """Trigger effective rollback with controlled restart"""
+        logger.critical("AUTOMATIC ROLLBACK TRIGGERED - Using Effective Rollback Manager")
         
-        # Set environment variables to safe defaults
+        # Use the new effective rollback manager
+        try:
+            from rollback_manager import trigger_effective_rollback
+            trigger_effective_rollback(
+                reason="automatic_gate_failure",
+                failed_gates=failed_gates,
+                metrics=metrics
+            )
+        except ImportError as e:
+            logger.error(f"Failed to import rollback manager: {e}")
+            # Fallback to old method
+            self._legacy_rollback(failed_gates, metrics)
+    
+    def _legacy_rollback(self, failed_gates: list, metrics: Dict[str, Any]):
+        """Legacy rollback method (runtime env vars only)"""
+        logger.warning("Using legacy rollback - restart required for full effect")
+        
+        # Set safer environment variables (runtime only)
         rollback_env = {
             'GUNICORN_WORKERS': '1',
             'ENABLE_COMPRESSION': 'false',
-            'CREATE_INDEXES': 'false',
+            'ENABLE_WORKER_SCALING': 'false',
+            'USE_ASYNC_WORKERS': 'false',
             'OPTIMIZE_DB_POOL': 'false',
             'USE_OPTIMIZED_QUERIES': 'false'
         }
         
         for key, value in rollback_env.items():
             os.environ[key] = value
-            logger.critical(f"Rollback: Set {key}={value}")
+            logger.critical(f"Legacy Rollback: Set {key}={value}")
         
-        # Log rollback event for manual intervention
-        rollback_event = {
-            "timestamp": datetime.utcnow().isoformat(),
-            "trigger": "automatic_gate_failure",
-            "failed_gates": failed_gates,
-            "metrics": metrics,
-            "rollback_actions": rollback_env
-        }
-        
-        logger.critical(f"ROLLBACK_EVENT: {rollback_event}")
+        logger.warning("⚠️ RESTART REQUIRED: Legacy rollback needs manual restart to take effect")
 
 # Global performance monitor instance
 performance_monitor = PerformanceMonitor()

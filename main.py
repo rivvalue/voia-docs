@@ -69,5 +69,21 @@ def apply_optimization_settings():
 # Apply optimization settings before importing the app
 apply_optimization_settings()
 
+# Check for rollback recovery
+def check_rollback_recovery():
+    """Check if we're recovering from a rollback"""
+    try:
+        from rollback_manager import rollback_manager
+        rollback_recovered = rollback_manager.check_rollback_on_startup()
+        if rollback_recovered:
+            logger.info("🔄 ROLLBACK RECOVERY: System recovered from previous rollback")
+        return rollback_recovered
+    except ImportError:
+        logger.debug("Rollback manager not available")
+        return False
+
+# Check rollback state
+check_rollback_recovery()
+
 # Import the Flask application
 from app import app  # noqa: F401
