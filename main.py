@@ -11,6 +11,15 @@ import logging
 import signal
 import time
 
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    load_dotenv('.env', verbose=False)
+    logger_temp = logging.getLogger(__name__)
+    logger_temp.info("📁 .env file loaded successfully")
+except ImportError:
+    pass  # python-dotenv not available, continue without it
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
