@@ -359,16 +359,16 @@
                     </div>
                 </div>
                 <div class="col-md-4 text-end">
-                    {% if current_license.expiration_date %}
-                    <p class="mb-1"><strong>Expires:</strong> {{ current_license.expiration_date.strftime('%B %d, %Y') }}</p>
-                    {% if current_license.days_until_expiration is not none %}
-                    <span class="status-badge status-{{ 'expired' if current_license.days_until_expiration < 0 else 'active' }}">
-                        {% if current_license.days_until_expiration > 0 %}
-                            <i class="fas fa-clock"></i>{{ current_license.days_until_expiration }} days left
-                        {% elif current_license.days_until_expiration == 0 %}
+                    {% if current_license.expires_at %}
+                    <p class="mb-1"><strong>Expires:</strong> {{ current_license.expires_at.strftime('%B %d, %Y') }}</p>
+                    {% if current_license.days_remaining() is not none %}
+                    <span class="status-badge status-{{ 'expired' if current_license.days_remaining() < 0 else 'active' }}">
+                        {% if current_license.days_remaining() > 0 %}
+                            <i class="fas fa-clock"></i>{{ current_license.days_remaining() }} days left
+                        {% elif current_license.days_remaining() == 0 %}
                             <i class="fas fa-exclamation-triangle"></i>Expires today
                         {% else %}
-                            <i class="fas fa-times-circle"></i>Expired {{ -current_license.days_until_expiration }} days ago
+                            <i class="fas fa-times-circle"></i>Expired {{ -current_license.days_remaining() }} days ago
                         {% endif %}
                     </span>
                     {% endif %}
@@ -481,10 +481,10 @@
                                 <span class="detail-value">{{ record.max_responses }}</span>
                             </div>
                             {% endif %}
-                            {% if record.expiration_date %}
+                            {% if record.expires_at %}
                             <div class="detail-item">
                                 <span class="detail-label">Expiration</span>
-                                <span class="detail-value">{{ record.expiration_date.strftime('%B %d, %Y') }}</span>
+                                <span class="detail-value">{{ record.expires_at.strftime('%B %d, %Y') }}</span>
                             </div>
                             {% endif %}
                         </div>
