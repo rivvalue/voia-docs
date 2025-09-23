@@ -3192,3 +3192,214 @@ def regenerate_executive_report(campaign_id):
     except Exception as e:
         logger.error(f"Error regenerating executive report for campaign {campaign_id}: {e}")
         return jsonify({'error': 'Failed to start executive report regeneration'}), 500
+
+
+# ==== TRANSCRIPT ANALYSIS ROUTES ====
+
+@business_auth_bp.route('/api/campaigns/<int:campaign_id>/transcripts/upload', methods=['POST'])
+@require_business_auth
+def upload_transcript(campaign_id):
+    """Upload and process transcript for a campaign"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account context not found'}), 401
+        
+        # Check if user has admin permission
+        business_user_id = session.get('business_user_id')
+        from models import BusinessAccountUser
+        user = BusinessAccountUser.query.get(business_user_id)
+        if not user or user.role != 'admin':
+            return jsonify({'error': 'Admin permission required'}), 403
+        
+        # TODO: Check license for transcript analysis feature
+        # if not current_account.transcript_analysis_enabled:
+        #     return jsonify({'error': 'Transcript analysis feature not licensed'}), 403
+        
+        # Verify campaign belongs to current business account
+        from models import Campaign
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            return jsonify({'error': 'Campaign not found'}), 404
+        
+        # Check if campaign is completed or active (transcript analysis allowed)
+        if campaign.status not in ['active', 'completed']:
+            return jsonify({'error': 'Transcript analysis only allowed for active or completed campaigns'}), 400
+        
+        # Check for uploaded file
+        if 'transcript_file' not in request.files:
+            return jsonify({'error': 'No transcript file provided'}), 400
+        
+        file = request.files['transcript_file']
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'}), 400
+        
+        # Validate file extension
+        if not file.filename.lower().endswith('.txt'):
+            return jsonify({'error': 'Only .txt files are supported'}), 400
+        
+        # Validate file size (max 1MB)
+        file.seek(0, 2)  # Seek to end
+        file_size = file.tell()
+        file.seek(0)  # Reset to beginning
+        
+        if file_size > 1024 * 1024:  # 1MB
+            return jsonify({'error': 'File size must be less than 1MB'}), 400
+        
+        # Read transcript content
+        try:
+            transcript_content = file.read().decode('utf-8').strip()
+        except UnicodeDecodeError:
+            return jsonify({'error': 'File must be valid UTF-8 text'}), 400
+        
+        if not transcript_content:
+            return jsonify({'error': 'Transcript file is empty'}), 400
+        
+        # Get participant details from form
+        participant_name = request.form.get('participant_name', '').strip()
+        participant_email = request.form.get('participant_email', '').strip()
+        participant_company = request.form.get('participant_company', '').strip()
+        
+        if not all([participant_name, participant_email, participant_company]):
+            return jsonify({'error': 'Participant name, email, and company are required'}), 400
+        
+        # Validate email format
+        import re
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_pattern, participant_email):
+            return jsonify({'error': 'Invalid email address format'}), 400
+        
+        # Check for duplicate transcript (by hash)
+        import hashlib
+        transcript_hash = hashlib.sha256(transcript_content.encode()).hexdigest()
+        
+        from models import SurveyResponse
+        existing_response = SurveyResponse.query.filter_by(
+            campaign_id=campaign_id,
+            transcript_hash=transcript_hash
+        ).first()
+        
+        if existing_response:
+            return jsonify({'error': 'This transcript has already been processed for this campaign'}), 409
+        
+        # Queue transcript for AI analysis processing
+        from task_queue import task_queue
+        task_queue.add_task('transcript_analysis', data_id=campaign_id, task_data={
+            'campaign_id': campaign_id,
+            'business_account_id': current_account.id,
+            'transcript_content': transcript_content,
+            'transcript_hash': transcript_hash,
+            'transcript_filename': file.filename,
+            'participant_name': participant_name,
+            'participant_email': participant_email,
+            'participant_company': participant_company,
+            'uploaded_by_user_id': user.id
+        })
+        
+        logger.info(f"Transcript analysis queued for campaign {campaign_id} by user {user.email}")
+        
+        return jsonify({
+            'message': 'Transcript uploaded successfully and queued for analysis',
+            'campaign_id': campaign_id,
+            'participant_name': participant_name
+        })
+        
+    except Exception as e:
+        logger.error(f"Error uploading transcript for campaign {campaign_id}: {e}")
+        return jsonify({'error': 'Failed to upload transcript'}), 500
+
+
+@business_auth_bp.route('/api/campaigns/<int:campaign_id>/transcripts', methods=['GET'])
+@require_business_auth
+def get_campaign_transcripts(campaign_id):
+    """Get list of transcript-sourced responses for a campaign"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account context not found'}), 401
+        
+        # Verify campaign belongs to current business account
+        from models import Campaign
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            return jsonify({'error': 'Campaign not found'}), 404
+        
+        # Get transcript responses for this campaign
+        from models import SurveyResponse
+        transcript_responses = SurveyResponse.query.filter_by(
+            campaign_id=campaign_id,
+            source_type='transcript'
+        ).order_by(SurveyResponse.created_at.desc()).all()
+        
+        responses_data = []
+        for response in transcript_responses:
+            responses_data.append({
+                'id': response.id,
+                'participant_name': response.respondent_name,
+                'participant_email': response.respondent_email,
+                'participant_company': response.company_name,
+                'transcript_filename': response.transcript_filename,
+                'nps_score': response.nps_score,
+                'nps_category': response.nps_category,
+                'sentiment_label': response.sentiment_label,
+                'created_at': response.created_at.isoformat() if response.created_at else None,
+                'analyzed_at': response.analyzed_at.isoformat() if response.analyzed_at else None
+            })
+        
+        return jsonify({
+            'transcripts': responses_data,
+            'count': len(responses_data)
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting transcripts for campaign {campaign_id}: {e}")
+        return jsonify({'error': 'Failed to get transcripts'}), 500
+
+
+@business_auth_bp.route('/api/transcripts/<int:response_id>/download', methods=['GET'])
+@require_business_auth
+def download_transcript(response_id):
+    """Download original transcript file"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account context not found'}), 401
+        
+        # Get transcript response and verify access
+        from models import SurveyResponse, Campaign
+        response = SurveyResponse.query.join(Campaign).filter(
+            SurveyResponse.id == response_id,
+            SurveyResponse.source_type == 'transcript',
+            Campaign.business_account_id == current_account.id
+        ).first()
+        
+        if not response:
+            return jsonify({'error': 'Transcript not found'}), 404
+        
+        if not response.transcript_content:
+            return jsonify({'error': 'Transcript content not available'}), 404
+        
+        # Create file-like response
+        from flask import Response
+        filename = response.transcript_filename or f"transcript_{response.id}.txt"
+        
+        return Response(
+            response.transcript_content,
+            mimetype='text/plain',
+            headers={
+                'Content-Disposition': f'attachment; filename="{filename}"',
+                'Content-Type': 'text/plain; charset=utf-8'
+            }
+        )
+        
+    except Exception as e:
+        logger.error(f"Error downloading transcript {response_id}: {e}")
+        return jsonify({'error': 'Failed to download transcript'}), 500
