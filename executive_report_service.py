@@ -99,6 +99,11 @@ class ExecutiveReportGenerator:
         # Get AI insights
         ai_insights = self._extract_ai_insights(responses)
         
+        # Calculate additional dashboard metrics
+        high_risk_accounts = self._calculate_high_risk_accounts(responses)
+        key_themes = self._calculate_key_themes(responses)
+        average_ratings = self._calculate_average_ratings(responses)
+        
         return {
             'campaign': campaign,
             'business_account': business_account,
@@ -108,6 +113,9 @@ class ExecutiveReportGenerator:
             'previous_campaigns': previous_campaigns,
             'charts': charts,
             'ai_insights': ai_insights,
+            'high_risk_accounts': high_risk_accounts,
+            'key_themes': key_themes,
+            'average_ratings': average_ratings,
             'generated_at': datetime.utcnow()
         }
     
@@ -402,6 +410,133 @@ class ExecutiveReportGenerator:
             'critical_issues': critical_issues[:3],  # Top 3 critical issues
             'total_themes': len(themes),
             'insights_available': len([r for r in responses if r.sentiment_label or r.key_themes or r.churn_risk_score is not None])
+        }
+    
+    def _calculate_high_risk_accounts(self, responses: List) -> List[Dict]:
+        """Calculate high risk accounts similar to dashboard implementation"""
+        import json
+        
+        high_risk_by_company = {}
+        
+        # Filter responses with high/critical churn risk
+        high_risk_responses = [r for r in responses if r.churn_risk_level in ['High', 'Critical']]
+        
+        for response in high_risk_responses:
+            if response.company_name:
+                company_key = response.company_name.upper()  # Case-insensitive grouping
+                
+                if company_key not in high_risk_by_company:
+                    high_risk_by_company[company_key] = {
+                        'company_name': response.company_name,
+                        'risk_levels': [],
+                        'risk_scores': [],
+                        'nps_scores': [],
+                        'respondent_count': 0,
+                        'latest_response': response.created_at
+                    }
+                else:
+                    # Update display name and latest response
+                    high_risk_by_company[company_key]['company_name'] = response.company_name
+                    if response.created_at > high_risk_by_company[company_key]['latest_response']:
+                        high_risk_by_company[company_key]['latest_response'] = response.created_at
+                
+                # Add response data
+                company_data = high_risk_by_company[company_key]
+                if response.churn_risk_level:
+                    company_data['risk_levels'].append(response.churn_risk_level)
+                if response.churn_risk_score is not None:
+                    company_data['risk_scores'].append(response.churn_risk_score)
+                if response.nps_score is not None:
+                    company_data['nps_scores'].append(response.nps_score)
+                company_data['respondent_count'] += 1
+        
+        # Convert to final format
+        high_risk_accounts = []
+        for company_key, company_data in high_risk_by_company.items():
+            # Determine highest risk level
+            risk_levels = company_data['risk_levels']
+            if 'Critical' in risk_levels:
+                max_risk_level = 'Critical'
+            elif 'High' in risk_levels:
+                max_risk_level = 'High'
+            else:
+                max_risk_level = 'Medium'
+            
+            # Calculate averages
+            avg_risk_score = sum(company_data['risk_scores']) / len(company_data['risk_scores']) if company_data['risk_scores'] else 0
+            avg_nps_score = sum(company_data['nps_scores']) / len(company_data['nps_scores']) if company_data['nps_scores'] else 0
+            
+            high_risk_accounts.append({
+                'company_name': company_data['company_name'],
+                'risk_level': max_risk_level,
+                'risk_score': round(avg_risk_score, 2),
+                'nps_score': round(avg_nps_score, 1),
+                'respondent_count': company_data['respondent_count'],
+                'latest_response': company_data['latest_response']
+            })
+        
+        # Sort by highest risk first, then by lowest NPS
+        high_risk_accounts.sort(key=lambda x: (
+            0 if x['risk_level'] == 'Critical' else 1 if x['risk_level'] == 'High' else 2,
+            x['nps_score']
+        ))
+        
+        return high_risk_accounts[:10]  # Top 10 high risk accounts
+    
+    def _calculate_key_themes(self, responses: List) -> List[Dict]:
+        """Calculate key themes from responses similar to dashboard implementation"""
+        import json
+        
+        all_themes = {}
+        
+        for response in responses:
+            if response.key_themes:
+                try:
+                    themes = json.loads(response.key_themes)
+                    for theme in themes:
+                        if not isinstance(theme, dict):
+                            continue
+                        
+                        theme_name = theme.get('theme', 'unknown')
+                        # Simple consolidation - normalize the theme name
+                        normalized_theme = theme_name.lower().strip()
+                        
+                        if normalized_theme not in all_themes:
+                            all_themes[normalized_theme] = {
+                                'theme': theme_name,  # Keep original case for display
+                                'count': 0,
+                                'sentiments': []
+                            }
+                        
+                        all_themes[normalized_theme]['count'] += 1
+                        all_themes[normalized_theme]['sentiments'].append(theme.get('sentiment', 'neutral'))
+                except json.JSONDecodeError:
+                    continue
+        
+        # Sort by frequency and return top themes
+        sorted_themes = sorted(all_themes.values(), key=lambda x: x['count'], reverse=True)
+        return sorted_themes[:10]  # Top 10 themes
+    
+    def _calculate_average_ratings(self, responses: List) -> Dict:
+        """Calculate average ratings similar to dashboard implementation"""
+        
+        # Collect all ratings
+        satisfaction_ratings = [r.satisfaction_rating for r in responses if r.satisfaction_rating is not None]
+        product_value_ratings = [r.product_value_rating for r in responses if r.product_value_rating is not None]
+        service_ratings = [r.service_rating for r in responses if r.service_rating is not None]
+        pricing_ratings = [r.pricing_rating for r in responses if r.pricing_rating is not None]
+        
+        # Calculate averages
+        avg_satisfaction = sum(satisfaction_ratings) / len(satisfaction_ratings) if satisfaction_ratings else 0
+        avg_product_value = sum(product_value_ratings) / len(product_value_ratings) if product_value_ratings else 0
+        avg_service = sum(service_ratings) / len(service_ratings) if service_ratings else 0
+        avg_pricing = sum(pricing_ratings) / len(pricing_ratings) if pricing_ratings else 0
+        
+        return {
+            'satisfaction': round(float(avg_satisfaction), 1),
+            'product_value': round(float(avg_product_value), 1),
+            'service': round(float(avg_service), 1),
+            'pricing': round(float(avg_pricing), 1)
         }
     
     def _generate_pdf_report(self, report_data: Dict, campaign, business_account) -> str:
