@@ -2610,7 +2610,7 @@ def license_assignment_form(business_id):
         current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
         logger.info(f"Platform admin {current_user.email if current_user else 'unknown'} accessed license assignment form for business_id {business_id} ({business_account.name})")
         
-        return render_template('business_auth/license_assignment_form.html', **template_data)
+        return render_template('business_auth/licenses/assignment_form.html', **template_data)
         
     except Exception as e:
         logger.error(f"Error loading license assignment form for business_id {business_id}: {e}")
@@ -2809,7 +2809,7 @@ def license_history(business_id):
         current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
         logger.info(f"Platform admin {current_user.email if current_user else 'unknown'} accessed license history for business_id {business_id} ({business_account.name})")
         
-        return render_template('business_auth/license_history.html', **template_data)
+        return render_template('business_auth/licenses/history.html', **template_data)
         
     except Exception as e:
         logger.error(f"Error loading license history for business_id {business_id}: {e}")
