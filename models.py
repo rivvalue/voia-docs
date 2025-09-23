@@ -1818,6 +1818,10 @@ class LicenseHistory(db.Model):
     
     # Add-on Features
     has_transcript_analysis = db.Column(db.Boolean, nullable=False, default=False)  # Transcript analysis add-on
+    # Transcript Analysis Add-on with Custom Pricing
+    transcript_analysis_start_date = db.Column(db.Date, nullable=True)  # When transcript analysis starts
+    transcript_analysis_end_date = db.Column(db.Date, nullable=True)    # When transcript analysis ends
+    transcript_analysis_price = db.Column(db.Numeric(10, 2), nullable=True)  # Custom price for transcript analysis add-on
     
     # Migration Metadata (for tracking data migration)
     migrated_from_business_account = db.Column(db.Boolean, nullable=False, default=False)  # True if migrated from old schema
@@ -1844,6 +1848,9 @@ class LicenseHistory(db.Model):
             'max_users': self.max_users,
             'max_participants_per_campaign': self.max_participants_per_campaign,
             'has_transcript_analysis': self.has_transcript_analysis,
+            'transcript_analysis_start_date': self.transcript_analysis_start_date.isoformat() if self.transcript_analysis_start_date else None,
+            'transcript_analysis_end_date': self.transcript_analysis_end_date.isoformat() if self.transcript_analysis_end_date else None,
+            'transcript_analysis_price': float(self.transcript_analysis_price) if self.transcript_analysis_price else None,
             'migrated_from_business_account': self.migrated_from_business_account,
             'migration_notes': self.migration_notes,
             'created_at': self.created_at.isoformat() if self.created_at else None,
