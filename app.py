@@ -72,6 +72,20 @@ try:
         """Performance monitoring endpoint for gate validation"""
         return get_performance_metrics()
     
+    # Add comprehensive optimization status endpoint
+    @app.route('/api/optimization-status')
+    def optimization_status_endpoint():
+        """Comprehensive optimization status and gate validation"""
+        try:
+            from optimization_status import optimization_status
+            return optimization_status.get_comprehensive_status()
+        except ImportError as e:
+            return {
+                'error': 'Optimization status unavailable',
+                'message': str(e),
+                'timestamp': time.time()
+            }
+    
     # Add performance monitoring to requests
     @app.before_request
     def before_request():
