@@ -78,6 +78,10 @@ class TaskQueue:
         elif task_type == 'executive_report':
             campaign_id = task_data.get('campaign_id', 'unknown') if task_data else 'unknown'
             logger.info(f"Added executive report task for campaign {campaign_id} to queue")
+        elif task_type == 'transcript_analysis':
+            campaign_id = task_data.get('campaign_id', 'unknown') if task_data else 'unknown'
+            participant_name = task_data.get('participant_name', 'unknown') if task_data else 'unknown'
+            logger.info(f"Added transcript analysis task for campaign {campaign_id}, participant {participant_name}")
         else:
             logger.info(f"Added task {task_type} for data_id {data_id}")
     
@@ -169,6 +173,17 @@ class TaskQueue:
                     logger.info(f"Worker {worker_id} completed executive report for campaign {campaign_id}")
                 else:
                     logger.error(f"Worker {worker_id} failed executive report task")
+                    
+            elif task_type == 'transcript_analysis':
+                # Process transcript analysis task
+                success = self._process_transcript_analysis_task(task_data, worker_id)
+                
+                if success:
+                    campaign_id = task_data.get('campaign_id', 'unknown')
+                    participant_name = task_data.get('participant_name', 'unknown')
+                    logger.info(f"Worker {worker_id} completed transcript analysis for campaign {campaign_id}, participant {participant_name}")
+                else:
+                    logger.error(f"Worker {worker_id} failed transcript analysis task")
                         
         except Exception as e:
             logger.error(f"Error processing task {task}: {e}")
@@ -639,6 +654,248 @@ class TaskQueue:
             
         except Exception as e:
             logger.error(f"Failed to store executive report info: {e}")
+    
+    def _process_transcript_analysis_task(self, task_data, worker_id):
+        """Process transcript analysis task - create participant and analyze transcript"""
+        try:
+            # Get task parameters
+            campaign_id = task_data.get('campaign_id')
+            business_account_id = task_data.get('business_account_id')
+            transcript_content = task_data.get('transcript_content')
+            transcript_hash = task_data.get('transcript_hash')
+            transcript_filename = task_data.get('transcript_filename')
+            participant_name = task_data.get('participant_name')
+            participant_email = task_data.get('participant_email')
+            participant_company = task_data.get('participant_company')
+            
+            if not all([campaign_id, business_account_id, transcript_content, participant_name, participant_email, participant_company]):
+                logger.error(f"Missing transcript analysis task parameters: {task_data}")
+                return False
+            
+            # Get campaign to verify it exists
+            from models import Campaign
+            campaign = Campaign.query.filter_by(
+                id=campaign_id,
+                business_account_id=business_account_id
+            ).first()
+            
+            if not campaign:
+                logger.error(f"Campaign {campaign_id} not found for business {business_account_id}")
+                return False
+            
+            # Create or get participant record
+            from models import Participant, CampaignParticipant
+            
+            # Check if participant already exists in this business account
+            participant = Participant.query.filter_by(
+                email=participant_email,
+                business_account_id=business_account_id
+            ).first()
+            
+            if not participant:
+                # Create new participant
+                participant = Participant(
+                    name=participant_name,
+                    email=participant_email,
+                    company=participant_company,
+                    business_account_id=business_account_id
+                )
+                db.session.add(participant)
+                db.session.flush()  # Get participant ID
+                logger.info(f"Created new participant {participant_name} ({participant_email})")
+            else:
+                # Update existing participant details if needed
+                if participant.name != participant_name or participant.company != participant_company:
+                    participant.name = participant_name
+                    participant.company = participant_company
+                    logger.info(f"Updated participant {participant_name} ({participant_email})")
+            
+            # Create campaign participation record if doesn't exist
+            campaign_participant = CampaignParticipant.query.filter_by(
+                campaign_id=campaign_id,
+                participant_id=participant.id
+            ).first()
+            
+            if not campaign_participant:
+                campaign_participant = CampaignParticipant(
+                    campaign_id=campaign_id,
+                    participant_id=participant.id,
+                    business_account_id=business_account_id,
+                    status='completed'  # Transcript implies survey completed
+                )
+                db.session.add(campaign_participant)
+                db.session.flush()  # Get campaign_participant ID
+            
+            # Analyze transcript using OpenAI
+            analysis_result = self._analyze_transcript_with_ai(transcript_content, participant_name, participant_company)
+            
+            if not analysis_result:
+                logger.error(f"Failed to analyze transcript for participant {participant_name}")
+                return False
+            
+            # Create survey response record with transcript and analysis data
+            from models import SurveyResponse
+            
+            survey_response = SurveyResponse(
+                company_name=participant_company,
+                respondent_name=participant_name,
+                respondent_email=participant_email,
+                nps_score=analysis_result.get('nps_score'),
+                nps_category=analysis_result.get('nps_category'),
+                satisfaction_rating=analysis_result.get('satisfaction_rating'),
+                product_value_rating=analysis_result.get('product_value_rating'),
+                service_rating=analysis_result.get('service_rating'),
+                pricing_rating=analysis_result.get('pricing_rating'),
+                improvement_feedback=analysis_result.get('improvement_feedback'),
+                recommendation_reason=analysis_result.get('recommendation_reason'),
+                additional_comments=analysis_result.get('additional_comments'),
+                sentiment_score=analysis_result.get('sentiment_score'),
+                sentiment_label=analysis_result.get('sentiment_label'),
+                key_themes=analysis_result.get('key_themes'),
+                churn_risk_score=analysis_result.get('churn_risk_score'),
+                churn_risk_level=analysis_result.get('churn_risk_level'),
+                churn_risk_factors=analysis_result.get('churn_risk_factors'),
+                growth_opportunities=analysis_result.get('growth_opportunities'),
+                account_risk_factors=analysis_result.get('account_risk_factors'),
+                growth_factor=analysis_result.get('growth_factor'),
+                growth_rate=analysis_result.get('growth_rate'),
+                growth_range=analysis_result.get('growth_range'),
+                commercial_value=analysis_result.get('commercial_value'),
+                campaign_id=campaign_id,
+                campaign_participant_id=campaign_participant.id,
+                source_type='transcript',
+                transcript_content=transcript_content,
+                transcript_hash=transcript_hash,
+                transcript_filename=transcript_filename,
+                analyzed_at=datetime.utcnow()
+            )
+            
+            db.session.add(survey_response)
+            db.session.commit()
+            
+            logger.info(f"Transcript analysis completed for participant {participant_name} in campaign {campaign_id}")
+            
+            # Add audit log for transcript analysis
+            try:
+                from audit_utils import queue_audit_log
+                
+                queue_audit_log(
+                    business_account_id=business_account_id,
+                    action_type='transcript_analyzed',
+                    resource_type='campaign',
+                    resource_id=campaign_id,
+                    resource_name=campaign.name,
+                    details={
+                        'participant_name': participant_name,
+                        'participant_email': participant_email,
+                        'transcript_filename': transcript_filename,
+                        'nps_score': analysis_result.get('nps_score'),
+                        'sentiment_label': analysis_result.get('sentiment_label')
+                    }
+                )
+            except Exception as e:
+                logger.error(f"Failed to log transcript analysis audit event: {e}")
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Transcript analysis task error for campaign {campaign_id}: {e}")
+            db.session.rollback()
+            return False
+    
+    def _analyze_transcript_with_ai(self, transcript_content, participant_name, participant_company):
+        """Use OpenAI to analyze transcript and extract survey response data"""
+        try:
+            import openai
+            from openai import OpenAI
+            import os
+            import json
+            
+            client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
+            
+            # Create specialized prompt for transcript analysis
+            prompt = f"""You are VOÏA (Voice of Client), an AI assistant specialized in analyzing customer feedback transcripts. 
+
+Analyze this meeting/call transcript between our team and {participant_name} from {participant_company}:
+
+TRANSCRIPT:
+{transcript_content}
+
+Extract the following information and respond with a valid JSON object:
+
+1. NPS Score (0-10): Based on likelihood to recommend us
+2. NPS Category: "Promoter" (9-10), "Passive" (7-8), or "Detractor" (0-6)
+3. Satisfaction Rating (1-5): Overall satisfaction with our service
+4. Product Value Rating (1-5): Perceived value of our product/service
+5. Service Rating (1-5): Quality of our customer service
+6. Pricing Rating (1-5): Satisfaction with pricing
+7. Improvement Feedback: What they want improved (max 500 chars)
+8. Recommendation Reason: Why they would/wouldn't recommend us (max 500 chars)
+9. Additional Comments: Other important insights (max 1000 chars)
+10. Sentiment Score (-1.0 to 1.0): Overall emotional tone
+11. Sentiment Label: "Positive", "Neutral", or "Negative"
+12. Key Themes: JSON array of up to 5 main topics discussed
+13. Churn Risk Score (0.0-1.0): Likelihood of leaving us
+14. Churn Risk Level: "Minimal", "Low", "Medium", or "High"
+15. Churn Risk Factors: JSON array of factors indicating churn risk
+16. Growth Opportunities: JSON array of expansion/upsell opportunities
+17. Account Risk Factors: JSON array of business risks with this account
+18. Growth Factor (1.0-3.0): Expected organic growth multiplier based on NPS
+19. Growth Rate: Expected growth percentage (e.g., "25%")
+20. Growth Range: NPS range (e.g., "9-10" for promoters)
+21. Commercial Value: Estimated monetary value of the relationship
+
+Respond with ONLY the JSON object, no other text:"""
+
+            response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=[{
+                    "role": "user",
+                    "content": prompt
+                }],
+                temperature=0.1,
+                max_tokens=2000
+            )
+            
+            # Parse the AI response
+            ai_response = response.choices[0].message.content.strip()
+            
+            try:
+                analysis_data = json.loads(ai_response)
+            except json.JSONDecodeError:
+                logger.error(f"Invalid JSON response from OpenAI: {ai_response[:200]}...")
+                return None
+            
+            # Convert analysis data to match SurveyResponse schema
+            result = {
+                'nps_score': analysis_data.get('nps_score', 0),
+                'nps_category': analysis_data.get('nps_category', 'Detractor'),
+                'satisfaction_rating': analysis_data.get('satisfaction_rating'),
+                'product_value_rating': analysis_data.get('product_value_rating'),
+                'service_rating': analysis_data.get('service_rating'),
+                'pricing_rating': analysis_data.get('pricing_rating'),
+                'improvement_feedback': analysis_data.get('improvement_feedback', ''),
+                'recommendation_reason': analysis_data.get('recommendation_reason', ''),
+                'additional_comments': analysis_data.get('additional_comments', ''),
+                'sentiment_score': analysis_data.get('sentiment_score', 0.0),
+                'sentiment_label': analysis_data.get('sentiment_label', 'Neutral'),
+                'key_themes': json.dumps(analysis_data.get('key_themes', [])),
+                'churn_risk_score': analysis_data.get('churn_risk_score', 0.0),
+                'churn_risk_level': analysis_data.get('churn_risk_level', 'Minimal'),
+                'churn_risk_factors': json.dumps(analysis_data.get('churn_risk_factors', [])),
+                'growth_opportunities': json.dumps(analysis_data.get('growth_opportunities', [])),
+                'account_risk_factors': json.dumps(analysis_data.get('account_risk_factors', [])),
+                'growth_factor': analysis_data.get('growth_factor', 1.0),
+                'growth_rate': analysis_data.get('growth_rate', '0%'),
+                'growth_range': analysis_data.get('growth_range', '0-6'),
+                'commercial_value': analysis_data.get('commercial_value', 0.0)
+            }
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"Error analyzing transcript with AI: {e}")
+            return None
     
     def _scheduler(self):
         """Background scheduler for campaign lifecycle management with DB advisory lock"""
