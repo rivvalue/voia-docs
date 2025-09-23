@@ -1816,6 +1816,9 @@ class LicenseHistory(db.Model):
     max_users = db.Column(db.Integer, nullable=False, default=5)
     max_participants_per_campaign = db.Column(db.Integer, nullable=False, default=500)
     
+    # Add-on Features
+    has_transcript_analysis = db.Column(db.Boolean, nullable=False, default=False)  # Transcript analysis add-on
+    
     # Migration Metadata (for tracking data migration)
     migrated_from_business_account = db.Column(db.Boolean, nullable=False, default=False)  # True if migrated from old schema
     migration_notes = db.Column(db.Text, nullable=True)  # Notes about migration process
@@ -1840,6 +1843,7 @@ class LicenseHistory(db.Model):
             'max_campaigns_per_year': self.max_campaigns_per_year,
             'max_users': self.max_users,
             'max_participants_per_campaign': self.max_participants_per_campaign,
+            'has_transcript_analysis': self.has_transcript_analysis,
             'migrated_from_business_account': self.migrated_from_business_account,
             'migration_notes': self.migration_notes,
             'created_at': self.created_at.isoformat() if self.created_at else None,

@@ -314,6 +314,37 @@ class LicenseService:
             logger.error(f"Failed to check participant limit for campaign {campaign_id}: {e}")
             return False
     
+    @staticmethod
+    def can_use_transcript_analysis(business_account_id: int) -> bool:
+        """
+        Check if business account has access to transcript analysis add-on feature.
+        
+        Args:
+            business_account_id: Business account ID to check
+            
+        Returns:
+            bool: True if account can use transcript analysis, False otherwise
+        """
+        try:
+            # Get current license
+            current_license = LicenseService.get_current_license(business_account_id)
+            
+            if not current_license:
+                logger.warning(f"No active license found for business_account_id {business_account_id}")
+                return False
+            
+            # Check if current license has transcript analysis add-on
+            has_feature = current_license.has_transcript_analysis
+            
+            logger.debug(f"Transcript analysis check for business_account_id {business_account_id}: "
+                        f"license_type={current_license.license_type}, has_transcript_analysis={has_feature}")
+            
+            return has_feature
+            
+        except Exception as e:
+            logger.error(f"Failed to check transcript analysis permission for business_account_id {business_account_id}: {e}")
+            return False
+    
     # ==== LICENSE INFORMATION AND STATUS ====
     
     @staticmethod
