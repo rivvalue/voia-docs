@@ -107,7 +107,7 @@ def build_gunicorn_command(workers, worker_class):
         '--timeout', '30',
         '--access-logfile', '-',
         '--error-logfile', '-',
-        'launcher_app:app'  # Import from launcher_app.py
+        'main:app'  # Import from main.py
     ]
     
     return cmd
@@ -158,8 +158,29 @@ def supervisor_loop():
 
 # Check if we're being called as a launcher or as a module
 if __name__ == '__main__':
-    # Called as launcher - start supervisor loop
+    # Called as launcher - start supervisor loop with full optimizations
+    logger.info("🚀 VOÏA Optimization System Starting (Supervisor Mode)")
     supervisor_loop()
 else:
-    # Called as module - just import app for Gunicorn
+    # Called as module by gunicorn - apply limited optimizations and import app
+    logger.info("⚡ VOÏA Limited Optimization Mode (Module Import)")
+    
+    # Load environment variables when imported as module
+    try:
+        from dotenv import load_dotenv
+        load_dotenv('.env', verbose=False)
+        logger.info("📁 .env file loaded in module mode")
+    except ImportError:
+        pass
+    
+    # Log current optimization status when loaded as module
+    enable_scaling = os.environ.get('ENABLE_WORKER_SCALING', 'false').lower() == 'true'
+    use_async = os.environ.get('USE_ASYNC_WORKERS', 'false').lower() == 'true'
+    perf_monitoring = os.environ.get('PERF_MONITORING', 'false').lower() == 'true'
+    
+    logger.info(f"📊 Module mode optimizations: scaling={enable_scaling}, async={use_async}, monitoring={perf_monitoring}")
+    
+    if enable_scaling:
+        logger.warning("⚠️ Worker scaling requires supervisor mode. Use 'python main.py' for full optimizations.")
+    
     from app import app  # noqa: F401
