@@ -2671,8 +2671,9 @@ def process_license_assignment():
         
         # Handle transcript analysis add-on configuration
         transcript_addon_config = None
-        if request.form.get('transcript_analysis_addon'):
-            transcript_addon_config = {}
+        transcript_addon_enabled = bool(request.form.get('transcript_analysis_addon'))
+        if transcript_addon_enabled:
+            transcript_addon_config = {'enabled': True}
             
             # Get and validate transcript analysis add-on fields
             transcript_start_date = request.form.get('transcript_start_date', '').strip()

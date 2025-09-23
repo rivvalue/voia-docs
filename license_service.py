@@ -1076,13 +1076,15 @@ class LicenseService:
             transcript_start_date = None
             transcript_end_date = None
             transcript_price = None
+            transcript_addon_enabled = False
             
             if transcript_addon_config:
+                transcript_addon_enabled = transcript_addon_config.get('enabled', False)
                 transcript_start_date = transcript_addon_config.get('start_date')
                 transcript_end_date = transcript_addon_config.get('end_date')
                 transcript_price = transcript_addon_config.get('price')
                 logger.info(f"Transcript analysis add-on configured for business_id {business_id}: "
-                           f"start={transcript_start_date}, end={transcript_end_date}, price={transcript_price}")
+                           f"enabled={transcript_addon_enabled}, start={transcript_start_date}, end={transcript_end_date}, price={transcript_price}")
             
             # Step 6: Create new license record with comprehensive audit trail
             assignment_notes = f"License assigned by {created_by or 'System'}"
@@ -1106,7 +1108,7 @@ class LicenseService:
                 transcript_analysis_start_date=transcript_start_date,
                 transcript_analysis_end_date=transcript_end_date,
                 transcript_analysis_price=transcript_price,
-                has_transcript_analysis=True if transcript_addon_config else False,
+                has_transcript_analysis=transcript_addon_enabled,
                 created_by=created_by,
                 notes=assignment_notes
             )
