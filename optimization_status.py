@@ -80,8 +80,10 @@ class OptimizationStatusManager:
     def validate_stage_1_gates(self) -> Dict[str, Any]:
         """Validate Stage 1 success gates - REQUIRES monitoring to be enabled"""
         
-        # CRITICAL FIX: Require monitoring to be enabled for any gate validation
-        monitoring_enabled = os.environ.get('PERF_MONITORING', 'false').lower() == 'true'
+        # CRITICAL FIX: Check both environment and programmatic monitoring
+        from performance_monitor import performance_monitor
+        monitoring_enabled = (os.environ.get('PERF_MONITORING', 'false').lower() == 'true' or 
+                             performance_monitor.is_monitoring_enabled())
         
         if not monitoring_enabled:
             return {

@@ -22,6 +22,9 @@ class PerformanceMonitor:
         self.enabled = os.environ.get('PERF_MONITORING', 'false').lower() == 'true'
         self.auto_rollback = os.environ.get('AUTO_ROLLBACK', 'false').lower() == 'true'
         
+        # Allow programmatic override for testing/production deployment
+        self._monitoring_override = None
+        
         # Performance thresholds (gates)
         self.response_time_threshold = float(os.environ.get('RESPONSE_TIME_THRESHOLD', '1000'))  # ms
         self.error_rate_threshold = float(os.environ.get('ERROR_RATE_THRESHOLD', '5.0'))  # percentage
@@ -42,9 +45,23 @@ class PerformanceMonitor:
                        f"error_rate={self.error_rate_threshold}%, "
                        f"auto_rollback={self.auto_rollback}")
     
+    def enable_monitoring(self, enable: bool = True):
+        """Programmatically enable/disable monitoring (override environment)"""
+        self._monitoring_override = enable
+        if enable:
+            logger.info("🔥 Performance monitoring ENABLED programmatically")
+        else:
+            logger.info("📊 Performance monitoring DISABLED programmatically")
+    
+    def is_monitoring_enabled(self) -> bool:
+        """Check if monitoring is enabled (including programmatic override)"""
+        if self._monitoring_override is not None:
+            return self._monitoring_override
+        return self.enabled
+    
     def track_request(self, func):
         """Decorator to track request performance"""
-        if not self.enabled:
+        if not self.is_monitoring_enabled():
             return func
             
         @wraps(func)
@@ -81,7 +98,7 @@ class PerformanceMonitor:
     
     def get_metrics(self) -> Dict[str, Any]:
         """Get current performance metrics"""
-        if not self.enabled:
+        if not self.is_monitoring_enabled():
             return {"monitoring": "disabled"}
         
         with self.lock:

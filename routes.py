@@ -55,7 +55,40 @@ def anonymize_response_data(campaign, response_data):
 @app.route('/api', methods=['GET', 'HEAD'])
 def api_health_check():
     """Simple API health check endpoint"""
-    return jsonify({'status': 'ok', 'service': 'voia'})
+    from performance_monitor import performance_monitor
+    
+    # Enable monitoring and track this request manually
+    if performance_monitor.is_monitoring_enabled():
+        import time
+        start_time = time.time()
+        
+        try:
+            result = jsonify({'status': 'ok', 'service': 'voia'})
+            
+            # Manually track the request
+            end_time = time.time()
+            response_time = (end_time - start_time) * 1000  # Convert to ms
+            
+            with performance_monitor.lock:
+                performance_monitor.response_times.append(response_time)
+                performance_monitor.error_count.append(0)  # No error
+                performance_monitor.request_count += 1
+                
+            return result
+        except Exception as e:
+            # Track error
+            end_time = time.time()
+            response_time = (end_time - start_time) * 1000
+            
+            with performance_monitor.lock:
+                performance_monitor.response_times.append(response_time)
+                performance_monitor.error_count.append(1)  # Error occurred
+                performance_monitor.request_count += 1
+                performance_monitor.error_total += 1
+            
+            raise
+    else:
+        return jsonify({'status': 'ok', 'service': 'voia'})
 
 def get_branding_context(business_account_id=None):
     """
