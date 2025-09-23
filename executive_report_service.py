@@ -903,6 +903,91 @@ class ExecutiveReportGenerator:
                 {% endif %}
             </div>
 
+            <!-- High Risk Accounts -->
+            <div class="section page-break">
+                <h2 class="section-title">🚨 High Risk Accounts</h2>
+                
+                {% if high_risk_accounts %}
+                <p>{{ high_risk_accounts|length }} companies identified with elevated churn risk requiring immediate attention.</p>
+                
+                <div class="insights-list">
+                    {% for account in high_risk_accounts[:5] %}
+                    <div class="insight-item" style="border-left: 4px solid {% if account.risk_level == 'Critical' %}#dc3545{% else %}#fd7e14{% endif %}; padding-left: 15px; margin-bottom: 15px;">
+                        <strong>{{ account.company_name }}</strong>
+                        <div style="color: #666; font-size: 0.9em; margin-top: 5px;">
+                            Risk Level: <span style="color: {% if account.risk_level == 'Critical' %}#dc3545{% else %}#fd7e14{% endif %}; font-weight: bold;">{{ account.risk_level }}</span> 
+                            | Risk Score: {{ account.risk_score }}/10 
+                            | NPS: {{ account.nps_score }}
+                            {% if account.respondent_count > 1 %} | {{ account.respondent_count }} responses{% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p>No high-risk accounts identified in this campaign period. All customer relationships appear stable based on current feedback.</p>
+                {% endif %}
+            </div>
+
+            <!-- Key Themes Analysis -->
+            <div class="section">
+                <h2 class="section-title">🔍 Key Themes Analysis</h2>
+                
+                {% if key_themes %}
+                <p>{{ key_themes|length }} distinct themes emerged from customer feedback analysis.</p>
+                
+                <div class="insights-list">
+                    {% for theme in key_themes[:8] %}
+                    <div class="insight-item" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span><strong>{{ theme.theme }}</strong></span>
+                        <span style="background: var(--primary-color, #dc3545); color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8em;">{{ theme.count }} mention{{ 's' if theme.count != 1 else '' }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p>No specific themes extracted from feedback in this campaign period.</p>
+                {% endif %}
+            </div>
+
+            <!-- Average Ratings -->
+            <div class="section">
+                <h2 class="section-title">⭐ Average Ratings</h2>
+                
+                <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Satisfaction</div>
+                        <div class="kpi-value" style="color: {% if average_ratings.satisfaction >= 4 %}#28a745{% elif average_ratings.satisfaction >= 3 %}#ffc107{% else %}#dc3545{% endif %};">
+                            {{ average_ratings.satisfaction }}/5.0
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Product Value</div>
+                        <div class="kpi-value" style="color: {% if average_ratings.product_value >= 4 %}#28a745{% elif average_ratings.product_value >= 3 %}#ffc107{% else %}#dc3545{% endif %};">
+                            {{ average_ratings.product_value }}/5.0
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Service Quality</div>
+                        <div class="kpi-value" style="color: {% if average_ratings.service >= 4 %}#28a745{% elif average_ratings.service >= 3 %}#ffc107{% else %}#dc3545{% endif %};">
+                            {{ average_ratings.service }}/5.0
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Pricing</div>
+                        <div class="kpi-value" style="color: {% if average_ratings.pricing >= 4 %}#28a745{% elif average_ratings.pricing >= 3 %}#ffc107{% else %}#dc3545{% endif %};">
+                            {{ average_ratings.pricing }}/5.0
+                        </div>
+                    </div>
+                </div>
+                
+                {% if average_ratings.satisfaction > 0 or average_ratings.product_value > 0 or average_ratings.service > 0 or average_ratings.pricing > 0 %}
+                <p style="margin-top: 20px; color: #666; font-size: 0.9em;">
+                    <em>Ratings are on a 1-5 scale where 5 represents the highest satisfaction level.</em>
+                </p>
+                {% else %}
+                <p>No rating data available for this campaign period.</p>
+                {% endif %}
+            </div>
+
             <!-- Report Details -->
             <div class="section page-break">
                 <h2 class="section-title">📋 Report Details</h2>
