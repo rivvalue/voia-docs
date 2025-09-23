@@ -1,20 +1,39 @@
 #!/usr/bin/env python3
 """
-VOÏA Main Application Entry Point
-Applies optimization settings via environment variables before Gunicorn startup
+VOÏA Optimized Application Launcher
+Proper wrapper that configures and launches Gunicorn with optimization settings
 """
 
 import os
+import sys
+import subprocess
 import logging
+import signal
+import time
 
-# Configure logging for optimization feedback
+# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+def check_rollback_recovery():
+    """Check if we're recovering from a rollback and apply settings"""
+    try:
+        from rollback_manager import rollback_manager
+        rollback_recovered = rollback_manager.check_rollback_on_startup()
+        if rollback_recovered:
+            logger.info("🔄 ROLLBACK RECOVERY: System recovered from previous rollback")
+        return rollback_recovered
+    except ImportError:
+        logger.debug("Rollback manager not available")
+        return False
+
 def apply_optimization_settings():
-    """Apply feature flag controlled optimization settings to Gunicorn via env vars"""
+    """Apply feature flag controlled optimization settings"""
     
     logger.info("🚀 VOÏA Performance Optimization: Configuring Gunicorn settings")
+    
+    # Check rollback first
+    check_rollback_recovery()
     
     # Get feature flag settings
     enable_scaling = os.environ.get('ENABLE_WORKER_SCALING', 'false').lower() == 'true'
@@ -49,10 +68,6 @@ def apply_optimization_settings():
     else:
         logger.info("⚙️ Using sync workers")
     
-    # Apply settings via environment variables that Gunicorn will read
-    os.environ['WEB_CONCURRENCY'] = str(workers)  # Heroku/standard env var for worker count
-    os.environ['GUNICORN_CMD_ARGS'] = f'--worker-class {worker_class} --max-requests 1000 --max-requests-jitter 100 --preload --timeout 30'
-    
     # Log optimization summary
     settings = {
         'workers': workers,
@@ -64,26 +79,78 @@ def apply_optimization_settings():
     }
     
     logger.info(f"🎯 Optimization settings applied: {settings}")
-    logger.info("✅ Gunicorn will use optimized configuration via environment variables")
+    
+    return workers, worker_class
 
-# Apply optimization settings before importing the app
-apply_optimization_settings()
+def build_gunicorn_command(workers, worker_class):
+    """Build the optimized Gunicorn command"""
+    
+    cmd = [
+        'gunicorn',
+        '--bind', '0.0.0.0:5000',
+        '--workers', str(workers),
+        '--worker-class', worker_class,
+        '--reuse-port',
+        '--reload',
+        '--max-requests', '1000',
+        '--max-requests-jitter', '100',
+        '--preload',
+        '--timeout', '30',
+        '--access-logfile', '-',
+        '--error-logfile', '-',
+        'launcher_app:app'  # Import from launcher_app.py
+    ]
+    
+    return cmd
 
-# Check for rollback recovery
-def check_rollback_recovery():
-    """Check if we're recovering from a rollback"""
-    try:
-        from rollback_manager import rollback_manager
-        rollback_recovered = rollback_manager.check_rollback_on_startup()
-        if rollback_recovered:
-            logger.info("🔄 ROLLBACK RECOVERY: System recovered from previous rollback")
-        return rollback_recovered
-    except ImportError:
-        logger.debug("Rollback manager not available")
-        return False
+def supervisor_loop():
+    """Supervisor loop that handles controlled restarts for rollbacks"""
+    
+    while True:
+        try:
+            # Apply optimization settings
+            workers, worker_class = apply_optimization_settings()
+            
+            # Build Gunicorn command
+            cmd = build_gunicorn_command(workers, worker_class)
+            
+            logger.info(f"🚀 Starting Gunicorn: {' '.join(cmd)}")
+            
+            # Start Gunicorn process
+            process = subprocess.Popen(cmd)
+            
+            # Wait for process to complete
+            returncode = process.wait()
+            
+            logger.info(f"Gunicorn exited with code: {returncode}")
+            
+            # Handle rollback restart
+            if returncode == 42:
+                logger.info("🔄 ROLLBACK RESTART: Restarting with safe configuration")
+                time.sleep(2)  # Brief pause before restart
+                continue
+            else:
+                # Normal exit or error
+                logger.info("🛑 Supervisor loop exiting")
+                break
+                
+        except KeyboardInterrupt:
+            logger.info("🛑 Shutdown requested")
+            try:
+                process.terminate()
+                process.wait()
+            except NameError:
+                pass  # Process wasn't started yet
+            break
+        except Exception as e:
+            logger.error(f"Supervisor error: {e}")
+            time.sleep(5)  # Wait before retry
+            continue
 
-# Check rollback state
-check_rollback_recovery()
-
-# Import the Flask application
-from app import app  # noqa: F401
+# Check if we're being called as a launcher or as a module
+if __name__ == '__main__':
+    # Called as launcher - start supervisor loop
+    supervisor_loop()
+else:
+    # Called as module - just import app for Gunicorn
+    from app import app  # noqa: F401
