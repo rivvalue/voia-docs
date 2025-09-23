@@ -256,7 +256,7 @@
                     <a href="{{ url_for('business_auth.license_history', business_id=business_account.id) }}" class="btn btn-outline-primary me-2">
                         <i class="fas fa-history me-2"></i>View History
                     </a>
-                    <a href="{{ url_for('business_auth.licenses_overview') }}" class="btn btn-primary">
+                    <a href="{{ url_for('business_auth.business_license_overview') }}" class="btn btn-primary">
                         <i class="fas fa-arrow-left me-2"></i>Back to Overview
                     </a>
                 </div>
@@ -321,8 +321,9 @@
         </div>
 
         <!-- License Assignment Form -->
-        <form method="POST" action="{{ url_for('business_auth.assign_license', business_id=business_account.id) }}">
+        <form method="POST" action="{{ url_for('business_auth.process_license_assignment') }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <input type="hidden" name="business_id" value="{{ business_account.id }}"/>
 
             <div class="admin-section">
                 <div class="section-header">
@@ -499,7 +500,7 @@
 
             <!-- Action Buttons -->
             <div class="action-buttons">
-                <a href="{{ url_for('business_auth.licenses_overview') }}" class="btn btn-outline-secondary">
+                <a href="{{ url_for('business_auth.business_license_overview') }}" class="btn btn-outline-secondary">
                     <i class="fas fa-times me-2"></i>Cancel
                 </a>
                 <button type="submit" class="btn btn-primary">
