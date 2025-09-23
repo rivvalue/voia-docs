@@ -693,7 +693,8 @@ def create_business_account_with_admin():
             user_first_name=admin_first_name,
             user_last_name=admin_last_name,
             business_account_name=business_name,
-            invitation_token=invitation_token
+            invitation_token=invitation_token,
+            business_account_id=business_account.id
         )
         
         if email_result.get('success'):
