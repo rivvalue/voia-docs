@@ -181,9 +181,17 @@
                         </button>
                         {% endif %}
                         {% if campaign.status == 'completed' %}
-                        <button type="button" id="execReportBtn_{{ campaign.id }}" class="btn btn-outline-primary btn-sm" onclick="downloadExecutiveReport({{ campaign.id }}, '{{ campaign.name|e }}')">
-                            <i class="fas fa-file-pdf me-1"></i><span id="execReportText_{{ campaign.id }}">Executive Report</span>
-                        </button>
+                        <div class="position-relative">
+                            <button type="button" id="execReportBtn_{{ campaign.id }}" class="btn btn-outline-primary btn-sm" onclick="downloadExecutiveReport({{ campaign.id }}, '{{ campaign.name|e }}')">
+                                <i class="fas fa-file-pdf me-1"></i><span id="execReportText_{{ campaign.id }}">Executive Report</span>
+                            </button>
+                            <div id="regenerateLink_{{ campaign.id }}" style="display: none; margin-top: 2px;">
+                                <a href="#" onclick="regenerateExecutiveReport({{ campaign.id }}, '{{ campaign.name|e }}'); return false;" 
+                                   class="text-muted text-decoration-none" style="font-size: 0.7rem;">
+                                    <i class="fas fa-sync-alt me-1" style="font-size: 0.6rem;"></i>regenerate
+                                </a>
+                            </div>
+                        </div>
                         {% endif %}
                     </div>
                 </div>
@@ -403,6 +411,12 @@ function updateReportButtonText(campaignId, isAvailable) {
     if (textElement) {
         textElement.textContent = isAvailable ? 'Executive Report Available' : 'Executive Report';
     }
+    
+    // Show/hide regenerate link based on availability
+    const regenerateLink = document.getElementById(`regenerateLink_${campaignId}`);
+    if (regenerateLink) {
+        regenerateLink.style.display = isAvailable ? 'block' : 'none';
+    }
 }
 
 function checkReportStatus(campaignId) {
@@ -526,6 +540,65 @@ function generateExecutiveReport(campaignId, campaignName) {
     .catch(error => {
         console.error('Error generating executive report:', error);
         alert('Failed to start executive report generation: ' + error.message);
+    });
+}
+
+function regenerateExecutiveReport(campaignId, campaignName) {
+    console.log('Starting executive report regeneration for campaign:', campaignId);
+    
+    if (!confirm(`Regenerate executive report for "${campaignName}"?\n\nThis will replace the existing report with a new version containing the latest data and updated features.`)) {
+        return;
+    }
+    
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name=csrf-token]');
+    if (!csrfToken) {
+        alert('Security token not found. Please refresh the page and try again.');
+        return;
+    }
+    
+    // Update button to show regenerating status
+    const textElement = document.getElementById(`execReportText_${campaignId}`);
+    if (textElement) {
+        textElement.textContent = 'Regenerating...';
+    }
+    
+    fetch(`/business/api/campaigns/${campaignId}/executive-reports/regenerate`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken.getAttribute('content'),
+            'Content-Type': 'application/json'
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json().then(data => ({ success: true, data }));
+        } else {
+            return response.json().then(data => ({ success: false, data }));
+        }
+    })
+    .then(result => {
+        if (result.success) {
+            alert(`Executive report regeneration started for "${campaignName}". The updated report will be ready in a few minutes.`);
+            
+            // Keep checking status until regeneration is complete
+            setTimeout(() => checkReportStatus(campaignId), 5000);
+        } else {
+            // Reset button text on error
+            if (textElement) {
+                textElement.textContent = 'Executive Report Available';
+            }
+            alert('Failed to start executive report regeneration: ' + (result.data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        // Reset button text on error
+        if (textElement) {
+            textElement.textContent = 'Executive Report Available';
+        }
+        console.error('Error regenerating executive report:', error);
+        alert('Failed to start executive report regeneration: ' + error.message);
     });
 }
 
