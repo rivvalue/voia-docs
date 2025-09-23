@@ -310,10 +310,6 @@
                                 <div class="usage-stat-value">{{ usage_stats.campaigns_count }}</div>
                                 <div class="usage-stat-label">Campaigns</div>
                             </div>
-                            <div class="usage-stat">
-                                <div class="usage-stat-value">{{ usage_stats.responses_count }}</div>
-                                <div class="usage-stat-label">Responses</div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -344,14 +340,15 @@
                             <h4 class="license-title">Core License</h4>
                             <p class="license-subtitle">Essential features for small teams</p>
                         </div>
-                        <div class="ms-auto license-price">$20/month per editor</div>
+                        <div class="ms-auto license-price">$2000/year</div>
                     </div>
                     <ul class="license-features">
                         <li><i class="fas fa-check"></i> Up to 5 users</li>
-                        <li><i class="fas fa-check"></i> 10 campaigns per month</li>
-                        <li><i class="fas fa-check"></i> 1,000 responses per month</li>
-                        <li><i class="fas fa-check"></i> Basic analytics</li>
-                        <li><i class="fas fa-check"></i> Email support</li>
+                        <li><i class="fas fa-check"></i> 4 campaigns per year</li>
+                        <li><i class="fas fa-check"></i> 200 participants per campaign</li>
+                        <li><i class="fas fa-check"></i> Basic Analytics</li>
+                        <li><i class="fas fa-check"></i> Email Support</li>
+                        <li><i class="fas fa-check"></i> Standard Templates</li>
                     </ul>
                 </label>
 
@@ -366,15 +363,16 @@
                             <h4 class="license-title">Plus License</h4>
                             <p class="license-subtitle">Advanced features for growing teams</p>
                         </div>
-                        <div class="ms-auto license-price">$50/month per editor</div>
+                        <div class="ms-auto license-price">$5400/year</div>
                     </div>
                     <ul class="license-features">
-                        <li><i class="fas fa-check"></i> Up to 15 users</li>
-                        <li><i class="fas fa-check"></i> 50 campaigns per month</li>
-                        <li><i class="fas fa-check"></i> 5,000 responses per month</li>
-                        <li><i class="fas fa-check"></i> Advanced analytics</li>
-                        <li><i class="fas fa-check"></i> Priority email support</li>
-                        <li><i class="fas fa-check"></i> Custom branding</li>
+                        <li><i class="fas fa-check"></i> Up to 10 users</li>
+                        <li><i class="fas fa-check"></i> 4 campaigns per year</li>
+                        <li><i class="fas fa-check"></i> 2,000 participants per campaign</li>
+                        <li><i class="fas fa-check"></i> Advanced Analytics</li>
+                        <li><i class="fas fa-check"></i> Priority Support</li>
+                        <li><i class="fas fa-check"></i> Custom Templates</li>
+                        <li><i class="fas fa-check"></i> API Access</li>
                     </ul>
                 </label>
 
@@ -392,13 +390,14 @@
                         <div class="ms-auto license-price">Custom pricing</div>
                     </div>
                     <ul class="license-features">
-                        <li><i class="fas fa-check"></i> Custom user limits</li>
-                        <li><i class="fas fa-check"></i> Custom campaign limits</li>
-                        <li><i class="fas fa-check"></i> Custom response limits</li>
-                        <li><i class="fas fa-check"></i> Advanced analytics & reporting</li>
-                        <li><i class="fas fa-check"></i> Dedicated support</li>
-                        <li><i class="fas fa-check"></i> Custom branding & white-label</li>
-                        <li><i class="fas fa-check"></i> API access</li>
+                        <li><i class="fas fa-check"></i> Custom user limits (default: 25)</li>
+                        <li><i class="fas fa-check"></i> Custom campaign limits (default: 12/year)</li>
+                        <li><i class="fas fa-check"></i> Custom participant limits (default: 10,000/campaign)</li>
+                        <li><i class="fas fa-check"></i> Custom Analytics</li>
+                        <li><i class="fas fa-check"></i> Dedicated Support</li>
+                        <li><i class="fas fa-check"></i> White Label</li>
+                        <li><i class="fas fa-check"></i> Custom Integrations</li>
+                        <li><i class="fas fa-check"></i> SLA Guarantee</li>
                     </ul>
                 </label>
 
@@ -424,10 +423,10 @@
                     
                     <div class="form-row">
                         <div class="mb-3">
-                            <label for="max_responses" class="form-label">Maximum Responses</label>
-                            <input type="number" class="form-control" id="max_responses" name="max_responses" 
-                                   min="1" value="{{ current_license.max_responses if current_license and current_license.type == 'pro' else 10000 }}">
-                            <div class="form-text">Number of responses per month</div>
+                            <label for="max_participants" class="form-label">Maximum Participants per Campaign</label>
+                            <input type="number" class="form-control" id="max_participants" name="max_participants" 
+                                   min="1" value="{{ current_license.max_participants_per_campaign if current_license and current_license.type == 'pro' else 10000 }}">
+                            <div class="form-text">Number of participants per campaign</div>
                         </div>
                         <div class="mb-3">
                             <label for="expiration_date" class="form-label">Expiration Date</label>
@@ -490,9 +489,9 @@
                             <td class="new-value" id="newMaxCampaigns">-</td>
                         </tr>
                         <tr>
-                            <td>Max Responses</td>
-                            <td class="current-value">{{ current_license.max_responses if current_license else 'N/A' }}</td>
-                            <td class="new-value" id="newMaxResponses">-</td>
+                            <td>Max Participants per Campaign</td>
+                            <td class="current-value">{{ current_license.max_participants_per_campaign if current_license else 'N/A' }}</td>
+                            <td class="new-value" id="newMaxParticipants">-</td>
                         </tr>
                     </tbody>
                 </table>
@@ -520,16 +519,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // License limits configuration
     const licenseLimits = {
-        core: { users: 5, campaigns: 10, responses: 1000 },
-        plus: { users: 15, campaigns: 50, responses: 5000 },
-        pro: { users: 'custom', campaigns: 'custom', responses: 'custom' }
+        core: { users: 5, campaigns: 4, participants: 200 },
+        plus: { users: 10, campaigns: 4, participants: 2000 },
+        pro: { users: 'custom', campaigns: 'custom', participants: 'custom' }
     };
     
     // Current usage from backend
     const currentUsage = {
         users: {{ usage_stats.users_count }},
-        campaigns: {{ usage_stats.campaigns_count }},
-        responses: {{ usage_stats.responses_count }}
+        campaigns: {{ usage_stats.campaigns_count }}
     };
 
     function updateLicenseSelection() {
@@ -566,11 +564,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (licenseType === 'pro') {
             document.getElementById('newMaxUsers').textContent = document.getElementById('max_users').value || 'Custom';
             document.getElementById('newMaxCampaigns').textContent = document.getElementById('max_campaigns').value || 'Custom';
-            document.getElementById('newMaxResponses').textContent = document.getElementById('max_responses').value || 'Custom';
+            document.getElementById('newMaxParticipants').textContent = document.getElementById('max_participants').value || 'Custom';
         } else {
             document.getElementById('newMaxUsers').textContent = limits.users;
             document.getElementById('newMaxCampaigns').textContent = limits.campaigns;
-            document.getElementById('newMaxResponses').textContent = limits.responses;
+            document.getElementById('newMaxParticipants').textContent = limits.participants;
         }
         
         licenseComparison.style.display = 'block';
@@ -582,19 +580,16 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (licenseType !== 'pro') {
             if (currentUsage.users > limits.users ||
-                currentUsage.campaigns > limits.campaigns ||
-                currentUsage.responses > limits.responses) {
+                currentUsage.campaigns > limits.campaigns) {
                 isDowngrade = true;
             }
         } else {
             // For Pro licenses, check custom limits
             const maxUsers = parseInt(document.getElementById('max_users').value) || 0;
             const maxCampaigns = parseInt(document.getElementById('max_campaigns').value) || 0;
-            const maxResponses = parseInt(document.getElementById('max_responses').value) || 0;
             
             if (currentUsage.users > maxUsers ||
-                currentUsage.campaigns > maxCampaigns ||
-                currentUsage.responses > maxResponses) {
+                currentUsage.campaigns > maxCampaigns) {
                 isDowngrade = true;
             }
         }
@@ -608,7 +603,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Update Pro limits when changed
-    ['max_users', 'max_campaigns', 'max_responses'].forEach(fieldId => {
+    ['max_users', 'max_campaigns', 'max_participants'].forEach(fieldId => {
         document.getElementById(fieldId).addEventListener('input', function() {
             const selectedLicense = document.querySelector('input[name="license_type"]:checked');
             if (selectedLicense && selectedLicense.value === 'pro') {
