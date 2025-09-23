@@ -74,9 +74,9 @@
                     <tr>
                         <td>
                             <div class="account-info">
-                                <strong>{{ account.get('account_name', 'Unknown') }}</strong>
+                                <strong>{{ account.get('name', 'Unknown') }}</strong>
                                 <br>
-                                <small class="text-muted">ID: {{ account.get('account_id', 'N/A') }}</small>
+                                <small class="text-muted">ID: {{ account.get('id', 'N/A') }}</small>
                             </div>
                         </td>
                         <td>
@@ -136,11 +136,11 @@
                         </td>
                         <td>
                             <div class="action-buttons">
-                                <a href="{{ url_for('business_auth.license_assignment_form', business_id=account.get('account_id', 0)) }}" 
+                                <a href="{{ url_for('business_auth.license_assignment_form', business_id=account.get('id', 0)) }}" 
                                    class="btn btn-sm btn-outline-primary" title="Manage License">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="{{ url_for('business_auth.license_history', business_id=account.get('account_id', 0)) }}" 
+                                <a href="{{ url_for('business_auth.license_history', business_id=account.get('id', 0)) }}" 
                                    class="btn btn-sm btn-outline-info" title="View History">
                                     <i class="fas fa-history"></i>
                                 </a>
