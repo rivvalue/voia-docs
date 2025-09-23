@@ -360,7 +360,6 @@ class ExecutiveReportGenerator:
     def _extract_ai_insights(self, responses: List) -> Dict:
         """Extract and summarize AI insights from responses"""
         themes = {}
-        recommendations = []
         critical_issues = []
         
         for response in responses:
@@ -623,13 +622,6 @@ class ExecutiveReportGenerator:
                     padding-bottom: 0;
                 }
                 
-                .recommendation {
-                    background: #e7f3ff;
-                    padding: 15px;
-                    border-radius: 8px;
-                    border-left: 4px solid #007bff;
-                    margin-bottom: 10px;
-                }
                 
                 .page-break {
                     page-break-before: always;
@@ -774,44 +766,6 @@ class ExecutiveReportGenerator:
                     <img src="{{ charts.response_timeline }}" alt="Response Timeline" class="chart-image">
                 </div>
                 {% endif %}
-            </div>
-
-            <!-- Recommendations -->
-            <div class="section page-break">
-                <h2 class="section-title">🚀 Recommendations & Action Plan</h2>
-                
-                <div class="recommendation">
-                    <strong>Immediate Actions (Next 30 days):</strong>
-                    <ul>
-                        {% if current_kpis.avg_churn_risk > 6 %}
-                        <li>Address high churn risk respondents identified in critical issues section</li>
-                        {% endif %}
-                        {% if current_kpis.nps_score < 50 %}
-                        <li>Develop improvement plan to address primary detractor concerns</li>
-                        {% endif %}
-                        <li>Follow up with survey participants to validate AI-identified themes</li>
-                    </ul>
-                </div>
-                
-                <div class="recommendation">
-                    <strong>Strategic Initiatives (Next 90 days):</strong>
-                    <ul>
-                        <li>Implement improvements based on top themes from AI analysis</li>
-                        {% if delta_kpis.trend_direction == 'declining' %}
-                        <li>Investigate root causes of performance decline since previous campaign</li>
-                        {% endif %}
-                        <li>Prepare next campaign with focus on identified improvement areas</li>
-                    </ul>
-                </div>
-                
-                <div class="recommendation">
-                    <strong>Long-term Goals (Next 6-12 months):</strong>
-                    <ul>
-                        <li>Achieve NPS score improvement of 10+ points</li>
-                        <li>Reduce average churn risk below 5.0</li>
-                        <li>Increase response rate to 90%+</li>
-                    </ul>
-                </div>
             </div>
 
             <!-- Report Details -->
