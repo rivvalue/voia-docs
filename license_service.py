@@ -1038,8 +1038,8 @@ class LicenseService:
             if not template:
                 return False, None, f"License template not found for type '{license_type}'"
                 
-            if custom_limits and template.is_custom:
-                license_config = LicenseTemplateManager.create_license_config(license_type, custom_limits)
+            if custom_config and template.is_custom:
+                license_config = LicenseTemplateManager.create_license_config(license_type, custom_config)
             else:
                 license_config = template.to_dict()
             
@@ -1157,7 +1157,7 @@ class LicenseService:
     def validate_license_assignment(
         business_id: int, 
         license_type: str, 
-        custom_limits: Optional[Dict[str, Any]] = None
+        custom_config: Optional[Dict[str, Any]] = None
     ) -> Tuple[bool, str]:
         """
         Comprehensive validation for license assignment requests.
@@ -1165,7 +1165,7 @@ class LicenseService:
         Args:
             business_id: Business account ID to validate
             license_type: License type to validate
-            custom_limits: Optional custom limits to validate
+            custom_config: Optional custom limits to validate
             
         Returns:
             tuple: (is_valid: bool, error_message: str)
@@ -1194,30 +1194,30 @@ class LicenseService:
                 return False, f"License template not found for type '{license_type}'"
             
             # Check 4: Validate custom limits for Pro licenses
-            if custom_limits:
+            if custom_config:
                 if not template.is_custom:
                     return False, f"Custom limits not supported for {license_type} license type"
                 
                 # Validate custom limit parameters
                 validation_errors = []
                 
-                if 'max_campaigns_per_year' in custom_limits:
-                    value = custom_limits['max_campaigns_per_year']
+                if 'max_campaigns_per_year' in custom_config:
+                    value = custom_config['max_campaigns_per_year']
                     if not isinstance(value, int) or value <= 0 or value > 1000:
                         validation_errors.append("max_campaigns_per_year must be a positive integer between 1 and 1000")
                 
-                if 'max_users' in custom_limits:
-                    value = custom_limits['max_users']
+                if 'max_users' in custom_config:
+                    value = custom_config['max_users']
                     if not isinstance(value, int) or value <= 0 or value > 10000:
                         validation_errors.append("max_users must be a positive integer between 1 and 10000")
                 
-                if 'max_participants_per_campaign' in custom_limits:
-                    value = custom_limits['max_participants_per_campaign']
+                if 'max_participants_per_campaign' in custom_config:
+                    value = custom_config['max_participants_per_campaign']
                     if not isinstance(value, int) or value <= 0 or value > 1000000:
                         validation_errors.append("max_participants_per_campaign must be a positive integer between 1 and 1000000")
                 
-                if 'duration_months' in custom_limits:
-                    value = custom_limits['duration_months']
+                if 'duration_months' in custom_config:
+                    value = custom_config['duration_months']
                     if not isinstance(value, int) or value <= 0 or value > 120:
                         validation_errors.append("duration_months must be a positive integer between 1 and 120")
                 

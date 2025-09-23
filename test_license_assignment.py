@@ -124,7 +124,7 @@ def test_license_assignment():
         success, license_record, message = LicenseService.assign_license_to_business(
             business_id=test_business_id,
             license_type='core',
-            assigned_by='test_user@example.com'
+            created_by='test_user@example.com'
         )
         print(f"Core license assignment: {'SUCCESS' if success else 'FAILED'} - {message}")
         
@@ -140,7 +140,7 @@ def test_license_assignment():
         success, license_record2, message = LicenseService.assign_license_to_business(
             business_id=test_business_id,
             license_type='plus',
-            assigned_by='test_user@example.com'
+            created_by='test_user@example.com'
         )
         print(f"Plus license assignment: {'SUCCESS' if success else 'FAILED'} - {message}")
         
@@ -151,7 +151,7 @@ def test_license_assignment():
         
         # Test 3: Assign Pro license with custom limits
         print("\nTest 3: Assigning Pro license with custom limits...")
-        custom_limits = {
+        custom_config = {
             'max_campaigns_per_year': 24,
             'max_users': 75,
             'max_participants_per_campaign': 15000
@@ -159,8 +159,8 @@ def test_license_assignment():
         success, license_record3, message = LicenseService.assign_license_to_business(
             business_id=test_business_id,
             license_type='pro',
-            custom_limits=custom_limits,
-            assigned_by='admin@example.com'
+            custom_config=custom_config,
+            created_by='admin@example.com'
         )
         print(f"Pro license with custom limits: {'SUCCESS' if success else 'FAILED'} - {message}")
         
@@ -171,6 +171,74 @@ def test_license_assignment():
             print(f"  Max Participants: {license_record3.max_participants_per_campaign} (custom)")
         
         return True
+
+def test_transcript_addon_assignment():
+    """Test transcript analysis add-on assignment functionality"""
+    print("\n=== Testing Transcript Analysis Add-on Assignment ===")
+    
+    from datetime import date, timedelta
+    
+    with app.app_context():
+        test_business_id = setup_test_environment()
+        if not test_business_id:
+            print("ERROR: Could not setup test business")
+            return False
+        
+        # Test 1: Assign Pro license with transcript analysis add-on
+        print("\nTest 1: Assigning Pro license with transcript analysis add-on...")
+        
+        # Configure transcript analysis add-on
+        start_date = date.today()
+        end_date = start_date + timedelta(days=365)  # 1 year
+        price = 299.99
+        
+        transcript_addon_config = {
+            'start_date': start_date,
+            'end_date': end_date,
+            'price': price
+        }
+        
+        success, license_record, message = LicenseService.assign_license_to_business(
+            business_id=test_business_id,
+            license_type='pro',
+            created_by='admin@example.com',
+            transcript_addon_config=transcript_addon_config
+        )
+        
+        print(f"Pro license with transcript add-on: {'SUCCESS' if success else 'FAILED'} - {message}")
+        
+        if success and license_record:
+            print(f"  License ID: {license_record.id}")
+            print(f"  License Type: {license_record.license_type}")
+            print(f"  Has Transcript Analysis: {license_record.has_transcript_analysis}")
+            print(f"  Transcript Start Date: {license_record.transcript_analysis_start_date}")
+            print(f"  Transcript End Date: {license_record.transcript_analysis_end_date}")
+            print(f"  Transcript Price: ${license_record.transcript_analysis_price}")
+            
+            # Verify data was saved correctly
+            if (license_record.has_transcript_analysis and 
+                license_record.transcript_analysis_start_date == start_date and
+                license_record.transcript_analysis_end_date == end_date and
+                license_record.transcript_analysis_price == price):
+                print("  ✅ Transcript add-on data verified successfully!")
+                
+                # Double-check by querying database directly
+                from models import LicenseHistory
+                db_record = LicenseHistory.query.filter_by(id=license_record.id).first()
+                if db_record and db_record.has_transcript_analysis:
+                    print("  ✅ Database verification: Transcript add-on data persisted correctly!")
+                    return True
+                else:
+                    print("  ❌ Database verification failed: Data not found in database")
+                    return False
+            else:
+                print("  ❌ Transcript add-on data verification failed!")
+                print(f"     Expected: has_transcript_analysis=True, start={start_date}, end={end_date}, price={price}")
+                print(f"     Actual: has_transcript_analysis={license_record.has_transcript_analysis}, start={license_record.transcript_analysis_start_date}, end={license_record.transcript_analysis_end_date}, price={license_record.transcript_analysis_price}")
+                return False
+        else:
+            print("  ❌ License assignment failed!")
+            return False
 
 def test_license_history():
     """Test license assignment history"""
@@ -206,6 +274,7 @@ def main():
             test_license_templates,
             test_license_assignment_validation,
             test_license_assignment,
+            test_transcript_addon_assignment,
             test_license_history
         ]
         
