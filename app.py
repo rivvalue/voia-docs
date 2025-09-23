@@ -66,25 +66,38 @@ db.init_app(app)
 try:
     from performance_monitor import performance_monitor, get_performance_metrics
     
-    # Add performance monitoring endpoint
-    @app.route('/api/performance-metrics')
+    # SECURITY: Protected diagnostic endpoints - require business admin authentication
+    @app.route('/business/admin/performance-metrics')
     def performance_metrics():
-        """Performance monitoring endpoint for gate validation"""
-        return get_performance_metrics()
+        """Performance monitoring endpoint - ADMIN ONLY"""
+        # Import here to avoid circular imports
+        from business_auth_routes import require_business_auth
+        
+        @require_business_auth
+        def _performance_metrics():
+            return get_performance_metrics()
+        
+        return _performance_metrics()
     
-    # Add comprehensive optimization status endpoint
-    @app.route('/api/optimization-status')
+    @app.route('/business/admin/optimization-status')  
     def optimization_status_endpoint():
-        """Comprehensive optimization status and gate validation"""
-        try:
-            from optimization_status import optimization_status
-            return optimization_status.get_comprehensive_status()
-        except ImportError as e:
-            return {
-                'error': 'Optimization status unavailable',
-                'message': str(e),
-                'timestamp': time.time()
-            }
+        """Optimization status endpoint - ADMIN ONLY"""
+        # Import here to avoid circular imports
+        from business_auth_routes import require_business_auth
+        
+        @require_business_auth
+        def _optimization_status():
+            try:
+                from optimization_status import optimization_status
+                return optimization_status.get_comprehensive_status()
+            except ImportError as e:
+                return {
+                    'error': 'Optimization status unavailable',
+                    'message': str(e),
+                    'timestamp': time.time()
+                }
+        
+        return _optimization_status()
     
     # Add performance monitoring to requests
     @app.before_request
