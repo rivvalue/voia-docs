@@ -3212,9 +3212,13 @@ def upload_transcript(campaign_id):
         if not user or user.role != 'admin':
             return jsonify({'error': 'Admin permission required'}), 403
         
-        # TODO: Check license for transcript analysis feature
-        # if not current_account.transcript_analysis_enabled:
-        #     return jsonify({'error': 'Transcript analysis feature not licensed'}), 403
+        # Check license for transcript analysis feature
+        from license_service import LicenseService
+        if not LicenseService.can_use_transcript_analysis(current_account.id):
+            return jsonify({
+                'success': False, 
+                'error': 'Transcript analysis feature requires a specific add-on license. Please contact support to upgrade your plan.'
+            }), 403
         
         # Verify campaign belongs to current business account
         from models import Campaign
