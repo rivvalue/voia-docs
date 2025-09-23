@@ -435,7 +435,7 @@
                     <ul class="pagination mb-0">
                         {% if pagination.has_prev %}
                         <li class="page-item">
-                            <a class="page-link" href="{{ url_for('business_auth.licenses_overview', page=pagination.prev_num, **request.args) }}">
+                            <a class="page-link" href="{{ url_for('business_auth.business_license_overview', page=pagination.prev_num, **request.args) }}">
                                 <i class="fas fa-chevron-left"></i>
                             </a>
                         </li>
@@ -445,7 +445,7 @@
                             {% if page_num %}
                                 {% if page_num != pagination.page %}
                                 <li class="page-item">
-                                    <a class="page-link" href="{{ url_for('business_auth.licenses_overview', page=page_num, **request.args) }}">
+                                    <a class="page-link" href="{{ url_for('business_auth.business_license_overview', page=page_num, **request.args) }}">
                                         {{ page_num }}
                                     </a>
                                 </li>
@@ -463,7 +463,7 @@
                         
                         {% if pagination.has_next %}
                         <li class="page-item">
-                            <a class="page-link" href="{{ url_for('business_auth.licenses_overview', page=pagination.next_num, **request.args) }}">
+                            <a class="page-link" href="{{ url_for('business_auth.business_license_overview', page=pagination.next_num, **request.args) }}">
                                 <i class="fas fa-chevron-right"></i>
                             </a>
                         </li>

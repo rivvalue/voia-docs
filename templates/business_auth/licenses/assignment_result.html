@@ -477,7 +477,7 @@
                 <a href="{{ url_for('business_auth.license_history', business_id=business_account.id) }}" class="btn btn-outline-primary">
                     <i class="fas fa-history me-2"></i>View License History
                 </a>
-                <a href="{{ url_for('business_auth.licenses_overview') }}" class="btn btn-primary">
+                <a href="{{ url_for('business_auth.business_license_overview') }}" class="btn btn-primary">
                     <i class="fas fa-list me-2"></i>Back to Overview
                 </a>
                 <a href="{{ url_for('business_auth.licenses_dashboard') }}" class="btn btn-outline-secondary">
@@ -487,7 +487,7 @@
                 <a href="{{ url_for('business_auth.license_assignment_form', business_id=business_account.id) }}" class="btn btn-primary">
                     <i class="fas fa-redo me-2"></i>Try Again
                 </a>
-                <a href="{{ url_for('business_auth.licenses_overview') }}" class="btn btn-outline-primary">
+                <a href="{{ url_for('business_auth.business_license_overview') }}" class="btn btn-outline-primary">
                     <i class="fas fa-list me-2"></i>Back to Overview
                 </a>
                 {% if support_email %}
@@ -520,7 +520,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (countdown <= 0) {
             clearInterval(timer);
-            window.location.href = "{{ url_for('business_auth.licenses_overview') }}";
+            window.location.href = "{{ url_for('business_auth.business_license_overview') }}";
         }
     }, 1000);
 });
