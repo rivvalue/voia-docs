@@ -3122,3 +3122,73 @@ def generate_executive_report_manually(campaign_id):
     except Exception as e:
         logger.error(f"Error generating executive report for campaign {campaign_id}: {e}")
         return jsonify({'error': 'Failed to start executive report generation'}), 500
+
+
+@business_auth_bp.route('/api/campaigns/<int:campaign_id>/executive-reports/regenerate', methods=['POST'])
+@require_business_auth
+def regenerate_executive_report(campaign_id):
+    """Regenerate an existing executive report for a campaign"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account context not found'}), 401
+        
+        # Verify campaign belongs to current business account
+        from models import Campaign
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            return jsonify({'error': 'Campaign not found'}), 404
+        
+        # Check if campaign is completed
+        if campaign.status != 'completed':
+            return jsonify({'error': 'Campaign must be completed to regenerate executive report'}), 400
+        
+        # Check if user has admin permission
+        business_user_id = session.get('business_user_id')
+        from models import BusinessAccountUser
+        user = BusinessAccountUser.query.get(business_user_id)
+        if not user or user.role != 'admin':
+            return jsonify({'error': 'Admin permission required'}), 403
+        
+        # Check if existing report exists
+        from models import ExecutiveReport
+        existing_report = ExecutiveReport.query.filter_by(
+            campaign_id=campaign_id,
+            business_account_id=current_account.id
+        ).order_by(ExecutiveReport.created_at.desc()).first()
+        
+        if not existing_report:
+            return jsonify({'error': 'No existing report found to regenerate. Please generate a new report instead.'}), 404
+        
+        # Prevent duplicate regeneration requests
+        if existing_report.status == 'processing':
+            return jsonify({'message': 'Report regeneration already in progress'}), 200
+        
+        # Update report status to processing
+        existing_report.status = 'processing'
+        existing_report.updated_at = datetime.utcnow()
+        db.session.commit()
+        
+        # Queue executive report regeneration
+        from task_queue import task_queue
+        task_queue.add_task('executive_report', data_id=campaign.id, task_data={
+            'campaign_id': campaign.id,
+            'business_account_id': current_account.id,
+            'regenerating': True,
+            'report_id': existing_report.id
+        })
+        
+        logger.info(f"Executive report regeneration queued for campaign {campaign.id} by user {user.email}")
+        
+        return jsonify({
+            'message': 'Executive report regeneration started',
+            'campaign_id': campaign.id
+        })
+        
+    except Exception as e:
+        logger.error(f"Error regenerating executive report for campaign {campaign_id}: {e}")
+        return jsonify({'error': 'Failed to start executive report regeneration'}), 500

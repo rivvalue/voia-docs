@@ -497,15 +497,30 @@ class TaskQueue:
                 logger.info(f"Cleaned up {len(jobs_to_remove)} old export jobs")
     
     def _process_executive_report_task(self, task_data, worker_id):
-        """Process executive report generation task"""
+        """Process executive report generation task (both new and regeneration)"""
         try:
             # Get task parameters
             campaign_id = task_data.get('campaign_id')
             business_account_id = task_data.get('business_account_id')
+            is_regenerating = task_data.get('regenerating', False)
+            report_id = task_data.get('report_id')
             
             if not all([campaign_id, business_account_id]):
                 logger.error(f"Missing executive report task parameters: {task_data}")
                 return False
+            
+            # If regenerating, handle existing report and old file cleanup
+            if is_regenerating and report_id:
+                try:
+                    from models import ExecutiveReport
+                    existing_report = ExecutiveReport.query.get(report_id)
+                    if existing_report and existing_report.file_path:
+                        # Delete old file if it exists
+                        if os.path.exists(existing_report.file_path):
+                            os.remove(existing_report.file_path)
+                            logger.info(f"Deleted old executive report file: {existing_report.file_path}")
+                except Exception as e:
+                    logger.error(f"Error cleaning up old report file: {e}")
             
             # Use lazy import to avoid circular dependency and import correct class
             from executive_report_service import ExecutiveReportGenerator
@@ -515,11 +530,12 @@ class TaskQueue:
             
             if report_file_path:
                 # Store report information in database
-                self._store_executive_report_info(campaign_id, business_account_id, report_file_path)
+                self._store_executive_report_info(campaign_id, business_account_id, report_file_path, is_regenerating, report_id)
                 
-                logger.info(f"Executive report generated for campaign {campaign_id}: {report_file_path}")
+                action_type = "regenerated" if is_regenerating else "generated"
+                logger.info(f"Executive report {action_type} for campaign {campaign_id}: {report_file_path}")
                 
-                # Add audit log for report generation
+                # Add audit log for report generation/regeneration
                 try:
                     from audit_utils import queue_audit_log
                     from models import Campaign
@@ -528,13 +544,14 @@ class TaskQueue:
                     
                     queue_audit_log(
                         business_account_id=business_account_id,
-                        action_type='executive_report_generated',
+                        action_type='executive_report_regenerated' if is_regenerating else 'executive_report_generated',
                         resource_type='campaign',
                         resource_id=campaign_id,
                         resource_name=campaign.name if campaign else f'Campaign {campaign_id}',
                         details={
                             'file_path': report_file_path,
-                            'report_type': 'executive_report'
+                            'report_type': 'executive_report',
+                            'is_regeneration': is_regenerating
                         }
                     )
                 except Exception as e:
@@ -542,14 +559,38 @@ class TaskQueue:
                 
                 return True
             else:
+                # If regeneration failed, update status back to failed
+                if is_regenerating and report_id:
+                    try:
+                        from models import ExecutiveReport
+                        existing_report = ExecutiveReport.query.get(report_id)
+                        if existing_report:
+                            existing_report.status = 'failed'
+                            existing_report.updated_at = datetime.utcnow()
+                            db.session.commit()
+                    except Exception as e:
+                        logger.error(f"Error updating report status to failed: {e}")
+                
                 logger.error(f"Failed to generate executive report for campaign {campaign_id}")
                 return False
                 
         except Exception as e:
+            # If regeneration failed, update status back to failed
+            if task_data.get('regenerating') and task_data.get('report_id'):
+                try:
+                    from models import ExecutiveReport
+                    existing_report = ExecutiveReport.query.get(task_data.get('report_id'))
+                    if existing_report:
+                        existing_report.status = 'failed'
+                        existing_report.updated_at = datetime.utcnow()
+                        db.session.commit()
+                except Exception as db_e:
+                    logger.error(f"Error updating report status to failed: {db_e}")
+            
             logger.error(f"Executive report task error for campaign {campaign_id}: {e}")
             return False
     
-    def _store_executive_report_info(self, campaign_id, business_account_id, file_path):
+    def _store_executive_report_info(self, campaign_id, business_account_id, file_path, is_regenerating=False, report_id=None):
         """Store executive report information in the database"""
         try:
             from models import ExecutiveReport
@@ -561,11 +602,18 @@ class TaskQueue:
             if os.path.exists(file_path):
                 file_size = os.path.getsize(file_path)
             
-            # Create or update executive report record
-            report = ExecutiveReport.query.filter_by(
-                campaign_id=campaign_id,
-                business_account_id=business_account_id
-            ).first()
+            # For regeneration, use existing report record if available
+            if is_regenerating and report_id:
+                report = ExecutiveReport.query.get(report_id)
+                if not report:
+                    logger.error(f"Report ID {report_id} not found for regeneration")
+                    return
+            else:
+                # Create or update executive report record (original behavior)
+                report = ExecutiveReport.query.filter_by(
+                    campaign_id=campaign_id,
+                    business_account_id=business_account_id
+                ).first()
             
             if not report:
                 report = ExecutiveReport(
@@ -582,9 +630,12 @@ class TaskQueue:
                 report.generated_at = datetime.utcnow()
                 report.status = 'completed'
                 report.file_size = file_size
+                report.updated_at = datetime.utcnow()
             
             db.session.commit()
-            logger.info(f"Executive report info stored for campaign {campaign_id}")
+            
+            action = "regenerated" if is_regenerating else "stored"
+            logger.info(f"Executive report info {action} for campaign {campaign_id}")
             
         except Exception as e:
             logger.error(f"Failed to store executive report info: {e}")
