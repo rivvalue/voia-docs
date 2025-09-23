@@ -484,7 +484,7 @@
                     <i class="fas fa-chart-bar me-2"></i>Dashboard
                 </a>
             {% else %}
-                <a href="{{ url_for('business_auth.assign_license', business_id=business_account.id) }}" class="btn btn-primary">
+                <a href="{{ url_for('business_auth.license_assignment_form', business_id=business_account.id) }}" class="btn btn-primary">
                     <i class="fas fa-redo me-2"></i>Try Again
                 </a>
                 <a href="{{ url_for('business_auth.licenses_overview') }}" class="btn btn-outline-primary">
