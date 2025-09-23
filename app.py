@@ -61,6 +61,56 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = db_config.get_engine_options()
 # Initialize the app with the extension
 db.init_app(app)
 
+# Stage 1 Optimization: Performance Monitoring and Compression
+# Feature flag controlled optimizations
+try:
+    from performance_monitor import performance_monitor, get_performance_metrics
+    
+    # Add performance monitoring endpoint
+    @app.route('/api/performance-metrics')
+    def performance_metrics():
+        """Performance monitoring endpoint for gate validation"""
+        return get_performance_metrics()
+    
+    # Add performance monitoring to requests
+    @app.before_request
+    def before_request():
+        from flask import g
+        import time
+        g.start_time = time.time()
+    
+    @app.after_request
+    def after_request(response):
+        from flask import g, request
+        import time
+        
+        if hasattr(g, 'start_time'):
+            duration = (time.time() - g.start_time) * 1000  # Convert to ms
+            
+            # Log slow requests
+            if duration > 1000:  # Log requests over 1 second
+                app.logger.warning(f'Slow request: {request.path} took {duration:.2f}ms')
+            
+            # Add performance header for monitoring
+            response.headers['X-Response-Time'] = f'{duration:.2f}ms'
+        
+        return response
+    
+    app.logger.info("Performance monitoring initialized")
+    
+except ImportError as e:
+    app.logger.warning(f"Performance monitoring unavailable: {e}")
+
+# Stage 1 Optimization: Response Compression (Feature Flag Controlled)
+ENABLE_COMPRESSION = os.environ.get('ENABLE_COMPRESSION', 'false').lower() == 'true'
+if ENABLE_COMPRESSION:
+    try:
+        from flask_compress import Compress
+        Compress(app)
+        app.logger.info("Response compression enabled")
+    except ImportError:
+        app.logger.warning("Flask-Compress not available, compression disabled")
+
 # Initialize CSRF protection
 csrf = CSRFProtect(app)
 
