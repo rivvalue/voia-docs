@@ -27,7 +27,7 @@ class ExecutiveReportGenerator:
     """Generates executive reports for completed campaigns"""
     
     def __init__(self):
-        self.report_dir = "/tmp/executive_reports"
+        self.report_dir = "static/reports"
         os.makedirs(self.report_dir, exist_ok=True)
     
     def generate_campaign_report(self, campaign_id: int, business_account_id: int) -> Optional[str]:
