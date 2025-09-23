@@ -2603,7 +2603,12 @@ def license_assignment_form(business_id):
             'license_info': license_info,
             'available_types': available_types,
             'campaigns_used': max(0, campaigns_used),  # Ensure non-negative
-            'users_count': max(0, users_count)  # Ensure non-negative
+            'users_count': max(0, users_count),  # Ensure non-negative
+            'usage_stats': {
+                'users_count': max(0, users_count),
+                'campaigns_count': max(0, campaigns_used),
+                'responses_count': 0  # TODO: Add response count when available
+            }
         }
         
         # Log platform admin access for audit
