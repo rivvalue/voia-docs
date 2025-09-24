@@ -404,7 +404,7 @@
                         </div>
                         <div>
                             <h2 class="mb-1">Welcome, {{ current_user.full_name }}</h2>
-                            <p class="mb-0 opacity-75">{{ business_account.name }} - {% if current_user.role == 'platform_admin' %}Platform Administrator{% elif current_user.role == 'business_account_admin' %}Administrator{% elif current_user.role == 'manager' %}Manager{% elif current_user.role == 'analyst' %}Analyst{% elif current_user.role == 'viewer' %}Viewer{% else %}{{ current_user.role|title }}{% endif %} Dashboard</p>
+                            <p class="mb-0 opacity-75">{{ business_account.name }} - {% if current_user.role == 'platform_admin' %}Platform Administrator{% elif current_user.role == 'business_account_admin' %}Administrator{% elif current_user.role == 'manager' %}Manager{% elif current_user.role == 'viewer' %}Viewer{% else %}{{ current_user.role|title }}{% endif %} Dashboard</p>
                         </div>
                     </div>
                 </div>
