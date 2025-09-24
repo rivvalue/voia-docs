@@ -696,8 +696,7 @@
         </div>
         {% endif %}
 
-        {% if admin_data.account_type == 'demo' %}
-        <!-- Demo Account: Rivvalue Campaign Management -->
+        <!-- Campaign Management for All Account Types -->
         <div class="row">
             <div class="col-lg-8">
                 <!-- Recent Campaigns -->
@@ -909,29 +908,6 @@
             </div>
         </div>
 
-        {% else %}
-        <!-- Customer Account: Future Phase 3 Features -->
-        <div class="admin-section">
-            <div class="section-header">
-                <h3 class="section-title">
-                    <i class="fas fa-users"></i>
-                    Participant Management
-                </h3>
-            </div>
-            <div class="empty-state">
-                <i class="fas fa-construction"></i>
-                <h4>Coming Soon in Phase 3</h4>
-                <p>{{ admin_data.message }}</p>
-                <p class="text-muted">
-                    <strong>Planned Features:</strong><br>
-                    • CSV participant upload<br>
-                    • Token generation for participants<br>
-                    • Campaign-based survey management<br>
-                    • Participant tracking and analytics
-                </p>
-            </div>
-        </div>
-        {% endif %}
 
         <!-- Session Info -->
         <div class="admin-section">

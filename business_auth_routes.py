@@ -1021,127 +1021,114 @@ def admin_panel():
         from license_service import LicenseService
         license_info = LicenseService.get_license_info(business_account.id)
         
-        # Admin panel data depends on account type
-        if business_account.account_type == 'demo':
-            # Rivvalue demo account - show demo campaign management
-            from models import Campaign, SurveyResponse, Participant, CampaignParticipant, EmailDelivery
-            from email_service import email_service
-            
-            # Get demo campaigns (for Rivvalue) - now using proper business account ownership
-            campaigns = Campaign.query.filter_by(
-                business_account_id=business_account.id
-            ).order_by(Campaign.created_at.desc()).limit(5).all()
-            
-            # Get recent demo responses (properly scoped to business account)
-            recent_responses = SurveyResponse.query.join(Campaign).filter(
-                Campaign.business_account_id == business_account.id
-            ).order_by(SurveyResponse.created_at.desc()).limit(10).all()
-            
-            # Basic stats for demo account (properly scoped to business account)
-            total_responses = SurveyResponse.query.join(Campaign).filter(
-                Campaign.business_account_id == business_account.id
-            ).count()
-            total_campaigns = Campaign.query.filter(
-                Campaign.business_account_id == business_account.id
-            ).count()
-            
-            # Add participant count for demo account
-            total_participants = Participant.query.filter_by(
-                business_account_id=business_account.id
-            ).count()
-            
-            # Email delivery statistics
-            total_invitations = EmailDelivery.query.filter_by(
-                business_account_id=business_account.id,
-                email_type='participant_invitation'
-            ).count()
-            
-            sent_invitations = EmailDelivery.query.filter_by(
-                business_account_id=business_account.id,
-                email_type='participant_invitation',
-                status='sent'
-            ).count()
-            
-            failed_invitations = EmailDelivery.query.filter_by(
-                business_account_id=business_account.id,
-                email_type='participant_invitation',
-                status='failed'
-            ).count()
-            
-            pending_invitations = EmailDelivery.query.filter_by(
-                business_account_id=business_account.id,
-                email_type='participant_invitation',
-                status='pending'
-            ).count()
-            
-            # Get active campaigns with invitation status
-            active_campaigns = []
-            for campaign in campaigns:
-                if campaign.is_active():
-                    # Get participant count for this campaign
-                    participant_count = CampaignParticipant.query.filter_by(
-                        campaign_id=campaign.id,
-                        business_account_id=business_account.id
-                    ).count()
-                    
-                    # Get invitation statistics for this campaign
-                    campaign_invitations = EmailDelivery.query.filter_by(
-                        campaign_id=campaign.id,
-                        business_account_id=business_account.id,
-                        email_type='participant_invitation'
-                    ).count()
-                    
-                    campaign_sent = EmailDelivery.query.filter_by(
-                        campaign_id=campaign.id,
-                        business_account_id=business_account.id,
-                        email_type='participant_invitation',
-                        status='sent'
-                    ).count()
-                    
-                    campaign_data = campaign.to_dict()
-                    campaign_data.update({
-                        'participant_count': participant_count,
-                        'invitation_stats': {
-                            'total': campaign_invitations,
-                            'sent': campaign_sent,
-                            'pending': campaign_invitations - campaign_sent,
-                            'can_send_invitations': participant_count > 0 and email_service.is_configured()
-                        }
-                    })
-                    active_campaigns.append(campaign_data)
-            
-            admin_data = {
-                'account_type': 'demo',
-                'campaigns': [c.to_dict() for c in campaigns],
-                'active_campaigns': active_campaigns,
-                'recent_responses': [r.to_dict() for r in recent_responses],
-                'stats': {
-                    'total_responses': total_responses,
-                    'total_campaigns': total_campaigns,
-                    'total_participants': total_participants,
-                    'active_campaigns': len(active_campaigns),
-                    'email_stats': {
-                        'total_invitations': total_invitations,
-                        'sent_invitations': sent_invitations,
-                        'failed_invitations': failed_invitations,
-                        'pending_invitations': pending_invitations
+        # Load admin panel data for all account types (security enforced by decorators)
+        from models import Campaign, SurveyResponse, Participant, CampaignParticipant, EmailDelivery
+        from email_service import email_service
+        
+        # Get campaigns for this business account
+        campaigns = Campaign.query.filter_by(
+            business_account_id=business_account.id
+        ).order_by(Campaign.created_at.desc()).limit(5).all()
+        
+        # Get recent responses (properly scoped to business account)
+        recent_responses = SurveyResponse.query.join(Campaign).filter(
+            Campaign.business_account_id == business_account.id
+        ).order_by(SurveyResponse.created_at.desc()).limit(10).all()
+        
+        # Basic stats (properly scoped to business account)
+        total_responses = SurveyResponse.query.join(Campaign).filter(
+            Campaign.business_account_id == business_account.id
+        ).count()
+        total_campaigns = Campaign.query.filter(
+            Campaign.business_account_id == business_account.id
+        ).count()
+        
+        # Add participant count
+        total_participants = Participant.query.filter_by(
+            business_account_id=business_account.id
+        ).count()
+        
+        # Email delivery statistics
+        total_invitations = EmailDelivery.query.filter_by(
+            business_account_id=business_account.id,
+            email_type='participant_invitation'
+        ).count()
+        
+        sent_invitations = EmailDelivery.query.filter_by(
+            business_account_id=business_account.id,
+            email_type='participant_invitation',
+            status='sent'
+        ).count()
+        
+        failed_invitations = EmailDelivery.query.filter_by(
+            business_account_id=business_account.id,
+            email_type='participant_invitation',
+            status='failed'
+        ).count()
+        
+        pending_invitations = EmailDelivery.query.filter_by(
+            business_account_id=business_account.id,
+            email_type='participant_invitation',
+            status='pending'
+        ).count()
+        
+        # Get active campaigns with invitation status
+        active_campaigns = []
+        for campaign in campaigns:
+            if campaign.is_active():
+                # Get participant count for this campaign
+                participant_count = CampaignParticipant.query.filter_by(
+                    campaign_id=campaign.id,
+                    business_account_id=business_account.id
+                ).count()
+                
+                # Get invitation statistics for this campaign
+                campaign_invitations = EmailDelivery.query.filter_by(
+                    campaign_id=campaign.id,
+                    business_account_id=business_account.id,
+                    email_type='participant_invitation'
+                ).count()
+                
+                campaign_sent = EmailDelivery.query.filter_by(
+                    campaign_id=campaign.id,
+                    business_account_id=business_account.id,
+                    email_type='participant_invitation',
+                    status='sent'
+                ).count()
+                
+                campaign_data = campaign.to_dict()
+                campaign_data.update({
+                    'participant_count': participant_count,
+                    'invitation_stats': {
+                        'total': campaign_invitations,
+                        'sent': campaign_sent,
+                        'pending': campaign_invitations - campaign_sent,
+                        'can_send_invitations': participant_count > 0 and email_service.is_configured()
                     }
-                },
-                'email_configured': email_service.is_configured(),
-                'license_info': license_info
-            }
-        else:
-            # Customer account - placeholder for future Phase 3
-            admin_data = {
-                'account_type': 'customer',
-                'message': 'Customer participant management coming in Phase 3',
-                'stats': {
-                    'total_participants': 0,
-                    'total_campaigns': 0,
-                    'completed_surveys': 0
-                },
-                'license_info': license_info
-            }
+                })
+                active_campaigns.append(campaign_data)
+        
+        # Build unified admin data for all account types
+        admin_data = {
+            'account_type': business_account.account_type,
+            'campaigns': [c.to_dict() for c in campaigns],
+            'active_campaigns': active_campaigns,
+            'recent_responses': [r.to_dict() for r in recent_responses],
+            'stats': {
+                'total_responses': total_responses,
+                'total_campaigns': total_campaigns,
+                'total_participants': total_participants,
+                'active_campaigns': len(active_campaigns),
+                'email_stats': {
+                    'total_invitations': total_invitations,
+                    'sent_invitations': sent_invitations,
+                    'failed_invitations': failed_invitations,
+                    'pending_invitations': pending_invitations
+                }
+            },
+            'email_configured': email_service.is_configured(),
+            'license_info': license_info
+        }
         
         return render_template('business_auth/admin_panel.html',
                              business_account=business_account,
