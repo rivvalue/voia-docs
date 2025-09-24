@@ -1273,7 +1273,6 @@ class BusinessAccountUser(UserMixin, db.Model):
         # 1. 'platform_admin' role AND belong to 'platform_owner' business account
         # 2. OR be specific admin emails (for emergency fallback)
         platform_admin_emails = {
-            'admin@archelo.com',         # Archelo Group admin (updated)
             'admin@voia.com',            # Platform admin for license management
             'admin@rivvalue.com',        # Generic admin
             'platform@rivvalue.com'      # Platform admin
