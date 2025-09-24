@@ -1108,12 +1108,18 @@ def admin_panel():
                 })
                 active_campaigns.append(campaign_data)
         
+        # Get primary active campaign for analytics link
+        primary_active_campaign_id = None
+        if active_campaigns:
+            primary_active_campaign_id = active_campaigns[0]['id']
+        
         # Build unified admin data for all account types
         admin_data = {
             'account_type': business_account.account_type,
             'campaigns': [c.to_dict() for c in campaigns],
             'active_campaigns': active_campaigns,
             'recent_responses': [r.to_dict() for r in recent_responses],
+            'primary_active_campaign_id': primary_active_campaign_id,
             'stats': {
                 'total_responses': total_responses,
                 'total_campaigns': total_campaigns,

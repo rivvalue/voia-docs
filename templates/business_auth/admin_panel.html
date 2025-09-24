@@ -452,7 +452,7 @@
                         <a href="{{ url_for('participants.list_participants') }}" class="btn btn-primary btn-admin" title="Manage survey participants">
                             <i class="fas fa-users me-2"></i>Manage Participants
                         </a>
-                        <a href="{{ url_for('dashboard') }}{% if admin_data.campaigns %}{% for campaign in admin_data.campaigns %}{% if campaign.status == 'active' %}?campaign_id={{ campaign.id }}{% endif %}{% endfor %}{% endif %}" class="btn btn-outline-primary btn-admin" title="View analytics and insights">
+                        <a href="{% if admin_data.primary_active_campaign_id %}{{ url_for('dashboard', campaign_id=admin_data.primary_active_campaign_id) }}{% else %}{{ url_for('dashboard') }}{% endif %}" class="btn btn-outline-primary btn-admin" title="View analytics and insights">
                             <i class="fas fa-chart-bar me-2"></i>View Analytics
                         </a>
                         <a href="{{ url_for('business_auth.logout') }}" class="btn btn-outline-dark btn-admin">
