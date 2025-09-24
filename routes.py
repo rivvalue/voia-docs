@@ -1143,7 +1143,6 @@ def dashboard():
     return render_template('dashboard.html', company_nps_data=company_nps_data, user_email=user_email)
 
 @app.route('/api/dashboard_data')
-@require_business_auth
 def dashboard_data():
     """API endpoint for dashboard data with optional campaign filtering"""
     try:
@@ -1152,42 +1151,38 @@ def dashboard_data():
         from data_storage import get_dashboard_data
         from business_auth_routes import get_current_business_account
         
-        # Get current business account for tenant scoping
-        current_account = get_current_business_account()
-        if not current_account:
-            return jsonify({'error': 'Business account context not found'}), 401
-        
         # Get campaign filter parameter
         campaign_id = request.args.get('campaign_id', type=int)
         
-        # If campaign_id provided, validate it belongs to current business account
+        # Determine target business account: authenticated users see their data, public users see demo data
+        current_account = get_current_business_account()
+        if current_account:
+            # Business user: scope to their account
+            target_business_account_id = current_account.id
+            account_context = f"business account {current_account.name}"
+        else:
+            # Public user: scope to demo account (Archelo Group - ID 1)
+            target_business_account_id = 1
+            account_context = "demo account"
+        
+        # If campaign_id provided, validate it belongs to target business account
         if campaign_id:
             campaign = Campaign.query.filter_by(
                 id=campaign_id, 
-                business_account_id=current_account.id
+                business_account_id=target_business_account_id
             ).first()
             if not campaign:
                 return jsonify({'error': 'Campaign not found or access denied'}), 404
         
-        # If no campaign specified, default to active campaign for current business account only
+        # If no campaign specified, default to active campaign for target business account
         if campaign_id is None:
             active_campaign = Campaign.query.filter_by(
-                business_account_id=current_account.id,
+                business_account_id=target_business_account_id,
                 status='active'
             ).order_by(Campaign.id.desc()).first()
             if active_campaign:
                 campaign_id = active_campaign.id
-                logger.info(f"Survey Insights defaulting to business account {current_account.name} active campaign: {active_campaign.name} (ID: {campaign_id})")
-            else:
-                # No active campaigns for this business account - return empty data
-                logger.info(f"No active campaigns found for business account {current_account.name}")
-                return jsonify({
-                    'responses': [],
-                    'nps_score': None,
-                    'theme_analysis': [],
-                    'growth_opportunities': [],
-                    'message': 'No active campaigns found. Create and activate a campaign to view analytics.'
-                })
+                logger.info(f"Survey Insights defaulting to {account_context} active campaign: {active_campaign.name} (ID: {campaign_id})")
         
         data = get_dashboard_data(campaign_id=campaign_id)
         
@@ -1195,7 +1190,7 @@ def dashboard_data():
         if campaign_id:
             campaign = Campaign.query.filter_by(
                 id=campaign_id,
-                business_account_id=current_account.id
+                business_account_id=target_business_account_id
             ).first()
             if campaign:
                 data['active_campaign'] = {
