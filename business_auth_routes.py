@@ -1163,9 +1163,9 @@ def admin_panel():
         return redirect(url_for('business_auth.login'))
 
 
-@business_auth_bp.route('/admin/platform-dashboard')
+@business_auth_bp.route('/admin/business-analytics-hub')
 @require_platform_admin
-def platform_dashboard():
+def business_analytics_hub():
     """Platform admin dashboard with system-wide metrics and management"""
     try:
         # Import required modules first
