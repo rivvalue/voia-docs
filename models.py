@@ -1265,9 +1265,9 @@ class BusinessAccountUser(UserMixin, db.Model):
     
     def is_platform_admin(self):
         """Check if user is a platform administrator with cross-tenant permissions"""
-        # Platform admins are identified by:
-        # 1. Having 'platform_admin' role
-        # 2. Being specific admin emails (for backward compatibility)
+        # Enhanced security: Platform admins must have BOTH:
+        # 1. 'platform_admin' role AND belong to 'platform_owner' business account
+        # 2. OR be specific admin emails (for emergency fallback)
         platform_admin_emails = {
             'admin@archelo.com',         # Archelo Group admin (updated)
             'admin@voia.com',            # Platform admin for license management
@@ -1275,8 +1275,17 @@ class BusinessAccountUser(UserMixin, db.Model):
             'platform@rivvalue.com'      # Platform admin
         }
         
-        return (self.role == 'platform_admin' or 
-                self.email.lower().strip() in platform_admin_emails)
+        # Check for dual-layer authentication: role + business account type
+        role_and_account_check = (
+            self.role == 'platform_admin' and 
+            self.business_account and 
+            self.business_account.account_type == 'platform_owner'
+        )
+        
+        # Fallback for emergency access via hardcoded emails
+        email_fallback = self.email.lower().strip() in platform_admin_emails
+        
+        return role_and_account_check or email_fallback
     
     def to_dict(self):
         return {
