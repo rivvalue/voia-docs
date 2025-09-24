@@ -1159,6 +1159,12 @@ class BusinessAccountUser(UserMixin, db.Model):
     invited_at = db.Column(db.DateTime, nullable=True, index=True)
     activated_at = db.Column(db.DateTime, nullable=True, index=True)
     
+    # Onboarding flow (Phase 3: Mandatory Setup for Core/Plus licenses)
+    onboarding_progress = db.Column(db.JSON, nullable=True, default=dict)
+    onboarding_completed = db.Column(db.Boolean, nullable=False, default=False, index=True)
+    onboarding_version = db.Column(db.String(20), nullable=True, default='1.0')
+    onboarding_completed_at = db.Column(db.DateTime, nullable=True, index=True)
+    
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -1316,6 +1322,106 @@ class BusinessAccountUser(UserMixin, db.Model):
     def get_by_business_account(business_account_id):
         """Get all users for a business account"""
         return BusinessAccountUser.query.filter_by(business_account_id=business_account_id).all()
+    
+    # ==== ONBOARDING METHODS ====
+    
+    def requires_onboarding(self):
+        """Check if user needs mandatory onboarding based on license and role"""
+        # Only admin roles need onboarding
+        if self.role not in ['admin', 'business_account_admin']:
+            return False
+        
+        # Platform admins skip onboarding
+        if self.is_platform_admin():
+            return False
+        
+        # Check if already completed
+        if self.onboarding_completed:
+            return False
+        
+        # Check license type - only Core and Plus require onboarding
+        try:
+            from license_service import LicenseService
+            license_info = LicenseService.get_license_info(self.business_account_id)
+            return license_info['license_type'] in ['core', 'plus']
+        except Exception:
+            # Default to requiring onboarding if license check fails
+            return True
+    
+    def get_onboarding_progress(self):
+        """Get current onboarding progress"""
+        if not self.onboarding_progress:
+            return self._get_default_onboarding_progress()
+        return self.onboarding_progress
+    
+    def _get_default_onboarding_progress(self):
+        """Get default onboarding progress structure"""
+        return {
+            "version": "1.0",
+            "steps": {
+                "welcome": {"completed": False},
+                "smtp": {"completed": False},
+                "users": {"completed": False}
+            },
+            "current_step": "welcome"
+        }
+    
+    def initialize_onboarding(self):
+        """Initialize onboarding progress for user"""
+        if not self.onboarding_progress:
+            self.onboarding_progress = self._get_default_onboarding_progress()
+            self.onboarding_version = "1.0"
+    
+    def complete_onboarding_step(self, step_name):
+        """Mark an onboarding step as completed"""
+        self.initialize_onboarding()
+        
+        progress = self.onboarding_progress.copy()
+        if step_name in progress["steps"]:
+            progress["steps"][step_name]["completed"] = True
+            progress["steps"][step_name]["completed_at"] = datetime.utcnow().isoformat()
+            
+            # Update current step to next incomplete step
+            progress["current_step"] = self._get_next_step(progress)
+            
+            self.onboarding_progress = progress
+            
+            # Check if all steps are completed
+            if self._all_steps_completed(progress):
+                self.complete_onboarding()
+    
+    def _get_next_step(self, progress):
+        """Get the next incomplete step"""
+        step_order = ["welcome", "smtp", "users"]
+        for step in step_order:
+            if not progress["steps"].get(step, {}).get("completed", False):
+                return step
+        return "completed"
+    
+    def _all_steps_completed(self, progress):
+        """Check if all required steps are completed"""
+        required_steps = ["welcome", "smtp", "users"]
+        return all(progress["steps"].get(step, {}).get("completed", False) for step in required_steps)
+    
+    def complete_onboarding(self):
+        """Mark entire onboarding as completed"""
+        self.onboarding_completed = True
+        self.onboarding_completed_at = datetime.utcnow()
+        
+        # Update progress
+        progress = self.get_onboarding_progress()
+        progress["current_step"] = "completed"
+        self.onboarding_progress = progress
+    
+    def get_current_onboarding_step(self):
+        """Get current onboarding step"""
+        progress = self.get_onboarding_progress()
+        return progress.get("current_step", "welcome")
+    
+    def get_onboarding_step_status(self, step_name):
+        """Get status of specific onboarding step"""
+        progress = self.get_onboarding_progress()
+        return progress["steps"].get(step_name, {"completed": False})
 
 
 class UserSession(db.Model):
