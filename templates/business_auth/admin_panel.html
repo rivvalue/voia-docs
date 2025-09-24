@@ -410,54 +410,103 @@
                 </div>
                 <div class="col-12 col-lg-6">
                     <div class="admin-actions">
-                        <!-- Platform Admin Section -->
+                        <!-- Platform Admin Section - Always Visible -->
                         {% if current_user.role == 'platform_admin' %}
-                        <a href="{{ url_for('business_auth.business_account_onboarding') }}" class="btn btn-success btn-admin me-2" title="Create new business accounts with license assignment">
+                        <a href="{{ url_for('business_auth.business_account_onboarding') }}" class="btn btn-success btn-admin me-2 d-none d-lg-inline-block" title="Create new business accounts with license assignment">
                             <i class="fas fa-plus-circle me-2"></i>Onboard Business
                         </a>
-                        <a href="{{ url_for('business_auth.license_dashboard') }}" class="btn btn-primary btn-admin me-2" title="License management dashboard and overview">
+                        <a href="{{ url_for('business_auth.license_dashboard') }}" class="btn btn-primary btn-admin me-2 d-none d-lg-inline-block" title="License management dashboard and overview">
                             <i class="fas fa-tachometer-alt me-2"></i>License Dashboard
-                        </a>
-                        <a href="{{ url_for('business_auth.license_info') }}" class="btn btn-outline-primary btn-admin me-2" title="View all business accounts and license assignments">
-                            <i class="fas fa-building me-2"></i>Manage Licenses
                         </a>
                         {% endif %}
                         
-                        <!-- Regular Admin Actions -->
-                        <a href="{{ url_for('business_auth.license_info') }}" class="btn btn-outline-primary btn-admin me-2" title="View license information and usage statistics">
-                            <i class="fas fa-certificate me-2"></i>License Info
+                        <!-- Primary Actions - Always Visible -->
+                        <a href="{{ url_for('campaigns.list_campaigns') }}" class="btn btn-primary btn-admin me-2" title="Manage survey campaigns">
+                            <i class="fas fa-bullhorn me-2"></i><span class="d-none d-sm-inline">Manage </span>Campaigns
                         </a>
-                        <a href="{{ url_for('business_auth.audit_logs') }}" class="btn btn-outline-primary btn-admin me-2" title="View account activity trail">
-                            <i class="fas fa-clipboard-list me-2"></i>Audit Trail
+                        <a href="{{ url_for('participants.list_participants') }}" class="btn btn-primary btn-admin me-2" title="Manage survey participants">
+                            <i class="fas fa-users me-2"></i><span class="d-none d-sm-inline">Manage </span>Participants
                         </a>
-                        <a href="{{ url_for('business_auth.email_config') }}" class="btn btn-primary btn-admin me-2" title="Configure email settings">
-                            <i class="fas fa-envelope-open-text me-2"></i>Email Config
-                        </a>
-                        <a href="{{ url_for('business_auth.brand_config') }}" class="btn btn-primary btn-admin me-2" title="Configure brand settings">
-                            <i class="fas fa-paint-brush me-2"></i>Brand Settings
-                        </a>
-                        {% if current_user.has_permission('manage_users') %}
-                        <a href="{{ url_for('business_auth.manage_users') }}" class="btn btn-primary btn-admin me-2" title="Manage team members and users">
-                            <i class="fas fa-users me-2"></i>Manage Users
-                        </a>
-                        {% endif %}
-                        {% if business_account.account_type in ['customer', 'demo'] %}
-                        <a href="{{ url_for('business_auth.survey_config') }}" class="btn btn-primary btn-admin me-2" title="Customize survey experience and conversation settings">
-                            <i class="fas fa-cog me-2"></i>Survey Customization
-                        </a>
-                        {% endif %}
-                        <a href="{{ url_for('campaigns.list_campaigns') }}" class="btn btn-primary btn-admin" title="Manage survey campaigns">
-                            <i class="fas fa-bullhorn me-2"></i>Manage Campaigns
-                        </a>
-                        <a href="{{ url_for('participants.list_participants') }}" class="btn btn-primary btn-admin" title="Manage survey participants">
-                            <i class="fas fa-users me-2"></i>Manage Participants
-                        </a>
-                        <a href="{% if admin_data.primary_active_campaign_id %}{{ url_for('dashboard', campaign_id=admin_data.primary_active_campaign_id) }}{% else %}{{ url_for('dashboard') }}{% endif %}" class="btn btn-outline-primary btn-admin" title="View analytics and insights">
-                            <i class="fas fa-chart-bar me-2"></i>View Analytics
-                        </a>
-                        <a href="{{ url_for('business_auth.logout') }}" class="btn btn-outline-dark btn-admin">
-                            <i class="fas fa-sign-out-alt me-2"></i>Logout
-                        </a>
+                        
+                        <!-- Quick Actions Dropdown -->
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-outline-primary btn-admin dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Quick actions and settings">
+                                <i class="fas fa-cog me-2"></i>Quick Actions
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <!-- Analytics -->
+                                <li>
+                                    <a class="dropdown-item" href="{% if admin_data.primary_active_campaign_id %}{{ url_for('dashboard', campaign_id=admin_data.primary_active_campaign_id) }}{% else %}{{ url_for('dashboard') }}{% endif %}" title="View analytics and insights">
+                                        <i class="fas fa-chart-bar me-2 text-primary"></i>View Analytics
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                
+                                <!-- Configuration Actions -->
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.email_config') }}" title="Configure email settings">
+                                        <i class="fas fa-envelope-open-text me-2 text-primary"></i>Email Config
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.brand_config') }}" title="Configure brand settings">
+                                        <i class="fas fa-paint-brush me-2 text-primary"></i>Brand Settings
+                                    </a>
+                                </li>
+                                {% if business_account.account_type in ['customer', 'demo'] %}
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.survey_config') }}" title="Customize survey experience and conversation settings">
+                                        <i class="fas fa-cog me-2 text-primary"></i>Survey Customization
+                                    </a>
+                                </li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                
+                                <!-- Management Actions -->
+                                {% if current_user.has_permission('manage_users') %}
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.manage_users') }}" title="Manage team members and users">
+                                        <i class="fas fa-users me-2 text-success"></i>Manage Users
+                                    </a>
+                                </li>
+                                {% endif %}
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.license_info') }}" title="View license information and usage statistics">
+                                        <i class="fas fa-certificate me-2 text-info"></i>License Info
+                                    </a>
+                                </li>
+                                {% if current_user.role == 'platform_admin' %}
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.license_info') }}" title="View all business accounts and license assignments">
+                                        <i class="fas fa-building me-2 text-warning"></i>Manage Licenses
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item d-lg-none" href="{{ url_for('business_auth.business_account_onboarding') }}" title="Create new business accounts with license assignment">
+                                        <i class="fas fa-plus-circle me-2 text-success"></i>Onboard Business
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item d-lg-none" href="{{ url_for('business_auth.license_dashboard') }}" title="License management dashboard and overview">
+                                        <i class="fas fa-tachometer-alt me-2 text-primary"></i>License Dashboard
+                                    </a>
+                                </li>
+                                {% endif %}
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.audit_logs') }}" title="View account activity trail">
+                                        <i class="fas fa-clipboard-list me-2 text-secondary"></i>Audit Trail
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                
+                                <!-- Logout -->
+                                <li>
+                                    <a class="dropdown-item text-danger" href="{{ url_for('business_auth.logout') }}">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
