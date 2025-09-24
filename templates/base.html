@@ -39,6 +39,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
+                    {% if not is_business_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('index') }}">Home</a>
                     </li>
@@ -53,19 +54,9 @@
                             <li><a class="dropdown-item" href="{{ url_for('dashboard') }}">
                                 What insights you get
                             </a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><h6 class="dropdown-header">Survey</h6></li>
-                            <li><a class="dropdown-item" href="{{ url_for('auth') }}">
-                                <i class="fas fa-key me-2"></i>Get Token
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('conversational_survey') }}">
-                                <i class="fas fa-comments me-2"></i>AI Conversation
-                            </a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('survey') }}">
-                                <i class="fas fa-list me-2"></i>Traditional Form
-                            </a></li>
                         </ul>
                     </li>
+                    {% endif %}
                     <!-- Business Authentication Status -->
                     {% if is_business_authenticated %}
                     <li class="nav-item dropdown">
