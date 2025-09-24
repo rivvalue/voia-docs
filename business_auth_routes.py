@@ -1282,51 +1282,73 @@ def platform_dashboard():
             func.count(Campaign.id).desc()
         ).limit(5).all()
         
-        # === BUILD COMPREHENSIVE DASHBOARD DATA ===
+        # Platform admin count for template compatibility
+        platform_admin_count = BusinessAccountUser.query.filter_by(role='platform_admin').count()
+        
+        # === BUILD DASHBOARD DATA (Compatible with existing template) ===
         dashboard_data = {
-            'business_intelligence': {
+            'overview_metrics': {
                 'total_accounts': total_accounts,
                 'active_accounts': active_accounts,
                 'trial_accounts': trial_accounts,
                 'customer_accounts': customer_accounts,
                 'demo_accounts': demo_accounts,
-                'platform_owner_accounts': platform_owner_accounts
-            },
-            'user_engagement': {
-                'total_users': total_users,
+                'platform_owner_accounts': platform_owner_accounts,
                 'total_active_users': total_active_users,
-                'total_inactive_users': total_inactive_users,
-                'avg_users_per_account': avg_users_per_account
-            },
-            'campaign_performance': {
-                'total_campaigns': total_campaigns,
-                'draft_campaigns': draft_campaigns,
-                'ready_campaigns': ready_campaigns,
+                'platform_admin_count': platform_admin_count,
+                'campaigns_this_month': campaigns_this_month,
                 'active_campaigns': active_campaigns,
-                'completed_campaigns': completed_campaigns,
-                'cancelled_campaigns': cancelled_campaigns,
-                'campaigns_this_month': campaigns_this_month
+                'responses_this_month': responses_this_month
             },
-            'participant_intelligence': {
-                'total_participants': total_participants,
-                'avg_participants_per_account': avg_participants_per_account,
-                'total_assignments': total_assignments,
-                'avg_participants_per_campaign': avg_participants_per_campaign
-            },
-            'survey_analytics': {
-                'total_responses': total_responses,
-                'responses_this_month': responses_this_month,
-                'completion_rate': completion_rate
-            },
-            'license_utilization': license_summary,
-            'recent_activity': {
-                'recent_accounts': [account.to_dict() for account in recent_accounts],
-                'most_active_accounts': [
-                    {
-                        'business_name': acc.name,
-                        'campaign_count': acc.campaign_count
-                    } for acc in most_active_accounts
-                ]
+            'recent_accounts': [account.to_dict() for account in recent_accounts],
+            'high_usage_accounts': license_summary['high_usage_accounts'][:10],  # Top 10 high usage accounts
+            
+            # Extended metrics for comprehensive platform insights
+            'detailed_metrics': {
+                'business_intelligence': {
+                    'total_accounts': total_accounts,
+                    'active_accounts': active_accounts,
+                    'trial_accounts': trial_accounts,
+                    'customer_accounts': customer_accounts,
+                    'demo_accounts': demo_accounts,
+                    'platform_owner_accounts': platform_owner_accounts
+                },
+                'user_engagement': {
+                    'total_users': total_users,
+                    'total_active_users': total_active_users,
+                    'total_inactive_users': total_inactive_users,
+                    'avg_users_per_account': avg_users_per_account
+                },
+                'campaign_performance': {
+                    'total_campaigns': total_campaigns,
+                    'draft_campaigns': draft_campaigns,
+                    'ready_campaigns': ready_campaigns,
+                    'active_campaigns': active_campaigns,
+                    'completed_campaigns': completed_campaigns,
+                    'cancelled_campaigns': cancelled_campaigns,
+                    'campaigns_this_month': campaigns_this_month
+                },
+                'participant_intelligence': {
+                    'total_participants': total_participants,
+                    'avg_participants_per_account': avg_participants_per_account,
+                    'total_assignments': total_assignments,
+                    'avg_participants_per_campaign': avg_participants_per_campaign
+                },
+                'survey_analytics': {
+                    'total_responses': total_responses,
+                    'responses_this_month': responses_this_month,
+                    'completion_rate': completion_rate
+                },
+                'license_utilization': license_summary,
+                'recent_activity': {
+                    'recent_accounts': [account.to_dict() for account in recent_accounts],
+                    'most_active_accounts': [
+                        {
+                            'business_name': acc.name,
+                            'campaign_count': acc.campaign_count
+                        } for acc in most_active_accounts
+                    ]
+                }
             }
         }
         
