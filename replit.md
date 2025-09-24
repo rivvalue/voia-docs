@@ -26,6 +26,7 @@ Key architectural decisions and features:
 -   **Hybrid Survey Customization**: Campaign-specific survey personalization with business account defaults for tailored AI conversations while maintaining brand identity.
 -   **License Management System**: Enterprise-ready license management with usage tracking and enforcement, including anniversary-based calculation, and limits on campaigns, users, and participants.
 -   **Business Account User Management**: Multi-tenant user management with a professional UI, license-aware counters, user creation workflows with validation, email verification, editing, role management, status controls, and admin-triggered password resets.
+-   **Mandatory Onboarding System**: Extensible guided setup workflow for business account administrators with Core/Plus licenses, featuring JSON-based progress tracking, license-conditional enforcement (Pro users exempted), step-by-step SMTP configuration and team member setup, route protection with zero regression for existing functionality, and configurable validation system for future step additions.
 -   **Scalability Assessment**: System reliably handles 20k-50k participants (100-150 clients) on existing Replit infrastructure. Scaling beyond this requires database migration, professional email services, and distributed background processing.
 
 # External Dependencies
