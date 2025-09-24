@@ -446,6 +446,9 @@
                             <i class="fas fa-cog me-2"></i>Survey Customization
                         </a>
                         {% endif %}
+                        <a href="{{ url_for('campaigns.list_campaigns') }}" class="btn btn-primary btn-admin" title="Manage survey campaigns">
+                            <i class="fas fa-bullhorn me-2"></i>Manage Campaigns
+                        </a>
                         <a href="{{ url_for('participants.list_participants') }}" class="btn btn-primary btn-admin" title="Manage survey participants">
                             <i class="fas fa-users me-2"></i>Manage Participants
                         </a>
