@@ -2182,7 +2182,7 @@ def get_campaign_filter_options():
         else:
             # Public/participant user - return demo campaigns only (ExecutiveSummary access)
             from models import BusinessAccount
-            demo_account = BusinessAccount.query.filter_by(name='Rivvalue Inc').first()
+            demo_account = BusinessAccount.query.filter_by(name='Archelo Group inc').first()
             if demo_account:
                 campaigns = Campaign.query.filter_by(business_account_id=demo_account.id).order_by(Campaign.start_date.desc()).all()
             else:
@@ -2229,7 +2229,7 @@ def get_campaign_comparison():
         else:
             # Public/participant user - only allow demo account campaigns (ExecutiveSummary access)
             from models import BusinessAccount
-            demo_account = BusinessAccount.query.filter_by(name='Rivvalue Inc').first()
+            demo_account = BusinessAccount.query.filter_by(name='Archelo Group inc').first()
             if demo_account:
                 campaign1 = Campaign.query.filter_by(id=campaign1_id, business_account_id=demo_account.id).first()
                 campaign2 = Campaign.query.filter_by(id=campaign2_id, business_account_id=demo_account.id).first()
