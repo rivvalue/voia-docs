@@ -1,0 +1,419 @@
+{% extends "base.html" %}
+
+{% block title %}Setup Complete - VOÏA{% endblock %}
+
+{% block page_class %}page-onboarding-complete{% endblock %}
+
+{% block content %}
+<style>
+/* Onboarding Complete specific styling */
+.onboarding-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 var(--spacing-lg);
+}
+
+.completion-header {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(22, 163, 74, 0.15) 100%);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: var(--primary-black);
+    padding: 3rem 2rem;
+    border-radius: var(--radius-2xl);
+    margin-bottom: 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.completion-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, rgb(34, 197, 94), rgb(22, 163, 74));
+}
+
+.success-icon {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgb(34, 197, 94) 0%, rgb(22, 163, 74) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: var(--primary-white);
+    font-size: 3rem;
+    box-shadow: var(--shadow-xl);
+    position: relative;
+    animation: checkmark 0.6s ease-in-out;
+}
+
+@keyframes checkmark {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.success-icon::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, rgb(34, 197, 94), rgb(22, 163, 74), rgb(34, 197, 94));
+    z-index: -1;
+    opacity: 0.3;
+}
+
+.completion-title {
+    font-size: var(--font-size-4xl);
+    font-weight: 700;
+    color: var(--primary-black);
+    margin-bottom: var(--spacing-sm);
+    font-family: var(--font-family-headings);
+}
+
+.completion-subtitle {
+    font-size: var(--font-size-xl);
+    color: var(--gray-dark);
+    margin-bottom: 2rem;
+    font-weight: 500;
+}
+
+.setup-summary {
+    background: var(--primary-white);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-2xl);
+    margin-bottom: var(--spacing-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+}
+
+.summary-header {
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+}
+
+.summary-items {
+    display: grid;
+    gap: var(--spacing-lg);
+}
+
+.summary-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg);
+    background: rgba(34, 197, 94, 0.05);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    border-radius: var(--radius-lg);
+}
+
+.summary-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgb(34, 197, 94) 0%, rgb(22, 163, 74) 100%);
+    color: var(--primary-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.summary-content {
+    flex: 1;
+}
+
+.summary-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--primary-black);
+    margin-bottom: var(--spacing-xs);
+}
+
+.summary-description {
+    color: var(--gray-dark);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+}
+
+.next-steps {
+    background: var(--primary-white);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-2xl);
+    margin-bottom: var(--spacing-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+}
+
+.next-step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg) 0;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.next-step-item:last-child {
+    border-bottom: none;
+}
+
+.step-number {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+    flex-shrink: 0;
+    margin-top: var(--spacing-xs);
+}
+
+.step-content {
+    flex: 1;
+}
+
+.step-title {
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--primary-black);
+    margin-bottom: var(--spacing-xs);
+}
+
+.step-description {
+    color: var(--gray-dark);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+}
+
+.action-buttons {
+    text-align: center;
+    padding: var(--spacing-2xl) 0;
+}
+
+.btn-dashboard {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+    border: none;
+    padding: var(--spacing-lg) var(--spacing-3xl);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-lg);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-dashboard:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+    color: var(--primary-white);
+}
+
+.celebration {
+    background: linear-gradient(135deg, rgba(var(--primary-red-rgb, 225, 58, 68), 0.05) 0%, rgba(34, 197, 94, 0.05) 100%);
+    border: 1px solid rgba(var(--primary-red-rgb, 225, 58, 68), 0.2);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-2xl);
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+}
+
+.celebration h4 {
+    color: var(--primary-red);
+    font-weight: 600;
+    margin-bottom: var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+}
+
+.confetti {
+    display: inline-block;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+.business-info {
+    background: rgba(var(--primary-red-rgb, 225, 58, 68), 0.05);
+    border: 1px solid rgba(var(--primary-red-rgb, 225, 58, 68), 0.2);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-2xl);
+    text-align: center;
+}
+
+.business-info h4 {
+    color: var(--primary-red);
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+}
+</style>
+
+<div class="onboarding-container">
+    <!-- Completion Header -->
+    <div class="completion-header">
+        <div class="success-icon">
+            <i class="fas fa-check"></i>
+        </div>
+        <h1 class="completion-title">Setup Complete!</h1>
+        <p class="completion-subtitle">Your VOÏA platform is ready for action</p>
+    </div>
+
+    <!-- Business Account Info -->
+    <div class="business-info">
+        <h4><i class="fas fa-building"></i> {{ business_account.name }}</h4>
+        <p>Congratulations, {{ current_user.get_full_name() }}! Your team is ready to start collecting valuable customer feedback.</p>
+    </div>
+
+    <!-- Celebration Message -->
+    <div class="celebration">
+        <h4>
+            <span class="confetti">🎉</span>
+            Welcome to the VOÏA Community!
+            <span class="confetti">🚀</span>
+        </h4>
+        <p style="color: var(--gray-dark); margin: 0;">
+            You've successfully configured your platform and can now create powerful customer feedback campaigns.
+        </p>
+    </div>
+
+    <!-- Setup Summary -->
+    <div class="setup-summary">
+        <div class="summary-header">
+            <h3 style="color: var(--primary-black); margin-bottom: var(--spacing-sm);">
+                <i class="fas fa-check-double me-2"></i>What You've Accomplished
+            </h3>
+            <p style="color: var(--gray-dark); margin: 0;">Here's what you've successfully set up:</p>
+        </div>
+
+        <div class="summary-items">
+            <div class="summary-item">
+                <div class="summary-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="summary-content">
+                    <div class="summary-title">Email Configuration</div>
+                    <div class="summary-description">Your SMTP settings are configured and tested. You can now send survey invitations to participants.</div>
+                </div>
+            </div>
+
+            <div class="summary-item">
+                <div class="summary-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="summary-content">
+                    <div class="summary-title">Team Members Added</div>
+                    <div class="summary-description">Your campaign managers have been invited and can help create and manage customer feedback surveys.</div>
+                </div>
+            </div>
+
+            <div class="summary-item">
+                <div class="summary-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="summary-content">
+                    <div class="summary-title">Platform Security</div>
+                    <div class="summary-description">Your account is secured with proper authentication and role-based access controls.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Next Steps -->
+    <div class="next-steps">
+        <h3 style="text-align: center; margin-bottom: var(--spacing-2xl); color: var(--primary-black);">
+            <i class="fas fa-rocket me-2"></i>Your Next Steps
+        </h3>
+
+        <div>
+            <div class="next-step-item">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-title">Create Your First Campaign</div>
+                    <div class="step-description">Start by creating a customer feedback campaign. Define your goals, target audience, and survey questions to begin collecting valuable insights.</div>
+                </div>
+            </div>
+
+            <div class="next-step-item">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-title">Add Participants</div>
+                    <div class="step-description">Upload your customer list or add participants individually. VOÏA will help you manage and track responses efficiently.</div>
+                </div>
+            </div>
+
+            <div class="next-step-item">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-title">Launch and Analyze</div>
+                    <div class="step-description">Send invitations to participants and watch real-time responses come in. Use our AI-powered analytics to gain deeper insights.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <a href="{{ url_for('business_auth.admin_panel') }}" class="btn-dashboard">
+            <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+        </a>
+    </div>
+
+    <!-- Additional Information -->
+    <div style="text-align: center; margin-top: var(--spacing-2xl); padding: var(--spacing-xl); background: rgba(var(--primary-red-rgb, 225, 58, 68), 0.03); border-radius: var(--radius-lg);">
+        <p style="color: var(--gray-dark); margin: 0; font-style: italic;">
+            <i class="fas fa-lightbulb me-2"></i>
+            Need help getting started? Check out our <a href="#" style="color: var(--primary-red); text-decoration: none;">Quick Start Guide</a> or contact our support team.
+        </p>
+    </div>
+</div>
+
+<script>
+// Auto-redirect to dashboard after 10 seconds (optional)
+let countdown = 10;
+const updateCountdown = () => {
+    // This could show a countdown if desired, but we'll keep it simple
+};
+
+// Confetti animation (optional enhancement)
+document.addEventListener('DOMContentLoaded', function() {
+    // Add some celebration animations or effects here if desired
+    console.log('🎉 Onboarding completed successfully!');
+});
+</script>
+
+{% endblock %}

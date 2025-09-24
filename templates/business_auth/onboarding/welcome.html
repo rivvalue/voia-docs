@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to VOÏA Setup - {{ business_account.name }}{% endblock %}
+
+{% block page_class %}page-onboarding-welcome{% endblock %}
+
+{% block content %}
+<style>
+/* Onboarding specific styling */
+.onboarding-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 var(--spacing-lg);
+}
+
+.onboarding-header {
+    background: linear-gradient(135deg, rgba(var(--primary-red-rgb, 225, 58, 68), 0.1) 0%, rgba(var(--red-hover-rgb, 197, 45, 54), 0.15) 100%);
+    border: 1px solid var(--red-light);
+    color: var(--primary-black);
+    padding: 3rem 2rem;
+    border-radius: var(--radius-2xl);
+    margin-bottom: 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.onboarding-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-red), var(--red-hover));
+}
+
+.welcome-icon {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: var(--primary-white);
+    font-size: 3rem;
+    box-shadow: var(--shadow-xl);
+    position: relative;
+}
+
+.welcome-icon::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, var(--primary-red), var(--red-hover), var(--primary-red));
+    z-index: -1;
+    opacity: 0.3;
+}
+
+.welcome-title {
+    font-size: var(--font-size-4xl);
+    font-weight: 700;
+    color: var(--primary-black);
+    margin-bottom: var(--spacing-sm);
+    font-family: var(--font-family-headings);
+}
+
+.welcome-subtitle {
+    font-size: var(--font-size-xl);
+    color: var(--gray-dark);
+    margin-bottom: 2rem;
+    font-weight: 500;
+}
+
+.progress-container {
+    background: var(--primary-white);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: var(--light-gray);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: var(--spacing-md);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-red), var(--red-hover));
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    text-align: center;
+    color: var(--gray-dark);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+.setup-info {
+    background: var(--primary-white);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-2xl);
+    margin-bottom: var(--spacing-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+}
+
+.setup-steps {
+    list-style: none;
+    padding: 0;
+    margin: var(--spacing-xl) 0;
+}
+
+.setup-step {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-lg) 0;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.setup-step:last-child {
+    border-bottom: none;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: var(--font-size-lg);
+    flex-shrink: 0;
+}
+
+.step-content {
+    flex: 1;
+}
+
+.step-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--primary-black);
+    margin-bottom: var(--spacing-xs);
+}
+
+.step-description {
+    color: var(--gray-dark);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+}
+
+.business-info {
+    background: rgba(var(--primary-red-rgb, 225, 58, 68), 0.05);
+    border: 1px solid rgba(var(--primary-red-rgb, 225, 58, 68), 0.2);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.business-info h4 {
+    color: var(--primary-red);
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.action-buttons {
+    text-align: center;
+    padding: var(--spacing-xl) 0;
+}
+
+.btn-start {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+    border: none;
+    padding: var(--spacing-lg) var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-lg);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-start:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+    color: var(--primary-white);
+}
+
+.mandatory-notice {
+    background: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    text-align: center;
+}
+
+.mandatory-notice .icon {
+    color: rgb(217, 119, 6);
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--spacing-sm);
+}
+
+.mandatory-notice p {
+    color: rgb(217, 119, 6);
+    font-weight: 500;
+    margin: 0;
+}
+</style>
+
+<div class="onboarding-container">
+    <!-- Header -->
+    <div class="onboarding-header">
+        <div class="welcome-icon">
+            <i class="fas fa-rocket"></i>
+        </div>
+        <h1 class="welcome-title">Welcome to VOÏA!</h1>
+        <p class="welcome-subtitle">Let's set up your platform for success</p>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ progress_percentage }}%"></div>
+        </div>
+        <div class="progress-text">
+            Step {{ current_step_index + 1 }} of {{ all_steps|length }}: {{ step.name }}
+        </div>
+    </div>
+
+    <!-- Business Account Info -->
+    <div class="business-info">
+        <h4><i class="fas fa-building"></i> {{ business_account.name }}</h4>
+        <p>Welcome, {{ current_user.get_full_name() }}! You're setting up VOÏA for your team.</p>
+    </div>
+
+    <!-- Mandatory Notice -->
+    <div class="mandatory-notice">
+        <div class="icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <p><strong>Essential Setup Required:</strong> Complete these steps to access your VOÏA platform and start collecting valuable customer feedback.</p>
+    </div>
+
+    <!-- Setup Information -->
+    <div class="setup-info">
+        <h3 style="text-align: center; margin-bottom: var(--spacing-xl); color: var(--primary-black);">
+            <i class="fas fa-list-check me-2"></i>Your Setup Journey
+        </h3>
+        
+        <ol class="setup-steps">
+            <li class="setup-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-title">Email Configuration</div>
+                    <div class="step-description">Configure your SMTP settings to send survey invitations to participants</div>
+                </div>
+            </li>
+            <li class="setup-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-title">Add Team Members</div>
+                    <div class="step-description">Invite campaign managers to help you create and manage customer feedback surveys</div>
+                </div>
+            </li>
+            <li class="setup-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-title">Start Collecting Feedback</div>
+                    <div class="step-description">Launch your first campaign and begin gathering valuable customer insights</div>
+                </div>
+            </li>
+        </ol>
+
+        <div style="background: rgba(var(--primary-red-rgb, 225, 58, 68), 0.05); padding: var(--spacing-lg); border-radius: var(--radius-lg); margin-top: var(--spacing-xl);">
+            <p style="margin: 0; color: var(--gray-dark); text-align: center; font-style: italic;">
+                <i class="fas fa-clock me-2"></i>
+                This setup takes approximately 5-10 minutes to complete
+            </p>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <form action="{{ url_for('business_auth.complete_onboarding_step', step='welcome') }}" method="post" id="welcomeForm">
+            <button type="submit" class="btn-start">
+                <i class="fas fa-arrow-right me-2"></i>Begin Setup
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+document.getElementById('welcomeForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    fetch(this.action, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (data.redirect) {
+                window.location.href = data.redirect;
+            }
+        } else {
+            alert(data.error || 'Failed to proceed. Please try again.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    });
+});
+</script>
+
+{% endblock %}
