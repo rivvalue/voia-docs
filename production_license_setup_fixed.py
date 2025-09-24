@@ -7,15 +7,8 @@ Created: September 24, 2025
 This script sets up the license system in production environment using Option 1:
 Manual License Recreation with clean business account setup.
 
-The script provides:
-- Clean license template validation
-- Production business account creation/configuration  
-- License assignment using the template system
-- Comprehensive validation and testing
-- Safe rollback capabilities
-
 Usage:
-    python production_license_setup.py [--dry-run] [--verbose]
+    python production_license_setup_fixed.py [--dry-run] [--verbose]
     
 Options:
     --dry-run    Validate setup without making changes
@@ -60,30 +53,30 @@ def validate_environment():
             # Test database connection
             db.session.execute(db.text('SELECT 1'))
             logger.info("✅ Database connection validated")
-        
-        # Check if tables exist
-        result = db.session.execute(db.text(
-            "SELECT table_name FROM information_schema.tables WHERE table_name IN ('business_accounts', 'license_history')"
-        )).fetchall()
-        
-        table_names = [row[0] for row in result]
-        required_tables = ['business_accounts', 'license_history']
-        
-        for table in required_tables:
-            if table in table_names:
-                logger.info(f"✅ Table {table} exists")
-            else:
-                logger.error(f"❌ Required table {table} missing")
-                return False
-        
-        # Import license system components
-        from license_templates import LicenseTemplateManager
-        from license_service import LicenseService
-        
-        # Validate license templates
-        templates = LicenseTemplateManager.get_available_license_types()
-        logger.info(f"✅ Available license templates: {templates}")
-        
+            
+            # Check if tables exist
+            result = db.session.execute(db.text(
+                "SELECT table_name FROM information_schema.tables WHERE table_name IN ('business_accounts', 'license_history')"
+            )).fetchall()
+            
+            table_names = [row[0] for row in result]
+            required_tables = ['business_accounts', 'license_history']
+            
+            for table in required_tables:
+                if table in table_names:
+                    logger.info(f"✅ Table {table} exists")
+                else:
+                    logger.error(f"❌ Required table {table} missing")
+                    return False
+            
+            # Import license system components
+            from license_templates import LicenseTemplateManager
+            from license_service import LicenseService
+            
+            # Validate license templates
+            templates = LicenseTemplateManager.get_available_license_types()
+            logger.info(f"✅ Available license templates: {templates}")
+            
         return True
         
     except Exception as e:
@@ -108,13 +101,6 @@ def create_production_business_accounts(dry_run=False):
                 'industry': 'Technology Consulting',
                 'company_description': 'Strategic technology consulting and implementation services',
                 'target_clients_description': 'Mid-market technology companies and enterprises',
-                'license_type': 'pro',
-                'custom_config': {
-                    'max_campaigns_per_year': 50,
-                    'max_users': 100,
-                    'max_participants_per_campaign': 50000,
-                    'duration_months': 24
-                }
             },
             {
                 'name': 'Demo Account',
@@ -125,7 +111,6 @@ def create_production_business_accounts(dry_run=False):
                 'industry': 'Various',
                 'company_description': 'Demonstration account for VOÏA system capabilities',
                 'target_clients_description': 'Various industries and use cases',
-                'license_type': 'trial'
             }
         ]
         
@@ -133,45 +118,45 @@ def create_production_business_accounts(dry_run=False):
         
         with app.app_context():
             for account_data in production_accounts:
-            logger.info(f"Processing business account: {account_data['name']}")
-            
-            # Check if account already exists
-            existing = BusinessAccount.query.filter_by(
-                name=account_data['name'],
-                account_type=account_data['account_type']
-            ).first()
-            
-            if existing:
-                logger.info(f"  ⚠️  Account {account_data['name']} already exists (ID: {existing.id})")
-                created_accounts.append(existing)
-                continue
-            
-            if not dry_run:
-                # Create business account
-                business_account = BusinessAccount()
-                business_account.name = account_data['name']
-                business_account.account_type = account_data['account_type']
-                business_account.contact_email = account_data['contact_email']
-                business_account.contact_name = account_data['contact_name']
-                business_account.status = account_data['status']
-                business_account.industry = account_data.get('industry')
-                business_account.company_description = account_data.get('company_description')
-                business_account.target_clients_description = account_data.get('target_clients_description')
-                business_account.created_at = datetime.utcnow()
+                logger.info(f"Processing business account: {account_data['name']}")
                 
-                db.session.add(business_account)
-                db.session.flush()  # Get ID without committing
+                # Check if account already exists
+                existing = BusinessAccount.query.filter_by(
+                    name=account_data['name'],
+                    account_type=account_data['account_type']
+                ).first()
                 
-                logger.info(f"  ✅ Created business account {account_data['name']} (ID: {business_account.id})")
-                created_accounts.append(business_account)
-            else:
-                logger.info(f"  🔍 Would create business account: {account_data['name']}")
-        
+                if existing:
+                    logger.info(f"  ⚠️  Account {account_data['name']} already exists (ID: {existing.id})")
+                    created_accounts.append(existing)
+                    continue
+                
+                if not dry_run:
+                    # Create business account
+                    business_account = BusinessAccount()
+                    business_account.name = account_data['name']
+                    business_account.account_type = account_data['account_type']
+                    business_account.contact_email = account_data['contact_email']
+                    business_account.contact_name = account_data['contact_name']
+                    business_account.status = account_data['status']
+                    business_account.industry = account_data.get('industry')
+                    business_account.company_description = account_data.get('company_description')
+                    business_account.target_clients_description = account_data.get('target_clients_description')
+                    business_account.created_at = datetime.utcnow()
+                    
+                    db.session.add(business_account)
+                    db.session.flush()  # Get ID without committing
+                    
+                    logger.info(f"  ✅ Created business account {account_data['name']} (ID: {business_account.id})")
+                    created_accounts.append(business_account)
+                else:
+                    logger.info(f"  🔍 Would create business account: {account_data['name']}")
+            
             if not dry_run:
                 db.session.commit()
                 logger.info("✅ All business accounts committed to database")
-        
-            return created_accounts
+            
+        return created_accounts
         
     except Exception as e:
         if not dry_run:
@@ -213,51 +198,51 @@ def assign_production_licenses(business_accounts, dry_run=False):
         
         with app.app_context():
             for account in business_accounts:
-            if account.name not in license_assignments:
-                logger.warning(f"  ⚠️  No license assignment configured for {account.name}")
-                continue
-            
-            assignment = license_assignments[account.name]
-            logger.info(f"Assigning {assignment['license_type']} license to {account.name}")
-            
-            # Check if license already exists
-            existing_license = LicenseService.get_current_license(account.id)
-            if existing_license:
-                logger.info(f"  ⚠️  Active license already exists for {account.name} (Type: {existing_license.license_type})")
-                assigned_licenses.append(existing_license)
-                continue
-            
-            if not dry_run:
-                # Assign license using template system
-                success, license_record, message = LicenseService.assign_license_to_business(
-                    business_id=account.id,
-                    license_type=assignment['license_type'],
-                    custom_config=assignment.get('custom_config'),
-                    created_by=assignment['created_by']
-                )
-                
-                if not success or not license_record:
-                    logger.error(f"  ❌ Failed to assign license to {account.name}: {message}")
+                if account.name not in license_assignments:
+                    logger.warning(f"  ⚠️  No license assignment configured for {account.name}")
                     continue
                 
-                # Add notes if provided
-                if assignment.get('notes'):
-                    license_record.notes = assignment['notes']
-                    db.session.commit()
+                assignment = license_assignments[account.name]
+                logger.info(f"Assigning {assignment['license_type']} license to {account.name}")
                 
-                logger.info(f"  ✅ Assigned {assignment['license_type']} license to {account.name}")
-                logger.info(f"      - Campaigns: {license_record.max_campaigns_per_year}/year")
-                logger.info(f"      - Users: {license_record.max_users}")
-                logger.info(f"      - Participants: {license_record.max_participants_per_campaign}/campaign")
-                logger.info(f"      - Expires: {license_record.expires_at.date()}")
+                # Check if license already exists
+                existing_license = LicenseService.get_current_license(account.id)
+                if existing_license:
+                    logger.info(f"  ⚠️  Active license already exists for {account.name} (Type: {existing_license.license_type})")
+                    assigned_licenses.append(existing_license)
+                    continue
                 
-                assigned_licenses.append(license_record)
-            else:
-                logger.info(f"  🔍 Would assign {assignment['license_type']} license to {account.name}")
+                if not dry_run:
+                    # Assign license using template system
+                    success, license_record, message = LicenseService.assign_license_to_business(
+                        business_id=account.id,
+                        license_type=assignment['license_type'],
+                        custom_config=assignment.get('custom_config'),
+                        created_by=assignment['created_by']
+                    )
+                    
+                    if not success or not license_record:
+                        logger.error(f"  ❌ Failed to assign license to {account.name}: {message}")
+                        continue
+                    
+                    # Add notes if provided
+                    if assignment.get('notes'):
+                        license_record.notes = assignment['notes']
+                        db.session.commit()
+                    
+                    logger.info(f"  ✅ Assigned {assignment['license_type']} license to {account.name}")
+                    logger.info(f"      - Campaigns: {license_record.max_campaigns_per_year}/year")
+                    logger.info(f"      - Users: {license_record.max_users}")
+                    logger.info(f"      - Participants: {license_record.max_participants_per_campaign}/campaign")
+                    logger.info(f"      - Expires: {license_record.expires_at.date()}")
+                    
+                    assigned_licenses.append(license_record)
+                else:
+                    logger.info(f"  🔍 Would assign {assignment['license_type']} license to {account.name}")
                     if assignment.get('custom_config'):
                         logger.info(f"      - Custom config: {assignment['custom_config']}")
         
-            return assigned_licenses
+        return assigned_licenses
         
     except Exception as e:
         logger.error(f"❌ Failed to assign licenses: {e}")
@@ -275,55 +260,55 @@ def validate_license_setup(business_accounts, assigned_licenses, dry_run=False):
         
         with app.app_context():
             for account in business_accounts:
-            logger.info(f"Validating license setup for {account.name}")
+                logger.info(f"Validating license setup for {account.name}")
+                
+                # Test license lookup
+                current_license = LicenseService.get_current_license(account.id)
+                if current_license:
+                    logger.info(f"  ✅ Current license: {current_license.license_type}")
+                    logger.info(f"  ✅ License status: {current_license.status}")
+                    logger.info(f"  ✅ Expires: {current_license.expires_at.date()}")
+                else:
+                    logger.warning(f"  ⚠️  No active license found for {account.name}")
+                    continue
+                
+                # Test license period calculation
+                period_start, period_end = LicenseService.get_license_period(account.id)
+                if period_start and period_end:
+                    logger.info(f"  ✅ License period: {period_start} to {period_end}")
+                else:
+                    logger.warning(f"  ⚠️  Could not determine license period for {account.name}")
+                
+                # Test usage limits
+                can_activate_campaign = LicenseService.can_activate_campaign(account.id)
+                can_add_user = LicenseService.can_add_user(account.id)
+                
+                logger.info(f"  ✅ Can activate campaign: {can_activate_campaign}")
+                logger.info(f"  ✅ Can add user: {can_add_user}")
+                
+                # Get comprehensive license info
+                license_info = LicenseService.get_license_info(account.id)
+                logger.info(f"  ✅ License info retrieved: {license_info['license_type']} ({license_info['license_status']})")
+                
+                validation_results.append({
+                    'account_name': account.name,
+                    'account_id': account.id,
+                    'license_valid': current_license is not None,
+                    'license_type': current_license.license_type if current_license else None,
+                    'period_valid': period_start is not None and period_end is not None,
+                    'limits_working': can_activate_campaign is not None and can_add_user is not None
+                })
             
-            # Test license lookup
-            current_license = LicenseService.get_current_license(account.id)
-            if current_license:
-                logger.info(f"  ✅ Current license: {current_license.license_type}")
-                logger.info(f"  ✅ License status: {current_license.status}")
-                logger.info(f"  ✅ Expires: {current_license.expires_at.date()}")
-            else:
-                logger.warning(f"  ⚠️  No active license found for {account.name}")
-                continue
+            # Summary validation
+            valid_setups = sum(1 for result in validation_results if all([
+                result['license_valid'], 
+                result['period_valid'], 
+                result['limits_working']
+            ]))
             
-            # Test license period calculation
-            period_start, period_end = LicenseService.get_license_period(account.id)
-            if period_start and period_end:
-                logger.info(f"  ✅ License period: {period_start} to {period_end}")
-            else:
-                logger.warning(f"  ⚠️  Could not determine license period for {account.name}")
-            
-            # Test usage limits
-            can_activate_campaign = LicenseService.can_activate_campaign(account.id)
-            can_add_user = LicenseService.can_add_user(account.id)
-            
-            logger.info(f"  ✅ Can activate campaign: {can_activate_campaign}")
-            logger.info(f"  ✅ Can add user: {can_add_user}")
-            
-            # Get comprehensive license info
-            license_info = LicenseService.get_license_info(account.id)
-            logger.info(f"  ✅ License info retrieved: {license_info['license_type']} ({license_info['license_status']})")
-            
-            validation_results.append({
-                'account_name': account.name,
-                'account_id': account.id,
-                'license_valid': current_license is not None,
-                'license_type': current_license.license_type if current_license else None,
-                'period_valid': period_start is not None and period_end is not None,
-                'limits_working': can_activate_campaign is not None and can_add_user is not None
-            })
-        
-        # Summary validation
-        valid_setups = sum(1 for result in validation_results if all([
-            result['license_valid'], 
-            result['period_valid'], 
-            result['limits_working']
-        ]))
-        
             logger.info(f"✅ Validation complete: {valid_setups}/{len(validation_results)} accounts fully validated")
-        
-            return validation_results
+            
+        return validation_results
         
     except Exception as e:
         logger.error(f"❌ License validation failed: {e}")
