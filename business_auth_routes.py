@@ -766,6 +766,189 @@ def create_business_account_with_admin():
         return redirect(url_for('business_auth.business_account_onboarding'))
 
 
+# ==== BUSINESS ACCOUNT ADMIN ONBOARDING FLOW ====
+
+@business_auth_bp.route('/onboarding')
+@require_business_auth
+def onboarding_redirect():
+    """Redirect to current onboarding step"""
+    try:
+        business_user_id = session.get('business_user_id')
+        current_user = BusinessAccountUser.query.get(business_user_id)
+        
+        if not current_user or not current_user.requires_onboarding():
+            # User doesn't need onboarding, redirect to admin panel
+            return redirect(url_for('business_auth.admin_panel'))
+        
+        # Initialize onboarding if needed
+        if not current_user.onboarding_progress:
+            current_user.initialize_onboarding()
+            db.session.commit()
+        
+        current_step = current_user.get_current_onboarding_step()
+        return redirect(url_for('business_auth.onboarding_step', step=current_step))
+        
+    except Exception as e:
+        logger.error(f"Error in onboarding redirect: {e}")
+        flash('Error accessing onboarding. Please try again.', 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+
+@business_auth_bp.route('/onboarding/<step>')
+@require_business_auth
+def onboarding_step(step):
+    """Display specific onboarding step"""
+    try:
+        business_user_id = session.get('business_user_id')
+        current_user = BusinessAccountUser.query.get(business_user_id)
+        
+        if not current_user:
+            flash('Authentication required.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Check if user needs onboarding
+        if not current_user.requires_onboarding():
+            return redirect(url_for('business_auth.admin_panel'))
+        
+        # Get license type for flow configuration
+        from license_service import LicenseService
+        license_info = LicenseService.get_license_info(current_user.business_account_id)
+        license_type = license_info.get('license_type', 'core')
+        
+        # Import onboarding configuration
+        from onboarding_config import OnboardingFlowManager
+        
+        # Get step definition
+        step_definition = OnboardingFlowManager.get_step_definition(step)
+        if not step_definition:
+            flash('Invalid onboarding step.', 'error')
+            return redirect(url_for('business_auth.onboarding'))
+        
+        # Validate step access
+        progress = current_user.get_onboarding_progress()
+        if not OnboardingFlowManager.validate_step_access(step, progress, license_type):
+            flash('Please complete previous steps first.', 'error')
+            return redirect(url_for('business_auth.onboarding'))
+        
+        # Get all steps for progress tracking
+        all_steps = OnboardingFlowManager.get_steps_for_license(license_type)
+        progress_percentage = OnboardingFlowManager.get_progress_percentage(progress, license_type)
+        
+        # Get existing data for pre-populating forms
+        context_data = {}
+        
+        if step == 'smtp':
+            # Pre-populate SMTP configuration if exists
+            from models import EmailConfiguration
+            email_config = EmailConfiguration.query.filter_by(
+                business_account_id=current_user.business_account_id
+            ).first()
+            if email_config:
+                context_data['email_config'] = email_config
+                
+        elif step == 'users':
+            # Get existing users for display
+            existing_users = BusinessAccountUser.query.filter_by(
+                business_account_id=current_user.business_account_id
+            ).filter(BusinessAccountUser.id != current_user.id).all()
+            context_data['existing_users'] = existing_users
+        
+        return render_template(f'business_auth/{step_definition.template}',
+                             step=step_definition,
+                             progress=progress,
+                             progress_percentage=progress_percentage,
+                             all_steps=all_steps,
+                             current_step_index=next((i for i, s in enumerate(all_steps) if s.step_id == step), 0),
+                             business_account=current_user.business_account,
+                             current_user=current_user,
+                             **context_data)
+        
+    except Exception as e:
+        logger.error(f"Error displaying onboarding step '{step}': {e}")
+        flash('Error loading onboarding step. Please try again.', 'error')
+        return redirect(url_for('business_auth.onboarding'))
+
+
+@business_auth_bp.route('/onboarding/<step>/complete', methods=['POST'])
+@require_business_auth
+def complete_onboarding_step(step):
+    """Complete an onboarding step"""
+    try:
+        business_user_id = session.get('business_user_id')
+        current_user = BusinessAccountUser.query.get(business_user_id)
+        
+        if not current_user:
+            return jsonify({'success': False, 'error': 'Authentication required'}), 401
+        
+        # Check if user needs onboarding
+        if not current_user.requires_onboarding():
+            return jsonify({'success': True, 'redirect': url_for('business_auth.admin_panel')})
+        
+        # Get license type for flow configuration
+        from license_service import LicenseService
+        license_info = LicenseService.get_license_info(current_user.business_account_id)
+        license_type = license_info.get('license_type', 'core')
+        
+        # Import onboarding configuration
+        from onboarding_config import OnboardingFlowManager, OnboardingValidation
+        
+        # Get step definition
+        step_definition = OnboardingFlowManager.get_step_definition(step)
+        if not step_definition:
+            return jsonify({'success': False, 'error': 'Invalid onboarding step'}), 400
+        
+        # Validate step completion
+        form_data = request.form.to_dict()
+        validation_method = step_definition.validation_method
+        
+        is_valid = True
+        validation_message = "Step completed successfully"
+        
+        if validation_method:
+            validator = OnboardingValidation.get_validator(validation_method)
+            if validator:
+                is_valid, validation_message = validator(current_user, form_data)
+        
+        if not is_valid:
+            return jsonify({'success': False, 'error': validation_message}), 400
+        
+        # Mark step as completed
+        current_user.complete_onboarding_step(step)
+        db.session.commit()
+        
+        # Check if all onboarding is complete
+        if current_user.onboarding_completed:
+            return jsonify({
+                'success': True, 
+                'completed': True,
+                'message': 'Onboarding completed successfully!',
+                'redirect': url_for('business_auth.admin_panel')
+            })
+        
+        # Get next step
+        next_step = OnboardingFlowManager.get_next_step(step, license_type)
+        if next_step:
+            return jsonify({
+                'success': True,
+                'message': validation_message,
+                'redirect': url_for('business_auth.onboarding_step', step=next_step)
+            })
+        else:
+            # This shouldn't happen, but handle gracefully
+            current_user.complete_onboarding()
+            db.session.commit()
+            return jsonify({
+                'success': True,
+                'completed': True,
+                'message': 'Onboarding completed successfully!',
+                'redirect': url_for('business_auth.admin_panel')
+            })
+        
+    except Exception as e:
+        logger.error(f"Error completing onboarding step '{step}': {e}")
+        return jsonify({'success': False, 'error': 'Failed to complete step. Please try again.'}), 500
+
+
 @business_auth_bp.route('/activate/<token>')
 def activate_account(token):
     """Account activation page for business account admin users"""
