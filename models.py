@@ -1143,7 +1143,7 @@ class BusinessAccountUser(UserMixin, db.Model):
     last_name = db.Column(db.String(100), nullable=False)
     
     # User role and permissions
-    role = db.Column(db.String(50), nullable=False, default='business_account_admin', index=True)  # business_account_admin, admin, viewer, manager, platform_admin
+    role = db.Column(db.String(50), nullable=False, default='admin', index=True)  # admin, manager, viewer, platform_admin (business_account_admin deprecated)
     is_active_user = db.Column(db.Boolean, nullable=False, default=True, index=True)  # Renamed to avoid conflict with UserMixin
     
     # Email verification
@@ -1255,12 +1255,16 @@ class BusinessAccountUser(UserMixin, db.Model):
     def has_permission(self, permission):
         """Check if user has specific permission"""
         role_permissions = {
-            'business_account_admin': ['view', 'create', 'edit', 'delete', 'manage_users', 'export_data', 'manage_participants'],
             'admin': ['view', 'create', 'edit', 'delete', 'manage_users', 'export_data', 'manage_participants'],
             'manager': ['view', 'create', 'edit', 'export_data', 'manage_participants'],
             'viewer': ['view'],
             'platform_admin': ['view', 'create', 'edit', 'delete', 'manage_users', 'export_data', 'manage_participants', 'platform_admin', 'manage_licenses', 'cross_tenant_access']
         }
+        
+        # Backward compatibility: map old business_account_admin to admin
+        if self.role == 'business_account_admin':
+            return permission in role_permissions.get('admin', [])
+        
         return permission in role_permissions.get(self.role, [])
     
     def is_platform_admin(self):
