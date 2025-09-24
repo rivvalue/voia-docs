@@ -94,7 +94,7 @@ def create_production_business_accounts(dry_run=False):
         production_accounts = [
             {
                 'name': 'Rivvalue Inc',
-                'account_type': 'premium',
+                'account_type': 'platform_owner',
                 'contact_email': 'admin@rivvalue.com',
                 'contact_name': 'Rivvalue Admin',
                 'status': 'active',
