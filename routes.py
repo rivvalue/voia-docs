@@ -1184,7 +1184,27 @@ def dashboard_data():
                 campaign_id = active_campaign.id
                 logger.info(f"Survey Insights defaulting to {account_context} active campaign: {active_campaign.name} (ID: {campaign_id})")
         
-        data = get_dashboard_data(campaign_id=campaign_id)
+        # SECURITY: Only call get_dashboard_data with a valid campaign_id to prevent cross-account data leakage
+        if campaign_id is not None:
+            data = get_dashboard_data(campaign_id=campaign_id)
+        else:
+            # No active campaign found - return empty dashboard data
+            logger.info(f"No active campaign found for {account_context} - returning empty dashboard")
+            data = {
+                'total_responses': 0,
+                'nps_score': 0,
+                'promoters': 0,
+                'passives': 0,
+                'detractors': 0,
+                'recent_responses': 0,
+                'sentiment_distribution': [],
+                'nps_distribution': [],
+                'top_themes': [],
+                'theme_trends': [],
+                'churn_risk_data': [],
+                'tenure_nps_data': [],
+                'growth_factors': []
+            }
         
         # Add campaign context to response for UI display
         if campaign_id:
