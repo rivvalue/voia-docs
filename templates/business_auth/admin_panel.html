@@ -821,14 +821,14 @@
                             <!-- Primary Actions (max 2 buttons based on status) -->
                             <div class="campaign-actions" onclick="event.stopPropagation();">
                                 {% if campaign.status == 'active' %}
-                                    <a href="{{ url_for('business_auth.business_analytics') }}" class="btn campaign-primary-btn">
+                                    <a href="{{ url_for('business_auth.business_analytics') }}?campaign_id={{ campaign.id }}" class="btn campaign-primary-btn">
                                         <i class="fas fa-chart-bar me-1"></i>View Analytics
                                     </a>
                                     <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" class="btn campaign-secondary-btn">
                                         <i class="fas fa-users me-1"></i>Manage Participants
                                     </a>
                                 {% elif campaign.status == 'completed' %}
-                                    <a href="{{ url_for('business_auth.business_analytics') }}" class="btn campaign-primary-btn">
+                                    <a href="{{ url_for('business_auth.business_analytics') }}?campaign_id={{ campaign.id }}" class="btn campaign-primary-btn">
                                         <i class="fas fa-chart-bar me-1"></i>View Results
                                     </a>
                                     <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="btn campaign-secondary-btn">
