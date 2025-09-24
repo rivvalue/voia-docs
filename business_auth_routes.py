@@ -1258,6 +1258,160 @@ def platform_dashboard():
         return redirect(url_for('business_auth.admin_panel'))
 
 
+@business_auth_bp.route('/admin/email-operations')
+@require_platform_admin
+def email_operations_center():
+    """Email Operations Center - Platform admin email management and monitoring"""
+    try:
+        # Import required modules
+        from email_service import EmailService
+        from datetime import datetime, timedelta
+        from models import BusinessAccount, EmailConfiguration, EmailDelivery
+        from sqlalchemy import func, text
+        
+        # Get current user
+        user_id = session.get('business_user_id')
+        current_user = BusinessAccountUser.query.get(user_id)
+        
+        if not current_user:
+            flash('User session invalid.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        email_service = EmailService()
+        
+        # 1. SMTP Configuration Status for all business accounts
+        smtp_status = []
+        business_accounts = BusinessAccount.query.all()
+        
+        for account in business_accounts:
+            config_info = {
+                'business_account_id': account.id,
+                'business_name': account.business_name,
+                'account_type': account.account_type,
+                'has_custom_smtp': False,
+                'smtp_configured': False,
+                'smtp_server': None,
+                'last_test': None,
+                'test_status': None
+            }
+            
+            # Check for custom SMTP configuration
+            email_config = EmailConfiguration.query.filter_by(business_account_id=account.id).first()
+            if email_config:
+                config_info['has_custom_smtp'] = True
+                config_info['smtp_configured'] = email_config.is_valid()
+                config_info['smtp_server'] = email_config.smtp_server
+                config_info['last_test'] = email_config.last_test_at.isoformat() if email_config.last_test_at else None
+                config_info['test_status'] = email_config.get_last_test_result().get('success', False) if email_config.get_last_test_result() else None
+            else:
+                # Using system default
+                config_info['smtp_configured'] = email_service.is_configured()
+                config_info['smtp_server'] = 'System Default'
+            
+            smtp_status.append(config_info)
+        
+        # 2. Email Delivery Statistics (last 30 days)
+        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+        
+        delivery_stats = db.session.query(
+            EmailDelivery.business_account_id,
+            BusinessAccount.business_name,
+            func.count(EmailDelivery.id).label('total_emails'),
+            func.sum(func.case([(EmailDelivery.status == 'sent', 1)], else_=0)).label('sent_count'),
+            func.sum(func.case([(EmailDelivery.status == 'failed', 1)], else_=0)).label('failed_count'),
+            func.sum(func.case([(EmailDelivery.status == 'permanent_failure', 1)], else_=0)).label('permanent_failed_count'),
+            func.sum(func.case([(EmailDelivery.status == 'pending', 1)], else_=0)).label('pending_count')
+        ).join(
+            BusinessAccount, EmailDelivery.business_account_id == BusinessAccount.id
+        ).filter(
+            EmailDelivery.created_at >= thirty_days_ago
+        ).group_by(
+            EmailDelivery.business_account_id, BusinessAccount.business_name
+        ).all()
+        
+        # Calculate delivery rates
+        email_delivery_stats = []
+        for stat in delivery_stats:
+            total = stat.total_emails or 0
+            success_rate = (stat.sent_count / total * 100) if total > 0 else 0
+            failure_rate = ((stat.failed_count + stat.permanent_failed_count) / total * 100) if total > 0 else 0
+            
+            email_delivery_stats.append({
+                'business_account_id': stat.business_account_id,
+                'business_name': stat.business_name,
+                'total_emails': total,
+                'sent_count': stat.sent_count or 0,
+                'failed_count': stat.failed_count or 0,
+                'permanent_failed_count': stat.permanent_failed_count or 0,
+                'pending_count': stat.pending_count or 0,
+                'success_rate': round(success_rate, 1),
+                'failure_rate': round(failure_rate, 1)
+            })
+        
+        # 3. Recent Failed Emails (last 7 days, retryable)
+        seven_days_ago = datetime.utcnow() - timedelta(days=7)
+        recent_failed_emails = EmailDelivery.query.join(
+            BusinessAccount, EmailDelivery.business_account_id == BusinessAccount.id
+        ).filter(
+            EmailDelivery.status == 'failed',
+            EmailDelivery.created_at >= seven_days_ago,
+            EmailDelivery.retry_count < EmailDelivery.max_retries
+        ).order_by(EmailDelivery.last_attempted_at.desc()).limit(50).all()
+        
+        failed_emails_data = []
+        for email in recent_failed_emails:
+            failed_emails_data.append({
+                'id': email.id,
+                'business_name': email.business_account.business_name,
+                'recipient_email': email.recipient_email,
+                'recipient_name': email.recipient_name,
+                'subject': email.subject,
+                'email_type': email.email_type,
+                'retry_count': email.retry_count,
+                'max_retries': email.max_retries,
+                'last_error': email.last_error,
+                'created_at': email.created_at.isoformat(),
+                'last_attempted_at': email.last_attempted_at.isoformat() if email.last_attempted_at else None,
+                'next_retry_at': email.next_retry_at.isoformat() if email.next_retry_at else None
+            })
+        
+        # 4. System-wide Email Health Metrics
+        total_accounts_with_smtp = len([s for s in smtp_status if s['smtp_configured']])
+        total_accounts = len(smtp_status)
+        
+        # Overall email volume (last 24 hours)
+        twenty_four_hours_ago = datetime.utcnow() - timedelta(hours=24)
+        recent_volume = EmailDelivery.query.filter(EmailDelivery.created_at >= twenty_four_hours_ago).count()
+        
+        # System health metrics
+        system_health = {
+            'total_accounts': total_accounts,
+            'accounts_with_smtp': total_accounts_with_smtp,
+            'smtp_coverage_rate': round((total_accounts_with_smtp / total_accounts * 100) if total_accounts > 0 else 0, 1),
+            'emails_last_24h': recent_volume,
+            'total_failed_retryable': len(failed_emails_data),
+            'accounts_with_failures': len([s for s in email_delivery_stats if s['failure_rate'] > 5])
+        }
+        
+        email_ops_data = {
+            'smtp_status': smtp_status,
+            'delivery_stats': email_delivery_stats,
+            'failed_emails': failed_emails_data,
+            'system_health': system_health
+        }
+        
+        logger.info(f"Platform admin {current_user.email} accessed email operations center")
+        
+        return render_template('business_auth/email_operations_center.html',
+                             current_user=current_user,
+                             email_ops_data=email_ops_data)
+    
+    except Exception as e:
+        logger.error(f"Email operations center error: {e}")
+        flash('Error loading email operations center.', 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+
 @business_auth_bp.route('/api/session-status')
 @require_business_auth
 def session_status():
