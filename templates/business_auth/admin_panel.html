@@ -436,7 +436,7 @@
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <!-- Analytics -->
                                 <li>
-                                    <a class="dropdown-item" href="{% if admin_data.primary_active_campaign_id %}{{ url_for('dashboard', campaign_id=admin_data.primary_active_campaign_id) }}{% else %}{{ url_for('dashboard') }}{% endif %}" title="View analytics and insights">
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.business_analytics') }}" title="View analytics and insights">
                                         <i class="fas fa-chart-bar me-2 text-primary"></i>View Analytics
                                     </a>
                                 </li>
@@ -821,14 +821,14 @@
                             <!-- Primary Actions (max 2 buttons based on status) -->
                             <div class="campaign-actions" onclick="event.stopPropagation();">
                                 {% if campaign.status == 'active' %}
-                                    <a href="{{ url_for('dashboard') }}?campaign_id={{ campaign.id }}" class="btn campaign-primary-btn">
+                                    <a href="{{ url_for('business_auth.business_analytics') }}" class="btn campaign-primary-btn">
                                         <i class="fas fa-chart-bar me-1"></i>View Analytics
                                     </a>
                                     <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" class="btn campaign-secondary-btn">
                                         <i class="fas fa-users me-1"></i>Manage Participants
                                     </a>
                                 {% elif campaign.status == 'completed' %}
-                                    <a href="{{ url_for('dashboard') }}?campaign_id={{ campaign.id }}" class="btn campaign-primary-btn">
+                                    <a href="{{ url_for('business_auth.business_analytics') }}" class="btn campaign-primary-btn">
                                         <i class="fas fa-chart-bar me-1"></i>View Results
                                     </a>
                                     <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="btn campaign-secondary-btn">
@@ -939,7 +939,7 @@
                 </h3>
             </div>
             <div class="quick-actions">
-                <a href="{{ url_for('dashboard') }}{% if admin_data.campaigns %}{% for campaign in admin_data.campaigns %}{% if campaign.status == 'active' %}?campaign_id={{ campaign.id }}{% endif %}{% endfor %}{% endif %}" class="quick-action-btn">
+                <a href="{{ url_for('business_auth.business_analytics') }}" class="quick-action-btn">
                     <i class="fas fa-chart-bar d-block mb-2"></i>
                     <strong>View Dashboard</strong><br>
                     <small>Analytics & Insights</small>
