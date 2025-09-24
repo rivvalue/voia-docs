@@ -3403,3 +3403,29 @@ def download_transcript(response_id):
     except Exception as e:
         logger.error(f"Error downloading transcript {response_id}: {e}")
         return jsonify({'error': 'Failed to download transcript'}), 500
+
+
+@business_auth_bp.route('/analytics')
+@require_business_auth
+def business_analytics():
+    """Analytics dashboard for business account users"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get company NPS data - will be filtered by business account in API calls
+        from data_storage import get_company_nps_data
+        company_nps_data = get_company_nps_data()
+        
+        # Pass business account context for template
+        return render_template('dashboard.html', 
+                             company_nps_data=company_nps_data, 
+                             user_email=None,  # Business users don't show email in public template
+                             business_account=current_account)
+        
+    except Exception as e:
+        logger.error(f"Error loading business analytics for account {current_account.id if current_account else 'unknown'}: {e}")
+        flash('Error loading analytics dashboard.', 'error')
+        return redirect(url_for('business_auth.admin_panel'))
