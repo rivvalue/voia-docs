@@ -367,9 +367,15 @@
 
     <div class="container">
         <!-- Account Type Badge -->
-        <div class="account-badge {{ 'account-demo' if business_account.account_type == 'demo' else 'account-customer' }}">
-            <i class="fas fa-{{ 'flask' if business_account.account_type == 'demo' else 'building' }} me-2"></i>
-            {{ 'Demo Environment' if business_account.account_type == 'demo' else 'Customer Account' }}
+        <div class="account-badge {{ 'account-demo' if business_account.account_type == 'demo' else ('status-badge active' if license_type == 'platform_admin' else 'account-customer') }}">
+            <i class="fas fa-{{ 'flask' if business_account.account_type == 'demo' else ('crown' if license_type == 'platform_admin' else 'building') }} me-2"></i>
+            {% if business_account.account_type == 'demo' %}
+                Demo Environment
+            {% elif license_type == 'platform_admin' %}
+                Platform Administrator - Unlimited Access
+            {% else %}
+                Customer Account
+            {% endif %}
         </div>
 
         <!-- License Status Section -->
@@ -382,9 +388,13 @@
             </div>
             
             <!-- Status Badge -->
-            <div class="status-badge {{ 'active' if not expires_soon and business_account.license_status == 'active' else ('trial' if business_account.license_status == 'trial' else ('warning' if expires_soon else 'expired')) }}">
-                <i class="fas fa-{{ 'check-circle' if business_account.license_status == 'active' and not expires_soon else ('exclamation-triangle' if expires_soon or business_account.license_status == 'trial' else 'times-circle') }}"></i>
-                {{ license_status }}
+            <div class="status-badge {{ 'active' if license_type == 'platform_admin' or (not expires_soon and business_account.license_status == 'active') else ('trial' if business_account.license_status == 'trial' else ('warning' if expires_soon else 'expired')) }}">
+                <i class="fas fa-{{ 'crown' if license_type == 'platform_admin' else ('check-circle' if business_account.license_status == 'active' and not expires_soon else ('exclamation-triangle' if expires_soon or business_account.license_status == 'trial' else 'times-circle')) }}"></i>
+                {% if license_type == 'platform_admin' %}
+                    Platform Administrator - Unlimited Access
+                {% else %}
+                    {{ license_status }}
+                {% endif %}
             </div>
 
             <!-- Primary License Dates -->
