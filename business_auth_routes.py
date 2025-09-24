@@ -1272,12 +1272,12 @@ def platform_dashboard():
         # Most active accounts by campaign volume
         most_active_accounts = db.session.query(
             Campaign.business_account_id,
-            BusinessAccount.business_name,
+            BusinessAccount.name,
             func.count(Campaign.id).label('campaign_count')
         ).join(
             BusinessAccount, Campaign.business_account_id == BusinessAccount.id
         ).group_by(
-            Campaign.business_account_id, BusinessAccount.business_name
+            Campaign.business_account_id, BusinessAccount.name
         ).order_by(
             func.count(Campaign.id).desc()
         ).limit(5).all()
@@ -1323,7 +1323,7 @@ def platform_dashboard():
                 'recent_accounts': [account.to_dict() for account in recent_accounts],
                 'most_active_accounts': [
                     {
-                        'business_name': acc.business_name,
+                        'business_name': acc.name,
                         'campaign_count': acc.campaign_count
                     } for acc in most_active_accounts
                 ]
