@@ -304,8 +304,23 @@ def add_user():
             flash(f'Cannot add user: License limit reached ({license_info.get("users_used", 0)}/{license_info.get("users_limit", 5)} users). Contact support to upgrade your license.', 'error')
             return redirect(url_for('business_auth.manage_users'))
         
-        # Validate role
-        allowed_roles = ['business_account_admin', 'admin', 'manager', 'viewer']
+        # Get current business account and user for role validation
+        current_account = get_current_business_account()
+        current_user = BusinessAccountUser.query.get(current_user_id)
+        
+        # Validate role based on account type and user permissions
+        allowed_roles = ['admin', 'manager', 'viewer']  # Simplified roles
+        
+        # Allow platform_admin role only for platform_owner accounts by platform admins
+        if (current_account.account_type == 'platform_owner' and 
+            current_user and current_user.is_platform_admin() and 
+            role == 'platform_admin'):
+            allowed_roles.append('platform_admin')
+        
+        # Backward compatibility for old business_account_admin role
+        if role == 'business_account_admin':
+            role = 'admin'
+        
         if role not in allowed_roles:
             role = 'manager'  # Default to manager
         
