@@ -1163,6 +1163,101 @@ def admin_panel():
         return redirect(url_for('business_auth.login'))
 
 
+@business_auth_bp.route('/admin/platform-dashboard')
+@require_platform_admin
+def platform_dashboard():
+    """Platform admin dashboard with system-wide metrics and management"""
+    try:
+        # Get current user
+        user_id = session.get('business_user_id')
+        current_user = BusinessAccountUser.query.get(user_id)
+        
+        if not current_user:
+            flash('User session invalid.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # System-wide metrics
+        from models import BusinessAccount, BusinessAccountUser, Campaign, SurveyResponse, Participant
+        from license_service import LicenseService
+        from datetime import datetime, timedelta
+        
+        # Total business accounts by type
+        total_accounts = BusinessAccount.query.count()
+        trial_accounts = BusinessAccount.query.filter_by(account_type='trial').count()
+        customer_accounts = BusinessAccount.query.filter_by(account_type='customer').count()
+        demo_accounts = BusinessAccount.query.filter_by(account_type='demo').count()
+        platform_owner_accounts = BusinessAccount.query.filter_by(account_type='platform_owner').count()
+        
+        # Total active users across all accounts
+        total_active_users = BusinessAccountUser.query.filter_by(is_active_user=True).count()
+        
+        # Total campaigns this month
+        current_month_start = datetime.utcnow().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        campaigns_this_month = Campaign.query.filter(Campaign.created_at >= current_month_start).count()
+        
+        # Total active campaigns
+        active_campaigns = Campaign.query.filter_by(status='active').count()
+        
+        # Total responses this month
+        responses_this_month = SurveyResponse.query.filter(SurveyResponse.created_at >= current_month_start).count()
+        
+        # Recent business account registrations
+        recent_accounts = BusinessAccount.query.order_by(BusinessAccount.created_at.desc()).limit(5).all()
+        
+        # High usage accounts (over 80% of limits)
+        high_usage_accounts = []
+        all_accounts = BusinessAccount.query.filter(BusinessAccount.account_type.in_(['trial', 'customer'])).all()
+        
+        for account in all_accounts:
+            try:
+                license_info = LicenseService.get_license_info(account.id)
+                users_usage = (license_info.get('users_used', 0) / max(license_info.get('users_limit', 1), 1)) * 100
+                campaigns_usage = (license_info.get('campaigns_used', 0) / max(license_info.get('campaigns_limit', 1), 1)) * 100
+                
+                if users_usage > 80 or campaigns_usage > 80:
+                    high_usage_accounts.append({
+                        'account': account,
+                        'users_usage': users_usage,
+                        'campaigns_usage': campaigns_usage,
+                        'license_type': license_info.get('license_type', 'trial')
+                    })
+            except Exception as e:
+                logger.warning(f"Error getting license info for account {account.id}: {e}")
+                continue
+        
+        # Platform admin metrics
+        platform_admin_count = BusinessAccountUser.query.filter_by(role='platform_admin').count()
+        
+        # Build dashboard data
+        dashboard_data = {
+            'overview_metrics': {
+                'total_accounts': total_accounts,
+                'trial_accounts': trial_accounts,
+                'customer_accounts': customer_accounts,
+                'demo_accounts': demo_accounts,
+                'platform_owner_accounts': platform_owner_accounts,
+                'total_active_users': total_active_users,
+                'campaigns_this_month': campaigns_this_month,
+                'active_campaigns': active_campaigns,
+                'responses_this_month': responses_this_month,
+                'platform_admin_count': platform_admin_count
+            },
+            'recent_accounts': [account.to_dict() for account in recent_accounts],
+            'high_usage_accounts': high_usage_accounts[:10]  # Top 10 high usage accounts
+        }
+        
+        logger.info(f"Platform admin {current_user.email} accessed platform dashboard")
+        
+        return render_template('business_auth/platform_dashboard.html',
+                             current_user=current_user,
+                             dashboard_data=dashboard_data)
+    
+    except Exception as e:
+        logger.error(f"Platform dashboard error: {e}")
+        flash('Error loading platform dashboard.', 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+
 @business_auth_bp.route('/api/session-status')
 @require_business_auth
 def session_status():

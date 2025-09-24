@@ -411,7 +411,10 @@
                 <div class="col-12 col-lg-6">
                     <div class="admin-actions">
                         <!-- Platform Admin Section - Always Visible -->
-                        {% if current_user.role == 'platform_admin' %}
+                        {% if current_user.role == 'platform_admin' or current_user.is_platform_admin() %}
+                        <a href="{{ url_for('business_auth.platform_dashboard') }}" class="btn btn-warning btn-admin me-2 d-none d-lg-inline-block" title="Platform admin dashboard with system-wide metrics" style="background: linear-gradient(135deg, #9333ea 0%, #818cf8 100%); border-color: #9333ea; color: white;">
+                            <i class="fas fa-crown me-2"></i>Platform Dashboard
+                        </a>
                         <a href="{{ url_for('business_auth.business_account_onboarding') }}" class="btn btn-success btn-admin me-2 d-none d-lg-inline-block" title="Create new business accounts with license assignment">
                             <i class="fas fa-plus-circle me-2"></i>Onboard Business
                         </a>

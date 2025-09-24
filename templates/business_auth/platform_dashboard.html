@@ -1,0 +1,509 @@
+{% extends "base.html" %}
+
+{% block title %}Platform Admin Dashboard - VOÏA{% endblock %}
+
+{% block page_class %}page-platform-dashboard{% endblock %}
+
+{% block content %}
+<style>
+/* Platform dashboard specific styling */
+.platform-header {
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.1) 0%, rgba(129, 140, 248, 0.15) 100%);
+    border: 1px solid rgba(147, 51, 234, 0.2);
+    color: var(--primary-black);
+    padding: 2rem 0;
+    border-radius: var(--radius-2xl);
+    margin-bottom: 2rem;
+}
+
+.platform-welcome {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.platform-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #9333ea 0%, #818cf8 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.metric-card {
+    background: var(--primary-white);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+    margin-bottom: var(--spacing-xl);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+}
+
+.metric-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.metric-icon.platform {
+    background: linear-gradient(135deg, #9333ea 0%, #818cf8 100%);
+    color: white;
+}
+
+.metric-icon.accounts {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: white;
+}
+
+.metric-icon.users {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+    color: white;
+}
+
+.metric-icon.activity {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.metric-number {
+    font-size: var(--font-size-4xl);
+    font-weight: 700;
+    color: var(--primary-black);
+    margin: 0;
+    font-family: var(--font-family-headings);
+}
+
+.metric-label {
+    color: var(--gray-dark);
+    font-size: var(--font-size-sm);
+    margin: 0;
+    font-family: var(--font-family-base);
+}
+
+.metric-sublabel {
+    color: var(--gray-medium);
+    font-size: var(--font-size-xs);
+    margin-top: 0.25rem;
+}
+
+.platform-section {
+    background: var(--primary-white);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 2px solid var(--light-gray);
+}
+
+.section-title {
+    font-size: var(--font-size-2xl);
+    font-weight: 600;
+    color: var(--primary-black);
+    margin: 0;
+}
+
+.account-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--light-gray);
+    transition: all 0.2s ease;
+}
+
+.account-item:hover {
+    background: var(--light-gray);
+    border-color: var(--medium-gray);
+}
+
+.account-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.account-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.account-details h6 {
+    margin: 0;
+    font-weight: 600;
+    color: var(--primary-black);
+    font-size: 0.95rem;
+}
+
+.account-details small {
+    color: var(--gray-dark);
+    font-size: 0.8rem;
+}
+
+.account-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.type-trial {
+    background-color: rgba(234, 179, 8, 0.1);
+    color: #ca8a04;
+    border: 1px solid rgba(234, 179, 8, 0.2);
+}
+
+.type-customer {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: rgb(22, 163, 74);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.type-demo {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.type-platform-owner {
+    background-color: rgba(147, 51, 234, 0.1);
+    color: #9333ea;
+    border: 1px solid rgba(147, 51, 234, 0.2);
+}
+
+.usage-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+}
+
+.usage-bar {
+    width: 60px;
+    height: 6px;
+    background: var(--light-gray);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.usage-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.usage-fill.low { background: #10b981; }
+.usage-fill.medium { background: #f59e0b; }
+.usage-fill.high { background: var(--primary-red); }
+
+.quick-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 8px;
+    border: 1.5px solid transparent;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.action-btn-primary {
+    background: #9333ea;
+    color: white;
+    border-color: #9333ea;
+}
+
+.action-btn-primary:hover {
+    background: #7c3aed;
+    border-color: #7c3aed;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.action-btn-secondary {
+    background: transparent;
+    color: var(--gray-dark);
+    border-color: var(--medium-gray);
+}
+
+.action-btn-secondary:hover {
+    background: var(--light-gray);
+    color: var(--primary-black);
+    border-color: var(--gray-dark);
+}
+
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-3xl);
+    color: var(--gray-dark);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+</style>
+
+<div class="container-fluid">
+    <!-- Platform Header -->
+    <div class="platform-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="platform-welcome">
+                        <div class="platform-avatar">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div>
+                            <h2 class="mb-1">Platform Administration</h2>
+                            <p class="mb-0 opacity-75">System-wide overview and management for {{ current_user.get_full_name() }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="quick-actions">
+                        <a href="{{ url_for('business_auth.business_account_onboarding') }}" class="action-btn action-btn-primary">
+                            <i class="fas fa-plus"></i>Onboard Business
+                        </a>
+                        <a href="{{ url_for('business_auth.admin_licenses') }}" class="action-btn action-btn-secondary">
+                            <i class="fas fa-list"></i>All Licenses
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- System Metrics Overview -->
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="metric-card">
+                    <div class="metric-icon platform">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <h3 class="metric-number">{{ dashboard_data.overview_metrics.total_accounts }}</h3>
+                    <p class="metric-label">Total Business Accounts</p>
+                    <p class="metric-sublabel">
+                        {{ dashboard_data.overview_metrics.trial_accounts }} trial, 
+                        {{ dashboard_data.overview_metrics.customer_accounts }} customer, 
+                        {{ dashboard_data.overview_metrics.demo_accounts }} demo
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="metric-card">
+                    <div class="metric-icon users">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="metric-number">{{ dashboard_data.overview_metrics.total_active_users }}</h3>
+                    <p class="metric-label">Total Active Users</p>
+                    <p class="metric-sublabel">{{ dashboard_data.overview_metrics.platform_admin_count }} platform admins</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="metric-card">
+                    <div class="metric-icon activity">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="metric-number">{{ dashboard_data.overview_metrics.campaigns_this_month }}</h3>
+                    <p class="metric-label">Campaigns This Month</p>
+                    <p class="metric-sublabel">{{ dashboard_data.overview_metrics.active_campaigns }} currently active</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="metric-card">
+                    <div class="metric-icon accounts">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3 class="metric-number">{{ dashboard_data.overview_metrics.responses_this_month }}</h3>
+                    <p class="metric-label">Responses This Month</p>
+                    <p class="metric-sublabel">Survey submissions</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Business Accounts -->
+        <div class="platform-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-clock me-2"></i>Recent Business Accounts
+                </h3>
+                <a href="{{ url_for('business_auth.admin_licenses', filter='all') }}" class="action-btn action-btn-secondary">
+                    <i class="fas fa-external-link-alt"></i>View All
+                </a>
+            </div>
+            
+            {% if dashboard_data.recent_accounts %}
+                {% for account in dashboard_data.recent_accounts %}
+                <div class="account-item">
+                    <div class="account-info">
+                        <div class="account-avatar">
+                            {{ account.name[:2]|upper }}
+                        </div>
+                        <div class="account-details">
+                            <h6>{{ account.name }}</h6>
+                            <small>Created {{ account.created_at }}</small>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="account-type-badge type-{{ account.account_type.replace('_', '-') }}">
+                            <i class="fas fa-{{ 'flask' if account.account_type == 'demo' else ('crown' if account.account_type == 'platform_owner' else ('building' if account.account_type == 'customer' else 'play')) }}"></i>
+                            {{ account.account_type|title }}
+                        </span>
+                        <span class="badge bg-{{ 'success' if account.status == 'active' else ('warning' if account.status == 'trial' else 'secondary') }}">
+                            {{ account.status|title }}
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-building"></i>
+                    <h4>No recent accounts</h4>
+                    <p>New business account registrations will appear here.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- High Usage Accounts -->
+        {% if dashboard_data.high_usage_accounts %}
+        <div class="platform-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>High Usage Accounts
+                </h3>
+                <small class="text-muted">Accounts using over 80% of their limits</small>
+            </div>
+            
+            {% for item in dashboard_data.high_usage_accounts %}
+            <div class="account-item">
+                <div class="account-info">
+                    <div class="account-avatar">
+                        {{ item.account.name[:2]|upper }}
+                    </div>
+                    <div class="account-details">
+                        <h6>{{ item.account.name }}</h6>
+                        <small>{{ item.license_type|title }} License</small>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="usage-indicator">
+                        <span>Users:</span>
+                        <div class="usage-bar">
+                            <div class="usage-fill {{ 'high' if item.users_usage > 90 else 'medium' if item.users_usage > 80 else 'low' }}" 
+                                 style="width: {{ item.users_usage|min(100) }}%"></div>
+                        </div>
+                        <span class="text-muted">{{ "%.0f"|format(item.users_usage) }}%</span>
+                    </div>
+                    <div class="usage-indicator">
+                        <span>Campaigns:</span>
+                        <div class="usage-bar">
+                            <div class="usage-fill {{ 'high' if item.campaigns_usage > 90 else 'medium' if item.campaigns_usage > 80 else 'low' }}" 
+                                 style="width: {{ item.campaigns_usage|min(100) }}%"></div>
+                        </div>
+                        <span class="text-muted">{{ "%.0f"|format(item.campaigns_usage) }}%</span>
+                    </div>
+                    <a href="{{ url_for('business_auth.license_assignment_form', business_id=item.account.id) }}" 
+                       class="action-btn action-btn-primary">
+                        <i class="fas fa-arrow-up"></i>Upgrade
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Quick Platform Actions -->
+        <div class="platform-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-tools me-2"></i>Platform Management
+                </h3>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('business_auth.business_account_onboarding') }}" class="action-btn action-btn-primary">
+                            <i class="fas fa-plus-circle"></i>Create Business Account
+                        </a>
+                        <a href="{{ url_for('business_auth.admin_licenses') }}" class="action-btn action-btn-secondary">
+                            <i class="fas fa-certificate"></i>Manage All Licenses
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('business_auth.license_dashboard') }}" class="action-btn action-btn-secondary">
+                            <i class="fas fa-chart-pie"></i>License Dashboard
+                        </a>
+                        <a href="{{ url_for('business_auth.manage_users') }}" class="action-btn action-btn-secondary">
+                            <i class="fas fa-user-cog"></i>Platform Admin Users
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
