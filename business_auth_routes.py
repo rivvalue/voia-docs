@@ -1177,9 +1177,9 @@ def platform_dashboard():
             return redirect(url_for('business_auth.login'))
         
         # System-wide metrics
-        from models import BusinessAccount, BusinessAccountUser, Campaign, SurveyResponse, Participant
         from license_service import LicenseService
         from datetime import datetime, timedelta
+        from models import BusinessAccount, BusinessAccountUser, Campaign, SurveyResponse, Participant
         
         # Total business accounts by type
         total_accounts = BusinessAccount.query.count()
