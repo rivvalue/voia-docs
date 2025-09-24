@@ -240,7 +240,8 @@ def manage_users():
         
         # Get all users for this business account
         users = BusinessAccountUser.get_by_business_account(current_account_id)
-        users_count = len(users)
+        # Count only active users to match license system
+        users_count = business_account.current_users_count
         
         logger.info(f"User {current_user.email} accessing user management for account {business_account.name}")
         
