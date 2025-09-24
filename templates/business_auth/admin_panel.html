@@ -412,13 +412,13 @@
                     <div class="admin-actions">
                         <!-- Platform Admin Section - Always Visible -->
                         {% if current_user.role == 'platform_admin' or current_user.is_platform_admin() %}
-                        <a href="{{ url_for('business_auth.business_analytics_hub') }}" class="btn btn-admin me-2 d-none d-lg-inline-block" title="Business analytics hub with comprehensive platform intelligence" style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%); border-color: var(--primary-red); color: white;">
-                            <i class="fas fa-chart-line me-2"></i>Business Analytics Hub
+                        <a href="{{ url_for('business_auth.business_analytics_hub') }}" class="btn btn-admin me-2" title="Business analytics hub with comprehensive platform intelligence" style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%); border-color: var(--primary-red); color: white;">
+                            <i class="fas fa-chart-line me-2"></i><span class="d-none d-sm-inline">Business Analytics Hub</span><span class="d-sm-none">Analytics</span>
                         </a>
-                        <a href="{{ url_for('business_auth.business_account_onboarding') }}" class="btn btn-success btn-admin me-2 d-none d-lg-inline-block" title="Create new business accounts with license assignment">
-                            <i class="fas fa-plus-circle me-2"></i>Onboard Business
+                        <a href="{{ url_for('business_auth.business_account_onboarding') }}" class="btn btn-success btn-admin me-2" title="Create new business accounts with license assignment">
+                            <i class="fas fa-plus-circle me-2"></i><span class="d-none d-sm-inline">Onboard Business</span><span class="d-sm-none">Onboard</span>
                         </a>
-                        <a href="{{ url_for('business_auth.license_dashboard') }}" class="btn btn-primary btn-admin me-2 d-none d-lg-inline-block" title="License management dashboard and overview">
+                        <a href="{{ url_for('business_auth.license_dashboard') }}" class="btn btn-primary btn-admin me-2" title="License management dashboard and overview">
                             <i class="fas fa-tachometer-alt me-2"></i>License Dashboard
                         </a>
                         {% endif %}
