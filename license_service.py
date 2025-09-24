@@ -436,6 +436,16 @@ class LicenseService:
                 - expires_soon: Whether license expires within 30 days
         """
         try:
+            # Check if current user is a platform admin (unlimited access)
+            from flask import session
+            current_user_id = session.get('business_user_id')
+            if current_user_id:
+                from models import BusinessAccountUser
+                current_user = BusinessAccountUser.query.get(current_user_id)
+                if current_user and current_user.is_platform_admin():
+                    logger.debug(f"Platform admin {current_user.email} accessing license info - showing unlimited access")
+                    return LicenseService._get_platform_admin_license_info(business_account_id)
+            
             # Get current license
             current_license = LicenseService.get_current_license(business_account_id)
             
@@ -575,6 +585,43 @@ class LicenseService:
             logger.error(f"Failed to get license info for business_account_id {business_account_id}: {e}")
             return LicenseService._get_empty_license_info()
     
+    @staticmethod
+    def _get_platform_admin_license_info(business_account_id: int) -> Dict[str, Any]:
+        """Get unlimited license info for platform administrators."""
+        # Get business account for basic info
+        business_account = BusinessAccount.query.get(business_account_id)
+        current_license = LicenseService.get_current_license(business_account_id)
+        
+        return {
+            'current_license': current_license,
+            'license_type': 'platform_admin',
+            'license_status': 'unlimited',
+            'license_start': None,
+            'license_end': None,
+            'days_remaining': 999999,  # Effectively unlimited
+            'days_since_expired': 0,
+            'expires_soon': False,
+            'campaigns_used': LicenseService.get_campaigns_used_in_current_period(business_account_id) if business_account else 0,
+            'campaigns_limit': 999999,  # Unlimited campaigns
+            'campaigns_remaining': 999999,
+            'users_used': business_account.current_users_count if business_account else 0,
+            'users_limit': 999999,  # Unlimited users
+            'users_remaining': 999999,
+            'participants_limit': 999999,  # Unlimited participants
+            'can_activate_campaign': True,
+            'can_add_user': True,
+            'can_use_transcript_analysis': True,
+            'transcript_analysis': {
+                'has_addon': True,
+                'status': 'unlimited',
+                'start_date': None,
+                'end_date': None,
+                'price': 0.0,
+                'days_remaining': 999999,
+                'expires_soon': False
+            }
+        }
+
     @staticmethod
     def _get_empty_license_info() -> Dict[str, Any]:
         """Get default/empty license info for error cases."""
