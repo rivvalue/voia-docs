@@ -75,6 +75,25 @@ def require_business_auth(f):
                 return render_template('business_auth/account_status.html', 
                                      account_status=current_account.status)
         
+        # Check mandatory onboarding for Core/Plus license holders (no regression)
+        current_user = BusinessAccountUser.query.get(business_user_id)
+        if (current_user and 
+            current_user.requires_onboarding() and 
+            not request.endpoint.startswith('business_auth.onboarding') and
+            request.endpoint not in ['business_auth.logout', 'business_auth.session_status']):
+            
+            # Initialize onboarding progress if not set
+            if not current_user.onboarding_progress:
+                current_user.initialize_onboarding()
+                db.session.commit()
+            
+            # Redirect to current onboarding step
+            current_step = current_user.get_current_onboarding_step()
+            if request.is_json:
+                return jsonify({'error': 'Onboarding required', 'redirect': url_for('business_auth.onboarding_step', step=current_step)}), 412
+            
+            return redirect(url_for('business_auth.onboarding_step', step=current_step))
+        
         return f(*args, **kwargs)
     
     return decorated_function
