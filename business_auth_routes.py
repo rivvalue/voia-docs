@@ -1181,69 +1181,153 @@ def platform_dashboard():
             flash('User session invalid.', 'error')
             return redirect(url_for('business_auth.login'))
         
-        # Total business accounts by type
+        # Import additional models for comprehensive metrics
+        from sqlalchemy import func
+        from models import CampaignParticipant
+        
+        # === BUSINESS ACCOUNT INTELLIGENCE ===
         total_accounts = BusinessAccount.query.count()
+        active_accounts = BusinessAccount.query.filter_by(is_active=True).count() if hasattr(BusinessAccount, 'is_active') else total_accounts
         trial_accounts = BusinessAccount.query.filter_by(account_type='trial').count()
         customer_accounts = BusinessAccount.query.filter_by(account_type='customer').count()
         demo_accounts = BusinessAccount.query.filter_by(account_type='demo').count()
         platform_owner_accounts = BusinessAccount.query.filter_by(account_type='platform_owner').count()
         
-        # Total active users across all accounts
+        # === USER ENGAGEMENT ===
+        total_users = BusinessAccountUser.query.count()
         total_active_users = BusinessAccountUser.query.filter_by(is_active_user=True).count()
+        total_inactive_users = total_users - total_active_users
+        avg_users_per_account = round(total_users / max(total_accounts, 1), 1)
         
-        # Total campaigns this month
+        # === CAMPAIGN PERFORMANCE ===
+        total_campaigns = Campaign.query.count()
+        draft_campaigns = Campaign.query.filter_by(status='draft').count()
+        ready_campaigns = Campaign.query.filter_by(status='ready').count()
+        active_campaigns = Campaign.query.filter_by(status='active').count()
+        completed_campaigns = Campaign.query.filter_by(status='completed').count()
+        cancelled_campaigns = Campaign.query.filter_by(status='cancelled').count()
+        
+        # Time-based metrics
         current_month_start = datetime.utcnow().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         campaigns_this_month = Campaign.query.filter(Campaign.created_at >= current_month_start).count()
         
-        # Total active campaigns
-        active_campaigns = Campaign.query.filter_by(status='active').count()
+        # === PARTICIPANT INTELLIGENCE ===
+        total_participants = Participant.query.count()
         
-        # Total responses this month
+        # Participants per business account
+        participant_counts = db.session.query(
+            Participant.business_account_id,
+            func.count(Participant.id).label('participant_count')
+        ).group_by(Participant.business_account_id).all()
+        
+        avg_participants_per_account = round(total_participants / max(total_accounts, 1), 1)
+        
+        # Campaign-participant assignments
+        total_assignments = CampaignParticipant.query.count()
+        avg_participants_per_campaign = round(total_assignments / max(total_campaigns, 1), 1)
+        
+        # === SURVEY & RESPONSE ANALYTICS ===
+        total_responses = SurveyResponse.query.count()
         responses_this_month = SurveyResponse.query.filter(SurveyResponse.created_at >= current_month_start).count()
         
-        # Recent business account registrations
-        recent_accounts = BusinessAccount.query.order_by(BusinessAccount.created_at.desc()).limit(5).all()
+        # Calculate completion rate (responses vs total assignments)
+        completion_rate = round((total_responses / max(total_assignments, 1)) * 100, 1)
         
-        # High usage accounts (over 80% of limits)
-        high_usage_accounts = []
+        # === LICENSE UTILIZATION ===
+        license_summary = {
+            'total_licensed_accounts': 0,
+            'high_usage_accounts': [],
+            'accounts_by_license_type': {
+                'trial': 0, 'core': 0, 'plus': 0, 'pro': 0, 'enterprise': 0
+            }
+        }
+        
         all_accounts = BusinessAccount.query.filter(BusinessAccount.account_type.in_(['trial', 'customer'])).all()
         
         for account in all_accounts:
             try:
                 license_info = LicenseService.get_license_info(account.id)
+                license_type = license_info.get('license_type', 'trial')
+                license_summary['accounts_by_license_type'][license_type] = license_summary['accounts_by_license_type'].get(license_type, 0) + 1
+                license_summary['total_licensed_accounts'] += 1
+                
+                # Check for high usage (over 80% of limits)
                 users_usage = (license_info.get('users_used', 0) / max(license_info.get('users_limit', 1), 1)) * 100
                 campaigns_usage = (license_info.get('campaigns_used', 0) / max(license_info.get('campaigns_limit', 1), 1)) * 100
                 
                 if users_usage > 80 or campaigns_usage > 80:
-                    high_usage_accounts.append({
+                    license_summary['high_usage_accounts'].append({
                         'account': account,
-                        'users_usage': users_usage,
-                        'campaigns_usage': campaigns_usage,
-                        'license_type': license_info.get('license_type', 'trial')
+                        'users_usage': round(users_usage, 1),
+                        'campaigns_usage': round(campaigns_usage, 1),
+                        'license_type': license_type
                     })
             except Exception as e:
                 logger.warning(f"Error getting license info for account {account.id}: {e}")
                 continue
         
-        # Platform admin metrics
-        platform_admin_count = BusinessAccountUser.query.filter_by(role='platform_admin').count()
+        # === RECENT ACTIVITY ===
+        recent_accounts = BusinessAccount.query.order_by(BusinessAccount.created_at.desc()).limit(5).all()
         
-        # Build dashboard data
+        # Most active accounts by campaign volume
+        most_active_accounts = db.session.query(
+            Campaign.business_account_id,
+            BusinessAccount.business_name,
+            func.count(Campaign.id).label('campaign_count')
+        ).join(
+            BusinessAccount, Campaign.business_account_id == BusinessAccount.id
+        ).group_by(
+            Campaign.business_account_id, BusinessAccount.business_name
+        ).order_by(
+            func.count(Campaign.id).desc()
+        ).limit(5).all()
+        
+        # === BUILD COMPREHENSIVE DASHBOARD DATA ===
         dashboard_data = {
-            'overview_metrics': {
+            'business_intelligence': {
                 'total_accounts': total_accounts,
+                'active_accounts': active_accounts,
                 'trial_accounts': trial_accounts,
                 'customer_accounts': customer_accounts,
                 'demo_accounts': demo_accounts,
-                'platform_owner_accounts': platform_owner_accounts,
-                'total_active_users': total_active_users,
-                'campaigns_this_month': campaigns_this_month,
-                'active_campaigns': active_campaigns,
-                'responses_this_month': responses_this_month,
-                'platform_admin_count': platform_admin_count
+                'platform_owner_accounts': platform_owner_accounts
             },
-            'recent_accounts': [account.to_dict() for account in recent_accounts],
-            'high_usage_accounts': high_usage_accounts[:10]  # Top 10 high usage accounts
+            'user_engagement': {
+                'total_users': total_users,
+                'total_active_users': total_active_users,
+                'total_inactive_users': total_inactive_users,
+                'avg_users_per_account': avg_users_per_account
+            },
+            'campaign_performance': {
+                'total_campaigns': total_campaigns,
+                'draft_campaigns': draft_campaigns,
+                'ready_campaigns': ready_campaigns,
+                'active_campaigns': active_campaigns,
+                'completed_campaigns': completed_campaigns,
+                'cancelled_campaigns': cancelled_campaigns,
+                'campaigns_this_month': campaigns_this_month
+            },
+            'participant_intelligence': {
+                'total_participants': total_participants,
+                'avg_participants_per_account': avg_participants_per_account,
+                'total_assignments': total_assignments,
+                'avg_participants_per_campaign': avg_participants_per_campaign
+            },
+            'survey_analytics': {
+                'total_responses': total_responses,
+                'responses_this_month': responses_this_month,
+                'completion_rate': completion_rate
+            },
+            'license_utilization': license_summary,
+            'recent_activity': {
+                'recent_accounts': [account.to_dict() for account in recent_accounts],
+                'most_active_accounts': [
+                    {
+                        'business_name': acc.business_name,
+                        'campaign_count': acc.campaign_count
+                    } for acc in most_active_accounts
+                ]
+            }
         }
         
         logger.info(f"Platform admin {current_user.email} accessed platform dashboard")
@@ -1257,159 +1341,6 @@ def platform_dashboard():
         flash('Error loading platform dashboard.', 'error')
         return redirect(url_for('business_auth.admin_panel'))
 
-
-@business_auth_bp.route('/admin/email-operations')
-@require_platform_admin
-def email_operations_center():
-    """Email Operations Center - Platform admin email management and monitoring"""
-    try:
-        # Import required modules
-        from email_service import EmailService
-        from datetime import datetime, timedelta
-        from models import BusinessAccount, EmailConfiguration, EmailDelivery
-        from sqlalchemy import func, text
-        
-        # Get current user
-        user_id = session.get('business_user_id')
-        current_user = BusinessAccountUser.query.get(user_id)
-        
-        if not current_user:
-            flash('User session invalid.', 'error')
-            return redirect(url_for('business_auth.login'))
-        
-        email_service = EmailService()
-        
-        # 1. SMTP Configuration Status for all business accounts
-        smtp_status = []
-        business_accounts = BusinessAccount.query.all()
-        
-        for account in business_accounts:
-            config_info = {
-                'business_account_id': account.id,
-                'business_name': account.business_name,
-                'account_type': account.account_type,
-                'has_custom_smtp': False,
-                'smtp_configured': False,
-                'smtp_server': None,
-                'last_test': None,
-                'test_status': None
-            }
-            
-            # Check for custom SMTP configuration
-            email_config = EmailConfiguration.query.filter_by(business_account_id=account.id).first()
-            if email_config:
-                config_info['has_custom_smtp'] = True
-                config_info['smtp_configured'] = email_config.is_valid()
-                config_info['smtp_server'] = email_config.smtp_server
-                config_info['last_test'] = email_config.last_test_at.isoformat() if email_config.last_test_at else None
-                config_info['test_status'] = email_config.get_last_test_result().get('success', False) if email_config.get_last_test_result() else None
-            else:
-                # Using system default
-                config_info['smtp_configured'] = email_service.is_configured()
-                config_info['smtp_server'] = 'System Default'
-            
-            smtp_status.append(config_info)
-        
-        # 2. Email Delivery Statistics (last 30 days)
-        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
-        
-        delivery_stats = db.session.query(
-            EmailDelivery.business_account_id,
-            BusinessAccount.business_name,
-            func.count(EmailDelivery.id).label('total_emails'),
-            func.sum(func.case([(EmailDelivery.status == 'sent', 1)], else_=0)).label('sent_count'),
-            func.sum(func.case([(EmailDelivery.status == 'failed', 1)], else_=0)).label('failed_count'),
-            func.sum(func.case([(EmailDelivery.status == 'permanent_failure', 1)], else_=0)).label('permanent_failed_count'),
-            func.sum(func.case([(EmailDelivery.status == 'pending', 1)], else_=0)).label('pending_count')
-        ).join(
-            BusinessAccount, EmailDelivery.business_account_id == BusinessAccount.id
-        ).filter(
-            EmailDelivery.created_at >= thirty_days_ago
-        ).group_by(
-            EmailDelivery.business_account_id, BusinessAccount.business_name
-        ).all()
-        
-        # Calculate delivery rates
-        email_delivery_stats = []
-        for stat in delivery_stats:
-            total = stat.total_emails or 0
-            success_rate = (stat.sent_count / total * 100) if total > 0 else 0
-            failure_rate = ((stat.failed_count + stat.permanent_failed_count) / total * 100) if total > 0 else 0
-            
-            email_delivery_stats.append({
-                'business_account_id': stat.business_account_id,
-                'business_name': stat.business_name,
-                'total_emails': total,
-                'sent_count': stat.sent_count or 0,
-                'failed_count': stat.failed_count or 0,
-                'permanent_failed_count': stat.permanent_failed_count or 0,
-                'pending_count': stat.pending_count or 0,
-                'success_rate': round(success_rate, 1),
-                'failure_rate': round(failure_rate, 1)
-            })
-        
-        # 3. Recent Failed Emails (last 7 days, retryable)
-        seven_days_ago = datetime.utcnow() - timedelta(days=7)
-        recent_failed_emails = EmailDelivery.query.join(
-            BusinessAccount, EmailDelivery.business_account_id == BusinessAccount.id
-        ).filter(
-            EmailDelivery.status == 'failed',
-            EmailDelivery.created_at >= seven_days_ago,
-            EmailDelivery.retry_count < EmailDelivery.max_retries
-        ).order_by(EmailDelivery.last_attempted_at.desc()).limit(50).all()
-        
-        failed_emails_data = []
-        for email in recent_failed_emails:
-            failed_emails_data.append({
-                'id': email.id,
-                'business_name': email.business_account.business_name,
-                'recipient_email': email.recipient_email,
-                'recipient_name': email.recipient_name,
-                'subject': email.subject,
-                'email_type': email.email_type,
-                'retry_count': email.retry_count,
-                'max_retries': email.max_retries,
-                'last_error': email.last_error,
-                'created_at': email.created_at.isoformat(),
-                'last_attempted_at': email.last_attempted_at.isoformat() if email.last_attempted_at else None,
-                'next_retry_at': email.next_retry_at.isoformat() if email.next_retry_at else None
-            })
-        
-        # 4. System-wide Email Health Metrics
-        total_accounts_with_smtp = len([s for s in smtp_status if s['smtp_configured']])
-        total_accounts = len(smtp_status)
-        
-        # Overall email volume (last 24 hours)
-        twenty_four_hours_ago = datetime.utcnow() - timedelta(hours=24)
-        recent_volume = EmailDelivery.query.filter(EmailDelivery.created_at >= twenty_four_hours_ago).count()
-        
-        # System health metrics
-        system_health = {
-            'total_accounts': total_accounts,
-            'accounts_with_smtp': total_accounts_with_smtp,
-            'smtp_coverage_rate': round((total_accounts_with_smtp / total_accounts * 100) if total_accounts > 0 else 0, 1),
-            'emails_last_24h': recent_volume,
-            'total_failed_retryable': len(failed_emails_data),
-            'accounts_with_failures': len([s for s in email_delivery_stats if s['failure_rate'] > 5])
-        }
-        
-        email_ops_data = {
-            'smtp_status': smtp_status,
-            'delivery_stats': email_delivery_stats,
-            'failed_emails': failed_emails_data,
-            'system_health': system_health
-        }
-        
-        logger.info(f"Platform admin {current_user.email} accessed email operations center")
-        
-        return render_template('business_auth/email_operations_center.html',
-                             current_user=current_user,
-                             email_ops_data=email_ops_data)
-    
-    except Exception as e:
-        logger.error(f"Email operations center error: {e}")
-        flash('Error loading email operations center.', 'error')
-        return redirect(url_for('business_auth.admin_panel'))
 
 
 @business_auth_bp.route('/api/session-status')
