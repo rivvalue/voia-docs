@@ -145,6 +145,7 @@ class LicenseService:
     def can_activate_campaign(business_account_id: int) -> bool:
         """
         Check if business account can activate another campaign based on current license limits.
+        Platform administrators have unlimited access.
         
         Replaces BusinessAccount.can_activate_campaign() with license_history table lookup.
         Maintains backward compatibility including trial account behavior.
@@ -161,6 +162,15 @@ class LicenseService:
             - Counts ALL campaigns that started in current period regardless of status
         """
         try:
+            # Check if current user is a platform admin (unlimited access)
+            from flask import session
+            current_user_id = session.get('business_user_id')
+            if current_user_id:
+                from models import BusinessAccountUser
+                current_user = BusinessAccountUser.query.get(current_user_id)
+                if current_user and current_user.is_platform_admin():
+                    logger.debug(f"Platform admin {current_user.email} bypassing campaign limit check")
+                    return True
             # Get current license period boundaries
             period_start, period_end = LicenseService.get_license_period(business_account_id)
             
@@ -248,6 +258,7 @@ class LicenseService:
     def can_add_user(business_account_id: int) -> bool:
         """
         Check if business account can add another user based on current license limits.
+        Platform administrators have unlimited access.
         
         Args:
             business_account_id: Business account ID to check
@@ -256,6 +267,15 @@ class LicenseService:
             bool: True if account can add another user, False otherwise
         """
         try:
+            # Check if current user is a platform admin (unlimited access)
+            from flask import session
+            current_user_id = session.get('business_user_id')
+            if current_user_id:
+                from models import BusinessAccountUser
+                current_user = BusinessAccountUser.query.get(current_user_id)
+                if current_user and current_user.is_platform_admin():
+                    logger.debug(f"Platform admin {current_user.email} bypassing user limit check")
+                    return True
             # Get current license limits
             current_license = LicenseService.get_current_license(business_account_id)
             max_users = current_license.max_users if current_license else 5
@@ -282,6 +302,7 @@ class LicenseService:
     def can_add_participants(business_account_id: int, campaign_id: int, additional_count: int) -> bool:
         """
         Check if campaign can add more participants based on current license limits.
+        Platform administrators have unlimited access.
         
         Args:
             business_account_id: Business account ID to check
@@ -292,6 +313,15 @@ class LicenseService:
             bool: True if campaign can add the participants, False otherwise
         """
         try:
+            # Check if current user is a platform admin (unlimited access)
+            from flask import session
+            current_user_id = session.get('business_user_id')
+            if current_user_id:
+                from models import BusinessAccountUser
+                current_user = BusinessAccountUser.query.get(current_user_id)
+                if current_user and current_user.is_platform_admin():
+                    logger.debug(f"Platform admin {current_user.email} bypassing participant limit check")
+                    return True
             # Get current license limits
             current_license = LicenseService.get_current_license(business_account_id)
             max_participants = current_license.max_participants_per_campaign if current_license else 500
@@ -318,6 +348,7 @@ class LicenseService:
     def can_use_transcript_analysis(business_account_id: int) -> bool:
         """
         Check if business account has access to transcript analysis add-on feature.
+        Platform administrators have unlimited access.
         
         Uses date-based access control: checks if today falls within the
         transcript_analysis_start_date and transcript_analysis_end_date range.
@@ -330,6 +361,15 @@ class LicenseService:
             bool: True if account can use transcript analysis, False otherwise
         """
         try:
+            # Check if current user is a platform admin (unlimited access)
+            from flask import session
+            current_user_id = session.get('business_user_id')
+            if current_user_id:
+                from models import BusinessAccountUser
+                current_user = BusinessAccountUser.query.get(current_user_id)
+                if current_user and current_user.is_platform_admin():
+                    logger.debug(f"Platform admin {current_user.email} bypassing transcript analysis access check")
+                    return True
             from datetime import date
             
             # Get current license
