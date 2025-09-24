@@ -1168,6 +1168,11 @@ def admin_panel():
 def platform_dashboard():
     """Platform admin dashboard with system-wide metrics and management"""
     try:
+        # Import required modules first
+        from license_service import LicenseService
+        from datetime import datetime, timedelta
+        from models import BusinessAccount, BusinessAccountUser, Campaign, SurveyResponse, Participant
+        
         # Get current user
         user_id = session.get('business_user_id')
         current_user = BusinessAccountUser.query.get(user_id)
@@ -1175,11 +1180,6 @@ def platform_dashboard():
         if not current_user:
             flash('User session invalid.', 'error')
             return redirect(url_for('business_auth.login'))
-        
-        # System-wide metrics
-        from license_service import LicenseService
-        from datetime import datetime, timedelta
-        from models import BusinessAccount, BusinessAccountUser, Campaign, SurveyResponse, Participant
         
         # Total business accounts by type
         total_accounts = BusinessAccount.query.count()
