@@ -34,7 +34,11 @@
 }
 
 .admin-actions {
-    text-align: right;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    align-items: center;
 }
 
 .stat-card {
@@ -393,7 +397,7 @@
     <div class="admin-header">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-md-8">
+                <div class="col-12 col-lg-6">
                     <div class="admin-welcome">
                         <div class="admin-avatar">
                             <i class="fas fa-user-shield"></i>
@@ -404,7 +408,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-12 col-lg-6">
                     <div class="admin-actions">
                         <!-- Platform Admin Section -->
                         {% if current_user.role == 'platform_admin' %}
@@ -442,10 +446,10 @@
                             <i class="fas fa-cog me-2"></i>Survey Customization
                         </a>
                         {% endif %}
-                        <a href="{{ url_for('participants.list_participants') }}" class="btn btn-primary btn-admin me-2" title="Manage survey participants">
+                        <a href="{{ url_for('participants.list_participants') }}" class="btn btn-primary btn-admin" title="Manage survey participants">
                             <i class="fas fa-users me-2"></i>Manage Participants
                         </a>
-                        <a href="{{ url_for('dashboard') }}{% if admin_data.campaigns %}{% for campaign in admin_data.campaigns %}{% if campaign.status == 'active' %}?campaign_id={{ campaign.id }}{% endif %}{% endfor %}{% endif %}" class="btn btn-outline-primary btn-admin me-2" title="View analytics and insights">
+                        <a href="{{ url_for('dashboard') }}{% if admin_data.campaigns %}{% for campaign in admin_data.campaigns %}{% if campaign.status == 'active' %}?campaign_id={{ campaign.id }}{% endif %}{% endfor %}{% endif %}" class="btn btn-outline-primary btn-admin" title="View analytics and insights">
                             <i class="fas fa-chart-bar me-2"></i>View Analytics
                         </a>
                         <a href="{{ url_for('business_auth.logout') }}" class="btn btn-outline-dark btn-admin">
