@@ -81,6 +81,21 @@
 .btn-group {
     white-space: nowrap;
 }
+
+/* Custom background for muted card */
+.bg-muted {
+    background-color: #6c757d !important;
+}
+
+/* Search form styling */
+.search-form .form-control {
+    height: 48px;
+}
+
+.search-form .btn {
+    height: 48px;
+    padding: 0.75rem 1.5rem;
+}
 </style>
 
 <div class="container">
@@ -118,92 +133,54 @@
 
             <!-- Summary Cards -->
             <div class="row mb-4">
-                <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-                    <div class="card bg-primary text-white">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="me-3">
-                                    <i class="fas fa-users fa-2x"></i>
-                                </div>
-                                <div>
-                                    <h5 class="mb-0">{{ kpi_stats.total }}</h5>
-                                    <small>Total Participants</small>
-                                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card bg-primary text-white h-100">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fas fa-users fa-2x"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-0">{{ kpi_stats.total }}</h5>
+                                <small>Total Participants</small>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-                    <div class="card bg-warning text-white">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="me-3">
-                                    <i class="fas fa-clock fa-2x"></i>
-                                </div>
-                                <div>
-                                    <h5 class="mb-0">{{ kpi_stats.active }}</h5>
-                                    <small>Active</small>
-                                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card bg-warning text-white h-100">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fas fa-clock fa-2x"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-0">{{ kpi_stats.active }}</h5>
+                                <small>Active</small>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-                    <div class="card bg-secondary text-white">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="me-3">
-                                    <i class="fas fa-building fa-2x"></i>
-                                </div>
-                                <div>
-                                    <h5 class="mb-0">{{ kpi_stats.companies }}</h5>
-                                    <small>Companies</small>
-                                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card bg-secondary text-white h-100">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fas fa-building fa-2x"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-0">{{ kpi_stats.companies }}</h5>
+                                <small>Companies</small>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-                    <div class="card bg-info text-white">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="me-3">
-                                    <i class="fas fa-chart-pie fa-2x"></i>
-                                </div>
-                                <div>
-                                    <h5 class="mb-0">{{ kpi_stats.participants_per_company }}</h5>
-                                    <small>Avg per Company</small>
-                                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card bg-muted text-white h-100">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fas fa-chart-pie fa-2x"></i>
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-                    <div class="card bg-success text-white">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="me-3">
-                                    <i class="fas fa-check-circle fa-2x"></i>
-                                </div>
-                                <div>
-                                    <h5 class="mb-0">{{ kpi_stats.completed }}</h5>
-                                    <small>Completed</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
-                    <div class="card bg-dark text-white">
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="me-3">
-                                    <i class="fas fa-play-circle fa-2x"></i>
-                                </div>
-                                <div>
-                                    <h5 class="mb-0">{{ kpi_stats.started }}</h5>
-                                    <small>Started</small>
-                                </div>
+                            <div>
+                                <h5 class="mb-0">{{ kpi_stats.participants_per_company }}</h5>
+                                <small>Avg per Company</small>
                             </div>
                         </div>
                     </div>
@@ -213,7 +190,7 @@
             <!-- Search -->
             <div class="card mb-4">
                 <div class="card-body">
-                    <form method="GET" action="{{ url_for('participants.list_participants') }}">
+                    <form method="GET" action="{{ url_for('participants.list_participants') }}" class="search-form">
                         <div class="row align-items-end">
                             <div class="col-md-8">
                                 <label for="search" class="form-label">Search Participants</label>
