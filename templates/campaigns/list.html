@@ -6,7 +6,7 @@
 
 {% block content %}
 <style>
-/* Campaign management kanban styling */
+/* Campaign management styling */
 .campaign-header {
     background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
     color: var(--primary-white);
@@ -15,105 +15,135 @@
     margin-bottom: 2rem;
 }
 
-/* Kanban Board Layout */
-.kanban-board {
-    display: flex;
-    gap: var(--spacing-lg);
-    min-height: 600px;
-    margin-bottom: 2rem;
-}
-
-.kanban-column {
-    flex: 1;
-    min-width: 0;
-    background: rgba(var(--primary-red-rgb, 225, 58, 68), 0.02);
-    border-radius: var(--radius-xl);
-    border: 1px solid var(--light-gray);
-}
-
-.kanban-header {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
-    color: var(--primary-white);
-    padding: var(--spacing-lg);
-    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-}
-
-.kanban-header.draft {
-    background: linear-gradient(135deg, var(--gray-dark) 0%, var(--medium-gray) 100%);
-}
-
-.kanban-header.active {
-    background: linear-gradient(135deg, #198754 0%, #157347 100%);
-}
-
-.kanban-header.completed {
-    background: linear-gradient(135deg, #6f42c1 0%, #5a2d91 100%);
-}
-
-.kanban-header h3 {
-    margin: 0;
-    font-size: var(--font-size-lg);
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.kanban-count {
-    background: rgba(255, 255, 255, 0.2);
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-}
-
-.kanban-list {
-    padding: var(--spacing-lg);
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-lg);
-    min-height: 500px;
-    max-height: 70vh;
-    overflow-y: auto;
-}
-
-/* Uniform Campaign Cards */
-.campaign-card {
+/* View Controls */
+.campaign-controls {
     background: var(--primary-white);
-    border-radius: var(--radius-2xl);
-    padding: var(--spacing-xl);
-    box-shadow: var(--shadow-lg);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
     border: 1px solid var(--light-gray);
-    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+}
+
+.view-toggle {
     display: flex;
-    flex-direction: column;
-    min-height: 340px;
+    gap: 0.5rem;
+    background: var(--light-gray);
+    padding: 0.25rem;
+    border-radius: var(--radius-lg);
+}
+
+.view-toggle button {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: transparent;
+    color: var(--gray-dark);
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
     cursor: pointer;
 }
 
-.campaign-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-xl);
-    border-color: var(--primary-red);
+.view-toggle button.active {
+    background: var(--primary-red);
+    color: var(--primary-white);
+    box-shadow: var(--shadow-sm);
 }
 
-.campaign-card-header {
-    margin-bottom: var(--spacing-lg);
+.filters-section {
+    display: flex;
+    gap: var(--spacing-lg);
+    align-items: center;
+    flex-wrap: wrap;
 }
 
-.campaign-card-body {
-    flex: 1;
-    margin-bottom: var(--spacing-lg);
+.status-filters {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
-.campaign-card-actions {
-    margin-top: auto;
-    padding-top: var(--spacing-lg);
-    border-top: 1px solid var(--light-gray);
+.status-filter {
+    padding: 0.25rem 0.75rem;
+    border: 2px solid transparent;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.status-filter:hover {
+    text-decoration: none;
+}
+
+.status-filter.all {
+    background-color: var(--medium-gray);
+    color: var(--primary-white);
+}
+
+.status-filter.draft {
+    background-color: var(--light-gray);
+    color: var(--gray-dark);
+}
+
+.status-filter.ready {
+    background-color: var(--red-light);
+    color: var(--primary-red);
+}
+
+.status-filter.active {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-filter.completed {
+    background-color: #e2e3ff;
+    color: #5a2d91;
+}
+
+.status-filter.active-filter {
+    border-color: currentColor;
+    transform: scale(1.05);
+}
+
+/* List View Styles */
+.campaigns-table {
+    background: var(--primary-white);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+}
+
+.campaigns-table table {
+    margin: 0;
+}
+
+.campaigns-table thead {
+    background: rgba(var(--primary-red-rgb, 225, 58, 68), 0.05);
+}
+
+.campaigns-table th {
+    border-bottom: 2px solid var(--light-gray);
+    padding: var(--spacing-lg);
+    font-weight: 600;
+    color: var(--primary-black);
+}
+
+.campaigns-table td {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--light-gray);
+    vertical-align: middle;
+}
+
+.campaigns-table tbody tr:hover {
+    background-color: rgba(var(--primary-red-rgb, 225, 58, 68), 0.02);
+}
+
+.campaign-name-cell {
+    font-weight: 600;
+    color: var(--primary-black);
 }
 
 .campaign-status {
@@ -144,55 +174,150 @@
     color: #5a2d91;
 }
 
+.table-actions {
+    display: flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.table-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border-radius: var(--radius-md);
+}
+
+.table-actions .btn .fas,
+.table-actions .btn .far,
+.table-actions .btn .fa {
+    line-height: 1;
+    vertical-align: middle;
+}
+
+/* Grid View Styles */
+.campaigns-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: var(--spacing-xl);
+    margin-bottom: 2rem;
+}
+
+.campaign-card {
+    background: var(--primary-white);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    min-height: 320px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.campaign-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--primary-red);
+}
+
+.campaign-card-header {
+    margin-bottom: var(--spacing-lg);
+}
+
+.campaign-card-body {
+    flex: 1;
+    margin-bottom: var(--spacing-lg);
+}
+
+.campaign-card-actions {
+    margin-top: auto;
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--light-gray);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.campaign-card-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border-radius: var(--radius-md);
+}
+
+.campaign-card-actions .btn .fas,
+.campaign-card-actions .btn .far,
+.campaign-card-actions .btn .fa {
+    line-height: 1;
+    vertical-align: middle;
+}
+
+/* Ensure images/icons stay within bounds */
+.campaign-card img,
+.campaign-card svg {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
 /* Empty State */
-.kanban-empty {
+.empty-state {
     text-align: center;
     padding: var(--spacing-3xl);
     color: var(--gray-dark);
+    background: var(--primary-white);
+    border-radius: var(--radius-2xl);
     border: 2px dashed var(--light-gray);
-    border-radius: var(--radius-xl);
-    background: rgba(255, 255, 255, 0.5);
 }
 
-.kanban-empty i {
-    font-size: 2.5rem;
+.empty-state i {
+    font-size: 4rem;
     margin-bottom: var(--spacing-lg);
     opacity: 0.5;
 }
 
 /* Mobile Responsiveness */
 @media (max-width: 991.98px) {
-    .kanban-board {
+    .filters-section {
         flex-direction: column;
-        gap: var(--spacing-xl);
+        align-items: stretch;
     }
     
-    .kanban-column {
-        min-height: auto;
-    }
-    
-    .kanban-header {
-        position: relative;
-    }
-    
-    .kanban-list {
-        max-height: none;
-        min-height: auto;
-        overflow-y: visible;
+    .campaigns-grid {
+        grid-template-columns: 1fr;
     }
     
     .campaign-card {
         min-height: 280px;
     }
+    
+    .campaigns-table {
+        overflow-x: auto;
+    }
 }
 
 @media (max-width: 575.98px) {
-    .kanban-board {
-        margin: 0 -1rem;
+    .campaign-controls {
+        padding: var(--spacing-md);
     }
     
-    .kanban-column {
-        margin: 0 var(--spacing-sm);
+    .view-toggle {
+        width: 100%;
+    }
+    
+    .view-toggle button {
+        flex: 1;
     }
     
     .campaign-card {
@@ -230,12 +355,51 @@
         </ol>
     </nav>
 
-    {# Filter campaigns by status #}
-    {% set draft_campaigns = campaigns|selectattr('status', 'in', ['draft', 'ready'])|list %}
-    {% set active_campaigns = campaigns|selectattr('status', '==', 'active')|list %}
-    {% set completed_campaigns = campaigns|selectattr('status', '==', 'completed')|list %}
+    {# Campaign Action Buttons Macro #}
+    {% macro campaign_actions(campaign, view_type='table') %}
+        {% set action_class = 'table-actions' if view_type == 'table' else 'campaign-card-actions' %}
+        <div class="{{ action_class }}" {% if view_type == 'card' %}onclick="event.stopPropagation();"{% endif %}>
+            <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" 
+               class="btn btn-outline-primary btn-sm" title="View Details">
+                <i class="fas fa-eye"></i>
+            </a>
+            {% if campaign.status in ['active', 'completed'] %}
+            <a href="{{ url_for('dashboard') }}?campaign_id={{ campaign.id }}" 
+               class="btn btn-outline-success btn-sm" title="Analytics">
+                <i class="fas fa-chart-bar"></i>
+            </a>
+            {% endif %}
+            <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" 
+               class="btn btn-outline-secondary btn-sm" title="Manage Participants">
+                <i class="fas fa-users"></i>
+            </a>
+            {% if campaign.status in ['active', 'completed'] %}
+            <button type="button" class="btn btn-outline-info btn-sm" 
+                    onclick="startCampaignExport({{ campaign.id }}, '{{ campaign.name|e }}')"
+                    title="Export Data">
+                <i class="fas fa-download"></i>
+            </button>
+            {% endif %}
+            {% if campaign.status == 'completed' %}
+            <button type="button" id="execReportBtn_{{ campaign.id }}" 
+                    class="btn btn-outline-primary btn-sm" 
+                    onclick="downloadExecutiveReport({{ campaign.id }}, '{{ campaign.name|e }}')"
+                    title="Executive Report">
+                <i class="fas fa-file-pdf"></i>
+            </button>
+            {% endif %}
+        </div>
+        {% if campaign.status == 'completed' %}
+        <div id="regenerateLink_{{ campaign.id }}" style="display: none; margin-top: 2px;">
+            <a href="#" onclick="regenerateExecutiveReport({{ campaign.id }}, '{{ campaign.name|e }}'); return false;" 
+               class="text-muted text-decoration-none small">
+                <i class="fas fa-sync-alt"></i>
+            </a>
+        </div>
+        {% endif %}
+    {% endmacro %}
 
-    {# Campaign Card Macro #}
+    {# Campaign Card for Grid View #}
     {% macro campaign_card(campaign) %}
     <div class="campaign-card" onclick="location.href='{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}'">
         <div class="campaign-card-header">
@@ -280,118 +444,115 @@
             </div>
         </div>
         
-        <div class="campaign-card-actions" onclick="event.stopPropagation();">
-            <div class="d-flex gap-1 flex-wrap justify-content-center">
-                <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="btn btn-outline-primary btn-sm">
-                    <i class="fas fa-eye"></i>
-                </a>
-                {% if campaign.status in ['active', 'completed'] %}
-                <a href="{{ url_for('dashboard') }}?campaign_id={{ campaign.id }}" class="btn btn-outline-success btn-sm">
-                    <i class="fas fa-chart-bar"></i>
-                </a>
-                {% endif %}
-                <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" class="btn btn-outline-secondary btn-sm">
-                    <i class="fas fa-users"></i>
-                </a>
-                {% if campaign.status in ['active', 'completed'] %}
-                <button type="button" class="btn btn-outline-info btn-sm" onclick="startCampaignExport({{ campaign.id }}, '{{ campaign.name|e }}')">
-                    <i class="fas fa-download"></i>
-                </button>
-                {% endif %}
-                {% if campaign.status == 'completed' %}
-                <button type="button" id="execReportBtn_{{ campaign.id }}" class="btn btn-outline-primary btn-sm" onclick="downloadExecutiveReport({{ campaign.id }}, '{{ campaign.name|e }}')">
-                    <i class="fas fa-file-pdf"></i>
-                </button>
-                <div id="regenerateLink_{{ campaign.id }}" style="display: none;">
-                    <a href="#" onclick="regenerateExecutiveReport({{ campaign.id }}, '{{ campaign.name|e }}'); return false;" 
-                       class="text-muted text-decoration-none small">
-                        <i class="fas fa-sync-alt"></i>
-                    </a>
-                </div>
-                {% endif %}
-            </div>
-        </div>
+        {{ campaign_actions(campaign, 'card') }}
     </div>
     {% endmacro %}
 
     {% if campaigns %}
-        <!-- Kanban Board -->
-        <div class="kanban-board">
-            <!-- Draft Column -->
-            <div class="kanban-column">
-                <div class="kanban-header draft">
-                    <h3>
-                        <span><i class="fas fa-edit me-2"></i>Draft</span>
-                        <span class="kanban-count">{{ draft_campaigns|length }}</span>
-                    </h3>
+        <!-- Campaign Controls -->
+        <div class="campaign-controls">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="view-toggle">
+                        <button type="button" id="listViewBtn" class="active" onclick="switchView('list')">
+                            <i class="fas fa-list me-2"></i>List
+                        </button>
+                        <button type="button" id="gridViewBtn" onclick="switchView('grid')">
+                            <i class="fas fa-th me-2"></i>Grid
+                        </button>
+                    </div>
                 </div>
-                <div class="kanban-list">
-                    {% if draft_campaigns %}
-                        {% for campaign in draft_campaigns %}
-                            {{ campaign_card(campaign) }}
-                        {% endfor %}
-                    {% else %}
-                        <div class="kanban-empty">
-                            <i class="fas fa-edit"></i>
-                            <p class="mb-0">No draft campaigns</p>
-                            <small class="text-muted">Create new campaigns here</small>
+                <div class="col-md-6">
+                    <div class="filters-section">
+                        <div class="status-filters">
+                            <a href="#" class="status-filter all active-filter" data-status="all">
+                                All <span class="badge">{{ campaigns|length }}</span>
+                            </a>
+                            <a href="#" class="status-filter draft" data-status="draft">
+                                Draft <span class="badge">{{ campaigns|selectattr('status', 'in', ['draft', 'ready'])|list|length }}</span>
+                            </a>
+                            <a href="#" class="status-filter active" data-status="active">
+                                Active <span class="badge">{{ campaigns|selectattr('status', '==', 'active')|list|length }}</span>
+                            </a>
+                            <a href="#" class="status-filter completed" data-status="completed">
+                                Completed <span class="badge">{{ campaigns|selectattr('status', '==', 'completed')|list|length }}</span>
+                            </a>
                         </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Active Column -->
-            <div class="kanban-column">
-                <div class="kanban-header active">
-                    <h3>
-                        <span><i class="fas fa-play-circle me-2"></i>Active</span>
-                        <span class="kanban-count">{{ active_campaigns|length }}</span>
-                    </h3>
-                </div>
-                <div class="kanban-list">
-                    {% if active_campaigns %}
-                        {% for campaign in active_campaigns %}
-                            {{ campaign_card(campaign) }}
-                        {% endfor %}
-                    {% else %}
-                        <div class="kanban-empty">
-                            <i class="fas fa-play-circle"></i>
-                            <p class="mb-0">No active campaigns</p>
-                            <small class="text-muted">Activate campaigns to collect feedback</small>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Completed Column -->
-            <div class="kanban-column">
-                <div class="kanban-header completed">
-                    <h3>
-                        <span><i class="fas fa-check-circle me-2"></i>Completed</span>
-                        <span class="kanban-count">{{ completed_campaigns|length }}</span>
-                    </h3>
-                </div>
-                <div class="kanban-list">
-                    {% if completed_campaigns %}
-                        {% for campaign in completed_campaigns %}
-                            {{ campaign_card(campaign) }}
-                        {% endfor %}
-                    {% else %}
-                        <div class="kanban-empty">
-                            <i class="fas fa-check-circle"></i>
-                            <p class="mb-0">No completed campaigns</p>
-                            <small class="text-muted">Finished campaigns will appear here</small>
-                        </div>
-                    {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- List View (Default) -->
+        <div id="listView" class="campaigns-table">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Campaign Name</th>
+                        <th>Status</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th class="text-center">Participants</th>
+                        <th class="text-center">Sent/Completed</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for campaign in campaigns %}
+                    <tr data-status="{{ campaign.status }}">
+                        <td class="campaign-name-cell">
+                            <div>
+                                <strong>{{ campaign.name }}</strong>
+                                {% if campaign.description %}
+                                <br><small class="text-muted">{{ campaign.description[:60] }}{% if campaign.description|length > 60 %}...{% endif %}</small>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="campaign-status status-{{ campaign.status }}">
+                                {{ campaign.status|title }}
+                            </span>
+                        </td>
+                        <td>
+                            <small>{{ campaign.start_date }}</small>
+                        </td>
+                        <td>
+                            <small>{{ campaign.end_date }}</small>
+                        </td>
+                        <td class="text-center">
+                            <strong>{{ campaign.participant_count }}</strong>
+                        </td>
+                        <td class="text-center">
+                            <small class="text-muted">
+                                {{ campaign.engagement_metrics.invitations_sent }} / {{ campaign.engagement_metrics.surveys_completed }}
+                                {% if campaign.engagement_metrics.participation_rate is not none %}
+                                <br>({{ campaign.engagement_metrics.participation_rate }}%)
+                                {% endif %}
+                            </small>
+                        </td>
+                        <td class="text-center">
+                            {{ campaign_actions(campaign, 'table') }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Grid View -->
+        <div id="gridView" class="campaigns-grid" style="display: none;">
+            {% for campaign in campaigns %}
+            <div data-status="{{ campaign.status }}">
+                {{ campaign_card(campaign) }}
+            </div>
+            {% endfor %}
+        </div>
     {% else %}
         <!-- Empty State - No Campaigns -->
-        <div class="text-center py-5" style="background: var(--primary-white); border-radius: var(--radius-2xl); border: 2px dashed var(--light-gray);">
-            <i class="fas fa-bullhorn" style="font-size: 4rem; color: var(--gray-dark); opacity: 0.5; margin-bottom: 1rem;"></i>
-            <h3 style="color: var(--primary-black);">No Campaigns Yet</h3>
-            <p class="text-muted mb-4">Create your first campaign to start managing survey participants and collecting feedback.</p>
+        <div class="empty-state">
+            <i class="fas fa-bullhorn"></i>
+            <h3>No Campaigns Yet</h3>
+            <p class="mb-4">Create your first campaign to start managing survey participants and collecting feedback.</p>
             <a href="{{ url_for('campaigns.create_campaign') }}" class="btn btn-primary">
                 <i class="fas fa-plus me-2"></i>Create Your First Campaign
             </a>
@@ -798,6 +959,94 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             checkReportStatus(campaignId);
         }, Math.random() * 2000); // Random delay up to 2 seconds
+    });
+
+    // Check executive report status for completed campaigns on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const completedCampaigns = document.querySelectorAll('[data-status="completed"]');
+        completedCampaigns.forEach(row => {
+            const execReportBtn = row.querySelector('[id^="execReportBtn_"]');
+            if (execReportBtn) {
+                const campaignId = execReportBtn.id.split('_')[1];
+                setTimeout(() => {
+                    checkReportStatus(campaignId);
+                }, Math.random() * 2000); // Random delay up to 2 seconds
+            }
+        });
+    });
+});
+
+// View Management Functions
+function switchView(viewType) {
+    const listView = document.getElementById('listView');
+    const gridView = document.getElementById('gridView');
+    const listBtn = document.getElementById('listViewBtn');
+    const gridBtn = document.getElementById('gridViewBtn');
+
+    if (viewType === 'list') {
+        listView.style.display = 'block';
+        gridView.style.display = 'none';
+        listBtn.classList.add('active');
+        gridBtn.classList.remove('active');
+    } else if (viewType === 'grid') {
+        listView.style.display = 'none';
+        gridView.style.display = 'grid';
+        listBtn.classList.remove('active');
+        gridBtn.classList.add('active');
+    }
+
+    // Save preference in sessionStorage
+    sessionStorage.setItem('campaignView', viewType);
+}
+
+// Status Filtering Functions
+function filterCampaigns(status) {
+    const listRows = document.querySelectorAll('#listView tbody tr[data-status]');
+    const gridCards = document.querySelectorAll('#gridView [data-status]');
+    
+    // Filter list view
+    listRows.forEach(row => {
+        if (status === 'all' || row.dataset.status === status || 
+            (status === 'draft' && ['draft', 'ready'].includes(row.dataset.status))) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    // Filter grid view
+    gridCards.forEach(card => {
+        if (status === 'all' || card.dataset.status === status || 
+            (status === 'draft' && ['draft', 'ready'].includes(card.dataset.status))) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    // Restore view preference
+    const savedView = sessionStorage.getItem('campaignView') || 'list';
+    switchView(savedView);
+    
+    // Add status filter click handlers
+    document.querySelectorAll('.status-filter').forEach(filter => {
+        filter.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Remove active class from all filters
+            document.querySelectorAll('.status-filter').forEach(f => {
+                f.classList.remove('active-filter');
+            });
+            
+            // Add active class to clicked filter
+            this.classList.add('active-filter');
+            
+            // Filter campaigns
+            filterCampaigns(this.dataset.status);
+        });
     });
 });
 </script>
