@@ -81,6 +81,35 @@ def list_participants():
         }
         kpi_stats['active'] = kpi_stats['created'] + kpi_stats['invited']
         
+        # Calculate company-related KPIs
+        # Get distinct company count (excluding None/empty values)
+        company_count_query = db.session.query(Participant.company_name).filter(
+            Participant.business_account_id == current_account.id,
+            Participant.company_name.isnot(None),
+            Participant.company_name != ''
+        )
+        
+        # Apply same search filter to company queries if search is active
+        if search_query:
+            search_term = f"%{search_query}%"
+            company_count_query = company_count_query.filter(
+                db.or_(
+                    Participant.name.ilike(search_term),
+                    Participant.email.ilike(search_term),
+                    Participant.company_name.ilike(search_term)
+                )
+            )
+        
+        distinct_companies = company_count_query.distinct().count()
+        kpi_stats['companies'] = distinct_companies
+        
+        # Calculate participants per company ratio
+        if distinct_companies > 0:
+            ratio = kpi_stats['total'] / distinct_companies
+            kpi_stats['participants_per_company'] = round(float(ratio), 1)
+        else:
+            kpi_stats['participants_per_company'] = 0.0
+        
         # Apply pagination
         participants = query.order_by(Participant.created_at.desc()).offset(
             (page - 1) * per_page
