@@ -2,16 +2,55 @@
 
 {% block title %}Bulk Upload Participants - {{ business_account.name }} - VOÏA{% endblock %}
 
+{% block page_class %}page-participant-upload{% endblock %}
+
 {% block content %}
-<div class="container-fluid">
+<style>
+/* Participant upload styling */
+.participant-header {
+    background: linear-gradient(135deg, rgba(var(--primary-red-rgb, 220, 53, 69), 0.1) 0%, rgba(var(--red-hover-rgb, 200, 40, 55), 0.15) 100%);
+    border: 1px solid var(--red-light);
+    color: var(--primary-black);
+    padding: 2rem 0;
+    border-radius: var(--radius-2xl);
+    margin-bottom: 2rem;
+}
+</style>
+
+<div class="container">
+    <!-- Participant Header -->
+    <div class="participant-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-12">
+                    <h1 class="mb-1">Bulk Upload Participants</h1>
+                    <p class="mb-0 opacity-75">Upload multiple participants to {{ business_account.name }} - you can assign them to campaigns later</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('business_auth.admin_panel') }}">Admin Panel</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('participants.list_participants') }}">Participants Management</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Participants Upload</li>
+        </ol>
+    </nav>
+
     <div class="row justify-content-center">
         <div class="col-lg-10">
             <div class="card">
                 <div class="card-header">
                     <h4 class="mb-0">
-                        <i class="fas fa-upload me-2"></i>Bulk Upload Participants
+                        <i class="fas fa-upload me-2"></i>Upload CSV File
                     </h4>
-                    <p class="text-muted mb-0 mt-2">Upload multiple participants to {{ business_account.name }} - you can assign them to campaigns later</p>
+                    <p class="text-muted mb-0 mt-2">Select your CSV file containing participant information</p>
                 </div>
                 <div class="card-body">
                     <form method="POST" action="{{ url_for('participants.upload_participants') }}" enctype="multipart/form-data">
@@ -51,7 +90,7 @@
             <div class="row mt-4">
                 <div class="col-md-6">
                     <div class="card">
-                        <div class="card-header bg-success text-white">
+                        <div class="card-header bg-primary text-white">
                             <h6 class="mb-0">
                                 <i class="fas fa-check-circle me-2"></i>Required CSV Format
                             </h6>
@@ -81,7 +120,7 @@
                 
                 <div class="col-md-6">
                     <div class="card">
-                        <div class="card-header bg-info text-white">
+                        <div class="card-header bg-warning text-white">
                             <h6 class="mb-0">
                                 <i class="fas fa-info-circle me-2"></i>Upload Process
                             </h6>
