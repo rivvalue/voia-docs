@@ -16,6 +16,32 @@
     margin-bottom: 2rem;
 }
 
+.create-campaign-btn {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    border: 2px solid var(--primary-red);
+    color: var(--primary-white) !important;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-xl);
+    font-weight: 600;
+    font-size: var(--font-size-lg);
+    box-shadow: var(--shadow-lg);
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.create-campaign-btn:hover {
+    background: linear-gradient(135deg, var(--red-hover) 0%, var(--primary-red) 100%);
+    border-color: var(--red-hover);
+    color: var(--primary-white) !important;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+}
+
+.create-campaign-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-md);
+}
+
 /* View Controls */
 .campaign-controls {
     background: var(--primary-white);
@@ -338,7 +364,7 @@
                     <p class="mb-0 opacity-75">Manage survey campaigns for {{ business_account.name }}</p>
                 </div>
                 <div class="col-md-4 text-end">
-                    <a href="{{ url_for('campaigns.create_campaign') }}" class="btn btn-outline-light">
+                    <a href="{{ url_for('campaigns.create_campaign') }}" class="btn btn-primary create-campaign-btn">
                         <i class="fas fa-plus me-2"></i>Create Campaign
                     </a>
                 </div>
