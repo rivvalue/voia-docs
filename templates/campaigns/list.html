@@ -6,7 +6,7 @@
 
 {% block content %}
 <style>
-/* Campaign management specific styling */
+/* Campaign management kanban styling */
 .campaign-header {
     background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
     color: var(--primary-white);
@@ -15,19 +15,105 @@
     margin-bottom: 2rem;
 }
 
+/* Kanban Board Layout */
+.kanban-board {
+    display: flex;
+    gap: var(--spacing-lg);
+    min-height: 600px;
+    margin-bottom: 2rem;
+}
+
+.kanban-column {
+    flex: 1;
+    min-width: 0;
+    background: rgba(var(--primary-red-rgb, 225, 58, 68), 0.02);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--light-gray);
+}
+
+.kanban-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.kanban-header.draft {
+    background: linear-gradient(135deg, var(--gray-dark) 0%, var(--medium-gray) 100%);
+}
+
+.kanban-header.active {
+    background: linear-gradient(135deg, #198754 0%, #157347 100%);
+}
+
+.kanban-header.completed {
+    background: linear-gradient(135deg, #6f42c1 0%, #5a2d91 100%);
+}
+
+.kanban-header h3 {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.kanban-count {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+.kanban-list {
+    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    min-height: 500px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* Uniform Campaign Cards */
 .campaign-card {
     background: var(--primary-white);
     border-radius: var(--radius-2xl);
     padding: var(--spacing-xl);
     box-shadow: var(--shadow-lg);
     border: 1px solid var(--light-gray);
-    margin-bottom: var(--spacing-lg);
-    transition: transform 0.3s ease;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    min-height: 340px;
+    cursor: pointer;
 }
 
 .campaign-card:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-xl);
+    border-color: var(--primary-red);
+}
+
+.campaign-card-header {
+    margin-bottom: var(--spacing-lg);
+}
+
+.campaign-card-body {
+    flex: 1;
+    margin-bottom: var(--spacing-lg);
+}
+
+.campaign-card-actions {
+    margin-top: auto;
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--light-gray);
 }
 
 .campaign-status {
@@ -54,20 +140,65 @@
 }
 
 .status-completed {
-    background-color: var(--medium-gray);
-    color: var(--primary-white);
+    background-color: #e2e3ff;
+    color: #5a2d91;
 }
 
-.empty-state {
+/* Empty State */
+.kanban-empty {
     text-align: center;
     padding: var(--spacing-3xl);
     color: var(--gray-dark);
+    border: 2px dashed var(--light-gray);
+    border-radius: var(--radius-xl);
+    background: rgba(255, 255, 255, 0.5);
 }
 
-.empty-state i {
-    font-size: 4rem;
-    margin-bottom: 1rem;
+.kanban-empty i {
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-lg);
     opacity: 0.5;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 991.98px) {
+    .kanban-board {
+        flex-direction: column;
+        gap: var(--spacing-xl);
+    }
+    
+    .kanban-column {
+        min-height: auto;
+    }
+    
+    .kanban-header {
+        position: relative;
+    }
+    
+    .kanban-list {
+        max-height: none;
+        min-height: auto;
+        overflow-y: visible;
+    }
+    
+    .campaign-card {
+        min-height: 280px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .kanban-board {
+        margin: 0 -1rem;
+    }
+    
+    .kanban-column {
+        margin: 0 var(--spacing-sm);
+    }
+    
+    .campaign-card {
+        min-height: 260px;
+        padding: var(--spacing-lg);
+    }
 }
 </style>
 
@@ -99,116 +230,171 @@
         </ol>
     </nav>
 
-    {% if campaigns %}
-        <!-- Campaign List -->
-        <div class="row">
-            {% for campaign in campaigns %}
-            <div class="col-lg-6 mb-4">
-                <div class="campaign-card" style="cursor: pointer;" onclick="location.href='{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}'">
-                    <div class="d-flex justify-content-between align-items-start mb-3">
-                        <h4 class="mb-0">{{ campaign.name }}</h4>
-                        <span class="campaign-status status-{{ campaign.status }}">
-                            {{ campaign.status|title }}
-                        </span>
-                    </div>
-                    
-                    {% if campaign.description %}
-                    <p class="text-muted mb-3">{{ campaign.description }}</p>
-                    {% endif %}
-                    
-                    <div class="row text-center mb-3">
-                        <div class="col-4">
-                            <div class="small text-muted">Start Date</div>
-                            <div class="fw-bold">{{ campaign.start_date }}</div>
-                        </div>
-                        <div class="col-4">
-                            <div class="small text-muted">End Date</div>
-                            <div class="fw-bold">{{ campaign.end_date }}</div>
-                        </div>
-                        <div class="col-4">
-                            <div class="small text-muted">Participants</div>
-                            <div class="fw-bold">{{ campaign.participant_count }}</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Engagement Metrics -->
-                    <div class="row text-center mb-3 py-2" style="background-color: #f8f9fa; border-radius: 8px;">
-                        <div class="col-3">
-                            <div class="small text-muted">📧 Sent</div>
-                            <div class="fw-bold">{{ campaign.engagement_metrics.invitations_sent }}</div>
-                        </div>
-                        <div class="col-3">
-                            <div class="small text-muted">✅ Completed</div>
-                            <div class="fw-bold">{{ campaign.engagement_metrics.surveys_completed }}</div>
-                        </div>
-                        <div class="col-3">
-                            <div class="small text-muted">📊 Participation</div>
-                            <div class="fw-bold">
-                                {% if campaign.engagement_metrics.participation_rate is not none %}
-                                    {{ campaign.engagement_metrics.participation_rate }}%
-                                {% else %}
-                                    N/A
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="col-3">
-                            <div class="small text-muted">📤 Email Success</div>
-                            <div class="fw-bold">
-                                {% if campaign.engagement_metrics.email_success_rate is not none %}
-                                    {{ campaign.engagement_metrics.email_success_rate }}%
-                                {% else %}
-                                    N/A
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="d-flex gap-2" onclick="event.stopPropagation();">
-                        <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-eye me-1"></i>View Details
-                        </a>
-                        {% if campaign.status in ['active', 'completed'] %}
-                        <a href="{{ url_for('dashboard') }}?campaign_id={{ campaign.id }}" class="btn btn-outline-success btn-sm">
-                            <i class="fas fa-chart-bar me-1"></i>Analytics
-                        </a>
-                        {% endif %}
-                        <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" class="btn btn-outline-secondary btn-sm">
-                            <i class="fas fa-users me-1"></i>Manage Participants
-                        </a>
-                        {% if campaign.status in ['active', 'completed'] %}
-                        <button type="button" class="btn btn-outline-info btn-sm" onclick="startCampaignExport({{ campaign.id }}, '{{ campaign.name|e }}')">
-                            <i class="fas fa-download me-1"></i>Export Data
-                        </button>
-                        {% endif %}
-                        {% if campaign.status == 'completed' %}
-                        <div class="position-relative">
-                            <button type="button" id="execReportBtn_{{ campaign.id }}" class="btn btn-outline-primary btn-sm" onclick="downloadExecutiveReport({{ campaign.id }}, '{{ campaign.name|e }}')">
-                                <i class="fas fa-file-pdf me-1"></i><span id="execReportText_{{ campaign.id }}">Executive Report</span>
-                            </button>
-                            <div id="regenerateLink_{{ campaign.id }}" style="display: none; margin-top: 2px;">
-                                <a href="#" onclick="regenerateExecutiveReport({{ campaign.id }}, '{{ campaign.name|e }}'); return false;" 
-                                   class="text-muted text-decoration-none" style="font-size: 0.7rem;">
-                                    <i class="fas fa-sync-alt me-1" style="font-size: 0.6rem;"></i>regenerate
-                                </a>
-                            </div>
-                        </div>
-                        {% endif %}
-                    </div>
+    {# Filter campaigns by status #}
+    {% set draft_campaigns = campaigns|selectattr('status', 'in', ['draft', 'ready'])|list %}
+    {% set active_campaigns = campaigns|selectattr('status', '==', 'active')|list %}
+    {% set completed_campaigns = campaigns|selectattr('status', '==', 'completed')|list %}
+
+    {# Campaign Card Macro #}
+    {% macro campaign_card(campaign) %}
+    <div class="campaign-card" onclick="location.href='{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}'">
+        <div class="campaign-card-header">
+            <div class="d-flex justify-content-between align-items-start">
+                <h5 class="mb-0" style="color: var(--primary-black);">{{ campaign.name }}</h5>
+                <span class="campaign-status status-{{ campaign.status }}">
+                    {{ campaign.status|title }}
+                </span>
+            </div>
+        </div>
+        
+        <div class="campaign-card-body">
+            {% if campaign.description %}
+            <p class="text-muted small mb-3">{{ campaign.description[:80] }}{% if campaign.description|length > 80 %}...{% endif %}</p>
+            {% endif %}
+            
+            <div class="row text-center mb-3">
+                <div class="col-4">
+                    <div class="small text-muted">Start</div>
+                    <div class="fw-bold small">{{ campaign.start_date }}</div>
+                </div>
+                <div class="col-4">
+                    <div class="small text-muted">End</div>
+                    <div class="fw-bold small">{{ campaign.end_date }}</div>
+                </div>
+                <div class="col-4">
+                    <div class="small text-muted">Participants</div>
+                    <div class="fw-bold small">{{ campaign.participant_count }}</div>
                 </div>
             </div>
-            {% endfor %}
+            
+            <!-- Engagement Metrics -->
+            <div class="row text-center py-2" style="background-color: rgba(var(--primary-red-rgb, 225, 58, 68), 0.05); border-radius: 8px;">
+                <div class="col-6">
+                    <div class="small text-muted">📧 Sent</div>
+                    <div class="fw-bold small">{{ campaign.engagement_metrics.invitations_sent }}</div>
+                </div>
+                <div class="col-6">
+                    <div class="small text-muted">✅ Done</div>
+                    <div class="fw-bold small">{{ campaign.engagement_metrics.surveys_completed }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="campaign-card-actions" onclick="event.stopPropagation();">
+            <div class="d-flex gap-1 flex-wrap justify-content-center">
+                <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-eye"></i>
+                </a>
+                {% if campaign.status in ['active', 'completed'] %}
+                <a href="{{ url_for('dashboard') }}?campaign_id={{ campaign.id }}" class="btn btn-outline-success btn-sm">
+                    <i class="fas fa-chart-bar"></i>
+                </a>
+                {% endif %}
+                <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-users"></i>
+                </a>
+                {% if campaign.status in ['active', 'completed'] %}
+                <button type="button" class="btn btn-outline-info btn-sm" onclick="startCampaignExport({{ campaign.id }}, '{{ campaign.name|e }}')">
+                    <i class="fas fa-download"></i>
+                </button>
+                {% endif %}
+                {% if campaign.status == 'completed' %}
+                <button type="button" id="execReportBtn_{{ campaign.id }}" class="btn btn-outline-primary btn-sm" onclick="downloadExecutiveReport({{ campaign.id }}, '{{ campaign.name|e }}')">
+                    <i class="fas fa-file-pdf"></i>
+                </button>
+                <div id="regenerateLink_{{ campaign.id }}" style="display: none;">
+                    <a href="#" onclick="regenerateExecutiveReport({{ campaign.id }}, '{{ campaign.name|e }}'); return false;" 
+                       class="text-muted text-decoration-none small">
+                        <i class="fas fa-sync-alt"></i>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endmacro %}
+
+    {% if campaigns %}
+        <!-- Kanban Board -->
+        <div class="kanban-board">
+            <!-- Draft Column -->
+            <div class="kanban-column">
+                <div class="kanban-header draft">
+                    <h3>
+                        <span><i class="fas fa-edit me-2"></i>Draft</span>
+                        <span class="kanban-count">{{ draft_campaigns|length }}</span>
+                    </h3>
+                </div>
+                <div class="kanban-list">
+                    {% if draft_campaigns %}
+                        {% for campaign in draft_campaigns %}
+                            {{ campaign_card(campaign) }}
+                        {% endfor %}
+                    {% else %}
+                        <div class="kanban-empty">
+                            <i class="fas fa-edit"></i>
+                            <p class="mb-0">No draft campaigns</p>
+                            <small class="text-muted">Create new campaigns here</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Active Column -->
+            <div class="kanban-column">
+                <div class="kanban-header active">
+                    <h3>
+                        <span><i class="fas fa-play-circle me-2"></i>Active</span>
+                        <span class="kanban-count">{{ active_campaigns|length }}</span>
+                    </h3>
+                </div>
+                <div class="kanban-list">
+                    {% if active_campaigns %}
+                        {% for campaign in active_campaigns %}
+                            {{ campaign_card(campaign) }}
+                        {% endfor %}
+                    {% else %}
+                        <div class="kanban-empty">
+                            <i class="fas fa-play-circle"></i>
+                            <p class="mb-0">No active campaigns</p>
+                            <small class="text-muted">Activate campaigns to collect feedback</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Completed Column -->
+            <div class="kanban-column">
+                <div class="kanban-header completed">
+                    <h3>
+                        <span><i class="fas fa-check-circle me-2"></i>Completed</span>
+                        <span class="kanban-count">{{ completed_campaigns|length }}</span>
+                    </h3>
+                </div>
+                <div class="kanban-list">
+                    {% if completed_campaigns %}
+                        {% for campaign in completed_campaigns %}
+                            {{ campaign_card(campaign) }}
+                        {% endfor %}
+                    {% else %}
+                        <div class="kanban-empty">
+                            <i class="fas fa-check-circle"></i>
+                            <p class="mb-0">No completed campaigns</p>
+                            <small class="text-muted">Finished campaigns will appear here</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     {% else %}
-        <!-- Empty State -->
-        <div class="campaign-card">
-            <div class="empty-state">
-                <i class="fas fa-bullhorn"></i>
-                <h3>No Campaigns Yet</h3>
-                <p class="mb-4">Create your first campaign to start managing survey participants and collecting feedback.</p>
-                <a href="{{ url_for('campaigns.create_campaign') }}" class="btn btn-primary">
-                    <i class="fas fa-plus me-2"></i>Create Your First Campaign
-                </a>
-            </div>
+        <!-- Empty State - No Campaigns -->
+        <div class="text-center py-5" style="background: var(--primary-white); border-radius: var(--radius-2xl); border: 2px dashed var(--light-gray);">
+            <i class="fas fa-bullhorn" style="font-size: 4rem; color: var(--gray-dark); opacity: 0.5; margin-bottom: 1rem;"></i>
+            <h3 style="color: var(--primary-black);">No Campaigns Yet</h3>
+            <p class="text-muted mb-4">Create your first campaign to start managing survey participants and collecting feedback.</p>
+            <a href="{{ url_for('campaigns.create_campaign') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Create Your First Campaign
+            </a>
         </div>
     {% endif %}
 </div>
