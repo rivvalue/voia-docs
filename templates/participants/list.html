@@ -27,7 +27,6 @@
     box-shadow: var(--shadow-lg);
     transition: all 0.3s ease;
     text-decoration: none;
-    margin-right: 0.5rem;
 }
 
 .add-participant-btn:hover {
@@ -93,13 +92,15 @@
                     <h1 class="mb-1">Participant Management</h1>
                     <p class="mb-0 opacity-75">Manage campaign participants for {{ business_account.name }}</p>
                 </div>
-                <div class="col-md-4 text-end">
-                    <a href="{{ url_for('participants.create_participant') }}" class="add-participant-btn">
-                        <i class="fas fa-plus me-2"></i>Add Participant
-                    </a>
-                    <a href="{{ url_for('participants.upload_participants') }}" class="btn btn-outline-primary">
-                        <i class="fas fa-upload me-2"></i>Bulk Upload CSV
-                    </a>
+                <div class="col-md-4">
+                    <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end">
+                        <a href="{{ url_for('participants.create_participant') }}" class="add-participant-btn">
+                            <i class="fas fa-plus me-2"></i>Add Participant
+                        </a>
+                        <a href="{{ url_for('participants.upload_participants') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-upload me-2"></i>Bulk Upload CSV
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -233,7 +234,6 @@
                                     <th>Origin</th>
                                     <th>Status</th>
                                     <th>Created</th>
-                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -293,20 +293,6 @@
                                                 -
                                             {% endif %}
                                         </small>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <form method="POST" 
-                                                  action="{{ url_for('participants.delete_participant', participant_id=participant.id) }}" 
-                                                  class="d-inline">
-                                                {{ csrf_token() }}
-                                                <button type="submit" class="btn btn-outline-danger btn-sm" 
-                                                        title="Delete Participant"
-                                                        onclick="return confirm('Delete {{ participant.name }}? This cannot be undone.')">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
