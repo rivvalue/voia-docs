@@ -28,4 +28,5 @@ dependencies = [
     "weasyprint>=66.0",
     "flask-compress>=1.18",
     "gevent>=25.9.1",
+    "flask-caching>=2.3.1",
 ]
