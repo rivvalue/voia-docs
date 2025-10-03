@@ -2640,8 +2640,8 @@ function redirectToBusinessLogin() {
 
 
 
-// Auto-refresh dashboard every 5 minutes
-setInterval(refreshData, 5 * 60 * 1000);
+// Auto-refresh dashboard every 1 hour
+setInterval(refreshData, 60 * 60 * 1000);
 
 
 
