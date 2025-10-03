@@ -111,20 +111,23 @@ def get_dashboard_data_cached(campaign_id=None, business_account_id=None):
     Uses optimized queries to reduce database round-trips from 20+ to 2-3.
     Cache can be disabled/configured by admins via environment variables.
     """
+    cache_status = "CACHE_HIT" if cache_config.is_enabled() else "CACHE_DISABLED"
+    logger.info(f"📊 Dashboard data request | Campaign: {campaign_id} | Account: {business_account_id} | {cache_status}")
+    
     # Check if we should use optimized queries
     use_optimized = os.environ.get('USE_OPTIMIZED_DASHBOARD', 'true').lower() == 'true'
     
     if use_optimized:
         try:
             from dashboard_query_optimizer import get_optimized_dashboard_data
-            logger.debug(f"Using optimized dashboard queries (cached: {cache_config.is_enabled()})")
+            logger.info(f"✅ Using OPTIMIZED dashboard queries | Cache: {cache_config.is_enabled()}")
             return get_optimized_dashboard_data(campaign_id, business_account_id)
         except Exception as e:
-            logger.warning(f"Optimized queries failed, falling back to original: {e}")
+            logger.warning(f"⚠️ Optimized queries FAILED, falling back to original: {e}")
             # Fall through to original implementation
     
     # Fallback to original implementation
-    logger.debug(f"Using original dashboard queries (cached: {cache_config.is_enabled()})")
+    logger.info(f"⏪ Using ORIGINAL dashboard queries | Cache: {cache_config.is_enabled()}")
     return get_dashboard_data(campaign_id)
 
 def get_dashboard_data(campaign_id=None):

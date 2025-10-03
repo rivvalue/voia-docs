@@ -60,11 +60,13 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
         func.avg(SurveyResponse.growth_factor).label('total_growth_potential')
     )
     
-    # Apply filters
-    if campaign_id:
+    # Apply filters - join with Campaign table if filtering by business_account_id
+    if business_account_id and not campaign_id:
+        # Need to join with Campaign to filter by business_account_id
+        master_query = master_query.join(Campaign).filter(Campaign.business_account_id == business_account_id)
+    elif campaign_id:
+        # Campaign ID already implies business account, no join needed
         master_query = master_query.filter(SurveyResponse.campaign_id == campaign_id)
-    if business_account_id:
-        master_query = master_query.filter(SurveyResponse.business_account_id == business_account_id)
     
     master_stats = master_query.first()
     
@@ -85,8 +87,8 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
     )
     if campaign_id:
         nps_dist_query = nps_dist_query.filter(SurveyResponse.campaign_id == campaign_id)
-    if business_account_id:
-        nps_dist_query = nps_dist_query.filter(SurveyResponse.business_account_id == business_account_id)
+    elif business_account_id:
+        nps_dist_query = nps_dist_query.join(Campaign).filter(Campaign.business_account_id == business_account_id)
     nps_distribution = nps_dist_query.group_by(SurveyResponse.nps_category).all()
     
     # Sentiment distribution
@@ -96,8 +98,8 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
     ).filter(SurveyResponse.sentiment_label.isnot(None))
     if campaign_id:
         sentiment_dist_query = sentiment_dist_query.filter(SurveyResponse.campaign_id == campaign_id)
-    if business_account_id:
-        sentiment_dist_query = sentiment_dist_query.filter(SurveyResponse.business_account_id == business_account_id)
+    elif business_account_id:
+        sentiment_dist_query = sentiment_dist_query.join(Campaign).filter(Campaign.business_account_id == business_account_id)
     sentiment_distribution = sentiment_dist_query.group_by(SurveyResponse.sentiment_label).all()
     
     # Tenure distribution
@@ -107,8 +109,8 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
     ).filter(SurveyResponse.tenure_with_fc.isnot(None))
     if campaign_id:
         tenure_dist_query = tenure_dist_query.filter(SurveyResponse.campaign_id == campaign_id)
-    if business_account_id:
-        tenure_dist_query = tenure_dist_query.filter(SurveyResponse.business_account_id == business_account_id)
+    elif business_account_id:
+        tenure_dist_query = tenure_dist_query.join(Campaign).filter(Campaign.business_account_id == business_account_id)
     tenure_distribution = tenure_dist_query.group_by(SurveyResponse.tenure_with_fc).all()
     
     # Growth factor distribution
@@ -120,8 +122,8 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
     ).filter(SurveyResponse.growth_factor.isnot(None))
     if campaign_id:
         growth_dist_query = growth_dist_query.filter(SurveyResponse.campaign_id == campaign_id)
-    if business_account_id:
-        growth_dist_query = growth_dist_query.filter(SurveyResponse.business_account_id == business_account_id)
+    elif business_account_id:
+        growth_dist_query = growth_dist_query.join(Campaign).filter(Campaign.business_account_id == business_account_id)
     growth_factor_distribution = growth_dist_query.group_by(
         SurveyResponse.growth_range, 
         SurveyResponse.growth_rate
@@ -147,8 +149,8 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
     
     if campaign_id:
         company_base_query = company_base_query.filter(SurveyResponse.campaign_id == campaign_id)
-    if business_account_id:
-        company_base_query = company_base_query.filter(SurveyResponse.business_account_id == business_account_id)
+    elif business_account_id:
+        company_base_query = company_base_query.join(Campaign).filter(Campaign.business_account_id == business_account_id)
     
     all_company_responses = company_base_query.all()
     
