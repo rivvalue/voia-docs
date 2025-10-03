@@ -1,10 +1,15 @@
 import json
 import re
+import os
+import logging
 from datetime import datetime, timedelta
 from sqlalchemy import func, case
-from app import db
+from app import db, cache
 from models import SurveyResponse, Campaign, CampaignKPISnapshot
 from flask import request
+from cache_config import cache_config
+
+logger = logging.getLogger(__name__)
 
 def consolidate_theme_name(theme_name):
     """Consolidate similar theme names to reduce duplication"""
@@ -98,6 +103,29 @@ def normalize_risk_factor_type(risk_type):
     
     # If no mapping found, return the normalized version
     return normalized
+
+@cache.memoize(timeout=cache_config.get_timeout())
+def get_dashboard_data_cached(campaign_id=None, business_account_id=None):
+    """
+    Cached wrapper for dashboard data retrieval with performance optimization.
+    Uses optimized queries to reduce database round-trips from 20+ to 2-3.
+    Cache can be disabled/configured by admins via environment variables.
+    """
+    # Check if we should use optimized queries
+    use_optimized = os.environ.get('USE_OPTIMIZED_DASHBOARD', 'true').lower() == 'true'
+    
+    if use_optimized:
+        try:
+            from dashboard_query_optimizer import get_optimized_dashboard_data
+            logger.debug(f"Using optimized dashboard queries (cached: {cache_config.is_enabled()})")
+            return get_optimized_dashboard_data(campaign_id, business_account_id)
+        except Exception as e:
+            logger.warning(f"Optimized queries failed, falling back to original: {e}")
+            # Fall through to original implementation
+    
+    # Fallback to original implementation
+    logger.debug(f"Using original dashboard queries (cached: {cache_config.is_enabled()})")
+    return get_dashboard_data(campaign_id)
 
 def get_dashboard_data(campaign_id=None):
     """Compile dashboard data for visualization with optional campaign filtering"""

@@ -1148,7 +1148,7 @@ def dashboard_data():
     try:
         # Import models to avoid circular imports
         from models import Campaign
-        from data_storage import get_dashboard_data
+        from data_storage import get_dashboard_data_cached
         from business_auth_routes import get_current_business_account
         
         # Get campaign filter parameter
@@ -1184,9 +1184,9 @@ def dashboard_data():
                 campaign_id = active_campaign.id
                 logger.info(f"Survey Insights defaulting to {account_context} active campaign: {active_campaign.name} (ID: {campaign_id})")
         
-        # SECURITY: Only call get_dashboard_data with a valid campaign_id to prevent cross-account data leakage
+        # SECURITY: Only call get_dashboard_data_cached with a valid campaign_id to prevent cross-account data leakage
         if campaign_id is not None:
-            data = get_dashboard_data(campaign_id=campaign_id)
+            data = get_dashboard_data_cached(campaign_id=campaign_id, business_account_id=target_business_account_id)
         else:
             # No active campaign found - return empty dashboard data
             logger.info(f"No active campaign found for {account_context} - returning empty dashboard")
