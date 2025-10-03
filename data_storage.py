@@ -1221,24 +1221,38 @@ def generate_campaign_kpi_snapshot(campaign_id):
             SurveyResponse.key_themes.isnot(None)
         ).all()
         
+        print(f"   📝 Processing {len(responses_with_themes)} responses for key themes extraction...")
+        
         for response in responses_with_themes:
-            if response.key_themes:
+            if response.key_themes and response.key_themes.strip() and response.key_themes != '[]':
                 try:
                     themes = json.loads(response.key_themes)
+                    if not themes:  # Skip empty arrays
+                        continue
                     for theme in themes:
                         # Extract theme name from theme object (handle both dict and string formats)
-                        theme_name = theme.get('theme', 'unknown') if isinstance(theme, dict) else str(theme)
+                        if isinstance(theme, dict):
+                            theme_name = theme.get('theme', 'unknown')
+                        else:
+                            theme_name = str(theme)
+                        
                         consolidated_theme = consolidate_theme_name(theme_name)
                         all_themes[consolidated_theme] = all_themes.get(consolidated_theme, 0) + 1
-                except:
+                except json.JSONDecodeError as e:
+                    print(f"   ⚠️ JSON decode error for response {response.id}: {e}")
+                    continue
+                except Exception as e:
+                    print(f"   ⚠️ Error processing themes for response {response.id}: {type(e).__name__}: {e}")
                     continue
         
         # Sort themes by frequency
         sorted_themes = sorted(all_themes.items(), key=lambda x: x[1], reverse=True)
         key_themes = [
-            {"theme": theme, "frequency": frequency}
-            for theme, frequency in sorted_themes[:10]  # Top 10 themes
+            {"theme": theme, "count": count}  # Changed from "frequency" to "count" to match live data format
+            for theme, count in sorted_themes[:10]  # Top 10 themes
         ]
+        
+        print(f"   ✅ Extracted {len(key_themes)} key themes from {len(all_themes)} unique themes")
         
         # ============================================================================
         # COMPANY AGGREGATIONS
