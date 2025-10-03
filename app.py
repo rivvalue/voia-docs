@@ -61,6 +61,15 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = db_config.get_engine_options()
 # Initialize the app with the extension
 db.init_app(app)
 
+# Initialize Flask-Caching with admin-configurable settings
+from flask_caching import Cache
+from cache_config import cache_config
+
+app.config.from_mapping(cache_config.get_cache_config())
+cache = Cache(app)
+
+logger.info(f"Cache configuration: {cache_config.get_status_info()}")
+
 # Stage 1 Optimization: Performance Monitoring and Compression
 # Feature flag controlled optimizations
 try:
