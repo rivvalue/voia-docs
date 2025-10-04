@@ -163,6 +163,14 @@ def get_dashboard_data(campaign_id=None):
         # Basic statistics
         total_responses = base_query.count()
         
+        # Count unique companies with campaign filtering
+        total_companies_query = db.session.query(
+            func.count(func.distinct(SurveyResponse.company_name))
+        )
+        if campaign_id:
+            total_companies_query = total_companies_query.filter(SurveyResponse.campaign_id == campaign_id)
+        total_companies = total_companies_query.scalar() or 0
+        
         # NPS distribution with campaign filtering
         nps_query = db.session.query(
             SurveyResponse.nps_category,
@@ -671,6 +679,7 @@ def get_dashboard_data(campaign_id=None):
         
         return {
             'total_responses': total_responses,
+            'total_companies': total_companies,
             'nps_score': round(nps_score, 1),
             'recent_responses': recent_responses,
             'nps_distribution': [
@@ -752,6 +761,7 @@ def convert_snapshot_to_dashboard_format(snapshot):
         
         return {
             'total_responses': snapshot.total_responses,
+            'total_companies': snapshot.total_companies,
             'nps_score': snapshot.nps_score,
             'recent_responses': 0,  # For closed campaigns, this is always 0
             'nps_distribution': nps_distribution,
