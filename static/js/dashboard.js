@@ -329,6 +329,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Dashboard JavaScript loaded and DOM ready');
     
+    // Initialize Bootstrap tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
     // Force remove yellow colors immediately
     forceRemoveYellowColors();
     
@@ -1664,7 +1670,7 @@ function populateAccountIntelligence() {
         const balanceIconColor = account.balance === 'risk_heavy' ? '#E13A44' : 
                                account.balance === 'opportunity_heavy' ? '#8A8A8A' : '#BDBDBD';
         
-        const balanceLabel = account.balance === 'risk_heavy' ? 'High Risk' : 
+        const balanceLabel = account.balance === 'risk_heavy' ? 'Risk-Heavy' : 
                            account.balance === 'opportunity_heavy' ? 'High Potential' : 'Balanced';
         
         // Consolidate opportunities by type to avoid duplicates
