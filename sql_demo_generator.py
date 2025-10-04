@@ -138,8 +138,15 @@ def churn(s):
 
 def generate_account_intelligence(nps_cat):
     """Generate realistic growth opportunities and risk factors based on NPS category"""
-    opportunities = random.sample(GROWTH_OPPORTUNITIES[nps_cat], k=random.randint(1, 2))
-    risks = random.sample(RISK_FACTORS[nps_cat], k=random.randint(1, 2))
+    opps_list = GROWTH_OPPORTUNITIES[nps_cat]
+    risks_list = RISK_FACTORS[nps_cat]
+    
+    # Sample safely - don't exceed available items
+    num_opps = min(random.randint(1, 2), len(opps_list))
+    num_risks = min(random.randint(1, 2), len(risks_list))
+    
+    opportunities = random.sample(opps_list, k=num_opps)
+    risks = random.sample(risks_list, k=num_risks)
     return json.dumps(opportunities), json.dumps(risks)
 
 
@@ -275,7 +282,7 @@ def main():
                     improvement_feedback, recommendation_reason,
                     sentiment_score, sentiment_label, key_themes,
                     churn_risk_score, churn_risk_level, churn_risk_factors,
-                    growth_opportunities_analysis, account_risk_factors_analysis,
+                    growth_opportunities, account_risk_factors,
                     growth_factor, commercial_value, source_type, created_at, analyzed_at
                 ) VALUES (
                     %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'conversational', %s, NOW()
