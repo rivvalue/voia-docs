@@ -677,6 +677,64 @@ def get_dashboard_data(campaign_id=None):
             growth_potential_query = growth_potential_query.filter(SurveyResponse.campaign_id == campaign_id)
         total_growth_potential = growth_potential_query.scalar() or 0
         
+        # Company NPS Data (for Survey Insights tab and snapshots)
+        company_nps_query = db.session.query(
+            func.max(SurveyResponse.company_name).label('company_name'),
+            func.count(SurveyResponse.id).label('total_responses'),
+            func.avg(SurveyResponse.nps_score).label('avg_nps'),
+            func.count(func.nullif(SurveyResponse.nps_score >= 9, False)).label('promoters'),
+            func.count(func.nullif(SurveyResponse.nps_score <= 6, False)).label('detractors')
+        ).filter(SurveyResponse.company_name.isnot(None))
+        if campaign_id:
+            company_nps_query = company_nps_query.filter(SurveyResponse.campaign_id == campaign_id)
+        company_nps_query = company_nps_query.group_by(func.upper(SurveyResponse.company_name))
+        
+        company_nps_data = []
+        for company in company_nps_query.all():
+            total = company.total_responses
+            promoters = company.promoters or 0
+            detractors = company.detractors or 0
+            company_nps = round(((promoters - detractors) / total) * 100) if total > 0 else 0
+            
+            company_nps_data.append({
+                'company_name': company.company_name,
+                'total_responses': total,
+                'avg_nps': round(company.avg_nps, 1) if company.avg_nps else 0,
+                'company_nps': company_nps,
+                'promoters': promoters,
+                'detractors': detractors,
+                'passives': total - promoters - detractors
+            })
+        
+        # Tenure NPS Data (for Survey Insights tab and snapshots)
+        tenure_nps_query = db.session.query(
+            SurveyResponse.tenure_with_fc,
+            func.count(SurveyResponse.id).label('total_responses'),
+            func.avg(SurveyResponse.nps_score).label('avg_nps'),
+            func.count(func.nullif(SurveyResponse.nps_score >= 9, False)).label('promoters'),
+            func.count(func.nullif(SurveyResponse.nps_score <= 6, False)).label('detractors')
+        ).filter(SurveyResponse.tenure_with_fc.isnot(None))
+        if campaign_id:
+            tenure_nps_query = tenure_nps_query.filter(SurveyResponse.campaign_id == campaign_id)
+        tenure_nps_query = tenure_nps_query.group_by(SurveyResponse.tenure_with_fc)
+        
+        tenure_nps_data = []
+        for tenure in tenure_nps_query.all():
+            total = tenure.total_responses
+            promoters = tenure.promoters or 0
+            detractors = tenure.detractors or 0
+            tenure_nps = round(((promoters - detractors) / total) * 100) if total > 0 else 0
+            
+            tenure_nps_data.append({
+                'tenure_group': tenure.tenure_with_fc,
+                'total_responses': total,
+                'avg_nps': round(tenure.avg_nps, 1) if tenure.avg_nps else 0,
+                'tenure_nps': tenure_nps,
+                'promoters': promoters,
+                'detractors': detractors,
+                'passives': total - promoters - detractors
+            })
+        
         return {
             'total_responses': total_responses,
             'total_companies': total_companies,
@@ -719,7 +777,9 @@ def get_dashboard_data(campaign_id=None):
                     }
                     for row in growth_factor_distribution
                 ]
-            }
+            },
+            'company_nps_data': company_nps_data,
+            'tenure_nps_data': tenure_nps_data
         }
         
     except Exception as e:
