@@ -1,6 +1,15 @@
 # Overview
 The Voice of Client (VOÏA) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. It converts raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses, particularly Rivvalue Inc., with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project features a production-ready multi-tenant participant management system with extensive email delivery capabilities and AI-powered survey functionalities.
 
+# Recent Changes
+**October 4, 2025 - Critical Bug Fixes**
+-   **Executive Summary Company Count Fixed**: Added missing `total_companies` field to both `get_dashboard_data()` and `convert_snapshot_to_dashboard_format()` functions. This field was being calculated but not included in the return dictionary, causing comparison API to default to 0.
+-   **Risk Metric Alignment**: Resolved discrepancy between Overview metric (High Churn Risk accounts via `churn_risk_level`) and Account Analytics metric (companies with Critical severity via `account_risk_factors`). Rewrote `generate_account_intelligence()` in demo generator with conditional logic matching production VOÏA AI behavior:
+    -   Promoters (NPS 9-10): Receive growth opportunities + minimal/moderate risks only
+    -   Passives (NPS 7-8): Receive balanced mix of opportunities and risks
+    -   Detractors (NPS 0-6): Receive risk factors + rare win-back opportunities, with Critical severity aligned to High/Critical churn risk
+-   **Demo Data Quality**: Regenerated Q1/Q2/Q3 2025 campaigns with realistic conditional logic. Results: 85-95% companies have opportunities, 89-98% have risks (down from unrealistic 100% for both), and perfect alignment between churn risk and critical severity metrics (16=16, 12=12, 13=13).
+
 # User Preferences
 Preferred communication style: Simple, everyday language.
 User interface tone: Thought leadership and research-oriented language, avoiding sales-oriented messaging.
