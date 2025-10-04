@@ -141,7 +141,7 @@ def main():
         else:
             cur.execute("""
                 INSERT INTO campaigns (business_account_id, name, description, start_date, end_date, status, client_identifier, created_at)
-                VALUES (%s, %s, %s, %s, %s, 'active', 'archelo_group', NOW())
+                VALUES (%s, %s, %s, %s, %s, 'ready', 'archelo_group', NOW())
                 RETURNING id
             """, (ba_id, cfg['name'], f"Q{q[1]} 2025 loyalty measurement", cfg['start'], cfg['end']))
             camp_id = cur.fetchone()[0]
