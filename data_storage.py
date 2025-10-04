@@ -1347,12 +1347,15 @@ def generate_campaign_kpi_snapshot(campaign_id):
         print("📊 Capturing comprehensive analysis data for snapshot...")
         full_dashboard_data = get_dashboard_data(campaign_id=campaign_id)
         
-        # Custom JSON serializer to handle datetime objects
+        # Custom JSON serializer to handle datetime and Decimal objects
         def serialize_for_json(obj):
+            from decimal import Decimal
             if isinstance(obj, list):
                 return [serialize_for_json(item) for item in obj]
             elif isinstance(obj, dict):
                 return {key: serialize_for_json(value) for key, value in obj.items()}
+            elif isinstance(obj, Decimal):
+                return float(obj)
             elif hasattr(obj, 'isoformat'):  # datetime objects
                 return obj.isoformat()
             else:
