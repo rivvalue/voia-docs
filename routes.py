@@ -2259,7 +2259,7 @@ def get_campaign_comparison():
                 'data': {
                     'total_responses': data1.get('total_responses', 0),
                     'nps_score': data1.get('nps_score', 0),
-                    'companies_analyzed': len(data1.get('account_intelligence', [])),
+                    'companies_analyzed': data1.get('total_companies', 0),
                     'critical_risk_companies': sum(1 for company in data1.get('account_intelligence', []) if company.get('critical_risks', 0) > 0),
                     'risk_heavy_accounts': sum(1 for company in data1.get('account_intelligence', []) if company.get('balance') == 'risk_heavy'),
                     'opportunity_heavy_accounts': sum(1 for company in data1.get('account_intelligence', []) if company.get('balance') == 'opportunity_heavy'),
@@ -2278,7 +2278,7 @@ def get_campaign_comparison():
                 'data': {
                     'total_responses': data2.get('total_responses', 0),
                     'nps_score': data2.get('nps_score', 0),
-                    'companies_analyzed': len(data2.get('account_intelligence', [])),
+                    'companies_analyzed': data2.get('total_companies', 0),
                     'critical_risk_companies': sum(1 for company in data2.get('account_intelligence', []) if company.get('critical_risks', 0) > 0),
                     'risk_heavy_accounts': sum(1 for company in data2.get('account_intelligence', []) if company.get('balance') == 'risk_heavy'),
                     'opportunity_heavy_accounts': sum(1 for company in data2.get('account_intelligence', []) if company.get('balance') == 'opportunity_heavy'),
