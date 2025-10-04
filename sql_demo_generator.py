@@ -266,9 +266,14 @@ def main():
         if row:
             camp_id, status = row
             print(f"✓ Found campaign ID: {camp_id} (status: {status})")
-            if status != 'active':
-                print(f"❌ Campaign must be active, currently: {status}")
-                return
+            # Allow regeneration of any campaign (including completed ones)
+            print(f"✓ Regenerating campaign data...")
+            
+            # Delete existing responses for this campaign
+            cur.execute("DELETE FROM survey_response WHERE campaign_id = %s", (camp_id,))
+            deleted_count = cur.rowcount
+            print(f"✓ Deleted {deleted_count} existing responses")
+            conn.commit()
         else:
             cur.execute("""
                 INSERT INTO campaigns (business_account_id, name, description, start_date, end_date, status, client_identifier, created_at)
