@@ -136,17 +136,70 @@ def churn(s):
     return score, risk_level
 
 
-def generate_account_intelligence(nps_cat):
-    """Generate realistic growth opportunities and risk factors based on NPS category"""
-    opps_list = GROWTH_OPPORTUNITIES[nps_cat]
-    risks_list = RISK_FACTORS[nps_cat]
+def generate_account_intelligence(nps_cat, churn_risk_level):
+    """Generate realistic growth opportunities and risk factors based on NPS category and churn risk
     
-    # Sample safely - don't exceed available items
-    num_opps = min(random.randint(1, 2), len(opps_list))
-    num_risks = min(random.randint(1, 2), len(risks_list))
+    Logic mirrors VOÏA's actual AI analysis:
+    - Promoters: High chance of opportunities, low/no critical risks
+    - Passives: Balanced mix
+    - Detractors: High chance of risks, minimal opportunities (only win-back)
+    """
+    opportunities = []
+    risks = []
     
-    opportunities = random.sample(opps_list, k=num_opps)
-    risks = random.sample(risks_list, k=num_risks)
+    # ============================================================================
+    # GROWTH OPPORTUNITIES (based on NPS category)
+    # ============================================================================
+    if nps_cat == "Promoter":
+        # 90% chance to get 1-2 opportunities
+        if random.random() < 0.9:
+            num_opps = random.randint(1, 2)
+            opportunities = random.sample(GROWTH_OPPORTUNITIES[nps_cat], k=min(num_opps, len(GROWTH_OPPORTUNITIES[nps_cat])))
+    
+    elif nps_cat == "Passive":
+        # 50% chance to get 1 opportunity (engagement/optimization)
+        if random.random() < 0.5:
+            opportunities = random.sample(GROWTH_OPPORTUNITIES[nps_cat], k=1)
+    
+    elif nps_cat == "Detractor":
+        # 20% chance to get 1 win-back/retention opportunity
+        if random.random() < 0.2:
+            opportunities = random.sample(GROWTH_OPPORTUNITIES[nps_cat], k=1)
+    
+    # ============================================================================
+    # ACCOUNT RISK FACTORS (based on NPS category and churn risk)
+    # ============================================================================
+    if nps_cat == "Promoter":
+        # 20% chance to get 1 LOW severity risk only
+        if random.random() < 0.2:
+            # Promoters only get low-severity risks (complacency)
+            low_risks = [r for r in RISK_FACTORS[nps_cat] if r.get('severity') == 'Low']
+            if low_risks:
+                risks = random.sample(low_risks, k=1)
+    
+    elif nps_cat == "Passive":
+        # 60% chance to get 1-2 risks (Medium severity primarily)
+        if random.random() < 0.6:
+            num_risks = random.randint(1, 2)
+            risks = random.sample(RISK_FACTORS[nps_cat], k=min(num_risks, len(RISK_FACTORS[nps_cat])))
+            
+            # If churn risk is High, ensure at least one High severity risk
+            if churn_risk_level == "High" and risks:
+                # Upgrade one risk to High severity
+                risks[0] = risks[0].copy()
+                risks[0]['severity'] = 'High'
+    
+    elif nps_cat == "Detractor":
+        # 100% chance to get 2-3 risks (High/Critical severity)
+        num_risks = random.randint(2, 3)
+        risks = random.sample(RISK_FACTORS[nps_cat], k=min(num_risks, len(RISK_FACTORS[nps_cat])))
+        
+        # If churn risk is High, ensure at least one Critical severity risk
+        if churn_risk_level == "High" and risks:
+            # Upgrade first risk to Critical severity
+            risks[0] = risks[0].copy()
+            risks[0]['severity'] = 'Critical'
+    
     return json.dumps(opportunities), json.dumps(risks)
 
 
@@ -271,7 +324,7 @@ def main():
             cs, cl = churn(nps)
             fb = random.choice(FEEDBACK[cat[0] if cat == "Promoter" else "Pa" if cat == "Passive" else "D"])
             themes = json.dumps(random.sample(THEMES, random.randint(2, 3)))
-            growth_opps, risk_factors = generate_account_intelligence(cat)
+            growth_opps, risk_factors = generate_account_intelligence(cat, cl)
             
             # Insert response
             cur.execute("""
