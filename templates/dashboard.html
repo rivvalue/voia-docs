@@ -214,8 +214,12 @@
                 <div class="col">
                     <div class="kpi-card kpi-danger">
                         <div class="kpi-value text-danger" id="highRiskCount">0</div>
-                        <div class="kpi-label">High Risk Accounts</div>
-                        <div class="kpi-trend" id="highRiskTrend">Accounts requiring attention</div>
+                        <div class="kpi-label">
+                            High Churn Risk Accounts
+                            <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top" 
+                               title="Companies with High or Critical churn risk level based on AI assessment" style="font-size: 0.8em; opacity: 0.7;"></i>
+                        </div>
+                        <div class="kpi-trend" id="highRiskTrend">Imminent churn risk (High/Critical)</div>
                     </div>
                 </div>
                 <div class="col">
@@ -227,12 +231,15 @@
                 </div>
             </div>
 
-            <!-- High Risk Accounts & Key Themes Summary -->
+            <!-- High Churn Risk Accounts & Key Themes Summary -->
             <div class="row mb-4">
                 <div class="col-md-6">
                     <div class="chart-card">
                         <div class="card-header">
-                            <h5>High Risk Accounts</h5>
+                            <h5>High Churn Risk Accounts
+                                <i class="fas fa-info-circle ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                   title="Companies with High or Critical churn risk level" style="font-size: 0.8em; opacity: 0.7;"></i>
+                            </h5>
                         </div>
                         <div class="card-body" style="height: 380px; overflow-y: auto; padding: 1.5rem;">
                             <div id="highRiskAccounts">
