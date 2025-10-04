@@ -227,16 +227,16 @@ def main():
                     improvement_feedback, recommendation_reason,
                     sentiment_score, sentiment_label, key_themes,
                     churn_risk_score, churn_risk_level, churn_risk_factors,
-                    commercial_value, source_type, created_at, analyzed_at
+                    growth_factor, commercial_value, source_type, created_at, analyzed_at
                 ) VALUES (
-                    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'conversational', %s, NOW()
+                    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'conversational', %s, NOW()
                 )
             """, (camp_id, cp_id, co, name, email,
                   random.choice(["< 1 year", "1-2 years", "2-3 years", "3-5 years", "> 5 years"]),
                   nps, cat,
-                  random.randint(1, 10), random.randint(1, 10), random.randint(1, 10), random.randint(1, 10),
+                  random.randint(1, 5), random.randint(1, 5), random.randint(1, 5), random.randint(1, 5),
                   fb, fb, ss, sl, themes, cs, cl,
-                  json.dumps(random.sample(THEMES, 2)), random.uniform(10000, 500000),
+                  json.dumps(random.sample(THEMES, 2)), random.uniform(0.8, 1.5), random.uniform(10000, 500000),
                   rand_time(cfg['start'], cfg['end'])))
             
             dist[cat] += 1
