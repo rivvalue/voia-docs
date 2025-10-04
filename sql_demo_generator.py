@@ -136,6 +136,30 @@ def churn(s):
     return score, risk_level
 
 
+def calculate_growth_factor(nps_score):
+    """Calculate growth factor, rate, and range based on NPS score
+    
+    Matches the lookup table from ai_analysis.py:
+    - NPS <0: 0% growth
+    - NPS 0-29: 5% growth
+    - NPS 30-49: 15% growth
+    - NPS 50-69: 25% growth
+    - NPS 70-100: 40% growth
+    """
+    if nps_score < 0:
+        return 0.0, '0%', '<0'
+    elif 0 <= nps_score <= 29:
+        return 0.05, '5%', '0-29'
+    elif 30 <= nps_score <= 49:
+        return 0.15, '15%', '30-49'
+    elif 50 <= nps_score <= 69:
+        return 0.25, '25%', '50-69'
+    elif 70 <= nps_score <= 100:
+        return 0.4, '40%', '70-100'
+    else:
+        return 0.0, '0%', 'invalid'
+
+
 def generate_account_intelligence(nps_cat, churn_risk_level):
     """Generate realistic growth opportunities and risk factors based on NPS category and churn risk
     
@@ -325,6 +349,7 @@ def main():
             fb = random.choice(FEEDBACK[cat[0] if cat == "Promoter" else "Pa" if cat == "Passive" else "D"])
             themes = json.dumps(random.sample(THEMES, random.randint(2, 3)))
             growth_opps, risk_factors = generate_account_intelligence(cat, cl)
+            gf, gr, grng = calculate_growth_factor(nps)
             
             # Insert response
             cur.execute("""
@@ -336,9 +361,9 @@ def main():
                     sentiment_score, sentiment_label, key_themes,
                     churn_risk_score, churn_risk_level, churn_risk_factors,
                     growth_opportunities, account_risk_factors,
-                    growth_factor, commercial_value, source_type, created_at, analyzed_at
+                    growth_factor, growth_rate, growth_range, commercial_value, source_type, created_at, analyzed_at
                 ) VALUES (
-                    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'conversational', %s, NOW()
+                    %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'conversational', %s, NOW()
                 )
             """, (camp_id, cp_id, co, name, email,
                   random.choice(["< 1 year", "1-2 years", "2-3 years", "3-5 years", "> 5 years"]),
@@ -346,7 +371,7 @@ def main():
                   random.randint(1, 5), random.randint(1, 5), random.randint(1, 5), random.randint(1, 5),
                   fb, fb, ss, sl, themes, cs, cl,
                   json.dumps(random.sample(THEMES, 2)), growth_opps, risk_factors,
-                  random.uniform(0.95, 1.15), random.uniform(10000, 500000),
+                  gf, gr, grng, random.uniform(10000, 500000),
                   rand_time(cfg['start'], cfg['end'])))
             
             dist[cat] += 1
