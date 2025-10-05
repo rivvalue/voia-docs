@@ -184,11 +184,11 @@ def view_campaign(campaign_id):
             flash('Campaign not found.', 'error')
             return redirect(url_for('campaigns.list_campaigns'))
         
-        # Get campaign participants
+        # Get campaign participants with eager loading to prevent N+1 queries
         campaign_participants = CampaignParticipant.query.filter_by(
             campaign_id=campaign_id,
             business_account_id=current_account.id
-        ).all()
+        ).options(joinedload(CampaignParticipant.participant)).all()
         
         participants_data = []
         for cp in campaign_participants:
@@ -643,11 +643,11 @@ def invitation_status(campaign_id):
             email_type='participant_invitation'
         ).all()
         
-        # Get campaign participants
+        # Get campaign participants with eager loading to prevent N+1 queries
         campaign_participants = CampaignParticipant.query.filter_by(
             campaign_id=campaign_id,
             business_account_id=current_account.id
-        ).all()
+        ).options(joinedload(CampaignParticipant.participant)).all()
         
         # Build status response
         participant_status = []
