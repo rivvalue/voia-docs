@@ -2517,12 +2517,15 @@ function refreshData() {
 
 function exportData() {
     // Use business authentication - server will handle authorization
+    console.log('Attempting to export data...');
     
     fetch('/api/export_data', {
         method: 'GET',
         credentials: 'include'  // Include session cookies for business authentication
     })
     .then(response => {
+        console.log('Export response received:', response.status, response.statusText);
+        
         if (response.status === 403) {
             alert('Admin access required. Please log in to your business account.');
             // Redirect to business login for authentication
@@ -2536,12 +2539,19 @@ function exportData() {
             return null;
         }
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            // Get error message from response if available
+            return response.json().then(err => {
+                throw new Error(err.error || `HTTP error! status: ${response.status}`);
+            }).catch(() => {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            });
         }
         return response.json();
     })
     .then(result => {
         if (!result) return; // Authentication failed
+        
+        console.log('Export data received, total responses:', result.data?.length || 0);
         
         const data = result.data || result; // Handle both old and new format
         const dataStr = JSON.stringify(data, null, 2);
@@ -2557,11 +2567,12 @@ function exportData() {
         // Show success message if we have export info
         if (result.export_info) {
             console.log(`Data exported successfully by ${result.export_info.exported_by}`);
+            alert(`Export successful! ${result.export_info.total_responses} responses exported.`);
         }
     })
     .catch(error => {
         console.error('Error exporting data:', error);
-        alert('Error exporting data. Please try again or contact administrator.');
+        alert(`Error exporting data: ${error.message}\n\nPlease check the browser console for details or contact administrator.`);
     });
 }
 
