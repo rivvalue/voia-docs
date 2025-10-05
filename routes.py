@@ -1296,21 +1296,33 @@ def survey_responses():
 @require_business_auth
 @require_permission('admin')
 def export_data():
-    """Export survey data as JSON - Admin access required"""
+    """Export survey data as JSON - Admin access required, scoped to current business account"""
     try:
-        responses = SurveyResponse.query.options(
+        # Get current business account
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account not found'}), 401
+        
+        # Query responses filtered by business account via campaign relationship
+        responses = SurveyResponse.query.join(
+            Campaign, SurveyResponse.campaign_id == Campaign.id
+        ).filter(
+            Campaign.business_account_id == current_account.id
+        ).options(
             joinedload(SurveyResponse.campaign)
         ).all()
+        
         data = [response.to_dict() for response in responses]
         
         # Log admin access
         admin_email = g.authenticated_email
-        logger.info(f"Admin data export accessed by {admin_email}")
+        logger.info(f"Admin data export accessed by {admin_email} for business account {current_account.id}")
         
         return jsonify({
             'data': data,
             'export_info': {
                 'total_responses': len(data),
+                'business_account': current_account.business_name,
                 'exported_by': admin_email,
                 'export_timestamp': datetime.utcnow().isoformat()
             }
