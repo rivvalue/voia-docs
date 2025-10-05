@@ -4,6 +4,7 @@ Provides CRUD operations for campaign participants with proper tenant scoping
 """
 
 from flask import Blueprint, request, render_template, redirect, url_for, flash, jsonify
+from sqlalchemy.orm import joinedload
 from business_auth_routes import require_business_auth, require_permission, current_tenant_id, get_current_business_account
 from models import Participant, Campaign, BusinessAccount, CampaignParticipant, EmailDelivery, db
 from task_queue import add_email_task
@@ -413,7 +414,10 @@ def delete_participant(participant_id):
             return redirect(url_for('participants.list_participants'))
         
         # Check for existing campaign associations (prevent FK constraint violations)
-        existing_associations = CampaignParticipant.query.filter_by(participant_id=participant_id).all()
+        # Use eager loading to prevent N+1 query when accessing campaign names
+        existing_associations = CampaignParticipant.query.filter_by(
+            participant_id=participant_id
+        ).options(joinedload(CampaignParticipant.campaign)).all()
         
         if existing_associations:
             # Show which campaigns they're associated with
@@ -556,13 +560,16 @@ def manage_campaign_participants(campaign_id: int):
                     )
                 )
             
-            campaign_participants = campaign_participants_query.all()
+            # Execute with eager loading to prevent N+1 queries
+            campaign_participants = campaign_participants_query.options(
+                joinedload(CampaignParticipant.participant)
+            ).all()
             
             # Get all campaign participants for KPI calculations (not just searched ones)
             all_campaign_participants = CampaignParticipant.query.filter_by(
                 campaign_id=campaign_id,
                 business_account_id=current_account.id
-            ).all()
+            ).options(joinedload(CampaignParticipant.participant)).all()
             
             # Calculate KPI stats from ALL campaign participants
             campaign_stats = {

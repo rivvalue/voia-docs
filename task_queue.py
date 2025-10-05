@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, date
 from threading import Thread, Lock
 from queue import Queue, Empty
 from time import sleep
+from sqlalchemy.orm import joinedload
 from app import app, db
 from models import SurveyResponse, Campaign, BusinessAccount, EmailDelivery, CampaignParticipant, Participant
 from ai_analysis import analyze_survey_response
@@ -418,10 +419,10 @@ class TaskQueue:
             participant_count = 0
             
             while True:
-                # Get chunk of campaign participants
+                # Get chunk of campaign participants with eager loading to prevent N+1 queries
                 participant_chunk = CampaignParticipant.query.filter_by(
                     campaign_id=campaign.id
-                ).join(Participant).offset(offset).limit(chunk_size).all()
+                ).options(joinedload(CampaignParticipant.participant)).offset(offset).limit(chunk_size).all()
                 
                 if not participant_chunk:
                     break
@@ -1072,10 +1073,12 @@ Respond with ONLY the JSON object, no other text:"""
         for campaign in sorted(ready_campaigns, key=lambda c: c.start_date):
             try:
                 # Double-check activation criteria
+                # Use count() instead of len() to avoid loading all participants
+                participant_count = CampaignParticipant.query.filter_by(campaign_id=campaign.id).count()
                 if (campaign.status == 'ready' and 
                     campaign.start_date <= today and 
                     campaign.description and 
-                    len(campaign.participants) > 0):
+                    participant_count > 0):
                     
                     # Activate the campaign
                     campaign.status = 'active'
