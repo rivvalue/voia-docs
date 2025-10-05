@@ -108,16 +108,22 @@ def require_permission(permission):
             # First ensure business auth - check manually since we can't call decorator
             business_user_id = session.get('business_user_id')
             if not business_user_id:
+                if request.is_json or request.path.startswith('/api/'):
+                    return jsonify({'error': 'Business authentication required'}), 401
                 flash('Please log in to access this page.', 'error')
                 return redirect(url_for('business_auth.login'))
             
             current_account = get_current_business_account()
             if not current_account:
+                if request.is_json or request.path.startswith('/api/'):
+                    return jsonify({'error': 'Invalid session'}), 401
                 flash('Please log in to access this page.', 'error')
                 return redirect(url_for('business_auth.login'))
             
             # Check account status - mirror require_business_auth logic
             if current_account.status in ['suspended', 'inactive', 'closed']:
+                if request.is_json or request.path.startswith('/api/'):
+                    return jsonify({'error': 'Account access blocked', 'status': current_account.status}), 403
                 flash('Account access blocked. Please contact support.', 'error')
                 return redirect(url_for('business_auth.login'))
             
@@ -130,6 +136,8 @@ def require_permission(permission):
             current_user = BusinessAccountUser.query.get(business_user_id)
             
             if not current_user or not current_user.has_permission(permission):
+                if request.is_json or request.path.startswith('/api/'):
+                    return jsonify({'error': f'Permission denied. {permission.replace("_", " ").title()} access required'}), 403
                 flash('You do not have permission to access this page.', 'error')
                 return redirect(url_for('business_auth.admin_panel'))
             
