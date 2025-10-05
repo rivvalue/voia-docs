@@ -2540,13 +2540,28 @@ function exportData() {
         }
         if (!response.ok) {
             // Get error message from response if available
-            return response.json().then(err => {
-                throw new Error(err.error || `HTTP error! status: ${response.status}`);
-            }).catch(() => {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            return response.text().then(text => {
+                console.error('Error response body:', text);
+                try {
+                    const err = JSON.parse(text);
+                    throw new Error(err.error || `HTTP error! status: ${response.status}`);
+                } catch(e) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
             });
         }
-        return response.json();
+        
+        // Clone response to read it twice (once for logging, once for parsing)
+        return response.clone().text().then(text => {
+            console.log('Response size:', text.length, 'characters');
+            try {
+                return JSON.parse(text);
+            } catch(e) {
+                console.error('JSON parse error:', e);
+                console.error('Response text preview:', text.substring(0, 500));
+                throw new Error('Failed to parse server response as JSON. The data might be too large.');
+            }
+        });
     })
     .then(result => {
         if (!result) return; // Authentication failed
