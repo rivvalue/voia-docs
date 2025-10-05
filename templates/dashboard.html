@@ -365,6 +365,45 @@
 
         <!-- Survey Insights Tab -->
         <div class="tab-pane fade" id="survey-insights" role="tabpanel" aria-labelledby="survey-insights-tab">
+            <!-- Search and Filter for Company NPS -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row align-items-end">
+                                <div class="col-md-5">
+                                    <label for="companySearch" class="form-label">Search Companies</label>
+                                    <input type="text" class="form-control" id="companySearch" 
+                                           placeholder="Search by company name...">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="companyNpsFilter" class="form-label">NPS Category</label>
+                                    <select class="form-select" id="companyNpsFilter" onchange="searchCompanyNPS()">
+                                        <option value="">All Companies</option>
+                                        <option value="promoters">Promoters (9-10)</option>
+                                        <option value="passives">Passives (7-8)</option>
+                                        <option value="detractors">Detractors (0-6)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="btn-group w-100">
+                                        <button type="button" class="btn btn-primary" onclick="searchCompanyNPS()">
+                                            <i class="fas fa-search me-1"></i>Search
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="clearCompanySearch()">
+                                            <i class="fas fa-times me-1"></i>Clear
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted" id="companySearchInfo"></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <!-- Company NPS Segregation Section -->
             <div class="row mb-4">
                 <div class="col-12">

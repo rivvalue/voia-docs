@@ -2135,97 +2135,56 @@ function updateCompanyPaginationInfo(currentPage, totalPages, totalItems) {
 function updateCompanyPaginationControls(pagination) {
     const controls = document.getElementById('companyPaginationControls');
     
-    // Clear existing controls safely
-    while (controls.firstChild) {
-        controls.removeChild(controls.firstChild);
-    }
-    
-    if (!pagination || pagination.pages <= 1) {
+    if (!controls) {
         return;
     }
     
-    // Previous button
-    const prevLi = document.createElement('li');
-    if (pagination.has_prev) {
-        prevLi.className = 'page-item';
-        const prevLink = document.createElement('a');
-        prevLink.className = 'page-link';
-        prevLink.href = '#';
-        prevLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            loadCompanyNpsData(pagination.page - 1);
-        });
-        const prevIcon = document.createElement('i');
-        prevIcon.className = 'fas fa-chevron-left';
-        prevLink.appendChild(prevIcon);
-        prevLi.appendChild(prevLink);
-    } else {
-        prevLi.className = 'page-item disabled';
-        const prevSpan = document.createElement('span');
-        prevSpan.className = 'page-link';
-        const prevIcon = document.createElement('i');
-        prevIcon.className = 'fas fa-chevron-left';
-        prevSpan.appendChild(prevIcon);
-        prevLi.appendChild(prevSpan);
+    if (!pagination || pagination.pages <= 1) {
+        controls.innerHTML = '';
+        return;
     }
-    controls.appendChild(prevLi);
+    
+    let html = '';
+    
+    // Previous button
+    if (pagination.has_prev) {
+        html += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="loadCompanyNpsData(${pagination.page - 1}, getCurrentCompanySearch(), getCurrentCompanyNpsFilter()); return false;">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+        `;
+    } else {
+        html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-left"></i></span></li>';
+    }
     
     // Page numbers with smart ellipsis
     const pages = generatePaginationPages(pagination.page, pagination.pages);
     for (const pageNum of pages) {
-        const pageLi = document.createElement('li');
         if (pageNum === null) {
-            pageLi.className = 'page-item disabled';
-            const pageSpan = document.createElement('span');
-            pageSpan.className = 'page-link';
-            pageSpan.textContent = '…';
-            pageLi.appendChild(pageSpan);
+            html += '<li class="page-item disabled"><span class="page-link">…</span></li>';
         } else if (pageNum === pagination.page) {
-            pageLi.className = 'page-item active';
-            const pageSpan = document.createElement('span');
-            pageSpan.className = 'page-link';
-            pageSpan.textContent = pageNum.toString();
-            pageLi.appendChild(pageSpan);
+            html += `<li class="page-item active"><span class="page-link">${pageNum}</span></li>`;
         } else {
-            pageLi.className = 'page-item';
-            const pageLink = document.createElement('a');
-            pageLink.className = 'page-link';
-            pageLink.href = '#';
-            pageLink.textContent = pageNum.toString();
-            pageLink.addEventListener('click', function(e) {
-                e.preventDefault();
-                loadCompanyNpsData(pageNum);
-            });
-            pageLi.appendChild(pageLink);
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadCompanyNpsData(${pageNum}, getCurrentCompanySearch(), getCurrentCompanyNpsFilter()); return false;">${pageNum}</a></li>`;
         }
-        controls.appendChild(pageLi);
     }
     
     // Next button
-    const nextLi = document.createElement('li');
     if (pagination.has_next) {
-        nextLi.className = 'page-item';
-        const nextLink = document.createElement('a');
-        nextLink.className = 'page-link';
-        nextLink.href = '#';
-        nextLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            loadCompanyNpsData(pagination.page + 1);
-        });
-        const nextIcon = document.createElement('i');
-        nextIcon.className = 'fas fa-chevron-right';
-        nextLink.appendChild(nextIcon);
-        nextLi.appendChild(nextLink);
+        html += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="loadCompanyNpsData(${pagination.page + 1}, getCurrentCompanySearch(), getCurrentCompanyNpsFilter()); return false;">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        `;
     } else {
-        nextLi.className = 'page-item disabled';
-        const nextSpan = document.createElement('span');
-        nextSpan.className = 'page-link';
-        const nextIcon = document.createElement('i');
-        nextIcon.className = 'fas fa-chevron-right';
-        nextSpan.appendChild(nextIcon);
-        nextLi.appendChild(nextSpan);
+        html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-right"></i></span></li>';
     }
-    controls.appendChild(nextLi);
+    
+    controls.innerHTML = html;
 }
 
 // Tenure pagination functions
@@ -2379,10 +2338,20 @@ function populateTenureNpsTable(tenureData) {
     }).join('');
 }
 
-function loadCompanyNpsData(page = 1) {
+function loadCompanyNpsData(page = 1, searchQuery = '', npsFilter = '') {
     currentCompanyPage = page;
     console.log('Loading company NPS data...');
-    fetch(`/api/company_nps?page=${page}&per_page=${companiesPerPage}`)
+    
+    // Build URL with search and filter parameters
+    let url = `/api/company_nps?page=${page}&per_page=${companiesPerPage}`;
+    if (searchQuery.trim()) {
+        url += `&search=${encodeURIComponent(searchQuery)}`;
+    }
+    if (npsFilter.trim()) {
+        url += `&nps_category=${encodeURIComponent(npsFilter)}`;
+    }
+    
+    fetch(url)
         .then(response => response.json())
         .then(data => {
             console.log('Company NPS data received:', data);
@@ -2938,6 +2907,78 @@ function getCurrentNpsFilter() {
     return npsFilter ? npsFilter.value : '';
 }
 
+// ============================================================================
+// COMPANY NPS SEARCH FUNCTIONALITY
+// ============================================================================
+
+function getCurrentCompanySearch() {
+    const searchInput = document.getElementById('companySearch');
+    return searchInput ? searchInput.value.trim() : '';
+}
+
+function getCurrentCompanyNpsFilter() {
+    const npsFilter = document.getElementById('companyNpsFilter');
+    return npsFilter ? npsFilter.value : '';
+}
+
+function searchCompanyNPS() {
+    const searchQuery = getCurrentCompanySearch();
+    const npsFilter = getCurrentCompanyNpsFilter();
+    
+    // Reset to page 1 when performing a new search
+    currentCompanyPage = 1;
+    
+    // Load company data with search query and NPS filter
+    loadCompanyNpsData(1, searchQuery, npsFilter);
+    
+    // Update search info
+    let infoText = '';
+    if (searchQuery && npsFilter) {
+        const filterLabel = {
+            'promoters': 'Promoters (9-10)',
+            'passives': 'Passives (7-8)',
+            'detractors': 'Detractors (0-6)'
+        }[npsFilter] || npsFilter;
+        infoText = `Search: "${searchQuery}" | Category: ${filterLabel}`;
+    } else if (searchQuery) {
+        infoText = `Search: "${searchQuery}"`;
+    } else if (npsFilter) {
+        const filterLabel = {
+            'promoters': 'Promoters (9-10)',
+            'passives': 'Passives (7-8)',
+            'detractors': 'Detractors (0-6)'
+        }[npsFilter] || npsFilter;
+        infoText = `Category: ${filterLabel}`;
+    }
+    const infoElement = document.getElementById('companySearchInfo');
+    if (infoElement) {
+        infoElement.textContent = infoText;
+    }
+}
+
+function clearCompanySearch() {
+    const searchInput = document.getElementById('companySearch');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    
+    const npsFilter = document.getElementById('companyNpsFilter');
+    if (npsFilter) {
+        npsFilter.value = '';
+    }
+    
+    const infoElement = document.getElementById('companySearchInfo');
+    if (infoElement) {
+        infoElement.textContent = '';
+    }
+    
+    // Reset to page 1 and clear search
+    currentCompanyPage = 1;
+    
+    // Load company data without search or filter
+    loadCompanyNpsData(1, '', '');
+}
+
 function searchSurveyResponses() {
     const searchQuery = getCurrentSearchQuery();
     const npsFilter = getCurrentNpsFilter();
@@ -2996,13 +3037,22 @@ function clearResponsesSearch() {
     loadSurveyResponses(1, '', '');
 }
 
-// Add Enter key support for search input
+// Add Enter key support for search inputs
 document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('responsesSearch');
-    if (searchInput) {
-        searchInput.addEventListener('keypress', function(e) {
+    const responsesSearchInput = document.getElementById('responsesSearch');
+    if (responsesSearchInput) {
+        responsesSearchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 searchSurveyResponses();
+            }
+        });
+    }
+    
+    const companySearchInput = document.getElementById('companySearch');
+    if (companySearchInput) {
+        companySearchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchCompanyNPS();
             }
         });
     }

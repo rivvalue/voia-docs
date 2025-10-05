@@ -1716,16 +1716,41 @@ def health_check():
 @app.route('/api/company_nps')
 @rate_limit(limit=100)
 def api_company_nps():
-    """API endpoint for company-segregated NPS data with pagination"""
+    """API endpoint for company-segregated NPS data with pagination, search, and filtering"""
     try:
         from data_storage import get_company_nps_data
         
-        # Get pagination parameters
+        # Get pagination and filter parameters
         page = request.args.get('page', 1, type=int)
         per_page = min(request.args.get('per_page', 10, type=int), 100)  # Max 100 per page
+        search_query = request.args.get('search', '').strip()
+        nps_category = request.args.get('nps_category', '').strip().lower()
         
         # Get all company data
         all_company_data = get_company_nps_data()
+        
+        # Apply search filter if provided
+        if search_query:
+            search_lower = search_query.lower()
+            all_company_data = [
+                company for company in all_company_data
+                if search_lower in company.get('company_name', '').lower()
+            ]
+        
+        # Apply NPS category filter if provided
+        if nps_category:
+            filtered_companies = []
+            for company in all_company_data:
+                avg_nps = company.get('avg_nps', 0)
+                # Filter based on average individual NPS scores of respondents
+                if nps_category == 'promoters' and avg_nps >= 9:
+                    filtered_companies.append(company)
+                elif nps_category == 'passives' and 7 <= avg_nps <= 8:
+                    filtered_companies.append(company)
+                elif nps_category == 'detractors' and avg_nps <= 6:
+                    filtered_companies.append(company)
+            all_company_data = filtered_companies
+        
         total_companies = len(all_company_data)
         
         # Calculate pagination
@@ -1734,7 +1759,7 @@ def api_company_nps():
         company_data = all_company_data[start_idx:end_idx]
         
         # Calculate pagination info
-        total_pages = (total_companies + per_page - 1) // per_page
+        total_pages = (total_companies + per_page - 1) // per_page if total_companies > 0 else 1
         has_prev = page > 1
         has_next = page < total_pages
         
