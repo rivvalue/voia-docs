@@ -2197,15 +2197,21 @@ def get_campaign_filter_options():
         current_business_user = get_current_business_user()
         
         if current_business_user:
-            # Business user - return their campaigns
+            # Business user - return their active/completed campaigns only (exclude drafts)
             business_account_id = current_business_user.business_account_id
-            campaigns = Campaign.query.filter_by(business_account_id=business_account_id).order_by(Campaign.start_date.desc()).all()
+            campaigns = Campaign.query.filter(
+                Campaign.business_account_id == business_account_id,
+                Campaign.status.in_(['active', 'completed'])
+            ).order_by(Campaign.start_date.desc()).all()
         else:
             # Public/participant user - return demo campaigns only (ExecutiveSummary access)
             from models import BusinessAccount
             demo_account = BusinessAccount.query.filter_by(name='Archelo Group inc').first()
             if demo_account:
-                campaigns = Campaign.query.filter_by(business_account_id=demo_account.id).order_by(Campaign.start_date.desc()).all()
+                campaigns = Campaign.query.filter(
+                    Campaign.business_account_id == demo_account.id,
+                    Campaign.status.in_(['active', 'completed'])
+                ).order_by(Campaign.start_date.desc()).all()
             else:
                 # No demo account found - return empty campaigns list
                 campaigns = []
