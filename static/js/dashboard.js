@@ -2555,14 +2555,20 @@ function exportData() {
         
         const data = result.data || result; // Handle both old and new format
         const dataStr = JSON.stringify(data, null, 2);
-        const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+        
+        // Use Blob instead of data URI to avoid size limitations
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
         
         const exportFileDefaultName = `voc_survey_data_${new Date().toISOString().split('T')[0]}.json`;
         
         const linkElement = document.createElement('a');
-        linkElement.setAttribute('href', dataUri);
+        linkElement.setAttribute('href', url);
         linkElement.setAttribute('download', exportFileDefaultName);
         linkElement.click();
+        
+        // Clean up the URL object after download
+        setTimeout(() => URL.revokeObjectURL(url), 100);
         
         // Show success message if we have export info
         if (result.export_info) {
