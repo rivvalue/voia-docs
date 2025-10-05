@@ -183,7 +183,7 @@ p, .text-body {
 .navbar {
     background-color: var(--primary-black) !important;
     border-bottom: 2px solid var(--primary-red);
-    padding: var(--spacing-md) 0;
+    padding: var(--spacing-lg) 0;
     box-shadow: var(--shadow-sm);
     backdrop-filter: blur(10px);
     z-index: 10000 !important;
@@ -193,7 +193,7 @@ p, .text-body {
     font-family: var(--font-family-headings);
     color: var(--primary-white) !important;
     font-weight: 600;
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-xl);
     letter-spacing: var(--letter-spacing-tight);
     text-decoration: none;
     transition: all 0.2s ease;
@@ -207,7 +207,7 @@ p, .text-body {
 .navbar-nav .nav-link {
     color: var(--primary-white) !important;
     font-weight: 500;
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-xl);
     letter-spacing: var(--letter-spacing-wide);
     padding: var(--spacing-sm) var(--spacing-md) !important;
     border-radius: var(--radius-md);
