@@ -1304,7 +1304,7 @@ def export_data():
             logger.error("Export failed: Business account not found in session")
             return jsonify({'error': 'Business account not found'}), 401
         
-        logger.info(f"Export initiated by business account {current_account.id} ({current_account.business_name})")
+        logger.info(f"Export initiated by business account {current_account.id} ({current_account.name})")
         
         # Query responses filtered by business account via campaign relationship
         responses = SurveyResponse.query.join(
