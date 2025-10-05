@@ -2021,6 +2021,36 @@ function loadSurveyResponses(page = 1, searchQuery = '') {
         });
 }
 
+// Helper function to generate smart pagination page numbers with ellipsis
+function generatePaginationPages(currentPage, totalPages) {
+    const pages = [];
+    const leftEdge = 1;
+    const leftCurrent = 2;
+    const rightCurrent = 2;
+    const rightEdge = 1;
+    
+    for (let i = 1; i <= totalPages; i++) {
+        // Show first page
+        if (i <= leftEdge) {
+            pages.push(i);
+        }
+        // Show pages around current page
+        else if (i >= currentPage - leftCurrent && i <= currentPage + rightCurrent) {
+            pages.push(i);
+        }
+        // Show last page
+        else if (i > totalPages - rightEdge) {
+            pages.push(i);
+        }
+        // Add ellipsis for gaps
+        else if (pages[pages.length - 1] !== null) {
+            pages.push(null); // null represents ellipsis
+        }
+    }
+    
+    return pages;
+}
+
 function updateResponsesPaginationInfo(currentPage, totalPages, totalItems) {
     const info = document.getElementById('paginationInfo');
     if (totalItems === 0) {
@@ -2057,12 +2087,15 @@ function updateResponsesPaginationControls(pagination) {
         html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-left"></i></span></li>';
     }
     
-    // Page numbers
-    for (let i = 1; i <= pagination.pages; i++) {
-        if (i === pagination.page) {
-            html += `<li class="page-item active"><span class="page-link">${i}</span></li>`;
+    // Page numbers with smart ellipsis
+    const pages = generatePaginationPages(pagination.page, pagination.pages);
+    for (const pageNum of pages) {
+        if (pageNum === null) {
+            html += '<li class="page-item disabled"><span class="page-link">…</span></li>';
+        } else if (pageNum === pagination.page) {
+            html += `<li class="page-item active"><span class="page-link">${pageNum}</span></li>`;
         } else {
-            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadSurveyResponses(${i}, getCurrentSearchQuery()); return false;">${i}</a></li>`;
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadSurveyResponses(${pageNum}, getCurrentSearchQuery()); return false;">${pageNum}</a></li>`;
         }
     }
     
@@ -2134,24 +2167,31 @@ function updateCompanyPaginationControls(pagination) {
     }
     controls.appendChild(prevLi);
     
-    // Page numbers
-    for (let i = 1; i <= pagination.pages; i++) {
+    // Page numbers with smart ellipsis
+    const pages = generatePaginationPages(pagination.page, pagination.pages);
+    for (const pageNum of pages) {
         const pageLi = document.createElement('li');
-        if (i === pagination.page) {
+        if (pageNum === null) {
+            pageLi.className = 'page-item disabled';
+            const pageSpan = document.createElement('span');
+            pageSpan.className = 'page-link';
+            pageSpan.textContent = '…';
+            pageLi.appendChild(pageSpan);
+        } else if (pageNum === pagination.page) {
             pageLi.className = 'page-item active';
             const pageSpan = document.createElement('span');
             pageSpan.className = 'page-link';
-            pageSpan.textContent = i.toString();
+            pageSpan.textContent = pageNum.toString();
             pageLi.appendChild(pageSpan);
         } else {
             pageLi.className = 'page-item';
             const pageLink = document.createElement('a');
             pageLink.className = 'page-link';
             pageLink.href = '#';
-            pageLink.textContent = i.toString();
+            pageLink.textContent = pageNum.toString();
             pageLink.addEventListener('click', function(e) {
                 e.preventDefault();
-                loadCompanyNpsData(i);
+                loadCompanyNpsData(pageNum);
             });
             pageLi.appendChild(pageLink);
         }
@@ -2222,12 +2262,15 @@ function updateTenurePaginationControls(pagination) {
         html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-left"></i></span></li>';
     }
     
-    // Page numbers
-    for (let i = 1; i <= pagination.pages; i++) {
-        if (i === pagination.page) {
-            html += `<li class="page-item active"><span class="page-link">${i}</span></li>`;
+    // Page numbers with smart ellipsis
+    const pages = generatePaginationPages(pagination.page, pagination.pages);
+    for (const pageNum of pages) {
+        if (pageNum === null) {
+            html += '<li class="page-item disabled"><span class="page-link">…</span></li>';
+        } else if (pageNum === pagination.page) {
+            html += `<li class="page-item active"><span class="page-link">${pageNum}</span></li>`;
         } else {
-            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadTenureNpsData(${i}); return false;">${i}</a></li>`;
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadTenureNpsData(${pageNum}); return false;">${pageNum}</a></li>`;
         }
     }
     

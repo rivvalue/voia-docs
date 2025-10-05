@@ -253,7 +253,7 @@
                 </li>
                 
                 <!-- Page Numbers -->
-                {% for page_num in pagination.iter_pages() %}
+                {% for page_num in pagination.iter_pages(left_edge=1, left_current=2, right_current=2, right_edge=1) %}
                     {% if page_num %}
                         {% if page_num != pagination.page %}
                         <li class="page-item">
