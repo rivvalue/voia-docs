@@ -365,14 +365,19 @@
 
         <!-- Survey Insights Tab -->
         <div class="tab-pane fade" id="survey-insights" role="tabpanel" aria-labelledby="survey-insights-tab">
-            <!-- Search and Filter for Company NPS -->
+            <!-- Company NPS Segregation Section -->
             <div class="row mb-4">
                 <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="row align-items-end">
+                    <div class="data-table">
+                        <div class="table-header">
+                            <h5>NPS by Client Company</h5>
+                            <small class="text-muted">Strategic account management - NPS scores segregated by company evaluating Archelo Group</small>
+                        </div>
+                        <div class="p-3">
+                            <!-- Search and Filter Controls -->
+                            <div class="row align-items-end mb-3">
                                 <div class="col-md-5">
-                                    <label for="companySearch" class="form-label">Search Companies</label>
+                                    <label for="companySearch" class="form-label">Search</label>
                                     <input type="text" class="form-control" id="companySearch" 
                                            placeholder="Search by company name...">
                                 </div>
@@ -396,21 +401,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="mt-2">
+                            <div class="mb-2">
                                 <small class="text-muted" id="companySearchInfo"></small>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Company NPS Segregation Section -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="data-table">
-                        <div class="table-header">
-                            <h5>NPS by Client Company</h5>
-                            <small class="text-muted">Strategic account management - NPS scores segregated by company evaluating Archelo Group</small>
                         </div>
                         <div class="p-0">
                             <div class="table-responsive">
@@ -542,14 +535,21 @@
                 </div>
             </div>
 
-            <!-- Search Survey Responses -->
-            <div class="row mb-4">
+            <!-- Recent Responses Table -->
+            <div class="row">
                 <div class="col-12">
                     <div class="card">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Recent Survey Responses</h5>
+                                <small class="text-muted" id="responsesSearchInfo"></small>
+                            </div>
+                        </div>
                         <div class="card-body">
-                            <div class="row align-items-end">
+                            <!-- Search and Filter Controls -->
+                            <div class="row align-items-end mb-3">
                                 <div class="col-md-5">
-                                    <label for="responsesSearch" class="form-label">Search Survey Responses</label>
+                                    <label for="responsesSearch" class="form-label">Search</label>
                                     <input type="text" class="form-control" id="responsesSearch" 
                                            placeholder="Search by company name, participant name, or email...">
                                 </div>
@@ -573,22 +573,6 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recent Responses Table -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h5 class="card-title mb-0">Recent Survey Responses</h5>
-                                <small class="text-muted" id="responsesSearchInfo"></small>
-                            </div>
-                        </div>
-                        <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table table-striped">
                                     <thead>
