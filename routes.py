@@ -1301,7 +1301,10 @@ def export_data():
         # Get current business account
         current_account = get_current_business_account()
         if not current_account:
+            logger.error("Export failed: Business account not found in session")
             return jsonify({'error': 'Business account not found'}), 401
+        
+        logger.info(f"Export initiated by business account {current_account.id} ({current_account.business_name})")
         
         # Query responses filtered by business account via campaign relationship
         responses = SurveyResponse.query.join(
@@ -1312,11 +1315,13 @@ def export_data():
             joinedload(SurveyResponse.campaign)
         ).all()
         
+        logger.info(f"Export query returned {len(responses)} responses for business account {current_account.id}")
+        
         data = [response.to_dict() for response in responses]
         
         # Log admin access
-        admin_email = g.authenticated_email
-        logger.info(f"Admin data export accessed by {admin_email} for business account {current_account.id}")
+        admin_email = g.authenticated_email if hasattr(g, 'authenticated_email') else session.get('business_email', 'unknown')
+        logger.info(f"Admin data export completed by {admin_email} for business account {current_account.id}")
         
         return jsonify({
             'data': data,
@@ -1328,8 +1333,8 @@ def export_data():
             }
         })
     except Exception as e:
-        logger.error(f"Error exporting data: {e}")
-        return jsonify({'error': 'Failed to export data'}), 500
+        logger.error(f"Error exporting data: {str(e)}", exc_info=True)
+        return jsonify({'error': f'Failed to export data: {str(e)}'}), 500
 
 @app.route('/api/queue_status')
 def queue_status():
