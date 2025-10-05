@@ -1327,7 +1327,7 @@ def export_data():
             'data': data,
             'export_info': {
                 'total_responses': len(data),
-                'business_account': current_account.business_name,
+                'business_account': current_account.name,
                 'exported_by': admin_email,
                 'export_timestamp': datetime.utcnow().isoformat()
             }
