@@ -509,10 +509,19 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="row align-items-end">
-                                <div class="col-md-8">
+                                <div class="col-md-5">
                                     <label for="responsesSearch" class="form-label">Search Survey Responses</label>
                                     <input type="text" class="form-control" id="responsesSearch" 
                                            placeholder="Search by company name, participant name, or email...">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="npsFilter" class="form-label">NPS Category</label>
+                                    <select class="form-select" id="npsFilter" onchange="searchSurveyResponses()">
+                                        <option value="">All Responses</option>
+                                        <option value="promoters">Promoters (9-10)</option>
+                                        <option value="passives">Passives (7-8)</option>
+                                        <option value="detractors">Detractors (0-6)</option>
+                                    </select>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="btn-group w-100">

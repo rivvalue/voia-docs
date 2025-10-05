@@ -1928,13 +1928,16 @@ const responsesPerPage = 10;
 const companiesPerPage = 10;
 const tenureGroupsPerPage = 10;
 
-function loadSurveyResponses(page = 1, searchQuery = '') {
+function loadSurveyResponses(page = 1, searchQuery = '', npsFilter = '') {
     currentResponsesPage = page;
     
-    // Build URL with search parameters
+    // Build URL with search and filter parameters
     let url = `/api/survey_responses?page=${page}&per_page=${responsesPerPage}`;
     if (searchQuery.trim()) {
         url += `&search=${encodeURIComponent(searchQuery)}`;
+    }
+    if (npsFilter.trim()) {
+        url += `&nps_category=${encodeURIComponent(npsFilter)}`;
     }
     
     fetch(url)
@@ -2078,7 +2081,7 @@ function updateResponsesPaginationControls(pagination) {
     if (pagination.has_prev) {
         html += `
             <li class="page-item">
-                <a class="page-link" href="#" onclick="loadSurveyResponses(${pagination.page - 1}, getCurrentSearchQuery()); return false;">
+                <a class="page-link" href="#" onclick="loadSurveyResponses(${pagination.page - 1}, getCurrentSearchQuery(), getCurrentNpsFilter()); return false;">
                     <i class="fas fa-chevron-left"></i>
                 </a>
             </li>
@@ -2095,7 +2098,7 @@ function updateResponsesPaginationControls(pagination) {
         } else if (pageNum === pagination.page) {
             html += `<li class="page-item active"><span class="page-link">${pageNum}</span></li>`;
         } else {
-            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadSurveyResponses(${pageNum}, getCurrentSearchQuery()); return false;">${pageNum}</a></li>`;
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadSurveyResponses(${pageNum}, getCurrentSearchQuery(), getCurrentNpsFilter()); return false;">${pageNum}</a></li>`;
         }
     }
     
@@ -2103,7 +2106,7 @@ function updateResponsesPaginationControls(pagination) {
     if (pagination.has_next) {
         html += `
             <li class="page-item">
-                <a class="page-link" href="#" onclick="loadSurveyResponses(${pagination.page + 1}, getCurrentSearchQuery()); return false;">
+                <a class="page-link" href="#" onclick="loadSurveyResponses(${pagination.page + 1}, getCurrentSearchQuery(), getCurrentNpsFilter()); return false;">
                     <i class="fas fa-chevron-right"></i>
                 </a>
             </li>
@@ -2930,14 +2933,44 @@ function getCurrentSearchQuery() {
     return searchInput ? searchInput.value.trim() : '';
 }
 
+function getCurrentNpsFilter() {
+    const npsFilter = document.getElementById('npsFilter');
+    return npsFilter ? npsFilter.value : '';
+}
+
 function searchSurveyResponses() {
     const searchQuery = getCurrentSearchQuery();
+    const npsFilter = getCurrentNpsFilter();
     
     // Reset to page 1 when performing a new search
     currentResponsesPage = 1;
     
-    // Load responses with search query
-    loadSurveyResponses(1, searchQuery);
+    // Load responses with search query and NPS filter
+    loadSurveyResponses(1, searchQuery, npsFilter);
+    
+    // Update search info
+    let infoText = '';
+    if (searchQuery && npsFilter) {
+        const filterLabel = {
+            'promoters': 'Promoters (9-10)',
+            'passives': 'Passives (7-8)',
+            'detractors': 'Detractors (0-6)'
+        }[npsFilter] || npsFilter;
+        infoText = `Search: "${searchQuery}" | Category: ${filterLabel}`;
+    } else if (searchQuery) {
+        infoText = `Search: "${searchQuery}"`;
+    } else if (npsFilter) {
+        const filterLabel = {
+            'promoters': 'Promoters (9-10)',
+            'passives': 'Passives (7-8)',
+            'detractors': 'Detractors (0-6)'
+        }[npsFilter] || npsFilter;
+        infoText = `Category: ${filterLabel}`;
+    }
+    const infoElement = document.getElementById('responsesSearchInfo');
+    if (infoElement) {
+        infoElement.textContent = infoText;
+    }
 }
 
 function clearResponsesSearch() {
@@ -2946,11 +2979,21 @@ function clearResponsesSearch() {
         searchInput.value = '';
     }
     
+    const npsFilter = document.getElementById('npsFilter');
+    if (npsFilter) {
+        npsFilter.value = '';
+    }
+    
+    const infoElement = document.getElementById('responsesSearchInfo');
+    if (infoElement) {
+        infoElement.textContent = '';
+    }
+    
     // Reset to page 1 and clear search
     currentResponsesPage = 1;
     
-    // Load responses without search
-    loadSurveyResponses(1, '');
+    // Load responses without search or filter
+    loadSurveyResponses(1, '', '');
 }
 
 // Add Enter key support for search input

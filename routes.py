@@ -1248,6 +1248,7 @@ def survey_responses():
         page = request.args.get('page', 1, type=int)
         per_page = min(request.args.get('per_page', 10, type=int), 100)  # Max 100 per page
         search_query = request.args.get('search', '').strip()
+        nps_category = request.args.get('nps_category', '').strip().lower()
         
         # Base query with business account scoping via campaign relationship
         query = SurveyResponse.query.join(Campaign).filter(
@@ -1266,6 +1267,15 @@ def survey_responses():
                     SurveyResponse.respondent_email.ilike(search_term)
                 )
             )
+        
+        # Apply NPS category filter if provided
+        if nps_category:
+            if nps_category == 'promoters':
+                query = query.filter(SurveyResponse.nps_score >= 9)
+            elif nps_category == 'passives':
+                query = query.filter(SurveyResponse.nps_score.between(7, 8))
+            elif nps_category == 'detractors':
+                query = query.filter(SurveyResponse.nps_score <= 6)
         
         pagination = query.order_by(
             SurveyResponse.created_at.desc()
