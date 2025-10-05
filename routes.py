@@ -1716,9 +1716,10 @@ def health_check():
 @app.route('/api/company_nps')
 @rate_limit(limit=100)
 def api_company_nps():
-    """API endpoint for company-segregated NPS data with pagination, search, and filtering"""
+    """API endpoint for company-segregated NPS data with pagination, search, and filtering - optimized for performance"""
     try:
-        from data_storage import get_company_nps_data
+        from models import SurveyResponse
+        from sqlalchemy import func
         
         # Get pagination and filter parameters
         page = request.args.get('page', 1, type=int)
@@ -1726,37 +1727,85 @@ def api_company_nps():
         search_query = request.args.get('search', '').strip()
         nps_category = request.args.get('nps_category', '').strip().lower()
         
-        # Get all company data
-        all_company_data = get_company_nps_data()
+        # Build optimized query with filters applied at database level
+        query = db.session.query(
+            func.max(SurveyResponse.company_name).label('company_name'),
+            func.count(SurveyResponse.id).label('total_responses'),
+            func.avg(SurveyResponse.nps_score).label('avg_nps'),
+            func.max(SurveyResponse.created_at).label('latest_response'),
+            func.count(func.nullif(SurveyResponse.nps_score >= 9, False)).label('promoters'),
+            func.count(func.nullif(SurveyResponse.nps_score <= 6, False)).label('detractors')
+        ).filter(
+            SurveyResponse.company_name.isnot(None)
+        )
         
-        # Apply search filter if provided
+        # Apply search filter at database level
         if search_query:
-            search_lower = search_query.lower()
-            all_company_data = [
-                company for company in all_company_data
-                if search_lower in company.get('company_name', '').lower()
-            ]
+            query = query.filter(
+                func.upper(SurveyResponse.company_name).like(f'%{search_query.upper()}%')
+            )
         
-        # Apply NPS category filter if provided
+        # Apply NPS category filter at database level
         if nps_category:
-            filtered_companies = []
-            for company in all_company_data:
-                avg_nps = company.get('avg_nps', 0)
-                # Filter based on average individual NPS scores of respondents
-                if nps_category == 'promoters' and avg_nps >= 9:
-                    filtered_companies.append(company)
-                elif nps_category == 'passives' and 7 <= avg_nps <= 8:
-                    filtered_companies.append(company)
-                elif nps_category == 'detractors' and avg_nps <= 6:
-                    filtered_companies.append(company)
-            all_company_data = filtered_companies
+            if nps_category == 'promoters':
+                query = query.filter(SurveyResponse.nps_score >= 9)
+            elif nps_category == 'passives':
+                query = query.filter(SurveyResponse.nps_score.between(7, 8))
+            elif nps_category == 'detractors':
+                query = query.filter(SurveyResponse.nps_score <= 6)
         
-        total_companies = len(all_company_data)
+        # Group by company and get results
+        company_stats = query.group_by(func.upper(SurveyResponse.company_name)).all()
         
-        # Calculate pagination
+        # Process results
+        company_nps_list = []
+        for company in company_stats:
+            total = company.total_responses
+            promoters = company.promoters or 0
+            detractors = company.detractors or 0
+            
+            # Calculate company NPS
+            company_nps = round(((promoters - detractors) / total) * 100) if total > 0 else 0
+            
+            # Determine risk level
+            if company_nps <= -50:
+                risk_level = "Critical"
+            elif company_nps <= -20:
+                risk_level = "High"
+            elif company_nps <= 20:
+                risk_level = "Medium"
+            else:
+                risk_level = "Low"
+            
+            # Get latest churn risk (optimized single query)
+            latest_response = SurveyResponse.query.filter(
+                func.upper(SurveyResponse.company_name) == func.upper(company.company_name)
+            ).order_by(SurveyResponse.created_at.desc()).first()
+            
+            latest_churn_risk = latest_response.churn_risk_level if latest_response and latest_response.churn_risk_level else None
+            
+            company_nps_list.append({
+                'company_name': company.company_name,
+                'total_responses': total,
+                'avg_nps': round(company.avg_nps, 1) if company.avg_nps else 0,
+                'company_nps': company_nps,
+                'promoters': promoters,
+                'detractors': detractors,
+                'passives': total - promoters - detractors,
+                'risk_level': risk_level,
+                'latest_response': company.latest_response.strftime('%Y-%m-%d') if company.latest_response else None,
+                'latest_churn_risk': latest_churn_risk
+            })
+        
+        # Sort by risk level and NPS
+        risk_order = {"Critical": 0, "High": 1, "Medium": 2, "Low": 3}
+        company_nps_list.sort(key=lambda x: (risk_order.get(x['risk_level'], 4), -x['company_nps']))
+        
+        # Apply pagination
+        total_companies = len(company_nps_list)
         start_idx = (page - 1) * per_page
         end_idx = start_idx + per_page
-        company_data = all_company_data[start_idx:end_idx]
+        company_data = company_nps_list[start_idx:end_idx]
         
         # Calculate pagination info
         total_pages = (total_companies + per_page - 1) // per_page if total_companies > 0 else 1
