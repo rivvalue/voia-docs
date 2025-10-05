@@ -1294,7 +1294,7 @@ def survey_responses():
 
 @app.route('/api/export_data')
 @require_business_auth
-@require_permission('admin')
+@require_permission('export_data')
 def export_data():
     """Export survey data as JSON - Admin access required, scoped to current business account"""
     try:
