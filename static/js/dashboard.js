@@ -1946,11 +1946,25 @@ function populateAccountIntelligence() {
             `;
         }).join('');
         
+        // Get campaign info for drill-down
+        const campaignSelect = document.getElementById('campaignFilter');
+        const campaignId = campaignSelect ? campaignSelect.value : null;
+        const campaignName = campaignSelect && campaignId ? campaignSelect.options[campaignSelect.selectedIndex].text : 'Current Campaign';
+        
         return `
             <div class="account-visual-card card mb-3 ${balanceClass}" style="border-width: 2px;">
                 <div class="card-body p-3">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">${escapeHtml(account.company_name)}</h5>
+                        <h5 class="mb-0">
+                            <a href="#" onclick="openCompanyResponsesModal('${escapeHtml(account.company_name).replace(/'/g, "\\'")}', ${campaignId}, '${escapeHtml(campaignName).replace(/'/g, "\\'")}'); return false;" 
+                               style="color: #2E5090; text-decoration: none; cursor: pointer;"
+                               onmouseover="this.style.textDecoration='underline';"
+                               onmouseout="this.style.textDecoration='none';"
+                               title="Click to view all responses from ${escapeHtml(account.company_name)}">
+                                ${escapeHtml(account.company_name)}
+                                <i class="fas fa-external-link-alt ms-2" style="font-size: 0.7em; color: #8A8A8A;"></i>
+                            </a>
+                        </h5>
                         <div class="d-flex align-items-center">
                             <span style="font-size: 1.2em; margin-right: 5px; color: ${balanceIconColor};">${balanceIcon}</span>
                             <span class="badge" style="background-color: ${balanceIconColor}20; color: ${balanceIconColor}; border: 1px solid ${balanceIconColor};">${balanceLabel}</span>
@@ -2204,11 +2218,25 @@ function renderAccountIntelligence(accountData, pagination) {
             `;
         }).join('');
         
+        // Get campaign info for drill-down
+        const campaignSelect = document.getElementById('campaignFilter');
+        const campaignId = campaignSelect ? campaignSelect.value : null;
+        const campaignName = campaignSelect && campaignId ? campaignSelect.options[campaignSelect.selectedIndex].text : 'Current Campaign';
+        
         return `
             <div class="account-visual-card card mb-3 ${balanceClass}" style="border-width: 2px;">
                 <div class="card-body p-3">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0">${escapeHtml(account.company_name)}</h5>
+                        <h5 class="mb-0">
+                            <a href="#" onclick="openCompanyResponsesModal('${escapeHtml(account.company_name).replace(/'/g, "\\'")}', ${campaignId}, '${escapeHtml(campaignName).replace(/'/g, "\\'")}'); return false;" 
+                               style="color: #2E5090; text-decoration: none; cursor: pointer;"
+                               onmouseover="this.style.textDecoration='underline';"
+                               onmouseout="this.style.textDecoration='none';"
+                               title="Click to view all responses from ${escapeHtml(account.company_name)}">
+                                ${escapeHtml(account.company_name)}
+                                <i class="fas fa-external-link-alt ms-2" style="font-size: 0.7em; color: #8A8A8A;"></i>
+                            </a>
+                        </h5>
                         <div class="d-flex align-items-center">
                             <span style="font-size: 1.2em; margin-right: 5px; color: ${balanceIconColor};">${balanceIcon}</span>
                             <span class="badge" style="background-color: ${balanceIconColor}20; color: ${balanceIconColor}; border: 1px solid ${balanceIconColor};">${balanceLabel}</span>
