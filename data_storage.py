@@ -846,21 +846,10 @@ def convert_snapshot_to_dashboard_format(snapshot):
         # Enrich account_intelligence with company_nps if missing (for old snapshots)
         account_intelligence = json.loads(snapshot.account_intelligence) if snapshot.account_intelligence else []
         company_nps_data = json.loads(snapshot.company_nps_breakdown) if snapshot.company_nps_breakdown else []
-        high_risk_accounts = json.loads(snapshot.high_risk_accounts) if snapshot.high_risk_accounts else []
         
-        # Build NPS lookup for enrichment - try company_nps_breakdown first, then fall back to high_risk_accounts
-        nps_lookup = {}
-        
-        # Primary source: company_nps_breakdown
-        for company in company_nps_data:
-            if 'company_name' in company and 'company_nps' in company:
-                nps_lookup[company['company_name'].upper()] = company['company_nps']
-        
-        # Fallback source: high_risk_accounts (has nps_score field)
-        if len(nps_lookup) == 0:
-            for account in high_risk_accounts:
-                if 'company_name' in account and 'nps_score' in account:
-                    nps_lookup[account['company_name'].upper()] = int(account['nps_score'])
+        # Build NPS lookup for enrichment
+        nps_lookup = {company['company_name'].upper(): company['company_nps'] 
+                     for company in company_nps_data if 'company_name' in company and 'company_nps' in company}
         
         # Enrich accounts with correct company_nps (always overwrite to fix old snapshots with 0 values)
         for account in account_intelligence:
