@@ -1779,18 +1779,21 @@ def api_company_nps():
         # Group by company
         base_query = base_query.group_by(func.upper(SurveyResponse.company_name))
         
+        # Create subquery once
+        company_stats_subq = base_query.subquery()
+        
         # Step 4: Join with latest churn risk (LEFT JOIN to handle companies without churn risk)
         company_query = db.session.query(
-            base_query.subquery().c.company_name,
-            base_query.subquery().c.total_responses,
-            base_query.subquery().c.avg_nps,
-            base_query.subquery().c.latest_response,
-            base_query.subquery().c.promoters,
-            base_query.subquery().c.detractors,
+            company_stats_subq.c.company_name,
+            company_stats_subq.c.total_responses,
+            company_stats_subq.c.avg_nps,
+            company_stats_subq.c.latest_response,
+            company_stats_subq.c.promoters,
+            company_stats_subq.c.detractors,
             latest_churn.c.latest_churn_risk
-        ).outerjoin(
+        ).select_from(company_stats_subq).outerjoin(
             latest_churn,
-            base_query.subquery().c.company_upper == latest_churn.c.company_upper
+            company_stats_subq.c.company_upper == latest_churn.c.company_upper
         )
         
         # Get all results in ONE QUERY
@@ -1908,7 +1911,7 @@ def api_tenure_nps():
         ).subquery()
         
         # Step 3: Build main query with aggregations
-        base_query = db.session.query(
+        tenure_stats_subq = db.session.query(
             SurveyResponse.tenure_with_fc,
             func.count(SurveyResponse.id).label('total_responses'),
             func.avg(SurveyResponse.nps_score).label('avg_nps'),
@@ -1921,16 +1924,16 @@ def api_tenure_nps():
         
         # Step 4: Join with latest churn risk (LEFT JOIN to handle tenure groups without churn risk)
         tenure_query = db.session.query(
-            base_query.c.tenure_with_fc,
-            base_query.c.total_responses,
-            base_query.c.avg_nps,
-            base_query.c.latest_response,
-            base_query.c.promoters,
-            base_query.c.detractors,
+            tenure_stats_subq.c.tenure_with_fc,
+            tenure_stats_subq.c.total_responses,
+            tenure_stats_subq.c.avg_nps,
+            tenure_stats_subq.c.latest_response,
+            tenure_stats_subq.c.promoters,
+            tenure_stats_subq.c.detractors,
             latest_churn.c.latest_churn_risk
-        ).outerjoin(
+        ).select_from(tenure_stats_subq).outerjoin(
             latest_churn,
-            base_query.c.tenure_with_fc == latest_churn.c.tenure_with_fc
+            tenure_stats_subq.c.tenure_with_fc == latest_churn.c.tenure_with_fc
         )
         
         # Get all results in ONE QUERY
