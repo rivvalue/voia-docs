@@ -1811,12 +1811,28 @@ function normalizeTypeForVisual(originalType) {
 
 function populateAccountIntelligence() {
     const container = document.getElementById('accountIntelligence');
-    const accountData = dashboardData.account_intelligence || [];
+    let accountData = dashboardData.account_intelligence || [];
     
     if (accountData.length === 0) {
         container.innerHTML = '<p class="text-muted">No account intelligence data available.</p>';
         return;
     }
+    
+    // Enrich account data with NPS from company_nps_data (for old snapshots that don't have it)
+    const companyNpsData = dashboardData.company_nps_data || [];
+    const npsLookup = {};
+    companyNpsData.forEach(company => {
+        npsLookup[company.company_name.toUpperCase()] = company.company_nps;
+    });
+    
+    // Add NPS to each account if missing
+    accountData = accountData.map(account => {
+        if (account.company_nps === undefined || account.company_nps === null) {
+            const nps = npsLookup[account.company_name.toUpperCase()];
+            return { ...account, company_nps: nps !== undefined ? nps : null };
+        }
+        return account;
+    });
     
     // Create legend
     const legendHtml = `
