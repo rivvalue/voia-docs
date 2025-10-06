@@ -2801,7 +2801,8 @@ def get_company_responses(campaign_id, company_name):
                 'product_value_rating': response.product_value_rating,
                 'service_rating': response.service_rating,
                 'pricing_rating': response.pricing_rating,
-                'created_at': response.created_at.isoformat() if response.created_at else None
+                'created_at': response.created_at.isoformat() if response.created_at else None,
+                'campaign_participant_id': response.campaign_participant_id
             })
         
         # Calculate pagination metadata

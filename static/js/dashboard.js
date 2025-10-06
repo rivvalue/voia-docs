@@ -3793,14 +3793,29 @@ function renderCompanyResponsesTable(responses) {
         }
         row.appendChild(dateCell);
         
-        // Action - Link to full response
+        // Action - Link to full response (respecting authentication rules)
         const actionCell = document.createElement('td');
         actionCell.style.textAlign = 'center';
-        actionCell.innerHTML = `
-            <a href="/response/${response.id}" class="btn btn-sm btn-outline-primary" target="_blank" title="View Full Response">
-                <i class="fas fa-external-link-alt"></i>
-            </a>
-        `;
+        
+        // Check if this is a trial response (campaign_participant_id is null) or business response
+        const isTrialResponse = response.campaign_participant_id === null || response.campaign_participant_id === undefined;
+        
+        if (isTrialResponse) {
+            // Trial response - allow public access
+            actionCell.innerHTML = `
+                <a href="/survey-response/${response.id}" class="btn btn-sm btn-outline-primary" title="View Full Response">
+                    <i class="fas fa-eye"></i>
+                </a>
+            `;
+        } else {
+            // Business response - authentication required
+            actionCell.innerHTML = `
+                <span class="text-muted" title="Business response - authentication required">
+                    <i class="fas fa-lock"></i>
+                </span>
+            `;
+        }
+        
         row.appendChild(actionCell);
         
         tbody.appendChild(row);
