@@ -2844,6 +2844,17 @@ def get_company_responses(campaign_id, company_name):
             if campaign.anonymize_responses:
                 response_data = anonymize_response_data(campaign, response_data)
             
+            # Determine if current user can view this response
+            if current_business_user:
+                # Business user can view all responses from their campaigns
+                can_view = True
+            elif response.campaign_participant_id is None:
+                # Public user can view trial responses only
+                can_view = True
+            else:
+                # Public user cannot view business responses
+                can_view = False
+            
             response_list.append({
                 'id': response.id,
                 'respondent_name': response_data['respondent_name'],
@@ -2853,7 +2864,8 @@ def get_company_responses(campaign_id, company_name):
                 'service_rating': response.service_rating,
                 'pricing_rating': response.pricing_rating,
                 'created_at': response.created_at.isoformat() if response.created_at else None,
-                'campaign_participant_id': response.campaign_participant_id
+                'campaign_participant_id': response.campaign_participant_id,
+                'can_view': can_view
             })
         
         # Calculate pagination metadata
