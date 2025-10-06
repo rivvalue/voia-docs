@@ -2012,6 +2012,119 @@ def api_tenure_nps():
         logger.error(f"Error getting tenure NPS data: {e}")
         return jsonify({'error': 'Failed to get tenure NPS data'}), 500
 
+@app.route('/api/account_intelligence')
+@rate_limit(limit=100)
+def api_account_intelligence():
+    """API endpoint for Account Intelligence with pagination, search, and filtering"""
+    try:
+        from data_storage import get_dashboard_data
+        
+        # Get pagination and filter parameters
+        page = request.args.get('page', 1, type=int)
+        per_page = min(request.args.get('per_page', 10, type=int), 100)
+        search_query = request.args.get('search', '').strip().lower()
+        balance_filter = request.args.get('balance', '').strip().lower()
+        risk_level_filter = request.args.get('risk_level', '').strip().lower()
+        has_opportunities = request.args.get('has_opportunities', '').strip().lower()
+        has_risks = request.args.get('has_risks', '').strip().lower()
+        min_responses = request.args.get('min_responses', type=int)
+        
+        # Get campaign filter (for multi-tenant support)
+        campaign_id = request.args.get('campaign', type=int)
+        
+        # Get dashboard data which includes account_intelligence
+        dashboard_data = get_dashboard_data(campaign_id=campaign_id)
+        all_accounts = dashboard_data.get('account_intelligence', [])
+        
+        # Apply filters
+        filtered_accounts = []
+        for account in all_accounts:
+            # Search filter - search company name, opportunities, and risk factors
+            if search_query:
+                company_match = search_query in account.get('company_name', '').lower()
+                
+                # Search in opportunities
+                opp_match = any(
+                    search_query in opp.get('type', '').lower()
+                    for opp in account.get('opportunities', [])
+                )
+                
+                # Search in risk factors
+                risk_match = any(
+                    search_query in risk.get('type', '').lower()
+                    for risk in account.get('risk_factors', [])
+                )
+                
+                if not (company_match or opp_match or risk_match):
+                    continue
+            
+            # Balance filter
+            if balance_filter and account.get('balance') != balance_filter:
+                continue
+            
+            # Risk level filter (based on critical_risks count)
+            if risk_level_filter:
+                critical_count = account.get('critical_risks', 0)
+                if risk_level_filter == 'critical' and critical_count == 0:
+                    continue
+                elif risk_level_filter == 'high' and critical_count < 2:
+                    continue
+                elif risk_level_filter == 'medium' and (critical_count > 1 or account.get('risk_count', 0) == 0):
+                    continue
+                elif risk_level_filter == 'low' and account.get('risk_count', 0) > 0:
+                    continue
+            
+            # Has opportunities filter
+            if has_opportunities == 'yes' and account.get('opportunity_count', 0) == 0:
+                continue
+            elif has_opportunities == 'no' and account.get('opportunity_count', 0) > 0:
+                continue
+            
+            # Has risks filter
+            if has_risks == 'yes' and account.get('risk_count', 0) == 0:
+                continue
+            elif has_risks == 'no' and account.get('risk_count', 0) > 0:
+                continue
+            
+            # Minimum responses filter (if applicable)
+            # Note: current structure doesn't have response count per company, skip for now
+            
+            filtered_accounts.append(account)
+        
+        # Apply pagination
+        total_accounts = len(filtered_accounts)
+        start_idx = (page - 1) * per_page
+        end_idx = start_idx + per_page
+        paginated_accounts = filtered_accounts[start_idx:end_idx]
+        
+        # Calculate pagination info
+        total_pages = (total_accounts + per_page - 1) // per_page if total_accounts > 0 else 1
+        has_prev = page > 1
+        has_next = page < total_pages
+        
+        return jsonify({
+            'success': True,
+            'data': paginated_accounts,
+            'pagination': {
+                'page': page,
+                'per_page': per_page,
+                'total': total_accounts,
+                'pages': total_pages,
+                'has_prev': has_prev,
+                'has_next': has_next
+            },
+            'filters_applied': {
+                'search': search_query if search_query else None,
+                'balance': balance_filter if balance_filter else None,
+                'risk_level': risk_level_filter if risk_level_filter else None,
+                'has_opportunities': has_opportunities if has_opportunities else None,
+                'has_risks': has_risks if has_risks else None
+            }
+        })
+    except Exception as e:
+        logger.error(f"Error getting account intelligence data: {e}")
+        return jsonify({'error': 'Failed to get account intelligence data'}), 500
+
 # Conversational Survey Routes
 @app.route('/conversational_survey')
 def conversational_survey():
