@@ -275,15 +275,29 @@ def get_dashboard_data(campaign_id=None):
             else:
                 max_risk_level = 'Medium'  # Fallback
             
-            # Calculate averages for scores
+            # Calculate average risk score from high-risk responses
             avg_risk_score = sum(company_data['risk_scores']) / len(company_data['risk_scores']) if company_data['risk_scores'] else 0
-            avg_nps_score = sum(company_data['nps_scores']) / len(company_data['nps_scores']) if company_data['nps_scores'] else 0
+            
+            # Calculate TRUE company NPS from ALL responses in this campaign (not just high-risk ones)
+            company_all_responses_query = SurveyResponse.query.filter(
+                func.upper(SurveyResponse.company_name) == company_key
+            )
+            if campaign_id:
+                company_all_responses_query = company_all_responses_query.filter(SurveyResponse.campaign_id == campaign_id)
+            
+            company_all_responses = company_all_responses_query.all()
+            
+            # Calculate company NPS properly: (Promoters - Detractors) / Total * 100
+            total_company_responses = len(company_all_responses)
+            promoters = sum(1 for r in company_all_responses if r.nps_score >= 9)
+            detractors = sum(1 for r in company_all_responses if r.nps_score <= 6)
+            company_nps = round(((promoters - detractors) / total_company_responses) * 100) if total_company_responses > 0 else 0
             
             high_risk_accounts.append({
                 'company_name': company_data['company_name'],
                 'risk_level': max_risk_level,
                 'risk_score': round(avg_risk_score, 2),
-                'nps_score': round(avg_nps_score, 1),
+                'nps_score': company_nps,
                 'respondent_count': company_data['respondent_count'],
                 'latest_response': company_data['latest_response']
             })
