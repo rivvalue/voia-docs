@@ -66,59 +66,56 @@
     <div class="loading-text">Loading dashboard data...</div>
 </div>
 
-<!-- Dashboard content -->
-<div class="d-none" id="dashboardContent">
-    <!-- Two-Tier Navigation -->
-    <div class="two-tier-navigation mb-4">
-        <!-- Primary Navigation -->
-        <ul class="nav nav-pills primary-nav mb-3" id="primaryNavigation" role="tablist" style="font-family: var(--font-family-headings);">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="insights-primary" data-primary-target="insights" type="button" role="tab" onclick="switchPrimarySection('insights')">
-                    <i class="fas fa-chart-bar me-2"></i>INSIGHTS
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="admin-primary" data-primary-target="admin" type="button" role="tab" onclick="switchPrimarySection('admin')">
-                    <i class="fas fa-shield-alt me-2"></i>ADMIN
-                </button>
-            </li>
-        </ul>
-        
-        <!-- Secondary Navigation - Insights -->
-        <div id="insightsSection">
-            <!-- Campaign Analytics Filter (Only for Insights) -->
-            <div class="row mb-3">
-                <div class="col-12">
-                    <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);">
-                        <div class="card-body py-3">
-                            <div class="row align-items-center">
-                                <div class="col-md-6">
-                                    <h6 class="mb-0"><i class="fas fa-filter me-2 text-primary"></i>Campaign Analytics Filter</h6>
-                                    <small class="text-muted">Compare KPIs across different campaigns</small>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="d-flex gap-2 align-items-center flex-wrap">
-                                        <label for="campaignFilter" class="form-label mb-0 me-2">Campaign:</label>
-                                        <select class="form-select flex-grow-1" id="campaignFilter" onchange="applyCampaignFilter()" style="max-width: 300px;">
-                                            <option value="">Select Campaign</option>
-                                            <!-- Will be populated by JavaScript -->
-                                        </select>
-                                        <button class="btn btn-outline-secondary btn-sm" onclick="clearCampaignFilter()" title="Clear Filter">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                        
-                                        <!-- Inline Campaign Info Badges -->
-                                        <div id="selectedCampaignInfo" class="d-flex gap-2 align-items-center" style="display: none;">
-                                            <span class="badge bg-light text-dark border" id="selectedCampaignDates">
-                                                <i class="fas fa-calendar-alt me-1"></i><span class="campaign-dates-text"></span>
-                                            </span>
-                                            <span class="badge" id="selectedCampaignStatus">
-                                                <span class="campaign-status-text"></span>
-                                            </span>
-                                            <span class="badge bg-info" id="selectedCampaignDaysLeft" style="display: none;">
-                                                <i class="fas fa-clock me-1"></i><span class="campaign-days-text"></span>
-                                            </span>
-                                        </div>
+<!-- Campaign Filter - Always Visible (like hero banner) -->
+<div class="two-tier-navigation mb-4">
+    <!-- Primary Navigation -->
+    <ul class="nav nav-pills primary-nav mb-3" id="primaryNavigation" role="tablist" style="font-family: var(--font-family-headings);">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="insights-primary" data-primary-target="insights" type="button" role="tab" onclick="switchPrimarySection('insights')">
+                <i class="fas fa-chart-bar me-2"></i>INSIGHTS
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="admin-primary" data-primary-target="admin" type="button" role="tab" onclick="switchPrimarySection('admin')">
+                <i class="fas fa-shield-alt me-2"></i>ADMIN
+            </button>
+        </li>
+    </ul>
+    
+    <!-- Secondary Navigation - Insights -->
+    <div id="insightsSection">
+        <!-- Campaign Analytics Filter (Only for Insights) -->
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);">
+                    <div class="card-body py-3">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <h6 class="mb-0"><i class="fas fa-filter me-2 text-primary"></i>Campaign Analytics Filter</h6>
+                                <small class="text-muted">Compare KPIs across different campaigns</small>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex gap-2 align-items-center flex-wrap">
+                                    <label for="campaignFilter" class="form-label mb-0 me-2">Campaign:</label>
+                                    <select class="form-select flex-grow-1" id="campaignFilter" onchange="applyCampaignFilter()" style="max-width: 300px;">
+                                        <option value="">Select Campaign</option>
+                                        <!-- Will be populated by JavaScript -->
+                                    </select>
+                                    <button class="btn btn-outline-secondary btn-sm" onclick="clearCampaignFilter()" title="Clear Filter">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    
+                                    <!-- Inline Campaign Info Badges -->
+                                    <div id="selectedCampaignInfo" class="d-flex gap-2 align-items-center" style="display: none;">
+                                        <span class="badge bg-light text-dark border" id="selectedCampaignDates">
+                                            <i class="fas fa-calendar-alt me-1"></i><span class="campaign-dates-text"></span>
+                                        </span>
+                                        <span class="badge" id="selectedCampaignStatus">
+                                            <span class="campaign-status-text"></span>
+                                        </span>
+                                        <span class="badge bg-info" id="selectedCampaignDaysLeft" style="display: none;">
+                                            <i class="fas fa-clock me-1"></i><span class="campaign-days-text"></span>
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -126,6 +123,7 @@
                     </div>
                 </div>
             </div>
+        </div>
             
             <ul class="nav nav-tabs secondary-nav" id="insightsSecondaryNav" role="tablist" style="font-family: var(--font-family-headings); border-bottom: 2px solid var(--medium-gray);">
                 <li class="nav-item" role="presentation">
@@ -167,8 +165,10 @@
         </ul>
     </div>
 
-    <!-- Tab Content -->
-    <div class="tab-content" id="dashboardTabContent">
+    <!-- Dashboard Content (toggles during loading) -->
+    <div class="d-none" id="dashboardContent">
+        <!-- Tab Content -->
+        <div class="tab-content" id="dashboardTabContent">
         <!-- Overview Tab -->
         <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
             <!-- Active Campaign Banner -->
@@ -906,12 +906,12 @@
                 </div>
             </div>
         </div>
+        </div>
+        <!-- End Tab Content -->
     </div>
+    <!-- End Dashboard Content -->
 </div>
-
-
-    </div>
-</div>
+<!-- End Dashboard Column -->
 {% endblock %}
 
 {% block scripts %}
