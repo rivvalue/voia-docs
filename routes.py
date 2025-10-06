@@ -1878,25 +1878,118 @@ def api_company_trends():
 @app.route('/api/tenure_nps')
 @rate_limit(limit=100)
 def api_tenure_nps():
-    """API endpoint for tenure-segregated NPS data with pagination"""
+    """API endpoint for tenure-segregated NPS data with pagination - OPTIMIZED to eliminate N+1 queries"""
     try:
-        from data_storage import get_tenure_nps_data
+        from models import SurveyResponse
+        from sqlalchemy import func
         
         # Get pagination parameters
         page = request.args.get('page', 1, type=int)
         per_page = min(request.args.get('per_page', 10, type=int), 100)  # Max 100 per page
         
-        # Get all tenure data
-        all_tenure_data = get_tenure_nps_data()
-        total_tenure_groups = len(all_tenure_data)
+        # Step 1: Create subquery to get latest churn risk per tenure group (SINGLE QUERY)
+        latest_churn_subquery = db.session.query(
+            SurveyResponse.tenure_with_fc,
+            SurveyResponse.churn_risk_level,
+            func.row_number().over(
+                partition_by=SurveyResponse.tenure_with_fc,
+                order_by=SurveyResponse.created_at.desc()
+            ).label('rn')
+        ).filter(
+            SurveyResponse.tenure_with_fc.isnot(None)
+        ).subquery()
         
-        # Calculate pagination
+        # Step 2: Filter to get only latest (rn=1) records
+        latest_churn = db.session.query(
+            latest_churn_subquery.c.tenure_with_fc,
+            latest_churn_subquery.c.churn_risk_level.label('latest_churn_risk')
+        ).filter(
+            latest_churn_subquery.c.rn == 1
+        ).subquery()
+        
+        # Step 3: Build main query with aggregations
+        base_query = db.session.query(
+            SurveyResponse.tenure_with_fc,
+            func.count(SurveyResponse.id).label('total_responses'),
+            func.avg(SurveyResponse.nps_score).label('avg_nps'),
+            func.max(SurveyResponse.created_at).label('latest_response'),
+            func.count(func.nullif(SurveyResponse.nps_score >= 9, False)).label('promoters'),
+            func.count(func.nullif(SurveyResponse.nps_score <= 6, False)).label('detractors')
+        ).filter(
+            SurveyResponse.tenure_with_fc.isnot(None)
+        ).group_by(SurveyResponse.tenure_with_fc).subquery()
+        
+        # Step 4: Join with latest churn risk (LEFT JOIN to handle tenure groups without churn risk)
+        tenure_query = db.session.query(
+            base_query.c.tenure_with_fc,
+            base_query.c.total_responses,
+            base_query.c.avg_nps,
+            base_query.c.latest_response,
+            base_query.c.promoters,
+            base_query.c.detractors,
+            latest_churn.c.latest_churn_risk
+        ).outerjoin(
+            latest_churn,
+            base_query.c.tenure_with_fc == latest_churn.c.tenure_with_fc
+        )
+        
+        # Get all results in ONE QUERY
+        tenure_stats = tenure_query.all()
+        
+        # Process results
+        tenure_nps_list = []
+        for tenure in tenure_stats:
+            total = tenure.total_responses
+            promoters = tenure.promoters or 0
+            detractors = tenure.detractors or 0
+            
+            # Calculate tenure NPS score
+            tenure_nps = round(((promoters - detractors) / total) * 100) if total > 0 else 0
+            
+            # Determine risk level based on NPS and sample size
+            if total < 2:
+                risk_level = "Insufficient Data"
+            elif tenure_nps <= -50:
+                risk_level = "Critical"
+            elif tenure_nps <= -20:
+                risk_level = "High"
+            elif tenure_nps <= 20:
+                risk_level = "Medium"
+            else:
+                risk_level = "Low"
+            
+            tenure_nps_list.append({
+                'tenure_group': tenure.tenure_with_fc,
+                'total_responses': total,
+                'avg_nps': round(tenure.avg_nps, 1) if tenure.avg_nps else 0,
+                'tenure_nps': tenure_nps,
+                'promoters': promoters,
+                'detractors': detractors,
+                'passives': total - promoters - detractors,
+                'risk_level': risk_level,
+                'latest_response': tenure.latest_response.strftime('%Y-%m-%d') if tenure.latest_response else None,
+                'latest_churn_risk': tenure.latest_churn_risk
+            })
+        
+        # Sort by tenure order (logical progression from new to long-term customers)
+        tenure_order = {
+            "Less than 1 year": 0,
+            "1-2 years": 1, 
+            "2-3 years": 2,
+            "3-5 years": 3,
+            "5-10 years": 4,
+            "More than 10 years": 5
+        }
+        tenure_nps_list.sort(key=lambda x: tenure_order.get(x['tenure_group'], 6))
+        
+        # Apply pagination
+        total_tenure_groups = len(tenure_nps_list)
         start_idx = (page - 1) * per_page
         end_idx = start_idx + per_page
-        tenure_data = all_tenure_data[start_idx:end_idx]
+        tenure_data = tenure_nps_list[start_idx:end_idx]
         
         # Calculate pagination info
-        total_pages = (total_tenure_groups + per_page - 1) // per_page
+        total_pages = (total_tenure_groups + per_page - 1) // per_page if total_tenure_groups > 0 else 1
         has_prev = page > 1
         has_next = page < total_pages
         
