@@ -1102,9 +1102,32 @@ def public_survey_response(response_id):
         # Get the survey response by ID
         response = SurveyResponse.query.get_or_404(response_id)
         
-        # Security check: Only allow access to trial responses (campaign_participant_id IS NULL)
+        # Security check: Check if user is authenticated as business user first
+        current_business_user = get_current_business_user()
+        if current_business_user and response.campaign_participant_id is not None:
+            # Business user trying to access a business response - verify ownership
+            if response.campaign and response.campaign.business_account_id == current_business_user.business_account_id:
+                # Business user owns this campaign - grant access
+                logger.info(f"Business user {current_business_user.email} granted access to response {response_id}")
+                response_data = response.to_dict()
+                
+                # Get business account branding
+                from business_auth_routes import get_current_business_account
+                current_account = get_current_business_account()
+                branding = get_branding_context(current_account)
+                
+                return render_template('public_survey_response.html', 
+                                     response=response_data,
+                                     branding=branding)
+            else:
+                # Business user doesn't own this campaign
+                logger.warning(f"Business user {current_business_user.email} denied access to response {response_id} - not their campaign")
+                flash('You do not have permission to view this survey response.', 'error')
+                return redirect(url_for('business_auth.business_analytics'))
+        
+        # Check if this is a trial response (public access allowed)
         if response.campaign_participant_id is not None:
-            # This is a business response - redirect to login
+            # This is a business response and user is not authenticated - redirect to login
             logger.warning(f"Access denied to business response {response_id} - redirecting to login")
             flash('This survey response requires authentication. Please log in to view.', 'info')
             return redirect(url_for('business_auth.login'))
