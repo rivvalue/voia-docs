@@ -1727,6 +1727,7 @@ def api_company_nps():
         per_page = min(request.args.get('per_page', 10, type=int), 100)  # Max 100 per page
         search_query = request.args.get('search', '').strip()
         nps_category = request.args.get('nps_category', '').strip().lower()
+        campaign_id = request.args.get('campaign', type=int)
         
         # Step 1: Create subquery to get latest churn risk per company (SINGLE QUERY)
         latest_churn_subquery = db.session.query(
@@ -1738,7 +1739,12 @@ def api_company_nps():
             ).label('rn')
         ).filter(
             SurveyResponse.company_name.isnot(None)
-        ).subquery()
+        )
+        
+        if campaign_id:
+            latest_churn_subquery = latest_churn_subquery.filter(SurveyResponse.campaign_id == campaign_id)
+        
+        latest_churn_subquery = latest_churn_subquery.subquery()
         
         # Step 2: Filter to get only latest (rn=1) records
         latest_churn = db.session.query(
@@ -1760,6 +1766,10 @@ def api_company_nps():
         ).filter(
             SurveyResponse.company_name.isnot(None)
         )
+        
+        # Apply campaign filter (CRITICAL: NPS must be campaign-specific)
+        if campaign_id:
+            base_query = base_query.filter(SurveyResponse.campaign_id == campaign_id)
         
         # Apply search filter at database level
         if search_query:
@@ -1889,6 +1899,7 @@ def api_tenure_nps():
         # Get pagination parameters
         page = request.args.get('page', 1, type=int)
         per_page = min(request.args.get('per_page', 10, type=int), 100)  # Max 100 per page
+        campaign_id = request.args.get('campaign', type=int)
         
         # Step 1: Create subquery to get latest churn risk per tenure group (SINGLE QUERY)
         latest_churn_subquery = db.session.query(
@@ -1900,7 +1911,12 @@ def api_tenure_nps():
             ).label('rn')
         ).filter(
             SurveyResponse.tenure_with_fc.isnot(None)
-        ).subquery()
+        )
+        
+        if campaign_id:
+            latest_churn_subquery = latest_churn_subquery.filter(SurveyResponse.campaign_id == campaign_id)
+        
+        latest_churn_subquery = latest_churn_subquery.subquery()
         
         # Step 2: Filter to get only latest (rn=1) records
         latest_churn = db.session.query(
@@ -1911,7 +1927,7 @@ def api_tenure_nps():
         ).subquery()
         
         # Step 3: Build main query with aggregations
-        tenure_stats_subq = db.session.query(
+        tenure_stats_query = db.session.query(
             SurveyResponse.tenure_with_fc,
             func.count(SurveyResponse.id).label('total_responses'),
             func.avg(SurveyResponse.nps_score).label('avg_nps'),
@@ -1920,7 +1936,13 @@ def api_tenure_nps():
             func.count(func.nullif(SurveyResponse.nps_score <= 6, False)).label('detractors')
         ).filter(
             SurveyResponse.tenure_with_fc.isnot(None)
-        ).group_by(SurveyResponse.tenure_with_fc).subquery()
+        )
+        
+        # Apply campaign filter (CRITICAL: NPS must be campaign-specific)
+        if campaign_id:
+            tenure_stats_query = tenure_stats_query.filter(SurveyResponse.campaign_id == campaign_id)
+        
+        tenure_stats_subq = tenure_stats_query.group_by(SurveyResponse.tenure_with_fc).subquery()
         
         # Step 4: Join with latest churn risk (LEFT JOIN to handle tenure groups without churn risk)
         tenure_query = db.session.query(
