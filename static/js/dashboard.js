@@ -611,14 +611,33 @@ function populateExecutiveSummary(data) {
 
 // Store comparison data globally for filtering
 let currentComparisonData = null;
+let currentComparisonPage = 1;
+const comparisonPerPage = 10;
 
-// Populate company comparison table
-function populateCompanyComparison(data) {
+// Populate company comparison table with pagination
+function populateCompanyComparison(data, page = 1) {
     const tableBody = document.getElementById('companyTable');
     if (!tableBody) return;
     
+    const companies = data.company_details || [];
+    const totalCompanies = companies.length;
+    const totalPages = Math.ceil(totalCompanies / comparisonPerPage);
+    const startIndex = (page - 1) * comparisonPerPage;
+    const endIndex = startIndex + comparisonPerPage;
+    const paginatedCompanies = companies.slice(startIndex, endIndex);
+    
+    // Update pagination info and controls
+    updateComparisonPaginationInfo(page, totalPages, totalCompanies);
+    updateComparisonPaginationControls({
+        page: page,
+        pages: totalPages,
+        total: totalCompanies,
+        has_prev: page > 1,
+        has_next: page < totalPages
+    });
+    
     let tableHTML = '';
-    data.company_details.forEach(company => {
+    paginatedCompanies.forEach(company => {
         const c1 = company.campaign1;
         const c2 = company.campaign2;
         
@@ -678,6 +697,9 @@ function searchComparisonTable() {
     const searchQuery = document.getElementById('comparisonSearch')?.value.trim().toLowerCase() || '';
     const balanceFilter = document.getElementById('comparisonBalanceFilter')?.value || '';
     
+    // Reset to page 1 when performing a new search
+    currentComparisonPage = 1;
+    
     // Filter company details
     const filteredData = {
         ...currentComparisonData,
@@ -695,8 +717,8 @@ function searchComparisonTable() {
         })
     };
     
-    // Update table
-    populateCompanyComparison(filteredData);
+    // Update table with pagination
+    populateCompanyComparison(filteredData, currentComparisonPage);
     
     // Update search info
     let infoText = '';
@@ -733,9 +755,95 @@ function clearComparisonSearch() {
         infoElement.textContent = '';
     }
     
-    // Reload original data
+    // Reset to page 1 and reload original data
+    currentComparisonPage = 1;
     if (currentComparisonData) {
-        populateCompanyComparison(currentComparisonData);
+        populateCompanyComparison(currentComparisonData, 1);
+    }
+}
+
+// Update comparison pagination info
+function updateComparisonPaginationInfo(currentPage, totalPages, totalItems) {
+    const info = document.getElementById('comparisonPaginationInfo');
+    if (!info) return;
+    
+    if (totalItems === 0) {
+        info.textContent = 'No companies found';
+    } else {
+        const startItem = (currentPage - 1) * comparisonPerPage + 1;
+        const endItem = Math.min(currentPage * comparisonPerPage, totalItems);
+        info.textContent = `Showing ${startItem}-${endItem} of ${totalItems} companies`;
+    }
+}
+
+// Update comparison pagination controls
+function updateComparisonPaginationControls(pagination) {
+    const controls = document.getElementById('comparisonPaginationControls');
+    
+    if (!controls) {
+        return;
+    }
+    
+    if (!pagination || pagination.pages <= 1) {
+        controls.innerHTML = '';
+        return;
+    }
+    
+    let html = '';
+    
+    // Previous button
+    if (pagination.has_prev) {
+        html += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="loadComparisonPage(${pagination.page - 1}); return false;">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+            </li>
+        `;
+    } else {
+        html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-left"></i></span></li>';
+    }
+    
+    // Page numbers with smart ellipsis
+    const pages = generatePaginationPages(pagination.page, pagination.pages);
+    for (const pageNum of pages) {
+        if (pageNum === null) {
+            html += '<li class="page-item disabled"><span class="page-link">…</span></li>';
+        } else if (pageNum === pagination.page) {
+            html += `<li class="page-item active"><span class="page-link">${pageNum}</span></li>`;
+        } else {
+            html += `<li class="page-item"><a class="page-link" href="#" onclick="loadComparisonPage(${pageNum}); return false;">${pageNum}</a></li>`;
+        }
+    }
+    
+    // Next button
+    if (pagination.has_next) {
+        html += `
+            <li class="page-item">
+                <a class="page-link" href="#" onclick="loadComparisonPage(${pagination.page + 1}); return false;">
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </li>
+        `;
+    } else {
+        html += '<li class="page-item disabled"><span class="page-link"><i class="fas fa-chevron-right"></i></span></li>';
+    }
+    
+    controls.innerHTML = html;
+}
+
+// Load comparison page
+function loadComparisonPage(page) {
+    currentComparisonPage = page;
+    
+    // If there's an active search/filter, apply it with new page
+    const searchQuery = document.getElementById('comparisonSearch')?.value.trim().toLowerCase() || '';
+    const balanceFilter = document.getElementById('comparisonBalanceFilter')?.value || '';
+    
+    if (searchQuery || balanceFilter) {
+        searchComparisonTable();
+    } else if (currentComparisonData) {
+        populateCompanyComparison(currentComparisonData, page);
     }
 }
 
