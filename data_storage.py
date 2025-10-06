@@ -843,6 +843,20 @@ def convert_snapshot_to_dashboard_format(snapshot):
         
         # Return comprehensive dashboard data from snapshot
         
+        # Enrich account_intelligence with company_nps if missing (for old snapshots)
+        account_intelligence = json.loads(snapshot.account_intelligence) if snapshot.account_intelligence else []
+        company_nps_data = json.loads(snapshot.company_nps_breakdown) if snapshot.company_nps_breakdown else []
+        
+        # Build NPS lookup for enrichment
+        nps_lookup = {company['company_name'].upper(): company['company_nps'] 
+                     for company in company_nps_data if 'company_name' in company and 'company_nps' in company}
+        
+        # Enrich accounts that don't have company_nps
+        for account in account_intelligence:
+            if 'company_nps' not in account or account['company_nps'] is None:
+                company_key = account.get('company_name', '').upper()
+                account['company_nps'] = nps_lookup.get(company_key, 0)
+        
         return {
             'total_responses': snapshot.total_responses,
             'total_companies': snapshot.total_companies,
@@ -851,10 +865,10 @@ def convert_snapshot_to_dashboard_format(snapshot):
             'nps_distribution': nps_distribution,
             'sentiment_distribution': sentiment_distribution,
             'high_risk_accounts': json.loads(snapshot.high_risk_accounts) if snapshot.high_risk_accounts else [],
-            'account_intelligence': json.loads(snapshot.account_intelligence) if snapshot.account_intelligence else [],
+            'account_intelligence': account_intelligence,
             'growth_opportunities': json.loads(snapshot.growth_opportunities_analysis) if snapshot.growth_opportunities_analysis else {},
             'account_risk_factors': json.loads(snapshot.account_risk_factors_analysis) if snapshot.account_risk_factors_analysis else {},
-            'company_nps_data': json.loads(snapshot.company_nps_breakdown) if snapshot.company_nps_breakdown else [],
+            'company_nps_data': company_nps_data,
             'tenure_nps_data': json.loads(snapshot.tenure_analysis) if snapshot.tenure_analysis else [],
             'key_themes': key_themes,
             'average_ratings': average_ratings,

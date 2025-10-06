@@ -2082,8 +2082,6 @@ function loadAccountIntelligence(page = 1) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                console.log('📊 Account Intelligence API Response:', data.data.slice(0, 2));
-                console.log('📊 First account NPS:', data.data[0]?.company_nps);
                 accountIntelCurrentPage = page;
                 renderAccountIntelligence(data.data, data.pagination);
                 updateAccountIntelFiltersUI(data.pagination.total, data.filters_applied);
