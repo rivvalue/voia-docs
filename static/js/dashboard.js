@@ -1037,8 +1037,8 @@ function populateDashboard() {
     // Populate high risk accounts
     populateHighRiskAccounts();
     
-    // Populate unified account intelligence
-    populateAccountIntelligence();
+    // Populate unified account intelligence via API (with pagination, search, filtering)
+    loadAccountIntelligence();
     
     // Load KPI overview data (Executive Summary)
     loadKpiOverview();
@@ -2010,6 +2010,308 @@ function populateAccountIntelligence() {
             }
         });
     }, 100);
+}
+
+// Account Intelligence API-based pagination, search, and filtering
+let accountIntelCurrentPage = 1;
+let accountIntelSearchTimeout = null;
+
+function loadAccountIntelligence(page = 1) {
+    const search = document.getElementById('accountIntelSearch')?.value || '';
+    const balance = document.getElementById('accountBalanceFilter')?.value || '';
+    const riskLevel = document.getElementById('accountRiskFilter')?.value || '';
+    const hasOpp = document.getElementById('accountOppFilter')?.value || '';
+    const hasRisks = document.getElementById('accountRisksFilter')?.value || '';
+    
+    // Build query params
+    const params = new URLSearchParams({
+        page: page,
+        per_page: 10
+    });
+    
+    if (search) params.append('search', search);
+    if (balance) params.append('balance', balance);
+    if (riskLevel) params.append('risk_level', riskLevel);
+    if (hasOpp) params.append('has_opportunities', hasOpp);
+    if (hasRisks) params.append('has_risks', hasRisks);
+    
+    // Get current campaign if set
+    const campaignSelect = document.getElementById('campaignFilter');
+    if (campaignSelect && campaignSelect.value) {
+        params.append('campaign', campaignSelect.value);
+    }
+    
+    // Show loading
+    const container = document.getElementById('accountIntelligence');
+    container.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+    
+    fetch(`/api/account_intelligence?${params}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                accountIntelCurrentPage = page;
+                renderAccountIntelligence(data.data, data.pagination);
+                updateAccountIntelFiltersUI(data.pagination.total, data.filters_applied);
+            } else {
+                container.innerHTML = '<div class="alert alert-danger">Error loading account intelligence</div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading account intelligence:', error);
+            container.innerHTML = '<div class="alert alert-danger">Error: ' + error.message + '</div>';
+        });
+}
+
+function renderAccountIntelligence(accountData, pagination) {
+    const container = document.getElementById('accountIntelligence');
+    
+    if (accountData.length === 0) {
+        container.innerHTML = '<p class="text-muted">No accounts match the selected filters.</p>';
+        document.getElementById('accountIntelPaginationContainer').style.display = 'none';
+        return;
+    }
+    
+    // Create legend (same as before)
+    const legendHtml = `
+        <div class="account-health-legend mb-4 p-3 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="text-success mb-2">Growth Opportunities</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-light text-dark">Upsell</span>
+                        <span class="badge bg-light text-dark">Cross-sell</span>
+                        <span class="badge bg-light text-dark">Referral</span>
+                        <span class="badge bg-light text-dark">Advocacy</span>
+                        <span class="badge bg-light text-dark">High NPS</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h6 class="text-danger mb-2">Risk Factors</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-light text-dark">Pricing</span>
+                        <span class="badge bg-light text-dark">Product</span>
+                        <span class="badge bg-light text-dark">Service</span>
+                        <span class="badge bg-light text-dark">Low NPS</span>
+                        <span class="badge bg-light text-dark">Critical</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Render accounts (reuse existing rendering logic)
+    const accountsHtml = accountData.map(account => {
+        const balanceClass = account.balance === 'risk_heavy' ? 'border-danger' : 
+                           account.balance === 'opportunity_heavy' ? 'border-secondary' : 'border-secondary';
+        
+        const balanceIcon = '●';
+        const balanceIconColor = account.balance === 'risk_heavy' ? '#E13A44' : 
+                               account.balance === 'opportunity_heavy' ? '#8A8A8A' : '#BDBDBD';
+        
+        const balanceLabel = account.balance === 'risk_heavy' ? 'Risk-Heavy' : 
+                           account.balance === 'opportunity_heavy' ? 'High Potential' : 'Balanced';
+        
+        // Consolidate opportunities
+        const opportunityMap = new Map();
+        account.opportunities.forEach(opp => {
+            const normalizedType = normalizeTypeForVisual(opp.type);
+            if (opportunityMap.has(normalizedType)) {
+                opportunityMap.get(normalizedType).count += (opp.count || 1);
+            } else {
+                opportunityMap.set(normalizedType, {
+                    type: opp.type,
+                    normalizedType: normalizedType,
+                    count: opp.count || 1
+                });
+            }
+        });
+        
+        const opportunityIndicators = Array.from(opportunityMap.values()).map(opp => {
+            const visual = getVisualIndicator(opp.normalizedType, 'opportunity');
+            return `
+                <span class="visual-indicator opportunity-indicator" 
+                      style="background-color: ${visual.color}20; border: 2px solid ${visual.color}; padding: 4px 8px; margin: 2px; border-radius: 12px; display: inline-block;"
+                      title="${escapeHtml(opp.type)}${opp.count > 1 ? ` (${opp.count} opportunities)` : ''}">
+                    ${escapeHtml(visual.label)}${opp.count > 1 ? ` (${opp.count})` : ''}
+                </span>
+            `;
+        }).join('');
+        
+        // Consolidate risks
+        const riskMap = new Map();
+        account.risk_factors.forEach(risk => {
+            const normalizedType = normalizeTypeForVisual(risk.type);
+            if (riskMap.has(normalizedType)) {
+                riskMap.get(normalizedType).count += (risk.count || 1);
+                const severityPriority = { 'Critical': 4, 'High': 3, 'Medium': 2, 'Low': 1 };
+                if (severityPriority[risk.severity] > severityPriority[riskMap.get(normalizedType).severity]) {
+                    riskMap.get(normalizedType).severity = risk.severity;
+                }
+            } else {
+                riskMap.set(normalizedType, {
+                    type: risk.type,
+                    normalizedType: normalizedType,
+                    severity: risk.severity,
+                    count: risk.count || 1
+                });
+            }
+        });
+        
+        const riskIndicators = Array.from(riskMap.values()).map(risk => {
+            const visual = getVisualIndicator(risk.normalizedType, 'risk');
+            const intensityMap = { 'Critical': '●●●', 'High': '●●', 'Medium': '●', 'Low': '○' };
+            const intensity = intensityMap[risk.severity] || '●';
+            
+            return `
+                <span class="visual-indicator risk-indicator" 
+                      style="background-color: ${visual.color}20; border: 2px solid ${visual.color}; padding: 4px 8px; margin: 2px; border-radius: 12px; display: inline-block;"
+                      title="${escapeHtml(risk.type)} - ${escapeHtml(risk.severity)}${risk.count > 1 ? ` (${risk.count} instances)` : ''}">
+                    ${escapeHtml(visual.label)} ${intensity}${risk.count > 1 ? ` (${risk.count})` : ''}
+                </span>
+            `;
+        }).join('');
+        
+        return `
+            <div class="account-visual-card card mb-3 ${balanceClass}" style="border-width: 2px;">
+                <div class="card-body p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">${escapeHtml(account.company_name)}</h5>
+                        <div class="d-flex align-items-center">
+                            <span style="font-size: 1.2em; margin-right: 5px; color: ${balanceIconColor};">${balanceIcon}</span>
+                            <span class="badge" style="background-color: ${balanceIconColor}20; color: ${balanceIconColor}; border: 1px solid ${balanceIconColor};">${balanceLabel}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="account-details mb-3 p-2 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted">Max Tenure:</small>
+                                <div class="fw-bold" style="color: #8A8A8A;">
+                                    ${account.max_tenure ? account.max_tenure + ' years' : 'N/A'}
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Commercial Value:</small>
+                                <div class="fw-bold" style="color: #8A8A8A;">
+                                    ${account.commercial_value ? '$' + account.commercial_value.toLocaleString() : 'N/A $'}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="account-indicators">
+                        ${opportunityIndicators ? `
+                            <div class="mb-2">
+                                <div class="fw-bold text-success mb-1" style="font-size: 0.9em;">Growth Opportunities</div>
+                                <div>${opportunityIndicators}</div>
+                            </div>
+                        ` : ''}
+                        
+                        ${riskIndicators ? `
+                            <div class="mb-2">
+                                <div class="fw-bold text-danger mb-1" style="font-size: 0.9em;">Risk Factors</div>
+                                <div>${riskIndicators}</div>
+                            </div>
+                        ` : ''}
+                        
+                        ${!opportunityIndicators && !riskIndicators ? 
+                            '<div class="text-muted text-center py-2" style="font-size: 0.9em;">No specific indicators identified</div>' : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    container.innerHTML = legendHtml + accountsHtml;
+    
+    // Render pagination
+    if (pagination.pages > 1) {
+        renderAccountIntelPagination(pagination);
+        document.getElementById('accountIntelPaginationContainer').style.display = 'block';
+    } else {
+        document.getElementById('accountIntelPaginationContainer').style.display = 'none';
+    }
+}
+
+function renderAccountIntelPagination(pagination) {
+    const paginationContainer = document.getElementById('accountIntelPagination');
+    const pages = generatePaginationPages(pagination.page, pagination.pages);
+    
+    let paginationHtml = '';
+    
+    // Previous button
+    paginationHtml += `
+        <li class="page-item ${!pagination.has_prev ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="loadAccountIntelligence(${pagination.page - 1}); return false;" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+    `;
+    
+    // Page numbers
+    pages.forEach(pageNum => {
+        if (pageNum === '...') {
+            paginationHtml += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+        } else {
+            paginationHtml += `
+                <li class="page-item ${pageNum === pagination.page ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="loadAccountIntelligence(${pageNum}); return false;">${pageNum}</a>
+                </li>
+            `;
+        }
+    });
+    
+    // Next button
+    paginationHtml += `
+        <li class="page-item ${!pagination.has_next ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="loadAccountIntelligence(${pagination.page + 1}); return false;" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    `;
+    
+    paginationContainer.innerHTML = paginationHtml;
+}
+
+function searchAccountIntelligence() {
+    // Debounce search for better UX
+    clearTimeout(accountIntelSearchTimeout);
+    accountIntelSearchTimeout = setTimeout(() => {
+        loadAccountIntelligence(1); // Reset to page 1 when searching
+    }, 300);
+}
+
+function updateAccountIntelFiltersUI(total, filtersApplied) {
+    // Update count display
+    const countElement = document.getElementById('accountIntelCount');
+    const start = (accountIntelCurrentPage - 1) * 10 + 1;
+    const end = Math.min(accountIntelCurrentPage * 10, total);
+    countElement.textContent = `Showing ${start}-${end} of ${total} accounts`;
+    
+    // Count active filters
+    const activeFilters = Object.values(filtersApplied || {}).filter(v => v).length;
+    
+    // Show/hide filter badge and clear button
+    const filterBadge = document.getElementById('accountIntelFiltersActive');
+    const clearButton = document.getElementById('accountIntelClearFilters');
+    
+    if (activeFilters > 0) {
+        filterBadge.textContent = `${activeFilters} filter${activeFilters > 1 ? 's' : ''} active`;
+        filterBadge.style.display = 'inline-block';
+        clearButton.style.display = 'inline-block';
+    } else {
+        filterBadge.style.display = 'none';
+        clearButton.style.display = 'none';
+    }
+}
+
+function clearAccountIntelFilters() {
+    document.getElementById('accountIntelSearch').value = '';
+    document.getElementById('accountBalanceFilter').value = '';
+    document.getElementById('accountRiskFilter').value = '';
+    document.getElementById('accountOppFilter').value = '';
+    document.getElementById('accountRisksFilter').value = '';
+    loadAccountIntelligence(1);
 }
 
 function populateAccountRiskFactors() {
