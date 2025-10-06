@@ -1168,7 +1168,7 @@ def dashboard():
     # Check if user is authenticated as business user
     current_business_user = get_current_business_user()
     is_business_authenticated = current_business_user is not None
-    business_user_name = current_business_user.name if current_business_user else None
+    business_user_name = f"{current_business_user.first_name} {current_business_user.last_name}" if current_business_user else None
     
     return render_template('dashboard.html', 
                          company_nps_data=company_nps_data, 
