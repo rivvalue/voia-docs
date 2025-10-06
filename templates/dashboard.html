@@ -66,8 +66,8 @@
 }
 </style>
 
-<!-- Full-page loading overlay - visible immediately -->
-<div id="pageLoadingOverlay">
+<!-- Full-page loading overlay - visible immediately with inline styles -->
+<div id="pageLoadingOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.98); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 99999;">
     <div class="loading-spinner"></div>
     <div class="loading-overlay-text">Loading dashboard...</div>
 </div>
