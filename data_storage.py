@@ -846,32 +846,29 @@ def convert_snapshot_to_dashboard_format(snapshot):
         # Enrich account_intelligence with company_nps if missing (for old snapshots)
         account_intelligence = json.loads(snapshot.account_intelligence) if snapshot.account_intelligence else []
         company_nps_data = json.loads(snapshot.company_nps_breakdown) if snapshot.company_nps_breakdown else []
+        high_risk_accounts = json.loads(snapshot.high_risk_accounts) if snapshot.high_risk_accounts else []
         
-        # Build NPS lookup for enrichment
-        nps_lookup = {company['company_name'].upper(): company['company_nps'] 
-                     for company in company_nps_data if 'company_name' in company and 'company_nps' in company}
+        # Build NPS lookup for enrichment - try company_nps_breakdown first, then fall back to high_risk_accounts
+        nps_lookup = {}
         
-        print(f"🔍 Snapshot enrichment - Available NPS data: {len(nps_lookup)} companies")
-        print(f"🔍 Account intelligence before enrichment: {len(account_intelligence)} accounts")
+        # Primary source: company_nps_breakdown
+        for company in company_nps_data:
+            if 'company_name' in company and 'company_nps' in company:
+                nps_lookup[company['company_name'].upper()] = company['company_nps']
+        
+        # Fallback source: high_risk_accounts (has nps_score field)
+        if len(nps_lookup) == 0:
+            for account in high_risk_accounts:
+                if 'company_name' in account and 'nps_score' in account:
+                    nps_lookup[account['company_name'].upper()] = int(account['nps_score'])
         
         # Enrich accounts with correct company_nps (always overwrite to fix old snapshots with 0 values)
         for account in account_intelligence:
             company_key = account.get('company_name', '').upper()
-            old_nps = account.get('company_nps', 'missing')
             if company_key in nps_lookup:
                 account['company_nps'] = nps_lookup[company_key]
-                if company_key == 'STAN':
-                    print(f"✅ Enriched Stan: {old_nps} → {account['company_nps']}")
             elif 'company_nps' not in account:
                 account['company_nps'] = 0
-                if company_key == 'STAN':
-                    print(f"⚠️ Stan not in lookup, setting to 0")
-        
-        print(f"🔍 NPS lookup keys: {list(nps_lookup.keys())[:5]}")
-        if 'STAN' in nps_lookup:
-            print(f"✅ Stan is in lookup with NPS: {nps_lookup['STAN']}")
-        else:
-            print(f"❌ Stan NOT in lookup!")
         
         return {
             'total_responses': snapshot.total_responses,
