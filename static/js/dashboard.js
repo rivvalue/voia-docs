@@ -442,6 +442,9 @@ async function updateComparison() {
         document.getElementById('campaign1Header').textContent = comparisonData.campaign1.name;
         document.getElementById('campaign2Header').textContent = comparisonData.campaign2.name;
         
+        // Store data globally for filtering
+        currentComparisonData = comparisonData;
+        
         // Populate executive summary table
         populateExecutiveSummary(comparisonData);
         
@@ -606,6 +609,9 @@ function populateExecutiveSummary(data) {
     });
 }
 
+// Store comparison data globally for filtering
+let currentComparisonData = null;
+
 // Populate company comparison table
 function populateCompanyComparison(data) {
     const tableBody = document.getElementById('companyTable');
@@ -663,6 +669,74 @@ function populateCompanyComparison(data) {
     });
     
     tableBody.innerHTML = tableHTML;
+}
+
+// Search and filter comparison table
+function searchComparisonTable() {
+    if (!currentComparisonData) return;
+    
+    const searchQuery = document.getElementById('comparisonSearch')?.value.trim().toLowerCase() || '';
+    const balanceFilter = document.getElementById('comparisonBalanceFilter')?.value || '';
+    
+    // Filter company details
+    const filteredData = {
+        ...currentComparisonData,
+        company_details: currentComparisonData.company_details.filter(company => {
+            // Search filter
+            const matchesSearch = !searchQuery || 
+                company.company_name.toLowerCase().includes(searchQuery);
+            
+            // Balance filter (check both campaigns)
+            const matchesBalance = !balanceFilter || 
+                company.campaign1.balance === balanceFilter || 
+                company.campaign2.balance === balanceFilter;
+            
+            return matchesSearch && matchesBalance;
+        })
+    };
+    
+    // Update table
+    populateCompanyComparison(filteredData);
+    
+    // Update search info
+    let infoText = '';
+    if (searchQuery && balanceFilter) {
+        const balanceLabel = balanceFilter.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+        infoText = `Search: "${searchQuery}" | Balance: ${balanceLabel}`;
+    } else if (searchQuery) {
+        infoText = `Search: "${searchQuery}"`;
+    } else if (balanceFilter) {
+        const balanceLabel = balanceFilter.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+        infoText = `Balance: ${balanceLabel}`;
+    }
+    
+    const infoElement = document.getElementById('comparisonSearchInfo');
+    if (infoElement) {
+        infoElement.textContent = infoText;
+    }
+}
+
+// Clear comparison search and filters
+function clearComparisonSearch() {
+    const searchInput = document.getElementById('comparisonSearch');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    
+    const balanceFilter = document.getElementById('comparisonBalanceFilter');
+    if (balanceFilter) {
+        balanceFilter.value = '';
+    }
+    
+    const infoElement = document.getElementById('comparisonSearchInfo');
+    if (infoElement) {
+        infoElement.textContent = '';
+    }
+    
+    // Reload original data
+    if (currentComparisonData) {
+        populateCompanyComparison(currentComparisonData);
+    }
 }
 
 // Run color override multiple times to catch dynamically loaded content
@@ -3053,6 +3127,15 @@ document.addEventListener('DOMContentLoaded', function() {
         companySearchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 searchCompanyNPS();
+            }
+        });
+    }
+    
+    const comparisonSearchInput = document.getElementById('comparisonSearch');
+    if (comparisonSearchInput) {
+        comparisonSearchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchComparisonTable();
             }
         });
     }
