@@ -1327,8 +1327,26 @@ def survey_responses():
             max_per_page=100
         )
         
+        # Convert responses to dict and add can_view flag
+        responses_data = []
+        for response in pagination.items:
+            response_dict = response.to_dict()
+            
+            # Determine if current user can view this response
+            if current_account:
+                # Business user can view all responses from their campaigns
+                response_dict['can_view'] = True
+            elif response.campaign_participant_id is None:
+                # Public user can view trial responses only
+                response_dict['can_view'] = True
+            else:
+                # Public user cannot view business responses
+                response_dict['can_view'] = False
+            
+            responses_data.append(response_dict)
+        
         return jsonify({
-            'responses': [response.to_dict() for response in pagination.items],
+            'responses': responses_data,
             'pagination': {
                 'page': pagination.page,
                 'pages': pagination.pages,
