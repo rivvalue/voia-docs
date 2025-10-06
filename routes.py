@@ -2712,6 +2712,121 @@ def get_campaign_comparison():
         logger.error(f"Error getting campaign comparison: {e}")
         return jsonify({'error': 'Failed to load comparison data'}), 500
 
+@app.route('/api/campaigns/<int:campaign_id>/companies/<company_name>/responses')
+def get_company_responses(campaign_id, company_name):
+    """Get all responses for a specific company in a campaign with pagination and filtering"""
+    try:
+        from models import Campaign, SurveyResponse
+        
+        # Pagination parameters
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 20, type=int)
+        
+        # Search/filter parameters
+        search = request.args.get('search', '').strip()
+        sort_by = request.args.get('sort_by', 'created_at')
+        sort_order = request.args.get('sort_order', 'desc')
+        
+        # Validate per_page limits
+        per_page = min(per_page, 100)
+        
+        # Check if this is a business user session (not participant)
+        current_business_user = get_current_business_user()
+        
+        if current_business_user:
+            # Business user - verify campaign belongs to their account
+            business_account_id = current_business_user.business_account_id
+            campaign = Campaign.query.filter_by(id=campaign_id, business_account_id=business_account_id).first()
+        else:
+            # Public/participant user - only allow demo account campaigns
+            from models import BusinessAccount
+            demo_account = BusinessAccount.query.filter_by(name='Archelo Group inc').first()
+            if demo_account:
+                campaign = Campaign.query.filter_by(id=campaign_id, business_account_id=demo_account.id).first()
+            else:
+                return jsonify({'error': 'Demo account not available'}), 404
+        
+        if not campaign:
+            return jsonify({'error': 'Campaign not found or not accessible'}), 404
+        
+        # Build base query for responses
+        query = SurveyResponse.query.filter_by(
+            campaign_id=campaign_id,
+            company_name=company_name
+        )
+        
+        # Apply search filter if provided
+        if search:
+            query = query.filter(
+                or_(
+                    SurveyResponse.respondent_name.ilike(f'%{search}%'),
+                    SurveyResponse.respondent_email.ilike(f'%{search}%')
+                )
+            )
+        
+        # Apply sorting
+        sort_column = getattr(SurveyResponse, sort_by, SurveyResponse.created_at)
+        if sort_order == 'desc':
+            query = query.order_by(desc(sort_column))
+        else:
+            query = query.order_by(sort_column)
+        
+        # Get total count before pagination
+        total_count = query.count()
+        
+        # Apply pagination
+        offset = (page - 1) * per_page
+        responses = query.limit(per_page).offset(offset).all()
+        
+        # Build response data
+        response_list = []
+        for response in responses:
+            # Create response data dict
+            response_data = {
+                'company_name': response.company_name,
+                'respondent_name': response.respondent_name,
+                'respondent_email': response.respondent_email
+            }
+            
+            # Apply anonymization if needed
+            if campaign.anonymize_responses:
+                response_data = anonymize_response_data(campaign, response_data)
+            
+            response_list.append({
+                'id': response.id,
+                'respondent_name': response_data['respondent_name'],
+                'nps_score': response.nps_score,
+                'satisfaction_rating': response.satisfaction_rating,
+                'product_value_rating': response.product_value_rating,
+                'service_rating': response.service_rating,
+                'pricing_rating': response.pricing_rating,
+                'created_at': response.created_at.isoformat() if response.created_at else None
+            })
+        
+        # Calculate pagination metadata
+        total_pages = (total_count + per_page - 1) // per_page
+        
+        return jsonify({
+            'responses': response_list,
+            'pagination': {
+                'page': page,
+                'per_page': per_page,
+                'total_count': total_count,
+                'total_pages': total_pages,
+                'has_next': page < total_pages,
+                'has_prev': page > 1
+            },
+            'campaign': {
+                'id': campaign.id,
+                'name': campaign.name
+            },
+            'company_name': company_name
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting company responses: {e}")
+        return jsonify({'error': 'Failed to load company responses'}), 500
+
 # Error handlers for routing diagnostics
 @app.errorhandler(404)
 def handle_404(e):
