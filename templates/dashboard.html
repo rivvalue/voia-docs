@@ -97,31 +97,28 @@
                                     <small class="text-muted">Compare KPIs across different campaigns</small>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="d-flex gap-2 align-items-center">
+                                    <div class="d-flex gap-2 align-items-center flex-wrap">
                                         <label for="campaignFilter" class="form-label mb-0 me-2">Campaign:</label>
-                                        <select class="form-select" id="campaignFilter" onchange="applyCampaignFilter()">
+                                        <select class="form-select flex-grow-1" id="campaignFilter" onchange="applyCampaignFilter()" style="max-width: 300px;">
                                             <option value="">Select Campaign</option>
                                             <!-- Will be populated by JavaScript -->
                                         </select>
                                         <button class="btn btn-outline-secondary btn-sm" onclick="clearCampaignFilter()" title="Clear Filter">
                                             <i class="fas fa-times"></i>
                                         </button>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Selected Campaign Info -->
-                            <div id="selectedCampaignInfo" class="mt-3" style="display: none;">
-                                <div class="alert alert-info mb-0 py-2" style="background: rgba(13, 110, 253, 0.1); border: 1px solid rgba(13, 110, 253, 0.2);">
-                                    <i class="fas fa-info-circle me-2"></i>
-                                    <strong>Viewing:</strong> <span id="selectedCampaignName">Campaign Name</span>
-                                    <span class="ms-2 text-muted">|</span>
-                                    <span class="ms-2" id="selectedCampaignDates">Jan 1 - Dec 31, 2024</span>
-                                    <span class="ms-2 text-muted">|</span>
-                                    <span class="ms-2 badge" id="selectedCampaignStatus" style="background-color: #28a745; color: white;">Active</span>
-                                    <span class="ms-2 badge bg-info" id="selectedCampaignDaysLeft" style="display: none;">X days left</span>
-                                    <div class="mt-1">
-                                        <small class="text-muted" id="selectedCampaignDesc">Campaign description</small>
+                                        
+                                        <!-- Inline Campaign Info Badges -->
+                                        <div id="selectedCampaignInfo" class="d-flex gap-2 align-items-center" style="display: none !important;">
+                                            <span class="badge bg-light text-dark border" id="selectedCampaignDates" style="transition: all 0.3s ease;">
+                                                <i class="fas fa-calendar-alt me-1"></i><span class="campaign-dates-text"></span>
+                                            </span>
+                                            <span class="badge" id="selectedCampaignStatus" style="transition: all 0.3s ease;">
+                                                <span class="campaign-status-text"></span>
+                                            </span>
+                                            <span class="badge bg-info" id="selectedCampaignDaysLeft" style="display: none; transition: all 0.3s ease;">
+                                                <i class="fas fa-clock me-1"></i><span class="campaign-days-text"></span>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

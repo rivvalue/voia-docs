@@ -248,31 +248,34 @@ function updateSelectedCampaignInfo() {
     
     if (selectedCampaignId && select.selectedOptions.length > 0) {
         const option = select.selectedOptions[0];
-        const campaignName = option.getAttribute('data-name');
         const startDate = option.getAttribute('data-start');
         const endDate = option.getAttribute('data-end');
         const status = option.getAttribute('data-status');
-        const description = option.getAttribute('data-description');
         
-        document.getElementById('selectedCampaignName').textContent = campaignName;
-        document.getElementById('selectedCampaignDates').textContent = 
-            `${formatDate(startDate)} - ${formatDate(endDate)}`;
-        
-        // Update status with proper styling
-        const statusBadge = document.getElementById('selectedCampaignStatus');
-        statusBadge.textContent = status;
-        if (status === 'Active') {
-            statusBadge.style.backgroundColor = '#28a745';
-            statusBadge.style.color = 'white';
-        } else {
-            statusBadge.style.backgroundColor = '#6c757d';
-            statusBadge.style.color = 'white';
+        // Update dates badge text (inline, no container refresh)
+        const datesText = document.querySelector('.campaign-dates-text');
+        if (datesText) {
+            datesText.textContent = `${formatDate(startDate)} - ${formatDate(endDate)}`;
         }
         
-        // Update days remaining/since ended - compute from end date directly
+        // Update status badge with proper styling
+        const statusBadge = document.getElementById('selectedCampaignStatus');
+        const statusText = document.querySelector('.campaign-status-text');
+        if (statusBadge && statusText) {
+            statusText.textContent = status;
+            if (status === 'Active') {
+                statusBadge.style.backgroundColor = '#28a745';
+                statusBadge.style.color = 'white';
+            } else {
+                statusBadge.style.backgroundColor = '#6c757d';
+                statusBadge.style.color = 'white';
+            }
+        }
+        
+        // Update days remaining/since ended
         const daysLeftSpan = document.getElementById('selectedCampaignDaysLeft');
-        if (daysLeftSpan && endDate) {
-            // Compute days remaining/since ended from the selected campaign's end date
+        const daysText = document.querySelector('.campaign-days-text');
+        if (daysLeftSpan && daysText && endDate) {
             const today = new Date();
             const campaignEndDate = new Date(endDate);
             const diffTime = campaignEndDate - today;
@@ -282,45 +285,36 @@ function updateSelectedCampaignInfo() {
             const daysSinceEnded = status === 'Closed' ? Math.max(0, -diffDays) : 0;
             
             if (status === 'Active' && daysRemaining >= 0) {
-                // Show days remaining for active campaigns
                 if (daysRemaining > 30) {
-                    daysLeftSpan.textContent = `${daysRemaining} days left`;
-                    daysLeftSpan.className = 'ms-2 badge bg-success';
+                    daysText.textContent = `${daysRemaining} days left`;
+                    daysLeftSpan.className = 'badge bg-success';
                 } else if (daysRemaining > 7) {
-                    daysLeftSpan.textContent = `${daysRemaining} days left`;
-                    daysLeftSpan.className = 'ms-2 badge bg-warning';
-                } else if (daysRemaining > 0) {
-                    daysLeftSpan.textContent = `${daysRemaining} days left`;
-                    daysLeftSpan.className = 'ms-2 badge bg-danger';
+                    daysText.textContent = `${daysRemaining} days left`;
+                    daysLeftSpan.className = 'badge bg-warning';
                 } else {
-                    daysLeftSpan.textContent = 'Campaign ended';
-                    daysLeftSpan.className = 'ms-2 badge bg-secondary';
+                    daysText.textContent = `${daysRemaining} days left`;
+                    daysLeftSpan.className = 'badge bg-danger';
                 }
-                daysLeftSpan.style.display = 'inline';
+                daysLeftSpan.style.display = '';
             } else if (status === 'Closed' && daysSinceEnded > 0) {
-                // Show days since ended for closed campaigns
-                if (daysSinceEnded === 1) {
-                    daysLeftSpan.textContent = `Ended 1 day ago`;
-                } else if (daysSinceEnded < 30) {
-                    daysLeftSpan.textContent = `Ended ${daysSinceEnded} days ago`;
+                if (daysSinceEnded < 30) {
+                    daysText.textContent = `${daysSinceEnded} days ago`;
                 } else if (daysSinceEnded < 365) {
                     const months = Math.floor(daysSinceEnded / 30);
-                    daysLeftSpan.textContent = months === 1 ? `Ended 1 month ago` : `Ended ${months} months ago`;
+                    daysText.textContent = `${months} month${months > 1 ? 's' : ''} ago`;
                 } else {
                     const years = Math.floor(daysSinceEnded / 365);
-                    daysLeftSpan.textContent = years === 1 ? `Ended 1 year ago` : `Ended ${years} years ago`;
+                    daysText.textContent = `${years} year${years > 1 ? 's' : ''} ago`;
                 }
-                daysLeftSpan.className = 'ms-2 badge bg-secondary';
-                daysLeftSpan.style.display = 'inline';
+                daysLeftSpan.className = 'badge bg-secondary';
+                daysLeftSpan.style.display = '';
             } else {
                 daysLeftSpan.style.display = 'none';
             }
         }
         
-        document.getElementById('selectedCampaignDesc').textContent = 
-            description || 'No description available';
-        
-        infoDiv.style.display = 'block';
+        // Show the inline badges (smooth transition)
+        infoDiv.style.display = 'flex';
     } else {
         infoDiv.style.display = 'none';
     }
