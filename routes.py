@@ -2912,6 +2912,59 @@ def handle_404(e):
                           requested_path=request_path), 404
 
 
+@app.route('/dashboard/company-responses/<company_name>')
+def company_responses_page(company_name):
+    """Dedicated page for viewing all responses from a specific company"""
+    try:
+        from models import Campaign
+        
+        # Get campaign ID from query parameter
+        campaign_id = request.args.get('campaign', type=int)
+        if not campaign_id:
+            flash('Campaign ID is required', 'error')
+            return redirect(url_for('dashboard'))
+        
+        # Check authentication and get campaign
+        current_business_user = get_current_business_user()
+        
+        if current_business_user:
+            # Business user - verify campaign belongs to their account
+            business_account_id = current_business_user.business_account_id
+            campaign = Campaign.query.filter_by(id=campaign_id, business_account_id=business_account_id).first()
+        else:
+            # Public user - only allow demo account campaigns
+            from models import BusinessAccount
+            demo_account = BusinessAccount.query.filter_by(name='Archelo Group inc').first()
+            if demo_account:
+                campaign = Campaign.query.filter_by(id=campaign_id, business_account_id=demo_account.id).first()
+            else:
+                flash('Demo account not available', 'error')
+                return redirect(url_for('dashboard'))
+        
+        if not campaign:
+            flash('Campaign not found or not accessible', 'error')
+            return redirect(url_for('dashboard'))
+        
+        # Get branding
+        from business_auth_routes import get_current_business_account
+        current_account = get_current_business_account()
+        branding = get_branding_context(current_account)
+        
+        # Check if user is authenticated as business user
+        is_business_authenticated = current_business_user is not None
+        
+        return render_template('company_responses.html',
+                             company_name=company_name,
+                             campaign=campaign,
+                             campaign_id=campaign_id,
+                             branding=branding,
+                             is_business_authenticated=is_business_authenticated)
+    
+    except Exception as e:
+        logger.error(f"Error loading company responses page: {e}")
+        flash('Error loading company responses', 'error')
+        return redirect(url_for('dashboard'))
+
 @app.route('/admin/regenerate-survey-tokens', methods=['GET'])
 def regenerate_all_survey_tokens():
     """Admin endpoint to regenerate all campaign participant tokens from within the running app"""
