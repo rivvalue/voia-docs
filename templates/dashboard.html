@@ -279,9 +279,74 @@
                             </h5>
                         </div>
                         <div class="card-body">
+                            <!-- Search and Filters -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <label for="accountIntelSearch" class="form-label">Search</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                        <input type="text" class="form-control" id="accountIntelSearch" 
+                                               placeholder="Search company, opportunities, risks..." 
+                                               onkeyup="searchAccountIntelligence()">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="accountBalanceFilter" class="form-label">Balance</label>
+                                    <select class="form-select" id="accountBalanceFilter" onchange="searchAccountIntelligence()">
+                                        <option value="">All</option>
+                                        <option value="risk_heavy">Risk-Heavy</option>
+                                        <option value="balanced">Balanced</option>
+                                        <option value="opportunity_heavy">High Potential</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="accountRiskFilter" class="form-label">Risk Level</label>
+                                    <select class="form-select" id="accountRiskFilter" onchange="searchAccountIntelligence()">
+                                        <option value="">All</option>
+                                        <option value="critical">Critical</option>
+                                        <option value="high">High</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="low">Low</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="accountOppFilter" class="form-label">Opportunities</label>
+                                    <select class="form-select" id="accountOppFilter" onchange="searchAccountIntelligence()">
+                                        <option value="">All</option>
+                                        <option value="yes">Has Opportunities</option>
+                                        <option value="no">No Opportunities</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="accountRisksFilter" class="form-label">Has Risks</label>
+                                    <select class="form-select" id="accountRisksFilter" onchange="searchAccountIntelligence()">
+                                        <option value="">All</option>
+                                        <option value="yes">Has Risks</option>
+                                        <option value="no">No Risks</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <!-- Results Count and Clear Filters -->
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <span id="accountIntelCount" class="text-muted">Loading...</span>
+                                    <span id="accountIntelFiltersActive" class="badge bg-primary ms-2" style="display: none;"></span>
+                                </div>
+                                <button class="btn btn-sm btn-outline-secondary" id="accountIntelClearFilters" 
+                                        onclick="clearAccountIntelFilters()" style="display: none;">
+                                    <i class="fas fa-times me-1"></i>Clear Filters
+                                </button>
+                            </div>
+                            
                             <div id="accountIntelligence">
                                 <!-- Will be populated by JavaScript -->
                             </div>
+                            
+                            <!-- Pagination Controls -->
+                            <nav aria-label="Account Intelligence pagination" id="accountIntelPaginationContainer" style="display: none;">
+                                <ul class="pagination justify-content-center" id="accountIntelPagination"></ul>
+                            </nav>
                         </div>
                     </div>
                 </div>
