@@ -1716,10 +1716,11 @@ def health_check():
 @app.route('/api/company_nps')
 @rate_limit(limit=100)
 def api_company_nps():
-    """API endpoint for company-segregated NPS data with pagination, search, and filtering - optimized for performance"""
+    """API endpoint for company-segregated NPS data with pagination, search, and filtering - OPTIMIZED to eliminate N+1 queries"""
     try:
         from models import SurveyResponse
-        from sqlalchemy import func
+        from sqlalchemy import func, case
+        from sqlalchemy.sql import label
         
         # Get pagination and filter parameters
         page = request.args.get('page', 1, type=int)
@@ -1727,9 +1728,30 @@ def api_company_nps():
         search_query = request.args.get('search', '').strip()
         nps_category = request.args.get('nps_category', '').strip().lower()
         
-        # Build optimized query with filters applied at database level
-        query = db.session.query(
+        # Step 1: Create subquery to get latest churn risk per company (SINGLE QUERY)
+        latest_churn_subquery = db.session.query(
+            func.upper(SurveyResponse.company_name).label('company_upper'),
+            SurveyResponse.churn_risk_level,
+            func.row_number().over(
+                partition_by=func.upper(SurveyResponse.company_name),
+                order_by=SurveyResponse.created_at.desc()
+            ).label('rn')
+        ).filter(
+            SurveyResponse.company_name.isnot(None)
+        ).subquery()
+        
+        # Step 2: Filter to get only latest (rn=1) records
+        latest_churn = db.session.query(
+            latest_churn_subquery.c.company_upper,
+            latest_churn_subquery.c.churn_risk_level.label('latest_churn_risk')
+        ).filter(
+            latest_churn_subquery.c.rn == 1
+        ).subquery()
+        
+        # Step 3: Build main query with aggregations
+        base_query = db.session.query(
             func.max(SurveyResponse.company_name).label('company_name'),
+            func.upper(SurveyResponse.company_name).label('company_upper'),
             func.count(SurveyResponse.id).label('total_responses'),
             func.avg(SurveyResponse.nps_score).label('avg_nps'),
             func.max(SurveyResponse.created_at).label('latest_response'),
@@ -1741,21 +1763,38 @@ def api_company_nps():
         
         # Apply search filter at database level
         if search_query:
-            query = query.filter(
+            base_query = base_query.filter(
                 func.upper(SurveyResponse.company_name).like(f'%{search_query.upper()}%')
             )
         
         # Apply NPS category filter at database level
         if nps_category:
             if nps_category == 'promoters':
-                query = query.filter(SurveyResponse.nps_score >= 9)
+                base_query = base_query.filter(SurveyResponse.nps_score >= 9)
             elif nps_category == 'passives':
-                query = query.filter(SurveyResponse.nps_score.between(7, 8))
+                base_query = base_query.filter(SurveyResponse.nps_score.between(7, 8))
             elif nps_category == 'detractors':
-                query = query.filter(SurveyResponse.nps_score <= 6)
+                base_query = base_query.filter(SurveyResponse.nps_score <= 6)
         
-        # Group by company and get results
-        company_stats = query.group_by(func.upper(SurveyResponse.company_name)).all()
+        # Group by company
+        base_query = base_query.group_by(func.upper(SurveyResponse.company_name))
+        
+        # Step 4: Join with latest churn risk (LEFT JOIN to handle companies without churn risk)
+        company_query = db.session.query(
+            base_query.subquery().c.company_name,
+            base_query.subquery().c.total_responses,
+            base_query.subquery().c.avg_nps,
+            base_query.subquery().c.latest_response,
+            base_query.subquery().c.promoters,
+            base_query.subquery().c.detractors,
+            latest_churn.c.latest_churn_risk
+        ).outerjoin(
+            latest_churn,
+            base_query.subquery().c.company_upper == latest_churn.c.company_upper
+        )
+        
+        # Get all results in ONE QUERY
+        company_stats = company_query.all()
         
         # Process results
         company_nps_list = []
@@ -1777,13 +1816,6 @@ def api_company_nps():
             else:
                 risk_level = "Low"
             
-            # Get latest churn risk (optimized single query)
-            latest_response = SurveyResponse.query.filter(
-                func.upper(SurveyResponse.company_name) == func.upper(company.company_name)
-            ).order_by(SurveyResponse.created_at.desc()).first()
-            
-            latest_churn_risk = latest_response.churn_risk_level if latest_response and latest_response.churn_risk_level else None
-            
             company_nps_list.append({
                 'company_name': company.company_name,
                 'total_responses': total,
@@ -1794,7 +1826,7 @@ def api_company_nps():
                 'passives': total - promoters - detractors,
                 'risk_level': risk_level,
                 'latest_response': company.latest_response.strftime('%Y-%m-%d') if company.latest_response else None,
-                'latest_churn_risk': latest_churn_risk
+                'latest_churn_risk': company.latest_churn_risk
             })
         
         # Sort by risk level and NPS
