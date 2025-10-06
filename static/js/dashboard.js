@@ -212,6 +212,12 @@ async function applyCampaignFilter() {
     createTenureChart();
     createGrowthFactorChart();
     
+    // CRITICAL: Reload Survey Insights tables with campaign-specific data
+    console.log('📊 Reloading Survey Insights tables for campaign:', selectedCampaignId);
+    loadCompanyNpsData(1); // Reset to page 1 when campaign changes
+    loadTenureNpsData(1);  // Reset to page 1 when campaign changes
+    loadAccountIntelligence(1); // Reset to page 1 when campaign changes
+    
     // Also refresh Overview tab chart if visible - but wait for data to load
     console.log('🎨 About to call createThemesChart from applyCampaignFilter');
     // Use a longer delay and verify data exists before creating chart
@@ -2739,7 +2745,17 @@ function updateTenurePaginationControls(pagination) {
 function loadTenureNpsData(page = 1) {
     currentTenurePage = page;
     console.log('Loading tenure NPS data...');
-    fetch(`/api/tenure_nps?page=${page}&per_page=${tenureGroupsPerPage}`)
+    
+    // Build URL with campaign filter
+    let url = `/api/tenure_nps?page=${page}&per_page=${tenureGroupsPerPage}`;
+    
+    // CRITICAL: Get campaign filter (NPS must be campaign-specific)
+    const campaignSelect = document.getElementById('campaignFilter');
+    if (campaignSelect && campaignSelect.value) {
+        url += `&campaign=${campaignSelect.value}`;
+    }
+    
+    fetch(url)
         .then(response => response.json())
         .then(data => {
             console.log('Tenure NPS data received:', data);
@@ -2828,6 +2844,13 @@ function loadCompanyNpsData(page = 1, searchQuery = '', npsFilter = '') {
     
     // Build URL with search and filter parameters
     let url = `/api/company_nps?page=${page}&per_page=${companiesPerPage}`;
+    
+    // CRITICAL: Get campaign filter (NPS must be campaign-specific)
+    const campaignSelect = document.getElementById('campaignFilter');
+    if (campaignSelect && campaignSelect.value) {
+        url += `&campaign=${campaignSelect.value}`;
+    }
+    
     if (searchQuery.trim()) {
         url += `&search=${encodeURIComponent(searchQuery)}`;
     }
