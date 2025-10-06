@@ -3657,6 +3657,13 @@ let companyResponsesState = {
 };
 
 function openCompanyResponsesModal(companyName, campaignId, campaignName) {
+    // Navigate to dedicated company responses page instead of modal (better for mobile)
+    const url = `/dashboard/company-responses/${encodeURIComponent(companyName)}?campaign=${campaignId}`;
+    window.location.href = url;
+}
+
+// Legacy modal function kept for compatibility
+function openCompanyResponsesModalLegacy(companyName, campaignId, campaignName) {
     // Store state
     companyResponsesState.companyName = companyName;
     companyResponsesState.campaignId = campaignId;
