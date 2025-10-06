@@ -472,12 +472,15 @@ def get_dashboard_data(campaign_id=None):
                     severity_order = {'Critical': 0, 'High': 1, 'Medium': 2, 'Low': 3}
                     risk_factors.sort(key=lambda x: (severity_order.get(x['severity'], 2), -x['count']))
             
-            # Get tenure and commercial value data for this company
-            company_responses = SurveyResponse.query.filter(
+            # Get tenure, commercial value, and NPS data for this company (filtered by campaign)
+            company_responses_query = SurveyResponse.query.filter(
                 func.upper(SurveyResponse.company_name) == company_key
-            ).all()
+            )
+            if campaign_id:
+                company_responses_query = company_responses_query.filter(SurveyResponse.campaign_id == campaign_id)
+            company_responses = company_responses_query.all()
             
-            # Calculate max tenure and total commercial value
+            # Calculate max tenure, total commercial value, and company NPS
             tenure_values = []
             commercial_values = []
             for resp in company_responses:
@@ -511,6 +514,12 @@ def get_dashboard_data(campaign_id=None):
             
             max_tenure = max(tenure_values) if tenure_values else None
             total_commercial_value = sum(commercial_values) if commercial_values else 0
+            
+            # Calculate company NPS from all responses (campaign-filtered)
+            total_company_responses = len(company_responses)
+            promoters = sum(1 for r in company_responses if r.nps_score >= 9)
+            detractors = sum(1 for r in company_responses if r.nps_score <= 6)
+            company_nps = round(((promoters - detractors) / total_company_responses) * 100) if total_company_responses > 0 else 0
             
             # Only include companies with either opportunities or risk factors
             if opportunities or risk_factors:
@@ -550,7 +559,8 @@ def get_dashboard_data(campaign_id=None):
                     'risk_count': len(risk_factors),
                     'critical_risks': critical_risk_count,
                     'max_tenure': max_tenure,
-                    'commercial_value': total_commercial_value
+                    'commercial_value': total_commercial_value,
+                    'company_nps': company_nps
                 })
         
         # Sort accounts by priority (most critical risks first, then by balance)
