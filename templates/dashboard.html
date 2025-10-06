@@ -1011,6 +1011,10 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- Pass business authentication status to JavaScript -->
+<script>
+    window.isBusinessAuthenticated = {{ 'true' if is_business_authenticated else 'false' }};
+</script>
 <!-- JavaScript disabled for company NPS table - using server-side rendering only -->
 <script src="{{ url_for('static', filename='js/dashboard.js') }}?v={{ range(1000, 9999) | random }}"></script>
 {% endblock %}

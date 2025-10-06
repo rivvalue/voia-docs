@@ -3797,18 +3797,22 @@ function renderCompanyResponsesTable(responses) {
         const actionCell = document.createElement('td');
         actionCell.style.textAlign = 'center';
         
-        // Check if this is a trial response (campaign_participant_id is null) or business response
+        // Check if user is authenticated as business user
+        const isBusinessUser = window.isBusinessAuthenticated || false;
+        
+        // Check if this is a trial response (campaign_participant_id is null)
         const isTrialResponse = response.campaign_participant_id === null || response.campaign_participant_id === undefined;
         
-        if (isTrialResponse) {
-            // Trial response - allow public access
+        // Business users can access all responses, public users can only access trial responses
+        if (isBusinessUser || isTrialResponse) {
+            // Authenticated business user OR public trial response - allow access
             actionCell.innerHTML = `
                 <a href="/survey-response/${response.id}" class="btn btn-sm btn-outline-primary" title="View Full Response">
                     <i class="fas fa-eye"></i>
                 </a>
             `;
         } else {
-            // Business response - authentication required
+            // Public user trying to access business response - authentication required
             actionCell.innerHTML = `
                 <span class="text-muted" title="Business response - authentication required">
                     <i class="fas fa-lock"></i>

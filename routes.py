@@ -1141,7 +1141,17 @@ def dashboard():
     auth_email = session.get('auth_email')
     auth_token = session.get('auth_token')
     user_email = auth_email if (auth_token and auth_email) else None
-    return render_template('dashboard.html', company_nps_data=company_nps_data, user_email=user_email)
+    
+    # Check if user is authenticated as business user
+    current_business_user = get_current_business_user()
+    is_business_authenticated = current_business_user is not None
+    business_user_name = current_business_user.name if current_business_user else None
+    
+    return render_template('dashboard.html', 
+                         company_nps_data=company_nps_data, 
+                         user_email=user_email,
+                         is_business_authenticated=is_business_authenticated,
+                         business_user_name=business_user_name)
 
 @app.route('/api/dashboard_data')
 def dashboard_data():
