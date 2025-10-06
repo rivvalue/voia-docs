@@ -3614,4 +3614,257 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// ============================================================================
+// COMPANY RESPONSES DRILL-DOWN
+// ============================================================================
+
+let companyResponsesState = {
+    companyName: null,
+    campaignId: null,
+    campaignName: null,
+    page: 1,
+    search: '',
+    sortBy: 'created_at',
+    sortOrder: 'desc'
+};
+
+function openCompanyResponsesModal(companyName, campaignId, campaignName) {
+    // Store state
+    companyResponsesState.companyName = companyName;
+    companyResponsesState.campaignId = campaignId;
+    companyResponsesState.campaignName = campaignName;
+    companyResponsesState.page = 1;
+    companyResponsesState.search = '';
+    
+    // Update modal header
+    document.getElementById('modalCompanyName').textContent = companyName;
+    document.getElementById('modalCampaignName').textContent = campaignName;
+    
+    // Reset UI
+    document.getElementById('companyResponseSearch').value = '';
+    document.getElementById('companyResponseSort').value = 'created_at_desc';
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('companyResponsesModal'));
+    modal.show();
+    
+    // Load data
+    loadCompanyResponses();
+}
+
+async function loadCompanyResponses() {
+    const { companyName, campaignId, page, search, sortBy, sortOrder } = companyResponsesState;
+    
+    // Show loading state
+    document.getElementById('companyResponsesLoading').style.display = 'block';
+    document.getElementById('companyResponsesContent').style.display = 'none';
+    document.getElementById('companyResponsesNoData').style.display = 'none';
+    
+    try {
+        // Build URL with parameters
+        const params = new URLSearchParams({
+            page: page,
+            per_page: 20,
+            sort_by: sortBy,
+            sort_order: sortOrder
+        });
+        
+        if (search) {
+            params.append('search', search);
+        }
+        
+        const url = `/api/campaigns/${campaignId}/companies/${encodeURIComponent(companyName)}/responses?${params}`;
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error('Failed to load company responses');
+        }
+        
+        const data = await response.json();
+        
+        // Hide loading state
+        document.getElementById('companyResponsesLoading').style.display = 'none';
+        
+        if (data.responses && data.responses.length > 0) {
+            // Show content
+            document.getElementById('companyResponsesContent').style.display = 'block';
+            
+            // Update response count badge
+            document.getElementById('modalResponseCount').textContent = data.pagination.total_count;
+            
+            // Render table and pagination
+            renderCompanyResponsesTable(data.responses);
+            renderCompanyResponsesPagination(data.pagination);
+        } else {
+            // Show no data state
+            document.getElementById('companyResponsesNoData').style.display = 'block';
+        }
+        
+    } catch (error) {
+        console.error('Error loading company responses:', error);
+        document.getElementById('companyResponsesLoading').style.display = 'none';
+        document.getElementById('companyResponsesNoData').style.display = 'block';
+    }
+}
+
+function renderCompanyResponsesTable(responses) {
+    const tbody = document.getElementById('companyResponsesTableBody');
+    tbody.innerHTML = '';
+    
+    responses.forEach(response => {
+        const row = document.createElement('tr');
+        
+        // Respondent name
+        const nameCell = document.createElement('td');
+        nameCell.textContent = response.respondent_name || 'N/A';
+        row.appendChild(nameCell);
+        
+        // NPS Score with color coding
+        const npsCell = document.createElement('td');
+        npsCell.style.textAlign = 'center';
+        const npsScore = response.nps_score;
+        let npsBadgeClass = 'bg-secondary';
+        if (npsScore >= 9) npsBadgeClass = 'bg-success';
+        else if (npsScore >= 7) npsBadgeClass = 'bg-warning';
+        else npsBadgeClass = 'bg-danger';
+        npsCell.innerHTML = `<span class="badge ${npsBadgeClass}">${npsScore}</span>`;
+        row.appendChild(npsCell);
+        
+        // Ratings (Satisfaction, Product Value, Service, Pricing)
+        const ratingsCell = document.createElement('td');
+        ratingsCell.style.textAlign = 'center';
+        const ratings = [];
+        
+        if (response.satisfaction_rating) {
+            ratings.push(`<span class="badge bg-info me-1" title="Satisfaction">S: ${response.satisfaction_rating}/10</span>`);
+        }
+        if (response.product_value_rating) {
+            ratings.push(`<span class="badge bg-info me-1" title="Value">V: ${response.product_value_rating}/10</span>`);
+        }
+        if (response.service_rating) {
+            ratings.push(`<span class="badge bg-info me-1" title="Service">Svc: ${response.service_rating}/10</span>`);
+        }
+        if (response.pricing_rating) {
+            ratings.push(`<span class="badge bg-info me-1" title="Pricing">P: ${response.pricing_rating}/10</span>`);
+        }
+        
+        ratingsCell.innerHTML = ratings.length > 0 ? ratings.join(' ') : '<span class="text-muted">No ratings</span>';
+        row.appendChild(ratingsCell);
+        
+        // Date
+        const dateCell = document.createElement('td');
+        if (response.created_at) {
+            const date = new Date(response.created_at);
+            dateCell.textContent = date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        } else {
+            dateCell.textContent = 'N/A';
+        }
+        row.appendChild(dateCell);
+        
+        // Action - Link to full response
+        const actionCell = document.createElement('td');
+        actionCell.style.textAlign = 'center';
+        actionCell.innerHTML = `
+            <a href="/response/${response.id}" class="btn btn-sm btn-outline-primary" target="_blank" title="View Full Response">
+                <i class="fas fa-external-link-alt"></i>
+            </a>
+        `;
+        row.appendChild(actionCell);
+        
+        tbody.appendChild(row);
+    });
+}
+
+function renderCompanyResponsesPagination(pagination) {
+    const { page, total_pages, total_count, has_prev, has_next } = pagination;
+    
+    // Update info text
+    const start = (page - 1) * pagination.per_page + 1;
+    const end = Math.min(page * pagination.per_page, total_count);
+    document.getElementById('companyResponsesPaginationInfo').textContent = 
+        `Showing ${start}-${end} of ${total_count} responses`;
+    
+    // Render pagination controls
+    const paginationEl = document.getElementById('companyResponsesPagination');
+    paginationEl.innerHTML = '';
+    
+    // Previous button
+    const prevLi = document.createElement('li');
+    prevLi.className = `page-item ${!has_prev ? 'disabled' : ''}`;
+    prevLi.innerHTML = `<a class="page-link" href="#" onclick="companyResponsesChangePage(${page - 1}); return false;">Previous</a>`;
+    paginationEl.appendChild(prevLi);
+    
+    // Page numbers (show max 5 pages)
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, page - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(total_pages, startPage + maxPagesToShow - 1);
+    
+    // Adjust startPage if we're near the end
+    if (endPage - startPage < maxPagesToShow - 1) {
+        startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const pageLi = document.createElement('li');
+        pageLi.className = `page-item ${i === page ? 'active' : ''}`;
+        pageLi.innerHTML = `<a class="page-link" href="#" onclick="companyResponsesChangePage(${i}); return false;">${i}</a>`;
+        paginationEl.appendChild(pageLi);
+    }
+    
+    // Next button
+    const nextLi = document.createElement('li');
+    nextLi.className = `page-item ${!has_next ? 'disabled' : ''}`;
+    nextLi.innerHTML = `<a class="page-link" href="#" onclick="companyResponsesChangePage(${page + 1}); return false;">Next</a>`;
+    paginationEl.appendChild(nextLi);
+}
+
+function companyResponsesChangePage(newPage) {
+    companyResponsesState.page = newPage;
+    loadCompanyResponses();
+}
+
+function companyResponsesSearch() {
+    const searchValue = document.getElementById('companyResponseSearch').value.trim();
+    companyResponsesState.search = searchValue;
+    companyResponsesState.page = 1; // Reset to first page
+    loadCompanyResponses();
+}
+
+function companyResponsesSort() {
+    const sortValue = document.getElementById('companyResponseSort').value;
+    const [sortBy, sortOrder] = sortValue.split('_');
+    companyResponsesState.sortBy = sortBy;
+    companyResponsesState.sortOrder = sortOrder;
+    companyResponsesState.page = 1; // Reset to first page
+    loadCompanyResponses();
+}
+
+// Event listeners for search and sort
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('companyResponseSearch');
+    if (searchInput) {
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                companyResponsesSearch();
+            }
+        });
+        
+        // Debounced search on input
+        let searchTimeout;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(companyResponsesSearch, 500);
+        });
+    }
+    
+    const sortSelect = document.getElementById('companyResponseSort');
+    if (sortSelect) {
+        sortSelect.addEventListener('change', companyResponsesSort);
+    }
+});
+
 // Cache bust: 1759630893
