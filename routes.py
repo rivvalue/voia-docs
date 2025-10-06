@@ -4,6 +4,7 @@ from app import app, db
 from models import SurveyResponse, Participant, CampaignParticipant, Campaign
 from data_storage import get_dashboard_data
 from sqlalchemy.orm import joinedload
+from sqlalchemy import desc, or_
 
 # Root route already exists - removed duplicate
 from models_auth import AuthToken
