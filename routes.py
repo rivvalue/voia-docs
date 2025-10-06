@@ -1729,6 +1729,8 @@ def api_company_nps():
         nps_category = request.args.get('nps_category', '').strip().lower()
         campaign_id = request.args.get('campaign', type=int)
         
+        logger.info(f"📊 /api/company_nps called - campaign_id: {campaign_id}, page: {page}, search: '{search_query}'")
+        
         # Step 1: Create subquery to get latest churn risk per company (SINGLE QUERY)
         latest_churn_subquery = db.session.query(
             func.upper(SurveyResponse.company_name).label('company_upper'),
@@ -1900,6 +1902,8 @@ def api_tenure_nps():
         page = request.args.get('page', 1, type=int)
         per_page = min(request.args.get('per_page', 10, type=int), 100)  # Max 100 per page
         campaign_id = request.args.get('campaign', type=int)
+        
+        logger.info(f"📊 /api/tenure_nps called - campaign_id: {campaign_id}, page: {page}")
         
         # Step 1: Create subquery to get latest churn risk per tenure group (SINGLE QUERY)
         latest_churn_subquery = db.session.query(
