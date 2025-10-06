@@ -1820,6 +1820,9 @@ function populateAccountIntelligence() {
     
     // Enrich account data with NPS from company_nps_data (for old snapshots that don't have it)
     const companyNpsData = dashboardData.company_nps_data || [];
+    console.log('📊 Company NPS Data available:', companyNpsData.length, 'companies');
+    console.log('📊 Account Intelligence Data:', accountData.length, 'accounts');
+    
     const npsLookup = {};
     companyNpsData.forEach(company => {
         npsLookup[company.company_name.toUpperCase()] = company.company_nps;
@@ -1829,10 +1832,14 @@ function populateAccountIntelligence() {
     accountData = accountData.map(account => {
         if (account.company_nps === undefined || account.company_nps === null) {
             const nps = npsLookup[account.company_name.toUpperCase()];
+            console.log(`  Enriching ${account.company_name}: NPS=${nps}`);
             return { ...account, company_nps: nps !== undefined ? nps : null };
         }
+        console.log(`  ${account.company_name}: NPS already set to ${account.company_nps}`);
         return account;
     });
+    
+    console.log('✅ Enriched account data:', accountData.slice(0, 2));
     
     // Create legend
     const legendHtml = `
