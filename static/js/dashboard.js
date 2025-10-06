@@ -2217,13 +2217,19 @@ function renderAccountIntelligence(accountData, pagination) {
                     
                     <div class="account-details mb-3 p-2 rounded" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
                         <div class="row">
-                            <div class="col-6">
+                            <div class="col-4">
+                                <small class="text-muted">NPS:</small>
+                                <div class="fw-bold" style="color: #8A8A8A;">
+                                    ${account.company_nps !== undefined && account.company_nps !== null ? account.company_nps : 'N/A'}
+                                </div>
+                            </div>
+                            <div class="col-4">
                                 <small class="text-muted">Max Tenure:</small>
                                 <div class="fw-bold" style="color: #8A8A8A;">
                                     ${account.max_tenure ? account.max_tenure + ' years' : 'N/A'}
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-4">
                                 <small class="text-muted">Commercial Value:</small>
                                 <div class="fw-bold" style="color: #8A8A8A;">
                                     ${account.commercial_value ? '$' + account.commercial_value.toLocaleString() : 'N/A $'}
