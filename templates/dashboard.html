@@ -23,7 +23,52 @@
     --bs-warning-rgb: 189, 189, 189 !important;
     --warning: #BDBDBD !important;
 }
+
+/* Full-page loading overlay - shows immediately on page load */
+#pageLoadingOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.3s ease-out;
+}
+#pageLoadingOverlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #2E5090;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.loading-overlay-text {
+    margin-top: 20px;
+    font-size: 16px;
+    color: #2E5090;
+    font-weight: 500;
+}
 </style>
+
+<!-- Full-page loading overlay - visible immediately -->
+<div id="pageLoadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-overlay-text">Loading dashboard...</div>
+</div>
+
 <div class="row">
     <div class="col-lg-10 mx-auto">
         <div data-page="dashboard"></div>
