@@ -218,6 +218,10 @@ async function applyCampaignFilter() {
     loadTenureNpsData(1);  // Reset to page 1 when campaign changes
     loadAccountIntelligence(1); // Reset to page 1 when campaign changes
     
+    // CRITICAL: Reload Recent Survey Responses with campaign-specific data
+    console.log('📊 Reloading Recent Survey Responses for campaign:', selectedCampaignId);
+    loadSurveyResponses(1); // Reset to page 1 when campaign changes
+    
     // Also refresh Overview tab chart if visible - but wait for data to load
     console.log('🎨 About to call createThemesChart from applyCampaignFilter');
     // Use a longer delay and verify data exists before creating chart
@@ -2423,6 +2427,13 @@ function loadSurveyResponses(page = 1, searchQuery = '', npsFilter = '') {
     
     // Build URL with search and filter parameters
     let url = `/api/survey_responses?page=${page}&per_page=${responsesPerPage}`;
+    
+    // CRITICAL: Get campaign filter (NPS must be campaign-specific)
+    const campaignSelect = document.getElementById('campaignFilter');
+    if (campaignSelect && campaignSelect.value) {
+        url += `&campaign=${campaignSelect.value}`;
+    }
+    
     if (searchQuery.trim()) {
         url += `&search=${encodeURIComponent(searchQuery)}`;
     }

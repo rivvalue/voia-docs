@@ -1249,6 +1249,9 @@ def survey_responses():
         per_page = min(request.args.get('per_page', 10, type=int), 100)  # Max 100 per page
         search_query = request.args.get('search', '').strip()
         nps_category = request.args.get('nps_category', '').strip().lower()
+        campaign_id = request.args.get('campaign', type=int)
+        
+        logger.info(f"📊 /api/survey_responses called - campaign_id: {campaign_id}, page: {page}, search: '{search_query}'")
         
         # Base query with business account scoping via campaign relationship
         query = SurveyResponse.query.join(Campaign).filter(
@@ -1256,6 +1259,10 @@ def survey_responses():
         ).options(
             joinedload(SurveyResponse.campaign)
         )
+        
+        # Apply campaign filter (CRITICAL: NPS must be campaign-specific)
+        if campaign_id:
+            query = query.filter(SurveyResponse.campaign_id == campaign_id)
         
         # Apply search filter if provided
         if search_query:
