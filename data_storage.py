@@ -851,13 +851,27 @@ def convert_snapshot_to_dashboard_format(snapshot):
         nps_lookup = {company['company_name'].upper(): company['company_nps'] 
                      for company in company_nps_data if 'company_name' in company and 'company_nps' in company}
         
+        print(f"🔍 Snapshot enrichment - Available NPS data: {len(nps_lookup)} companies")
+        print(f"🔍 Account intelligence before enrichment: {len(account_intelligence)} accounts")
+        
         # Enrich accounts with correct company_nps (always overwrite to fix old snapshots with 0 values)
         for account in account_intelligence:
             company_key = account.get('company_name', '').upper()
+            old_nps = account.get('company_nps', 'missing')
             if company_key in nps_lookup:
                 account['company_nps'] = nps_lookup[company_key]
+                if company_key == 'STAN':
+                    print(f"✅ Enriched Stan: {old_nps} → {account['company_nps']}")
             elif 'company_nps' not in account:
                 account['company_nps'] = 0
+                if company_key == 'STAN':
+                    print(f"⚠️ Stan not in lookup, setting to 0")
+        
+        print(f"🔍 NPS lookup keys: {list(nps_lookup.keys())[:5]}")
+        if 'STAN' in nps_lookup:
+            print(f"✅ Stan is in lookup with NPS: {nps_lookup['STAN']}")
+        else:
+            print(f"❌ Stan NOT in lookup!")
         
         return {
             'total_responses': snapshot.total_responses,
