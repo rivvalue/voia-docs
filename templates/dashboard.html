@@ -912,6 +912,102 @@
     <!-- End Dashboard Content -->
 </div>
 <!-- End Dashboard Column -->
+
+<!-- Company Responses Modal -->
+<div class="modal fade" id="companyResponsesModal" tabindex="-1" aria-labelledby="companyResponsesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" style="background-color: #1e1e1e; border: 1px solid #2E5090;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #2E5090 0%, #1a3560 100%); border-bottom: 2px solid #E13A44;">
+                <div class="w-100">
+                    <h5 class="modal-title text-white mb-2" id="companyResponsesModalLabel">
+                        <i class="fas fa-building me-2"></i><span id="modalCompanyName"></span>
+                    </h5>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <span class="badge bg-light text-dark">
+                            <i class="fas fa-flag me-1"></i><span id="modalCampaignName"></span>
+                        </span>
+                        <span class="badge bg-info">
+                            <i class="fas fa-poll me-1"></i><span id="modalResponseCount">0</span> Responses
+                        </span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="background-color: #1e1e1e;">
+                <!-- Search and Filters -->
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            <span class="input-group-text" style="background-color: #2a2a2a; border-color: #3a3a3a;">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <input type="text" class="form-control" id="companyResponseSearch" 
+                                   placeholder="Search by respondent name or email..."
+                                   style="background-color: #2a2a2a; border-color: #3a3a3a; color: #ffffff;">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="companyResponseSort" 
+                                style="background-color: #2a2a2a; border-color: #3a3a3a; color: #ffffff;">
+                            <option value="created_at_desc">Newest First</option>
+                            <option value="created_at_asc">Oldest First</option>
+                            <option value="nps_score_desc">Highest NPS</option>
+                            <option value="nps_score_asc">Lowest NPS</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Loading State -->
+                <div id="companyResponsesLoading" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="text-muted mt-2">Loading responses...</p>
+                </div>
+                
+                <!-- Responses Table -->
+                <div id="companyResponsesContent" style="display: none;">
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover">
+                            <thead style="background-color: #2E5090; position: sticky; top: 0; z-index: 10;">
+                                <tr>
+                                    <th style="width: 20%;">Respondent</th>
+                                    <th style="width: 10%; text-align: center;">NPS</th>
+                                    <th style="width: 50%;" class="text-center">Ratings</th>
+                                    <th style="width: 15%;">Date</th>
+                                    <th style="width: 5%; text-align: center;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="companyResponsesTableBody">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div class="text-muted">
+                            <span id="companyResponsesPaginationInfo"></span>
+                        </div>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0" id="companyResponsesPagination">
+                                <!-- Will be populated by JavaScript -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                
+                <!-- No Data State -->
+                <div id="companyResponsesNoData" class="text-center py-5" style="display: none;">
+                    <i class="fas fa-inbox fa-4x text-muted mb-3"></i>
+                    <h5 class="text-muted">No Responses Found</h5>
+                    <p class="text-muted">No survey responses match your search criteria.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block scripts %}
