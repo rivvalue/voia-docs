@@ -665,30 +665,46 @@ function populateCompanyComparison(data, page = 1) {
         const c1 = company.campaign1;
         const c2 = company.campaign2;
         
-        // Determine status
-        let status = 'No Change';
+        // Helper function to display value or N/A
+        const displayValue = (value) => {
+            return (value === null || value === undefined) ? 'N/A' : value;
+        };
+        
+        // Determine status - only compare if both campaigns have data
+        let status = 'N/A';
         let statusClass = 'text-muted';
         
-        if (c1.balance !== c2.balance) {
-            if (c2.balance === 'opportunity_heavy' && c1.balance !== 'opportunity_heavy') {
-                status = 'Improved';
+        if (c1.participated && c2.participated) {
+            // Both campaigns have data - can compare
+            status = 'No Change';
+            
+            if (c1.balance !== c2.balance) {
+                if (c2.balance === 'opportunity_heavy' && c1.balance !== 'opportunity_heavy') {
+                    status = 'Improved';
+                    statusClass = 'text-success';
+                } else if (c2.balance === 'risk_heavy' && c1.balance !== 'risk_heavy') {
+                    status = 'Worsened';
+                    statusClass = 'text-danger';
+                } else if (c2.balance === 'balanced' && c1.balance === 'risk_heavy') {
+                    status = 'Improved';
+                    statusClass = 'text-success';
+                } else {
+                    status = 'Changed';
+                    statusClass = 'text-warning';
+                }
+            } else if (c2.risk_count < c1.risk_count) {
+                status = 'Less Risk';
                 statusClass = 'text-success';
-            } else if (c2.balance === 'risk_heavy' && c1.balance !== 'risk_heavy') {
-                status = 'Worsened';
-                statusClass = 'text-danger';
-            } else if (c2.balance === 'balanced' && c1.balance === 'risk_heavy') {
-                status = 'Improved';
+            } else if (c2.opportunity_count > c1.opportunity_count) {
+                status = 'More Opps';
                 statusClass = 'text-success';
-            } else {
-                status = 'Changed';
-                statusClass = 'text-warning';
             }
-        } else if (c2.risk_count < c1.risk_count) {
-            status = 'Less Risk';
-            statusClass = 'text-success';
-        } else if (c2.opportunity_count > c1.opportunity_count) {
-            status = 'More Opps';
-            statusClass = 'text-success';
+        } else if (!c1.participated && c2.participated) {
+            status = 'New in C2';
+            statusClass = 'text-info';
+        } else if (c1.participated && !c2.participated) {
+            status = 'Not in C2';
+            statusClass = 'text-warning';
         }
         
         // Create table row using safe DOM methods
@@ -703,32 +719,32 @@ function populateCompanyComparison(data, page = 1) {
         // Campaign 1 - Risk count
         const c1RiskCell = document.createElement('td');
         c1RiskCell.className = 'text-center';
-        c1RiskCell.textContent = c1.risk_count;
+        c1RiskCell.textContent = displayValue(c1.risk_count);
         
         // Campaign 1 - Opportunity count
         const c1OppCell = document.createElement('td');
         c1OppCell.className = 'text-center';
-        c1OppCell.textContent = c1.opportunity_count;
+        c1OppCell.textContent = displayValue(c1.opportunity_count);
         
         // Campaign 1 - Balance
         const c1BalanceCell = document.createElement('td');
         c1BalanceCell.className = 'text-center';
-        c1BalanceCell.textContent = formatBalance(c1.balance);
+        c1BalanceCell.textContent = c1.balance ? formatBalance(c1.balance) : 'N/A';
         
         // Campaign 2 - Risk count
         const c2RiskCell = document.createElement('td');
         c2RiskCell.className = 'text-center';
-        c2RiskCell.textContent = c2.risk_count;
+        c2RiskCell.textContent = displayValue(c2.risk_count);
         
         // Campaign 2 - Opportunity count
         const c2OppCell = document.createElement('td');
         c2OppCell.className = 'text-center';
-        c2OppCell.textContent = c2.opportunity_count;
+        c2OppCell.textContent = displayValue(c2.opportunity_count);
         
         // Campaign 2 - Balance
         const c2BalanceCell = document.createElement('td');
         c2BalanceCell.className = 'text-center';
-        c2BalanceCell.textContent = formatBalance(c2.balance);
+        c2BalanceCell.textContent = c2.balance ? formatBalance(c2.balance) : 'N/A';
         
         // Status column
         const statusCell = document.createElement('td');

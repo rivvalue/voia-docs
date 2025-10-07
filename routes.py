@@ -2742,19 +2742,25 @@ def get_campaign_comparison():
             # Use the most recent company name version
             display_name = c1.get('company_name') or c2.get('company_name', company_key.title())
             
+            # Determine if company participated in each campaign
+            c1_participated = bool(c1)
+            c2_participated = bool(c2)
+            
             comparison['company_details'].append({
                 'company_name': display_name,
                 'campaign1': {
-                    'risk_count': c1.get('risk_count', 0),
-                    'opportunity_count': c1.get('opportunity_count', 0),
-                    'balance': c1.get('balance', 'N/A'),
-                    'critical_risks': c1.get('critical_risks', 0)
+                    'risk_count': c1.get('risk_count') if c1_participated else None,
+                    'opportunity_count': c1.get('opportunity_count') if c1_participated else None,
+                    'balance': c1.get('balance') if c1_participated else None,
+                    'critical_risks': c1.get('critical_risks') if c1_participated else None,
+                    'participated': c1_participated
                 },
                 'campaign2': {
-                    'risk_count': c2.get('risk_count', 0),
-                    'opportunity_count': c2.get('opportunity_count', 0),
-                    'balance': c2.get('balance', 'N/A'),
-                    'critical_risks': c2.get('critical_risks', 0)
+                    'risk_count': c2.get('risk_count') if c2_participated else None,
+                    'opportunity_count': c2.get('opportunity_count') if c2_participated else None,
+                    'balance': c2.get('balance') if c2_participated else None,
+                    'critical_risks': c2.get('critical_risks') if c2_participated else None,
+                    'participated': c2_participated
                 }
             })
         
