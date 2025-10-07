@@ -90,7 +90,7 @@ def create_campaign():
         description = request.form.get('description', '').strip()
         start_date = request.form.get('start_date', '').strip()
         end_date = request.form.get('end_date', '').strip()
-        anonymize_responses = bool(request.form.get('anonymize_responses'))
+        anonymize_responses = 'anonymize_responses' in request.form
         
         # Validate required fields
         if not name or not start_date or not end_date:
