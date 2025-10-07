@@ -271,10 +271,16 @@ function showValidationError(message) {
         existingError.remove();
     }
     
-    // Create error message
+    // Create error message using safe DOM methods
     const errorDiv = document.createElement('div');
     errorDiv.className = 'alert alert-warning validation-error mt-3';
-    errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>${message}`;
+    
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-exclamation-triangle me-2';
+    errorDiv.appendChild(icon);
+    
+    const messageText = document.createTextNode(message);
+    errorDiv.appendChild(messageText);
     
     // Add to current step
     const currentStepDiv = document.getElementById(`step${currentStep}`);
@@ -419,12 +425,33 @@ function showAuthRequired() {
     // Show authentication requirement
     const authAlert = document.createElement('div');
     authAlert.className = 'alert alert-warning alert-dismissible fade show';
-    authAlert.innerHTML = `
-        <i class="fas fa-key me-2"></i>
-        <strong>Authentication Required:</strong> You need a valid token to submit surveys.
-        <a href="/auth" class="btn btn-sm btn-outline-warning ms-2">Get Token</a>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
+    
+    // Create icon
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-key me-2';
+    authAlert.appendChild(icon);
+    
+    // Create strong text
+    const strongText = document.createElement('strong');
+    strongText.textContent = 'Authentication Required:';
+    authAlert.appendChild(strongText);
+    
+    // Add regular text
+    authAlert.appendChild(document.createTextNode(' You need a valid token to submit surveys. '));
+    
+    // Create link button
+    const link = document.createElement('a');
+    link.href = '/auth';
+    link.className = 'btn btn-sm btn-outline-warning ms-2';
+    link.textContent = 'Get Token';
+    authAlert.appendChild(link);
+    
+    // Create close button
+    const closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.className = 'btn-close';
+    closeButton.setAttribute('data-bs-dismiss', 'alert');
+    authAlert.appendChild(closeButton);
     
     // Insert at the top of the form
     const formContainer = document.querySelector('.card-body');
