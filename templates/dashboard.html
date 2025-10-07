@@ -697,49 +697,49 @@
                                                     <th style="min-width: 120px;">Campaign</th>
                                                     <th class="text-center" style="min-width: 100px;">
                                                         Responses
-                                                        <div style="height: 30px; margin-top: 5px;">
+                                                        <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Click to view full trends">
                                                             <canvas id="sparkline-responses"></canvas>
                                                         </div>
                                                     </th>
                                                     <th class="text-center" style="min-width: 100px;">
                                                         NPS
-                                                        <div style="height: 30px; margin-top: 5px;">
+                                                        <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Click to view full trends">
                                                             <canvas id="sparkline-nps"></canvas>
                                                         </div>
                                                     </th>
                                                     <th class="text-center" style="min-width: 100px;">
                                                         Companies
-                                                        <div style="height: 30px; margin-top: 5px;">
+                                                        <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Click to view full trends">
                                                             <canvas id="sparkline-companies"></canvas>
                                                         </div>
                                                     </th>
                                                     <th class="text-center" style="min-width: 110px;">
                                                         Critical Risk
-                                                        <div style="height: 30px; margin-top: 5px;">
+                                                        <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Click to view full trends">
                                                             <canvas id="sparkline-critical"></canvas>
                                                         </div>
                                                     </th>
                                                     <th class="text-center" style="min-width: 110px;">
                                                         Satisfaction
-                                                        <div style="height: 30px; margin-top: 5px;">
+                                                        <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Click to view full trends">
                                                             <canvas id="sparkline-satisfaction"></canvas>
                                                         </div>
                                                     </th>
                                                     <th class="text-center" style="min-width: 110px;">
                                                         Product
-                                                        <div style="height: 30px; margin-top: 5px;">
+                                                        <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Click to view full trends">
                                                             <canvas id="sparkline-product"></canvas>
                                                         </div>
                                                     </th>
                                                     <th class="text-center" style="min-width: 100px;">
                                                         Pricing
-                                                        <div style="height: 30px; margin-top: 5px;">
+                                                        <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Click to view full trends">
                                                             <canvas id="sparkline-pricing"></canvas>
                                                         </div>
                                                     </th>
                                                     <th class="text-center" style="min-width: 100px;">
                                                         Service
-                                                        <div style="height: 30px; margin-top: 5px;">
+                                                        <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Click to view full trends">
                                                             <canvas id="sparkline-service"></canvas>
                                                         </div>
                                                     </th>
@@ -753,6 +753,13 @@
                                                 </tr>
                                             </tbody>
                                         </table>
+                                    </div>
+                                    
+                                    <!-- Mobile: View Trends Button (hidden on desktop) -->
+                                    <div class="text-center mt-3 d-md-none">
+                                        <button class="btn btn-outline-secondary btn-sm" onclick="openTrendsModal()" style="border-color: #BDBDBD; color: #000000;">
+                                            <i class="fas fa-chart-line me-2"></i>View Trends
+                                        </button>
                                     </div>
                                     
                                     <!-- Overall Delta Summary -->
@@ -1054,6 +1061,107 @@
                     <h5 style="color: #8A8A8A;">No Responses Found</h5>
                     <p style="color: #8A8A8A;">No survey responses match your search criteria.</p>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- KPI Trends Modal -->
+<div class="modal fade" id="kpiTrendsModal" tabindex="-1" aria-labelledby="kpiTrendsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #E9E8E4; border-bottom: 2px solid #BDBDBD;">
+                <h5 class="modal-title" id="kpiTrendsModalLabel" style="color: #000000;">
+                    <i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>Campaign KPI Trends
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="background-color: #FFFFFF;">
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="card" style="border: 1px solid #E9E8E4;">
+                            <div class="card-header" style="background-color: #E9E8E4; border-bottom: 1px solid #BDBDBD;">
+                                <h6 class="mb-0" style="color: #000000;">Responses</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-responses" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card" style="border: 1px solid #E9E8E4;">
+                            <div class="card-header" style="background-color: #E9E8E4; border-bottom: 1px solid #BDBDBD;">
+                                <h6 class="mb-0" style="color: #000000;">NPS Score</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-nps" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card" style="border: 1px solid #E9E8E4;">
+                            <div class="card-header" style="background-color: #E9E8E4; border-bottom: 1px solid #BDBDBD;">
+                                <h6 class="mb-0" style="color: #000000;">Companies Analyzed</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-companies" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card" style="border: 1px solid #E9E8E4;">
+                            <div class="card-header" style="background-color: #E9E8E4; border-bottom: 1px solid #BDBDBD;">
+                                <h6 class="mb-0" style="color: #000000;">Critical Risk</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-critical" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-3">
+                        <div class="card" style="border: 1px solid #E9E8E4;">
+                            <div class="card-header" style="background-color: #E9E8E4; border-bottom: 1px solid #BDBDBD;">
+                                <h6 class="mb-0" style="color: #000000;">Satisfaction</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-satisfaction" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-3">
+                        <div class="card" style="border: 1px solid #E9E8E4;">
+                            <div class="card-header" style="background-color: #E9E8E4; border-bottom: 1px solid #BDBDBD;">
+                                <h6 class="mb-0" style="color: #000000;">Product Value</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-product" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-3">
+                        <div class="card" style="border: 1px solid #E9E8E4;">
+                            <div class="card-header" style="background-color: #E9E8E4; border-bottom: 1px solid #BDBDBD;">
+                                <h6 class="mb-0" style="color: #000000;">Pricing</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-pricing" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-3">
+                        <div class="card" style="border: 1px solid #E9E8E4;">
+                            <div class="card-header" style="background-color: #E9E8E4; border-bottom: 1px solid #BDBDBD;">
+                                <h6 class="mb-0" style="color: #000000;">Service</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-service" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="background-color: #E9E8E4; border-top: 2px solid #BDBDBD;">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="background-color: #BDBDBD; border-color: #BDBDBD; color: #000000;">Close</button>
             </div>
         </div>
     </div>

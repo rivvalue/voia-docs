@@ -3125,29 +3125,23 @@ async function loadKpiOverview() {
         }
         
         // Build rows for each campaign with their individual KPI data
-        let kpiRows = [];
-        
-        for (const campaign of campaigns) {
-            // For each campaign, we'll extract KPI data from dashboard data or use comparison with self
-            // This leverages the fact that comparison endpoint provides comprehensive KPI metrics
-            
+        // PERFORMANCE FIX: Load all campaign data in parallel instead of sequentially
+        const campaignDataPromises = campaigns.map(async (campaign) => {
             let campaignKpis = null;
             
             // Try to get KPI data by calling comparison endpoint with same campaign twice
-            if (campaigns.length >= 1) {
-                try {
-                    const comparisonResponse = await fetch(`/api/campaigns/comparison?campaign1=${campaign.id}&campaign2=${campaign.id}`);
-                    if (comparisonResponse.ok) {
-                        const comparisonData = await comparisonResponse.json();
-                        campaignKpis = comparisonData.campaign1?.data; // Same campaign data
-                    }
-                } catch (error) {
-                    console.warn(`Failed to load KPI data for campaign ${campaign.name}:`, error);
+            try {
+                const comparisonResponse = await fetch(`/api/campaigns/comparison?campaign1=${campaign.id}&campaign2=${campaign.id}`);
+                if (comparisonResponse.ok) {
+                    const comparisonData = await comparisonResponse.json();
+                    campaignKpis = comparisonData.campaign1?.data; // Same campaign data
                 }
+            } catch (error) {
+                console.warn(`Failed to load KPI data for campaign ${campaign.name}:`, error);
             }
             
             // Format the row with available data or defaults
-            const row = {
+            return {
                 name: campaign.name || 'Unknown',
                 status: formatCampaignStatus(campaign.status),
                 responses: campaignKpis?.total_responses || 0,
@@ -3159,9 +3153,10 @@ async function loadKpiOverview() {
                 pricing: campaignKpis?.average_ratings?.pricing || 0,
                 service: campaignKpis?.average_ratings?.service || 0
             };
-            
-            kpiRows.push(row);
-        }
+        });
+        
+        // Wait for all campaign data to load in parallel
+        const kpiRows = await Promise.all(campaignDataPromises);
         
         // Sort by campaign end date (chronological order for trend visualization)
         campaigns.sort((a, b) => new Date(a.end_date) - new Date(b.end_date));
@@ -3199,8 +3194,16 @@ async function loadKpiOverview() {
 // Store sparkline chart instances to destroy them before recreating
 let sparklineCharts = {};
 
+// Store KPI data globally for modal use
+let globalKpiData = null;
+
+// Store modal chart instances
+let modalCharts = {};
+
 // Create sparklines for KPI metrics using approved color palette only
 function createKpiSparklines(kpiData) {
+    // Store data globally for modal
+    globalKpiData = kpiData;
     if (!kpiData || kpiData.length === 0) return;
     
     // Destroy existing charts to prevent memory leaks
@@ -3299,6 +3302,138 @@ function createKpiSparklines(kpiData) {
     });
     
     console.log('Sparklines created successfully');
+}
+
+// Open the KPI trends modal with full-size charts
+function openTrendsModal() {
+    if (!globalKpiData || globalKpiData.length === 0) {
+        alert('No campaign data available to display trends.');
+        return;
+    }
+    
+    // Show the modal using Bootstrap 5
+    const modal = new bootstrap.Modal(document.getElementById('kpiTrendsModal'));
+    modal.show();
+    
+    // Create full-size charts after modal is shown (needed for proper rendering)
+    setTimeout(() => {
+        createModalCharts(globalKpiData);
+    }, 300);
+}
+
+// Create full-size trend charts in modal
+function createModalCharts(kpiData) {
+    // Destroy existing modal charts
+    Object.values(modalCharts).forEach(chart => {
+        if (chart) chart.destroy();
+    });
+    modalCharts = {};
+    
+    // Approved color palette
+    const PRIMARY_RED = '#E13A44';
+    const MEDIUM_GRAY = '#BDBDBD';
+    const BLACK = '#000000';
+    
+    // Extract data for each metric
+    const metrics = {
+        responses: kpiData.map(row => row.responses),
+        nps_score: kpiData.map(row => row.nps_score),
+        companies: kpiData.map(row => row.companies),
+        critical_risk: kpiData.map(row => row.critical_risk),
+        satisfaction: kpiData.map(row => row.satisfaction),
+        product_value: kpiData.map(row => row.product_value),
+        pricing: kpiData.map(row => row.pricing),
+        service: kpiData.map(row => row.service)
+    };
+    
+    // Campaign labels
+    const labels = kpiData.map(row => row.name);
+    
+    // Common chart configuration for modal
+    const createModalChartConfig = (data, label, yAxisLabel) => ({
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: yAxisLabel,
+                data: data,
+                borderColor: PRIMARY_RED,
+                backgroundColor: 'rgba(225, 58, 68, 0.1)',
+                borderWidth: 3,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                pointBackgroundColor: PRIMARY_RED,
+                pointBorderColor: '#FFFFFF',
+                pointBorderWidth: 2,
+                tension: 0.3,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { 
+                    display: true,
+                    labels: {
+                        color: BLACK,
+                        font: { size: 12 }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#FFFFFF',
+                    bodyColor: '#FFFFFF',
+                    borderColor: MEDIUM_GRAY,
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: false,
+                    callbacks: {
+                        label: (context) => `${yAxisLabel}: ${context.parsed.y.toFixed(1)}`
+                    }
+                }
+            },
+            scales: {
+                x: { 
+                    display: true,
+                    grid: { color: '#E9E8E4' },
+                    ticks: { color: BLACK }
+                },
+                y: { 
+                    display: true,
+                    grid: { color: '#E9E8E4' },
+                    ticks: { color: BLACK },
+                    beginAtZero: true
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            }
+        }
+    });
+    
+    // Create modal charts
+    const modalChartConfigs = [
+        { id: 'modal-chart-responses', data: metrics.responses, label: 'Responses', yLabel: 'Total Responses' },
+        { id: 'modal-chart-nps', data: metrics.nps_score, label: 'NPS', yLabel: 'NPS Score' },
+        { id: 'modal-chart-companies', data: metrics.companies, label: 'Companies', yLabel: 'Companies Analyzed' },
+        { id: 'modal-chart-critical', data: metrics.critical_risk, label: 'Critical Risk', yLabel: 'Critical Risk Count' },
+        { id: 'modal-chart-satisfaction', data: metrics.satisfaction, label: 'Satisfaction', yLabel: 'Satisfaction Rating' },
+        { id: 'modal-chart-product', data: metrics.product_value, label: 'Product', yLabel: 'Product Value Rating' },
+        { id: 'modal-chart-pricing', data: metrics.pricing, label: 'Pricing', yLabel: 'Pricing Rating' },
+        { id: 'modal-chart-service', data: metrics.service, label: 'Service', yLabel: 'Service Rating' }
+    ];
+    
+    modalChartConfigs.forEach(config => {
+        const canvas = document.getElementById(config.id);
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            modalCharts[config.id] = new Chart(ctx, createModalChartConfig(config.data, config.label, config.yLabel));
+        }
+    });
+    
+    console.log('Modal charts created successfully');
 }
 
 function refreshData() {
