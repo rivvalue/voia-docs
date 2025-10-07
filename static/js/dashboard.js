@@ -949,7 +949,6 @@ function loadDashboardData() {
     console.log('loadDashboardData called');
     const loadingElement = document.getElementById('loadingIndicator');
     const contentElement = document.getElementById('dashboardContent');
-    const pageOverlay = document.getElementById('pageLoadingOverlay');
     
     if (loadingElement) loadingElement.classList.remove('d-none');
     if (contentElement) contentElement.classList.add('d-none');
@@ -998,17 +997,6 @@ function loadDashboardData() {
             // Show content BEFORE creating charts
             if (loadingElement) loadingElement.classList.add('d-none');
             if (contentElement) contentElement.classList.remove('d-none');
-            
-            // Hide page loading overlay
-            if (pageOverlay) {
-                pageOverlay.classList.add('hidden');
-                // Remove from DOM after transition
-                setTimeout(() => {
-                    if (pageOverlay && pageOverlay.classList.contains('hidden')) {
-                        pageOverlay.style.display = 'none';
-                    }
-                }, 300);
-            }
             
             // Now populate dashboard with charts AFTER content is visible
             populateDashboard();
