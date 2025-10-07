@@ -110,7 +110,7 @@ def main():
     logger.info(f"Executing: {' '.join(cmd)}")
     
     try:
-        subprocess.run(cmd, check=True)
+        subprocess.run(cmd, check=True, shell=False)
     except KeyboardInterrupt:
         logger.info("Server shutdown requested")
     except subprocess.CalledProcessError as e:
