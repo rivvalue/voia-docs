@@ -2308,3 +2308,37 @@ class ExecutiveReport(db.Model):
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
             'campaign_name': self.campaign.name if self.campaign else None
         }
+
+class ExportJob(db.Model):
+    """Model for tracking campaign data export jobs"""
+    __tablename__ = 'export_jobs'
+    
+    id = db.Column(db.String(36), primary_key=True)  # UUID
+    campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=False, index=True)
+    business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
+    status = db.Column(db.String(20), default='queued', nullable=False, index=True)  # queued, processing, completed, failed
+    file_path = db.Column(db.String(500), nullable=True)
+    error = db.Column(db.Text, nullable=True)
+    progress = db.Column(db.Integer, default=0, nullable=True)  # 0-100
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    completed_at = db.Column(db.DateTime, nullable=True)
+    
+    # Relationships
+    campaign = db.relationship('Campaign', backref='export_jobs')
+    business_account = db.relationship('BusinessAccount', backref='export_jobs')
+    
+    def to_dict(self):
+        return {
+            'job_id': self.id,
+            'campaign_id': self.campaign_id,
+            'business_account_id': self.business_account_id,
+            'status': self.status,
+            'file_path': self.file_path,
+            'error': self.error,
+            'progress': self.progress,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            'completed_at': self.completed_at.isoformat() if self.completed_at else None,
+            'campaign_name': self.campaign.name if self.campaign else None
+        }

@@ -26,10 +26,6 @@ class TaskQueue:
         self.last_scheduler_run = None
         self.scheduler_interval = 300  # 5 minutes in seconds
         
-        # Export job tracking
-        self.export_jobs = {}  # job_id -> job_status
-        self.export_jobs_lock = Lock()
-        
     def start(self):
         """Start the task queue workers and scheduler"""
         if self.running:
@@ -453,64 +449,95 @@ class TaskQueue:
             return False
     
     def _update_export_job_status(self, job_id, status, error=None, file_path=None, progress=None):
-        """Update export job status thread-safely"""
-        with self.export_jobs_lock:
-            if job_id in self.export_jobs:
-                self.export_jobs[job_id].update({
-                    'status': status,
-                    'updated_at': datetime.utcnow(),
-                    'error': error,
-                    'file_path': file_path,
-                    'progress': progress
-                })
+        """Update export job status in database"""
+        from models import ExportJob
+        from app import db
+        
+        try:
+            export_job = ExportJob.query.get(job_id)
+            if export_job:
+                export_job.status = status
+                export_job.error = error
+                if file_path:
+                    export_job.file_path = file_path
+                if progress is not None:
+                    export_job.progress = progress
+                if status == 'completed':
+                    export_job.completed_at = datetime.utcnow()
+                
+                db.session.commit()
+                logger.debug(f"Updated export job {job_id} status to {status}")
+            else:
+                logger.warning(f"Export job {job_id} not found for status update")
+        except Exception as e:
+            logger.error(f"Error updating export job status: {e}")
+            db.session.rollback()
     
     def create_export_job(self, campaign_id, business_account_id):
         """Create a new export job and return job ID"""
+        from models import ExportJob
+        from app import db
+        
         job_id = str(uuid.uuid4())
         
-        with self.export_jobs_lock:
-            self.export_jobs[job_id] = {
-                'job_id': job_id,
-                'campaign_id': campaign_id,
-                'business_account_id': business_account_id,
-                'status': 'queued',
-                'created_at': datetime.utcnow(),
-                'updated_at': datetime.utcnow(),
-                'error': None,
-                'file_path': None,
-                'progress': None
-            }
+        # Create export job in database
+        export_job = ExportJob(
+            id=job_id,
+            campaign_id=campaign_id,
+            business_account_id=business_account_id,
+            status='queued',
+            progress=0
+        )
+        
+        db.session.add(export_job)
+        db.session.commit()
+        
+        logger.info(f"Created export job {job_id} for campaign {campaign_id}")
         
         return job_id
     
     def get_export_job_status(self, job_id):
-        """Get export job status"""
-        with self.export_jobs_lock:
-            return self.export_jobs.get(job_id)
+        """Get export job status from database"""
+        from models import ExportJob
+        
+        try:
+            export_job = ExportJob.query.get(job_id)
+            if export_job:
+                return export_job.to_dict()
+            return None
+        except Exception as e:
+            logger.error(f"Error getting export job status: {e}")
+            return None
     
     def cleanup_old_export_jobs(self, max_age_hours=24):
-        """Clean up old export jobs and their files"""
-        cutoff_time = datetime.utcnow() - timedelta(hours=max_age_hours)
+        """Clean up old export jobs and their files from database"""
+        from models import ExportJob
+        from app import db
         
-        with self.export_jobs_lock:
-            jobs_to_remove = []
-            for job_id, job_data in self.export_jobs.items():
-                if job_data['updated_at'] < cutoff_time:
-                    # Clean up file if it exists
-                    if job_data.get('file_path') and os.path.exists(job_data['file_path']):
-                        try:
-                            os.remove(job_data['file_path'])
-                            logger.info(f"Cleaned up export file: {job_data['file_path']}")
-                        except Exception as e:
-                            logger.error(f"Error cleaning up export file {job_data['file_path']}: {e}")
-                    
-                    jobs_to_remove.append(job_id)
+        try:
+            cutoff_time = datetime.utcnow() - timedelta(hours=max_age_hours)
             
-            for job_id in jobs_to_remove:
-                del self.export_jobs[job_id]
+            # Find old export jobs
+            old_jobs = ExportJob.query.filter(ExportJob.updated_at < cutoff_time).all()
+            
+            for job in old_jobs:
+                # Clean up file if it exists
+                if job.file_path and os.path.exists(job.file_path):
+                    try:
+                        os.remove(job.file_path)
+                        logger.info(f"Cleaned up export file: {job.file_path}")
+                    except Exception as e:
+                        logger.error(f"Error cleaning up export file {job.file_path}: {e}")
                 
-            if jobs_to_remove:
-                logger.info(f"Cleaned up {len(jobs_to_remove)} old export jobs")
+                # Delete job from database
+                db.session.delete(job)
+            
+            if old_jobs:
+                db.session.commit()
+                logger.info(f"Cleaned up {len(old_jobs)} old export jobs")
+        except Exception as e:
+            logger.error(f"Error cleaning up old export jobs: {e}")
+            db.session.rollback()
     
     def _process_executive_report_task(self, task_data, worker_id):
         """Process executive report generation task (both new and regeneration)"""
