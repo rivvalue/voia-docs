@@ -3483,6 +3483,25 @@ def download_executive_report(campaign_id):
         report.download_count += 1
         db.session.commit()
         
+        # Log the download in audit trail
+        try:
+            from audit_utils import queue_audit_log
+            queue_audit_log(
+                business_account_id=current_account.id,
+                action_type='executive_report_downloaded',
+                resource_type='campaign',
+                resource_id=campaign_id,
+                resource_name=campaign.name,
+                details={
+                    'report_id': report.id,
+                    'file_name': f"Executive_Report_{campaign.name}_{report.generated_at.strftime('%Y%m%d')}.pdf",
+                    'report_generated_at': report.generated_at.isoformat() if report.generated_at else None,
+                    'download_count': report.download_count
+                }
+            )
+        except Exception as e:
+            logger.error(f"Failed to log executive report download audit event: {e}")
+        
         # Serve the file
         from flask import send_file
         filename = f"Executive_Report_{campaign.name}_{report.generated_at.strftime('%Y%m%d')}.pdf"

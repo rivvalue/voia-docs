@@ -35,7 +35,8 @@ ACTION_DESCRIPTIONS = {
     'account_settings_updated': 'Account settings updated',
     'user_added': 'New user added to account',
     'user_removed': 'User removed from account',
-    'scheduler_run': 'Campaign scheduler executed'
+    'scheduler_run': 'Campaign scheduler executed',
+    'executive_report_downloaded': 'Executive report downloaded'
 }
 
 def get_current_user_context():
@@ -132,6 +133,8 @@ def create_audit_description(action_type, resource_name=None, details=None):
         elif action_type == 'survey_invitations_sent':
             count = details.get('count', 0) if details else 0
             return f"Survey invitations sent to {count} participant{'s' if count != 1 else ''}"
+        elif action_type == 'executive_report_downloaded':
+            return f"Executive report downloaded for campaign '{resource_name}'"
         else:
             return f"{base_description} - {resource_name}"
     
