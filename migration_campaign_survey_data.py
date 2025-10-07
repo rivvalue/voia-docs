@@ -72,10 +72,12 @@ class CampaignSurveyMigration:
             ORDER BY c.id
             """
             
+            params = {}
             if limit:
-                query += f" LIMIT {limit}"
+                query += " LIMIT :limit"
+                params['limit'] = limit
                 
-            result = db.session.execute(text(query))
+            result = db.session.execute(text(query), params)
             campaigns = result.fetchall()
             
             logger.info(f"Found {len(campaigns)} campaigns:")
