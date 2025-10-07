@@ -1488,12 +1488,12 @@ def get_export_status(job_id):
         if job_status['business_account_id'] != current_account.id:
             return jsonify({'error': 'Export job not found'}), 404
         
-        # Prepare response data
+        # Prepare response data (dates are already ISO formatted from to_dict())
         response_data = {
             'job_id': job_status['job_id'],
             'status': job_status['status'],
-            'created_at': job_status['created_at'].isoformat(),
-            'updated_at': job_status['updated_at'].isoformat(),
+            'created_at': job_status['created_at'],
+            'updated_at': job_status['updated_at'],
             'progress': job_status.get('progress'),
             'error': job_status.get('error')
         }
