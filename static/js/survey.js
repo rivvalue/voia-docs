@@ -202,7 +202,15 @@ function submitSurvey() {
         // Show error message in UI instead of alert
         const errorDiv = document.createElement('div');
         errorDiv.className = 'alert alert-danger mt-3';
-        errorDiv.innerHTML = `<i class="fas fa-exclamation-triangle me-2"></i>Error submitting survey: ${error.message}`;
+        
+        // Use safe DOM methods instead of innerHTML to prevent XSS
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-exclamation-triangle me-2';
+        errorDiv.appendChild(icon);
+        
+        const errorText = document.createTextNode('Error submitting survey: ' + error.message);
+        errorDiv.appendChild(errorText);
+        
         document.getElementById('surveyForm').appendChild(errorDiv);
         
         // Remove error message after 5 seconds
