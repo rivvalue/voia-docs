@@ -2319,7 +2319,7 @@ class ExportJob(db.Model):
     status = db.Column(db.String(20), default='queued', nullable=False, index=True)  # queued, processing, completed, failed
     file_path = db.Column(db.String(500), nullable=True)
     error = db.Column(db.Text, nullable=True)
-    progress = db.Column(db.Integer, default=0, nullable=True)  # 0-100
+    progress = db.Column(db.Text, nullable=True)  # Progress message
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
     completed_at = db.Column(db.DateTime, nullable=True)
