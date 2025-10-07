@@ -3163,8 +3163,12 @@ async function loadKpiOverview() {
             kpiRows.push(row);
         }
         
-        // Sort by responses (most active campaigns first)
-        kpiRows.sort((a, b) => b.responses - a.responses);
+        // Sort by campaign end date (chronological order for trend visualization)
+        campaigns.sort((a, b) => new Date(a.end_date) - new Date(b.end_date));
+        
+        // Re-sort kpiRows to match campaign chronological order
+        const campaignOrder = campaigns.map(c => c.name);
+        kpiRows.sort((a, b) => campaignOrder.indexOf(a.name) - campaignOrder.indexOf(b.name));
         
         // Generate table HTML
         tbody.innerHTML = kpiRows.map(row => `
@@ -3181,12 +3185,120 @@ async function loadKpiOverview() {
             </tr>
         `).join('');
         
+        // Create sparklines after table is populated
+        createKpiSparklines(kpiRows);
+        
         console.log(`KPI overview loaded successfully with ${kpiRows.length} campaigns`);
         
     } catch (error) {
         console.error('Error loading KPI overview:', error);
         tbody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error loading KPI overview data</td></tr>';
     }
+}
+
+// Store sparkline chart instances to destroy them before recreating
+let sparklineCharts = {};
+
+// Create sparklines for KPI metrics using approved color palette only
+function createKpiSparklines(kpiData) {
+    if (!kpiData || kpiData.length === 0) return;
+    
+    // Destroy existing charts to prevent memory leaks
+    Object.values(sparklineCharts).forEach(chart => {
+        if (chart) chart.destroy();
+    });
+    sparklineCharts = {};
+    
+    // Approved color palette
+    const PRIMARY_RED = '#E13A44';
+    const MEDIUM_GRAY = '#BDBDBD';
+    
+    // Extract data for each metric
+    const metrics = {
+        responses: kpiData.map(row => row.responses),
+        nps_score: kpiData.map(row => row.nps_score),
+        companies: kpiData.map(row => row.companies),
+        critical_risk: kpiData.map(row => row.critical_risk),
+        satisfaction: kpiData.map(row => row.satisfaction),
+        product_value: kpiData.map(row => row.product_value),
+        pricing: kpiData.map(row => row.pricing),
+        service: kpiData.map(row => row.service)
+    };
+    
+    // Campaign labels (for tooltips)
+    const labels = kpiData.map(row => row.name);
+    
+    // Helper function to determine line color based on trend
+    const getLineColor = (data) => {
+        if (data.length < 2) return MEDIUM_GRAY;
+        const trend = data[data.length - 1] - data[0];
+        return trend >= 0 ? PRIMARY_RED : MEDIUM_GRAY;
+    };
+    
+    // Common sparkline configuration
+    const createSparklineConfig = (data, label) => ({
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: label,
+                data: data,
+                borderColor: getLineColor(data),
+                backgroundColor: 'transparent',
+                borderWidth: 2,
+                pointRadius: 0,
+                pointHoverRadius: 4,
+                pointBackgroundColor: PRIMARY_RED,
+                pointBorderColor: PRIMARY_RED,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    enabled: true,
+                    displayColors: false,
+                    callbacks: {
+                        title: (items) => items[0].label,
+                        label: (context) => `${label}: ${context.parsed.y.toFixed(1)}`
+                    }
+                }
+            },
+            scales: {
+                x: { display: false },
+                y: { display: false }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            }
+        }
+    });
+    
+    // Create sparklines for each metric
+    const sparklineConfigs = [
+        { id: 'sparkline-responses', data: metrics.responses, label: 'Responses' },
+        { id: 'sparkline-nps', data: metrics.nps_score, label: 'NPS' },
+        { id: 'sparkline-companies', data: metrics.companies, label: 'Companies' },
+        { id: 'sparkline-critical', data: metrics.critical_risk, label: 'Critical Risk' },
+        { id: 'sparkline-satisfaction', data: metrics.satisfaction, label: 'Satisfaction' },
+        { id: 'sparkline-product', data: metrics.product_value, label: 'Product' },
+        { id: 'sparkline-pricing', data: metrics.pricing, label: 'Pricing' },
+        { id: 'sparkline-service', data: metrics.service, label: 'Service' }
+    ];
+    
+    sparklineConfigs.forEach(config => {
+        const canvas = document.getElementById(config.id);
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            sparklineCharts[config.id] = new Chart(ctx, createSparklineConfig(config.data, config.label));
+        }
+    });
+    
+    console.log('Sparklines created successfully');
 }
 
 function refreshData() {
