@@ -652,7 +652,15 @@ function populateCompanyComparison(data, page = 1) {
         has_next: page < totalPages
     });
     
-    let tableHTML = '';
+    // Clear existing table content
+    tableBody.innerHTML = '';
+    
+    // Format balance for display
+    const formatBalance = (balance) => {
+        if (balance === 'N/A') return 'N/A';
+        return balance.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+    };
+    
     paginatedCompanies.forEach(company => {
         const c1 = company.campaign1;
         const c2 = company.campaign2;
@@ -683,27 +691,65 @@ function populateCompanyComparison(data, page = 1) {
             statusClass = 'text-success';
         }
         
-        // Format balance for display
-        const formatBalance = (balance) => {
-            if (balance === 'N/A') return 'N/A';
-            return balance.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
-        };
+        // Create table row using safe DOM methods
+        const row = document.createElement('tr');
         
-        tableHTML += `
-            <tr>
-                <td><strong>${company.company_name}</strong></td>
-                <td class="text-center">${c1.risk_count}</td>
-                <td class="text-center">${c1.opportunity_count}</td>
-                <td class="text-center">${formatBalance(c1.balance)}</td>
-                <td class="text-center">${c2.risk_count}</td>
-                <td class="text-center">${c2.opportunity_count}</td>
-                <td class="text-center">${formatBalance(c2.balance)}</td>
-                <td class="text-center ${statusClass}"><strong>${status}</strong></td>
-            </tr>
-        `;
+        // Company name column
+        const nameCell = document.createElement('td');
+        const nameStrong = document.createElement('strong');
+        nameStrong.textContent = company.company_name;
+        nameCell.appendChild(nameStrong);
+        
+        // Campaign 1 - Risk count
+        const c1RiskCell = document.createElement('td');
+        c1RiskCell.className = 'text-center';
+        c1RiskCell.textContent = c1.risk_count;
+        
+        // Campaign 1 - Opportunity count
+        const c1OppCell = document.createElement('td');
+        c1OppCell.className = 'text-center';
+        c1OppCell.textContent = c1.opportunity_count;
+        
+        // Campaign 1 - Balance
+        const c1BalanceCell = document.createElement('td');
+        c1BalanceCell.className = 'text-center';
+        c1BalanceCell.textContent = formatBalance(c1.balance);
+        
+        // Campaign 2 - Risk count
+        const c2RiskCell = document.createElement('td');
+        c2RiskCell.className = 'text-center';
+        c2RiskCell.textContent = c2.risk_count;
+        
+        // Campaign 2 - Opportunity count
+        const c2OppCell = document.createElement('td');
+        c2OppCell.className = 'text-center';
+        c2OppCell.textContent = c2.opportunity_count;
+        
+        // Campaign 2 - Balance
+        const c2BalanceCell = document.createElement('td');
+        c2BalanceCell.className = 'text-center';
+        c2BalanceCell.textContent = formatBalance(c2.balance);
+        
+        // Status column
+        const statusCell = document.createElement('td');
+        statusCell.className = `text-center ${statusClass}`;
+        const statusStrong = document.createElement('strong');
+        statusStrong.textContent = status;
+        statusCell.appendChild(statusStrong);
+        
+        // Append all cells to row
+        row.appendChild(nameCell);
+        row.appendChild(c1RiskCell);
+        row.appendChild(c1OppCell);
+        row.appendChild(c1BalanceCell);
+        row.appendChild(c2RiskCell);
+        row.appendChild(c2OppCell);
+        row.appendChild(c2BalanceCell);
+        row.appendChild(statusCell);
+        
+        // Append row to table body
+        tableBody.appendChild(row);
     });
-    
-    tableBody.innerHTML = tableHTML;
 }
 
 // Search and filter comparison table
