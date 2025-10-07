@@ -3124,25 +3124,52 @@ async function loadKpiOverview() {
             return;
         }
         
-        // Build rows for each campaign with their individual KPI data
-        // PERFORMANCE FIX: Load all campaign data in parallel instead of sequentially
-        const campaignDataPromises = campaigns.map(async (campaign) => {
-            let campaignKpis = null;
+        // PERFORMANCE FIX: TRUE PARALLEL LOADING WITH ISOLATED ERROR HANDLING
+        // Step 1: Launch ALL fetch requests simultaneously (no blocking)
+        const fetchPromises = campaigns.map(campaign => 
+            fetch(`/api/campaigns/comparison?campaign1=${campaign.id}&campaign2=${campaign.id}`)
+        );
+        
+        // Step 2: Wait for all network requests to complete (parallel execution, resilient)
+        const fetchResults = await Promise.allSettled(fetchPromises);
+        
+        // Step 3: Process ALL results synchronously (no Promise.all to avoid all-or-nothing)
+        const jsonPromises = fetchResults.map(async (result, index) => {
+            const campaign = campaigns[index];
             
-            // Try to get KPI data by calling comparison endpoint with same campaign twice
-            try {
-                const comparisonResponse = await fetch(`/api/campaigns/comparison?campaign1=${campaign.id}&campaign2=${campaign.id}`);
-                if (comparisonResponse.ok) {
-                    const comparisonData = await comparisonResponse.json();
-                    campaignKpis = comparisonData.campaign1?.data; // Same campaign data
-                }
-            } catch (error) {
-                console.warn(`Failed to load KPI data for campaign ${campaign.name}:`, error);
+            // Handle network failures
+            if (result.status === 'rejected') {
+                console.warn(`Network error for campaign ${campaign.name}:`, result.reason);
+                return null;
             }
             
-            // Format the row with available data or defaults
+            // Handle HTTP errors  
+            if (!result.value.ok) {
+                console.warn(`HTTP error for campaign ${campaign.name}: ${result.value.status} ${result.value.statusText}`);
+                return null;
+            }
+            
+            // Parse JSON with isolated error handling
+            try {
+                const data = await result.value.json();
+                return data?.campaign1?.data || null;
+            } catch (error) {
+                console.warn(`JSON parse error for campaign ${campaign.name}:`, error);
+                return null;
+            }
+        });
+        
+        // Wait for JSON parsing (still parallel but with per-campaign error isolation)
+        const kpiDataArray = await Promise.allSettled(jsonPromises);
+        
+        // Step 4: Build final KPI rows (purely synchronous, no failures possible)
+        const kpiRows = campaigns.map((campaign, index) => {
+            const kpiDataResult = kpiDataArray[index];
+            const campaignKpis = kpiDataResult.status === 'fulfilled' ? kpiDataResult.value : null;
+            
             return {
                 name: campaign.name || 'Unknown',
+                end_date: campaign.end_date || null,
                 status: formatCampaignStatus(campaign.status),
                 responses: campaignKpis?.total_responses || 0,
                 nps_score: campaignKpis?.nps_score || 0,
@@ -3154,9 +3181,6 @@ async function loadKpiOverview() {
                 service: campaignKpis?.average_ratings?.service || 0
             };
         });
-        
-        // Wait for all campaign data to load in parallel
-        const kpiRows = await Promise.all(campaignDataPromises);
         
         // Sort by campaign end date (chronological order for trend visualization)
         campaigns.sort((a, b) => new Date(a.end_date) - new Date(b.end_date));
@@ -3346,8 +3370,15 @@ function createModalCharts(kpiData) {
         service: kpiData.map(row => row.service)
     };
     
-    // Campaign labels
-    const labels = kpiData.map(row => row.name);
+    // Campaign labels with end dates (Month Year)
+    const labels = kpiData.map(row => {
+        if (row.end_date) {
+            const date = new Date(row.end_date);
+            const monthYear = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+            return `${row.name}\n(${monthYear})`;
+        }
+        return row.name;
+    });
     
     // Common chart configuration for modal
     const createModalChartConfig = (data, label, yAxisLabel) => ({
