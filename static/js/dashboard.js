@@ -458,6 +458,12 @@ async function updateComparison() {
         document.getElementById('campaign1Header').textContent = comparisonData.campaign1.name;
         document.getElementById('campaign2Header').textContent = comparisonData.campaign2.name;
         
+        // Update campaign identifiers in company table
+        const c1Name = document.getElementById('c1CampaignName');
+        const c2Name = document.getElementById('c2CampaignName');
+        if (c1Name) c1Name.textContent = comparisonData.campaign1.name;
+        if (c2Name) c2Name.textContent = comparisonData.campaign2.name;
+        
         // Store data globally for filtering
         currentComparisonData = comparisonData;
         
@@ -701,10 +707,10 @@ function populateCompanyComparison(data, page = 1) {
             }
         } else if (!c1.participated && c2.participated) {
             status = 'New in C2';
-            statusClass = 'text-info';
+            statusClass = 'text-secondary';
         } else if (c1.participated && !c2.participated) {
             status = 'Not in C2';
-            statusClass = 'text-warning';
+            statusClass = 'text-secondary';
         }
         
         // Create table row using safe DOM methods
