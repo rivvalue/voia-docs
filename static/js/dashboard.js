@@ -141,21 +141,33 @@ function populateCampaignFilterDropdown() {
     // Clear existing options
     select.innerHTML = '';
     
-    // Find default campaign: active campaign, or most recent if none active
+    // Check for campaign_id URL parameter first
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlCampaignId = urlParams.get('campaign_id');
+    
+    // Find default campaign: URL param > active campaign > most recent
     let defaultCampaign = null;
     
-    // First, look for active campaign
-    const activeCampaign = availableCampaigns.find(c => c.status === 'active');
-    if (activeCampaign) {
-        defaultCampaign = activeCampaign;
-    } else {
-        // If no active campaign, get the most recent (by end_date or created_at)
-        const sortedCampaigns = [...availableCampaigns].sort((a, b) => {
-            const dateA = new Date(a.end_date || a.created_at);
-            const dateB = new Date(b.end_date || b.created_at);
-            return dateB - dateA; // Most recent first
-        });
-        defaultCampaign = sortedCampaigns[0];
+    if (urlCampaignId) {
+        // If URL has campaign_id, use that
+        defaultCampaign = availableCampaigns.find(c => c.id === parseInt(urlCampaignId));
+        console.log('📌 Using campaign from URL parameter:', urlCampaignId, defaultCampaign);
+    }
+    
+    if (!defaultCampaign) {
+        // First, look for active campaign
+        const activeCampaign = availableCampaigns.find(c => c.status === 'active');
+        if (activeCampaign) {
+            defaultCampaign = activeCampaign;
+        } else {
+            // If no active campaign, get the most recent (by end_date or created_at)
+            const sortedCampaigns = [...availableCampaigns].sort((a, b) => {
+                const dateA = new Date(a.end_date || a.created_at);
+                const dateB = new Date(b.end_date || b.created_at);
+                return dateB - dateA; // Most recent first
+            });
+            defaultCampaign = sortedCampaigns[0];
+        }
     }
     
     // Add campaign options
