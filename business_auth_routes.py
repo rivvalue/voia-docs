@@ -3092,7 +3092,7 @@ def process_license_assignment():
         
         # Handle transcript analysis add-on configuration
         transcript_addon_config = None
-        transcript_addon_enabled = bool(request.form.get('transcript_analysis_addon'))
+        transcript_addon_enabled = request.form.get('transcript_analysis_addon') is not None
         if transcript_addon_enabled:
             transcript_addon_config = {'enabled': True}
             
@@ -3120,6 +3120,10 @@ def process_license_assignment():
             
             if transcript_price:
                 try:
+                    # Guard against NaN injection
+                    if transcript_price.lower().strip() in ('nan', 'inf', '-inf', '+inf'):
+                        flash('Invalid transcript analysis price format.', 'error')
+                        return redirect(url_for('business_auth.license_assignment_form', business_id=business_id))
                     price = float(transcript_price)
                     if price < 0:
                         flash('Transcript analysis price must be non-negative.', 'error')
