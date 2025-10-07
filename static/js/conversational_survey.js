@@ -171,7 +171,15 @@ function startConversation() {
         showSurveySetup();
         const errorDiv = document.createElement('div');
         errorDiv.className = 'alert alert-danger mt-3';
-        errorDiv.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Error starting conversation: ' + error.message;
+        
+        // Safely construct error message to prevent XSS
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-exclamation-triangle me-2';
+        errorDiv.appendChild(icon);
+        
+        const errorText = document.createTextNode('Error starting conversation: ' + error.message);
+        errorDiv.appendChild(errorText);
+        
         const form = document.getElementById('setupForm');
         form.appendChild(errorDiv);
         setTimeout(() => errorDiv.remove(), 4000);
