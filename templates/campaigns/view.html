@@ -4,6 +4,19 @@
 
 {% block page_class %}page-campaign-details{% endblock %}
 
+{% block breadcrumb %}
+<div class="breadcrumb-container">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('campaigns.list_campaigns') }}">Campaigns</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ campaign.name }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+{% endblock %}
+
 {% block content %}
 <style>
 /* Campaign view specific styling */
@@ -129,19 +142,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a href="{{ url_for('business_auth.admin_panel') }}">Admin Panel</a>
-            </li>
-            <li class="breadcrumb-item">
-                <a href="{{ url_for('campaigns.list_campaigns') }}">Campaigns</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">{{ campaign.name }}</li>
-        </ol>
-    </nav>
 
     <!-- Campaign Information Grid -->
     <div class="info-grid">

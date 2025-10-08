@@ -388,21 +388,20 @@ p, .text-body {
     box-shadow: none;
 }
 
-/* Card styling */
+/* Card styling - Standardized Pattern */
 .card {
     background-color: var(--primary-white);
     border: 1px solid var(--light-gray);
     border-radius: var(--radius-xl);
-    box-shadow: var(--shadow);
-    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
     overflow: hidden;
     position: relative;
 }
 
 .card:hover {
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-2px);
-    border-color: rgba(225, 58, 68, 0.2);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-red);
 }
 
 .card-header {
@@ -454,7 +453,7 @@ p, .text-body {
 
 .card-subtle:hover {
     box-shadow: var(--shadow-md);
-    transform: translateY(-1px);
+    border-color: var(--primary-red);
 }
 
 /* Form styling */
@@ -1191,15 +1190,15 @@ small, .small {
     }
 }
 
-/* Professional KPI Cards */
+/* Professional KPI Cards - Standardized */
 .kpi-card {
     background: var(--primary-white) !important;
-    border: 1px solid var(--light-gray);
+    border: 2px solid var(--light-gray);
     border-radius: var(--radius-xl);
-    padding: var(--spacing-lg);
+    padding: var(--spacing-xl);
     text-align: center;
-    box-shadow: var(--shadow);
-    transition: all 0.3s ease;
+    box-shadow: none;
+    transition: all 0.2s ease;
     position: relative;
     overflow: hidden;
     height: 100%;
@@ -1223,7 +1222,7 @@ html .kpi-card.kpi-warning {
     left: 0;
     right: 0;
     height: 4px;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
 .kpi-card.kpi-primary::before { background: var(--gray-dark); }
@@ -1232,9 +1231,8 @@ html .kpi-card.kpi-warning {
 .kpi-card.kpi-danger::before { background: var(--primary-red); }
 
 .kpi-card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-lg);
-    border-color: rgba(225, 58, 68, 0.2);
+    border-color: var(--primary-red);
+    box-shadow: var(--shadow-sm);
 }
 
 .kpi-value {
@@ -1284,15 +1282,15 @@ canvas {
     background: var(--primary-white);
     border: 1px solid var(--light-gray);
     border-radius: var(--radius-xl);
-    box-shadow: var(--shadow);
-    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
     overflow: hidden;
     margin-bottom: var(--spacing-lg);
 }
 
 .chart-card:hover {
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-red);
 }
 
 .chart-card .card-header {
@@ -1969,4 +1967,109 @@ a:hover {
 
 .tab-pane.fade.show {
     opacity: 1;
+}
+
+/* ========================================
+   PHASE 1: STANDARDIZED CARD SYSTEM
+   ======================================== */
+
+/* Primary Card - Main content containers */
+.primary-card {
+    background: var(--primary-white);
+    border: 1px solid var(--light-gray);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-sm);
+    padding: var(--spacing-2xl);
+    transition: all 0.2s ease;
+}
+
+.primary-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-red);
+}
+
+/* Metric Card - For KPIs and statistics (already defined as .kpi-card) */
+
+/* List Item Card - For campaigns, participants in lists */
+.list-item-card {
+    background: var(--primary-white);
+    border: 1px solid var(--light-gray);
+    border-radius: var(--radius-lg);
+    box-shadow: none;
+    padding: var(--spacing-lg);
+    transition: all 0.2s ease;
+}
+
+.list-item-card:hover {
+    border-color: var(--primary-red);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Modal Shadow - Reserved for elevated overlays */
+.modal-content {
+    box-shadow: var(--shadow-xl) !important;
+    border-radius: var(--radius-2xl) !important;
+}
+
+/* ========================================
+   BREADCRUMB NAVIGATION SYSTEM
+   ======================================== */
+
+.breadcrumb-container {
+    background: var(--light-gray);
+    border-bottom: 1px solid var(--medium-gray);
+    padding: var(--spacing-sm) 0;
+    margin-bottom: var(--spacing-lg);
+}
+
+.breadcrumb {
+    background: transparent;
+    margin-bottom: 0;
+    padding: 0;
+    font-size: var(--font-size-sm);
+}
+
+.breadcrumb-item {
+    color: var(--gray-dark);
+    font-weight: 500;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "›";
+    color: var(--medium-gray);
+    padding: 0 var(--spacing-sm);
+}
+
+.breadcrumb-item a {
+    color: var(--primary-red);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.breadcrumb-item a:hover {
+    color: var(--red-hover);
+    text-decoration: underline;
+}
+
+.breadcrumb-item.active {
+    color: var(--primary-black);
+    font-weight: 600;
+}
+
+/* Mobile breadcrumb optimization */
+@media (max-width: 768px) {
+    .breadcrumb-container {
+        padding: var(--spacing-xs) 0;
+    }
+    
+    .breadcrumb {
+        font-size: var(--font-size-xs);
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    
+    .breadcrumb-item {
+        display: inline-block;
+    }
 }

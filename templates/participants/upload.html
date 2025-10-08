@@ -4,6 +4,20 @@
 
 {% block page_class %}page-participant-upload{% endblock %}
 
+{% block breadcrumb %}
+<div class="breadcrumb-container">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('business_auth.admin_panel') }}">Admin Panel</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('participants.list_participants') }}">Participants</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Bulk Upload</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+{% endblock %}
+
 {% block content %}
 <style>
 /* Participant upload styling */
@@ -29,19 +43,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a href="{{ url_for('business_auth.admin_panel') }}">Admin Panel</a>
-            </li>
-            <li class="breadcrumb-item">
-                <a href="{{ url_for('participants.list_participants') }}">Participants Management</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">Participants Upload</li>
-        </ol>
-    </nav>
 
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}

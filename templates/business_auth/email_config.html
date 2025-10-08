@@ -4,6 +4,19 @@
 
 {% block page_class %}page-email-config{% endblock %}
 
+{% block breadcrumb %}
+<div class="breadcrumb-container">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('business_auth.admin_panel') }}">Admin Panel</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Email Configuration</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+{% endblock %}
+
 {% block content %}
 <style>
 /* Email configuration specific styling */
