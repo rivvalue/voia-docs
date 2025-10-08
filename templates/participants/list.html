@@ -307,18 +307,24 @@
                         </table>
                     </div>
                     {% else %}
-                    <div class="text-center py-5">
-                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
-                        <h5 class="text-muted">No Participants Yet</h5>
-                        <p class="text-muted">Start by adding individual participants or uploading a CSV file.</p>
-                        <div class="mt-3">
-                            <a href="{{ url_for('participants.create_participant') }}" class="btn btn-primary me-2">
+                    <div class="empty-state empty-state-compact">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3>No participants {% if search_query %}match your search{% else %}yet{% endif %}</h3>
+                        {% if search_query %}
+                        <p>Try adjusting your search terms or <a href="{{ url_for('participants.list_participants') }}">view all participants</a>.</p>
+                        {% else %}
+                        <p>Add individual participants or upload a CSV file to build your participant database. You can then assign them to campaigns for feedback collection.</p>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <a href="{{ url_for('participants.create_participant') }}" class="btn btn-primary">
                                 <i class="fas fa-plus me-2"></i>Add First Participant
                             </a>
                             <a href="{{ url_for('participants.upload_participants') }}" class="btn btn-outline-primary">
                                 <i class="fas fa-upload me-2"></i>Upload CSV
                             </a>
                         </div>
+                        {% endif %}
                     </div>
                     {% endif %}
                 </div>

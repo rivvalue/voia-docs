@@ -577,11 +577,16 @@
     {% else %}
         <!-- Empty State - No Campaigns -->
         <div class="empty-state">
-            <i class="fas fa-bullhorn"></i>
-            <h3>No Campaigns Yet</h3>
-            <p class="mb-4">Create your first campaign to start managing survey participants and collecting feedback.</p>
+            <div class="empty-state-icon">
+                <i class="fas fa-bullhorn"></i>
+            </div>
+            <h3>Ready to gather insights?</h3>
+            <p>Create your first campaign to start collecting customer feedback and understanding their experience. Campaigns help you organize survey participants, send invitations, and analyze results.</p>
             <a href="{{ url_for('campaigns.create_campaign') }}" class="btn btn-primary">
-                <i class="fas fa-plus me-2"></i>Create Your First Campaign
+                <i class="fas fa-plus me-2"></i>Create First Campaign
+            </a>
+            <a href="/demo" class="empty-state-secondary-action">
+                <i class="fas fa-play-circle me-1"></i>View Demo First
             </a>
         </div>
     {% endif %}

@@ -2073,3 +2073,137 @@ a:hover {
         display: inline-block;
     }
 }
+
+/* ============================================
+   EMPTY STATES - Professional SaaS Pattern
+   ============================================ */
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: var(--spacing-3xl) var(--spacing-xl);
+    min-height: 400px;
+    background: var(--primary-white);
+    border-radius: var(--radius-2xl);
+    border: 1px dashed var(--medium-gray);
+}
+
+.empty-state-icon {
+    width: 120px;
+    height: 120px;
+    margin-bottom: var(--spacing-xl);
+    color: var(--medium-gray);
+    opacity: 0.6;
+}
+
+.empty-state-icon i {
+    font-size: 120px;
+}
+
+/* SVG Empty State Illustrations */
+.empty-state-svg {
+    width: 200px;
+    height: 200px;
+    margin-bottom: var(--spacing-xl);
+}
+
+.empty-state-svg svg {
+    width: 100%;
+    height: 100%;
+}
+
+.empty-state h3 {
+    font-family: var(--font-heading);
+    font-size: var(--font-size-2xl);
+    font-weight: 600;
+    color: var(--primary-black);
+    margin-bottom: var(--spacing-md);
+    letter-spacing: var(--letter-spacing-tight);
+}
+
+.empty-state p {
+    font-family: var(--font-body);
+    font-size: var(--font-size-base);
+    color: var(--gray-dark);
+    max-width: 480px;
+    margin: 0 auto var(--spacing-xl);
+    line-height: var(--line-height-relaxed);
+}
+
+.empty-state .btn-primary {
+    margin-top: var(--spacing-md);
+    padding: 12px 32px;
+    font-size: var(--font-size-base);
+    font-weight: 600;
+}
+
+.empty-state-secondary-action {
+    margin-top: var(--spacing-md);
+    color: var(--primary-red);
+    text-decoration: none;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.empty-state-secondary-action:hover {
+    color: var(--red-hover);
+    text-decoration: underline;
+}
+
+/* Empty state variants */
+.empty-state-compact {
+    min-height: 300px;
+    padding: var(--spacing-2xl) var(--spacing-lg);
+}
+
+.empty-state-compact .empty-state-icon {
+    width: 80px;
+    height: 80px;
+    margin-bottom: var(--spacing-lg);
+}
+
+.empty-state-compact .empty-state-icon i {
+    font-size: 80px;
+}
+
+.empty-state-compact h3 {
+    font-size: var(--font-size-xl);
+}
+
+.empty-state-compact p {
+    font-size: var(--font-size-sm);
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+    .empty-state {
+        padding: var(--spacing-2xl) var(--spacing-md);
+        min-height: 320px;
+    }
+    
+    .empty-state-icon {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .empty-state-icon i {
+        font-size: 80px;
+    }
+    
+    .empty-state-svg {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .empty-state h3 {
+        font-size: var(--font-size-xl);
+    }
+    
+    .empty-state p {
+        font-size: var(--font-size-sm);
+    }
+}
