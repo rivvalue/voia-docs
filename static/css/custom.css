@@ -2056,6 +2056,25 @@ a:hover {
     font-weight: 600;
 }
 
+/* Breadcrumb truncation for long paths */
+.breadcrumb-item.truncate {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.breadcrumb-item.truncate a,
+.breadcrumb-item.truncate span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: inline-block;
+}
+
 /* Mobile breadcrumb optimization */
 @media (max-width: 768px) {
     .breadcrumb-container {
@@ -2067,10 +2086,30 @@ a:hover {
         flex-wrap: nowrap;
         overflow-x: auto;
         white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Firefox */
+    }
+    
+    .breadcrumb::-webkit-scrollbar {
+        display: none; /* Chrome/Safari */
     }
     
     .breadcrumb-item {
         display: inline-block;
+    }
+    
+    /* Truncate breadcrumb items on mobile */
+    .breadcrumb-item.truncate {
+        max-width: 120px;
+    }
+    
+    /* Show first and last items fully on mobile, truncate middle */
+    .breadcrumb-item:first-child {
+        max-width: none;
+    }
+    
+    .breadcrumb-item:last-child {
+        max-width: none;
     }
 }
 

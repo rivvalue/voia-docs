@@ -10,7 +10,7 @@
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="{{ url_for('campaigns.list_campaigns') }}">Campaigns</a></li>
-                <li class="breadcrumb-item active" aria-current="page">{{ campaign.name }}</li>
+                <li class="breadcrumb-item active truncate" aria-current="page" title="{{ campaign.name }}">{{ campaign.name }}</li>
             </ol>
         </nav>
     </div>
