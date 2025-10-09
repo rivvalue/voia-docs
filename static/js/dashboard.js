@@ -145,13 +145,24 @@ function populateCampaignFilterDropdown() {
     const urlParams = new URLSearchParams(window.location.search);
     const urlCampaignId = urlParams.get('campaign_id');
     
-    // Find default campaign: URL param > active campaign > most recent
+    // Find default campaign: URL param > session storage > active campaign > most recent
     let defaultCampaign = null;
     
     if (urlCampaignId) {
         // If URL has campaign_id, use that
         defaultCampaign = availableCampaigns.find(c => c.id === parseInt(urlCampaignId));
         console.log('📌 Using campaign from URL parameter:', urlCampaignId, defaultCampaign);
+    }
+    
+    // Check session storage if no URL param
+    if (!defaultCampaign) {
+        const storedCampaignId = sessionStorage.getItem('selectedCampaignId');
+        if (storedCampaignId) {
+            defaultCampaign = availableCampaigns.find(c => c.id === parseInt(storedCampaignId));
+            if (defaultCampaign) {
+                console.log('🔄 Restored campaign from session storage:', storedCampaignId);
+            }
+        }
     }
     
     if (!defaultCampaign) {
@@ -210,6 +221,23 @@ async function applyCampaignFilter() {
     
     console.log('🎯 Campaign filter applied:', selectedCampaignId);
     
+    // Save to session storage for persistence across pages
+    if (selectedCampaignId) {
+        const option = select.selectedOptions[0];
+        sessionStorage.setItem('selectedCampaignId', selectedCampaignId);
+        sessionStorage.setItem('selectedCampaignName', option.text);
+        sessionStorage.setItem('selectedCampaignDates', `${option.getAttribute('data-start')} - ${option.getAttribute('data-end')}`);
+        sessionStorage.setItem('selectedCampaignStatus', option.getAttribute('data-status'));
+    } else {
+        sessionStorage.removeItem('selectedCampaignId');
+        sessionStorage.removeItem('selectedCampaignName');
+        sessionStorage.removeItem('selectedCampaignDates');
+        sessionStorage.removeItem('selectedCampaignStatus');
+    }
+    
+    // Update global campaign indicator if on filtered pages
+    updateGlobalCampaignIndicator();
+    
     // Reload dashboard data with campaign filter
     console.log('📡 Loading dashboard data for campaign:', selectedCampaignId);
     await loadDashboardData();
@@ -251,6 +279,65 @@ async function applyCampaignFilter() {
 function clearCampaignFilter() {
     document.getElementById('campaignFilter').value = '';
     applyCampaignFilter();
+}
+
+// Update global campaign indicator (for persistent display across pages)
+function updateGlobalCampaignIndicator() {
+    const indicator = document.getElementById('globalCampaignIndicator');
+    if (!indicator) return; // Not on a page with the indicator
+    
+    const campaignId = sessionStorage.getItem('selectedCampaignId');
+    const campaignName = sessionStorage.getItem('selectedCampaignName');
+    const campaignDates = sessionStorage.getItem('selectedCampaignDates');
+    
+    if (campaignId && campaignName) {
+        indicator.innerHTML = `
+            <div class="campaign-filter-badge">
+                <i class="fas fa-filter me-2"></i>
+                <strong>Filtered by:</strong> ${escapeHtml(campaignName)}
+                <span class="badge bg-light text-dark ms-2">${escapeHtml(campaignDates)}</span>
+                <button class="btn btn-sm btn-link text-danger ms-2 p-0" onclick="clearGlobalCampaignFilter()" title="Clear filter">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+        indicator.style.display = 'block';
+    } else {
+        indicator.style.display = 'none';
+    }
+}
+
+// Clear global campaign filter
+function clearGlobalCampaignFilter() {
+    sessionStorage.removeItem('selectedCampaignId');
+    sessionStorage.removeItem('selectedCampaignName');
+    sessionStorage.removeItem('selectedCampaignDates');
+    sessionStorage.removeItem('selectedCampaignStatus');
+    
+    // Clear the filter select if on dashboard
+    const select = document.getElementById('campaignFilter');
+    if (select) {
+        select.value = '';
+        applyCampaignFilter();
+    } else {
+        // Just update indicator and reload page
+        updateGlobalCampaignIndicator();
+        location.reload();
+    }
+}
+
+// Restore campaign selection from session storage
+function restoreCampaignSelection() {
+    const campaignId = sessionStorage.getItem('selectedCampaignId');
+    const select = document.getElementById('campaignFilter');
+    
+    if (campaignId && select) {
+        select.value = campaignId;
+        selectedCampaignId = parseInt(campaignId);
+        console.log('🔄 Restored campaign selection:', campaignId);
+        return true;
+    }
+    return false;
 }
 
 // Update selected campaign info display
@@ -362,6 +449,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Load campaign filter options first, then initial dashboard data
     loadCampaignFilterOptions().then(() => {
+        // Update global campaign indicator after filter is populated
+        updateGlobalCampaignIndicator();
+        
         // Only load dashboard data if no default campaign was auto-selected
         if (!selectedCampaignId) {
             loadDashboardData().catch(error => {
