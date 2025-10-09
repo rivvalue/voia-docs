@@ -2,6 +2,15 @@
 The Voice of Client (VOÏA) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. It converts raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses, particularly Rivvalue Inc., with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project features a production-ready multi-tenant participant management system with extensive email delivery capabilities and AI-powered survey functionalities.
 
 # Recent Changes
+**October 9, 2025 - UX Refinement: ADMIN Tab Removal & Export Reorganization**
+-   **ADMIN Tab Removal**: Eliminated redundant ADMIN tab from analytics dashboard for cleaner navigation. All admin functionality now contextually located.
+-   **Export Functionality Relocation**: Campaign-specific export buttons added to responses pages (/business/campaigns/<id>/responses) for contextual data access. System-wide export moved to Settings → Data Management section.
+-   **Route Fix**: Corrected campaign export endpoint from `/api/campaigns/<id>/export` to `/business/campaigns/api/campaigns/<id>/export` to match blueprint registration.
+-   **Sidebar Dashboard Link**: Updated sidebar navigation Dashboard link from platform admin route to business user route (/business/analytics) for proper access control.
+-   **Navigation Structure**: Maintained original 5-tab analytics dashboard structure (Overview, Account Intelligence, Analytics, Survey Insights, Executive Summary) based on user preference for intuitive information architecture.
+-   **Hash Redirects**: Added bookmark compatibility redirects (#admin-tools → Settings page) for seamless transition.
+-   **Zero Regressions**: All export functionality preserved and relocated contextually, no feature loss during restructuring.
+
 **October 9, 2025 - Phase 2b Sidebar Navigation COMPLETE**
 -   **Sidebar Navigation System**: Production-ready modern sidebar navigation (v2 UI) replacing two-tier tab navigation. Professional dark gradient theme (#1a1a1a → #2d2d2d) with VOÏA red accents (#E13A44), smooth transitions, and hover effects.
 -   **Navigation Components**: Fully functional sidebar with Dashboard, Campaigns, Participants, and Settings sections. Font Awesome icons, semantic HTML structure, and proper accessibility attributes.
