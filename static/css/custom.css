@@ -2955,3 +2955,12 @@ a:hover {
 .sidebar-overlay.active {
     display: block;
 }
+
+/* Show sidebar toggle only for v2 UI */
+body:not([data-ui-version="v2"]) .sidebar-toggle {
+    display: none !important;
+}
+
+body:not([data-ui-version="v2"]) .sidebar-overlay {
+    display: none !important;
+}
