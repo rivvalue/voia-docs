@@ -1,0 +1,32 @@
+<!-- UI Version Toggle Component (Phase 2b) -->
+{% if can_toggle_ui %}
+<div class="ui-version-toggle" style="display: inline-flex; align-items: center; gap: 8px;">
+    <span class="badge" style="
+        background: {% if ui_version == 'v2' %}#4CAF50{% else %}#E13A44{% endif %};
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    ">
+        UI: {{ ui_version|upper }}
+    </span>
+    
+    <form action="{{ url_for('business_auth.toggle_ui_version') }}" method="POST" style="margin: 0;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-sm btn-outline-secondary" style="
+            height: 28px;
+            padding: 0 12px;
+            font-size: 12px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        " title="Switch to {% if ui_version == 'v1' %}v2 (New Sidebar){% else %}v1 (Current){% endif %}">
+            <i class="fas fa-exchange-alt" style="font-size: 10px;"></i>
+            <span>Switch</span>
+        </button>
+    </form>
+</div>
+{% endif %}

@@ -187,6 +187,22 @@ def inject_csrf():
     
     return context
 
+# Make UI version available in all templates (Phase 2b Feature Flags)
+@app.context_processor
+def inject_ui_version():
+    from feature_flags import feature_flags
+    from flask import session
+    
+    # Get current UI version
+    user_id = session.get('business_user_id')
+    ui_version = feature_flags.get_ui_version(user_id=user_id)
+    
+    return {
+        'ui_version': ui_version,
+        'can_toggle_ui': feature_flags.can_user_toggle(),
+        'sidebar_enabled': feature_flags.is_feature_enabled('sidebar_navigation')
+    }
+
 with app.app_context():
     # Import models FIRST to avoid circular imports
     import models  # noqa: F401

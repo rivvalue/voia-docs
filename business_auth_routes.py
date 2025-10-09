@@ -1225,6 +1225,67 @@ def logout():
     return redirect(url_for('business_auth.login'))
 
 
+# ==== UI VERSION TOGGLE (PHASE 2B FEATURE FLAGS) ====
+
+@business_auth_bp.route('/toggle-ui-version', methods=['POST'])
+@require_business_auth
+def toggle_ui_version():
+    """Toggle between v1 (current) and v2 (sidebar) UI versions"""
+    from feature_flags import feature_flags
+    
+    try:
+        # Check if toggling is enabled
+        if not feature_flags.can_user_toggle():
+            logger.warning(f"User {session.get('business_user_id')} attempted UI toggle when disabled")
+            if request.is_json:
+                return jsonify({'success': False, 'error': 'UI toggling is not enabled'}), 403
+            else:
+                flash('UI version switching is currently disabled.', 'error')
+                return redirect(request.referrer or url_for('business_auth.admin_panel'))
+        
+        # Safely get requested version from JSON or form data
+        requested_version = None
+        json_data = request.get_json(silent=True)  # Returns None for malformed JSON
+        if json_data:
+            requested_version = json_data.get('version')
+        elif request.form:
+            requested_version = request.form.get('version')
+        
+        current_version = feature_flags.get_ui_version()
+        
+        if not requested_version:
+            # Toggle: v1 → v2, v2 → v1
+            requested_version = 'v2' if current_version == 'v1' else 'v1'
+        
+        # Validate and set preference
+        if feature_flags.set_user_ui_preference(requested_version):
+            logger.info(f"User {session.get('business_user_id')} toggled UI to {requested_version}")
+            
+            if request.is_json:
+                return jsonify({
+                    'success': True,
+                    'ui_version': requested_version,
+                    'message': f'Switched to UI version {requested_version}'
+                })
+            else:
+                flash(f'UI switched to version {requested_version}. Page will reload.', 'success')
+                return redirect(request.referrer or url_for('business_auth.admin_panel'))
+        else:
+            if request.is_json:
+                return jsonify({'success': False, 'error': 'Invalid UI version'}), 400
+            else:
+                flash('Failed to switch UI version.', 'error')
+                return redirect(request.referrer or url_for('business_auth.admin_panel'))
+    
+    except Exception as e:
+        logger.error(f"UI toggle error: {e}")
+        if request.is_json:
+            return jsonify({'success': False, 'error': str(e)}), 500
+        else:
+            flash('Error toggling UI version.', 'error')
+            return redirect(request.referrer or url_for('business_auth.admin_panel'))
+
+
 @business_auth_bp.route('/admin')
 @require_permission('manage_participants')
 def admin_panel():
