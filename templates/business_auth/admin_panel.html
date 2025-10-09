@@ -7,14 +7,6 @@
 {% block content %}
 <style>
 /* Admin panel specific styling */
-.admin-header {
-    background: linear-gradient(135deg, rgba(var(--primary-red-rgb, 220, 53, 69), 0.1) 0%, rgba(var(--red-hover-rgb, 200, 40, 55), 0.15) 100%);
-    border: 1px solid var(--red-light);
-    color: var(--primary-black);
-    padding: 2rem 0;
-    border-radius: var(--radius-2xl);
-    margin-bottom: 2rem;
-}
 
 .admin-welcome {
     display: flex;
@@ -394,7 +386,7 @@
 
 <div class="container-fluid">
     <!-- Admin Header -->
-    <div class="admin-header">
+    <div class="header-gradient-primary" style="padding: var(--spacing-xl); margin-bottom: var(--spacing-xl);">
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-12 col-lg-6">
@@ -403,8 +395,8 @@
                             <i class="fas fa-user-shield"></i>
                         </div>
                         <div>
-                            <h2 class="mb-1">Welcome {{ current_user.get_full_name() }}</h2>
-                            <p class="mb-0 opacity-75">{{ business_account.name }}, {% if current_user.role == 'platform_admin' %}Platform Administrator{% elif current_user.role == 'business_account_admin' %}Administrator{% elif current_user.role == 'manager' %}Manager{% elif current_user.role == 'viewer' %}Viewer{% else %}{{ current_user.role|title }}{% endif %}</p>
+                            <h2 class="page-title mb-1">Welcome {{ current_user.get_full_name() }}</h2>
+                            <p class="page-subtitle mb-0">{{ business_account.name }}, {% if current_user.role == 'platform_admin' %}Platform Administrator{% elif current_user.role == 'business_account_admin' %}Administrator{% elif current_user.role == 'manager' %}Manager{% elif current_user.role == 'viewer' %}Viewer{% else %}{{ current_user.role|title }}{% endif %}</p>
                         </div>
                     </div>
                 </div>
