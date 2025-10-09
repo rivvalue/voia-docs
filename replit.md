@@ -2,14 +2,18 @@
 The Voice of Client (VOÏA) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. It converts raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses, particularly Rivvalue Inc., with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project features a production-ready multi-tenant participant management system with extensive email delivery capabilities and AI-powered survey functionalities.
 
 # Recent Changes
+**October 9, 2025 - Phase 2b Pre-Implementation Complete**
+-   **Feature Flag System**: Production-ready feature flag infrastructure for UI version toggle (v1/v2) with environment variable control, rollout percentage, and user toggle. Fixed critical bugs (FLAGS dict propagation, JSON handling with get_json(silent=True), permission checks). Supports gradual rollout strategy (10%→25%→50%→100%) for sidebar navigation.
+-   **Database Backup Strategy**: Finalized Replit Rollback as PRIMARY backup mechanism. SQLAlchemy export available for data analysis only (restore explicitly disabled). Checkpoint metadata system for rollback organization. Prevents unsafe restore operations while maintaining data export capabilities.
+-   **Error Monitoring Configuration**: Sentry/LogRocket integration prepared with proper has_request_context() guards to prevent Flask context crashes. Supports request, background task, and CLI execution contexts. Phase 2b context tracking (ui_version, feature_flags) for debugging v1/v2 issues. Disabled by default (opt-in).
+-   **Staging Environment Documentation**: Comprehensive guide for Phase 2b testing covering Replit/external staging setup, sidebar navigation validation, feature flag testing, error monitoring verification, rollback procedures, and production promotion workflow.
+-   **Pre-Implementation Safety**: All Phase 2b critical systems architect-reviewed and approved. Ready for sidebar navigation development.
+
 **October 4, 2025 - Critical Bug Fixes & Survey Insights Data**
--   **Survey Insights Data Fix**: Fixed missing company_nps_data and tenure_nps_data in get_dashboard_data() return dictionary. These fields were being calculated in separate standalone functions but never included in dashboard data output, causing Survey Insights tab to display "No data available". Added campaign-filtered SQL queries for both datasets with proper Decimal-to-float conversion in serialize_for_json(). Regenerated Q1 2025 snapshot with complete data (62 companies, 5 tenure groups).
--   **Executive Summary Company Count Fixed**: Added missing `total_companies` field to both `get_dashboard_data()` and `convert_snapshot_to_dashboard_format()` functions. This field was being calculated but not included in the return dictionary, causing comparison API to default to 0.
--   **Risk Metric Alignment**: Resolved discrepancy between Overview metric (High Churn Risk accounts via `churn_risk_level`) and Account Analytics metric (companies with Critical severity via `account_risk_factors`). Rewrote `generate_account_intelligence()` in demo generator with conditional logic matching production VOÏA AI behavior:
-    -   Promoters (NPS 9-10): Receive growth opportunities + minimal/moderate risks only
-    -   Passives (NPS 7-8): Receive balanced mix of opportunities and risks
-    -   Detractors (NPS 0-6): Receive risk factors + rare win-back opportunities, with Critical severity aligned to High/Critical churn risk
--   **Demo Data Quality**: Regenerated Q1/Q2/Q3 2025 campaigns with realistic conditional logic. Results: 85-95% companies have opportunities, 89-98% have risks (down from unrealistic 100% for both), and perfect alignment between churn risk and critical severity metrics (16=16, 12=12, 13=13).
+-   **Survey Insights Data Fix**: Fixed missing company_nps_data and tenure_nps_data in get_dashboard_data() return dictionary. Added campaign-filtered SQL queries with proper Decimal-to-float conversion.
+-   **Executive Summary Company Count Fixed**: Added missing `total_companies` field to dashboard data functions.
+-   **Risk Metric Alignment**: Aligned churn risk and critical severity metrics with conditional logic matching production VOÏA AI behavior.
+-   **Demo Data Quality**: Regenerated Q1/Q2/Q3 2025 campaigns with realistic conditional logic and perfect metric alignment.
 
 # User Preferences
 Preferred communication style: Simple, everyday language.
