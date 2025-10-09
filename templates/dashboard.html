@@ -40,18 +40,7 @@
         </div>
 
 <!-- Campaign Filter - Always Visible (like hero banner) -->
-<div class="two-tier-navigation mb-4">
-    <!-- Primary Navigation -->
-    <ul class="nav nav-pills primary-nav mb-3" id="primaryNavigation" role="tablist" style="font-family: var(--font-family-headings);">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="insights-primary" data-primary-target="insights" type="button" role="tab" onclick="switchPrimarySection('insights')">
-                <i class="fas fa-chart-bar me-2"></i>INSIGHTS
-            </button>
-        </li>
-    </ul>
-    
-    <!-- Secondary Navigation - Insights -->
-    <div id="insightsSection">
+<div class="dashboard-navigation mb-4">
         <!-- Campaign Analytics Filter (Only for Insights) -->
         <div class="row mb-3">
             <div class="col-12">
@@ -92,27 +81,26 @@
                 </div>
             </div>
         </div>
-            
-            <ul class="nav nav-tabs secondary-nav" id="insightsSecondaryNav" role="tablist" style="font-family: var(--font-family-headings); border-bottom: 2px solid var(--medium-gray);">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
-                        <i class="fas fa-tachometer-alt me-2"></i>Overview
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="analytics" aria-selected="false">
-                        <i class="fas fa-chart-line me-2"></i>Analytics
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="comparison-tab" data-bs-toggle="tab" data-bs-target="#comparison" type="button" role="tab" aria-controls="comparison" aria-selected="false">
-                        <i class="fas fa-chart-line me-2"></i>Executive Summary
-                    </button>
-                </li>
-            </ul>
-        </div>
-        
-    </div>
+    
+    <!-- Main Navigation Tabs -->
+    <ul class="nav nav-tabs dashboard-tabs mb-3" id="dashboardNav" role="tablist" style="font-family: var(--font-family-headings); border-bottom: 2px solid var(--medium-gray);">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
+                <i class="fas fa-tachometer-alt me-2"></i>Overview
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="analytics" aria-selected="false">
+                <i class="fas fa-chart-line me-2"></i>Analytics
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="comparison-tab" data-bs-toggle="tab" data-bs-target="#comparison" type="button" role="tab" aria-controls="comparison" aria-selected="false">
+                <i class="fas fa-chart-line me-2"></i>Executive Summary
+            </button>
+        </li>
+    </ul>
+</div>
 
     <!-- Loading state (positioned below campaign filter) -->
     <div class="loading-card" id="loadingIndicator">
