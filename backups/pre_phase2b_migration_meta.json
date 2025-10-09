@@ -1,0 +1,30 @@
+{
+  "backup_name": "pre_phase2b_migration",
+  "timestamp": "20251009_014720",
+  "datetime": "2025-10-09T01:47:24.230748",
+  "description": "Critical baseline before Phase 2b sidebar navigation",
+  "file_path": "backups/pre_phase2b_migration.json",
+  "file_size_bytes": 3041431,
+  "table_count": 18,
+  "total_rows": 3413,
+  "tables": [
+    "auth_tokens",
+    "campaign_kpi_snapshots",
+    "campaigns",
+    "business_accounts",
+    "participants",
+    "user_sessions",
+    "business_account_users",
+    "campaign_participants",
+    "survey_response",
+    "email_deliveries",
+    "email_configurations",
+    "audit_logs",
+    "license_history",
+    "business_accounts_backup_20250917",
+    "license_usage_snapshots",
+    "executive_reports",
+    "branding_configs",
+    "export_jobs"
+  ]
+}
