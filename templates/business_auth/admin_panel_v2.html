@@ -329,6 +329,93 @@
     }
 }
 
+/* Settings Items within Cards */
+.settings-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-md);
+    transition: background-color 0.2s ease;
+    gap: var(--spacing-md);
+}
+
+.settings-item:last-child {
+    margin-bottom: 0;
+}
+
+.settings-item:hover {
+    background-color: rgba(225, 58, 68, 0.03);
+}
+
+.settings-item-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex: 1;
+}
+
+.settings-item-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-lg);
+    background: rgba(225, 58, 68, 0.1);
+    color: var(--primary-red);
+    flex-shrink: 0;
+}
+
+.settings-item-info {
+    flex: 1;
+}
+
+.settings-item-title {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    margin: 0 0 var(--spacing-xs) 0;
+    color: var(--primary-black);
+}
+
+.settings-item-desc {
+    font-size: var(--font-size-sm);
+    color: var(--gray-dark);
+    margin: 0;
+}
+
+/* Stats within cards */
+.settings-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+}
+
+.settings-stat {
+    text-align: center;
+    padding: var(--spacing-md);
+    background: rgba(225, 58, 68, 0.05);
+    border-radius: var(--radius-lg);
+}
+
+.settings-stat-number {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--primary-red);
+    margin: 0 0 var(--spacing-xs) 0;
+    font-family: var(--font-family-headings);
+}
+
+.settings-stat-label {
+    font-size: var(--font-size-xs);
+    color: var(--gray-dark);
+    margin: 0;
+}
+
 /* Accessibility */
 .settings-card-header:focus {
     outline: 3px solid var(--primary-red);
@@ -400,11 +487,55 @@
             </div>
             <div class="settings-card-content" id="account-settings-content">
                 <div class="settings-card-body">
-                    <div class="card-empty-state">
-                        <i class="fas fa-cog"></i>
-                        <p>Account settings will be migrated here</p>
-                        <small class="text-muted">Email, Brand, Survey configuration</small>
+                    <!-- Email Configuration -->
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Email Configuration</h4>
+                                <p class="settings-item-desc">Configure SMTP settings for sending survey invitations</p>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('business_auth.email_config') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-cog me-1"></i>Configure
+                        </a>
                     </div>
+
+                    <!-- Brand Configuration -->
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-palette"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Brand Configuration</h4>
+                                <p class="settings-item-desc">Customize your brand colors, logo, and visual identity</p>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('business_auth.brand_config') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-paint-brush me-1"></i>Customize
+                        </a>
+                    </div>
+
+                    <!-- Survey Defaults -->
+                    {% if business_account.account_type in ['core', 'plus', 'demo'] %}
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-comment-dots"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Survey Defaults</h4>
+                                <p class="settings-item-desc">Set default AI conversation settings for surveys</p>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('business_auth.survey_config') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-sliders-h me-1"></i>Configure
+                        </a>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -429,11 +560,43 @@
             </div>
             <div class="settings-card-content" id="user-management-content">
                 <div class="settings-card-body">
-                    <div class="card-empty-state">
-                        <i class="fas fa-users"></i>
-                        <p>User management will be migrated here</p>
-                        <small class="text-muted">Team members, Roles, Permissions</small>
+                    {% if current_user.has_permission('manage_users') %}
+                    <!-- Team Members -->
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Team Members</h4>
+                                <p class="settings-item-desc">Add and manage team members for your business account</p>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('business_auth.manage_users') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-user-plus me-1"></i>Manage Users
+                        </a>
                     </div>
+
+                    <!-- Usage Stats -->
+                    {% if admin_data.license_info %}
+                    <div class="settings-stats">
+                        <div class="settings-stat">
+                            <div class="settings-stat-number">{{ admin_data.license_info.users_used }}</div>
+                            <div class="settings-stat-label">Users Active</div>
+                        </div>
+                        <div class="settings-stat">
+                            <div class="settings-stat-number">{{ admin_data.license_info.users_limit }}</div>
+                            <div class="settings-stat-label">User Limit</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div class="card-empty-state">
+                        <i class="fas fa-lock"></i>
+                        <p>Permission Required</p>
+                        <small class="text-muted">Contact your administrator for user management access</small>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -458,10 +621,52 @@
             </div>
             <div class="settings-card-content" id="data-management-content">
                 <div class="settings-card-body">
-                    <div class="card-empty-state">
-                        <i class="fas fa-database"></i>
-                        <p>Data management will be migrated here</p>
-                        <small class="text-muted">Export, Audit logs, Database health</small>
+                    <!-- Data Export -->
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-download"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Export Data</h4>
+                                <p class="settings-item-desc">Export all survey responses for analysis and reporting</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline-primary btn-sm" onclick="exportAllData()" id="exportBtn">
+                            <i class="fas fa-file-export me-1"></i>Export
+                        </button>
+                    </div>
+
+                    <!-- Audit Logs -->
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-clipboard-list"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Audit Logs</h4>
+                                <p class="settings-item-desc">View system activity and user action history</p>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('business_auth.audit_logs') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-history me-1"></i>View Logs
+                        </a>
+                    </div>
+
+                    <!-- Database Health -->
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-heartbeat"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Database Health</h4>
+                                <p class="settings-item-desc">Monitor database connection and performance status</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline-primary btn-sm" onclick="checkDatabaseHealth()">
+                            <i class="fas fa-stethoscope me-1"></i>Check Status
+                        </button>
                     </div>
                 </div>
             </div>
@@ -487,10 +692,70 @@
             </div>
             <div class="settings-card-content" id="system-settings-content">
                 <div class="settings-card-body">
-                    <div class="card-empty-state">
-                        <i class="fas fa-sliders-h"></i>
-                        <p>System settings will be migrated here</p>
-                        <small class="text-muted">License, Performance, Scheduler</small>
+                    <!-- License Information -->
+                    {% if admin_data.license_info %}
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-certificate"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">License Information</h4>
+                                <p class="settings-item-desc">{{ admin_data.license_info.license_type|title }} - {{ admin_data.license_info.status|title }}</p>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('business_auth.license_info') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-info-circle me-1"></i>Details
+                        </a>
+                    </div>
+
+                    <!-- License Stats -->
+                    <div class="settings-stats">
+                        <div class="settings-stat">
+                            <div class="settings-stat-number">{{ admin_data.license_info.campaigns_used }}/{{ admin_data.license_info.campaigns_limit }}</div>
+                            <div class="settings-stat-label">Campaigns</div>
+                        </div>
+                        <div class="settings-stat">
+                            <div class="settings-stat-number">{{ admin_data.license_info.users_used }}/{{ admin_data.license_info.users_limit }}</div>
+                            <div class="settings-stat-label">Users</div>
+                        </div>
+                        <div class="settings-stat">
+                            <div class="settings-stat-number">{{ admin_data.license_info.participants_per_campaign_limit }}</div>
+                            <div class="settings-stat-label">Max Participants</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Performance Metrics -->
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Performance Metrics</h4>
+                                <p class="settings-item-desc">Monitor system performance and cache status</p>
+                            </div>
+                        </div>
+                        <a href="/business/admin/performance-metrics" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-chart-line me-1"></i>View Metrics
+                        </a>
+                    </div>
+
+                    <!-- Scheduler Status -->
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Campaign Scheduler</h4>
+                                <p class="settings-item-desc">View and manage automated campaign lifecycle</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline-primary btn-sm" onclick="checkSchedulerStatus()">
+                            <i class="fas fa-sync me-1"></i>Check Status
+                        </button>
                     </div>
                 </div>
             </div>
@@ -609,5 +874,104 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Export all data functionality
+function exportAllData() {
+    const btn = document.getElementById('exportBtn');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Exporting...';
+    
+    fetch('/api/export_user_data')
+        .then(response => response.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `voia_export_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            a.remove();
+            
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check me-1"></i>Exported';
+            setTimeout(() => { btn.innerHTML = originalText; }, 3000);
+        })
+        .catch(error => {
+            console.error('Export failed:', error);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>Failed';
+            setTimeout(() => { btn.innerHTML = originalText; }, 3000);
+        });
+}
+
+// Database health check
+function checkDatabaseHealth() {
+    const btn = event.currentTarget;
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Checking...';
+    
+    fetch('/business/api/database-health')
+        .then(response => response.json())
+        .then(data => {
+            btn.disabled = false;
+            if (data.healthy) {
+                btn.innerHTML = '<i class="fas fa-check-circle me-1"></i>Healthy';
+                btn.classList.add('btn-success');
+                btn.classList.remove('btn-outline-primary');
+            } else {
+                btn.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>Issues Found';
+                btn.classList.add('btn-warning');
+                btn.classList.remove('btn-outline-primary');
+            }
+            setTimeout(() => { 
+                btn.innerHTML = originalText;
+                btn.classList.remove('btn-success', 'btn-warning');
+                btn.classList.add('btn-outline-primary');
+            }, 3000);
+        })
+        .catch(error => {
+            console.error('Health check failed:', error);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-times-circle me-1"></i>Error';
+            setTimeout(() => { btn.innerHTML = originalText; }, 3000);
+        });
+}
+
+// Scheduler status check
+function checkSchedulerStatus() {
+    const btn = event.currentTarget;
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Checking...';
+    
+    fetch('/business/admin/scheduler/status')
+        .then(response => response.json())
+        .then(data => {
+            btn.disabled = false;
+            if (data.running) {
+                btn.innerHTML = '<i class="fas fa-play-circle me-1"></i>Running';
+                btn.classList.add('btn-success');
+                btn.classList.remove('btn-outline-primary');
+            } else {
+                btn.innerHTML = '<i class="fas fa-pause-circle me-1"></i>Stopped';
+                btn.classList.add('btn-warning');
+                btn.classList.remove('btn-outline-primary');
+            }
+            setTimeout(() => { 
+                btn.innerHTML = originalText;
+                btn.classList.remove('btn-success', 'btn-warning');
+                btn.classList.add('btn-outline-primary');
+            }, 3000);
+        })
+        .catch(error => {
+            console.error('Scheduler check failed:', error);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-times-circle me-1"></i>Error';
+            setTimeout(() => { btn.innerHTML = originalText; }, 3000);
+        });
+}
 </script>
 {% endblock %}
