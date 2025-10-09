@@ -34,8 +34,29 @@
             </div>
         </div>
         <nav class="sidebar-nav">
-            <!-- Navigation items will be added in Step 2 -->
+            <a href="{{ url_for('business_auth.business_analytics_hub') }}" class="sidebar-nav-item" data-page="dashboard">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('campaigns.list_campaigns') }}" class="sidebar-nav-item" data-page="campaigns">
+                <i class="fas fa-bullhorn"></i>
+                <span>Campaigns</span>
+            </a>
+            <a href="{{ url_for('participants.list_participants') }}" class="sidebar-nav-item" data-page="participants">
+                <i class="fas fa-users"></i>
+                <span>Participants</span>
+            </a>
+            <a href="{{ url_for('business_auth.admin_panel') }}" class="sidebar-nav-item" data-page="admin">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </a>
         </nav>
+        <div class="sidebar-footer">
+            <a href="{{ url_for('business_auth.logout') }}" class="sidebar-nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
     </div>
     {% endif %}
 
