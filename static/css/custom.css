@@ -2114,6 +2114,285 @@ a:hover {
 }
 
 /* ============================================
+   TYPOGRAPHY SCALE - Phase 1 Standardization
+   ============================================ */
+
+/* Page Headers */
+.page-title {
+    font-family: var(--font-family-headings);
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: var(--primary-black);
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.2;
+}
+
+.page-subtitle {
+    font-family: var(--font-family-base);
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--gray-dark);
+    line-height: 1.5;
+    margin-bottom: var(--spacing-xl);
+}
+
+/* Section Headings */
+.section-heading {
+    font-family: var(--font-family-headings);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--primary-black);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--light-gray);
+    margin-bottom: var(--spacing-lg);
+    line-height: 1.3;
+}
+
+/* Card Titles */
+.card-title-standard {
+    font-family: var(--font-family-headings);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary-black);
+    margin-bottom: var(--spacing-md);
+    line-height: 1.3;
+}
+
+/* Body Text */
+.body-text {
+    font-family: var(--font-family-base);
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--primary-black);
+    line-height: 1.6;
+}
+
+/* Labels and Helper Text */
+.label-text {
+    font-family: var(--font-family-base);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-dark);
+    line-height: 1.4;
+}
+
+.helper-text {
+    font-family: var(--font-family-base);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--gray-dark);
+    line-height: 1.4;
+    font-style: italic;
+}
+
+/* ============================================
+   SHADOW SYSTEM - Consolidated & Purposeful
+   ============================================ */
+
+/* Light shadows for subtle elevation */
+.shadow-minimal {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-card {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* Medium shadows for interactive elements */
+.shadow-interactive {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    transition: box-shadow 0.2s ease;
+}
+
+.shadow-interactive:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Heavy shadows - ONLY for modals and overlays */
+.shadow-modal {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.shadow-overlay {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+}
+
+/* ============================================
+   CARD COMPONENTS - Unified Pattern
+   ============================================ */
+
+/* Standard Card - Replace all .kpi-card, .stat-card, .metric-card */
+.card-standard {
+    background: var(--primary-white);
+    border: 1px solid var(--light-gray);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    transition: all 0.2s ease;
+}
+
+.card-standard:hover {
+    border-color: var(--medium-gray);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+/* Card with click action */
+.card-interactive {
+    background: var(--primary-white);
+    border: 1px solid var(--light-gray);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.card-interactive:hover {
+    border-color: var(--primary-red);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Compact card variant */
+.card-compact {
+    background: var(--primary-white);
+    border: 1px solid var(--light-gray);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+}
+
+/* ============================================
+   HEADER GRADIENTS - Standardized
+   ============================================ */
+
+/* Primary header gradient (for main pages) */
+.header-gradient-primary {
+    background: linear-gradient(135deg, rgba(var(--primary-red-rgb, 225, 58, 68), 0.08) 0%, rgba(var(--primary-red-rgb, 225, 58, 68), 0.12) 100%);
+    border: 1px solid var(--red-light);
+    border-radius: var(--radius-2xl);
+}
+
+/* Neutral header gradient (for secondary pages) */
+.header-gradient-neutral {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border: 1px solid var(--light-gray);
+    border-radius: var(--radius-2xl);
+}
+
+/* ============================================
+   BUTTON HIERARCHY - Consistent Sizing
+   ============================================ */
+
+/* Primary Large - Main CTAs */
+.btn-primary-lg {
+    height: 48px;
+    padding: 12px 28px;
+    font-family: var(--font-family-headings);
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: var(--radius-lg);
+    transition: all 0.2s ease;
+}
+
+/* Primary Standard */
+.btn-primary-standard {
+    height: 44px;
+    padding: 12px 24px;
+    font-family: var(--font-family-headings);
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-radius: var(--radius-lg);
+    transition: all 0.2s ease;
+}
+
+/* Secondary - Less prominent actions */
+.btn-secondary-standard {
+    height: 44px;
+    padding: 12px 24px;
+    font-family: var(--font-family-headings);
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    background: transparent;
+    border: 2px solid var(--primary-red);
+    color: var(--primary-red);
+    border-radius: var(--radius-lg);
+    transition: all 0.2s ease;
+}
+
+.btn-secondary-standard:hover {
+    background: rgba(var(--primary-red-rgb), 0.05);
+    border-color: var(--red-hover);
+    color: var(--red-hover);
+}
+
+/* Tertiary/Ghost - Subtle actions */
+.btn-tertiary {
+    height: 40px;
+    padding: 10px 16px;
+    font-family: var(--font-family-base);
+    font-size: 14px;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    color: var(--gray-dark);
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+}
+
+.btn-tertiary:hover {
+    background: var(--light-gray);
+    color: var(--primary-black);
+}
+
+/* Icon-only button */
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--light-gray);
+    background: var(--primary-white);
+    color: var(--gray-dark);
+    transition: all 0.2s ease;
+}
+
+.btn-icon:hover {
+    border-color: var(--primary-red);
+    color: var(--primary-red);
+    background: rgba(var(--primary-red-rgb), 0.05);
+}
+
+.btn-icon i {
+    font-size: 20px;
+}
+
+/* ============================================
+   SPACING RHYTHM - 8px Baseline Grid
+   ============================================ */
+
+/* Utility spacing classes following 8px baseline */
+.spacing-xs { margin-bottom: 8px; }   /* 1 unit */
+.spacing-sm { margin-bottom: 16px; }  /* 2 units */
+.spacing-md { margin-bottom: 24px; }  /* 3 units */
+.spacing-lg { margin-bottom: 32px; }  /* 4 units */
+.spacing-xl { margin-bottom: 40px; }  /* 5 units */
+.spacing-2xl { margin-bottom: 48px; } /* 6 units */
+.spacing-3xl { margin-bottom: 56px; } /* 7 units */
+
+/* Padding variants */
+.padding-xs { padding: 8px; }
+.padding-sm { padding: 16px; }
+.padding-md { padding: 24px; }
+.padding-lg { padding: 32px; }
+.padding-xl { padding: 40px; }
+
+/* ============================================
    GLOBAL CAMPAIGN FILTER INDICATOR
    ============================================ */
 
