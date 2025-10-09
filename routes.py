@@ -14,6 +14,7 @@ from auth_system import require_auth, generate_user_token
 from business_auth_routes import require_business_auth, require_permission, get_current_business_account, get_current_business_user
 from conversational_survey import start_conversational_survey, process_conversation_response, finalize_conversational_survey
 from ai_conversational_survey import start_ai_conversational_survey, process_ai_conversation_response, finalize_ai_conversational_survey
+from audit_utils import queue_audit_log
 from datetime import datetime, timedelta, date
 import json
 import logging
@@ -1388,8 +1389,29 @@ def export_data():
         
         data = [response.to_dict() for response in responses]
         
-        # Log admin access
-        admin_email = g.authenticated_email if hasattr(g, 'authenticated_email') else session.get('business_email', 'unknown')
+        # Get current user info
+        current_user = get_current_business_user()
+        admin_email = current_user.email if current_user else session.get('business_email', 'unknown')
+        admin_name = current_user.get_full_name() if current_user else 'Unknown'
+        
+        # Create audit trail entry
+        try:
+            queue_audit_log(
+                business_account_id=current_account.id,
+                action_type='data_exported',
+                resource_type='survey_responses',
+                resource_name='All Survey Data',
+                user_email=admin_email,
+                user_name=admin_name,
+                details={
+                    'total_responses': len(data),
+                    'export_format': 'JSON',
+                    'export_timestamp': datetime.utcnow().isoformat()
+                }
+            )
+        except Exception as audit_error:
+            logger.error(f"Failed to create audit log for data export: {audit_error}")
+        
         logger.info(f"Admin data export completed by {admin_email} for business account {current_account.id}")
         
         return jsonify({
