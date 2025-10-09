@@ -1,47 +1,6 @@
 # Overview
 The Voice of Client (VOÏA) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. It converts raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses, particularly Rivvalue Inc., with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project features a production-ready multi-tenant participant management system with extensive email delivery capabilities and AI-powered survey functionalities.
 
-# Recent Changes
-**October 9, 2025 - Settings Hub Redesign: Phase 1 Discovery COMPLETE**
--   **Comprehensive Section Inventory**: Documented all 10 admin panel sections with complete role-based visibility matrix, data dependencies, and migration complexity assessment. Mapped to proposed 4-card Settings Hub architecture (Account Settings, User Management, Data Management, System Settings).
--   **Data Dependency Mapping**: Catalogued 50+ data points including admin_data dictionary structure, database models (BusinessAccount, BusinessAccountUser, Campaign, SurveyResponse, EmailDelivery), external services (LicenseService, OnboardingFlowManager, EmailService), form submission flows, and security considerations.
--   **Reusable Component Library**: Identified 20+ reusable components (7 CSS, 6 JavaScript classes, 6 template macros, accessibility helpers) aligned with accordion/grid layout to reduce Phase 2 implementation risk.
--   **Wireframe Designs**: Created 12 wireframes covering mobile/tablet/desktop layouts with complete design system (VOÏA branding #E13A44, responsive breakpoints, WCAG 2.1 AA accessibility specs, animation specifications, icon system).
--   **Architect Validation**: Phase 1 deliverables approved with no blocker-level risks. Ready for Phase 2 foundation work (admin_panel_v2.html scaffolding, responsive grid, accordion components).
--   **Documentation**: 4 comprehensive planning documents created (section inventory, data dependencies, reusable components, wireframes) plus project objective and implementation plan with 24 tracked tasks.
-
-**October 9, 2025 - UX Refinement: ADMIN Tab Removal & Export Reorganization**
--   **ADMIN Tab Removal**: Eliminated redundant ADMIN tab from analytics dashboard for cleaner navigation. All admin functionality now contextually located.
--   **Export Functionality Relocation**: Campaign-specific export buttons added to responses pages (/business/campaigns/<id>/responses) for contextual data access. System-wide export moved to Settings → Data Management section.
--   **Route Fix**: Corrected campaign export endpoint from `/api/campaigns/<id>/export` to `/business/campaigns/api/campaigns/<id>/export` to match blueprint registration.
--   **Sidebar Dashboard Link**: Updated sidebar navigation Dashboard link from platform admin route to business user route (/business/analytics) for proper access control.
--   **Navigation Structure**: Maintained original 5-tab analytics dashboard structure (Overview, Account Intelligence, Analytics, Survey Insights, Executive Summary) based on user preference for intuitive information architecture.
--   **Hash Redirects**: Added bookmark compatibility redirects (#admin-tools → Settings page) for seamless transition.
--   **Zero Regressions**: All export functionality preserved and relocated contextually, no feature loss during restructuring.
-
-**October 9, 2025 - Phase 2b Sidebar Navigation COMPLETE**
--   **Sidebar Navigation System**: Production-ready modern sidebar navigation (v2 UI) replacing two-tier tab navigation. Professional dark gradient theme (#1a1a1a → #2d2d2d) with VOÏA red accents (#E13A44), smooth transitions, and hover effects.
--   **Navigation Components**: Fully functional sidebar with Dashboard, Campaigns, Participants, and Settings sections. Font Awesome icons, semantic HTML structure, and proper accessibility attributes.
--   **Active State Highlighting**: Intelligent route-based highlighting - Dashboard (analytics hub/analytics paths), Campaigns (/business/campaigns), Participants (/business/participants), Settings (/business/admin excluding analytics). Single active state guaranteed across all routes.
--   **Mobile Responsive Design**: Collapsible sidebar with hamburger toggle button (z-index: 10001 above navbar), slide animations, dark overlay, and auto-close on navigation. Fully responsive from mobile to desktop.
--   **UI Version Toggle**: Navbar-based switcher between v1 (tabs) and v2 (sidebar) with session persistence. Automatically removes URL parameters on toggle to ensure session preference takes effect. Visual badge indicator shows current version.
--   **Feature Flag Integration**: Complete integration with Phase 2b feature flag system. Supports gradual rollout (10%→25%→50%→100%), manual user toggle, and URL parameter override (?ui=v2) for testing.
--   **Architect Validation**: All components reviewed and approved - HTML structure, CSS styling, JavaScript functionality, active state logic, mobile responsiveness, and zero regressions to v1 UI.
--   **Production Ready**: Incremental development complete (6 steps), user-tested at each stage, ready for production rollout with Replit Rollback safety net.
-
-**October 9, 2025 - Phase 2b Pre-Implementation Complete**
--   **Feature Flag System**: Production-ready feature flag infrastructure for UI version toggle (v1/v2) with environment variable control, rollout percentage, and user toggle. Fixed critical bugs (FLAGS dict propagation, JSON handling with get_json(silent=True), permission checks). Supports gradual rollout strategy (10%→25%→50%→100%) for sidebar navigation.
--   **Database Backup Strategy**: Finalized Replit Rollback as PRIMARY backup mechanism. SQLAlchemy export available for data analysis only (restore explicitly disabled). Checkpoint metadata system for rollback organization. Prevents unsafe restore operations while maintaining data export capabilities.
--   **Error Monitoring Configuration**: Sentry/LogRocket integration prepared with proper has_request_context() guards to prevent Flask context crashes. Supports request, background task, and CLI execution contexts. Phase 2b context tracking (ui_version, feature_flags) for debugging v1/v2 issues. Disabled by default (opt-in).
--   **Staging Environment Documentation**: Comprehensive guide for Phase 2b testing covering Replit/external staging setup, sidebar navigation validation, feature flag testing, error monitoring verification, rollback procedures, and production promotion workflow.
--   **Pre-Implementation Safety**: All Phase 2b critical systems architect-reviewed and approved. Ready for sidebar navigation development.
-
-**October 4, 2025 - Critical Bug Fixes & Survey Insights Data**
--   **Survey Insights Data Fix**: Fixed missing company_nps_data and tenure_nps_data in get_dashboard_data() return dictionary. Added campaign-filtered SQL queries with proper Decimal-to-float conversion.
--   **Executive Summary Company Count Fixed**: Added missing `total_companies` field to dashboard data functions.
--   **Risk Metric Alignment**: Aligned churn risk and critical severity metrics with conditional logic matching production VOÏA AI behavior.
--   **Demo Data Quality**: Regenerated Q1/Q2/Q3 2025 campaigns with realistic conditional logic and perfect metric alignment.
-
 # User Preferences
 Preferred communication style: Simple, everyday language.
 User interface tone: Thought leadership and research-oriented language, avoiding sales-oriented messaging.
@@ -51,7 +10,7 @@ Project customization: Rivvalue Inc. branding and conversational AI surveys for 
 The system is a Flask web application with a multi-tiered architecture. The frontend uses Jinja2, Bootstrap 5 (dark theme), custom CSS, vanilla JavaScript, and Chart.js. The backend is Flask with SQLAlchemy ORM, designed for scalability from SQLite to PostgreSQL. AI integration, primarily via OpenAI API, handles natural language processing, sentiment analysis, and conversational surveys (VOÏA), supplemented by TextBlob.
 
 Key architectural decisions and features:
--   **UI/UX**: Multi-step survey forms, interactive dashboards, chat-style interfaces for conversational surveys, and Rivvalue Inc. branding with a professional blue color scheme.
+-   **UI/UX**: Multi-step survey forms, interactive dashboards, chat-style interfaces for conversational surveys, and Rivvalue Inc. branding with a professional blue color scheme. Modern sidebar navigation with dark gradient theme and VOÏA red accents, mobile responsiveness, and active state highlighting. The Settings Hub features a 4-card layout (Account Settings, User Management, Data Management, System Settings) with reusable components.
 -   **Technical Implementations**:
     -   **Survey Collection**: Multi-step forms with dynamic follow-up questions and real-time validation.
     -   **AI Analysis Engine**: Sentiment analysis, key theme extraction, churn risk assessment, growth opportunity identification, and NPS-based growth factor analysis.
@@ -67,19 +26,10 @@ Key architectural decisions and features:
 -   **Hybrid Survey Customization**: Campaign-specific survey personalization with business account defaults for tailored AI conversations while maintaining brand identity.
 -   **License Management System**: Enterprise-ready license management with usage tracking and enforcement, including anniversary-based calculation, and limits on campaigns, users, and participants.
 -   **Business Account User Management**: Multi-tenant user management with a professional UI, license-aware counters, user creation workflows with validation, email verification, editing, role management, status controls, and admin-triggered password resets.
--   **Mandatory Onboarding System**: Extensible guided setup workflow for business account administrators with Core/Plus licenses, featuring JSON-based progress tracking, license-conditional enforcement (Pro users exempted), step-by-step SMTP configuration and team member setup, route protection with zero regression for existing functionality, and configurable validation system for future step additions.
--   **Scalability Assessment**: System reliably handles 20k-50k participants (100-150 clients) on existing Replit infrastructure. Scaling beyond this requires database migration, professional email services, and distributed background processing.
-
-# Performance Optimization System
--   **Query Optimization**: Dashboard data retrieval consolidated from 20+ separate database queries to 2-3 optimized queries, reducing network latency and improving response times from 2-3 seconds to under 500ms.
--   **Response Caching**: Flask-Caching integration with admin-configurable settings via environment variables:
-    -   `ENABLE_CACHE` (true/false) - Enable or disable caching system
-    -   `CACHE_TIMEOUT` (seconds) - Cache duration, default 300 seconds (5 minutes)
-    -   `CACHE_TYPE` (simple/redis) - In-memory or Redis-based caching
-    -   `USE_OPTIMIZED_DASHBOARD` (true/false) - Toggle optimized queries with automatic fallback
--   **Database Indexing**: Strategic indexes on `survey_response` and `campaigns` tables for frequently queried columns (campaign_id, nps_score, created_at, churn_risk_level, sentiment_label, company_name, business_account_id, status).
--   **Fallback Strategy**: Automatic fallback to original queries if optimized queries fail, ensuring system reliability.
--   **Multi-Tenant Cache Isolation**: Cache keys scoped by campaign_id and business_account_id to prevent data leakage.
+-   **Mandatory Onboarding System**: Extensible guided setup workflow for business account administrators with Core/Plus licenses, featuring JSON-based progress tracking, license-conditional enforcement, and configurable validation system.
+-   **Scalability Assessment**: System reliably handles 20k-50k participants (100-150 clients) on existing Replit infrastructure.
+-   **Performance Optimization System**: Query optimization consolidating dashboard data retrieval, Flask-Caching integration with configurable settings (`ENABLE_CACHE`, `CACHE_TIMEOUT`, `CACHE_TYPE`, `USE_OPTIMIZED_DASHBOARD`), strategic database indexing, and an automatic fallback strategy for queries. Multi-tenant cache isolation by `campaign_id` and `business_account_id`.
+-   **Feature Flag System**: Production-ready infrastructure for UI version toggling (v1/v2) with environment variable control, rollout percentage, and user toggling.
 
 # External Dependencies
 -   **OpenAI API**: For advanced AI functionalities including sentiment analysis, theme extraction, and conversational surveys.
