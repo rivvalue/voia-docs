@@ -1075,6 +1075,39 @@
 <script>
     window.isBusinessAuthenticated = {{ 'true' if is_business_authenticated else 'false' }};
 </script>
+
+<!-- Hash redirect handler for old bookmarks -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const hash = window.location.hash;
+    
+    // Handle old bookmark hashes
+    if (hash) {
+        // Redirect #admin-tools to Settings page
+        if (hash === '#admin-tools') {
+            window.location.href = "{{ url_for('business_auth.admin_panel') }}";
+            return;
+        }
+        
+        // Redirect old tab hashes to new structure
+        const tabRedirects = {
+            '#intelligence': '#overview',  // Account Intelligence merged into Overview
+            '#survey-insights': '#analytics'  // Survey Insights merged into Analytics
+        };
+        
+        if (tabRedirects[hash]) {
+            window.location.hash = tabRedirects[hash];
+            // Trigger Bootstrap tab switch
+            const targetTab = document.querySelector(`button[data-bs-target="${tabRedirects[hash]}"]`);
+            if (targetTab) {
+                const tab = new bootstrap.Tab(targetTab);
+                tab.show();
+            }
+        }
+    }
+});
+</script>
+
 <!-- JavaScript disabled for company NPS table - using server-side rendering only -->
 <script src="{{ url_for('static', filename='js/dashboard.js') }}?v={{ range(1000, 9999) | random }}"></script>
 {% endblock %}
