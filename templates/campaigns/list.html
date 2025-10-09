@@ -512,22 +512,22 @@
 
         <!-- List View (Default) -->
         <div id="listView" class="campaigns-table">
-            <table class="table table-hover mb-0">
+            <table class="table table-hover mb-0 responsive-table">
                 <thead>
                     <tr>
                         <th>Campaign Name</th>
                         <th>Status</th>
-                        <th>Start Date</th>
-                        <th>End Date</th>
+                        <th class="hide-on-tablet">Start Date</th>
+                        <th class="hide-on-tablet">End Date</th>
                         <th class="text-center">Participants</th>
-                        <th class="text-center">Sent/Completed</th>
+                        <th class="text-center hide-on-tablet">Sent/Completed</th>
                         <th class="text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for campaign in campaigns %}
                     <tr data-status="{{ campaign.status }}">
-                        <td class="campaign-name-cell">
+                        <td class="campaign-name-cell" data-label="Campaign">
                             <div>
                                 <strong>{{ campaign.name }}</strong>
                                 {% if campaign.description %}
@@ -535,21 +535,21 @@
                                 {% endif %}
                             </div>
                         </td>
-                        <td>
+                        <td data-label="Status">
                             <span class="campaign-status status-{{ campaign.status }}">
                                 {{ campaign.status|title }}
                             </span>
                         </td>
-                        <td>
+                        <td data-label="Start Date" class="hide-on-tablet">
                             <small>{{ campaign.start_date }}</small>
                         </td>
-                        <td>
+                        <td data-label="End Date" class="hide-on-tablet">
                             <small>{{ campaign.end_date }}</small>
                         </td>
-                        <td class="text-center">
+                        <td class="text-center" data-label="Participants">
                             <strong>{{ campaign.participant_count }}</strong>
                         </td>
-                        <td class="text-center">
+                        <td class="text-center hide-on-tablet" data-label="Sent/Completed">
                             <small class="text-muted">
                                 {{ campaign.engagement_metrics.invitations_sent }} / {{ campaign.engagement_metrics.surveys_completed }}
                                 {% if campaign.engagement_metrics.participation_rate is not none %}
@@ -557,7 +557,7 @@
                                 {% endif %}
                             </small>
                         </td>
-                        <td class="text-center">
+                        <td class="text-center actions-cell">
                             {{ campaign_actions(campaign, 'table') }}
                         </td>
                     </tr>

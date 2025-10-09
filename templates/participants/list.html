@@ -232,30 +232,30 @@
                 <div class="card-body p-0">
                     {% if participants %}
                     <div class="table-responsive">
-                        <table class="table table-hover mb-0">
+                        <table class="table table-hover mb-0 responsive-table">
                             <thead class="table-dark">
                                 <tr>
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Company</th>
-                                    <th>Origin</th>
+                                    <th class="hide-on-tablet">Origin</th>
                                     <th>Status</th>
-                                    <th>Created</th>
+                                    <th class="hide-on-tablet">Created</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for participant in participants %}
                                 <tr>
-                                    <td>
+                                    <td data-label="Name">
                                         <div class="fw-bold">{{ participant.name }}</div>
                                     </td>
-                                    <td>
+                                    <td data-label="Email">
                                         <div class="text-muted">{{ participant.email }}</div>
                                     </td>
-                                    <td>
+                                    <td data-label="Company">
                                         <div>{{ participant.company_name or '-' }}</div>
                                     </td>
-                                    <td>
+                                    <td data-label="Origin" class="hide-on-tablet">
                                         {% if participant.origin_badge %}
                                             <span class="badge {{ participant.origin_badge.class }}">
                                                 {% if participant.source == 'trial' %}
@@ -271,7 +271,7 @@
                                             <span class="badge bg-secondary">Unknown</span>
                                         {% endif %}
                                     </td>
-                                    <td>
+                                    <td data-label="Status">
                                         {% if participant.status == 'completed' %}
                                             <span class="badge bg-success">
                                                 <i class="fas fa-check me-1"></i>Completed
@@ -292,7 +292,7 @@
                                             <span class="badge bg-secondary">{{ participant.status|title }}</span>
                                         {% endif %}
                                     </td>
-                                    <td>
+                                    <td data-label="Created" class="hide-on-tablet">
                                         <small class="text-muted">
                                             {% if participant.created_at %}
                                                 {{ participant.created_at[:10] }}

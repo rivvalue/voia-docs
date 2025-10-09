@@ -2174,6 +2174,225 @@ a:hover {
 }
 
 /* ============================================
+   RESPONSIVE TABLE PATTERNS
+   ============================================ */
+
+/* Mobile Card View - Transform tables into cards on mobile */
+@media (max-width: 767px) {
+    /* Hide table headers on mobile */
+    .responsive-table thead {
+        display: none;
+    }
+    
+    /* Transform table rows into cards */
+    .responsive-table tbody tr {
+        display: block;
+        margin-bottom: var(--spacing-lg);
+        border: 1px solid var(--light-gray);
+        border-radius: var(--radius-lg);
+        background: var(--primary-white);
+        box-shadow: var(--shadow-sm);
+        padding: var(--spacing-md);
+    }
+    
+    /* Transform table cells into card rows */
+    .responsive-table tbody td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--spacing-sm) 0;
+        border: none;
+        border-bottom: 1px solid var(--light-gray);
+    }
+    
+    .responsive-table tbody td:last-child {
+        border-bottom: none;
+    }
+    
+    /* Add labels from data attributes */
+    .responsive-table tbody td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--gray-dark);
+        margin-right: var(--spacing-md);
+        flex-shrink: 0;
+    }
+    
+    /* Align content to the right */
+    .responsive-table tbody td > * {
+        text-align: right;
+    }
+    
+    /* Special handling for action buttons */
+    .responsive-table tbody td.actions-cell {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        padding-top: var(--spacing-md);
+        margin-top: var(--spacing-sm);
+        border-top: 2px solid var(--light-gray);
+    }
+    
+    .responsive-table tbody td.actions-cell::before {
+        content: '';
+        display: none;
+    }
+    
+    .responsive-table tbody td.actions-cell .table-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+/* Progressive Column Hiding - Tablet */
+@media (min-width: 768px) and (max-width: 991px) {
+    /* Hide less critical columns on tablet */
+    .responsive-table .hide-on-tablet {
+        display: none;
+    }
+    
+    /* Reduce padding for better fit */
+    .responsive-table th,
+    .responsive-table td {
+        padding: var(--spacing-sm);
+        font-size: var(--font-size-sm);
+    }
+}
+
+/* Desktop - Show all columns */
+@media (min-width: 992px) {
+    .responsive-table .hide-on-desktop {
+        display: none;
+    }
+}
+
+/* View Toggle Styling */
+.table-view-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background: var(--primary-white);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--light-gray);
+}
+
+.view-mode-toggle {
+    display: flex;
+    gap: 0.25rem;
+    background: var(--light-gray);
+    padding: 0.25rem;
+    border-radius: var(--radius-md);
+}
+
+.view-mode-toggle button {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: transparent;
+    color: var(--gray-dark);
+    border-radius: var(--radius-sm);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
+.view-mode-toggle button:hover {
+    background: rgba(var(--primary-red-rgb), 0.1);
+}
+
+.view-mode-toggle button.active {
+    background: var(--primary-red);
+    color: var(--primary-white);
+    box-shadow: var(--shadow-sm);
+}
+
+.view-mode-toggle button i {
+    margin-right: 0.5rem;
+}
+
+/* Card Grid View (Alternative to Table) */
+.data-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.data-card {
+    background: var(--primary-white);
+    border: 1px solid var(--light-gray);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
+}
+
+.data-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-red);
+    transform: translateY(-2px);
+}
+
+.data-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.data-card-title {
+    font-weight: 600;
+    font-size: var(--font-size-lg);
+    color: var(--primary-black);
+    margin: 0;
+}
+
+.data-card-body {
+    margin-bottom: var(--spacing-md);
+}
+
+.data-card-row {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.data-card-row:last-child {
+    border-bottom: none;
+}
+
+.data-card-label {
+    font-weight: 500;
+    color: var(--gray-dark);
+    font-size: var(--font-size-sm);
+}
+
+.data-card-value {
+    text-align: right;
+    color: var(--primary-black);
+    font-size: var(--font-size-sm);
+}
+
+.data-card-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: flex-end;
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--light-gray);
+}
+
+/* Mobile optimizations for cards grid */
+@media (max-width: 575px) {
+    .data-cards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================
    EMPTY STATES - Professional SaaS Pattern
    ============================================ */
 
