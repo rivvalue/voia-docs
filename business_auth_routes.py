@@ -1269,7 +1269,23 @@ def toggle_ui_version():
                 })
             else:
                 flash(f'UI switched to version {requested_version}. Page will reload.', 'success')
-                return redirect(request.referrer or url_for('business_auth.admin_panel'))
+                # Redirect to same page but strip ?ui parameter so session preference takes effect
+                from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+                redirect_url = request.referrer or url_for('business_auth.admin_panel')
+                
+                # Parse URL and remove 'ui' parameter
+                parsed = urlparse(redirect_url)
+                query_params = parse_qs(parsed.query)
+                query_params.pop('ui', None)  # Remove ui parameter
+                
+                # Rebuild URL without ui parameter
+                new_query = urlencode(query_params, doseq=True)
+                redirect_url = urlunparse((
+                    parsed.scheme, parsed.netloc, parsed.path,
+                    parsed.params, new_query, parsed.fragment
+                ))
+                
+                return redirect(redirect_url)
         else:
             if request.is_json:
                 return jsonify({'success': False, 'error': 'Invalid UI version'}), 400
