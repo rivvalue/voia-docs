@@ -23,7 +23,23 @@
     {% block head %}{% endblock %}
     
 </head>
-<body class="{% block page_class %}{% endblock %}">
+<body class="{% block page_class %}{% endblock %}" data-ui-version="{{ ui_version }}" data-user-id="{{ business_user_id }}" data-user-email="{{ business_user_email }}">
+    
+    <!-- Sidebar Navigation (v2 UI only) -->
+    {% if ui_version == 'v2' and is_business_authenticated %}
+    <div class="sidebar" id="voiaSidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <span>VO<span style="color: #E13A44;">Ï</span>A</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <!-- Navigation items will be added in Step 2 -->
+        </nav>
+    </div>
+    {% endif %}
+
+    <!-- Top Navbar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container">
             <div class="navbar-brand d-flex align-items-center">
@@ -98,7 +114,7 @@
     <!-- Breadcrumb Navigation -->
     {% block breadcrumb %}{% endblock %}
 
-    <main class="container mt-4">
+    <main class="container mt-4 {% if ui_version == 'v2' and is_business_authenticated %}main-with-sidebar{% endif %}">
         {% block content %}{% endblock %}
     </main>
 
