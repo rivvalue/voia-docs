@@ -4,6 +4,19 @@
 
 {% block page_class %}page-audit-logs{% endblock %}
 
+{% block breadcrumb %}
+<div class="breadcrumb-container">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('business_auth.admin_panel') }}">Settings Hub</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Account Activity Trail</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+{% endblock %}
+
 {% block content %}
 <style>
 /* Audit logs specific styling */
