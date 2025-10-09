@@ -21,6 +21,11 @@ class FeatureFlags:
             'rollout_percentage': 0,  # 0-100: percentage of users who see v2 by default
             'description': 'New sidebar navigation system (Phase 2b)'
         },
+        'settings_hub_v2': {
+            'enabled': False,  # Master switch - controls if Settings Hub v2 is available
+            'rollout_percentage': 0,  # 0-100: percentage of users who see Settings Hub v2
+            'description': 'Settings Hub redesign with 4-card layout (Phase 2-5)'
+        },
         'ui_version_toggle': {
             'enabled': True,  # Allow users to manually toggle UI versions
             'description': 'Manual UI version switcher for testing'
@@ -31,15 +36,20 @@ class FeatureFlags:
         # Load configuration from environment if available
         self.sidebar_enabled = os.environ.get('FEATURE_SIDEBAR_NAV', 'false').lower() == 'true'
         self.rollout_percentage = int(os.environ.get('SIDEBAR_ROLLOUT_PERCENTAGE', '0'))
+        self.settings_hub_enabled = os.environ.get('FEATURE_SETTINGS_HUB_V2', 'false').lower() == 'true'
+        self.settings_hub_rollout = int(os.environ.get('SETTINGS_HUB_ROLLOUT_PERCENTAGE', '0'))
         self.toggle_enabled = os.environ.get('FEATURE_UI_TOGGLE', 'true').lower() == 'true'
         
         # Update FLAGS dict with runtime values from environment
         self.FLAGS['sidebar_navigation']['enabled'] = self.sidebar_enabled
         self.FLAGS['sidebar_navigation']['rollout_percentage'] = self.rollout_percentage
+        self.FLAGS['settings_hub_v2']['enabled'] = self.settings_hub_enabled
+        self.FLAGS['settings_hub_v2']['rollout_percentage'] = self.settings_hub_rollout
         self.FLAGS['ui_version_toggle']['enabled'] = self.toggle_enabled
         
         logger.info(f"Feature Flags initialized - Sidebar: {self.sidebar_enabled}, "
-                   f"Rollout: {self.rollout_percentage}%, Toggle: {self.toggle_enabled}")
+                   f"Rollout: {self.rollout_percentage}%, Settings Hub v2: {self.settings_hub_enabled}, "
+                   f"Settings Hub Rollout: {self.settings_hub_rollout}%, Toggle: {self.toggle_enabled}")
     
     def is_feature_enabled(self, feature_name):
         """Check if a feature flag is enabled (reads from updated FLAGS dict)"""
