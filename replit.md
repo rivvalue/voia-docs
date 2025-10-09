@@ -2,6 +2,11 @@
 The Voice of Client (VOÏA) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. It converts raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses, particularly Rivvalue Inc., with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project features a production-ready multi-tenant participant management system with extensive email delivery capabilities and AI-powered survey functionalities.
 
 # Recent Changes
+**October 9, 2025 - Critical Bug Fixes: Breadcrumb Visibility & Export Functionality**
+-   **Breadcrumb Visibility Fix**: Enhanced breadcrumb container styling with improved contrast - changed background from subtle #E9E8E4 to clearer #f8f9fa, strengthened border (2px solid #dee2e6), and added subtle box-shadow for depth. Breadcrumbs now clearly visible across all settings sub-pages.
+-   **Export Feature Fix**: Corrected export endpoint in Settings Hub v2 Data Management card from '/api/export_user_data' to '/api/export_data'. Eliminated "EMAIL_REQUIRED" error - admin export now correctly downloads all survey responses without requiring email parameter.
+-   **Testing**: Both fixes validated with architect review, zero regressions confirmed, application restarted successfully.
+
 **October 9, 2025 - Settings Sub-Pages: Navigation & Breadcrumb Enhancement**
 -   **Breadcrumb Navigation**: Added missing breadcrumbs to Audit Logs and License Info pages for consistent navigation across all settings sub-pages.
 -   **Unified Naming**: Updated all breadcrumb text from "Admin Panel" to "Settings Hub" across 6 pages (Email Config, Brand Config, Survey Config, User Management, Audit Logs, License Info).
