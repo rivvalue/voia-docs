@@ -2434,7 +2434,7 @@ a:hover {
 }
 
 .empty-state h3 {
-    font-family: var(--font-heading);
+    font-family: var(--font-family-headings);
     font-size: var(--font-size-2xl);
     font-weight: 600;
     color: var(--primary-black);
@@ -2443,7 +2443,7 @@ a:hover {
 }
 
 .empty-state p {
-    font-family: var(--font-body);
+    font-family: var(--font-family-base);
     font-size: var(--font-size-base);
     color: var(--gray-dark);
     max-width: 480px;
