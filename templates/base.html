@@ -185,6 +185,23 @@
                         }
                     });
                 });
+                
+                // Highlight active page in sidebar
+                const currentPath = window.location.pathname;
+                navItems.forEach(item => {
+                    const page = item.getAttribute('data-page');
+                    
+                    // Map paths to page identifiers (order matters - check more specific paths first)
+                    if (page === 'dashboard' && (currentPath.includes('/business-analytics-hub') || currentPath.includes('/business/analytics'))) {
+                        item.classList.add('active');
+                    } else if (page === 'campaigns' && currentPath.includes('/business/campaigns')) {
+                        item.classList.add('active');
+                    } else if (page === 'participants' && currentPath.includes('/business/participants')) {
+                        item.classList.add('active');
+                    } else if (page === 'admin' && currentPath.startsWith('/business/admin') && !currentPath.includes('/business-analytics-hub')) {
+                        item.classList.add('active');
+                    }
+                });
             }
         });
     </script>
