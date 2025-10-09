@@ -958,6 +958,43 @@
         </div>
 
 
+        <!-- Data Management -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-database"></i>
+                    Data Management
+                </h3>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card border-0" style="background: var(--light-gray);">
+                        <div class="card-body text-center">
+                            <i class="fas fa-download fa-3x text-primary mb-3"></i>
+                            <h5>Export All Data</h5>
+                            <p class="text-muted small">Export all survey responses across all campaigns for analysis and reporting.</p>
+                            <button class="btn btn-primary" onclick="exportAllData()" id="exportAllBtn">
+                                <i class="fas fa-download me-2"></i>Export Full Dataset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-0" style="background: var(--light-gray);">
+                        <div class="card-body">
+                            <h6 class="mb-3"><i class="fas fa-info-circle me-2 text-primary"></i>Export Information</h6>
+                            <ul class="small mb-0" style="list-style: none; padding-left: 0;">
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Includes all campaigns</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>JSON format for easy analysis</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Complete response data</li>
+                                <li class="mb-0"><i class="fas fa-check text-success me-2"></i>Admin access required</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Session Info -->
         <div class="admin-section">
             <div class="section-header">
@@ -1063,6 +1100,67 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Export all data function (moved from ADMIN tab to Settings)
+function exportAllData() {
+    const btn = document.getElementById('exportAllBtn');
+    const originalHTML = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Exporting...';
+    btn.disabled = true;
+    
+    fetch('/api/export_data', {
+        method: 'GET',
+        credentials: 'include'
+    })
+    .then(response => {
+        if (response.status === 403 || response.status === 401) {
+            alert('Authentication required. Please log in to export data.');
+            window.location.href = '/business/login';
+            return null;
+        }
+        if (!response.ok) {
+            return response.json().then(err => {
+                throw new Error(err.error || `HTTP error! status: ${response.status}`);
+            });
+        }
+        return response.clone().text().then(text => {
+            try {
+                return JSON.parse(text);
+            } catch(e) {
+                throw new Error('Failed to parse server response. The data might be too large.');
+            }
+        });
+    })
+    .then(result => {
+        if (!result) return;
+        
+        const data = result.data || result;
+        const dataStr = JSON.stringify(data, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const fileName = `voïa_full_export_${new Date().toISOString().split('T')[0]}.json`;
+        
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', url);
+        linkElement.setAttribute('download', fileName);
+        linkElement.click();
+        
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+        
+        if (result.export_info) {
+            alert(`Export successful! ${result.export_info.total_responses} responses exported.`);
+        }
+    })
+    .catch(error => {
+        console.error('Error exporting data:', error);
+        alert(`Error exporting data: ${error.message}`);
+    })
+    .finally(() => {
+        btn.innerHTML = originalHTML;
+        btn.disabled = false;
+    });
+}
 
 </script>
 {% endblock %}

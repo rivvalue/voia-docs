@@ -6,7 +6,7 @@ Dedicated routes for campaign lifecycle management with email invitation functio
 import logging
 import uuid
 from datetime import datetime, timedelta
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from sqlalchemy import desc
 from sqlalchemy.orm import joinedload
 
@@ -1143,3 +1143,57 @@ def individual_response(campaign_id, participant_id):
             return jsonify({'error': 'Failed to load individual response'}), 500
         flash('Error loading individual response.', 'error')
         return redirect(url_for('campaigns.campaign_responses', campaign_id=campaign_id))
+
+
+@campaign_bp.route('/api/campaigns/<int:campaign_id>/export')
+@require_business_auth
+@require_permission('export_data')
+def export_campaign_responses(campaign_id):
+    """Export campaign responses as JSON - Admin access required"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account not found'}), 401
+        
+        # Get campaign and verify access
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            return jsonify({'error': 'Campaign not found'}), 404
+        
+        logger.info(f"Campaign export initiated for campaign {campaign_id} ({campaign.name}) by business account {current_account.id}")
+        
+        # Query responses for this specific campaign
+        responses = SurveyResponse.query.filter_by(
+            campaign_id=campaign_id
+        ).all()
+        
+        logger.info(f"Export query returned {len(responses)} responses for campaign {campaign_id}")
+        
+        # Convert responses to dictionaries
+        data = []
+        for response in responses:
+            response_dict = response.to_dict()
+            response_dict['campaign_name'] = campaign.name
+            data.append(response_dict)
+        
+        export_info = {
+            'total_responses': len(responses),
+            'campaign_id': campaign_id,
+            'campaign_name': campaign.name,
+            'business_account': current_account.name,
+            'exported_at': datetime.utcnow().isoformat(),
+            'exported_by': session.get('business_user_email', 'Unknown')
+        }
+        
+        return jsonify({
+            'data': data,
+            'export_info': export_info
+        })
+        
+    except Exception as e:
+        logger.error(f"Error exporting campaign {campaign_id}: {e}")
+        return jsonify({'error': 'Failed to export campaign data'}), 500

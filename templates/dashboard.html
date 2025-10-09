@@ -48,11 +48,6 @@
                 <i class="fas fa-chart-bar me-2"></i>INSIGHTS
             </button>
         </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="admin-primary" data-primary-target="admin" type="button" role="tab" onclick="switchPrimarySection('admin')">
-                <i class="fas fa-shield-alt me-2"></i>ADMIN
-            </button>
-        </li>
     </ul>
     
     <!-- Secondary Navigation - Insights -->
@@ -127,15 +122,6 @@
             </ul>
         </div>
         
-        
-        <!-- Secondary Navigation - Admin -->
-        <ul class="nav nav-tabs secondary-nav d-none" id="adminSecondaryNav" role="tablist" style="font-family: var(--font-family-headings); border-bottom: 2px solid var(--medium-gray);">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="admin-tools-tab" data-bs-toggle="tab" data-bs-target="#admin-tools" type="button" role="tab" aria-controls="admin-tools" aria-selected="true">
-                    <i class="fas fa-tools me-2"></i>Admin Tools
-                </button>
-            </li>
-        </ul>
     </div>
 
     <!-- Loading state (positioned below campaign filter) -->
@@ -891,59 +877,6 @@
             </div>
         </div>
 
-        
-        <!-- Admin Tools Tab -->
-        <div class="tab-pane fade" id="admin-tools" role="tabpanel" aria-labelledby="admin-tools-tab">
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header" style="background: linear-gradient(135deg, rgba(225, 58, 68, 0.6) 0%, rgba(197, 45, 54, 0.6) 100%); color: white;">
-                            <h4 class="mb-0"><i class="fas fa-tools me-2"></i>Admin Tools</h4>
-                            <small>Administrative functions and system management</small>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <div class="card">
-                                        <div class="card-body text-center">
-                                            <i class="fas fa-user-circle fa-3x text-muted mb-3"></i>
-                                            <h5>Export Response Data</h5>
-                                            <p class="text-muted">Export customer response data for analysis</p>
-                                            <button class="btn btn-outline-primary" onclick="exportUserData()">
-                                                <i class="fas fa-download me-2"></i>Export Data
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <div class="card">
-                                        <div class="card-body text-center">
-                                            <i class="fas fa-key fa-3x text-muted mb-3"></i>
-                                            <h5>Admin Access</h5>
-                                            <p class="text-muted">Login to access advanced admin features</p>
-                                            {% if is_business_authenticated %}
-                                            <button class="btn btn-outline-secondary" onclick="exportData()">
-                                                <i class="fas fa-database me-2"></i>Export Full Data
-                                            </button>
-                                            <br><br>
-                                            <p class="text-success"><i class="fas fa-check-circle me-2"></i>Logged in as: {{ business_user_name }}</p>
-                                            <a href="/business/logout" class="btn btn-outline-danger btn-sm">
-                                                <i class="fas fa-sign-out-alt me-2"></i>Logout
-                                            </a>
-                                            {% else %}
-                                            <a href="/business/login" class="btn btn-outline-primary">
-                                                <i class="fas fa-sign-in-alt me-2"></i>Business Login
-                                            </a>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
         </div>
         <!-- End Tab Content -->
     </div>

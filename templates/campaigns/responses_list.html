@@ -105,6 +105,9 @@
                     <p class="mb-0 opacity-75">Review and analyze individual participant responses</p>
                 </div>
                 <div class="col-md-4 text-end">
+                    <button onclick="exportCampaignResponses({{ campaign.id }})" class="btn btn-light me-2" title="Export campaign responses">
+                        <i class="fas fa-download me-2"></i>Export
+                    </button>
                     <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="btn btn-outline-light">
                         <i class="fas fa-arrow-left me-2"></i>Back to Campaign
                     </a>
@@ -297,5 +300,54 @@ document.querySelector('input[name="search"]').addEventListener('keypress', func
         this.closest('form').submit();
     }
 });
+
+// Export campaign responses
+function exportCampaignResponses(campaignId) {
+    console.log('Exporting campaign responses for campaign:', campaignId);
+    
+    fetch(`/business/campaigns/api/campaigns/${campaignId}/export`, {
+        method: 'GET',
+        credentials: 'include'
+    })
+    .then(response => {
+        if (response.status === 403 || response.status === 401) {
+            alert('Authentication required. Please log in to export data.');
+            window.location.href = '/business/login';
+            return null;
+        }
+        if (!response.ok) {
+            return response.json().then(err => {
+                throw new Error(err.error || `HTTP error! status: ${response.status}`);
+            });
+        }
+        return response.json();
+    })
+    .then(result => {
+        if (!result) return;
+        
+        const data = result.data || result;
+        const dataStr = JSON.stringify(data, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const campaignName = '{{ campaign.name }}'.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        const fileName = `campaign_${campaignName}_responses_${new Date().toISOString().split('T')[0]}.json`;
+        
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', url);
+        linkElement.setAttribute('download', fileName);
+        linkElement.click();
+        
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+        
+        if (result.export_info) {
+            alert(`Export successful! ${result.export_info.total_responses} responses exported.`);
+        }
+    })
+    .catch(error => {
+        console.error('Error exporting campaign data:', error);
+        alert(`Error exporting data: ${error.message}`);
+    });
+}
 </script>
 {% endblock %}
