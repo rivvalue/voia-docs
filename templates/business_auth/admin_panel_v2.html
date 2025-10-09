@@ -868,7 +868,7 @@ function exportAllData() {
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Exporting...';
     
-    fetch('/api/export_user_data')
+    fetch('/api/export_data')
         .then(response => response.blob())
         .then(blob => {
             const url = window.URL.createObjectURL(blob);

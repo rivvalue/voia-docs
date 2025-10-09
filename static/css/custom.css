@@ -2016,10 +2016,11 @@ a:hover {
    ======================================== */
 
 .breadcrumb-container {
-    background: var(--light-gray);
-    border-bottom: 1px solid var(--medium-gray);
+    background: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
     padding: var(--spacing-sm) 0;
     margin-bottom: var(--spacing-lg);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .breadcrumb {
