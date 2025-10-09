@@ -119,26 +119,12 @@
     border: 1px solid var(--primary-red);
 }
 
-/* 4-Card Grid System */
+/* 4-Card Grid System - Full Width Stacked */
 .settings-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--spacing-xl);
     margin-bottom: var(--spacing-2xl);
-}
-
-/* Tablet: 2 columns */
-@media (min-width: 768px) {
-    .settings-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-/* Desktop: 4 columns */
-@media (min-width: 1200px) {
-    .settings-grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
 }
 
 /* Settings Card */
