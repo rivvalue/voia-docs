@@ -8,6 +8,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from models import BusinessAccountUser, UserSession, BusinessAccount, EmailConfiguration, LicenseHistory, db
 from rate_limiter import rate_limit
 from license_service import LicenseService
+from feature_flags import feature_flags
 import logging
 from datetime import datetime, timedelta, date
 import json
@@ -1439,7 +1440,13 @@ def admin_panel():
             'license_info': license_info
         }
         
-        return render_template('business_auth/admin_panel.html',
+        # Check if Settings Hub v2 is enabled
+        template_name = 'business_auth/admin_panel.html'
+        if feature_flags.is_feature_enabled('settings_hub_v2'):
+            template_name = 'business_auth/admin_panel_v2.html'
+            logger.info(f"Settings Hub v2 enabled for user {current_business_user.email}")
+        
+        return render_template(template_name,
                              business_account=business_account,
                              current_user=current_business_user,
                              admin_data=admin_data)
