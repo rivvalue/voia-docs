@@ -100,18 +100,8 @@
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="intelligence-tab" data-bs-toggle="tab" data-bs-target="#intelligence" type="button" role="tab" aria-controls="intelligence" aria-selected="false">
-                        <i class="fas fa-brain me-2"></i>Account Intelligence
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
                     <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="analytics" aria-selected="false">
                         <i class="fas fa-chart-line me-2"></i>Analytics
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="survey-insights-tab" data-bs-toggle="tab" data-bs-target="#survey-insights" type="button" role="tab" aria-controls="survey-insights" aria-selected="false">
-                        <i class="fas fa-comments me-2"></i>Survey Insights
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -225,23 +215,24 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Account Intelligence Tab -->
-        <div class="tab-pane fade" id="intelligence" role="tabpanel" aria-labelledby="intelligence-tab">
-            <!-- Account Intelligence - Unified View -->
+            <!-- Section Divider -->
+            <hr class="my-4" style="border-top: 2px solid var(--medium-gray);">
+
+            <!-- Account Intelligence Section -->
+            <div class="row mb-3">
+                <div class="col-12">
+                    <h4 style="font-family: var(--font-family-headings); color: var(--primary-dark);">
+                        <i class="fas fa-brain me-2"></i>Account Intelligence
+                    </h4>
+                    <p class="text-muted">Risk vs Opportunity Balance by Company</p>
+                </div>
+            </div>
+
+            <!-- Account Intelligence Content -->
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="card">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">
-                                <i class="fas fa-brain me-2"></i>Account Intelligence
-                                <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top" 
-                                   title="Shows account health balance: Risk-Heavy (risks outweigh opportunities), High Potential (opportunities with minimal risks), or Balanced" 
-                                   style="font-size: 0.8em; opacity: 0.7;"></i>
-                                <small class="text-muted ms-2">Risk vs Opportunity Balance by Company</small>
-                            </h5>
-                        </div>
                         <div class="card-body">
                             <!-- Search and Filters -->
                             <div class="row g-3 mb-4">
@@ -390,10 +381,19 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Survey Insights Tab -->
-        <div class="tab-pane fade" id="survey-insights" role="tabpanel" aria-labelledby="survey-insights-tab">
+            <!-- Section Divider -->
+            <hr class="my-4" style="border-top: 2px solid var(--medium-gray);">
+
+            <!-- Survey Insights Section -->
+            <div class="row mb-3">
+                <div class="col-12">
+                    <h4 style="font-family: var(--font-family-headings); color: var(--primary-dark);">
+                        <i class="fas fa-comments me-2"></i>Survey Insights
+                    </h4>
+                    <p class="text-muted">Company-level NPS data and customer tenure analysis</p>
+                </div>
+            </div>
             <!-- Company NPS Segregation Section -->
             <div class="row mb-4">
                 <div class="col-12">
