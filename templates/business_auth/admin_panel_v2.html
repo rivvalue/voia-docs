@@ -22,6 +22,16 @@
     margin: calc(-1 * var(--spacing-xl)) calc(-1 * var(--spacing-xl)) var(--spacing-2xl);
     border-radius: 0;
     color: var(--primary-white);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+}
+
+.settings-hub-header-content {
+    flex: 1;
+    min-width: 250px;
 }
 
 .settings-hub-title {
@@ -38,6 +48,60 @@
     margin: 0;
     opacity: 0.9;
     color: var(--primary-white);
+}
+
+/* Header Actions */
+.settings-hub-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+}
+
+.settings-action-btn {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--primary-white);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.settings-action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+.settings-action-btn:active {
+    transform: translateY(0);
+}
+
+.help-icon-btn {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 767px) {
+    .settings-hub-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .settings-hub-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
 }
 
 /* Account Badge */
@@ -165,15 +229,70 @@
 .settings-card-content {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease-out;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
 }
 
 .settings-card-content.expanded {
     max-height: 2000px; /* Large enough for content */
+    opacity: 1;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-in 0.1s;
 }
 
 .settings-card-body {
     padding: var(--spacing-xl);
+}
+
+/* Help Tooltips */
+.help-tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.help-tooltip .tooltip-text {
+    visibility: hidden;
+    width: 280px;
+    background-color: var(--primary-black);
+    color: var(--primary-white);
+    text-align: left;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+    position: absolute;
+    z-index: 1000;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -140px;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+    box-shadow: var(--shadow-xl);
+}
+
+.help-tooltip .tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -8px;
+    border-width: 8px;
+    border-style: solid;
+    border-color: var(--primary-black) transparent transparent transparent;
+}
+
+.help-tooltip:hover .tooltip-text,
+.help-tooltip:focus .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Mobile tooltip adjustment */
+@media (max-width: 767px) {
+    .help-tooltip .tooltip-text {
+        width: 200px;
+        margin-left: -100px;
+        font-size: var(--font-size-xs);
+    }
 }
 
 /* Empty state for cards */
@@ -224,12 +343,33 @@
 <div class="settings-hub-container">
     <!-- Header -->
     <div class="settings-hub-header">
-        <h1 class="settings-hub-title">
-            <i class="fas fa-cog me-2"></i>Settings Hub
-        </h1>
-        <p class="settings-hub-subtitle">
-            Manage your account, team, data, and system settings
-        </p>
+        <div class="settings-hub-header-content">
+            <h1 class="settings-hub-title">
+                <i class="fas fa-cog me-2"></i>Settings Hub
+            </h1>
+            <p class="settings-hub-subtitle">
+                Manage your account, team, data, and system settings
+            </p>
+        </div>
+        <div class="settings-hub-actions">
+            <button class="settings-action-btn" onclick="expandAll()" aria-label="Expand all sections">
+                <i class="fas fa-chevron-down"></i>
+                <span>Expand All</span>
+            </button>
+            <button class="settings-action-btn" onclick="collapseAll()" aria-label="Collapse all sections">
+                <i class="fas fa-chevron-up"></i>
+                <span>Collapse All</span>
+            </button>
+            <div class="help-tooltip">
+                <button class="settings-action-btn help-icon-btn" aria-label="Help">
+                    <i class="fas fa-question-circle"></i>
+                </button>
+                <span class="tooltip-text">
+                    <strong>Settings Hub</strong><br>
+                    Use the cards below to manage your account settings, team members, data exports, and system configuration. Click any card to expand and view options.
+                </span>
+            </div>
+        </div>
     </div>
 
     <!-- Account Type Badge -->
@@ -393,14 +533,79 @@ function toggleCard(cardId) {
     }
 }
 
-// Keyboard navigation support
-document.addEventListener('DOMContentLoaded', function() {
+// Expand all cards
+function expandAll() {
     document.querySelectorAll('.settings-card-header').forEach(header => {
+        header.classList.add('expanded');
+        header.setAttribute('aria-expanded', 'true');
+    });
+    
+    document.querySelectorAll('.settings-card-content').forEach(content => {
+        content.classList.add('expanded');
+    });
+}
+
+// Collapse all cards
+function collapseAll() {
+    document.querySelectorAll('.settings-card-header').forEach(header => {
+        header.classList.remove('expanded');
+        header.setAttribute('aria-expanded', 'false');
+    });
+    
+    document.querySelectorAll('.settings-card-content').forEach(content => {
+        content.classList.remove('expanded');
+    });
+}
+
+// Enhanced keyboard navigation support
+document.addEventListener('DOMContentLoaded', function() {
+    const headers = Array.from(document.querySelectorAll('.settings-card-header'));
+    
+    headers.forEach((header, index) => {
+        // Enter/Space to toggle
         header.addEventListener('keypress', function(e) {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 header.click();
             }
+        });
+        
+        // Arrow key navigation
+        header.addEventListener('keydown', function(e) {
+            let newIndex;
+            
+            switch(e.key) {
+                case 'ArrowDown':
+                case 'ArrowRight':
+                    e.preventDefault();
+                    newIndex = (index + 1) % headers.length;
+                    headers[newIndex].focus();
+                    break;
+                    
+                case 'ArrowUp':
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    newIndex = (index - 1 + headers.length) % headers.length;
+                    headers[newIndex].focus();
+                    break;
+                    
+                case 'Home':
+                    e.preventDefault();
+                    headers[0].focus();
+                    break;
+                    
+                case 'End':
+                    e.preventDefault();
+                    headers[headers.length - 1].focus();
+                    break;
+            }
+        });
+    });
+    
+    // Smooth scroll to focused element
+    headers.forEach(header => {
+        header.addEventListener('focus', function() {
+            header.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         });
     });
 });
