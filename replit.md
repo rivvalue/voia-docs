@@ -2,6 +2,13 @@
 The Voice of Client (VOÏA) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. It converts raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses, particularly Rivvalue Inc., with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project features a production-ready multi-tenant participant management system with extensive email delivery capabilities and AI-powered survey functionalities.
 
 # Recent Changes
+**October 9, 2025 - Settings Sub-Pages: Navigation & Breadcrumb Enhancement**
+-   **Breadcrumb Navigation**: Added missing breadcrumbs to Audit Logs and License Info pages for consistent navigation across all settings sub-pages.
+-   **Unified Naming**: Updated all breadcrumb text from "Admin Panel" to "Settings Hub" across 6 pages (Email Config, Brand Config, Survey Config, User Management, Audit Logs, License Info).
+-   **Sub-Page Audit**: Comprehensive audit completed - verified 6 template-based pages and 1 API endpoint, all compliant with VOÏA design guidelines.
+-   **Navigation Flow**: Seamless navigation between Settings Hub and all sub-pages, with consistent back-navigation via breadcrumbs.
+-   **Documentation**: Created detailed audit report (docs/settings_subpages_audit.md) with findings, fixes, and future enhancement recommendations.
+
 **October 9, 2025 - Settings Hub v2: Layout Optimization Based on User Feedback**
 -   **Full-Width Card Layout**: Changed from 2-column grid to full-width stacked cards for better horizontal space utilization and improved readability.
 -   **Simplified Responsive Design**: Removed breakpoints - cards now consistently span 100% width across all devices (mobile, tablet, desktop).
