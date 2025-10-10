@@ -77,12 +77,13 @@ def list_campaigns():
         # Build campaign data with pre-loaded metrics (no additional queries)
         campaign_data = []
         for campaign in campaigns:
-            campaign_dict = campaign.to_dict()
-            
-            # Get metrics from pre-loaded data
+            # Get metrics from pre-loaded data FIRST
             participant_count = participant_counts.get(campaign.id, 0)
             invitations_sent = invitation_counts.get(campaign.id, 0)
             surveys_completed = survey_counts.get(campaign.id, 0)
+            
+            # Pass pre-computed response_count to avoid N+1 query
+            campaign_dict = campaign.to_dict(response_count=surveys_completed)
             
             # Calculate rates
             participation_rate = None

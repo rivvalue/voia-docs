@@ -177,8 +177,15 @@ class Campaign(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     completed_at = db.Column(db.DateTime, nullable=True)
     
-    def to_dict(self):
-        return {
+    def to_dict(self, include_response_count=False, response_count=None):
+        """
+        Serialize campaign to dictionary.
+        
+        Args:
+            include_response_count: Whether to include response count (expensive query if not pre-computed)
+            response_count: Pre-computed response count to avoid N+1 queries (overrides include_response_count)
+        """
+        result = {
             'id': self.id,
             'name': self.name,
             'description': self.description,
@@ -190,7 +197,6 @@ class Campaign(db.Model):
             'business_account_name': self.business_account.name if self.business_account else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'completed_at': self.completed_at.isoformat() if self.completed_at else None,
-            'response_count': len([r for r in SurveyResponse.query.filter_by(campaign_id=self.id).all()]),
             'is_active': self.is_active(),
             'days_remaining': self.days_remaining(),
             'days_since_ended': self.days_since_ended(),
@@ -208,6 +214,16 @@ class Campaign(db.Model):
             'custom_system_prompt': self.custom_system_prompt,
             'anonymize_responses': self.anonymize_responses
         }
+        
+        # OPTIMIZATION: Only include response_count if explicitly requested or pre-computed
+        if response_count is not None:
+            result['response_count'] = response_count
+        elif include_response_count:
+            # WARNING: This triggers a query - should be avoided in loops
+            result['response_count'] = len([r for r in SurveyResponse.query.filter_by(campaign_id=self.id).all()])
+        # Otherwise: omit response_count key entirely (don't default to 0 to surface regressions)
+        
+        return result
     
     def is_active(self):
         """Check if campaign is currently active"""
