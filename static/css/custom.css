@@ -1162,17 +1162,11 @@ small, .small {
         justify-content: space-between;
     }
     
-    /* User dropdown - right side when authenticated */
-    .navbar > .container > .navbar-nav.ms-2 {
-        margin-left: auto !important;
-        margin-right: 0 !important;
-    }
-    
-    .navbar > .container > .navbar-nav.ms-2 .nav-link {
-        padding: 0.5rem !important;
-        border: none !important;
-        white-space: nowrap;
+    /* User name display - right side when authenticated */
+    .navbar-text {
         font-size: 0.9rem !important;
+        white-space: nowrap;
+        margin-left: auto !important;
     }
     
     /* Hamburger - always right side when unauthenticated */
