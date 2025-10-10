@@ -1155,16 +1155,17 @@ small, .small {
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
     
-    /* User dropdown and hamburger - right side on mobile */
+    /* Navbar right-side controls on mobile */
     .navbar .container {
-        position: relative;
         display: flex;
         align-items: center;
+        justify-content: space-between;
     }
     
+    /* User dropdown - right side when authenticated */
     .navbar > .container > .navbar-nav.ms-2 {
         margin-left: auto !important;
-        margin-right: 0.5rem !important;
+        margin-right: 0 !important;
     }
     
     .navbar > .container > .navbar-nav.ms-2 .nav-link {
@@ -1174,9 +1175,10 @@ small, .small {
         font-size: 0.9rem !important;
     }
     
+    /* Hamburger - always right side when unauthenticated */
     .navbar-toggler {
-        margin-left: 0.5rem !important;
-        order: 999;
+        margin-left: auto !important;
+        order: 10;
     }
     
     /* Collapsible navbar menu - above sidebar */

@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}?v=hamburger-right-20251010">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}?v=hamburger-consistent-right-20251010">
     
     <!-- CSRF Token for AJAX requests -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -153,9 +153,9 @@
             </ul>
             {% endif %}
             
-            <!-- Hamburger Toggle Button (Right Side - Only for unauthenticated users) -->
+            <!-- Hamburger Toggle Button (Right Side - Unauthenticated) / User Dropdown (Right Side - Authenticated) -->
             {% if not is_business_authenticated %}
-            <button class="navbar-toggler ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             {% endif %}
