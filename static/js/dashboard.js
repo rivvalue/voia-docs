@@ -1203,8 +1203,10 @@ function loadDashboardData() {
 }
 
 function populateDashboard() {
-    console.log('populateDashboard called with data:', dashboardData);
-    // Update key metrics
+    console.log('⚡ populateDashboard called - OPTIMIZED PROGRESSIVE LOADING');
+    
+    // ========== CRITICAL PATH: Immediate rendering (unblock browser) ==========
+    // Update key metrics (visible immediately)
     document.getElementById('totalResponses').textContent = dashboardData.total_responses || 0;
     document.getElementById('npsScore').textContent = dashboardData.nps_score || 0;
     document.getElementById('recentResponses').textContent = dashboardData.recent_responses || 0;
@@ -1214,37 +1216,45 @@ function populateDashboard() {
     const growthPotential = dashboardData.growth_factor_analysis?.total_growth_potential || 0;
     document.getElementById('growthPotential').textContent = Math.round(growthPotential * 100) + '%';
     
-    // Only create charts for the active (Overview) tab initially
-    // Other charts will be created when their tabs are shown
-    // Wait for Bootstrap tab rendering to complete
-    setTimeout(() => createThemesChart(), 100);
-    
-    // Populate high risk accounts
+    // Populate high risk accounts (visible on Overview tab)
     populateHighRiskAccounts();
     
-    // Populate unified account intelligence via API (with pagination, search, filtering)
-    loadAccountIntelligence();
+    // Create themes chart (visible on Overview tab) - defer slightly for smooth rendering
+    setTimeout(() => createThemesChart(), 50);
     
-    // Load KPI overview data (Executive Summary)
-    loadKpiOverview();
-    
-    // Skip legacy functions that don't work with new tab structure
-    // populateGrowthOpportunities(); // Removed - element doesn't exist in new tabs
-    // populateAccountRiskFactors();  // Removed - element doesn't exist in new tabs
-    
-    // Load survey responses table
-    loadSurveyResponses();
-    
-    // Load company NPS data
-    console.log('About to call loadCompanyNpsData...');
-    loadCompanyNpsData();
-    
-    // Load tenure NPS data
-    console.log('About to call loadTenureNpsData...');
-    loadTenureNpsData();
-    
-    // Set up tab event listeners for chart initialization
+    // Set up tab event listeners immediately (needed for tab switching)
     setupTabEventListeners();
+    
+    // ========== DEFERRED PATH: Load non-visible data asynchronously (unblock UI) ==========
+    // Use requestAnimationFrame to defer heavy operations to next frame
+    requestAnimationFrame(() => {
+        console.log('⏳ Loading deferred data (non-blocking)...');
+        
+        // Defer account intelligence (Analytics tab - not visible initially)
+        setTimeout(() => loadAccountIntelligence(), 100);
+        
+        // Defer KPI overview (Executive Summary tab - not visible initially)
+        setTimeout(() => loadKpiOverview(), 150);
+        
+        // Defer survey responses (Survey Insights tab - not visible initially)
+        setTimeout(() => loadSurveyResponses(), 200);
+        
+        // Defer company NPS data (Analytics tab - not visible initially)
+        setTimeout(() => {
+            console.log('About to call loadCompanyNpsData...');
+            loadCompanyNpsData();
+        }, 250);
+        
+        // Defer tenure NPS data (Analytics tab - not visible initially)
+        setTimeout(() => {
+            console.log('About to call loadTenureNpsData...');
+            loadTenureNpsData();
+        }, 300);
+        
+        console.log('✅ Deferred data loading scheduled');
+    });
+    
+    console.log('✅ Critical path complete - page interactive');
 }
 
 // Helper function to get active campaign ID
