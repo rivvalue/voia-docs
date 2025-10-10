@@ -2,14 +2,13 @@
 The Voice of Client (VOÏA) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. Its purpose is to convert raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses, particularly Rivvalue Inc., with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project features a production-ready multi-tenant participant management system with extensive email delivery capabilities and AI-powered survey functionalities.
 
 # Recent Changes
-**October 10, 2025 - Multi-Tenant Branding: Global Logo & User Display**
--   **UX Improvements**: Moved business account logo to sidebar header for consistent branding across all pages; Fixed navbar dropdown to show user's name instead of company name.
--   **Sidebar Logo Implementation**: Business logos now display in v2 UI sidebar header (50px height, 180px width max) above VOÏA brand, visible on all authenticated pages.
--   **User Display Fix**: Fixed critical UX bug where navbar dropdown showed company name - now correctly displays user's first and last name via session['business_user_name'].
--   **Global Branding Context**: Added branding_context to app.py context processor, making logo data available in all templates automatically for authenticated users.
--   **Dashboard Cleanup**: Removed logo duplication from dashboard content area, restored original two-column layout (title left, actions right).
--   **Session Enhancement**: Login flow now stores both business_user_name (user's full name) and business_account_name (company name) separately for proper display contexts.
--   **Testing**: Architect-approved with verified multi-tenant isolation, proper session handling, and no functional regressions.
+**October 10, 2025 - Multi-Tenant Branding & Trial Experience Optimization**
+-   **Multi-Tenant Logo System**: Business account logos display in v2 UI sidebar header (50px height, 180px width max) for authenticated users; Removed duplicate Rivvalue logo/title from top banner for cleaner UI.
+-   **Selective Trial Branding**: Archelo demo logo now appears ONLY on trial pages (demo_intro, dashboard) via endpoint-based context filtering, keeping Home page clean and brand-neutral for marketing.
+-   **User Display Enhancement**: Fixed navbar dropdown to show user's actual name instead of company name via session['business_user_name'] storage.
+-   **Z-Index Optimization**: Sidebar (z-index: 10002) now properly layers above navbar (z-index: 10000) for consistent visibility.
+-   **Context Processor Logic**: Intelligent branding_context injection based on authentication state and route endpoint (trial_pages: ['demo_intro', 'dashboard']).
+-   **Testing**: Architect-approved with verified multi-tenant isolation, selective logo display, and no functional regressions.
 
 # User Preferences
 Preferred communication style: Simple, everyday language.
