@@ -1,6 +1,7 @@
 from app import db
 from datetime import datetime, date, timedelta
 from sqlalchemy import or_, and_, func, text, desc
+from sqlalchemy.dialects.postgresql import TSVECTOR
 import json
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
@@ -52,6 +53,9 @@ class SurveyResponse(db.Model):
     
     # Conversational transcript
     conversation_history = db.Column(db.Text, nullable=True)  # JSON string of conversation transcript
+    
+    # Full-text search vector (automatically maintained by PostgreSQL trigger)
+    conversation_search = db.Column(TSVECTOR, nullable=True)
     
     # Campaign tracking
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=True, index=True)
