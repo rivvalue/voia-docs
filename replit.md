@@ -2,13 +2,14 @@
 The Voice of Client (VOÏA) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. Its purpose is to convert raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses, particularly Rivvalue Inc., with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project features a production-ready multi-tenant participant management system with extensive email delivery capabilities and AI-powered survey functionalities.
 
 # Recent Changes
-**October 10, 2025 - Multi-Tenant Branding: Dashboard Logo Implementation**
--   **Critical Gap Fixed**: Dashboard was hardcoding Archelo Group logo for all users instead of showing each business account's uploaded logo.
--   **Multi-Tenant Logo System**: Implemented proper branding isolation - authenticated business users now see their uploaded logo from BrandingConfig, trial/demo users see Archelo logo (business_account_id=1).
--   **Dashboard Route Updated**: Added branding_context retrieval via get_branding_context() with business_account_id scoping from authenticated user session.
--   **Template Enhancement**: Logo now displays dynamically from branding_context.logo_url with centered layout (120px height, increased from 60px), proper fallbacks for missing branding.
--   **Layout Improvements**: Centered header design with title → subtitle → logo → action buttons hierarchy, cleaner visual organization.
--   **Testing**: Architect-approved with verified multi-tenant isolation, null-safe fallbacks, and proper authentication-based conditional rendering.
+**October 10, 2025 - Multi-Tenant Branding: Global Logo & User Display**
+-   **UX Improvements**: Moved business account logo to sidebar header for consistent branding across all pages; Fixed navbar dropdown to show user's name instead of company name.
+-   **Sidebar Logo Implementation**: Business logos now display in v2 UI sidebar header (50px height, 180px width max) above VOÏA brand, visible on all authenticated pages.
+-   **User Display Fix**: Fixed critical UX bug where navbar dropdown showed company name - now correctly displays user's first and last name via session['business_user_name'].
+-   **Global Branding Context**: Added branding_context to app.py context processor, making logo data available in all templates automatically for authenticated users.
+-   **Dashboard Cleanup**: Removed logo duplication from dashboard content area, restored original two-column layout (title left, actions right).
+-   **Session Enhancement**: Login flow now stores both business_user_name (user's full name) and business_account_name (company name) separately for proper display contexts.
+-   **Testing**: Architect-approved with verified multi-tenant isolation, proper session handling, and no functional regressions.
 
 # User Preferences
 Preferred communication style: Simple, everyday language.
