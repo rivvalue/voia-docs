@@ -2,6 +2,13 @@
 The Voice of Client (VOÏA) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. It converts raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses, particularly Rivvalue Inc., with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project features a production-ready multi-tenant participant management system with extensive email delivery capabilities and AI-powered survey functionalities.
 
 # Recent Changes
+**October 10, 2025 - Business Intelligence Dashboard UI Enhancements**
+-   **Banner Standardization**: Resized Dashboard hero banner to match Campaigns/Participants pattern - removed col-lg-10 wrapper, implemented responsive columns (col-12 col-md-8/col-12 col-md-4) for proper mobile stacking.
+-   **Navigation Rebranding**: Renamed "Dashboard" to "Business Intelligence" in sidebar navigation menu, aligning with data-centric purpose of the page.
+-   **Tab Alignment Fix**: Optimized Dashboard tabs to display on single line at desktop widths - reduced padding (1rem 2rem → 0.75rem 1.25rem), reduced margins, added desktop-only nowrap via media query (≥992px) to prevent mobile overflow.
+-   **Responsive Logo**: Restored Adelco logo with d-none d-md-block for desktop-only display, maintaining brand presence without mobile clutter.
+-   **Testing**: All changes validated with architect review, zero layout regressions, proper responsive behavior across breakpoints confirmed.
+
 **October 9, 2025 - Audit Trail Fix: Export Actions Now Tracked**
 -   **Audit Trail Logging**: Added comprehensive audit logging to export_data endpoint. Export actions now properly recorded in Audit Logs page with user information, timestamp, and export details.
 -   **Implementation**: Integrated queue_audit_log function with action_type='data_exported', capturing user context (email, name), business account, and export metadata (total_responses, format, timestamp).
