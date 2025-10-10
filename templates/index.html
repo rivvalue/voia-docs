@@ -125,6 +125,22 @@
         margin-top: 6rem !important;
     }
     
+    /* Feature Tile with Partial Top Border */
+    .feature-tile {
+        position: relative;
+        padding: 1rem 0.75rem;
+    }
+    
+    .feature-tile::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 33%;
+        height: 3px;
+        background: #E13A44;
+    }
+    
     /* Mobile Optimization */
     @media (max-width: 768px) {
         .hero-section {
@@ -349,42 +365,42 @@
                 <h3 class="mb-5 fs-3" style="color: #6c757d; font-family: 'Montserrat', sans-serif; font-weight: 500;">Complete Intelligence Platform</h3>
                 <div class="row g-3">
                     <div class="col-md-3 col-6">
-                        <div class="p-3" style="border-top: 3px solid #E13A44;">
+                        <div class="feature-tile">
                             <p class="mb-0 text-start" style="color: #000000; font-size: 0.95rem;">NPS scoring system</p>
                         </div>
                     </div>
                     <div class="col-md-3 col-6">
-                        <div class="p-3" style="border-top: 3px solid #E13A44;">
+                        <div class="feature-tile">
                             <p class="mb-0 text-start" style="color: #000000; font-size: 0.95rem;">Dynamic follow-up questions</p>
                         </div>
                     </div>
                     <div class="col-md-3 col-6">
-                        <div class="p-3" style="border-top: 3px solid #E13A44;">
+                        <div class="feature-tile">
                             <p class="mb-0 text-start" style="color: #000000; font-size: 0.95rem;">Sentiment analysis</p>
                         </div>
                     </div>
                     <div class="col-md-3 col-6">
-                        <div class="p-3" style="border-top: 3px solid #E13A44;">
+                        <div class="feature-tile">
                             <p class="mb-0 text-start" style="color: #000000; font-size: 0.95rem;">Key theme extraction</p>
                         </div>
                     </div>
                     <div class="col-md-3 col-6">
-                        <div class="p-3" style="border-top: 3px solid #E13A44;">
+                        <div class="feature-tile">
                             <p class="mb-0 text-start" style="color: #000000; font-size: 0.95rem;">Churn risk assessment</p>
                         </div>
                     </div>
                     <div class="col-md-3 col-6">
-                        <div class="p-3" style="border-top: 3px solid #E13A44;">
+                        <div class="feature-tile">
                             <p class="mb-0 text-start" style="color: #000000; font-size: 0.95rem;">Growth opportunities</p>
                         </div>
                     </div>
                     <div class="col-md-3 col-6">
-                        <div class="p-3" style="border-top: 3px solid #E13A44;">
+                        <div class="feature-tile">
                             <p class="mb-0 text-start" style="color: #000000; font-size: 0.95rem;">Real-time dashboard</p>
                         </div>
                     </div>
                     <div class="col-md-3 col-6">
-                        <div class="p-3" style="border-top: 3px solid #E13A44;">
+                        <div class="feature-tile">
                             <p class="mb-0 text-start" style="color: #000000; font-size: 0.95rem;">Data export</p>
                         </div>
                     </div>
