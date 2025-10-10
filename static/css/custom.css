@@ -242,17 +242,17 @@ p, .text-body {
     box-shadow: var(--shadow-lg);
     padding: var(--spacing-sm);
     margin-top: var(--spacing-sm);
-    z-index: 10001 !important;
+    z-index: 10003 !important;
 }
 
 /* More specific targeting for navbar dropdowns */
 .navbar .dropdown-menu {
-    z-index: 10001 !important;
+    z-index: 10003 !important;
 }
 
 /* Bootstrap dropdown override */
 .dropdown-menu.show {
-    z-index: 10001 !important;
+    z-index: 10003 !important;
 }
 
 .dropdown-item {
