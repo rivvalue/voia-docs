@@ -3,7 +3,31 @@
 {% block title %}VOÏA - Voice Of Client - Home{% endblock %}
 
 {% block extra_head %}
+<!-- Load Brand Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Karla:wght@400;500;600&display=swap" rel="stylesheet">
+
 <style>
+    /* Brand Typography */
+    h1, h2, h3, h4, h5, h6, .card-title {
+        font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-weight: 600;
+    }
+    
+    body, p, .card-text, .lead {
+        font-family: 'Karla', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-weight: 400;
+        line-height: 1.7;
+    }
+    
+    /* Optimal reading width */
+    .hero-section p, .card-text {
+        max-width: 65ch;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
     .hero-section {
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         border-radius: 15px;
@@ -90,6 +114,93 @@
     .mt-6 {
         margin-top: 4rem !important;
     }
+    
+    /* Mobile Optimization */
+    @media (max-width: 768px) {
+        .hero-section {
+            padding: 2rem 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .hero-section h1 {
+            font-size: 2rem !important;
+        }
+        
+        .hero-section p {
+            font-size: 1rem !important;
+        }
+        
+        .demo-card .card-body {
+            padding: 1.5rem !important;
+        }
+        
+        .demo-card .rounded-circle {
+            width: 60px !important;
+            height: 60px !important;
+        }
+        
+        .demo-card i {
+            font-size: 1.5rem !important;
+        }
+        
+        .demo-card .btn {
+            padding: 0.5rem 1.25rem !important;
+            font-size: 0.95rem !important;
+        }
+        
+        .mt-6, .mb-6 {
+            margin-top: 2rem !important;
+            margin-bottom: 2rem !important;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .hero-section {
+            padding: 1.5rem 1rem;
+        }
+        
+        .hero-section h1 {
+            font-size: 1.75rem !important;
+        }
+        
+        .demo-card .card-body {
+            padding: 1rem !important;
+        }
+        
+        .demo-card .rounded-circle {
+            width: 50px !important;
+            height: 50px !important;
+        }
+        
+        .demo-card i {
+            font-size: 1.25rem !important;
+        }
+        
+        .demo-card .btn {
+            padding: 0.5rem 1rem !important;
+            font-size: 0.9rem !important;
+            width: 100%;
+        }
+    }
+    
+    @media (max-width: 375px) {
+        .hero-section h1 {
+            font-size: 1.5rem !important;
+        }
+        
+        .demo-card .card-body {
+            padding: 0.75rem !important;
+        }
+        
+        .demo-card .rounded-circle {
+            width: 45px !important;
+            height: 45px !important;
+        }
+        
+        .demo-card i {
+            font-size: 1.1rem !important;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -100,7 +211,7 @@
         <div class="hero-section text-center">
             <h1 class="display-3 fw-bold mb-3">VO<span style="color: #E13A44;">Ï</span>A - Turning voices into value</h1>
             <p class="fs-5 text-muted mb-4">
-                Run targeted AI-powered campaigns at decision-critical moments. Natural AI conversations reveal the insights that shape your strategy.
+                Launch customer feedback campaigns when it matters most. AI-powered conversations automatically uncover churn risks, satisfaction trends, and growth opportunities—no analyst required.
             </p>
         </div>
         <!-- What You'll Experience Section -->
@@ -138,21 +249,10 @@
                             </div>
                         </div>
                         <h4 class="card-title mb-3" style="font-weight: 600; color: #1a1a1a;">Instant AI Discovery</h4>
-                        <p class="card-text text-muted mb-4" style="line-height: 1.6;">No manual work required. AI analyzes every response for sentiment, churn signals, and growth themes as your campaign runs.</p>
-                        <div class="d-flex flex-column gap-2 text-start">
-                            <div class="d-flex align-items-center">
-                                <div class="rounded-circle me-3" style="width: 6px; height: 6px; background: #8A8A8A;"></div>
-                                <span class="text-muted" style="font-size: 0.9rem;">NPS Scoring</span>
-                            </div>
-                            <div class="d-flex align-items-center">
-                                <div class="rounded-circle me-3" style="width: 6px; height: 6px; background: #8A8A8A;"></div>
-                                <span class="text-muted" style="font-size: 0.9rem;">Sentiment Analysis</span>
-                            </div>
-                            <div class="d-flex align-items-center">
-                                <div class="rounded-circle me-3" style="width: 6px; height: 6px; background: #8A8A8A;"></div>
-                                <span class="text-muted" style="font-size: 0.9rem;">Risk Assessment</span>
-                            </div>
-                        </div>
+                        <p class="card-text text-muted mb-4" style="line-height: 1.6;">No manual work required. AI automatically processes every response for NPS scoring, sentiment analysis, and churn risk assessment—all in real-time as your campaign runs.</p>
+                        <a href="{{ url_for('demo_intro') }}" class="btn w-100 py-3" style="background: rgba(225, 58, 68, 0.9); border: none; color: white; font-weight: 500; border-radius: 8px; transition: all 0.3s ease;" onmouseover="this.style.background='#E13A44'" onmouseout="this.style.background='rgba(225, 58, 68, 0.9)'">
+                            See AI in Action
+                        </a>
                     </div>
                 </div>
             </div>
@@ -162,8 +262,8 @@
                 <div class="demo-card card h-100 border-0">
                     <div class="card-body p-5 text-center">
                         <div class="mb-4">
-                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background: rgba(0, 0, 0, 0.08);">
-                                <i class="fas fa-chart-line" style="color: #000000; font-size: 2rem;"></i>
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background: rgba(225, 58, 68, 0.08);">
+                                <i class="fas fa-chart-line" style="color: #E13A44; font-size: 2rem;"></i>
                             </div>
                         </div>
                         <h4 class="card-title mb-3" style="font-weight: 600; color: #1a1a1a;">Act on Strategic Insights</h4>
@@ -176,7 +276,28 @@
             </div>
         </div>
 
-
+        <!-- Trust & Metrics Section -->
+        <div class="row mt-6 mb-6">
+            <div class="col-12">
+                <div class="text-center py-5" style="background: rgba(225, 58, 68, 0.03); border-radius: 12px;">
+                    <p class="text-uppercase text-muted mb-4" style="font-size: 0.85rem; letter-spacing: 1px; font-weight: 500;">Proven Results from Campaign-Based Intelligence</p>
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <h3 class="mb-2" style="color: #E13A44; font-weight: 700;">2 Minutes</h3>
+                            <p class="text-muted mb-0">Average survey completion time</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h3 class="mb-2" style="color: #E13A44; font-weight: 700;">10x Faster</h3>
+                            <p class="text-muted mb-0">Insights vs. traditional analysis</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h3 class="mb-2" style="color: #E13A44; font-weight: 700;">95% Accuracy</h3>
+                            <p class="text-muted mb-0">AI sentiment detection rate</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="row mt-6 mb-5">
             <div class="col-12">
