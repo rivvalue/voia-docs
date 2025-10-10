@@ -2,6 +2,13 @@
 The Voice of Client (VOÏA) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. Its purpose is to convert raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses, particularly Rivvalue Inc., with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project features a production-ready multi-tenant participant management system with extensive email delivery capabilities and AI-powered survey functionalities.
 
 # Recent Changes
+**October 10, 2025 - Home Page Campaign-Centric Messaging Update**
+-   **Marketing Shift**: Repositioned VOÏA from "3-step process" to campaign-based strategic pulse checks, aligning messaging with actual platform functionality.
+-   **New Subtitle**: "Run targeted AI-powered campaigns at decision-critical moments. Natural AI conversations reveal the insights that shape your strategy."
+-   **Updated Pillars**: Replaced sequential steps with three value pillars: (1) Launch Your Campaign - timing and natural conversations, (2) Instant AI Discovery - automated analysis for sentiment/churn/growth, (3) Act on Strategic Insights - campaign dashboard with actionable priorities.
+-   **Hero CTAs**: Retained both "Try Demo" and "View Dashboard" buttons for clear user pathways.
+-   **Messaging Focus**: Emphasizes strategic timing, quarterly pulse checks, and decision-critical insights over continuous monitoring.
+
 **October 10, 2025 - Critical Production Login Bug Fix**
 -   **Issue**: Production users could login successfully but sidebar loaded while main content stayed on login page (not reproducible in dev).
 -   **Root Cause**: Missing session cookie configuration - browsers rejected cookies on HTTPS without `Secure=True` flag, causing session loss after initial render.
