@@ -174,7 +174,7 @@ def handle_csrf_error(e):
 # Make csrf_token and business auth state available in all templates
 @app.context_processor
 def inject_csrf():
-    from flask import session
+    from flask import session, request
     
     context = dict(csrf_token=generate_csrf)
     
@@ -191,9 +191,11 @@ def inject_csrf():
             from routes import get_branding_context
             context['branding_context'] = get_branding_context(business_account_id)
     else:
-        # For trial/demo mode (unauthenticated users), show Archelo demo branding
-        from routes import get_branding_context
-        context['branding_context'] = get_branding_context(business_account_id=1)
+        # For trial/demo mode (unauthenticated users), show Archelo demo branding ONLY on trial pages
+        trial_pages = ['demo_intro', 'dashboard']
+        if request.endpoint in trial_pages:
+            from routes import get_branding_context
+            context['branding_context'] = get_branding_context(business_account_id=1)
     
     return context
 
