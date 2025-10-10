@@ -27,16 +27,26 @@ app.secret_key = os.environ.get("SESSION_SECRET")
 if not app.secret_key:
     raise RuntimeError("SESSION_SECRET environment variable is required")
 
+# Production-safe session cookie configuration (environment-aware)
+from datetime import timedelta
+app_env = os.environ.get('APP_ENV', 'demo')
+is_production = app_env not in ['demo', 'development', 'test']
+
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # 'Lax' is more secure and compatible than 'None'
+app.config['SESSION_COOKIE_SECURE'] = is_production  # HTTPS-only in production, allow HTTP in dev/test
+app.config['SESSION_COOKIE_HTTPONLY'] = True  # Already default, but explicit for security
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=7)  # 7-day session lifetime
+
 # Log environment variable status for debugging
 logger = logging.getLogger(__name__)
 logger.debug(f"EMAIL_ENCRYPTION_KEY loaded: {bool(os.environ.get('EMAIL_ENCRYPTION_KEY'))}")
 logger.debug(f"SESSION_SECRET loaded: {bool(os.environ.get('SESSION_SECRET'))}")
+logger.debug(f"Session cookie config: SameSite={app.config.get('SESSION_COOKIE_SAMESITE')}, Secure={app.config.get('SESSION_COOKIE_SECURE')}")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1, x_for=1, x_port=1)
 
 # Enable CORS for deployment compatibility
 # In development, we allow broader origins for Replit's architecture
 # In production, this should be restricted to specific domains
-app_env = os.environ.get('APP_ENV', 'demo')
 allowed_origins = ['*'] if app_env == 'demo' else [os.environ.get('ALLOWED_ORIGIN', 'https://your-domain.com')]
 CORS(app, 
      origins=allowed_origins,

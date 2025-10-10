@@ -1180,7 +1180,7 @@ def login():
         session['business_account_name'] = user.business_account.name
         session['business_user_name'] = user.get_full_name()  # User's actual name for display
         session['user_role'] = user.role
-        session.permanent = remember_me
+        session.permanent = True  # Always use permanent session (7-day lifetime from app config)
         
         logger.info(f"Business account user {email} logged in successfully")
         flash(f'Welcome back, {user.get_full_name()}!', 'success')
