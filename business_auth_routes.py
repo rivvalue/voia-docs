@@ -19,6 +19,51 @@ business_auth_bp = Blueprint('business_auth', __name__, url_prefix='/business')
 
 logger = logging.getLogger(__name__)
 
+def get_branding_context(business_account_id=None):
+    """
+    Get branding context for templates including company name and logo URL.
+    
+    Args:
+        business_account_id: ID of the business account, if None will try to get from session
+    
+    Returns:
+        dict: Branding context with company_name, logo_url, and has_branding flag
+    """
+    branding_context = {
+        'company_name': 'VOÏA - Voice Of Client Agent',  # Default fallback
+        'logo_url': None,
+        'has_branding': False,
+        'branding_config': None
+    }
+    
+    try:
+        # Try to get business_account_id from parameter or session
+        if not business_account_id:
+            business_account_id = session.get('business_account_id')
+        
+        if business_account_id:
+            from models import BrandingConfig
+            branding_config = BrandingConfig.query.filter_by(business_account_id=business_account_id).first()
+            
+            if branding_config:
+                # Update context with custom branding
+                branding_context.update({
+                    'company_name': branding_config.get_company_display_name(),
+                    'logo_url': branding_config.get_logo_url(),
+                    'has_branding': branding_config.has_logo(),
+                    'branding_config': branding_config
+                })
+                
+                logger.info(f"Loaded branding for business account {business_account_id}: {branding_context['company_name']}")
+            else:
+                logger.info(f"No branding config found for business account {business_account_id}, using defaults")
+    
+    except Exception as e:
+        logger.warning(f"Error loading branding context: {e}")
+        # Keep default fallback values
+    
+    return branding_context
+
 # ==== TENANT SCOPING HELPERS (PHASE 2.5 MINIMAL ACCOUNT MANAGEMENT) ====
 
 def current_tenant_id():
@@ -3954,11 +3999,22 @@ def business_analytics():
         from data_storage import get_company_nps_data
         company_nps_data = get_company_nps_data()
         
+        # Get current business user for branding context
+        current_business_user = get_current_business_user()
+        is_business_authenticated = current_business_user is not None
+        business_user_name = f"{current_business_user.first_name} {current_business_user.last_name}" if current_business_user else None
+        
+        # Get branding context for the business account
+        branding_context = get_branding_context(current_account.id)
+        
         # Pass business account context for template
         return render_template('dashboard.html', 
                              company_nps_data=company_nps_data, 
                              user_email=None,  # Business users don't show email in public template
-                             business_account=current_account)
+                             business_account=current_account,
+                             is_business_authenticated=is_business_authenticated,
+                             business_user_name=business_user_name,
+                             branding_context=branding_context)
         
     except Exception as e:
         logger.error(f"Error loading business analytics for account {current_account.id if current_account else 'unknown'}: {e}")
