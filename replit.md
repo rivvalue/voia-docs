@@ -2,6 +2,13 @@
 The Voice of Client (VOÏA) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. Its purpose is to convert raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses, particularly Rivvalue Inc., with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project features a production-ready multi-tenant participant management system with extensive email delivery capabilities and AI-powered survey functionalities.
 
 # Recent Changes
+**October 10, 2025 - Critical Production Login Bug Fix**
+-   **Issue**: Production users could login successfully but sidebar loaded while main content stayed on login page (not reproducible in dev).
+-   **Root Cause**: Missing session cookie configuration - browsers rejected cookies on HTTPS without `Secure=True` flag, causing session loss after initial render.
+-   **Fix**: Added environment-aware session cookie configuration (SameSite=Lax, Secure=True for production, HttpOnly, 7-day lifetime).
+-   **Security**: Enhanced CSRF/XSS protection with proper cookie flags, HTTPS-only enforcement in production while maintaining HTTP compatibility for dev/test.
+-   **Files**: app.py (session config), business_auth_routes.py (always permanent sessions).
+
 **October 10, 2025 - Phase 1 Performance Optimization**
 -   **Frontend Performance**: Eliminated render-blocking Chart.js by moving to bottom with defer attribute, added CDN resource hints (preconnect, dns-prefetch) for 100-200ms faster external resource loading.
 -   **Database Connection Pool**: Enabled OPTIMIZE_DB_POOL flag by default - increased pool_size to 30, max_overflow to 70 (100 total connections), reduced timeout to 20s for faster failure detection. Capacity increased from 50 to 200+ concurrent users.
