@@ -29,4 +29,5 @@ dependencies = [
     "flask-compress>=1.18",
     "gevent>=25.9.1",
     "flask-caching>=2.3.1",
+    "sentry-sdk>=2.41.0",
 ]

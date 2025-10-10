@@ -70,6 +70,10 @@ cache = Cache(app)
 
 logger.info(f"Cache configuration: {cache_config.get_status_info()}")
 
+# Initialize Error Monitoring (Sentry)
+from error_monitoring import error_monitor
+error_monitor.init_app(app)
+
 # Stage 1 Optimization: Performance Monitoring and Compression
 # Feature flag controlled optimizations
 try:

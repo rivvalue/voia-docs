@@ -2,6 +2,12 @@
 The Voice of Client (VOÏA) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. Its purpose is to convert raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses, particularly Rivvalue Inc., with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project features a production-ready multi-tenant participant management system with extensive email delivery capabilities and AI-powered survey functionalities.
 
 # Recent Changes
+**October 10, 2025 - Sentry Error Monitoring Integration**
+-   **Sentry Integration**: Activated Sentry error tracking with production environment monitoring, 10% performance trace sampling, and automatic 500 error capture.
+-   **Error Context**: Enhanced error reports with UI version tracking, user context, and request metadata for better debugging.
+-   **Clean Navbar UX**: Simplified authenticated user navbar to display only user name (no dropdown) - all actions moved to sidebar for cleaner v2 design.
+-   **Consistent Mobile Navigation**: Hamburger menu stays on right side for unauthenticated users, creating predictable layout with left space reserved for sidebar toggle.
+
 **October 10, 2025 - Multi-Tenant Branding & Mobile UX Enhancement**
 -   **Multi-Tenant Logo System**: Business account logos display in v2 UI sidebar header (80px height, 220px width max) for authenticated users; Removed duplicate Rivvalue logo/title from top banner for cleaner UI.
 -   **Selective Trial Branding**: Archelo demo logo now appears ONLY on trial pages (demo_intro, dashboard) via endpoint-based context filtering, keeping Home page clean and brand-neutral for marketing.
