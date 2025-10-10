@@ -29,6 +29,16 @@
     {% if ui_version == 'v2' and is_business_authenticated %}
     <div class="sidebar" id="voiaSidebar">
         <div class="sidebar-header">
+            <!-- Multi-tenant Business Logo -->
+            {% if branding_context and branding_context.logo_url %}
+            <div class="text-center mb-2">
+                <img src="{{ branding_context.logo_url }}" 
+                     alt="{{ branding_context.company_name }}" 
+                     style="max-height: 50px; max-width: 180px; height: auto; object-fit: contain;">
+            </div>
+            {% endif %}
+            
+            <!-- VOÏA Brand -->
             <div class="sidebar-brand">
                 <span>VO<span style="color: #E13A44;">Ï</span>A</span>
             </div>
