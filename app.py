@@ -68,8 +68,51 @@ db_config.set_environment(app_env)
 app.config["SQLALCHEMY_DATABASE_URI"] = db_config.get_database_url()
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = db_config.get_engine_options()
 
+# Enable SQL query logging for debugging (Phase 2: Query Optimization)
+ENABLE_SQL_PROFILING = os.environ.get('ENABLE_SQL_PROFILING', 'true').lower() == 'true'
+if ENABLE_SQL_PROFILING:
+    app.config["SQLALCHEMY_ECHO"] = True  # Log all SQL queries
+    app.config["SQLALCHEMY_RECORD_QUERIES"] = True  # Record query stats
+    logger.info("🔍 SQL query profiling enabled")
+
 # Initialize the app with the extension
 db.init_app(app)
+
+# Add query profiling event listeners (Phase 2: Query Optimization)
+if ENABLE_SQL_PROFILING:
+    from sqlalchemy import event
+    from sqlalchemy.engine import Engine
+    from flask import g
+    import time as time_module
+    
+    @event.listens_for(Engine, "before_cursor_execute")
+    def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+        conn.info.setdefault('query_start_time', []).append(time_module.time())
+    
+    @event.listens_for(Engine, "after_cursor_execute")
+    def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+        total = time_module.time() - conn.info['query_start_time'].pop(-1)
+        duration_ms = total * 1000
+        
+        # Store query info in Flask g for request tracking
+        if hasattr(g, 'queries'):
+            pass  # g.queries already initialized
+        else:
+            g.queries = []
+        
+        g.queries.append({
+            'statement': statement,
+            'parameters': parameters,
+            'duration': duration_ms
+        })
+        
+        # Log very slow queries immediately
+        if duration_ms > 500:  # Queries over 500ms
+            logger.warning(
+                f'🔴 VERY SLOW QUERY ({duration_ms:.0f}ms): {statement[:300]}...'
+            )
+    
+    logger.info("📊 Query profiling event listeners registered")
 
 # Initialize Flask-Caching with admin-configurable settings
 from flask_caching import Cache
@@ -153,13 +196,28 @@ try:
     def after_request(response):
         from flask import g, request
         import time
+        from sqlalchemy import event
         
         if hasattr(g, 'start_time'):
             duration = (time.time() - g.start_time) * 1000  # Convert to ms
             
-            # Log slow requests
+            # Log slow requests with query count
             if duration > 1000:  # Log requests over 1 second
-                app.logger.warning(f'Slow request: {request.path} took {duration:.2f}ms')
+                query_count = len(getattr(g, 'queries', []))
+                app.logger.warning(
+                    f'🐌 Slow request: {request.path} | '
+                    f'Duration: {duration:.0f}ms | '
+                    f'Queries: {query_count}'
+                )
+                
+                # Log individual slow queries
+                if hasattr(g, 'queries'):
+                    for query_info in g.queries:
+                        if query_info['duration'] > 100:  # Queries over 100ms
+                            app.logger.warning(
+                                f'  ⚠️ Slow Query ({query_info["duration"]:.0f}ms): '
+                                f'{query_info["statement"][:200]}...'
+                            )
             
             # Add performance header for monitoring
             response.headers['X-Response-Time'] = f'{duration:.2f}ms'
