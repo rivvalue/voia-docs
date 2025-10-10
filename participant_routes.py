@@ -96,8 +96,8 @@ def list_participants():
         kpi_stats['active'] = kpi_stats['created'] + kpi_stats['invited']
         
         # Calculate participants per company ratio
-        if distinct_companies > 0:
-            ratio = kpi_stats['total'] / distinct_companies
+        if kpi_stats['companies'] > 0:
+            ratio = kpi_stats['total'] / kpi_stats['companies']
             kpi_stats['participants_per_company'] = round(float(ratio), 1)
         else:
             kpi_stats['participants_per_company'] = 0.0
