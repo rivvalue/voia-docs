@@ -973,33 +973,6 @@ function regenerateExecutiveReport(campaignId, campaignName) {
     });
 }
 
-// Initialize report status checks when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    // Find all executive report buttons and check their status
-    const reportButtons = document.querySelectorAll('[id^="execReportBtn_"]');
-    reportButtons.forEach(button => {
-        const campaignId = button.id.replace('execReportBtn_', '');
-        // Check status with a small delay to avoid overwhelming the server
-        setTimeout(() => {
-            checkReportStatus(campaignId);
-        }, Math.random() * 2000); // Random delay up to 2 seconds
-    });
-
-    // Check executive report status for completed campaigns on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        const completedCampaigns = document.querySelectorAll('[data-status="completed"]');
-        completedCampaigns.forEach(row => {
-            const execReportBtn = row.querySelector('[id^="execReportBtn_"]');
-            if (execReportBtn) {
-                const campaignId = execReportBtn.id.split('_')[1];
-                setTimeout(() => {
-                    checkReportStatus(campaignId);
-                }, Math.random() * 2000); // Random delay up to 2 seconds
-            }
-        });
-    });
-});
-
 // View Management Functions
 function switchView(viewType) {
     const listView = document.getElementById('listView');
@@ -1049,13 +1022,16 @@ function filterCampaigns(status) {
     });
 }
 
-// Initialize page
+// ========== OPTIMIZED: Single DOMContentLoaded handler - Progressive Loading ==========
 document.addEventListener('DOMContentLoaded', function() {
-    // Restore view preference
+    console.log('⚡ Campaigns page - OPTIMIZED PROGRESSIVE LOADING');
+    
+    // ========== CRITICAL PATH: Immediate rendering (unblock browser) ==========
+    // Restore view preference (needed for layout)
     const savedView = sessionStorage.getItem('campaignView') || 'list';
     switchView(savedView);
     
-    // Add status filter click handlers
+    // Add status filter click handlers (needed for interactivity)
     document.querySelectorAll('.status-filter').forEach(filter => {
         filter.addEventListener('click', function(e) {
             e.preventDefault();
@@ -1071,6 +1047,29 @@ document.addEventListener('DOMContentLoaded', function() {
             // Filter campaigns
             filterCampaigns(this.dataset.status);
         });
+    });
+    
+    console.log('✅ Critical path complete - page interactive');
+    
+    // ========== DEFERRED PATH: Load executive reports asynchronously (unblock UI) ==========
+    // Use requestAnimationFrame to defer heavy operations to next frame
+    requestAnimationFrame(() => {
+        console.log('⏳ Loading executive report statuses (non-blocking)...');
+        
+        // Find all executive report buttons and check their status
+        const reportButtons = document.querySelectorAll('[id^="execReportBtn_"]');
+        
+        // OPTIMIZATION: Defer each status check to prevent blocking
+        reportButtons.forEach((button, index) => {
+            const campaignId = button.id.replace('execReportBtn_', '');
+            
+            // Stagger checks to avoid overwhelming server (50ms intervals)
+            setTimeout(() => {
+                checkReportStatus(campaignId);
+            }, index * 50); // Sequential delays: 0ms, 50ms, 100ms, etc.
+        });
+        
+        console.log(`✅ Scheduled ${reportButtons.length} executive report checks`);
     });
 });
 </script>
