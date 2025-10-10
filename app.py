@@ -190,6 +190,10 @@ def inject_csrf():
         if business_account_id:
             from routes import get_branding_context
             context['branding_context'] = get_branding_context(business_account_id)
+    else:
+        # For trial/demo mode (unauthenticated users), show Archelo demo branding
+        from routes import get_branding_context
+        context['branding_context'] = get_branding_context(business_account_id=1)
     
     return context
 
