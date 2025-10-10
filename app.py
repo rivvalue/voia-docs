@@ -221,6 +221,41 @@ def inject_ui_version():
         'business_user_email': session.get('business_user_email', '')
     }
 
+# Sentry Test Endpoint (Admin Only)
+@app.route('/business/admin/test-sentry-error')
+def test_sentry_error():
+    """Test endpoint to verify Sentry error capture - ADMIN ONLY"""
+    from business_auth_routes import require_business_auth
+    from flask import jsonify
+    
+    @require_business_auth
+    def _test_sentry():
+        # Capture a test message
+        error_monitor.capture_message("Test message from VOÏA admin", level='info', context={
+            'test_type': 'manual_trigger',
+            'feature': 'sentry_integration'
+        })
+        
+        # Trigger a test exception
+        try:
+            # This will intentionally raise an error for Sentry to capture
+            raise ValueError("🧪 Test error: Sentry integration verification - This is intentional!")
+        except ValueError as e:
+            error_monitor.capture_exception(e, context={
+                'test_type': 'manual_trigger',
+                'feature': 'sentry_integration',
+                'note': 'This is a deliberate test error'
+            })
+            
+            return jsonify({
+                'success': True,
+                'message': 'Test error captured! Check your Sentry dashboard.',
+                'sentry_active': error_monitor.sentry_initialized,
+                'hint': 'Look for: "Test error: Sentry integration verification"'
+            })
+    
+    return _test_sentry()
+
 with app.app_context():
     # Import models FIRST to avoid circular imports
     import models  # noqa: F401
