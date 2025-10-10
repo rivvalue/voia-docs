@@ -1171,11 +1171,21 @@ def dashboard():
     is_business_authenticated = current_business_user is not None
     business_user_name = f"{current_business_user.first_name} {current_business_user.last_name}" if current_business_user else None
     
+    # Get branding context based on authentication
+    if is_business_authenticated and current_business_user:
+        # Authenticated business user - get their branding
+        business_account_id = current_business_user.business_account_id
+        branding_context = get_branding_context(business_account_id)
+    else:
+        # Trial/demo user - get demo branding (Archelo Group - ID 1)
+        branding_context = get_branding_context(business_account_id=1)
+    
     return render_template('dashboard.html', 
                          company_nps_data=company_nps_data, 
                          user_email=user_email,
                          is_business_authenticated=is_business_authenticated,
-                         business_user_name=business_user_name)
+                         business_user_name=business_user_name,
+                         branding_context=branding_context)
 
 @app.route('/api/dashboard_data')
 def dashboard_data():
