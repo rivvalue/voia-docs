@@ -30,4 +30,5 @@ dependencies = [
     "gevent>=25.9.1",
     "flask-caching>=2.3.1",
     "sentry-sdk>=2.41.0",
+    "redis>=6.4.0",
 ]

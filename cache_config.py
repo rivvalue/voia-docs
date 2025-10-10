@@ -16,8 +16,8 @@ class CacheConfig:
         self.enabled = os.environ.get('ENABLE_CACHE', 'true').lower() == 'true'
         
         # Cache timeout in seconds (admin configurable)
-        # Default: 300 seconds (5 minutes)
-        self.timeout = int(os.environ.get('CACHE_TIMEOUT', '300'))
+        # Default: 7200 seconds (2 hours) - Phase 2 optimization
+        self.timeout = int(os.environ.get('CACHE_TIMEOUT', '7200'))
         
         # Cache type (simple for in-memory, redis for production scaling)
         cache_type = os.environ.get('CACHE_TYPE', 'simple').lower()
@@ -26,9 +26,13 @@ class CacheConfig:
         # Redis configuration (if using Redis)
         self.redis_url = os.environ.get('CACHE_REDIS_URL', 'redis://localhost:6379/0')
         
+        # Phase 2: Enhanced caching metrics
+        self._cache_hits = 0
+        self._cache_misses = 0
+        
         # Log configuration on startup
         if self.enabled:
-            logger.info(f"✅ Cache enabled - Type: {self.cache_type}, Timeout: {self.timeout}s")
+            logger.info(f"✅ Cache enabled - Type: {self.cache_type}, Timeout: {self.timeout}s ({self.timeout/3600:.1f}h)")
         else:
             logger.info("❌ Cache disabled by admin configuration")
     
@@ -62,6 +66,30 @@ class CacheConfig:
         """Check if caching is enabled"""
         return self.enabled
     
+    def record_hit(self):
+        """Record cache hit for metrics"""
+        self._cache_hits += 1
+    
+    def record_miss(self):
+        """Record cache miss for metrics"""
+        self._cache_misses += 1
+    
+    def get_hit_rate(self):
+        """Calculate cache hit rate percentage"""
+        total = self._cache_hits + self._cache_misses
+        if total == 0:
+            return 0.0
+        return (self._cache_hits / total) * 100
+    
+    def get_metrics(self):
+        """Get cache performance metrics"""
+        return {
+            'hits': self._cache_hits,
+            'misses': self._cache_misses,
+            'hit_rate': round(self.get_hit_rate(), 1),
+            'total_requests': self._cache_hits + self._cache_misses
+        }
+    
     def get_status_info(self):
         """Get cache configuration status for admin dashboard"""
         return {
@@ -69,7 +97,9 @@ class CacheConfig:
             'type': self.cache_type,
             'timeout_seconds': self.timeout,
             'timeout_minutes': round(self.timeout / 60, 1),
-            'redis_url': self.redis_url if self.cache_type == 'RedisCache' else None
+            'timeout_hours': round(self.timeout / 3600, 1),
+            'redis_url': self.redis_url if self.cache_type == 'RedisCache' else None,
+            'metrics': self.get_metrics()
         }
 
 

@@ -122,6 +122,26 @@ try:
         
         return _optimization_status()
     
+    @app.route('/business/admin/cache-status')
+    def cache_status_endpoint():
+        """Cache performance monitoring endpoint - ADMIN ONLY"""
+        # Import here to avoid circular imports
+        from business_auth_routes import require_business_auth
+        from flask import jsonify
+        import time as time_module
+        
+        @require_business_auth
+        def _cache_status():
+            cache_info = cache_config.get_status_info()
+            
+            # Add real-time stats
+            cache_info['timestamp'] = time_module.time()
+            cache_info['cache_active'] = cache_config.is_enabled()
+            
+            return jsonify(cache_info)
+        
+        return _cache_status()
+    
     # Add performance monitoring to requests
     @app.before_request
     def before_request():

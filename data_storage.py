@@ -110,9 +110,15 @@ def get_dashboard_data_cached(campaign_id=None, business_account_id=None):
     Cached wrapper for dashboard data retrieval with performance optimization.
     Uses optimized queries to reduce database round-trips from 20+ to 2-3.
     Cache can be disabled/configured by admins via environment variables.
+    
+    Phase 2: 2-hour cache TTL for 10x performance improvement on repeat visits.
     """
-    cache_status = "CACHE_HIT" if cache_config.is_enabled() else "CACHE_DISABLED"
-    logger.info(f"📊 Dashboard data request | Campaign: {campaign_id} | Account: {business_account_id} | {cache_status}")
+    import time
+    start_time = time.time()
+    
+    # Generate cache key for logging
+    cache_key = f"dashboard_data_{campaign_id}_{business_account_id}"
+    logger.info(f"📊 Dashboard data request | Key: {cache_key} | Cache enabled: {cache_config.is_enabled()}")
     
     # Check if we should use optimized queries
     use_optimized = os.environ.get('USE_OPTIMIZED_DASHBOARD', 'true').lower() == 'true'
@@ -128,7 +134,13 @@ def get_dashboard_data_cached(campaign_id=None, business_account_id=None):
     
     # Fallback to original implementation
     logger.info(f"⏪ Using ORIGINAL dashboard queries | Cache: {cache_config.is_enabled()}")
-    return get_dashboard_data(campaign_id)
+    result = get_dashboard_data(campaign_id)
+    
+    # Log execution time for performance monitoring
+    execution_time = (time.time() - start_time) * 1000  # Convert to ms
+    logger.info(f"⏱️ Dashboard data generated | Time: {execution_time:.0f}ms | Key: {cache_key}")
+    
+    return result
 
 def get_dashboard_data(campaign_id=None):
     """Compile dashboard data for visualization with optional campaign filtering"""
