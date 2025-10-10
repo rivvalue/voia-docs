@@ -1385,74 +1385,89 @@ def admin_panel():
             Campaign.business_account_id == business_account.id
         ).order_by(SurveyResponse.created_at.desc()).limit(10).all()
         
-        # Basic stats (properly scoped to business account)
-        total_responses = SurveyResponse.query.join(Campaign).filter(
-            Campaign.business_account_id == business_account.id
-        ).count()
-        total_campaigns = Campaign.query.filter(
-            Campaign.business_account_id == business_account.id
+        # OPTIMIZATION: Consolidate stats into 3 batch queries instead of 7 separate COUNTs
+        from sqlalchemy import func
+        
+        # Query 1: Get email stats grouped by status (replaces 4 COUNT queries)
+        email_stats_raw = db.session.query(
+            EmailDelivery.status,
+            func.count(EmailDelivery.id)
+        ).filter(
+            EmailDelivery.business_account_id == business_account.id,
+            EmailDelivery.email_type == 'participant_invitation'
+        ).group_by(EmailDelivery.status).all()
+        
+        email_stats_dict = dict(email_stats_raw)
+        total_invitations = sum(email_stats_dict.values())
+        sent_invitations = email_stats_dict.get('sent', 0)
+        failed_invitations = email_stats_dict.get('failed', 0)
+        pending_invitations = email_stats_dict.get('pending', 0)
+        
+        # Query 2: Get basic entity counts (replaces 2 COUNT queries)
+        total_campaigns = Campaign.query.filter_by(
+            business_account_id=business_account.id
         ).count()
         
-        # Add participant count
         total_participants = Participant.query.filter_by(
             business_account_id=business_account.id
         ).count()
         
-        # Email delivery statistics
-        total_invitations = EmailDelivery.query.filter_by(
-            business_account_id=business_account.id,
-            email_type='participant_invitation'
+        # Query 3: Get response count
+        total_responses = SurveyResponse.query.join(Campaign).filter(
+            Campaign.business_account_id == business_account.id
         ).count()
         
-        sent_invitations = EmailDelivery.query.filter_by(
-            business_account_id=business_account.id,
-            email_type='participant_invitation',
-            status='sent'
-        ).count()
+        # OPTIMIZATION: Pre-compute all campaign metrics in batch queries (eliminates N+1)
+        campaign_ids = [c.id for c in campaigns]
         
-        failed_invitations = EmailDelivery.query.filter_by(
-            business_account_id=business_account.id,
-            email_type='participant_invitation',
-            status='failed'
-        ).count()
+        # Batch query: Get participant counts for all campaigns
+        participant_counts = dict(
+            db.session.query(
+                CampaignParticipant.campaign_id,
+                func.count(CampaignParticipant.id)
+            ).filter(
+                CampaignParticipant.campaign_id.in_(campaign_ids),
+                CampaignParticipant.business_account_id == business_account.id
+            ).group_by(CampaignParticipant.campaign_id).all()
+        ) if campaign_ids else {}
         
-        pending_invitations = EmailDelivery.query.filter_by(
-            business_account_id=business_account.id,
-            email_type='participant_invitation',
-            status='pending'
-        ).count()
+        # Batch query: Get invitation stats for all campaigns grouped by campaign_id and status
+        invitation_stats_raw = db.session.query(
+            EmailDelivery.campaign_id,
+            EmailDelivery.status,
+            func.count(EmailDelivery.id)
+        ).filter(
+            EmailDelivery.campaign_id.in_(campaign_ids),
+            EmailDelivery.business_account_id == business_account.id,
+            EmailDelivery.email_type == 'participant_invitation'
+        ).group_by(EmailDelivery.campaign_id, EmailDelivery.status).all() if campaign_ids else []
         
-        # Get active campaigns with invitation status
+        # Build invitation stats lookup: {campaign_id: {'sent': X, 'failed': Y, 'pending': Z}}
+        invitation_stats_by_campaign = {}
+        for campaign_id, status, count in invitation_stats_raw:
+            if campaign_id not in invitation_stats_by_campaign:
+                invitation_stats_by_campaign[campaign_id] = {}
+            invitation_stats_by_campaign[campaign_id][status] = count
+        
+        # Build active campaigns list using pre-computed data
         active_campaigns = []
         for campaign in campaigns:
             if campaign.is_active():
-                # Get participant count for this campaign
-                participant_count = CampaignParticipant.query.filter_by(
-                    campaign_id=campaign.id,
-                    business_account_id=business_account.id
-                ).count()
+                participant_count = participant_counts.get(campaign.id, 0)
+                campaign_inv_stats = invitation_stats_by_campaign.get(campaign.id, {})
                 
-                # Get invitation statistics for this campaign
-                campaign_invitations = EmailDelivery.query.filter_by(
-                    campaign_id=campaign.id,
-                    business_account_id=business_account.id,
-                    email_type='participant_invitation'
-                ).count()
+                campaign_sent = campaign_inv_stats.get('sent', 0)
+                campaign_failed = campaign_inv_stats.get('failed', 0)
+                campaign_pending = campaign_inv_stats.get('pending', 0)
+                campaign_invitations = campaign_sent + campaign_failed + campaign_pending
                 
-                campaign_sent = EmailDelivery.query.filter_by(
-                    campaign_id=campaign.id,
-                    business_account_id=business_account.id,
-                    email_type='participant_invitation',
-                    status='sent'
-                ).count()
-                
-                campaign_data = campaign.to_dict()
+                campaign_data = campaign.to_dict(response_count=0)  # No query needed for admin panel
                 campaign_data.update({
                     'participant_count': participant_count,
                     'invitation_stats': {
                         'total': campaign_invitations,
                         'sent': campaign_sent,
-                        'pending': campaign_invitations - campaign_sent,
+                        'pending': campaign_pending,
                         'can_send_invitations': participant_count > 0 and email_service.is_configured()
                     }
                 })
@@ -1463,10 +1478,13 @@ def admin_panel():
         if active_campaigns:
             primary_active_campaign_id = active_campaigns[0]['id']
         
+        # OPTIMIZATION: Serialize all campaigns once without response_count to avoid N+1
+        all_campaigns_data = [c.to_dict(response_count=0) for c in campaigns]
+        
         # Build unified admin data for all account types
         admin_data = {
             'account_type': business_account.account_type,
-            'campaigns': [c.to_dict() for c in campaigns],
+            'campaigns': all_campaigns_data,
             'active_campaigns': active_campaigns,
             'recent_responses': [r.to_dict() for r in recent_responses],
             'primary_active_campaign_id': primary_active_campaign_id,
