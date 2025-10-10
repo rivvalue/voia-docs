@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 @require_business_auth
 @require_permission('manage_participants')
 def list_campaigns():
-    """List all campaigns for current business account"""
+    """List all campaigns for current business account - OPTIMIZED to fix N+1 query problem"""
     try:
         current_account = get_current_business_account()
         if not current_account:
@@ -38,18 +38,72 @@ def list_campaigns():
             business_account_id=current_account.id
         ).order_by(desc(Campaign.created_at)).all()
         
-        # Get participant counts and engagement metrics for each campaign
+        # OPTIMIZATION: Get all metrics in 3 batch queries instead of N+1 queries
+        campaign_ids = [c.id for c in campaigns]
+        
+        # Batch query 1: Get participant counts for all campaigns
+        participant_counts = dict(
+            db.session.query(
+                CampaignParticipant.campaign_id,
+                func.count(CampaignParticipant.id)
+            ).filter(
+                CampaignParticipant.campaign_id.in_(campaign_ids),
+                CampaignParticipant.business_account_id == current_account.id
+            ).group_by(CampaignParticipant.campaign_id).all()
+        ) if campaign_ids else {}
+        
+        # Batch query 2: Get invitation counts for all campaigns
+        invitation_counts = dict(
+            db.session.query(
+                EmailDelivery.campaign_id,
+                func.count(EmailDelivery.id)
+            ).filter(
+                EmailDelivery.campaign_id.in_(campaign_ids),
+                EmailDelivery.status == 'sent',
+                EmailDelivery.email_type == 'participant_invitation'
+            ).group_by(EmailDelivery.campaign_id).all()
+        ) if campaign_ids else {}
+        
+        # Batch query 3: Get survey completion counts for all campaigns
+        survey_counts = dict(
+            db.session.query(
+                SurveyResponse.campaign_id,
+                func.count(SurveyResponse.id)
+            ).filter(
+                SurveyResponse.campaign_id.in_(campaign_ids)
+            ).group_by(SurveyResponse.campaign_id).all()
+        ) if campaign_ids else {}
+        
+        # Build campaign data with pre-loaded metrics (no additional queries)
         campaign_data = []
         for campaign in campaigns:
-            participant_count = CampaignParticipant.query.filter_by(
-                campaign_id=campaign.id,
-                business_account_id=current_account.id
-            ).count()
-            
             campaign_dict = campaign.to_dict()
+            
+            # Get metrics from pre-loaded data
+            participant_count = participant_counts.get(campaign.id, 0)
+            invitations_sent = invitation_counts.get(campaign.id, 0)
+            surveys_completed = survey_counts.get(campaign.id, 0)
+            
+            # Calculate rates
+            participation_rate = None
+            if participant_count > 0:
+                participation_rate = round((surveys_completed / participant_count) * 100, 1)
+            
+            email_success_rate = None
+            if invitations_sent > 0:
+                email_success_rate = round((surveys_completed / invitations_sent) * 100, 1)
+            
             campaign_dict['participant_count'] = participant_count
-            campaign_dict['engagement_metrics'] = campaign.get_engagement_metrics()
+            campaign_dict['engagement_metrics'] = {
+                'invitations_sent': invitations_sent,
+                'surveys_completed': surveys_completed,
+                'total_participants': participant_count,
+                'participation_rate': participation_rate,
+                'email_success_rate': email_success_rate
+            }
             campaign_data.append(campaign_dict)
+        
+        logger.info(f"📊 Campaigns list loaded: {len(campaigns)} campaigns, optimized query (no N+1)")
         
         return render_template('campaigns/list.html',
                              campaigns=campaign_data,
