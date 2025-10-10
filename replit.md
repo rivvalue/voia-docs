@@ -2,6 +2,14 @@
 The Voice of Client (VOÏA) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. Its purpose is to convert raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses, particularly Rivvalue Inc., with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project features a production-ready multi-tenant participant management system with extensive email delivery capabilities and AI-powered survey functionalities.
 
 # Recent Changes
+**October 10, 2025 - Home Page Minimalist Refinement & Mobile UX Enhancement**
+-   **Metrics Section Redesign**: Replaced boxed metrics banner with clean inline layout - white background, subtle gray headline (fs-3, Montserrat 500), three metrics separated by thin dividers with red numbers (2rem) for visual emphasis.
+-   **Features Section Modernization**: Eliminated dated card/checklist design (gray header, green checkmarks), replaced with modern tile grid using red left borders (3px solid #E13A44), maintaining minimal aesthetic across entire page.
+-   **Mobile Typography Scaling**: Enhanced hero responsiveness with progressive text scaling - 8rem→3.5rem→2.5rem for VOÏA title, fs-1→1.5rem→1.1rem for tagline across 768px/576px/375px breakpoints to prevent wrapping.
+-   **Mobile Metrics Layout**: Intelligent border switching at ≤768px - horizontal dividers removed, replaced with vertical bottom borders for clean stacked layout with proper spacing (1.5rem gaps).
+-   **Mobile CTA Optimization**: Added side margins (0.5rem 1rem) and adjusted padding (0.8rem 1.5rem) for CTAs at ≤576px to prevent edge-touching on small screens.
+-   **Design Coherence**: Architect-approved for visual consistency - all sections now use white backgrounds, Montserrat/Karla typography, strategic VOÏA red accents, creating cohesive professional B2B landing experience.
+
 **October 10, 2025 - Home Page Professional Redesign (Path B Implementation)**
 -   **Brand Typography**: Implemented Montserrat (headings, 600 weight) and Karla (body, 400 weight) with Google Fonts loading, optimal line-height (1.7), and 65ch reading width for professional B2B SaaS presentation.
 -   **Visual Consistency**: Standardized all three pillar cards with VOÏA red icons (#E13A44) on light red backgrounds, balanced card layouts by removing bullet points for equal visual weight.
