@@ -1155,17 +1155,16 @@ small, .small {
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
     
-    /* User dropdown - always visible on right on mobile */
+    /* User dropdown and hamburger - right side on mobile */
     .navbar .container {
         position: relative;
+        display: flex;
+        align-items: center;
     }
     
     .navbar > .container > .navbar-nav.ms-2 {
-        position: absolute !important;
-        right: 60px !important;
-        top: 8px !important;
-        margin: 0 !important;
-        z-index: 10003 !important;
+        margin-left: auto !important;
+        margin-right: 0.5rem !important;
     }
     
     .navbar > .container > .navbar-nav.ms-2 .nav-link {
@@ -1173,6 +1172,11 @@ small, .small {
         border: none !important;
         white-space: nowrap;
         font-size: 0.9rem !important;
+    }
+    
+    .navbar-toggler {
+        margin-left: 0.5rem !important;
+        order: 999;
     }
     
     /* Collapsible navbar menu - above sidebar */
