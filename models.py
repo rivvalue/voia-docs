@@ -1100,8 +1100,13 @@ class CampaignParticipant(db.Model):
     completed_at = db.Column(db.DateTime, nullable=True)
     
     # Relationships
-    campaign = db.relationship('Campaign', backref='campaign_participants', overlaps="participants")
-    participant = db.relationship('Participant', foreign_keys='CampaignParticipant.participant_id', backref='campaign_participations', overlaps="campaigns")
+    campaign = db.relationship('Campaign', 
+                              backref=db.backref('campaign_participants', overlaps="campaigns,participants"), 
+                              overlaps="campaigns,participants")
+    participant = db.relationship('Participant', 
+                                 foreign_keys='CampaignParticipant.participant_id', 
+                                 backref=db.backref('campaign_participations', overlaps="campaigns,participants"), 
+                                 overlaps="campaigns,participants")
     business_account = db.relationship('BusinessAccount', backref='campaign_participants')
     
     def to_dict(self):

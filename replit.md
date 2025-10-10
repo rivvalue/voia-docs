@@ -2,6 +2,15 @@
 The Voice of Client (VOÏA) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. Its purpose is to convert raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses, particularly Rivvalue Inc., with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project features a production-ready multi-tenant participant management system with extensive email delivery capabilities and AI-powered survey functionalities.
 
 # Recent Changes
+**October 10, 2025 - Home Page Professional Redesign (Path B Implementation)**
+-   **Brand Typography**: Implemented Montserrat (headings, 600 weight) and Karla (body, 400 weight) with Google Fonts loading, optimal line-height (1.7), and 65ch reading width for professional B2B SaaS presentation.
+-   **Visual Consistency**: Standardized all three pillar cards with VOÏA red icons (#E13A44) on light red backgrounds, balanced card layouts by removing bullet points for equal visual weight.
+-   **Guided Journey CTAs**: Path B implementation with progressive CTAs on all cards - "Start Demo" → "See AI in Action" → "See Live Insights" - creating clear user pathway through experience.
+-   **Enhanced Messaging**: Sharpened subtitle to emphasize campaign-based differentiation: "Launch customer feedback campaigns when it matters most. AI-powered conversations automatically uncover churn risks, satisfaction trends, and growth opportunities—no analyst required."
+-   **Trust Elements**: Added metrics section with three key stats (2min completion, 10x faster insights, 95% accuracy) using fictive but realistic data for credibility without customer logos.
+-   **Mobile Optimization**: Comprehensive responsive design with breakpoints at 768px/576px/375px - progressive scaling of padding, icons, and buttons to prevent overflow; full-width CTAs on small screens for accessible tap targets.
+-   **Testing**: Architect-approved for professional B2B SaaS standards, verified font loading, mobile layout integrity, and accessible CTA functionality across all screen sizes.
+
 **October 10, 2025 - Home Page Campaign-Centric Messaging Update**
 -   **Marketing Shift**: Repositioned VOÏA from "3-step process" to campaign-based strategic pulse checks, aligning messaging with actual platform functionality.
 -   **New Subtitle**: "Run targeted AI-powered campaigns at decision-critical moments. Natural AI conversations reveal the insights that shape your strategy."
