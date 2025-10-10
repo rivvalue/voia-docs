@@ -224,10 +224,10 @@ SENTRY_TRACES_SAMPLE_RATE=0.1  # 10% sampling (cost control)
 ## Phase 2b Monitoring Checklist
 
 ### Pre-Migration
-- [ ] Configure Sentry DSN
+- [x] Configure Sentry DSN ✅ (October 10, 2025)
 - [ ] Configure LogRocket App ID
-- [ ] Test error capture in development
-- [ ] Verify UI version context in errors
+- [x] Test error capture in development ✅ (October 10, 2025 - Test endpoint created)
+- [x] Verify UI version context in errors ✅ (October 10, 2025)
 - [ ] Set up Sentry alerts for critical errors
 
 ### During Migration
@@ -493,6 +493,16 @@ SENTRY_TRACES_SAMPLE_RATE=0.05  # 5% instead of 10%
 
 ---
 
-**Last Updated:** October 9, 2025 (Phase 2b Pre-Implementation)  
-**Version:** 1.0  
+**Last Updated:** October 10, 2025 (Sentry Integration Complete)  
+**Version:** 1.1  
 **Maintainer:** VOÏA Development Team
+
+## Recent Updates
+
+### October 10, 2025 - Sentry Integration Activated
+- ✅ Sentry SDK installed and configured
+- ✅ Error monitor integrated in `app.py`
+- ✅ Production environment monitoring active (10% trace sampling)
+- ✅ Test endpoint created: `/business/admin/test-sentry-error`
+- ✅ UI version tracking verified
+- ✅ Automatic 500 error capture enabled
