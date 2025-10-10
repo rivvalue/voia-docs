@@ -25,7 +25,8 @@ class DatabaseConfig:
         env = environment if environment is not None else self.current_environment
         
         # Stage 2 Optimization: Feature flag controlled database optimization
-        optimize_db_pool = os.environ.get('OPTIMIZE_DB_POOL', 'false').lower() == 'true'
+        # Phase 1 Performance Improvement: Enabled by default for better concurrency
+        optimize_db_pool = os.environ.get('OPTIMIZE_DB_POOL', 'true').lower() == 'true'
         
         if env == "production":
             if optimize_db_pool:
