@@ -81,6 +81,13 @@
     <!-- Top Navbar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container">
+            <!-- Demo Logo for Trial Users (not authenticated) -->
+            {% if not is_business_authenticated and branding_context and branding_context.logo_url %}
+            <div class="navbar-brand d-flex align-items-center">
+                <img src="{{ branding_context.logo_url }}" alt="{{ branding_context.company_name }}" height="40" class="navbar-logo">
+            </div>
+            {% endif %}
+            
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
