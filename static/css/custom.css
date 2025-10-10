@@ -1175,6 +1175,20 @@ small, .small {
         font-size: 0.9rem !important;
     }
     
+    /* Collapsible navbar menu - above sidebar */
+    .navbar-collapse {
+        z-index: 10003 !important;
+        position: relative;
+    }
+    
+    .navbar-collapse.show,
+    .navbar-collapse.collapsing {
+        background-color: var(--primary-black);
+        padding: 1rem;
+        margin-top: 0.5rem;
+        border-radius: var(--radius-md);
+    }
+    
     /* Banner logo fixes */
     .dashboard-logo {
         height: 100px !important;
