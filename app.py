@@ -100,10 +100,17 @@ if ENABLE_SQL_PROFILING:
         else:
             g.queries = []
         
+        # Capture stack trace for survey_response queries (debugging)
+        stack_trace = None
+        if 'survey_response' in statement.lower():
+            import traceback
+            stack_trace = ''.join(traceback.format_stack()[:-1])  # Exclude this frame
+        
         g.queries.append({
             'statement': statement,
             'parameters': parameters,
-            'duration': duration_ms
+            'duration': duration_ms,
+            'stack': stack_trace
         })
         
         # Log very slow queries immediately
@@ -213,7 +220,16 @@ try:
                 # Log individual slow queries
                 if hasattr(g, 'queries'):
                     for query_info in g.queries:
-                        if query_info['duration'] > 100:  # Queries over 100ms
+                        # DEBUGGING: Log ALL survey_response queries with stack traces (temporarily)
+                        if 'survey_response' in query_info['statement'].lower():
+                            app.logger.warning(
+                                f'  📍 SURVEY_RESPONSE QUERY ({query_info["duration"]:.0f}ms): '
+                                f'{query_info["statement"][:200]}...'
+                            )
+                            if query_info.get('stack'):
+                                app.logger.warning(f'  📍 Stack Trace:\n{query_info["stack"]}')
+                        
+                        elif query_info['duration'] > 100:  # Other slow queries over 100ms
                             app.logger.warning(
                                 f'  ⚠️ Slow Query ({query_info["duration"]:.0f}ms): '
                                 f'{query_info["statement"][:200]}...'
