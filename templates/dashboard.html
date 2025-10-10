@@ -5,39 +5,41 @@
 {% block page_class %}page-dashboard{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-lg-10 mx-auto">
-        <div data-page="dashboard"></div>
-        <div class="header-gradient-primary" style="padding: var(--spacing-xl); margin-bottom: var(--spacing-xl);">
+<div class="container">
+    <div data-page="dashboard"></div>
+    <!-- Dashboard Header -->
+    <div class="header-gradient-primary" style="padding: var(--spacing-xl); margin-bottom: var(--spacing-xl);">
+        <div class="container">
             <div class="row align-items-center">
                 <div class="col-12 col-md-8 mb-3 mb-md-0">
-                    <h2 class="page-title">Analytics Dashboard</h2>
-                    <p class="page-subtitle">Comprehensive customer feedback insights and analysis</p>
-                    <div class="dashboard-actions d-flex flex-wrap gap-2 mt-3">
-                    <button class="btn btn-outline-primary btn-sm dashboard-btn" onclick="refreshData()">
-                        <i class="fas fa-sync-alt me-2 d-none d-sm-inline"></i>
-                        <i class="fas fa-sync-alt d-sm-none"></i>
-                        <span class="d-none d-sm-inline">Refresh</span>
-                    </button>
-                    <button class="btn btn-outline-secondary btn-sm dashboard-btn" onclick="exportUserData()">
-                        <i class="fas fa-user-circle me-2 d-none d-sm-inline"></i>
-                        <i class="fas fa-user-circle d-sm-none"></i>
-                        <span class="d-none d-sm-inline">Export Response Data</span>
-                    </button>
-                    {% if is_business_authenticated %}
-                    <button class="btn btn-outline-secondary btn-sm dashboard-btn" onclick="exportData()" id="exportDataBtn">
-                        <i class="fas fa-download me-2 d-none d-sm-inline"></i>
-                        <i class="fas fa-download d-sm-none"></i>
-                        <span class="d-none d-sm-inline">Export Full Data</span>
-                    </button>
-                    {% endif %}
-                    </div>
+                    <h1 class="page-title mb-1">Business Intelligence</h1>
+                    <p class="page-subtitle mb-0">Comprehensive customer feedback insights and analysis</p>
                 </div>
                 <div class="col-12 col-md-4 text-center text-md-end">
-                    <img src="{{ url_for('static', filename='images/archelo-logo.png') }}" alt="Adelco" class="dashboard-logo">
+                    <div class="dashboard-actions d-flex flex-wrap gap-2 justify-content-center justify-content-md-end mb-3 mb-md-0">
+                        <button class="btn btn-outline-primary btn-sm dashboard-btn" onclick="refreshData()">
+                            <i class="fas fa-sync-alt me-2 d-none d-sm-inline"></i>
+                            <i class="fas fa-sync-alt d-sm-none"></i>
+                            <span class="d-none d-sm-inline">Refresh</span>
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm dashboard-btn" onclick="exportUserData()">
+                            <i class="fas fa-user-circle me-2 d-none d-sm-inline"></i>
+                            <i class="fas fa-user-circle d-sm-none"></i>
+                            <span class="d-none d-sm-inline">Export Response Data</span>
+                        </button>
+                        {% if is_business_authenticated %}
+                        <button class="btn btn-outline-secondary btn-sm dashboard-btn" onclick="exportData()" id="exportDataBtn">
+                            <i class="fas fa-download me-2 d-none d-sm-inline"></i>
+                            <i class="fas fa-download d-sm-none"></i>
+                            <span class="d-none d-sm-inline">Export Full Data</span>
+                        </button>
+                        {% endif %}
+                    </div>
+                    <img src="{{ url_for('static', filename='images/archelo-logo.png') }}" alt="Adelco" class="dashboard-logo d-none d-md-block ms-auto" style="max-height: 60px;">
                 </div>
             </div>
         </div>
+    </div>
 
 <!-- Campaign Filter - Always Visible (like hero banner) -->
 <div class="dashboard-navigation mb-4">
