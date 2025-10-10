@@ -10,24 +10,13 @@
     <!-- Dashboard Header -->
     <div class="header-gradient-primary" style="padding: var(--spacing-xl); margin-bottom: var(--spacing-xl);">
         <div class="container">
-            <div class="row">
-                <div class="col-12 text-center">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-8 mb-3 mb-md-0">
                     <h1 class="page-title mb-1">Business Intelligence</h1>
-                    <p class="page-subtitle mb-3">Comprehensive customer feedback insights and analysis</p>
-                    
-                    <!-- Multi-tenant Logo Display -->
-                    {% if branding_context and branding_context.logo_url %}
-                        <!-- Business Account Logo -->
-                        <div class="mb-3">
-                            <img src="{{ branding_context.logo_url }}" 
-                                 alt="{{ branding_context.company_name }}" 
-                                 class="dashboard-logo" 
-                                 style="max-height: 120px; height: auto; object-fit: contain; filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));">
-                        </div>
-                    {% endif %}
-                    
-                    <!-- Action Buttons Row -->
-                    <div class="d-flex align-items-center justify-content-center gap-3 mt-2">
+                    <p class="page-subtitle mb-0">Comprehensive customer feedback insights and analysis</p>
+                </div>
+                <div class="col-12 col-md-4 text-center text-md-end">
+                    <div class="d-flex align-items-center justify-content-center justify-content-md-end gap-3">
                         <!-- Export Response Data - Only for trial/public users -->
                         {% if not is_business_authenticated %}
                         <button class="btn btn-outline-secondary btn-sm dashboard-btn" onclick="exportUserData()">

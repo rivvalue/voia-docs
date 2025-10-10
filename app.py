@@ -182,8 +182,14 @@ def inject_csrf():
     context['is_business_authenticated'] = bool(session.get('business_user_id'))
     
     if context['is_business_authenticated']:
-        context['business_user_name'] = session.get('business_account_name', 'User')
+        context['business_user_name'] = session.get('business_user_name', 'User')  # User's actual name
         context['business_account_name'] = session.get('business_account_name')
+        
+        # Get branding context for multi-tenant logo display
+        business_account_id = session.get('business_account_id')
+        if business_account_id:
+            from routes import get_branding_context
+            context['branding_context'] = get_branding_context(business_account_id)
     
     return context
 

@@ -1178,6 +1178,7 @@ def login():
         session['business_session_id'] = user_session.session_id
         session['business_account_id'] = user.business_account_id
         session['business_account_name'] = user.business_account.name
+        session['business_user_name'] = user.get_full_name()  # User's actual name for display
         session['user_role'] = user.role
         session.permanent = remember_me
         
