@@ -913,7 +913,7 @@ def convert_snapshot_to_dashboard_format(snapshot):
         }
 
 def get_company_nps_data():
-    """Get NPS data segregated by company"""
+    """Get NPS data segregated by company - OPTIMIZED to fix N+1 query problem"""
     try:
         # Get all responses grouped by company (case-insensitive)
         company_stats = db.session.query(
@@ -924,6 +924,32 @@ def get_company_nps_data():
             func.count(func.nullif(SurveyResponse.nps_score >= 9, False)).label('promoters'),
             func.count(func.nullif(SurveyResponse.nps_score <= 6, False)).label('detractors')
         ).group_by(func.upper(SurveyResponse.company_name)).all()
+        
+        # OPTIMIZATION: Get all latest churn risks in ONE query instead of N+1 queries
+        # Use subquery to find latest response per company
+        from sqlalchemy import and_
+        from sqlalchemy.sql import exists
+        
+        # Create a subquery that gets the latest response ID for each company
+        latest_subquery = db.session.query(
+            func.upper(SurveyResponse.company_name).label('upper_company'),
+            func.max(SurveyResponse.created_at).label('max_created_at')
+        ).group_by(func.upper(SurveyResponse.company_name)).subquery()
+        
+        # Join to get the actual latest responses with churn risk
+        latest_responses = db.session.query(
+            func.upper(SurveyResponse.company_name).label('upper_company'),
+            SurveyResponse.churn_risk_level
+        ).join(
+            latest_subquery,
+            and_(
+                func.upper(SurveyResponse.company_name) == latest_subquery.c.upper_company,
+                SurveyResponse.created_at == latest_subquery.c.max_created_at
+            )
+        ).all()
+        
+        # Create a dictionary for fast lookup: {upper_company_name: churn_risk}
+        churn_risk_map = {resp.upper_company: resp.churn_risk_level for resp in latest_responses}
         
         company_nps_list = []
         
@@ -948,14 +974,8 @@ def get_company_nps_data():
             else:
                 risk_level = "Low"
             
-            # Get latest churn risk for this company (case-insensitive)
-            latest_response = SurveyResponse.query.filter(
-                func.upper(SurveyResponse.company_name) == func.upper(company.company_name)
-            ).order_by(SurveyResponse.created_at.desc()).first()
-            
-            latest_churn_risk = None
-            if latest_response and latest_response.churn_risk_level:
-                latest_churn_risk = latest_response.churn_risk_level
+            # OPTIMIZED: Get latest churn risk from pre-loaded map (no additional query)
+            latest_churn_risk = churn_risk_map.get(company.company_name.upper() if company.company_name else None)
             
             company_nps_list.append({
                 'company_name': company.company_name,
@@ -973,6 +993,8 @@ def get_company_nps_data():
         # Sort by risk level and then by NPS score
         risk_order = {"Critical": 0, "High": 1, "Medium": 2, "Low": 3}
         company_nps_list.sort(key=lambda x: (risk_order.get(x['risk_level'], 4), -x['company_nps']))
+        
+        logger.info(f"📊 Company NPS data generated: {len(company_nps_list)} companies, optimized query (no N+1)")
         
         return company_nps_list
         
