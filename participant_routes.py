@@ -54,17 +54,25 @@ def list_participants():
                 )
             )
         
-        # Get total count for pagination
-        total_participants = query.count()
+        # OPTIMIZATION: Get all KPI stats in ONE query using SQL CASE statements
+        from sqlalchemy import case, func as sql_func
         
-        # Calculate KPI stats for ALL participants (not just paginated ones) 
-        # Base query for all participants in business account
-        all_participants_query = Participant.query.filter_by(business_account_id=current_account.id)
+        # Build base query with same filters
+        kpi_base_query = db.session.query(
+            sql_func.count(Participant.id).label('total'),
+            sql_func.count(case((Participant.status == 'completed', 1))).label('completed'),
+            sql_func.count(case((Participant.status == 'started', 1))).label('started'),
+            sql_func.count(case((Participant.status == 'invited', 1))).label('invited'),
+            sql_func.count(case((Participant.status == 'created', 1))).label('created'),
+            sql_func.count(sql_func.distinct(case(
+                ((Participant.company_name.isnot(None)) & (Participant.company_name != ''), Participant.company_name)
+            ))).label('companies')
+        ).filter(Participant.business_account_id == current_account.id)
         
-        # Apply same search filter to get totals for current search
+        # Apply same search filter if provided
         if search_query:
             search_term = f"%{search_query}%"
-            all_participants_query = all_participants_query.filter(
+            kpi_base_query = kpi_base_query.filter(
                 db.or_(
                     Participant.name.ilike(search_term),
                     Participant.email.ilike(search_term),
@@ -72,37 +80,20 @@ def list_participants():
                 )
             )
         
-        # Calculate KPI stats
+        # Execute single query to get all KPI stats
+        kpi_result = kpi_base_query.first()
+        
+        # Build KPI stats dictionary from single query result
+        total_participants = kpi_result.total  # Use for pagination
         kpi_stats = {
-            'total': all_participants_query.count(),
-            'completed': all_participants_query.filter(Participant.status == 'completed').count(),
-            'started': all_participants_query.filter(Participant.status == 'started').count(),
-            'invited': all_participants_query.filter(Participant.status == 'invited').count(),
-            'created': all_participants_query.filter(Participant.status == 'created').count()
+            'total': kpi_result.total,
+            'completed': kpi_result.completed,
+            'started': kpi_result.started,
+            'invited': kpi_result.invited,
+            'created': kpi_result.created,
+            'companies': kpi_result.companies
         }
         kpi_stats['active'] = kpi_stats['created'] + kpi_stats['invited']
-        
-        # Calculate company-related KPIs
-        # Get distinct company count (excluding None/empty values)
-        company_count_query = db.session.query(Participant.company_name).filter(
-            Participant.business_account_id == current_account.id,
-            Participant.company_name.isnot(None),
-            Participant.company_name != ''
-        )
-        
-        # Apply same search filter to company queries if search is active
-        if search_query:
-            search_term = f"%{search_query}%"
-            company_count_query = company_count_query.filter(
-                db.or_(
-                    Participant.name.ilike(search_term),
-                    Participant.email.ilike(search_term),
-                    Participant.company_name.ilike(search_term)
-                )
-            )
-        
-        distinct_companies = company_count_query.distinct().count()
-        kpi_stats['companies'] = distinct_companies
         
         # Calculate participants per company ratio
         if distinct_companies > 0:
