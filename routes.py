@@ -1,5 +1,5 @@
 from flask import render_template, request, jsonify, flash, redirect, url_for, g, session, send_file
-from app import app, db
+from app import app, db, cache
 # Models imported inside functions to avoid circular imports
 from models import SurveyResponse, Participant, CampaignParticipant, Campaign
 from data_storage import get_dashboard_data
@@ -330,6 +330,7 @@ def ensure_trial_participant(email, name, company_name, campaign_id):
     return participant, campaign_association
 
 @app.route('/')
+@cache.cached(timeout=300, key_prefix=lambda: f"index_{bool(session.get('auth_token'))}")
 def index():
     """Landing page with survey overview"""
     # Pass authentication status to template
