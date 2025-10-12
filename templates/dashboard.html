@@ -624,21 +624,19 @@
 
         <!-- Campaign Comparison Tab -->
         <div class="tab-pane fade" id="comparison" role="tabpanel" aria-labelledby="comparison-tab">
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-white" style="border-left: 4px solid var(--primary-red);">
-                            <h4 class="mb-0"><i class="fas fa-chart-line me-2"></i>Executive Summary Analysis</h4>
-                            <small class="text-muted">Compare key metrics and account intelligence between different campaigns</small>
-                        </div>
-                        <div class="card-body">
-                            <!-- KPI Overview Table -->
-                            <div class="card mb-4">
-                                <div class="card-header">
-                                    <h5 class="mb-0"><i class="fas fa-trending-up me-2"></i>Campaign KPI Overview</h5>
-                                    <small class="text-muted">Track key performance indicators across all campaigns</small>
-                                </div>
-                                <div class="card-body">
+            <!-- Section Header -->
+            <div class="mb-4">
+                <h4 class="mb-1"><i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>Executive Summary Analysis</h4>
+                <p class="text-muted mb-0">Compare key metrics and account intelligence between different campaigns</p>
+            </div>
+
+            <!-- KPI Overview Section -->
+            <div class="chart-card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-trending-up me-2"></i>Campaign KPI Overview</h5>
+                    <small class="text-muted">Track key performance indicators across all campaigns</small>
+                </div>
+                <div class="card-body">
                                     <div class="table-responsive">
                                         <table class="table table-borderless table-sm" id="kpiOverviewTable" style="font-size: 0.85rem;">
                                             <thead>
@@ -724,31 +722,32 @@
                                     </div>
                                 </div>
                             </div>
-                            
-                            <!-- Campaign Selection -->
-                            <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <label for="campaign1Select" class="form-label">Campaign 1</label>
-                                    <select class="form-select" id="campaign1Select" onchange="updateComparison()">
-                                        <option value="">Select first campaign</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="campaign2Select" class="form-label">Campaign 2</label>
-                                    <select class="form-select" id="campaign2Select" onchange="updateComparison()">
-                                        <option value="">Select second campaign</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <!-- Comparison Results -->
-                            <div id="comparisonResults" style="display: none;">
-                                <!-- Executive Summary -->
-                                <div class="card mb-4">
-                                    <div class="card-header">
-                                        <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Executive Summary</h5>
-                                    </div>
-                                    <div class="card-body">
+            </div>
+
+            <!-- Campaign Selection Section -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label for="campaign1Select" class="form-label">Campaign 1</label>
+                    <select class="form-select" id="campaign1Select" onchange="updateComparison()">
+                        <option value="">Select first campaign</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="campaign2Select" class="form-label">Campaign 2</label>
+                    <select class="form-select" id="campaign2Select" onchange="updateComparison()">
+                        <option value="">Select second campaign</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Comparison Results -->
+            <div id="comparisonResults" style="display: none;">
+                <!-- Metrics Comparison -->
+                <div class="chart-card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-bar me-2"></i>Metrics Comparison</h5>
+                    </div>
+                    <div class="card-body">
                                         <div class="table-responsive">
                                             <table class="table table-borderless">
                                                 <thead>
@@ -766,16 +765,18 @@
                                         </div>
                                     </div>
                                 </div>
-                                
-                                <!-- Campaign-by-Campaign Comparison -->
-                                <div class="card mb-4">
-                                    <div class="card-header">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <h5 class="mb-0"><i class="fas fa-building me-2"></i>Campaign-by-Campaign Analysis</h5>
-                                            <small class="text-muted" id="comparisonSearchInfo"></small>
-                                        </div>
-                                    </div>
-                                    <div class="card-body">
+                
+                <!-- Account-by-Account Analysis -->
+                <div class="chart-card mb-4">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-0"><i class="fas fa-building me-2"></i>Account-by-Account Analysis</h5>
+                                <small class="text-muted" id="comparisonSearchInfo"></small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
                                         <!-- Campaign Identifiers -->
                                         <div class="row mb-3">
                                             <div class="col-md-6">
@@ -846,17 +847,15 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            
-                            <!-- No Selection Message -->
-                            <div id="noComparisonMessage" class="text-center py-5">
-                                <i class="fas fa-exchange-alt fa-4x text-muted mb-3"></i>
-                                <h5 class="text-muted">Executive Summary</h5>
-                                <p class="text-muted">Select two campaigns above to compare their key metrics and account intelligence data.</p>
-                            </div>
-                        </div>
                     </div>
                 </div>
+            </div>
+            
+            <!-- No Selection Message -->
+            <div id="noComparisonMessage" class="text-center py-5">
+                <i class="fas fa-exchange-alt fa-4x text-muted mb-3"></i>
+                <h5 class="text-muted">Select Campaigns to Compare</h5>
+                <p class="text-muted">Choose two campaigns above to compare their key metrics and account intelligence data.</p>
             </div>
         </div>
 
