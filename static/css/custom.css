@@ -1254,15 +1254,11 @@ html .kpi-card.kpi-warning {
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
-    height: 4px;
+    width: 16%;
+    height: 3px;
+    background: var(--primary-red);
     transition: all 0.2s ease;
 }
-
-.kpi-card.kpi-primary::before { background: var(--gray-dark); }
-.kpi-card.kpi-success::before { background: var(--primary-red); }
-.kpi-card.kpi-info::before { background: var(--medium-gray); }
-.kpi-card.kpi-danger::before { background: var(--primary-red); }
 
 .kpi-card:hover {
     border-color: var(--primary-red);
@@ -1277,10 +1273,13 @@ html .kpi-card.kpi-warning {
     font-family: var(--font-family-mono);
 }
 
-.kpi-value.text-primary { color: var(--primary-red) !important; }
-.kpi-value.text-success { color: var(--gray-dark) !important; }
-.kpi-value.text-info { color: var(--medium-gray) !important; }
-.kpi-value.text-warning { color: var(--primary-red) !important; }
+.kpi-value.text-primary,
+.kpi-value.text-success,
+.kpi-value.text-info,
+.kpi-value.text-warning,
+.kpi-value.text-danger { 
+    color: var(--primary-red) !important; 
+}
 
 .kpi-label {
     color: var(--gray-dark);
@@ -1328,8 +1327,8 @@ canvas {
 }
 
 .chart-card .card-header {
-    background: linear-gradient(135deg, var(--light-gray) 0%, rgba(233, 232, 228, 0.7) 100%);
-    border-bottom: 1px solid var(--medium-gray);
+    background: var(--primary-white);
+    border-bottom: 1px solid #e5e5e5;
     padding: var(--spacing-lg) var(--spacing-xl);
     position: relative;
 }
@@ -1339,9 +1338,9 @@ canvas {
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--primary-red), var(--red-hover));
+    width: 16%;
+    height: 3px;
+    background: var(--primary-red);
 }
 
 .chart-card .card-header h5 {
@@ -1367,9 +1366,9 @@ canvas {
 }
 
 .data-table .table-header {
-    background: linear-gradient(135deg, var(--light-gray) 0%, rgba(233, 232, 228, 0.7) 100%);
+    background: var(--primary-white);
     padding: var(--spacing-lg) var(--spacing-xl);
-    border-bottom: 1px solid var(--medium-gray);
+    border-bottom: 1px solid #e5e5e5;
     position: relative;
 }
 
@@ -1378,9 +1377,9 @@ canvas {
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--primary-red), var(--red-hover));
+    width: 16%;
+    height: 3px;
+    background: var(--primary-red);
 }
 
 .data-table .table-header h5 {
@@ -1546,6 +1545,21 @@ canvas {
     
     .nav-tabs .nav-link i {
         margin-right: 6px !important;
+    }
+    
+    /* Campaign Filter Mobile Stacking */
+    #campaignFilter {
+        max-width: 100% !important;
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .d-flex.gap-2.align-items-center.flex-wrap {
+        gap: var(--spacing-sm) !important;
+    }
+    
+    .badge {
+        font-size: var(--font-size-xs) !important;
+        padding: 0.25rem 0.5rem !important;
     }
 }
 
@@ -2306,11 +2320,10 @@ a:hover {
    HEADER GRADIENTS - Standardized
    ============================================ */
 
-/* Primary header gradient (for main pages) */
+/* Primary header gradient (for main pages) - Simplified to white */
 .header-gradient-primary {
-    background: linear-gradient(135deg, rgba(var(--primary-red-rgb, 225, 58, 68), 0.08) 0%, rgba(var(--primary-red-rgb, 225, 58, 68), 0.12) 100%);
-    border: 1px solid var(--red-light);
-    border-radius: var(--radius-2xl);
+    background: var(--primary-white);
+    border-bottom: 1px solid var(--light-gray);
 }
 
 /* Neutral header gradient (for secondary pages) */

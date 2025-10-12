@@ -1,57 +1,5 @@
 # Overview
-The Voice of Client (VOÏA) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. Its purpose is to convert raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses, particularly Rivvalue Inc., with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project features a production-ready multi-tenant participant management system with extensive email delivery capabilities and AI-powered survey functionalities.
-
-# Recent Changes
-**October 10, 2025 - Home Page Minimalist Refinement & Mobile UX Enhancement**
--   **Metrics Section Redesign**: Replaced boxed metrics banner with clean inline layout - white background, subtle gray headline (fs-3, Montserrat 500), three metrics separated by thin dividers with red numbers (2rem) for visual emphasis.
--   **Features Section Modernization**: Eliminated dated card/checklist design (gray header, green checkmarks), replaced with modern tile grid using red left borders (3px solid #E13A44), maintaining minimal aesthetic across entire page.
--   **Mobile Typography Scaling**: Enhanced hero responsiveness with progressive text scaling - 8rem→3.5rem→2.5rem for VOÏA title, fs-1→1.5rem→1.1rem for tagline across 768px/576px/375px breakpoints to prevent wrapping.
--   **Mobile Metrics Layout**: Intelligent border switching at ≤768px - horizontal dividers removed, replaced with vertical bottom borders for clean stacked layout with proper spacing (1.5rem gaps).
--   **Mobile CTA Optimization**: Added side margins (0.5rem 1rem) and adjusted padding (0.8rem 1.5rem) for CTAs at ≤576px to prevent edge-touching on small screens.
--   **Design Coherence**: Architect-approved for visual consistency - all sections now use white backgrounds, Montserrat/Karla typography, strategic VOÏA red accents, creating cohesive professional B2B landing experience.
-
-**October 10, 2025 - Home Page Professional Redesign (Path B Implementation)**
--   **Brand Typography**: Implemented Montserrat (headings, 600 weight) and Karla (body, 400 weight) with Google Fonts loading, optimal line-height (1.7), and 65ch reading width for professional B2B SaaS presentation.
--   **Visual Consistency**: Standardized all three pillar cards with VOÏA red icons (#E13A44) on light red backgrounds, balanced card layouts by removing bullet points for equal visual weight.
--   **Guided Journey CTAs**: Path B implementation with progressive CTAs on all cards - "Start Demo" → "See AI in Action" → "See Live Insights" - creating clear user pathway through experience.
--   **Enhanced Messaging**: Sharpened subtitle to emphasize campaign-based differentiation: "Launch customer feedback campaigns when it matters most. AI-powered conversations automatically uncover churn risks, satisfaction trends, and growth opportunities—no analyst required."
--   **Trust Elements**: Added metrics section with three key stats (2min completion, 10x faster insights, 95% accuracy) using fictive but realistic data for credibility without customer logos.
--   **Mobile Optimization**: Comprehensive responsive design with breakpoints at 768px/576px/375px - progressive scaling of padding, icons, and buttons to prevent overflow; full-width CTAs on small screens for accessible tap targets.
--   **Testing**: Architect-approved for professional B2B SaaS standards, verified font loading, mobile layout integrity, and accessible CTA functionality across all screen sizes.
-
-**October 10, 2025 - Home Page Campaign-Centric Messaging Update**
--   **Marketing Shift**: Repositioned VOÏA from "3-step process" to campaign-based strategic pulse checks, aligning messaging with actual platform functionality.
--   **New Subtitle**: "Run targeted AI-powered campaigns at decision-critical moments. Natural AI conversations reveal the insights that shape your strategy."
--   **Updated Pillars**: Replaced sequential steps with three value pillars: (1) Launch Your Campaign - timing and natural conversations, (2) Instant AI Discovery - automated analysis for sentiment/churn/growth, (3) Act on Strategic Insights - campaign dashboard with actionable priorities.
--   **Hero CTAs**: Retained both "Try Demo" and "View Dashboard" buttons for clear user pathways.
--   **Messaging Focus**: Emphasizes strategic timing, quarterly pulse checks, and decision-critical insights over continuous monitoring.
-
-**October 10, 2025 - Critical Production Login Bug Fix**
--   **Issue**: Production users could login successfully but sidebar loaded while main content stayed on login page (not reproducible in dev).
--   **Root Cause**: Missing session cookie configuration - browsers rejected cookies on HTTPS without `Secure=True` flag, causing session loss after initial render.
--   **Fix**: Added environment-aware session cookie configuration (SameSite=Lax, Secure=True for production, HttpOnly, 7-day lifetime).
--   **Security**: Enhanced CSRF/XSS protection with proper cookie flags, HTTPS-only enforcement in production while maintaining HTTP compatibility for dev/test.
--   **Files**: app.py (session config), business_auth_routes.py (always permanent sessions).
-
-**October 10, 2025 - Phase 1 Performance Optimization**
--   **Frontend Performance**: Eliminated render-blocking Chart.js by moving to bottom with defer attribute, added CDN resource hints (preconnect, dns-prefetch) for 100-200ms faster external resource loading.
--   **Database Connection Pool**: Enabled OPTIMIZE_DB_POOL flag by default - increased pool_size to 30, max_overflow to 70 (100 total connections), reduced timeout to 20s for faster failure detection. Capacity increased from 50 to 200+ concurrent users.
--   **Full-Text Search Optimization**: Added PostgreSQL GIN index with automatic tsvector column for conversation_history, reducing search time from 2000ms to <50ms on large datasets (40x faster). Trigger-based auto-update ensures real-time search index maintenance.
--   **Impact**: Initial page load reduced from 2-5s to <0.5s (10x faster), database concurrency increased 4x, text search future-proofed for millions of records.
-
-**October 10, 2025 - Sentry Error Monitoring Integration**
--   **Sentry Integration**: Activated Sentry error tracking with production environment monitoring, 10% performance trace sampling, and automatic 500 error capture.
--   **Error Context**: Enhanced error reports with UI version tracking, user context, and request metadata for better debugging.
--   **Clean Navbar UX**: Simplified authenticated user navbar to display only user name (no dropdown) - all actions moved to sidebar for cleaner v2 design.
--   **Consistent Mobile Navigation**: Hamburger menu stays on right side for unauthenticated users, creating predictable layout with left space reserved for sidebar toggle.
-
-**October 10, 2025 - Multi-Tenant Branding & Mobile UX Enhancement**
--   **Multi-Tenant Logo System**: Business account logos display in v2 UI sidebar header (80px height, 220px width max) for authenticated users; Removed duplicate Rivvalue logo/title from top banner for cleaner UI.
--   **Selective Trial Branding**: Archelo demo logo now appears ONLY on trial pages (demo_intro, dashboard) via endpoint-based context filtering, keeping Home page clean and brand-neutral for marketing.
--   **User Display Enhancement**: Fixed navbar dropdown to show user's actual name instead of company name via session['business_user_name'] storage.
--   **Mobile Navigation Fix**: User dropdown now always visible outside collapsible menu on mobile, preventing sidebar overlay conflicts with z-index hierarchy (dropdown: 10003 > sidebar: 10002 > navbar: 10000).
--   **Context Processor Logic**: Intelligent branding_context injection based on authentication state and route endpoint (trial_pages: ['demo_intro', 'dashboard']).
--   **Testing**: Architect-approved with verified multi-tenant isolation, selective logo display, mobile UX improvements, and no functional regressions.
+The Voice of Client (VOÏA) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. Its purpose is to convert raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA provides businesses, particularly Rivvalue Inc., with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project features a production-ready multi-tenant participant management system with extensive email delivery capabilities and AI-powered survey functionalities.
 
 # User Preferences
 Preferred communication style: Simple, everyday language.
@@ -59,19 +7,19 @@ User interface tone: Thought leadership and research-oriented language, avoiding
 Project customization: Rivvalue Inc. branding and conversational AI surveys for enhanced user experience.
 
 # System Architecture
-The system is a Flask web application with a multi-tiered architecture. The frontend uses Jinja2, Bootstrap 5 (dark theme), custom CSS, vanilla JavaScript, and Chart.js. The backend is Flask with SQLAlchemy ORM, designed for scalability from SQLite to PostgreSQL. AI integration, primarily via OpenAI API, handles natural language processing, sentiment analysis, and conversational surveys (VOÏA), supplemented by TextBlob.
+The system is a Flask web application with a multi-tiered architecture. The frontend uses Jinja2, Bootstrap 5, custom CSS, vanilla JavaScript, and Chart.js. The backend is Flask with SQLAlchemy ORM, designed for scalability from SQLite to PostgreSQL. AI integration, primarily via OpenAI API, handles natural language processing, sentiment analysis, and conversational surveys (VOÏA), supplemented by TextBlob.
 
 Key architectural decisions and features:
--   **UI/UX**: Multi-step survey forms, interactive dashboards, chat-style interfaces for conversational surveys, and Rivvalue Inc. branding with a professional blue color scheme. Modern sidebar navigation with dark gradient theme and VOÏA red accents, mobile responsiveness, and active state highlighting. The Settings Hub features a 4-card layout (Account Settings, User Management, Data Management, System Settings) with reusable components.
+-   **UI/UX**: Multi-step survey forms, interactive dashboards, chat-style interfaces for conversational surveys, and Rivvalue Inc. branding with a professional blue color scheme. Modern sidebar navigation with dark gradient theme and VOÏA red accents, mobile responsiveness, and active state highlighting. The Settings Hub features a 4-card layout with reusable components. Modernized dashboard and campaign pages feature consistent typography (Montserrat headings, Karla body), clean white backgrounds with #E13A44 red accents, lighter shadows, and standardized badge styling. The home page features a minimalist design with red accent borders for features and optimized mobile layouts.
 -   **Technical Implementations**:
     -   **Survey Collection**: Multi-step forms with dynamic follow-up questions and real-time validation.
     -   **AI Analysis Engine**: Sentiment analysis, key theme extraction, churn risk assessment, growth opportunity identification, and NPS-based growth factor analysis.
     -   **Conversational Surveys**: AI-powered (GPT-4o) natural language interface, dynamic question generation, real-time processing, and structured data extraction.
     -   **Data Management**: Centralized data aggregation, NPS calculation, time-based filtering, and optimized database queries.
-    -   **Authentication**: JWT token-based with email validation, admin roles, server-side token generation, and automatic invalidation post-survey.
-    -   **Performance**: PostgreSQL migration, database indexing, connection pooling, asynchronous background tasks for AI, IP-based rate limiting, optimized dashboard queries, and admin-configurable response caching.
--   **Security**: Token-based authentication, duplicate response prevention, enhanced rate limiting, and robust input validation.
--   **Branding**: "VOÏA - Voice Of Client" with "AI Powered Client Insights" subtitle and a specific tagline.
+    -   **Authentication**: JWT token-based with email validation, admin roles, server-side token generation, and automatic invalidation post-survey. Session management includes environment-aware cookie configuration for security.
+    -   **Performance**: PostgreSQL migration, database indexing (including GIN index for full-text search), connection pooling, asynchronous background tasks for AI, IP-based rate limiting, optimized dashboard queries, admin-configurable response caching, and frontend optimizations (deferring Chart.js, CDN resource hints).
+-   **Security**: Token-based authentication, duplicate response prevention, enhanced rate limiting, and robust input validation. CSRF/XSS protection via proper cookie flags. Sentry error monitoring integration.
+-   **Branding**: "VOÏA - Voice Of Client" with "AI Powered Client Insights" subtitle and a specific tagline. Multi-tenant logo system and selective trial branding.
 -   **Multi-Tenant Architecture**: Business Accounts, Campaigns, and Participants with tenant isolation via `business_account_id` scoping, dual authentication, and a token system for survey access. Includes a lightweight scheduler for campaign lifecycle automation.
 -   **Email Delivery System**: Custom SMTP configuration per business account with encrypted password storage, connection testing, professional VOÏA-branded templates, background task processing, and delivery tracking.
 -   **Campaign Lifecycle Management**: Automated status transitions, multi-tenant scheduling, automatic KPI snapshot generation, and background task management for email retries.
@@ -79,7 +27,6 @@ Key architectural decisions and features:
 -   **License Management System**: Enterprise-ready license management with usage tracking and enforcement, including anniversary-based calculation, and limits on campaigns, users, and participants.
 -   **Business Account User Management**: Multi-tenant user management with a professional UI, license-aware counters, user creation workflows with validation, email verification, editing, role management, status controls, and admin-triggered password resets.
 -   **Mandatory Onboarding System**: Extensible guided setup workflow for business account administrators with JSON-based progress tracking, license-conditional enforcement, and configurable validation system.
--   **Performance Optimization System**: Query optimization consolidating dashboard data retrieval, Flask-Caching integration with configurable settings, strategic database indexing, and an automatic fallback strategy for queries. Multi-tenant cache isolation.
 -   **Feature Flag System**: Production-ready infrastructure for UI version toggling with environment variable control, rollout percentage, and user toggling.
 
 # External Dependencies
@@ -88,3 +35,4 @@ Key architectural decisions and features:
 -   **Chart.js CDN**: For interactive data visualizations.
 -   **Font Awesome CDN**: For iconography.
 -   **Python Packages**: Flask, SQLAlchemy, OpenAI client library, TextBlob, cryptography, Flask-Caching.
+-   **Sentry**: For error tracking and performance monitoring.

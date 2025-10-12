@@ -9,24 +9,21 @@
 /* Campaign management styling */
 
 .create-campaign-btn {
-    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
-    border: 2px solid var(--primary-red);
+    background: var(--primary-red);
+    border: none;
     color: var(--primary-white) !important;
     padding: 0.75rem 1.5rem;
-    border-radius: var(--radius-xl);
+    border-radius: 12px;
     font-weight: 600;
-    font-size: var(--font-size-lg);
-    box-shadow: var(--shadow-lg);
+    font-size: var(--font-size-base);
     transition: all 0.3s ease;
     text-decoration: none;
 }
 
 .create-campaign-btn:hover {
-    background: linear-gradient(135deg, var(--red-hover) 0%, var(--primary-red) 100%);
-    border-color: var(--red-hover);
+    background: var(--red-hover);
     color: var(--primary-white) !important;
     transform: translateY(-2px);
-    box-shadow: var(--shadow-xl);
 }
 
 .create-campaign-btn:active {
@@ -97,28 +94,28 @@
 }
 
 .status-filter.all {
-    background-color: var(--medium-gray);
-    color: var(--primary-white);
+    background-color: #f5f5f5;
+    color: #1a1a1a;
 }
 
 .status-filter.draft {
-    background-color: var(--light-gray);
-    color: var(--gray-dark);
+    background-color: #f5f5f5;
+    color: #6b7280;
 }
 
 .status-filter.ready {
-    background-color: var(--red-light);
+    background-color: rgba(225, 58, 68, 0.1);
     color: var(--primary-red);
 }
 
 .status-filter.active {
-    background-color: #d4edda;
-    color: #155724;
+    background-color: rgba(225, 58, 68, 0.1);
+    color: var(--primary-red);
 }
 
 .status-filter.completed {
-    background-color: #e2e3ff;
-    color: #5a2d91;
+    background-color: #f5f5f5;
+    color: #6b7280;
 }
 
 .status-filter.active-filter {
@@ -129,10 +126,10 @@
 /* List View Styles */
 .campaigns-table {
     background: var(--primary-white);
-    border-radius: var(--radius-xl);
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--light-gray);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid #e5e5e5;
 }
 
 .campaigns-table table {
@@ -174,23 +171,23 @@
 }
 
 .status-draft {
-    background-color: var(--light-gray);
-    color: var(--gray-dark);
+    background-color: #f5f5f5;
+    color: #6b7280;
 }
 
 .status-ready {
-    background-color: var(--red-light);
+    background-color: rgba(225, 58, 68, 0.1);
     color: var(--primary-red);
 }
 
 .status-active {
-    background-color: #d4edda;
-    color: #155724;
+    background-color: rgba(225, 58, 68, 0.1);
+    color: var(--primary-red);
 }
 
 .status-completed {
-    background-color: #e2e3ff;
-    color: #5a2d91;
+    background-color: #f5f5f5;
+    color: #6b7280;
 }
 
 .table-actions {
@@ -220,17 +217,17 @@
 /* Grid View Styles */
 .campaigns-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 350px), 1fr));
     gap: var(--spacing-xl);
     margin-bottom: 2rem;
 }
 
 .campaign-card {
     background: var(--primary-white);
-    border-radius: var(--radius-2xl);
+    border-radius: 16px;
     padding: var(--spacing-xl);
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--light-gray);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid #e5e5e5;
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
@@ -242,7 +239,7 @@
 
 .campaign-card:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-xl);
+    box-shadow: var(--shadow-md);
     border-color: var(--primary-red);
 }
 
@@ -348,18 +345,16 @@
 
 <div class="container">
     <!-- Campaign Header -->
-    <div class="header-gradient-primary" style="padding: var(--spacing-xl); margin-bottom: var(--spacing-xl);">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1 class="page-title mb-1">Campaign Management</h1>
-                    <p class="page-subtitle mb-0">Manage survey campaigns for {{ business_account.name }}</p>
-                </div>
-                <div class="col-md-4 text-end">
-                    <a href="{{ url_for('campaigns.create_campaign') }}" class="btn btn-primary create-campaign-btn">
-                        <i class="fas fa-plus me-2"></i>Create Campaign
-                    </a>
-                </div>
+    <div class="bg-white border-bottom" style="padding: 2.5rem 0; margin-bottom: 2rem;">
+        <div class="row align-items-center">
+            <div class="col-md-8 mb-3 mb-md-0">
+                <h1 class="h2 mb-2">Campaign Management</h1>
+                <p class="text-muted mb-0">Manage survey campaigns for {{ business_account.name }}</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{{ url_for('campaigns.create_campaign') }}" class="btn btn-primary create-campaign-btn">
+                    <i class="fas fa-plus me-2"></i>Create Campaign
+                </a>
             </div>
         </div>
     </div>

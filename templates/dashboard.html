@@ -9,29 +9,27 @@
 <div class="container">
     <div data-page="dashboard"></div>
     <!-- Dashboard Header -->
-    <div class="header-gradient-primary" style="padding: var(--spacing-xl); margin-bottom: var(--spacing-xl);">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-8 mb-3 mb-md-0">
-                    <h1 class="page-title mb-1">Business Intelligence</h1>
-                    <p class="page-subtitle mb-0">Comprehensive customer feedback insights and analysis</p>
-                </div>
-                <div class="col-12 col-md-4 text-center text-md-end">
-                    <div class="d-flex align-items-center justify-content-center justify-content-md-end gap-3">
-                        <!-- Export Response Data - Only for trial/public users -->
-                        {% if not is_business_authenticated %}
-                        <button class="btn btn-outline-secondary btn-sm dashboard-btn" onclick="exportUserData()">
-                            <i class="fas fa-user-circle me-2"></i>Export Response Data
-                        </button>
-                        {% endif %}
-                        
-                        <!-- Refresh Icon -->
-                        <button class="btn btn-sm btn-link text-muted p-1" 
-                                onclick="refreshData()" 
-                                title="Refresh data">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
+    <div class="bg-white border-bottom" style="padding: 2.5rem 0; margin-bottom: 2rem;">
+        <div class="row align-items-center">
+            <div class="col-12 col-md-8 mb-3 mb-md-0">
+                <h1 class="h2 mb-2">Business Intelligence</h1>
+                <p class="text-muted mb-0">Comprehensive customer feedback insights and analysis</p>
+            </div>
+            <div class="col-12 col-md-4 text-center text-md-end">
+                <div class="d-flex align-items-center justify-content-center justify-content-md-end gap-3">
+                    <!-- Export Response Data - Only for trial/public users -->
+                    {% if not is_business_authenticated %}
+                    <button class="btn btn-outline-secondary btn-sm" onclick="exportUserData()">
+                        <i class="fas fa-user-circle me-2"></i>Export Response Data
+                    </button>
+                    {% endif %}
+                    
+                    <!-- Refresh Icon -->
+                    <button class="btn btn-sm btn-link text-muted p-1" 
+                            onclick="refreshData()" 
+                            title="Refresh data">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -42,13 +40,12 @@
         <!-- Campaign Analytics Filter (Only for Insights) -->
         <div class="row mb-3">
             <div class="col-12">
-                <div class="card-standard shadow-card">
-                    <div class="card-body py-3">
-                        <div class="row align-items-center">
-                            <div class="col-md-6">
-                                <h6 class="mb-0" style="font-family: var(--font-family-headings); font-weight: 600;"><i class="fas fa-filter me-2 text-primary"></i>Campaign Analytics Filter</h6>
-                                <small class="helper-text">Compare KPIs across different campaigns</small>
-                            </div>
+                <div class="bg-white border rounded" style="padding: 1.5rem;">
+                    <div class="row align-items-center">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <h6 class="mb-1"><i class="fas fa-filter me-2" style="color: #E13A44;"></i>Campaign Analytics Filter</h6>
+                            <small class="text-muted">Compare KPIs across different campaigns</small>
+                        </div>
                             <div class="col-md-6">
                                 <div class="d-flex gap-2 align-items-center flex-wrap">
                                     <label for="campaignFilter" class="form-label mb-0 me-2">Campaign:</label>
@@ -68,8 +65,8 @@
                                         <span class="badge" id="selectedCampaignStatus">
                                             <span class="campaign-status-text"></span>
                                         </span>
-                                        <span class="badge bg-info" id="selectedCampaignDaysLeft" style="display: none;">
-                                            <i class="fas fa-clock me-1"></i><span class="campaign-days-text"></span>
+                                        <span class="badge text-dark border" id="selectedCampaignDaysLeft" style="display: none; background: #f5f5f5;">
+                                            <i class="fas fa-clock me-1" style="color: #E13A44;"></i><span class="campaign-days-text"></span>
                                         </span>
                                     </div>
                                 </div>
@@ -81,7 +78,7 @@
         </div>
     
     <!-- Main Navigation Tabs -->
-    <ul class="nav nav-tabs dashboard-tabs mb-3" id="dashboardNav" role="tablist" style="font-family: var(--font-family-headings); border-bottom: 2px solid var(--medium-gray);">
+    <ul class="nav nav-tabs mb-4" id="dashboardNav" role="tablist" style="border-bottom: 1px solid #e5e5e5;">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
                 <i class="fas fa-tachometer-alt me-2"></i>Overview
@@ -127,12 +124,12 @@
             <!-- Active Campaign Banner -->
             <div class="row mb-3" id="activeCampaignBanner" style="display: none;">
                 <div class="col-12">
-                    <div class="alert alert-primary d-flex align-items-center border-0" style="background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);">
-                        <i class="fas fa-bullhorn me-3 text-white"></i>
-                        <div class="text-white">
+                    <div class="alert d-flex align-items-center border rounded" style="background: #fff; border-color: #E13A44 !important; padding: 1rem;">
+                        <i class="fas fa-bullhorn me-3" style="color: #E13A44;"></i>
+                        <div>
                             <strong>Survey Insights</strong> - Currently showing data from active campaign: 
                             <span id="activeCampaignName" class="fw-bold">Campaign Name</span>
-                            <span class="ms-2" id="activeCampaignDates">Jan 1 - Dec 31, 2024</span>
+                            <span class="ms-2 text-muted" id="activeCampaignDates">Jan 1 - Dec 31, 2024</span>
                         </div>
                     </div>
                 </div>
@@ -281,7 +278,7 @@
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div>
                                     <span id="accountIntelCount" class="text-muted">Loading...</span>
-                                    <span id="accountIntelFiltersActive" class="badge bg-primary ms-2" style="display: none;"></span>
+                                    <span id="accountIntelFiltersActive" class="badge ms-2" style="display: none; background: rgba(225, 58, 68, 0.1); color: #E13A44;"></span>
                                 </div>
                                 <button class="btn btn-sm btn-outline-secondary" id="accountIntelClearFilters" 
                                         onclick="clearAccountIntelFilters()" style="display: none;">
