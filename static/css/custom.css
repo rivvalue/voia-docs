@@ -1249,20 +1249,10 @@ html .kpi-card.kpi-warning {
     color: inherit !important;
 }
 
-.kpi-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 16%;
-    height: 3px;
-    background: var(--primary-red);
-    transition: all 0.2s ease;
-}
-
 .kpi-card:hover {
     border-color: var(--primary-red);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
 }
 
 .kpi-value {
@@ -1271,6 +1261,7 @@ html .kpi-card.kpi-warning {
     line-height: var(--line-height-tight);
     margin-bottom: var(--spacing-sm);
     font-family: var(--font-family-mono);
+    color: var(--primary-black);
 }
 
 .kpi-value.text-primary,
@@ -1278,7 +1269,7 @@ html .kpi-card.kpi-warning {
 .kpi-value.text-info,
 .kpi-value.text-warning,
 .kpi-value.text-danger { 
-    color: var(--primary-red) !important; 
+    color: var(--primary-black) !important; 
 }
 
 .kpi-label {

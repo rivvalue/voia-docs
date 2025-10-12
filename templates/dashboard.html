@@ -38,7 +38,7 @@
 <!-- Campaign Filter - Always Visible (like hero banner) -->
 <div class="dashboard-navigation mb-4">
         <!-- Campaign Analytics Filter (Only for Insights) -->
-        <div class="row mb-3">
+        <div class="row mb-4">
             <div class="col-12">
                 <div class="bg-white border rounded" style="padding: 1.5rem;">
                     <div class="row align-items-center">
@@ -122,7 +122,7 @@
         <!-- Overview Tab -->
         <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
             <!-- Active Campaign Banner -->
-            <div class="row mb-3" id="activeCampaignBanner" style="display: none;">
+            <div class="row mb-4" id="activeCampaignBanner" style="display: none;">
                 <div class="col-12">
                     <div class="alert d-flex align-items-center border rounded" style="background: #fff; border-color: #E13A44 !important; padding: 1rem;">
                         <i class="fas fa-bullhorn me-3" style="color: #E13A44;"></i>
@@ -627,9 +627,9 @@
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="card border-0 shadow-sm">
-                        <div class="card-header" style="background: linear-gradient(135deg, rgba(225, 58, 68, 0.6) 0%, rgba(197, 45, 54, 0.6) 100%); color: white;">
+                        <div class="card-header bg-white" style="border-left: 4px solid var(--primary-red);">
                             <h4 class="mb-0"><i class="fas fa-chart-line me-2"></i>Executive Summary Analysis</h4>
-                            <small>Compare key metrics and account intelligence between different campaigns</small>
+                            <small class="text-muted">Compare key metrics and account intelligence between different campaigns</small>
                         </div>
                         <div class="card-body">
                             <!-- KPI Overview Table -->
@@ -966,8 +966,8 @@
 <div class="modal fade" id="kpiTrendsModal" tabindex="-1" aria-labelledby="kpiTrendsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
-            <div class="modal-header" style="background-color: #E9E8E4; border-bottom: 2px solid #BDBDBD;">
-                <h5 class="modal-title" id="kpiTrendsModalLabel" style="color: #000000;">
+            <div class="modal-header bg-white border-bottom">
+                <h5 class="modal-title" id="kpiTrendsModalLabel">
                     <i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>Campaign KPI Trends
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -975,9 +975,9 @@
             <div class="modal-body" style="background-color: #FFFFFF;">
                 <div class="row">
                     <div class="col-lg-6 mb-4">
-                        <div class="card" style="border: 1px solid #E9E8E4;">
-                            <div class="card-header" style="background-color: #E9E8E4; border-bottom: 1px solid #BDBDBD;">
-                                <h6 class="mb-0" style="color: #000000;">Responses</h6>
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Responses</h6>
                             </div>
                             <div class="card-body">
                                 <canvas id="modal-chart-responses" height="250"></canvas>
@@ -985,9 +985,9 @@
                         </div>
                     </div>
                     <div class="col-lg-6 mb-4">
-                        <div class="card" style="border: 1px solid #E9E8E4;">
-                            <div class="card-header" style="background-color: #E9E8E4; border-bottom: 1px solid #BDBDBD;">
-                                <h6 class="mb-0" style="color: #000000;">NPS Score</h6>
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">NPS Score</h6>
                             </div>
                             <div class="card-body">
                                 <canvas id="modal-chart-nps" height="250"></canvas>
@@ -995,9 +995,9 @@
                         </div>
                     </div>
                     <div class="col-lg-6 mb-4">
-                        <div class="card" style="border: 1px solid #E9E8E4;">
-                            <div class="card-header" style="background-color: #E9E8E4; border-bottom: 1px solid #BDBDBD;">
-                                <h6 class="mb-0" style="color: #000000;">Companies Analyzed</h6>
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Companies Analyzed</h6>
                             </div>
                             <div class="card-body">
                                 <canvas id="modal-chart-companies" height="250"></canvas>
@@ -1005,49 +1005,49 @@
                         </div>
                     </div>
                     <div class="col-lg-6 mb-4">
-                        <div class="card" style="border: 1px solid #E9E8E4;">
-                            <div class="card-header" style="background-color: #E9E8E4; border-bottom: 1px solid #BDBDBD;">
-                                <h6 class="mb-0" style="color: #000000;">Critical Risk</h6>
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Critical Risk</h6>
                             </div>
                             <div class="card-body">
                                 <canvas id="modal-chart-critical" height="250"></canvas>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6 mb-3">
-                        <div class="card" style="border: 1px solid #E9E8E4;">
-                            <div class="card-header" style="background-color: #E9E8E4; border-bottom: 1px solid #BDBDBD;">
-                                <h6 class="mb-0" style="color: #000000;">Satisfaction</h6>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Satisfaction</h6>
                             </div>
                             <div class="card-body">
                                 <canvas id="modal-chart-satisfaction" height="250"></canvas>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6 mb-3">
-                        <div class="card" style="border: 1px solid #E9E8E4;">
-                            <div class="card-header" style="background-color: #E9E8E4; border-bottom: 1px solid #BDBDBD;">
-                                <h6 class="mb-0" style="color: #000000;">Product Value</h6>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Product Value</h6>
                             </div>
                             <div class="card-body">
                                 <canvas id="modal-chart-product" height="250"></canvas>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6 mb-3">
-                        <div class="card" style="border: 1px solid #E9E8E4;">
-                            <div class="card-header" style="background-color: #E9E8E4; border-bottom: 1px solid #BDBDBD;">
-                                <h6 class="mb-0" style="color: #000000;">Pricing</h6>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Pricing</h6>
                             </div>
                             <div class="card-body">
                                 <canvas id="modal-chart-pricing" height="250"></canvas>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6 mb-3">
-                        <div class="card" style="border: 1px solid #E9E8E4;">
-                            <div class="card-header" style="background-color: #E9E8E4; border-bottom: 1px solid #BDBDBD;">
-                                <h6 class="mb-0" style="color: #000000;">Service</h6>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Service</h6>
                             </div>
                             <div class="card-body">
                                 <canvas id="modal-chart-service" height="250"></canvas>
@@ -1056,8 +1056,8 @@
                     </div>
                 </div>
             </div>
-            <div class="modal-footer" style="background-color: #E9E8E4; border-top: 2px solid #BDBDBD;">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="background-color: #BDBDBD; border-color: #BDBDBD; color: #000000;">Close</button>
+            <div class="modal-footer bg-white border-top">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
