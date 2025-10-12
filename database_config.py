@@ -31,41 +31,43 @@ class DatabaseConfig:
         if env == "production":
             if optimize_db_pool:
                 # Stage 2: Optimized production settings for high concurrency
+                # pool_recycle: 180s (Neon serverless timeout is ~180s, recycle before timeout)
                 return {
-                    "pool_recycle": 300,
+                    "pool_recycle": 180,  # Optimized for Neon serverless PostgreSQL timeout
                     "pool_pre_ping": True,
-                    "pool_size": 50,  # Increased for Stage 2
-                    "max_overflow": 100,  # Increased for Stage 2
+                    "pool_size": 10,  # Balanced for concurrent requests
+                    "max_overflow": 20,  # Allow burst traffic
                     "pool_timeout": 20,  # Reduced timeout for faster failure detection
                     "echo": False,  # Disable SQL logging in production
                     "execution_options": {"isolation_level": "READ_COMMITTED"},  # Optimize transaction isolation
                 }
             else:
                 return {
-                    "pool_recycle": 300,
+                    "pool_recycle": 180,  # Optimized for Neon timeout
                     "pool_pre_ping": True,
-                    "pool_size": 30,  # Higher pool size for production
-                    "max_overflow": 70,
+                    "pool_size": 10,
+                    "max_overflow": 20,
                     "pool_timeout": 30,
                 }
         else:
             if optimize_db_pool:
                 # Stage 2: Optimized demo/development settings
+                # pool_recycle: 180s to prevent Neon timeout issues
                 return {
-                    "pool_recycle": 300,
+                    "pool_recycle": 180,  # Optimized for Neon serverless PostgreSQL timeout
                     "pool_pre_ping": True,
-                    "pool_size": 30,  # Increased for Stage 2
-                    "max_overflow": 70,  # Increased for Stage 2
+                    "pool_size": 10,  # Balanced for development
+                    "max_overflow": 20,  # Sufficient for burst traffic
                     "pool_timeout": 20,  # Reduced timeout
                     "echo": False,  # Disable SQL logging for performance
                     "execution_options": {"isolation_level": "READ_COMMITTED"},
                 }
             else:
                 return {
-                    "pool_recycle": 300,
+                    "pool_recycle": 180,  # Optimized for Neon timeout
                     "pool_pre_ping": True,
-                    "pool_size": 20,
-                    "max_overflow": 50,
+                    "pool_size": 10,
+                    "max_overflow": 20,
                     "pool_timeout": 30,
                 }
     
