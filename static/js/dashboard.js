@@ -1852,6 +1852,7 @@ function populateHighRiskAccounts() {
                            onmouseout="this.style.textDecoration='none';"
                            title="Click to view all responses from ${escapeHtml(account.company_name)}">
                             ${escapeHtml(account.company_name)}
+                            <i class="fas fa-external-link-alt ms-2" style="font-size: 0.7em; color: #8A8A8A;"></i>
                         </a>
                     </h6>
                     <small class="text-muted">NPS Score: ${escapeHtml(account.nps_score)}</small>
