@@ -41,36 +41,45 @@
         <div class="row mb-4">
             <div class="col-12">
                 <div class="bg-white border rounded" style="padding: 1.5rem;">
-                    <div class="row align-items-center">
-                        <div class="col-md-6 mb-3 mb-md-0">
+                    <!-- Header -->
+                    <div class="row mb-3">
+                        <div class="col-12">
                             <h6 class="mb-1"><i class="fas fa-filter me-2" style="color: #E13A44;"></i>Campaign Analytics Filter</h6>
                             <small class="text-muted">Compare KPIs across different campaigns</small>
                         </div>
-                            <div class="col-md-6">
-                                <div class="d-flex gap-2 align-items-center flex-wrap">
-                                    <label for="campaignFilter" class="form-label mb-0 me-2">Campaign:</label>
-                                    <select class="form-select flex-grow-1" id="campaignFilter" onchange="applyCampaignFilter()" style="max-width: 300px;">
-                                        <option value="">Select Campaign</option>
-                                        <!-- Will be populated by JavaScript -->
-                                    </select>
-                                    <button class="btn btn-outline-secondary btn-sm" onclick="clearCampaignFilter()" title="Clear Filter">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                    
-                                    <!-- Inline Campaign Info Badges -->
-                                    <div id="selectedCampaignInfo" class="d-flex gap-2 align-items-center" style="display: none;">
-                                        <span class="badge bg-light text-dark border" id="selectedCampaignDates">
-                                            <i class="fas fa-calendar-alt me-1"></i><span class="campaign-dates-text"></span>
-                                        </span>
-                                        <span class="badge" id="selectedCampaignStatus">
-                                            <span class="campaign-status-text"></span>
-                                        </span>
-                                        <span class="badge text-dark border" id="selectedCampaignDaysLeft" style="display: none; background: #f5f5f5;">
-                                            <i class="fas fa-clock me-1" style="color: #E13A44;"></i><span class="campaign-days-text"></span>
-                                        </span>
-                                    </div>
-                                </div>
+                    </div>
+                    
+                    <!-- Filter Controls -->
+                    <div class="row align-items-center mb-2">
+                        <div class="col-12 col-md-auto mb-2 mb-md-0">
+                            <label for="campaignFilter" class="form-label mb-0">Campaign:</label>
+                        </div>
+                        <div class="col-12 col-md">
+                            <div class="d-flex gap-2 align-items-center">
+                                <select class="form-select" id="campaignFilter" onchange="applyCampaignFilter()" style="max-width: 400px;">
+                                    <option value="">Select Campaign</option>
+                                    <!-- Will be populated by JavaScript -->
+                                </select>
+                                <button class="btn btn-outline-secondary btn-sm" onclick="clearCampaignFilter()" title="Clear Filter">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Campaign Metadata (appears when campaign selected) -->
+                    <div id="selectedCampaignInfo" class="mt-3 pt-3 border-top" style="display: none; background-color: #f8f9fa; margin: 0 -1.5rem -1.5rem; padding: 1rem 1.5rem !important; border-radius: 0 0 0.375rem 0.375rem;">
+                        <div class="d-flex gap-2 align-items-center flex-wrap">
+                            <small class="text-muted me-2">Campaign Details:</small>
+                            <span class="badge bg-light text-dark border" id="selectedCampaignDates">
+                                <i class="fas fa-calendar-alt me-1"></i><span class="campaign-dates-text"></span>
+                            </span>
+                            <span class="badge" id="selectedCampaignStatus">
+                                <span class="campaign-status-text"></span>
+                            </span>
+                            <span class="badge text-dark border" id="selectedCampaignDaysLeft" style="display: none; background: #f5f5f5;">
+                                <i class="fas fa-clock me-1" style="color: #E13A44;"></i><span class="campaign-days-text"></span>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -200,7 +209,7 @@
                         <div class="card-header">
                             <h5>Key Themes</h5>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body" style="height: 380px;">
                             <div class="chart-container">
                                 <canvas id="themesChart"></canvas>
                             </div>
