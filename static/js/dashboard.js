@@ -1836,11 +1836,24 @@ function populateHighRiskAccounts() {
         return;
     }
     
+    // Get campaign info for drill-down
+    const campaignSelect = document.getElementById('campaignFilter');
+    const campaignId = campaignSelect && campaignSelect.value ? campaignSelect.value : null;
+    const campaignName = campaignSelect && campaignId ? campaignSelect.options[campaignSelect.selectedIndex].text : 'Current Campaign';
+    
     const html = highRiskAccounts.map(account => `
         <div class="risk-card p-3 mb-3 rounded">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h6 class="mb-1">${escapeHtml(account.company_name)}</h6>
+                    <h6 class="mb-1">
+                        <a href="#" onclick="openCompanyResponsesModal('${escapeHtml(account.company_name).replace(/'/g, "\\'")}', ${campaignId ? campaignId : 'null'}, '${escapeHtml(campaignName).replace(/'/g, "\\'")}'); return false;" 
+                           style="color: #2E5090; text-decoration: none; cursor: pointer;"
+                           onmouseover="this.style.textDecoration='underline';"
+                           onmouseout="this.style.textDecoration='none';"
+                           title="Click to view all responses from ${escapeHtml(account.company_name)}">
+                            ${escapeHtml(account.company_name)}
+                        </a>
+                    </h6>
                     <small class="text-muted">NPS Score: ${escapeHtml(account.nps_score)}</small>
                 </div>
                 <div class="text-end">
