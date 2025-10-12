@@ -13,6 +13,7 @@
     --red-hover: #C52D36;
     --red-light: #F5C6C7;
     --gray-dark: #8A8A8A;
+    --neutral-dark: #2B2B2B;
     
     /* Enhanced spacing system */
     --spacing-xs: 0.25rem;
@@ -1772,7 +1773,7 @@ a:hover {
 .nav-tabs .nav-link {
     font-family: var(--font-family-headings);
     font-weight: 500;
-    color: var(--gray-dark);
+    color: var(--neutral-dark);
     border: none;
     border-bottom: 3px solid transparent;
     background: none;
