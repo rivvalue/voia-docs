@@ -81,27 +81,27 @@
     <ul class="nav nav-tabs mb-4" id="dashboardNav" role="tablist" style="border-bottom: 1px solid #e5e5e5;">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
-                <i class="fas fa-tachometer-alt me-2"></i>Overview
+                <i class="fas fa-tachometer-alt me-2" style="color: #E13A44;"></i>Overview
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="intelligence-tab" data-bs-toggle="tab" data-bs-target="#intelligence" type="button" role="tab" aria-controls="intelligence" aria-selected="false">
-                <i class="fas fa-brain me-2"></i>Account Intelligence
+                <i class="fas fa-brain me-2" style="color: #E13A44;"></i>Account Intelligence
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="analytics" aria-selected="false">
-                <i class="fas fa-chart-line me-2"></i>Analytics
+                <i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>Analytics
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="survey-insights-tab" data-bs-toggle="tab" data-bs-target="#survey-insights" type="button" role="tab" aria-controls="survey-insights" aria-selected="false">
-                <i class="fas fa-comments me-2"></i>Survey Insights
+                <i class="fas fa-comments me-2" style="color: #E13A44;"></i>Survey Insights
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="comparison-tab" data-bs-toggle="tab" data-bs-target="#comparison" type="button" role="tab" aria-controls="comparison" aria-selected="false">
-                <i class="fas fa-chart-line me-2"></i>Executive Summary
+                <i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>Executive Summary
             </button>
         </li>
     </ul>
@@ -717,27 +717,37 @@
                                 </div>
                             </div>
 
-            <!-- Campaign Selection Section -->
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <label for="campaign1Select" class="form-label">Campaign 1</label>
-                    <select class="form-select" id="campaign1Select" onchange="updateComparison()">
-                        <option value="">Select first campaign</option>
-                    </select>
+            <!-- Campaign Comparison Selector -->
+            <div class="chart-card mb-4">
+                <div class="card-header">
+                    <h5>Campaign Comparison Selector</h5>
+                    <small class="text-muted">Select two campaigns to compare key metrics and account intelligence</small>
                 </div>
-                <div class="col-md-6">
-                    <label for="campaign2Select" class="form-label">Campaign 2</label>
-                    <select class="form-select" id="campaign2Select" onchange="updateComparison()">
-                        <option value="">Select second campaign</option>
-                    </select>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-5">
+                            <label for="campaign1Select" class="form-label fw-semibold">Campaign 1</label>
+                            <select class="form-select" id="campaign1Select" onchange="updateComparison()">
+                                <option value="">Select first campaign</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <i class="fas fa-exchange-alt fa-2x mt-4" style="color: #E13A44;"></i>
+                        </div>
+                        <div class="col-md-5">
+                            <label for="campaign2Select" class="form-label fw-semibold">Campaign 2</label>
+                            <select class="form-select" id="campaign2Select" onchange="updateComparison()">
+                                <option value="">Select second campaign</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- No Selection Message -->
+                    <div id="noComparisonMessage" class="text-center py-4 mt-3" style="background-color: #f8f9fa; border-radius: 8px;">
+                        <i class="fas fa-info-circle fa-2x mb-2" style="color: #E13A44;"></i>
+                        <p class="text-muted mb-0">Please select two campaigns above to view comparison results</p>
+                    </div>
                 </div>
-            </div>
-            
-            <!-- No Selection Message -->
-            <div id="noComparisonMessage" class="text-center py-5">
-                <i class="fas fa-exchange-alt fa-4x text-muted mb-3"></i>
-                <h5 class="text-muted">Select Campaigns to Compare</h5>
-                <p class="text-muted">Choose two campaigns above to compare their key metrics and account intelligence data.</p>
             </div>
             
             <!-- Comparison Results -->
