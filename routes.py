@@ -2709,9 +2709,19 @@ def get_campaign_comparison():
         if not campaign1 or not campaign2:
             return jsonify({'error': 'One or both campaigns not found or not accessible'}), 404
             
-        # Get dashboard data for both campaigns
-        data1 = get_dashboard_data(campaign_id=campaign1_id)
-        data2 = get_dashboard_data(campaign_id=campaign2_id)
+        # Get dashboard data for both campaigns using optimized cached path
+        from data_storage import get_dashboard_data_cached
+        
+        # Determine business account ID for proper data scoping
+        if current_business_user:
+            business_account_id = current_business_user.business_account_id
+        else:
+            from models import BusinessAccount
+            demo_account = BusinessAccount.query.filter_by(name='Archelo Group inc').first()
+            business_account_id = demo_account.id if demo_account else None
+        
+        data1 = get_dashboard_data_cached(campaign_id=campaign1_id, business_account_id=business_account_id)
+        data2 = get_dashboard_data_cached(campaign_id=campaign2_id, business_account_id=business_account_id)
         
         # Build comparison data
         comparison = {
