@@ -20,8 +20,8 @@
 
             <!-- Authentication Check -->
             {% if not authenticated %}
-            <div id="authCheck" class="card mb-4">
-                <div class="card-body text-center">
+            <div id="authCheck" class="card mb-4" style="box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: none;">
+                <div class="card-body text-center" style="padding: 2rem;">
                     <div class="alert alert-warning">
                         <i class="fas fa-key me-2"></i>
                         <strong>Authentication Required</strong>
@@ -29,7 +29,7 @@
                         {% if error %}
                         <p class="text-danger">{{ error }}</p>
                         {% endif %}
-                        <a href="/auth" class="btn btn-primary">Get Authentication Token</a>
+                        <a href="/auth" class="btn" style="background-color: #E13A44; border: none; color: white;">Get Authentication Token</a>
                     </div>
                 </div>
             </div>
@@ -37,12 +37,12 @@
 
             <!-- Survey Setup -->
             {% if authenticated %}
-            <div id="surveySetup" class="card mb-4">
-                <div class="card-header">
-                    <h5><i class="fas fa-user-circle me-2"></i>Let's Get Started</h5>
+            <div id="surveySetup" class="card mb-4" style="box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: none;">
+                <div class="card-header" style="background-color: #ffffff; border-bottom: 1px solid #e5e5e5;">
+                    <h5 class="mb-0"><i class="fas fa-user-circle me-2" style="color: #E13A44;"></i>Let's Get Started</h5>
                     <small class="text-muted">Authenticated as: {{ email }}</small>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="padding: 1.5rem;">
                     <form id="setupForm">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <div class="mb-3">
@@ -79,7 +79,7 @@
                                 <option value="More than 10 years">More than 10 years</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <button type="submit" class="btn btn-lg w-100" style="background-color: #E13A44; border: none; color: white; font-weight: 500; padding: 0.75rem;">
                             <i class="fas fa-comments me-2"></i>Start Conversation
                         </button>
                     </form>
@@ -87,8 +87,8 @@
             </div>
 
             <!-- Conversation Interface -->
-            <div id="conversationInterface" class="card" style="display: none;">
-                <div class="card-header d-flex justify-content-between align-items-center">
+            <div id="conversationInterface" class="card" style="display: none; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: none;">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #ffffff; border-bottom: 1px solid #e5e5e5;">
                     <h5 class="mb-0 voia-wordmark">VO<span class="voia-accent">Ï</span>A</h5>
                     <div class="progress" style="width: 200px;">
                         <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-danger" 
@@ -96,9 +96,9 @@
                     </div>
                 </div>
                 
-                <div class="card-body">
+                <div class="card-body" style="padding: 1.5rem;">
                     <!-- Chat Messages -->
-                    <div id="chatMessages" class="mb-4" style="height: 400px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.5rem; padding: 1rem;">
+                    <div id="chatMessages" class="mb-4" style="height: 400px; overflow-y: auto; background-color: #f8f9fa; border: none; border-radius: 0.5rem; padding: 1rem;">
                         <!-- Messages will be populated here -->
                     </div>
                     
@@ -107,12 +107,12 @@
                         <div class="input-group">
                             <textarea id="userInput" class="form-control" rows="3" 
                                       placeholder="Type your response here..."></textarea>
-                            <button id="sendButton" class="btn btn-primary" type="button">
+                            <button id="sendButton" class="btn" type="button" style="background-color: #E13A44; border: none; color: white;">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                         </div>
                         <div class="form-text">
-                            <i class="fas fa-lightbulb me-1"></i>
+                            <i class="fas fa-lightbulb me-1" style="color: #E13A44;"></i>
                             Tip: Speak naturally! VOÏA understands conversational responses.
                         </div>
                     </div>
@@ -120,9 +120,9 @@
             </div>
 
             <!-- Loading State -->
-            <div id="loadingState" class="card" style="display: none;">
-                <div class="card-body text-center">
-                    <div class="spinner-border text-primary mb-3" role="status">
+            <div id="loadingState" class="card" style="display: none; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: none;">
+                <div class="card-body text-center" style="padding: 3rem 2rem;">
+                    <div class="spinner-border mb-3" role="status" style="color: #E13A44;">
                         <span class="visually-hidden">Loading...</span>
                     </div>
                     <h5>VOÏA is processing your response...</h5>
@@ -131,17 +131,17 @@
             </div>
 
             <!-- Survey Complete -->
-            <div id="surveyComplete" class="card" style="display: none;">
-                <div class="card-body text-center">
+            <div id="surveyComplete" class="card" style="display: none; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: none;">
+                <div class="card-body text-center" style="padding: 3rem 2rem;">
                     <div class="success-icon mb-4">
-                        <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                        <i class="fas fa-check-circle" style="font-size: 4rem; color: #E13A44;"></i>
                     </div>
-                    <h4 class="text-success mb-3">Thank you for sharing with us your feedback.</h4>
+                    <h4 class="mb-3">Thank you for sharing your feedback.</h4>
                     <p class="lead mb-2">Your feedback has been successfully analyzed by VOÏA Intelligence.</p>
                     
                     <!-- Dashboard Button -->
                     <div class="mb-4">
-                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-lg" style="background-color: #E13A44; border: none; color: white;">
                             <i class="fas fa-chart-bar me-2"></i>View Analytics Dashboard
                         </a>
                     </div>
@@ -150,19 +150,19 @@
                     
                     <!-- Next Steps Section -->
                     <div class="border rounded p-4 mb-4" style="background-color: #f8f9fa;">
-                        <h5 class="mb-3"><i class="fas fa-rocket me-2 text-primary"></i>What's Next?</h5>
+                        <h5 class="mb-3"><i class="fas fa-rocket me-2" style="color: #E13A44;"></i>What's Next?</h5>
                         <p class="text-muted mb-3">Experience the full power of Voice of Client Agent for your organization.</p>
                         
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <button onclick="startNewSession()" class="btn btn-outline-primary btn-lg w-100">
+                                <button onclick="startNewSession()" class="btn btn-lg w-100" style="border: 1px solid #E13A44; color: #E13A44; background-color: white;">
                                     <i class="fas fa-redo me-2"></i>Try Another Session
                                 </button>
                                 <small class="text-muted d-block mt-2">Experience VOÏA with different scenarios</small>
                             </div>
                             <div class="col-md-6">
                                 <a href="mailto:info@rivvalue.com?subject=Voice of Client Agent - Full Service Inquiry&body=Hi Rivvalue team,%0A%0AI just completed the VOÏA Intelligence demonstration and I'm interested in learning more about implementing the full Voice of Client Agent service for my organization.%0A%0APlease contact me to discuss how this can benefit our customer feedback strategy.%0A%0AThank you!" 
-                                   class="btn btn-primary btn-lg w-100">
+                                   class="btn btn-lg w-100" style="background-color: #E13A44; border: none; color: white;">
                                     <i class="fas fa-envelope me-2"></i>Contact Rivvalue
                                 </a>
                                 <small class="text-muted d-block mt-2">Implement full VoC Agent for your business</small>
