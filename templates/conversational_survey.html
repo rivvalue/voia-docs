@@ -9,22 +9,13 @@
 <div class="container mt-4">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <!-- Survey Header -->
-            <div class="card mb-4">
-                <div class="card-header text-center">
-                    {% if branding and branding.logo_url %}
-                        <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}" height="50" class="mb-3">
-                    {% else %}
-                        <img src="{{ url_for('static', filename='rivvalue-logo.png') }}" alt="Rivvalue Inc." height="50" class="mb-3">
-                    {% endif %}
-                    <h4>AI Powered Client Insights</h4>
-                    <p class="text-muted">Have a natural conversation with VOÏA to share your feedback</p>
-                    {% if branding and branding.company_name %}
-                        <p style="color: #E13A44; font-size: 1.1rem; font-weight: 500;"><em>{{ branding.company_name }}: Hear what matters. Act on what counts.</em></p>
-                    {% else %}
-                        <p style="color: #E13A44; font-size: 1.1rem; font-weight: 500;"><em>VOÏA: Hear what matters. Act on what counts.</em></p>
-                    {% endif %}
-                </div>
+            <!-- Hero Section -->
+            <div class="hero-section text-center">
+                {% if branding and branding.logo_url %}
+                    <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}" height="60" class="mb-4">
+                {% endif %}
+                <h1 class="display-1 fw-bold mb-3" style="font-size: 6rem;">VO<span style="color: #E13A44;">Ï</span>A</h1>
+                <p class="fs-4 mb-4" style="color: #000000; font-weight: 400;">Share your experience</p>
             </div>
 
             <!-- Authentication Check -->
