@@ -1233,7 +1233,7 @@ function populateDashboard() {
         // Defer account intelligence (Analytics tab - not visible initially)
         setTimeout(() => loadAccountIntelligence(), 100);
         
-        // Defer KPI overview (Executive Summary tab - not visible initially)
+        // Defer KPI overview (Executive Summary section - below the fold initially)
         setTimeout(() => loadKpiOverview(), 150);
         
         // Defer survey responses (Survey Insights tab - not visible initially)
