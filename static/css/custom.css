@@ -82,6 +82,23 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+/* Section Spacing Utility */
+.section-spacing {
+    margin-block: 6rem;
+}
+
+@media (max-width: 992px) {
+    .section-spacing {
+        margin-block: 3rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .section-spacing {
+        margin-block: 2rem;
+    }
+}
+
 /* Typography Hierarchy - Headings use Montserrat */
 h1, .h1 {
     font-family: var(--font-family-headings);
