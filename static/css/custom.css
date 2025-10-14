@@ -88,10 +88,6 @@ body {
     margin-bottom: 6rem;
 }
 
-.section-spacing:last-child {
-    margin-bottom: 0;
-}
-
 @media (max-width: 992px) {
     .section-spacing {
         margin-bottom: 3rem;
