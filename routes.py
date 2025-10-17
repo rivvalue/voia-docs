@@ -3,6 +3,7 @@ from app import app, db, cache
 # Models imported inside functions to avoid circular imports
 from models import SurveyResponse, Participant, CampaignParticipant, Campaign
 from data_storage import get_dashboard_data
+from cache_config import cache_config
 from sqlalchemy.orm import joinedload
 from sqlalchemy import desc, or_
 
@@ -2676,6 +2677,7 @@ def get_campaign_filter_options():
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/campaigns/comparison')
+@cache.memoize(timeout=cache_config.get_timeout())
 def get_campaign_comparison():
     """Get comparison data between two campaigns (secure business user authentication)"""
     try:
