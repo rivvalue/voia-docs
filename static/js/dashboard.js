@@ -3217,11 +3217,17 @@ function populateCompanyNpsTable(companyData) {
 async function loadKpiOverview() {
     console.log('Loading KPI overview data...');
     const tbody = document.getElementById('kpiOverviewTableBody');
+    const loadingElement = document.getElementById('executiveSummaryLoading');
+    const contentElement = document.getElementById('executiveSummaryContent');
     
     if (!tbody) {
         console.error('kpiOverviewTableBody element not found!');
         return;
     }
+    
+    // Show loading, hide content
+    if (loadingElement) loadingElement.classList.remove('d-none');
+    if (contentElement) contentElement.classList.add('d-none');
     
     try {
         // First, load available campaigns
@@ -3323,9 +3329,17 @@ async function loadKpiOverview() {
         
         console.log(`KPI overview loaded successfully with ${kpiRows.length} campaigns`);
         
+        // Hide loading, show content
+        if (loadingElement) loadingElement.classList.add('d-none');
+        if (contentElement) contentElement.classList.remove('d-none');
+        
     } catch (error) {
         console.error('Error loading KPI overview:', error);
         tbody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error loading KPI overview data</td></tr>';
+        
+        // Hide loading, show content even on error
+        if (loadingElement) loadingElement.classList.add('d-none');
+        if (contentElement) contentElement.classList.remove('d-none');
     }
 }
 
