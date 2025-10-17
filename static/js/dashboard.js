@@ -535,6 +535,20 @@ async function updateComparison() {
         return;
     }
     
+    // Show loading state
+    if (messageDiv) {
+        messageDiv.innerHTML = `
+            <div class="text-center">
+                <div class="spinner-border" style="color: #E13A44;" role="status">
+                    <span class="visually-hidden">Loading comparison...</span>
+                </div>
+                <p class="text-muted mt-3 mb-0">Loading comparison data...</p>
+            </div>
+        `;
+        messageDiv.style.display = 'block';
+    }
+    if (resultsDiv) resultsDiv.style.display = 'none';
+    
     try {
         // Fetch comparison data
         const response = await fetch(`/api/campaigns/comparison?campaign1=${campaign1Id}&campaign2=${campaign2Id}`);
