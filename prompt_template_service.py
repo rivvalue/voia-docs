@@ -2,11 +2,25 @@
 Prompt Template Service for VOÏA Conversational Surveys
 Handles dynamic prompt generation based on BusinessAccount customization settings
 Supports dual-mode operation: demo (hardcoded) vs customer (customized)
+Hybrid Prompt Architecture: Structured JSON configuration + conversation guidance
 """
 
 import json
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from models import BusinessAccount, Campaign
+
+# Topic-to-Field Mapping for AI Response Validation and Analytics
+TOPIC_FIELD_MAP = {
+    "NPS": ["nps_score", "nps_reasoning"],
+    "Business Relationship Tenure": ["tenure_with_fc"],
+    "Overall Satisfaction": ["satisfaction_rating"],
+    "Professional Services Quality": ["service_rating"],
+    "Product Value": ["product_value_rating"],
+    "Pricing Value": ["pricing_rating"],
+    "Support Quality": ["service_rating"],
+    "Improvement Suggestions": ["improvement_feedback"],
+    "Additional Feedback": ["improvement_feedback"]
+}
 
 
 class PromptTemplateService:
@@ -375,6 +389,83 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
             return self.business_account.custom_end_message
         
         return f"Thank you so much for taking the time to share your detailed feedback about {company_name}! Your insights are incredibly valuable and will help us improve our service delivery. Have a wonderful day!"
+    
+    def _build_prioritized_topics_with_fields(self) -> List[Dict[str, Any]]:
+        """Build prioritized topics with database field mappings for hybrid prompt architecture"""
+        company_name = self.get_company_name()
+        
+        # Define base topics with field mappings
+        base_topics_map = [
+            {"topic": "Business Relationship Tenure", "description": f"How long working with {company_name}", "fields": TOPIC_FIELD_MAP["Business Relationship Tenure"]},
+            {"topic": "NPS", "description": f"How likely to recommend {company_name} (0-10 scale)", "fields": TOPIC_FIELD_MAP["NPS"]},
+            {"topic": "Overall Satisfaction", "description": f"Overall satisfaction with {company_name} (1-5 scale)", "fields": TOPIC_FIELD_MAP["Overall Satisfaction"]},
+            {"topic": "Professional Services Quality", "description": f"Quality of {company_name}'s professional services (1-5 scale)", "fields": TOPIC_FIELD_MAP["Professional Services Quality"]},
+            {"topic": "Product Value", "description": f"Value and quality of {company_name}'s products/solutions (1-5 scale)", "fields": TOPIC_FIELD_MAP["Product Value"]},
+            {"topic": "Pricing Value", "description": f"How they feel about {company_name}'s pricing value (1-5 scale)", "fields": TOPIC_FIELD_MAP["Pricing Value"]},
+            {"topic": "Support Quality", "description": f"Quality of {company_name}'s support and customer service (1-5 scale)", "fields": TOPIC_FIELD_MAP["Support Quality"]},
+            {"topic": "Improvement Suggestions", "description": f"What could {company_name} do better", "fields": TOPIC_FIELD_MAP["Improvement Suggestions"]},
+            {"topic": "Additional Feedback", "description": f"Any other comments about {company_name}", "fields": TOPIC_FIELD_MAP["Additional Feedback"]}
+        ]
+        
+        # Check campaign prioritized topics first
+        if (not self.is_demo_mode and 
+            self.campaign and 
+            self.campaign.prioritized_topics and 
+            isinstance(self.campaign.prioritized_topics, list)):
+            
+            # Map custom topics to field mappings where possible
+            custom_topics = []
+            for topic_name in self.campaign.prioritized_topics[:5]:
+                # Try to find matching base topic for field mapping
+                matched = next((t for t in base_topics_map if topic_name.lower() in t["topic"].lower() or t["topic"].lower() in topic_name.lower()), None)
+                if matched:
+                    custom_topics.append({"topic": topic_name, "description": matched["description"], "fields": matched["fields"]})
+                else:
+                    # Use generic mapping for unknown topics
+                    custom_topics.append({"topic": topic_name, "description": topic_name, "fields": ["improvement_feedback"]})
+            
+            # Merge with base topics
+            used_base_topics = [t for t in base_topics_map if not any(ct["topic"].lower() in t["topic"].lower() for ct in custom_topics)]
+            all_topics = custom_topics + used_base_topics[:10 - len(custom_topics)]
+        else:
+            all_topics = base_topics_map[:10]
+        
+        # Add priority order
+        for i, topic in enumerate(all_topics, 1):
+            topic["priority"] = i
+        
+        return all_topics
+    
+    def build_survey_config_json(self, participant_data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """Build structured survey configuration JSON for hybrid prompt architecture"""
+        company_name = self.get_company_name()
+        
+        # Build participant profile if data provided
+        participant_profile = None
+        if participant_data:
+            participant_profile = {
+                "name": participant_data.get("name"),
+                "email": participant_data.get("email"),
+                "company": participant_data.get("company_name"),
+                "role": participant_data.get("role"),
+                "region": participant_data.get("region"),
+                "customer_tier": participant_data.get("customer_tier"),
+                "language": participant_data.get("language", "en")
+            }
+        
+        # Build survey configuration
+        config = {
+            "goals": self._build_prioritized_topics_with_fields(),
+            "max_questions": self.get_max_questions(),
+            "max_duration_seconds": self.get_max_duration_seconds(),
+            "conversation_tone": self.get_conversation_tone(),
+            "company_name": company_name,
+            "industry": self.business_account.industry if self.business_account and hasattr(self.business_account, 'industry') else None,
+            "target_clients": self.business_account.target_clients_description if self.business_account and hasattr(self.business_account, 'target_clients_description') else None,
+            "participant_profile": participant_profile
+        }
+        
+        return config
     
     def get_effective_survey_config(self) -> Dict[str, Any]:
         """Get merged survey configuration from campaign and business account data"""
