@@ -29,6 +29,7 @@ The system is a Flask web application with a multi-tiered architecture. The fron
 -   **Business Account User Management**: Multi-tenant user management with professional UI, license-aware counters, and comprehensive user workflows.
 -   **Mandatory Onboarding System**: Extensible guided setup workflow for business account administrators.
 -   **Feature Flag System**: Production-ready infrastructure for UI version toggling.
+-   **Segmentation Analytics**: Comprehensive analytics system displaying NPS and satisfaction metrics segmented by participant attributes (role, region, customer tier). Includes a dedicated Segmentation Insights tab in Campaign Insights with interactive Chart.js visualizations showing NPS distribution across segments, detailed satisfaction ratings table, and historical preservation through campaign snapshots. Supports NULL handling by grouping unmapped participants as "Unspecified" for complete data coverage.
 
 # External Dependencies
 -   **OpenAI API**: For advanced AI functionalities including sentiment analysis, theme extraction, and conversational surveys.
