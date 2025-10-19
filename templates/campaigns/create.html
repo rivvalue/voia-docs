@@ -155,6 +155,72 @@
                 </div>
             </div>
 
+            <!-- Email Content Customization -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-envelope"></i>Invitation Email Content
+                </h3>
+                
+                <div class="mb-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="use_custom_email_content" name="use_custom_email_content">
+                        <label class="form-check-label" for="use_custom_email_content">
+                            <strong>Customize invitation email content for this campaign</strong>
+                        </label>
+                    </div>
+                    <div class="form-text">
+                        When enabled, customize the email sent to participants. Leave unchecked to use your account's default email templates.
+                    </div>
+                </div>
+
+                <div id="customContentFields" style="display: none;">
+                    <div class="mb-3">
+                        <label for="custom_subject_template" class="form-label">Email Subject</label>
+                        <input type="text" class="form-control" id="custom_subject_template" name="custom_subject_template" 
+                               maxlength="500" placeholder="Your feedback is requested: {campaign_name}">
+                        <div class="form-text">Available variables: {participant_name}, {campaign_name}, {business_account_name}</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="custom_intro_message" class="form-label">Introduction Message</label>
+                        <textarea class="form-control" id="custom_intro_message" name="custom_intro_message" 
+                                  rows="3" maxlength="2000" 
+                                  placeholder="{business_account_name} is requesting your valuable feedback through our Voice of Client system."></textarea>
+                        <div class="form-text">Opens the email body. Available variables: {participant_name}, {campaign_name}, {business_account_name}</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="custom_cta_text" class="form-label">Call-to-Action Button Text</label>
+                        <input type="text" class="form-control" id="custom_cta_text" name="custom_cta_text" 
+                               maxlength="100" placeholder="Complete Your Survey">
+                        <div class="form-text">Text displayed on the survey button</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="custom_closing_message" class="form-label">Closing Message</label>
+                        <textarea class="form-control" id="custom_closing_message" name="custom_closing_message" 
+                                  rows="4" maxlength="2000" 
+                                  placeholder="Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.
+
+Thank you for your time and valuable insights!"></textarea>
+                        <div class="form-text">Message before sign-off. Available variables: {participant_name}, {campaign_name}, {business_account_name}</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="custom_footer_note" class="form-label">Footer Note</label>
+                        <textarea class="form-control" id="custom_footer_note" name="custom_footer_note" 
+                                  rows="2" maxlength="1000" 
+                                  placeholder="This is an automated message. If you have any questions, please contact the organization that sent this survey."></textarea>
+                        <div class="form-text">Small print at the bottom of the email</div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Email Preview:</strong> After creating the campaign, you can preview the customized email from the campaign details page.
+                    </div>
+                </div>
+            </div>
+
             <!-- Form Actions -->
             <div class="d-flex justify-content-between">
                 <a href="{{ url_for('campaigns.list_campaigns') }}" class="btn btn-outline-secondary">
@@ -189,5 +255,21 @@ document.getElementById('end_date').addEventListener('change', function() {
         this.value = '';
     }
 });
+
+// Toggle custom email content fields
+function toggleCustomEmailContent() {
+    const checkbox = document.getElementById('use_custom_email_content');
+    const fieldsContainer = document.getElementById('customContentFields');
+    
+    if (checkbox.checked) {
+        fieldsContainer.style.display = 'block';
+    } else {
+        fieldsContainer.style.display = 'none';
+    }
+}
+
+// Initialize toggle on page load
+document.getElementById('use_custom_email_content').addEventListener('change', toggleCustomEmailContent);
+toggleCustomEmailContent(); // Initialize on page load
 </script>
 {% endblock %}
