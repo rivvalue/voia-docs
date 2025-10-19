@@ -241,8 +241,75 @@ class PromptTemplateService:
         
         return f"Hi {respondent_name}, we'd love to hear from you.{company_description}\n\n{survey_purpose}\n\nOn a scale of 0-10, how likely are you to recommend {company_name} to a friend or colleague?"
     
-    def generate_system_prompt(self, extracted_data: Dict[str, Any], step_count: int, conversation_history: str) -> str:
-        """Generate system prompt for OpenAI conversation"""
+    def generate_system_prompt(self, extracted_data: Dict[str, Any], step_count: int, conversation_history: str, participant_data: Optional[Dict[str, Any]] = None) -> str:
+        """Generate system prompt for OpenAI conversation with hybrid prompt support"""
+        import os
+        
+        # Feature flag for hybrid prompt architecture
+        use_hybrid_prompt = os.getenv('VOIA_USE_HYBRID_PROMPT', 'false').lower() == 'true'
+        
+        if use_hybrid_prompt:
+            return self._generate_hybrid_prompt(extracted_data, step_count, conversation_history, participant_data)
+        else:
+            return self._generate_legacy_prompt(extracted_data, step_count, conversation_history)
+    
+    def _generate_hybrid_prompt(self, extracted_data: Dict[str, Any], step_count: int, conversation_history: str, participant_data: Optional[Dict[str, Any]] = None) -> str:
+        """Generate hybrid prompt with structured JSON configuration and conversation guidance"""
+        survey_config = self.build_survey_config_json(participant_data)
+        
+        # Build participant profile section
+        participant_section = ""
+        if survey_config.get("participant_profile"):
+            profile = survey_config["participant_profile"]
+            participant_section = f"""
+PARTICIPANT PROFILE:
+- Name: {profile.get('name')}
+- Role: {profile.get('role') or 'Not specified'}
+- Region: {profile.get('region') or 'Not specified'}
+- Customer Tier: {profile.get('customer_tier') or 'Not specified'}
+- Language: {profile.get('language', 'en')}
+- Company: {profile.get('company')}
+"""
+        
+        # Build goals section with field mappings
+        goals_text = ""
+        for goal in survey_config['goals']:
+            goals_text += f"  {goal['priority']}. {goal['topic']}: {goal['description']}\n"
+        
+        return f"""SURVEY CONFIGURATION:
+{json.dumps(survey_config, indent=2)}
+{participant_section}
+CONVERSATION HISTORY:
+{conversation_history}
+
+SURVEY DATA COLLECTED SO FAR:
+{json.dumps(extracted_data, indent=2)}
+
+CONVERSATION STEP: {step_count} / {survey_config['max_questions']}
+
+You are VOÏA, an AI-powered customer feedback specialist conducting a survey for {survey_config['company_name']}.
+
+Your responsibilities:
+1. Follow SURVEY CONFIGURATION.goals priorities strictly - always work through topics in priority order
+2. Ask ONE question at a time in a {survey_config['conversation_tone']} conversational style
+3. Select the highest-priority remaining topic from goals list (check SURVEY DATA COLLECTED for completed topics)
+4. Stop when max_questions ({survey_config['max_questions']}) is reached
+5. Never ask for data already in SURVEY DATA COLLECTED SO FAR
+
+Personalization guidelines (adapt based on participant profile):
+- C-Level/VP roles: Focus on ROI, strategic value, executive concerns, business impact
+- Manager/Team Lead roles: Focus on team productivity, operational efficiency, workflow improvements  
+- End User roles: Focus on day-to-day usability, feature requests, user experience
+- Enterprise tier: Ask about integration, compliance, scalability, enterprise features
+- SMB/Startup tier: Focus on ease of use, value for money, support responsiveness
+- Regional considerations: Use region-appropriate examples and timezone-aware language
+
+Be empathetic, adapt to user communication style, and keep the conversation natural while respecting all constraints.
+
+RESPONSE FORMAT: Return JSON with fields: message, message_type, step, topic, progress, is_complete"""
+    
+    def _generate_legacy_prompt(self, extracted_data: Dict[str, Any], step_count: int, conversation_history: str) -> str:
+        """Generate legacy system prompt (current implementation)"""
         company_name = self.get_company_name()
         product_name = self.get_product_name()
         tone = self.get_conversation_tone()
