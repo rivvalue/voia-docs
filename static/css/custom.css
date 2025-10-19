@@ -5081,3 +5081,183 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
         width: 100%;
     }
 }
+
+/* ============================================
+   BUSINESS LOGIN PAGE - PLATFORM ALIGNED
+   ============================================ */
+
+/* Login Container */
+.business-login-container {
+    max-width: 450px;
+    margin: var(--spacing-3xl) auto;
+    padding: var(--spacing-3xl);
+    background: linear-gradient(135deg, var(--primary-white) 0%, rgba(225, 58, 68, 0.02) 100%);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+}
+
+/* Login Header */
+.business-login-header {
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+}
+
+.business-login-logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--spacing-lg);
+    color: var(--primary-white);
+    font-size: var(--font-size-3xl);
+}
+
+.business-login-title {
+    font-family: var(--font-family-headings);
+    color: var(--primary-black);
+    font-weight: 600;
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--spacing-sm);
+}
+
+.business-login-subtitle {
+    font-family: var(--font-family-base);
+    color: var(--gray-dark);
+    font-size: var(--font-size-sm);
+}
+
+/* Form Floating Controls */
+.business-login-form .form-floating {
+    margin-bottom: var(--spacing-lg);
+}
+
+.business-login-form .form-control {
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--light-gray);
+    transition: all 0.3s ease;
+    font-family: var(--font-family-base);
+}
+
+.business-login-form .form-control:focus {
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 3px rgba(225, 58, 68, 0.1);
+}
+
+.business-login-form label {
+    font-family: var(--font-family-headings);
+    color: var(--gray-dark);
+}
+
+/* Remember Me Checkbox */
+.business-login-form .form-check {
+    margin: var(--spacing-lg) 0;
+}
+
+.business-login-form .form-check-label {
+    font-family: var(--font-family-base);
+    color: var(--primary-black);
+    font-size: var(--font-size-sm);
+}
+
+/* Login Button */
+.business-login-btn {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md) var(--spacing-2xl);
+    font-family: var(--font-family-headings);
+    font-weight: 600;
+    font-size: var(--font-size-base);
+    transition: all 0.3s ease;
+    width: 100%;
+    color: var(--primary-white);
+}
+
+.business-login-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(225, 58, 68, 0.4);
+    color: var(--primary-white);
+}
+
+.business-login-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Alerts */
+.business-login-alert {
+    border-radius: var(--radius-lg);
+    border: 2px solid;
+    margin-bottom: var(--spacing-lg);
+    font-family: var(--font-family-base);
+}
+
+/* Back Link */
+.business-login-back {
+    text-align: center;
+    margin-top: var(--spacing-2xl);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--light-gray);
+}
+
+.business-login-back a {
+    font-family: var(--font-family-base);
+    color: var(--gray-dark);
+    text-decoration: none;
+    font-size: var(--font-size-sm);
+    transition: color 0.3s ease;
+}
+
+.business-login-back a:hover {
+    color: var(--primary-red);
+}
+
+/* Demo Account Info */
+.business-login-demo {
+    margin-top: var(--spacing-xl);
+}
+
+.business-login-demo .alert {
+    border-radius: var(--radius-lg);
+    border: 2px solid rgba(225, 58, 68, 0.2);
+    background: rgba(225, 58, 68, 0.05);
+    font-family: var(--font-family-base);
+}
+
+.business-login-demo h6 {
+    font-family: var(--font-family-headings);
+    font-weight: 600;
+    color: var(--primary-red);
+    margin-bottom: var(--spacing-sm);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .business-login-container {
+        margin: var(--spacing-xl) auto;
+        padding: var(--spacing-2xl);
+    }
+}
+
+@media (max-width: 576px) {
+    .business-login-container {
+        margin: var(--spacing-lg) 0;
+        padding: var(--spacing-lg);
+        border-radius: var(--radius-lg);
+    }
+    
+    .business-login-title {
+        font-size: var(--font-size-xl);
+    }
+    
+    .business-login-logo {
+        width: 60px;
+        height: 60px;
+        font-size: var(--font-size-2xl);
+    }
+}
