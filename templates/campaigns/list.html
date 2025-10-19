@@ -5,6 +5,11 @@
 {% block page_class %}page-campaign-management{% endblock %}
 
 {% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Campaigns', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
 <style>
 /* Campaign management styling */
 

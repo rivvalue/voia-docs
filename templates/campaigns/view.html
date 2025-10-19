@@ -4,20 +4,13 @@
 
 {% block page_class %}page-campaign-details{% endblock %}
 
-{% block breadcrumb %}
-<div class="breadcrumb-container">
-    <div class="container">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ url_for('campaigns.list_campaigns') }}">Campaigns</a></li>
-                <li class="breadcrumb-item active truncate" aria-current="page" title="{{ campaign.name }}">{{ campaign.name }}</li>
-            </ol>
-        </nav>
-    </div>
-</div>
-{% endblock %}
-
 {% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Campaigns', 'url': url_for('campaigns.list_campaigns')},
+    {'label': campaign.name, 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
 <style>
 /* Campaign view specific styling */
 .campaign-header {

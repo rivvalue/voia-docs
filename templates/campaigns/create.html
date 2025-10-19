@@ -5,6 +5,12 @@
 {% block page_class %}page-create-campaign{% endblock %}
 
 {% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Campaigns', 'url': url_for('campaigns.list_campaigns')},
+    {'label': 'Create Campaign', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
 <style>
 /* Create campaign specific styling */
 .form-header {
@@ -60,19 +66,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a href="{{ url_for('business_auth.admin_panel') }}">Admin Panel</a>
-            </li>
-            <li class="breadcrumb-item">
-                <a href="{{ url_for('campaigns.list_campaigns') }}">Campaigns</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">Create Campaign</li>
-        </ol>
-    </nav>
 
     <!-- Campaign Creation Form -->
     <div class="form-container">

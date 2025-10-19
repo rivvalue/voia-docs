@@ -5261,3 +5261,128 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
         font-size: var(--font-size-2xl);
     }
 }
+
+/* ============================================
+   BREADCRUMB NAVIGATION - PLATFORM WIDE
+   ============================================ */
+
+/* Breadcrumb Container */
+.breadcrumb-nav {
+    background: var(--primary-white);
+    border-bottom: 1px solid var(--light-gray);
+    padding: var(--spacing-md) 0;
+    margin-bottom: var(--spacing-xl);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.breadcrumb-nav .container {
+    max-width: 1400px;
+}
+
+/* Breadcrumb List */
+.breadcrumb-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-xs);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family-base);
+}
+
+/* Breadcrumb Items */
+.breadcrumb-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: var(--font-size-sm);
+    color: var(--gray-dark);
+}
+
+/* Breadcrumb Links */
+.breadcrumb-link {
+    color: var(--gray-dark);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    font-weight: 500;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-sm);
+}
+
+.breadcrumb-link:hover {
+    color: var(--primary-red);
+    background: rgba(225, 58, 68, 0.05);
+}
+
+.breadcrumb-link:focus {
+    outline: 2px solid var(--primary-red);
+    outline-offset: 2px;
+}
+
+/* Current Page Item */
+.breadcrumb-item-current {
+    color: var(--primary-black);
+    font-weight: 600;
+}
+
+.breadcrumb-item-current .breadcrumb-text {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+}
+
+/* Breadcrumb Separator */
+.breadcrumb-separator {
+    color: var(--medium-gray);
+    font-size: 10px;
+    margin: 0 var(--spacing-xs);
+}
+
+/* Mobile Breadcrumbs - Show Last 2 Levels Only */
+@media (max-width: 768px) {
+    .breadcrumb-nav {
+        padding: var(--spacing-sm) 0;
+    }
+    
+    .breadcrumb-item {
+        font-size: var(--font-size-xs);
+    }
+    
+    /* Hide all but last 2 items on mobile */
+    .breadcrumb-item:not(:nth-last-child(-n+2)) {
+        display: none;
+    }
+    
+    /* Show ellipsis before visible items */
+    .breadcrumb-list::before {
+        content: "...";
+        color: var(--medium-gray);
+        padding: 0 var(--spacing-xs);
+        font-weight: 600;
+    }
+    
+    .breadcrumb-item-current .breadcrumb-text {
+        max-width: 200px;
+    }
+}
+
+@media (max-width: 576px) {
+    .breadcrumb-item {
+        font-size: 11px;
+    }
+    
+    .breadcrumb-separator {
+        font-size: 8px;
+    }
+    
+    .breadcrumb-item-current .breadcrumb-text {
+        max-width: 150px;
+    }
+}
