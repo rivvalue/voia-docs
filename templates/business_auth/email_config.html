@@ -4,254 +4,35 @@
 
 {% block page_class %}page-email-config{% endblock %}
 
-{% block breadcrumb %}
-<div class="breadcrumb-container">
-    <div class="container">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ url_for('business_auth.admin_panel') }}">Settings Hub</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Email Configuration</li>
-            </ol>
-        </nav>
-    </div>
-</div>
-{% endblock %}
-
 {% block content %}
-<style>
-/* Email configuration specific styling */
-.email-config-header {
-    background: linear-gradient(135deg, rgba(var(--primary-red-rgb, 220, 53, 69), 0.1) 0%, rgba(var(--red-hover-rgb, 200, 40, 55), 0.15) 100%);
-    border: 1px solid var(--red-light);
-    color: var(--primary-black);
-    padding: 2rem 0;
-    border-radius: var(--radius-2xl);
-    margin-bottom: 2rem;
-}
-
-.config-form-section {
-    background: var(--primary-white);
-    border-radius: var(--radius-2xl);
-    padding: var(--spacing-2xl);
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--light-gray);
-    margin-bottom: var(--spacing-2xl);
-}
-
-.form-group {
-    margin-bottom: var(--spacing-lg);
-}
-
-.form-label {
-    display: block;
-    font-weight: 600;
-    color: var(--primary-black);
-    margin-bottom: var(--spacing-sm);
-    font-size: var(--font-size-sm);
-}
-
-.form-control {
-    width: 100%;
-    padding: var(--spacing-md);
-    border: 2px solid var(--light-gray);
-    border-radius: var(--radius-lg);
-    font-size: var(--font-size-sm);
-    transition: all 0.3s ease;
-    font-family: var(--font-family-base);
-}
-
-.form-control:focus {
-    outline: none;
-    border-color: var(--primary-red);
-    box-shadow: 0 0 0 3px rgba(var(--primary-red-rgb, 220, 53, 69), 0.1);
-}
-
-.form-check {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    margin-bottom: var(--spacing-md);
-}
-
-.form-check-input {
-    width: 18px;
-    height: 18px;
-    border: 2px solid var(--light-gray);
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.form-check-label {
-    cursor: pointer;
-    font-size: var(--font-size-sm);
-    color: var(--gray-dark);
-}
-
-.btn-test {
-    background: rgba(var(--primary-red-rgb, 220, 53, 69), 0.1);
-    color: var(--primary-red);
-    border: 2px solid var(--primary-red);
-    padding: var(--spacing-sm) var(--spacing-lg);
-    border-radius: var(--radius-lg);
-    font-size: var(--font-size-sm);
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-    margin-right: var(--spacing-sm);
-}
-
-.btn-test:hover {
-    background: var(--primary-red);
-    color: var(--primary-white);
-    transform: translateY(-1px);
-}
-
-.btn-save {
-    background: var(--primary-red);
-    color: var(--primary-white);
-    border: 2px solid var(--primary-red);
-    padding: var(--spacing-md) var(--spacing-xl);
-    border-radius: var(--radius-lg);
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.btn-save:hover {
-    background: var(--red-hover);
-    border-color: var(--red-hover);
-    transform: translateY(-1px);
-}
-
-.config-status {
-    padding: var(--spacing-lg);
-    border-radius: var(--radius-lg);
-    margin-bottom: var(--spacing-xl);
-    border: 2px solid;
-}
-
-.config-status.success {
-    background: rgba(34, 197, 94, 0.1);
-    border-color: #22c55e;
-    color: #15803d;
-}
-
-.config-status.warning {
-    background: rgba(245, 158, 11, 0.1);
-    border-color: #f59e0b;
-    color: #d97706;
-}
-
-.config-status.error {
-    background: rgba(239, 68, 68, 0.1);
-    border-color: #ef4444;
-    color: #dc2626;
-}
-
-.test-result {
-    margin-top: var(--spacing-lg);
-    padding: var(--spacing-lg);
-    border-radius: var(--radius-lg);
-    border: 2px solid;
-    display: none;
-}
-
-.test-result.success {
-    background: rgba(34, 197, 94, 0.1);
-    border-color: #22c55e;
-    color: #15803d;
-}
-
-.test-result.error {
-    background: rgba(239, 68, 68, 0.1);
-    border-color: #ef4444;
-    color: #dc2626;
-}
-
-.input-group {
-    display: flex;
-    gap: var(--spacing-md);
-    align-items: end;
-}
-
-.input-group .form-group {
-    flex: 1;
-    margin-bottom: 0;
-}
-
-.help-text {
-    font-size: var(--font-size-xs);
-    color: var(--gray-dark);
-    margin-top: var(--spacing-xs);
-    font-style: italic;
-}
-
-.section-title {
-    font-size: var(--font-size-xl);
-    font-weight: 600;
-    color: var(--primary-black);
-    margin-bottom: var(--spacing-lg);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    font-family: var(--font-family-headings);
-}
-
-.breadcrumb {
-    margin-bottom: var(--spacing-xl);
-}
-
-.breadcrumb a {
-    color: var(--primary-red);
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.breadcrumb a:hover {
-    text-decoration: underline;
-}
-
-.breadcrumb span {
-    color: var(--gray-dark);
-    margin: 0 var(--spacing-sm);
-}
-</style>
-
-<div class="container mt-4">
-    <!-- Breadcrumb -->
-    <div class="breadcrumb">
-        <a href="{{ url_for('business_auth.admin_panel') }}">Admin Panel</a>
-        <span>></span>
-        <span>Email Configuration</span>
-    </div>
-
+<div class="email-config-container">
     <!-- Header -->
-    <div class="email-config-header text-center">
-        <h1 class="mb-3">📧 Email Configuration</h1>
-        <p class="mb-0">Configure SMTP settings for {{ business_account.name }}</p>
+    <div class="email-config-header">
+        <div class="email-config-header-content">
+            <h1>
+                <i class="fas fa-envelope me-2" aria-hidden="true"></i>
+                Email Configuration
+            </h1>
+            <p>Configure SMTP settings for {{ business_account.name }}</p>
+        </div>
     </div>
 
     <!-- Current Status -->
     {% if email_config %}
         {% if email_config.is_verified %}
-            <div class="config-status success">
-                <strong>✅ Email configuration is active and verified</strong><br>
+            <div class="email-config-status success" role="status" aria-live="polite">
+                <strong><i class="fas fa-check-circle me-2" aria-hidden="true"></i>Email configuration is active and verified</strong>
                 Last tested: {{ email_config.last_test_at.strftime('%Y-%m-%d %H:%M:%S') if email_config.last_test_at else 'Never' }} UTC
             </div>
         {% else %}
-            <div class="config-status warning">
-                <strong>⚠️ Email configuration exists but not verified</strong><br>
+            <div class="email-config-status warning" role="alert" aria-live="polite">
+                <strong><i class="fas fa-exclamation-triangle me-2" aria-hidden="true"></i>Email configuration exists but not verified</strong>
                 Please test your configuration to ensure it works properly.
             </div>
         {% endif %}
     {% else %}
-        <div class="config-status error">
-            <strong>❌ No email configuration found</strong><br>
+        <div class="email-config-status error" role="alert" aria-live="polite">
+            <strong><i class="fas fa-times-circle me-2" aria-hidden="true"></i>No email configuration found</strong>
             Configure your SMTP settings below to enable email sending for your account.
         </div>
     {% endif %}
@@ -259,66 +40,104 @@
     <!-- Configuration Form -->
     <form method="POST" action="{{ url_for('business_auth.save_email_config') }}" id="emailConfigForm">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        
         <!-- SMTP Server Settings -->
-        <div class="config-form-section">
-            <h3 class="section-title">🔧 SMTP Server Settings</h3>
+        <div class="email-config-form-section">
+            <h3 class="email-section-title">
+                <i class="fas fa-server" aria-hidden="true"></i>
+                SMTP Server Settings
+            </h3>
             
             <div class="row">
                 <div class="col-md-8">
-                    <div class="form-group">
-                        <label class="form-label" for="smtp_server">SMTP Server *</label>
-                        <input type="text" class="form-control" id="smtp_server" name="smtp_server" 
+                    <div class="email-form-group">
+                        <label class="email-form-label" for="smtp_server">SMTP Server *</label>
+                        <input type="text" 
+                               class="email-form-control" 
+                               id="smtp_server" 
+                               name="smtp_server" 
                                value="{{ email_config.smtp_server if email_config else '' }}" 
-                               placeholder="smtp.gmail.com" required>
-                        <div class="help-text">Your email provider's SMTP server address</div>
+                               placeholder="smtp.gmail.com" 
+                               required
+                               aria-required="true"
+                               aria-describedby="smtp_server_help">
+                        <div class="email-help-text" id="smtp_server_help">Your email provider's SMTP server address</div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="form-label" for="smtp_port">Port *</label>
-                        <input type="number" class="form-control" id="smtp_port" name="smtp_port" 
+                    <div class="email-form-group">
+                        <label class="email-form-label" for="smtp_port">Port *</label>
+                        <input type="number" 
+                               class="email-form-control" 
+                               id="smtp_port" 
+                               name="smtp_port" 
                                value="{{ email_config.smtp_port if email_config else '587' }}" 
-                               min="1" max="65535" required>
-                        <div class="help-text">Usually 587 (TLS) or 465 (SSL)</div>
+                               min="1" 
+                               max="65535" 
+                               required
+                               aria-required="true"
+                               aria-describedby="smtp_port_help">
+                        <div class="email-help-text" id="smtp_port_help">Usually 587 (TLS) or 465 (SSL)</div>
                     </div>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label" for="smtp_username">Username *</label>
-                        <input type="text" class="form-control" id="smtp_username" name="smtp_username" 
+                    <div class="email-form-group">
+                        <label class="email-form-label" for="smtp_username">Username *</label>
+                        <input type="text" 
+                               class="email-form-control" 
+                               id="smtp_username" 
+                               name="smtp_username" 
                                value="{{ email_config.smtp_username if email_config else '' }}" 
-                               placeholder="your-email@domain.com" required>
-                        <div class="help-text">Usually your email address</div>
+                               placeholder="your-email@domain.com" 
+                               required
+                               aria-required="true"
+                               aria-describedby="smtp_username_help">
+                        <div class="email-help-text" id="smtp_username_help">Usually your email address</div>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label" for="smtp_password">Password {{ '*' if not email_config else '(leave blank to keep current)' }}</label>
-                        <input type="password" class="form-control" id="smtp_password" name="smtp_password" 
-                               placeholder="Enter SMTP password" {{ 'required' if not email_config else '' }}>
-                        <div class="help-text">Your email password or app-specific password</div>
+                    <div class="email-form-group">
+                        <label class="email-form-label" for="smtp_password">
+                            Password {{ '*' if not email_config else '(leave blank to keep current)' }}
+                        </label>
+                        <input type="password" 
+                               class="email-form-control" 
+                               id="smtp_password" 
+                               name="smtp_password" 
+                               placeholder="Enter SMTP password" 
+                               {{ 'required aria-required=true' if not email_config else '' }}
+                               aria-describedby="smtp_password_help">
+                        <div class="email-help-text" id="smtp_password_help">Your email password or app-specific password</div>
                     </div>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="use_tls" name="use_tls" 
-                               {{ 'checked' if email_config and email_config.use_tls else 'checked' if not email_config }}>
-                        <label class="form-check-label" for="use_tls">
+                    <div class="email-form-check">
+                        <input type="checkbox" 
+                               class="email-form-check-input" 
+                               id="use_tls" 
+                               name="use_tls" 
+                               {{ 'checked' if (email_config and email_config.use_tls) or not email_config else '' }}
+                               aria-describedby="use_tls_help">
+                        <label class="email-form-check-label" for="use_tls">
                             Use TLS (recommended for port 587)
                         </label>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="use_ssl" name="use_ssl" 
-                               {{ 'checked' if email_config and email_config.use_ssl else '' }}>
-                        <label class="form-check-label" for="use_ssl">
+                    <div class="email-form-check">
+                        <input type="checkbox" 
+                               class="email-form-check-input" 
+                               id="use_ssl" 
+                               name="use_ssl" 
+                               {{ 'checked' if email_config and email_config.use_ssl else '' }}
+                               aria-describedby="use_ssl_help">
+                        <label class="email-form-check-label" for="use_ssl">
                             Use SSL (for port 465)
                         </label>
                     </div>
@@ -327,81 +146,134 @@
         </div>
 
         <!-- Sender Settings -->
-        <div class="config-form-section">
-            <h3 class="section-title">👤 Sender Settings</h3>
+        <div class="email-config-form-section">
+            <h3 class="email-section-title">
+                <i class="fas fa-user" aria-hidden="true"></i>
+                Sender Settings
+            </h3>
             
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label" for="sender_name">Sender Name *</label>
-                        <input type="text" class="form-control" id="sender_name" name="sender_name" 
+                    <div class="email-form-group">
+                        <label class="email-form-label" for="sender_name">Sender Name *</label>
+                        <input type="text" 
+                               class="email-form-control" 
+                               id="sender_name" 
+                               name="sender_name" 
                                value="{{ email_config.sender_name if email_config else business_account.name + ' Team' }}" 
-                               placeholder="Your Company Name" required>
-                        <div class="help-text">Name that appears in the "From" field</div>
+                               placeholder="Your Company Name" 
+                               required
+                               aria-required="true"
+                               aria-describedby="sender_name_help">
+                        <div class="email-help-text" id="sender_name_help">Name that appears in the "From" field</div>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label" for="sender_email">Sender Email *</label>
-                        <input type="email" class="form-control" id="sender_email" name="sender_email" 
+                    <div class="email-form-group">
+                        <label class="email-form-label" for="sender_email">Sender Email *</label>
+                        <input type="email" 
+                               class="email-form-control" 
+                               id="sender_email" 
+                               name="sender_email" 
                                value="{{ email_config.sender_email if email_config else '' }}" 
-                               placeholder="noreply@yourcompany.com" required>
-                        <div class="help-text">Email address that appears in the "From" field</div>
+                               placeholder="noreply@yourcompany.com" 
+                               required
+                               aria-required="true"
+                               aria-describedby="sender_email_help">
+                        <div class="email-help-text" id="sender_email_help">Email address that appears in the "From" field</div>
                     </div>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label class="form-label" for="reply_to_email">Reply-To Email (optional)</label>
-                <input type="email" class="form-control" id="reply_to_email" name="reply_to_email" 
+            <div class="email-form-group">
+                <label class="email-form-label" for="reply_to_email">Reply-To Email (optional)</label>
+                <input type="email" 
+                       class="email-form-control" 
+                       id="reply_to_email" 
+                       name="reply_to_email" 
                        value="{{ email_config.reply_to_email if email_config and email_config.reply_to_email else '' }}" 
-                       placeholder="support@yourcompany.com">
-                <div class="help-text">Where replies should be sent (if different from sender)</div>
+                       placeholder="support@yourcompany.com"
+                       aria-describedby="reply_to_email_help">
+                <div class="email-help-text" id="reply_to_email_help">Where replies should be sent (if different from sender)</div>
             </div>
         </div>
 
         <!-- Admin Notifications -->
-        <div class="config-form-section">
-            <h3 class="section-title">🔔 Admin Notifications</h3>
+        <div class="email-config-form-section">
+            <h3 class="email-section-title">
+                <i class="fas fa-bell" aria-hidden="true"></i>
+                Admin Notifications
+            </h3>
             
-            <div class="form-group">
-                <label class="form-label" for="admin_emails">Admin Email Addresses</label>
-                <input type="text" class="form-control" id="admin_emails" name="admin_emails" 
+            <div class="email-form-group">
+                <label class="email-form-label" for="admin_emails">Admin Email Addresses</label>
+                <input type="text" 
+                       class="email-form-control" 
+                       id="admin_emails" 
+                       name="admin_emails" 
                        value="{{ email_config.get_admin_emails() | join(', ') if email_config and email_config.get_admin_emails() else '' }}" 
-                       placeholder="admin@yourcompany.com, manager@yourcompany.com">
-                <div class="help-text">Comma-separated list of email addresses for admin notifications</div>
+                       placeholder="admin@yourcompany.com, manager@yourcompany.com"
+                       aria-describedby="admin_emails_help">
+                <div class="email-help-text" id="admin_emails_help">Comma-separated list of email addresses for admin notifications</div>
             </div>
         </div>
 
         <!-- Action Buttons -->
-        <div class="config-form-section">
-            <div class="row">
-                <div class="col-md-6">
-                    <button type="button" class="btn-test" id="testConnectionBtn">
-                        🔍 Test Connection
+        <div class="email-config-form-section">
+            <div class="email-actions-row">
+                <div class="email-actions-left">
+                    <button type="button" 
+                            class="email-btn-test" 
+                            id="testConnectionBtn"
+                            aria-label="Test SMTP connection">
+                        <i class="fas fa-plug" aria-hidden="true"></i>
+                        Test Connection
                     </button>
-                    <button type="button" class="btn-test" id="sendTestEmailBtn" style="display: none;">
-                        📧 Send Test Email
+                    <button type="button" 
+                            class="email-btn-test" 
+                            id="sendTestEmailBtn" 
+                            style="display: none;"
+                            aria-label="Send test email">
+                        <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                        Send Test Email
                     </button>
                 </div>
-                <div class="col-md-6 text-end">
-                    <button type="submit" class="btn-save">
-                        💾 Save Configuration
+                <div class="email-actions-right">
+                    <button type="submit" 
+                            class="email-btn-save"
+                            aria-label="Save email configuration">
+                        <i class="fas fa-save" aria-hidden="true"></i>
+                        Save Configuration
                     </button>
                 </div>
             </div>
 
             <!-- Test Results -->
-            <div id="testResult" class="test-result"></div>
+            <div id="testResult" 
+                 class="email-test-result" 
+                 role="status" 
+                 aria-live="polite"></div>
             
             <!-- Test Email Form -->
-            <div id="testEmailForm" style="display: none; margin-top: 1rem;">
-                <div class="input-group">
-                    <div class="form-group">
-                        <label class="form-label" for="test_email">Test Email Address</label>
-                        <input type="email" class="form-control" id="test_email" placeholder="test@example.com">
+            <div id="testEmailForm" 
+                 class="email-test-email-form" 
+                 style="display: none;">
+                <div class="email-input-group">
+                    <div class="email-form-group">
+                        <label class="email-form-label" for="test_email">Test Email Address</label>
+                        <input type="email" 
+                               class="email-form-control" 
+                               id="test_email" 
+                               placeholder="test@example.com"
+                               aria-label="Enter test email address">
                     </div>
-                    <button type="button" class="btn-test" id="sendTestBtn">Send</button>
+                    <button type="button" 
+                            class="email-btn-test" 
+                            id="sendTestBtn"
+                            aria-label="Send test email">
+                        <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                        Send
+                    </button>
                 </div>
             </div>
         </div>
@@ -419,9 +291,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Test connection
     testConnectionBtn.addEventListener('click', function() {
         this.disabled = true;
-        this.textContent = '🔍 Testing...';
+        this.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Testing...';
         
-        // Get CSRF token
         const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
         
         fetch('{{ url_for("business_auth.test_email_config") }}', {
@@ -436,24 +307,24 @@ document.addEventListener('DOMContentLoaded', function() {
             testResult.style.display = 'block';
             
             if (data.success) {
-                testResult.className = 'test-result success';
-                testResult.innerHTML = '<strong>✅ Connection successful!</strong><br>' + data.message;
-                sendTestEmailBtn.style.display = 'inline-block';
+                testResult.className = 'email-test-result success';
+                testResult.innerHTML = '<strong><i class="fas fa-check-circle me-2" aria-hidden="true"></i>Connection successful!</strong>' + data.message;
+                sendTestEmailBtn.style.display = 'inline-flex';
             } else {
-                testResult.className = 'test-result error';
-                testResult.innerHTML = '<strong>❌ Connection failed!</strong><br>' + (data.error || data.message);
+                testResult.className = 'email-test-result error';
+                testResult.innerHTML = '<strong><i class="fas fa-times-circle me-2" aria-hidden="true"></i>Connection failed!</strong>' + (data.error || data.message);
                 sendTestEmailBtn.style.display = 'none';
             }
         })
         .catch(error => {
             testResult.style.display = 'block';
-            testResult.className = 'test-result error';
-            testResult.innerHTML = '<strong>❌ Test failed!</strong><br>Network error: ' + error.message;
+            testResult.className = 'email-test-result error';
+            testResult.innerHTML = '<strong><i class="fas fa-times-circle me-2" aria-hidden="true"></i>Test failed!</strong>Network error: ' + error.message;
             sendTestEmailBtn.style.display = 'none';
         })
         .finally(() => {
             testConnectionBtn.disabled = false;
-            testConnectionBtn.textContent = '🔍 Test Connection';
+            testConnectionBtn.innerHTML = '<i class="fas fa-plug" aria-hidden="true"></i> Test Connection';
         });
     });
 
@@ -472,9 +343,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         this.disabled = true;
-        this.textContent = 'Sending...';
+        this.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Sending...';
         
-        // Get CSRF token
         const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
         
         fetch('{{ url_for("business_auth.send_test_email") }}', {
@@ -490,21 +360,21 @@ document.addEventListener('DOMContentLoaded', function() {
             testResult.style.display = 'block';
             
             if (data.success) {
-                testResult.className = 'test-result success';
-                testResult.innerHTML = '<strong>✅ Test email sent!</strong><br>Check ' + testEmail + ' for the test message.';
+                testResult.className = 'email-test-result success';
+                testResult.innerHTML = '<strong><i class="fas fa-check-circle me-2" aria-hidden="true"></i>Test email sent!</strong>Check ' + testEmail + ' for the test message.';
             } else {
-                testResult.className = 'test-result error';
-                testResult.innerHTML = '<strong>❌ Failed to send test email!</strong><br>' + (data.error || data.message);
+                testResult.className = 'email-test-result error';
+                testResult.innerHTML = '<strong><i class="fas fa-times-circle me-2" aria-hidden="true"></i>Failed to send test email!</strong>' + (data.error || data.message);
             }
         })
         .catch(error => {
             testResult.style.display = 'block';
-            testResult.className = 'test-result error';
-            testResult.innerHTML = '<strong>❌ Send failed!</strong><br>Network error: ' + error.message;
+            testResult.className = 'email-test-result error';
+            testResult.innerHTML = '<strong><i class="fas fa-times-circle me-2" aria-hidden="true"></i>Send failed!</strong>Network error: ' + error.message;
         })
         .finally(() => {
             sendTestBtn.disabled = false;
-            sendTestBtn.textContent = 'Send';
+            sendTestBtn.innerHTML = '<i class="fas fa-paper-plane" aria-hidden="true"></i> Send';
         });
     });
 
