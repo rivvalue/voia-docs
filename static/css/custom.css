@@ -4269,3 +4269,391 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
         align-items: flex-start;
     }
 }
+
+/* ============================================
+   LICENSE INFORMATION PAGE - PLATFORM ALIGNED
+   ============================================ */
+
+/* License Container */
+.license-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--spacing-xl);
+}
+
+/* Header Section - Settings Hub v2 Pattern */
+.license-header {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    padding: var(--spacing-2xl);
+    margin: calc(-1 * var(--spacing-xl)) calc(-1 * var(--spacing-xl)) var(--spacing-2xl);
+    border-radius: 0;
+    color: var(--primary-white);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+}
+
+.license-header-content {
+    flex: 1;
+    min-width: 250px;
+}
+
+.license-header h1 {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    margin: 0 0 var(--spacing-sm) 0;
+    color: var(--primary-white);
+}
+
+.license-header p {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+    margin: 0;
+    opacity: 0.9;
+    color: var(--primary-white);
+}
+
+/* Account Type Badge */
+.license-account-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: 20px;
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    margin-bottom: var(--spacing-xl);
+}
+
+.license-account-badge.demo {
+    background-color: var(--red-light);
+    color: var(--primary-red);
+    border: 2px solid var(--primary-red);
+}
+
+.license-account-badge.admin {
+    background: rgba(225, 58, 68, 0.1);
+    color: var(--primary-red);
+    border: 2px solid var(--primary-red);
+}
+
+.license-account-badge.customer {
+    background-color: var(--light-gray);
+    color: var(--primary-black);
+    border: 2px solid var(--medium-gray);
+}
+
+/* License Section Cards */
+.license-section {
+    background: var(--primary-white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--light-gray);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.license-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 2px solid var(--light-gray);
+}
+
+.license-section-title {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-2xl);
+    font-weight: 600;
+    color: var(--primary-black);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+/* Status Badges - VOÏA Colors */
+.license-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: 20px;
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    margin-bottom: var(--spacing-lg);
+    border: 2px solid;
+}
+
+.license-status-badge.active {
+    background: rgba(225, 58, 68, 0.1);
+    color: var(--primary-red);
+    border-color: var(--primary-red);
+}
+
+.license-status-badge.trial {
+    background: rgba(225, 58, 68, 0.05);
+    color: var(--red-hover);
+    border-color: var(--red-light);
+}
+
+.license-status-badge.warning {
+    background: rgba(225, 58, 68, 0.08);
+    color: var(--red-hover);
+    border-color: var(--red-light);
+}
+
+.license-status-badge.expired {
+    background: rgba(189, 189, 189, 0.1);
+    color: var(--gray-dark);
+    border-color: var(--medium-gray);
+}
+
+/* License Date Cards */
+.license-date-card {
+    background: var(--primary-white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-sm);
+    border: 2px solid var(--light-gray);
+    margin-bottom: var(--spacing-xl);
+    position: relative;
+    overflow: hidden;
+}
+
+.license-date-card.primary {
+    border-color: var(--primary-red);
+    background: rgba(225, 58, 68, 0.05);
+}
+
+.license-date-card.success {
+    border-color: var(--primary-red);
+    background: rgba(225, 58, 68, 0.03);
+}
+
+.license-date-card.warning {
+    border-color: var(--red-light);
+    background: rgba(225, 58, 68, 0.05);
+}
+
+.license-date-card.danger {
+    border-color: var(--medium-gray);
+    background: rgba(189, 189, 189, 0.05);
+}
+
+.license-date-icon {
+    position: absolute;
+    top: var(--spacing-lg);
+    right: var(--spacing-lg);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    opacity: 0.1;
+}
+
+.license-date-label {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--gray-dark);
+    margin-bottom: var(--spacing-sm);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wide);
+}
+
+.license-date-value {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--primary-black);
+    margin: 0 0 var(--spacing-sm) 0;
+}
+
+.license-date-meta {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-sm);
+    color: var(--gray-dark);
+    margin: 0;
+}
+
+/* Info Grid */
+.license-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-xl);
+}
+
+.license-info-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
+    background: rgba(225, 58, 68, 0.05);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(225, 58, 68, 0.1);
+}
+
+.license-info-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--primary-red);
+    color: var(--primary-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-base);
+    flex-shrink: 0;
+}
+
+.license-info-content {
+    flex-grow: 1;
+}
+
+.license-info-label {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-xs);
+    color: var(--gray-dark);
+    font-weight: 500;
+    margin: 0 0 var(--spacing-xs) 0;
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wide);
+}
+
+.license-info-value {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    color: var(--primary-black);
+    margin: 0;
+}
+
+/* Usage Cards */
+.license-usage-card {
+    background: var(--primary-white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    border: 1px solid var(--light-gray);
+    margin-bottom: var(--spacing-lg);
+    transition: all 0.2s ease;
+}
+
+.license-usage-card:hover {
+    border-color: var(--primary-red);
+    background-color: rgba(225, 58, 68, 0.02);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.license-usage-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-md);
+}
+
+.license-usage-title {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--primary-black);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.license-usage-count {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--primary-red);
+}
+
+/* Progress Bars - VOÏA Colors */
+.license-progress-container {
+    width: 100%;
+    height: 8px;
+    background-color: var(--light-gray);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: var(--spacing-sm);
+}
+
+.license-progress-bar {
+    height: 100%;
+    transition: width 0.3s ease;
+    border-radius: 4px;
+}
+
+.license-progress-bar.low {
+    background: linear-gradient(90deg, var(--primary-red) 0%, var(--red-hover) 100%);
+}
+
+.license-progress-bar.medium {
+    background: linear-gradient(90deg, var(--red-light) 0%, var(--primary-red) 100%);
+}
+
+.license-progress-bar.high {
+    background: linear-gradient(90deg, var(--medium-gray) 0%, var(--gray-dark) 100%);
+}
+
+.license-progress-text {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-xs);
+    color: var(--gray-dark);
+    text-align: right;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 992px) {
+    .license-section {
+        padding: var(--spacing-xl);
+    }
+    
+    .license-info-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .license-container {
+        padding: var(--spacing-md);
+    }
+    
+    .license-header {
+        padding: var(--spacing-xl);
+        margin: calc(-1 * var(--spacing-md)) calc(-1 * var(--spacing-md)) var(--spacing-xl);
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .license-header h1 {
+        font-size: var(--font-size-2xl);
+    }
+    
+    .license-section {
+        padding: var(--spacing-lg);
+    }
+}
+
+@media (max-width: 576px) {
+    .license-header h1 {
+        font-size: var(--font-size-xl);
+    }
+    
+    .license-section-title {
+        font-size: var(--font-size-lg);
+    }
+}
