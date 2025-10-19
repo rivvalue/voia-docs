@@ -156,6 +156,50 @@ class EmailService:
         
         return branding
     
+    def _get_email_content(self, business_account_id: Optional[int] = None) -> Dict:
+        """Get email content configuration (custom or default)
+        
+        Args:
+            business_account_id: Optional business account ID
+            
+        Returns:
+            Dict with subject, intro, cta_text, closing, footer
+        """
+        # Default templates
+        defaults = {
+            'subject': "Your feedback is requested: {campaign_name}",
+            'intro': "{business_account_name} is requesting your valuable feedback through our Voice of Client system.",
+            'cta_text': "Complete Your Survey",
+            'closing': "Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.\n\nThank you for your time and valuable insights!",
+            'footer': "This is an automated message. If you have any questions, please contact the organization that sent this survey."
+        }
+        
+        if business_account_id:
+            try:
+                email_config = EmailConfiguration.get_for_business_account(business_account_id)
+                if email_config:
+                    return email_config.get_email_content()
+            except Exception as e:
+                logger.error(f"Failed to load email content for business account {business_account_id}: {e}")
+        
+        return defaults
+    
+    def _substitute_variables(self, template: str, variables: Dict) -> str:
+        """Substitute template variables with values
+        
+        Args:
+            template: Template string with {variable} placeholders
+            variables: Dict of variable names to values
+            
+        Returns:
+            String with variables substituted
+        """
+        result = template
+        for key, value in variables.items():
+            placeholder = f"{{{key}}}"
+            result = result.replace(placeholder, str(value))
+        return result
+    
     def is_configured(self, business_account_id: Optional[int] = None) -> bool:
         """Check if email service is properly configured for a business account or system default"""
         logger.debug(f"is_configured() called with business_account_id={business_account_id}")
@@ -493,17 +537,32 @@ class EmailService:
             # Get branding configuration for this business account
             branding = self._get_branding_config(business_account_id)
             
+            # Get custom email content (or defaults)
+            email_content = self._get_email_content(business_account_id)
+            
             # Generate survey URL (using the correct 'survey' route)
             survey_url = url_for('survey', token=survey_token, _external=True)
             
-            # Email subject
-            subject = f"Your feedback is requested: {campaign_name}"
+            # Template variables for substitution
+            template_vars = {
+                'participant_name': participant_name,
+                'campaign_name': campaign_name,
+                'business_account_name': business_account_name,
+                'survey_url': survey_url
+            }
             
-            # Text body with branding support
+            # Email subject (with variable substitution)
+            subject = self._substitute_variables(email_content['subject'], template_vars)
+            
+            # Build text body with custom content
+            intro_text = self._substitute_variables(email_content['intro'], template_vars)
+            closing_text = self._substitute_variables(email_content['closing'], template_vars)
+            footer_text = self._substitute_variables(email_content['footer'], template_vars)
+            
             text_body = f"""
 Hello {participant_name},
 
-{business_account_name} is requesting your valuable feedback through our Voice of Client system.
+{intro_text}
 
 Campaign: {campaign_name}
 
@@ -512,16 +571,14 @@ Please click the link below to complete your survey:
 
 This personalized link is secure and will expire in 72 hours.
 
-Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.
-
-Thank you for your time and valuable insights!
+{closing_text}
 
 Best regards,
 The {branding['company_name']} Team
 {branding['tagline']}
 
 ---
-This is an automated message. If you have any questions, please contact the organization that sent this survey.
+{footer_text}
 """
             
             # HTML body with branding support
@@ -627,29 +684,27 @@ This is an automated message. If you have any questions, please contact the orga
         
         <h2>Hello {participant_name},</h2>
         
-        <p><strong>{business_account_name}</strong> is requesting your valuable feedback through our Voice of Client system.</p>
+        <p>{intro_text}</p>
         
         <div class="campaign-name">
             <strong>Campaign:</strong> {campaign_name}
         </div>
         
-        <p>Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.</p>
-        
         <div style="text-align: center;">
-            <a href="{survey_url}" class="cta-button">Complete Your Survey</a>
+            <a href="{survey_url}" class="cta-button">{email_content['cta_text']}</a>
         </div>
         
         <div class="security-note">
             <strong>🔒 Security Note:</strong> This personalized link is secure and will expire in 72 hours.
         </div>
         
-        <p>Thank you for your time and valuable insights!</p>
+        <p style="white-space: pre-line;">{closing_text}</p>
         
         <p>Best regards,<br>
         The {branding['company_name']} Team</p>
         
         <div class="footer">
-            This is an automated message. If you have any questions, please contact the organization that sent this survey.
+            {footer_text}
         </div>
     </div>
 </body>
