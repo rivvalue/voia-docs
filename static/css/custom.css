@@ -5976,15 +5976,6 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
    Survey Response Page - Settings Hub v2
    =================================== */
 
-/* Header - VOÏA Red Gradient */
-.public-response-header {
-    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
-    color: var(--primary-white);
-    padding: var(--spacing-2xl) 0;
-    border-radius: var(--radius-xl);
-    margin-bottom: var(--spacing-2xl);
-}
-
 /* Container Layout */
 .public-container {
     display: grid;
@@ -6233,9 +6224,5 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     
     .public-message-content {
         max-width: 85%;
-    }
-    
-    .public-response-header {
-        padding: var(--spacing-xl) 0;
     }
 }

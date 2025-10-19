@@ -5,30 +5,24 @@
 {% block page_class %}page-public-response{% endblock %}
 
 {% block content %}
-<div class="container" role="main" aria-label="Survey response details">
+<div class="container py-4" role="main" aria-label="Survey response details">
     <!-- Back button -->
-    <div class="public-back-button">
-        <a href="{{ back_url }}" class="btn btn-outline-secondary">
+    <div class="mb-3">
+        <a href="{{ back_url }}" class="btn btn-outline-secondary btn-sm">
             <i class="fas fa-arrow-left me-2"></i>Back to Business Intelligence
         </a>
     </div>
 
-    <!-- Response Header -->
-    <header class="public-response-header" role="banner" aria-label="Survey response header">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h2><i class="fas fa-comment-dots me-3" aria-hidden="true"></i>Survey Response Details</h2>
-                    <p class="mb-0 fs-5">{{ response.respondent_name }} from {{ response.company_name }}</p>
-                </div>
-                <div class="col-md-4 text-center text-md-end">
-                    <span class="public-nps-score public-nps-{{ response.nps_category.lower() }}" role="status" aria-label="Net Promoter Score: {{ response.nps_score }} out of 10, {{ response.nps_category }}">
-                        NPS: {{ response.nps_score }}/10
-                    </span>
-                </div>
-            </div>
+    <!-- Simple Page Header -->
+    <div class="mb-4">
+        <h3 class="mb-2">{{ response.respondent_name }} - {{ response.company_name }}</h3>
+        <div class="d-flex align-items-center gap-3">
+            <span class="public-nps-score public-nps-{{ response.nps_category.lower() }}" role="status" aria-label="Net Promoter Score: {{ response.nps_score }} out of 10, {{ response.nps_category }}">
+                NPS: {{ response.nps_score }}/10
+            </span>
+            <span class="text-muted">{{ response.created_at[:10] if response.created_at else 'Unknown' }}</span>
         </div>
-    </header>
+    </div>
 
     <!-- Main Content Grid -->
     <div class="public-container">
@@ -58,11 +52,7 @@
                     <span class="public-data-value">{{ response.tenure_with_fc }}</span>
                 </div>
                 {% endif %}
-                <div class="public-data-item">
-                    <span class="public-data-label">Date:</span>
-                    <span class="public-data-value">{{ response.created_at[:10] if response.created_at else 'Unknown' }}</span>
-                </div>
-            </div>
+            </section>
 
             <!-- NPS and Ratings -->
             <section class="public-section" aria-labelledby="ratings-heading">
