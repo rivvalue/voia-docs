@@ -364,16 +364,6 @@
         </div>
     </div>
 
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a href="{{ url_for('business_auth.admin_panel') }}">Admin Panel</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">Campaigns</li>
-        </ol>
-    </nav>
-
     {# Campaign Action Buttons Macro #}
     {% macro campaign_actions(campaign, view_type='table') %}
         {% set action_class = 'table-actions' if view_type == 'table' else 'campaign-card-actions' %}
