@@ -1118,9 +1118,13 @@ def public_survey_response(response_id):
                 current_account = get_current_business_account()
                 branding = get_branding_context(current_account)
                 
+                # Determine back URL from session or default to Campaign Insights for business users
+                back_url = session.get('last_bi_page', url_for('campaign_insights'))
+                
                 return render_template('public_survey_response.html', 
                                      response=response_data,
-                                     branding=branding)
+                                     branding=branding,
+                                     back_url=back_url)
             else:
                 # Business user doesn't own this campaign
                 logger.warning(f"Business user {current_business_user.email} denied access to response {response_id} - not their campaign")
@@ -1143,9 +1147,13 @@ def public_survey_response(response_id):
         # Get default branding for public view (no business branding)
         branding = get_branding_context()
         
+        # Determine back URL from session or default to Dashboard for trial users
+        back_url = session.get('last_bi_page', url_for('dashboard'))
+        
         return render_template('public_survey_response.html', 
                              response=response_data,
-                             branding=branding)
+                             branding=branding,
+                             back_url=back_url)
     
     except Exception as e:
         logger.error(f"Error accessing survey response {response_id}: {e}")
@@ -1155,6 +1163,9 @@ def public_survey_response(response_id):
 @app.route('/dashboard')
 def dashboard():
     """Dashboard showing survey results and insights"""
+    # Store this page as the last BI page for back navigation
+    session['last_bi_page'] = url_for('dashboard')
+    
     try:
         from data_storage import get_company_nps_data
         company_nps_data = get_company_nps_data()
@@ -1192,6 +1203,9 @@ def dashboard():
 @require_business_auth
 def executive_summary():
     """Executive Summary - Strategic overview across all campaigns (Business users only)"""
+    # Store this page as the last BI page for back navigation
+    session['last_bi_page'] = url_for('executive_summary')
+    
     # Get current business user
     current_business_user = get_current_business_user()
     business_user_name = f"{current_business_user.first_name} {current_business_user.last_name}"
@@ -1211,6 +1225,9 @@ def executive_summary():
 @require_business_auth
 def campaign_insights():
     """Campaign Insights - Operational analytics with campaign filtering (Business users only)"""
+    # Store this page as the last BI page for back navigation
+    session['last_bi_page'] = url_for('campaign_insights')
+    
     try:
         from data_storage import get_company_nps_data
         company_nps_data = get_company_nps_data()
@@ -3048,12 +3065,19 @@ def company_responses_page(company_name):
         # Check if user is authenticated as business user
         is_business_authenticated = current_business_user is not None
         
+        # Determine back URL from session or default based on user type
+        if is_business_authenticated:
+            back_url = session.get('last_bi_page', url_for('campaign_insights'))
+        else:
+            back_url = session.get('last_bi_page', url_for('dashboard'))
+        
         return render_template('company_responses.html',
                              company_name=company_name,
                              campaign=campaign,
                              campaign_id=campaign_id,
                              branding=branding,
-                             is_business_authenticated=is_business_authenticated)
+                             is_business_authenticated=is_business_authenticated,
+                             back_url=back_url)
     
     except Exception as e:
         logger.error(f"Error loading company responses page: {e}")
