@@ -15,32 +15,32 @@ from models import (
     SurveyResponse
 )
 
-# Campaign configurations
+# Campaign configurations - Updated for high-volume testing
 CAMPAIGNS = {
     "Q1 2025": {
         "name": "Loyalty measurement Q1 2025",
         "start_date": date(2025, 1, 1),
         "end_date": date(2025, 3, 31),
-        "responses": 180,
+        "responses": 1000,
         "company_reuse": 0  # First campaign, no reuse
     },
     "Q2 2025": {
         "name": "Loyalty measurement Q2 2025",
         "start_date": date(2025, 4, 1),
         "end_date": date(2025, 6, 30),
-        "responses": 220,
+        "responses": 1000,
         "company_reuse": 40  # 40% companies from Q1
     },
     "Q3 2025": {
         "name": "Loyalty measurement Q3 2025",
         "start_date": date(2025, 7, 1),
         "end_date": date(2025, 9, 30),
-        "responses": 200,
+        "responses": 1000,
         "company_reuse": 50  # 50% companies from Q1+Q2
     }
 }
 
-# Demo company pool
+# Demo company pool - Expanded to 70 companies
 COMPANIES = [
     "CloudSync Technologies", "DataFlow Solutions", "API Masters Inc", "TechVision Corp",
     "SecureBank Financial", "FinanceFirst Ltd", "InvestPro Group", "PaymentHub",
@@ -57,7 +57,10 @@ COMPANIES = [
     "LegalTech Partners", "ComplianceSync Inc", "JusticeFlow Systems", "LawyerHub",
     "PropertyTech Solutions", "RealEstateFlow Inc", "BuildingSync Pro", "HomeHub",
     "InsureTech Corp", "PolicyFlow Systems", "ClaimSync Solutions", "RiskHub",
-    "ConsultPro Partners", "AdvisoryTech Inc", "StrategyFlow Systems", "ExpertHub"
+    "ConsultPro Partners", "AdvisoryTech Inc", "StrategyFlow Systems", "ExpertHub",
+    "CyberDefense Corp", "NetworkGuard Solutions", "CloudShield Technologies", "DataVault Inc",
+    "Analytics360 Group", "InsightPro Systems", "MetricsHub Technologies", "ReportFlow Inc",
+    "DevOps Masters", "CodePipeline Solutions", "DeployFast Technologies", "BuildSync Pro"
 ]
 
 # Name pool for participants
@@ -80,6 +83,13 @@ LAST_NAMES = [
 ]
 
 ROLES = ["CEO", "CTO", "CFO", "COO", "VP Operations", "VP Sales", "Director", "Manager"]
+
+# Segmentation attributes for participant personalization
+REGIONS = ["North America", "EMEA", "APAC"]
+
+CUSTOMER_TIERS = ["T1: Strategic", "T2: Managed", "T3: Self-serve"]
+
+LANGUAGES = ["en", "en", "en", "en", "en", "es", "fr"]  # 70% English, 15% Spanish, 15% French
 
 # Feedback templates by NPS category
 PROMOTER_FEEDBACK = [
@@ -213,14 +223,24 @@ def generate_random_timestamp(start_date, end_date):
     )
 
 
-def get_or_create_participant(business_account_id, company, campaign_id, existing_companies):
-    """Get existing participant or create new one"""
+def get_or_create_participant(business_account_id, company, campaign_id, existing_companies, company_commercial_values):
+    """Get existing participant or create new one with segmentation attributes"""
     # Generate participant details
     first_name = random.choice(FIRST_NAMES)
     last_name = random.choice(LAST_NAMES)
     role = random.choice(ROLES)
-    name = f"{first_name} {last_name} ({role})"
+    name = f"{first_name} {last_name}"
     email = f"{first_name.lower()}.{last_name.lower()}@{company.lower().replace(' ', '')}.com"
+    
+    # Segmentation attributes
+    region = random.choice(REGIONS)
+    customer_tier = random.choice(CUSTOMER_TIERS)
+    language = random.choice(LANGUAGES)
+    
+    # Company-level commercial value (consistent across all participants from same company)
+    if company not in company_commercial_values:
+        company_commercial_values[company] = random.uniform(10000, 500000)
+    commercial_value = company_commercial_values[company]
     
     # Check if participant exists
     participant = Participant.query.filter_by(
@@ -234,6 +254,11 @@ def get_or_create_participant(business_account_id, company, campaign_id, existin
             email=email,
             name=name,
             company_name=company,
+            role=role,
+            region=region,
+            customer_tier=customer_tier,
+            language=language,
+            company_commercial_value=commercial_value,
             source='admin_bulk',
             status='created',
             created_at=datetime.utcnow()
@@ -241,6 +266,13 @@ def get_or_create_participant(business_account_id, company, campaign_id, existin
         participant.token = str(__import__('uuid').uuid4())
         db.session.add(participant)
         db.session.flush()
+    else:
+        # Update segmentation fields and sync company commercial value if participant already exists
+        participant.role = role
+        participant.region = region
+        participant.customer_tier = customer_tier
+        participant.language = language
+        participant.company_commercial_value = commercial_value
     
     # Create campaign participant association if not exists
     campaign_participant = CampaignParticipant.query.filter_by(
@@ -347,6 +379,7 @@ def generate_campaign_data(campaign_key, dry_run=False):
             # Generate responses
             responses_created = 0
             nps_distribution = {"Promoter": 0, "Passive": 0, "Detractor": 0}
+            company_commercial_values = {}  # Track company-level commercial values for consistency
             
             print(f"\nGenerating {config['responses']} responses...")
             
@@ -355,7 +388,7 @@ def generate_campaign_data(campaign_key, dry_run=False):
                 
                 # Get or create participant
                 participant, campaign_participant = get_or_create_participant(
-                    business_account.id, company, campaign.id, existing_companies
+                    business_account.id, company, campaign.id, existing_companies, company_commercial_values
                 )
                 
                 # Generate response data
@@ -389,7 +422,6 @@ def generate_campaign_data(campaign_key, dry_run=False):
                     churn_risk_factors=json.dumps([random.choice(KEY_THEMES) for _ in range(random.randint(1, 3))]),
                     growth_opportunities=json.dumps([random.choice(KEY_THEMES) for _ in range(random.randint(1, 2))]) if nps_score >= 7 else None,
                     account_risk_factors=json.dumps([random.choice(KEY_THEMES) for _ in range(random.randint(1, 3))]) if nps_score < 7 else None,
-                    commercial_value=random.uniform(10000, 500000),
                     source_type='conversational',
                     created_at=generate_random_timestamp(config['start_date'], config['end_date']),
                     analyzed_at=datetime.utcnow()

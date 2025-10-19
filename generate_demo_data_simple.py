@@ -30,32 +30,32 @@ db.init_app(app)
 # Import models after db initialization
 from models import BusinessAccount, Campaign, Participant, CampaignParticipant, SurveyResponse
 
-# Campaign configurations
+# Campaign configurations - Updated for high-volume testing
 CAMPAIGNS = {
     "Q1 2025": {
         "name": "Loyalty measurement Q1 2025",
         "start_date": date(2025, 1, 1),
         "end_date": date(2025, 3, 31),
-        "responses": 180,
+        "responses": 1000,
         "company_reuse": 0
     },
     "Q2 2025": {
         "name": "Loyalty measurement Q2 2025",
         "start_date": date(2025, 4, 1),
         "end_date": date(2025, 6, 30),
-        "responses": 220,
+        "responses": 1000,
         "company_reuse": 40
     },
     "Q3 2025": {
         "name": "Loyalty measurement Q3 2025",
         "start_date": date(2025, 7, 1),
         "end_date": date(2025, 9, 30),
-        "responses": 200,
+        "responses": 1000,
         "company_reuse": 50
     }
 }
 
-# Demo company pool
+# Demo company pool - Expanded to 70 companies
 COMPANIES = [
     "CloudSync Technologies", "DataFlow Solutions", "API Masters Inc", "TechVision Corp",
     "SecureBank Financial", "FinanceFirst Ltd", "InvestPro Group", "PaymentHub",
@@ -72,7 +72,10 @@ COMPANIES = [
     "LegalTech Partners", "ComplianceSync Inc", "JusticeFlow Systems", "LawyerHub",
     "PropertyTech Solutions", "RealEstateFlow Inc", "BuildingSync Pro", "HomeHub",
     "InsureTech Corp", "PolicyFlow Systems", "ClaimSync Solutions", "RiskHub",
-    "ConsultPro Partners", "AdvisoryTech Inc", "StrategyFlow Systems", "ExpertHub"
+    "ConsultPro Partners", "AdvisoryTech Inc", "StrategyFlow Systems", "ExpertHub",
+    "CyberDefense Corp", "NetworkGuard Solutions", "CloudShield Technologies", "DataVault Inc",
+    "Analytics360 Group", "InsightPro Systems", "MetricsHub Technologies", "ReportFlow Inc",
+    "DevOps Masters", "CodePipeline Solutions", "DeployFast Technologies", "BuildSync Pro"
 ]
 
 FIRST_NAMES = ["Sarah", "Michael", "Jennifer", "David", "Lisa", "James", "Emily", "Robert",
@@ -82,6 +85,13 @@ LAST_NAMES = ["Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davi
               "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor"]
 
 ROLES = ["CEO", "CTO", "CFO", "COO", "VP Operations", "VP Sales", "Director", "Manager"]
+
+# Segmentation attributes for participant personalization
+REGIONS = ["North America", "EMEA", "APAC"]
+
+CUSTOMER_TIERS = ["T1: Strategic", "T2: Managed", "T3: Self-serve"]
+
+LANGUAGES = ["en", "en", "en", "en", "en", "es", "fr"]  # 70% English, 15% Spanish, 15% French
 
 PROMOTER_FEEDBACK = [
     "Excellent service and product quality. The team is very responsive and professional.",
@@ -228,14 +238,25 @@ def main():
             
             # Generate responses
             nps_dist = {"Promoter": 0, "Passive": 0, "Detractor": 0}
+            company_commercial_values = {}  # Track company-level commercial values for consistency
             
             for i in range(config['responses']):
                 company = random.choice(companies)
                 first = random.choice(FIRST_NAMES)
                 last = random.choice(LAST_NAMES)
                 role = random.choice(ROLES)
-                name = f"{first} {last} ({role})"
+                name = f"{first} {last}"
                 email = f"{first.lower()}.{last.lower()}@{company.lower().replace(' ', '')}.com"
+                
+                # Segmentation attributes
+                region = random.choice(REGIONS)
+                customer_tier = random.choice(CUSTOMER_TIERS)
+                language = random.choice(LANGUAGES)
+                
+                # Company-level commercial value (consistent across all participants from same company)
+                if company not in company_commercial_values:
+                    company_commercial_values[company] = random.uniform(10000, 500000)
+                commercial_value = company_commercial_values[company]
                 
                 # Get or create participant
                 participant = Participant.query.filter_by(
@@ -249,12 +270,24 @@ def main():
                         email=email,
                         name=name,
                         company_name=company,
+                        role=role,
+                        region=region,
+                        customer_tier=customer_tier,
+                        language=language,
+                        company_commercial_value=commercial_value,
                         source='admin_bulk',
                         status='created',
                         token=str(__import__('uuid').uuid4())
                     )
                     db.session.add(participant)
                     db.session.flush()
+                else:
+                    # Update segmentation fields and sync company commercial value if participant already exists
+                    participant.role = role
+                    participant.region = region
+                    participant.customer_tier = customer_tier
+                    participant.language = language
+                    participant.company_commercial_value = commercial_value
                 
                 # Get or create campaign participant
                 cp = CampaignParticipant.query.filter_by(
@@ -300,7 +333,6 @@ def main():
                     churn_risk_score=churn_score,
                     churn_risk_level=churn_level,
                     churn_risk_factors=json.dumps(random.sample(KEY_THEMES, 2)),
-                    commercial_value=random.uniform(10000, 500000),
                     source_type='conversational',
                     created_at=generate_timestamp(config['start_date'], config['end_date']),
                     analyzed_at=datetime.utcnow()
