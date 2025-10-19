@@ -156,16 +156,17 @@ class EmailService:
         
         return branding
     
-    def _get_email_content(self, business_account_id: Optional[int] = None) -> Dict:
-        """Get email content configuration (custom or default)
+    def _get_email_content(self, business_account_id: Optional[int] = None, campaign=None) -> Dict:
+        """Get email content configuration with 3-tier fallback: campaign → email_config → defaults
         
         Args:
             business_account_id: Optional business account ID
+            campaign: Optional Campaign object for campaign-specific content
             
         Returns:
             Dict with subject, intro, cta_text, closing, footer
         """
-        # Default templates
+        # Default templates (tier 3)
         defaults = {
             'subject': "Your feedback is requested: {campaign_name}",
             'intro': "{business_account_name} is requesting your valuable feedback through our Voice of Client system.",
@@ -174,15 +175,49 @@ class EmailService:
             'footer': "This is an automated message. If you have any questions, please contact the organization that sent this survey."
         }
         
+        # Try campaign-specific content first (tier 1)
+        if campaign and campaign.use_custom_email_content:
+            try:
+                campaign_content = campaign.get_email_content()
+                # Build result, falling back to tier 2/3 for empty fields
+                result = {
+                    'subject': campaign_content.get('subject_template') or None,
+                    'intro': campaign_content.get('intro_message') or None,
+                    'cta_text': campaign_content.get('cta_text') or None,
+                    'closing': campaign_content.get('closing_message') or None,
+                    'footer': campaign_content.get('footer_note') or None
+                }
+                
+                # If all campaign fields are set, return immediately
+                if all(result.values()):
+                    return result
+                
+                # Otherwise, continue to tier 2 to fill in gaps
+            except Exception as e:
+                logger.error(f"Failed to load campaign-specific email content: {e}")
+                result = {k: None for k in defaults.keys()}
+        else:
+            result = {k: None for k in defaults.keys()}
+        
+        # Try business account email config (tier 2)
         if business_account_id:
             try:
                 email_config = EmailConfiguration.get_for_business_account(business_account_id)
                 if email_config:
-                    return email_config.get_email_content()
+                    account_content = email_config.get_email_content()
+                    # Fill in any None values from campaign tier
+                    for key in result.keys():
+                        if result[key] is None:
+                            result[key] = account_content.get(key)
             except Exception as e:
                 logger.error(f"Failed to load email content for business account {business_account_id}: {e}")
         
-        return defaults
+        # Fill in any remaining None values with defaults (tier 3)
+        for key in result.keys():
+            if result[key] is None:
+                result[key] = defaults[key]
+        
+        return result
     
     def _substitute_variables(self, template: str, variables: Dict) -> str:
         """Substitute template variables with values
@@ -516,7 +551,8 @@ class EmailService:
                                     survey_token: str,
                                     business_account_name: str,
                                     email_delivery_id: Optional[int] = None,
-                                    business_account_id: Optional[int] = None) -> Dict:
+                                    business_account_id: Optional[int] = None,
+                                    campaign=None) -> Dict:
         """
         Send survey invitation to a participant using tenant-specific configuration
         
@@ -528,6 +564,7 @@ class EmailService:
             business_account_name: Business account name
             email_delivery_id: Optional EmailDelivery record ID for tracking
             business_account_id: Optional business account ID for tenant-specific configuration
+            campaign: Optional Campaign object for campaign-specific email content
             
         Returns:
             Dict with success status and details
@@ -537,8 +574,8 @@ class EmailService:
             # Get branding configuration for this business account
             branding = self._get_branding_config(business_account_id)
             
-            # Get custom email content (or defaults)
-            email_content = self._get_email_content(business_account_id)
+            # Get custom email content with 3-tier fallback (campaign → email_config → defaults)
+            email_content = self._get_email_content(business_account_id, campaign=campaign)
             
             # Generate survey URL (using the correct 'survey' route)
             survey_url = url_for('survey', token=survey_token, _external=True)
