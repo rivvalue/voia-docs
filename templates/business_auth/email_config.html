@@ -47,6 +47,62 @@
     <form method="POST" action="{{ url_for('business_auth.save_email_config') }}" id="emailConfigForm">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         
+        <!-- Email Provider Selection -->
+        <div class="email-config-form-section">
+            <h3 class="email-section-title">
+                <i class="fas fa-cloud" aria-hidden="true"></i>
+                Email Provider
+            </h3>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="email-form-group">
+                        <label class="email-form-label" for="email_provider">Email Provider *</label>
+                        <select class="email-form-control" 
+                                id="email_provider" 
+                                name="email_provider" 
+                                required
+                                aria-required="true"
+                                aria-describedby="email_provider_help"
+                                onchange="toggleProviderFields()">
+                            <option value="smtp" {{ 'selected' if not email_config or email_config.email_provider == 'smtp' else '' }}>Standard SMTP</option>
+                            <option value="aws_ses" {{ 'selected' if email_config and email_config.email_provider == 'aws_ses' else '' }}>AWS SES</option>
+                        </select>
+                        <div class="email-help-text" id="email_provider_help">Choose your email delivery provider</div>
+                    </div>
+                </div>
+                
+                <!-- AWS Region (shown only for AWS SES) -->
+                <div class="col-md-6" id="aws_region_field" style="display: none;">
+                    <div class="email-form-group">
+                        <label class="email-form-label" for="aws_region">AWS Region *</label>
+                        <select class="email-form-control" 
+                                id="aws_region" 
+                                name="aws_region"
+                                aria-describedby="aws_region_help">
+                            <option value="">Select a region</option>
+                            <option value="us-east-1" {{ 'selected' if email_config and email_config.aws_region == 'us-east-1' else '' }}>US East (N. Virginia)</option>
+                            <option value="us-east-2" {{ 'selected' if email_config and email_config.aws_region == 'us-east-2' else '' }}>US East (Ohio)</option>
+                            <option value="us-west-1" {{ 'selected' if email_config and email_config.aws_region == 'us-west-1' else '' }}>US West (N. California)</option>
+                            <option value="us-west-2" {{ 'selected' if email_config and email_config.aws_region == 'us-west-2' else '' }}>US West (Oregon)</option>
+                            <option value="ca-central-1" {{ 'selected' if email_config and email_config.aws_region == 'ca-central-1' else '' }}>Canada (Central)</option>
+                            <option value="eu-west-1" {{ 'selected' if email_config and email_config.aws_region == 'eu-west-1' else '' }}>Europe (Ireland)</option>
+                            <option value="eu-west-2" {{ 'selected' if email_config and email_config.aws_region == 'eu-west-2' else '' }}>Europe (London)</option>
+                            <option value="eu-west-3" {{ 'selected' if email_config and email_config.aws_region == 'eu-west-3' else '' }}>Europe (Paris)</option>
+                            <option value="eu-central-1" {{ 'selected' if email_config and email_config.aws_region == 'eu-central-1' else '' }}>Europe (Frankfurt)</option>
+                            <option value="ap-south-1" {{ 'selected' if email_config and email_config.aws_region == 'ap-south-1' else '' }}>Asia Pacific (Mumbai)</option>
+                            <option value="ap-northeast-1" {{ 'selected' if email_config and email_config.aws_region == 'ap-northeast-1' else '' }}>Asia Pacific (Tokyo)</option>
+                            <option value="ap-northeast-2" {{ 'selected' if email_config and email_config.aws_region == 'ap-northeast-2' else '' }}>Asia Pacific (Seoul)</option>
+                            <option value="ap-southeast-1" {{ 'selected' if email_config and email_config.aws_region == 'ap-southeast-1' else '' }}>Asia Pacific (Singapore)</option>
+                            <option value="ap-southeast-2" {{ 'selected' if email_config and email_config.aws_region == 'ap-southeast-2' else '' }}>Asia Pacific (Sydney)</option>
+                            <option value="sa-east-1" {{ 'selected' if email_config and email_config.aws_region == 'sa-east-1' else '' }}>South America (São Paulo)</option>
+                        </select>
+                        <div class="email-help-text" id="aws_region_help">Select the AWS region where you configured SES</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- SMTP Server Settings -->
         <div class="email-config-form-section">
             <h3 class="email-section-title">
@@ -55,7 +111,8 @@
             </h3>
             
             <div class="row">
-                <div class="col-md-8">
+                <!-- Standard SMTP server field (hidden for AWS SES) -->
+                <div class="col-md-8" id="smtp_server_field">
                     <div class="email-form-group">
                         <label class="email-form-label" for="smtp_server">SMTP Server *</label>
                         <input type="text" 
@@ -63,11 +120,20 @@
                                id="smtp_server" 
                                name="smtp_server" 
                                value="{{ email_config.smtp_server if email_config else '' }}" 
-                               placeholder="smtp.gmail.com" 
-                               required
-                               aria-required="true"
+                               placeholder="smtp.gmail.com"
                                aria-describedby="smtp_server_help">
                         <div class="email-help-text" id="smtp_server_help">Your email provider's SMTP server address</div>
+                    </div>
+                </div>
+                
+                <!-- AWS SES info field (shown for AWS SES) -->
+                <div class="col-md-8" id="aws_ses_server_info" style="display: none;">
+                    <div class="email-form-group">
+                        <label class="email-form-label">SMTP Server</label>
+                        <div class="email-form-control" style="background-color: #f8f9fa; cursor: not-allowed;" readonly>
+                            <span id="ses_server_display">Auto-generated from region</span>
+                        </div>
+                        <div class="email-help-text">AWS SES SMTP server is automatically set based on your region</div>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -91,7 +157,9 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="email-form-group">
-                        <label class="email-form-label" for="smtp_username">Username *</label>
+                        <label class="email-form-label" for="smtp_username">
+                            <span id="smtp_username_label">Username</span> *
+                        </label>
                         <input type="text" 
                                class="email-form-control" 
                                id="smtp_username" 
@@ -107,7 +175,7 @@
                 <div class="col-md-6">
                     <div class="email-form-group">
                         <label class="email-form-label" for="smtp_password">
-                            Password {{ '*' if not email_config else '(leave blank to keep current)' }}
+                            <span id="smtp_password_label">Password</span> {{ '*' if not email_config else '(leave blank to keep current)' }}
                         </label>
                         <input type="password" 
                                class="email-form-control" 
@@ -287,12 +355,89 @@
 </div>
 
 <script>
+// Toggle provider-specific fields
+function toggleProviderFields() {
+    const provider = document.getElementById('email_provider').value;
+    const awsRegionField = document.getElementById('aws_region_field');
+    const awsRegionSelect = document.getElementById('aws_region');
+    const smtpServerField = document.getElementById('smtp_server_field');
+    const smtpServerInput = document.getElementById('smtp_server');
+    const awsSesServerInfo = document.getElementById('aws_ses_server_info');
+    const sesServerDisplay = document.getElementById('ses_server_display');
+    const smtpUsernameHelp = document.getElementById('smtp_username_help');
+    const smtpPasswordHelp = document.getElementById('smtp_password_help');
+    const smtpUsernameLabel = document.getElementById('smtp_username_label');
+    const smtpPasswordLabel = document.getElementById('smtp_password_label');
+    
+    if (provider === 'aws_ses') {
+        // Show AWS SES fields
+        awsRegionField.style.display = 'block';
+        awsRegionSelect.required = true;
+        
+        // Hide standard SMTP server field
+        smtpServerField.style.display = 'none';
+        smtpServerInput.required = false;
+        
+        // Show AWS SES server info
+        awsSesServerInfo.style.display = 'block';
+        
+        // Update help text for AWS SES
+        smtpUsernameLabel.textContent = 'AWS SES SMTP Username';
+        smtpPasswordLabel.textContent = 'AWS SES SMTP Password';
+        smtpUsernameHelp.textContent = 'SMTP username from AWS SES Console > SMTP Settings';
+        smtpPasswordHelp.textContent = 'SMTP password from AWS SES Console (not your AWS password)';
+        
+        // Update SES server display based on region
+        const region = awsRegionSelect.value;
+        if (region) {
+            sesServerDisplay.textContent = `email-smtp.${region}.amazonaws.com`;
+        } else {
+            sesServerDisplay.textContent = 'Select a region above to see SMTP server';
+        }
+    } else {
+        // Show standard SMTP fields
+        awsRegionField.style.display = 'none';
+        awsRegionSelect.required = false;
+        
+        smtpServerField.style.display = 'block';
+        smtpServerInput.required = true;
+        
+        awsSesServerInfo.style.display = 'none';
+        
+        // Reset help text for standard SMTP
+        smtpUsernameLabel.textContent = 'Username';
+        smtpPasswordLabel.textContent = 'Password';
+        smtpUsernameHelp.textContent = 'Usually your email address';
+        smtpPasswordHelp.textContent = 'Your email password or app-specific password';
+    }
+}
+
+// Update SES server display when region changes
+function updateSesServerDisplay() {
+    const provider = document.getElementById('email_provider').value;
+    if (provider === 'aws_ses') {
+        const region = document.getElementById('aws_region').value;
+        const sesServerDisplay = document.getElementById('ses_server_display');
+        if (region) {
+            sesServerDisplay.textContent = `email-smtp.${region}.amazonaws.com`;
+        } else {
+            sesServerDisplay.textContent = 'Select a region above to see SMTP server';
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const testConnectionBtn = document.getElementById('testConnectionBtn');
     const sendTestEmailBtn = document.getElementById('sendTestEmailBtn');
     const sendTestBtn = document.getElementById('sendTestBtn');
     const testResult = document.getElementById('testResult');
     const testEmailForm = document.getElementById('testEmailForm');
+    
+    // Initialize provider fields on page load
+    toggleProviderFields();
+    
+    // Add region change listener
+    document.getElementById('aws_region').addEventListener('change', updateSesServerDisplay);
 
     // Test connection
     testConnectionBtn.addEventListener('click', function() {
