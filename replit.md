@@ -80,7 +80,7 @@ The hybrid prompt architecture enables personalized AI-powered conversational su
 ## Testing Checklist
 ### Participant Segmentation Testing:
 - [ ] Create participants with different roles (C-Level, Manager, End User)
-- [ ] Create participants with different customer tiers (Executive Stakeholders, Operational Leaders, End Users / Functional Users)
+- [ ] Create participants with different customer tiers (T1: Strategic, T2: Managed, T3: Self-serve or small)
 - [ ] Create participants with different regions (North America, EMEA, APAC)
 - [ ] Upload CSV with segmentation columns
 - [ ] Upload CSV without segmentation columns (backward compatibility)
@@ -89,8 +89,8 @@ The hybrid prompt architecture enables personalized AI-powered conversational su
 ### Hybrid Prompt Testing:
 - [ ] Start conversational survey with C-Level participant (expect strategic questions)
 - [ ] Start conversational survey with End User participant (expect tactical questions)
-- [ ] Start conversational survey with Executive Stakeholders tier participant (expect strategic/executive focus)
-- [ ] Start conversational survey with End Users / Functional Users tier participant (expect operational/usability focus)
+- [ ] Start conversational survey with T1: Strategic tier participant (expect top-tier client focus)
+- [ ] Start conversational survey with T3: Self-serve tier participant (expect self-service/small client focus)
 - [ ] Verify topic-field mappings: NPS → nps_score/nps_reasoning
 - [ ] Verify topic-field mappings: Additional Feedback → additional_comments
 - [ ] Check conversation tone adapts to participant context
@@ -98,7 +98,7 @@ The hybrid prompt architecture enables personalized AI-powered conversational su
 
 ### Analytics Validation:
 - [ ] Segment NPS scores by role (C-Level vs End User vs Manager)
-- [ ] Segment satisfaction ratings by customer tier (Executive Stakeholders vs Operational Leaders vs End Users / Functional Users)
+- [ ] Segment satisfaction ratings by customer tier (T1: Strategic vs T2: Managed vs T3: Self-serve)
 - [ ] Segment feedback themes by region (North America vs EMEA vs APAC)
 - [ ] Verify all topic fields are populated correctly
 - [ ] Verify additional_comments captures Additional Feedback responses

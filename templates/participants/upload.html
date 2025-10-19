@@ -128,7 +128,7 @@
                 </li>
                 <li>
                     <i class="fas fa-circle text-secondary me-2" aria-hidden="true"></i>
-                    <strong>customer_tier</strong> - Customer segment (e.g., "Executive Stakeholders", "Operational Leaders", "End Users / Functional Users")
+                    <strong>customer_tier</strong> - Customer segment (e.g., "T1: Strategic (Top 5–10% clients)", "T2: Managed (bulk of paying clients)", "T3: Self-serve or small")
                 </li>
                 <li>
                     <i class="fas fa-circle text-secondary me-2" aria-hidden="true"></i>
@@ -140,9 +140,9 @@
                 <strong class="d-block mb-2">Example CSV with optional columns:</strong>
                 <code class="d-block p-3 bg-light rounded" style="font-size: 12px; overflow-x: auto;">
 email,name,company_name,role,region,customer_tier,language<br>
-john@abc.com,John Doe,ABC Corp,Manager,North America,Executive Stakeholders,en<br>
-jane@startup.io,Jane Smith,Startup Inc,C-Level,EMEA,Operational Leaders,en<br>
-bob@freelance.com,Bob Johnson,Freelance Services,End User,APAC,End Users / Functional Users,en
+john@abc.com,John Doe,ABC Corp,Manager,North America,T1: Strategic (Top 5–10% clients),en<br>
+jane@startup.io,Jane Smith,Startup Inc,C-Level,EMEA,T2: Managed (bulk of paying clients),en<br>
+bob@freelance.com,Bob Johnson,Freelance Services,End User,APAC,T3: Self-serve or small,en
                 </code>
             </div>
         </div>
@@ -255,9 +255,9 @@ document.addEventListener('DOMContentLoaded', function() {
 // Download CSV template
 function downloadTemplate() {
     const csvContent = 'email,name,company_name,role,region,customer_tier,language\n' +
-        'john.doe@company.com,John Doe,ABC Corp,Manager,North America,Executive Stakeholders,en\n' +
-        'jane.smith@startup.io,Jane Smith,Startup Inc,C-Level,EMEA,Operational Leaders,en\n' +
-        'bob@freelance.com,Bob Johnson,Freelance Services,End User,APAC,End Users / Functional Users,en';
+        'john.doe@company.com,John Doe,ABC Corp,Manager,North America,T1: Strategic (Top 5–10% clients),en\n' +
+        'jane.smith@startup.io,Jane Smith,Startup Inc,C-Level,EMEA,T2: Managed (bulk of paying clients),en\n' +
+        'bob@freelance.com,Bob Johnson,Freelance Services,End User,APAC,T3: Self-serve or small,en';
     
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
