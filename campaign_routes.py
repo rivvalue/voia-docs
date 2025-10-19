@@ -182,6 +182,25 @@ def create_campaign():
         campaign.status = 'draft'  # Initial status
         campaign.anonymize_responses = anonymize_responses
         
+        # Custom email content
+        use_custom_email_content = request.form.get('use_custom_email_content') == 'on'
+        campaign.use_custom_email_content = use_custom_email_content
+        
+        if use_custom_email_content:
+            campaign.custom_subject_template = request.form.get('custom_subject_template', '').strip() or None
+            campaign.custom_intro_message = request.form.get('custom_intro_message', '').strip() or None
+            campaign.custom_cta_text = request.form.get('custom_cta_text', '').strip() or None
+            campaign.custom_closing_message = request.form.get('custom_closing_message', '').strip() or None
+            campaign.custom_footer_note = request.form.get('custom_footer_note', '').strip() or None
+        
+        # Validate custom email content if enabled
+        content_errors = campaign.validate_custom_email_content()
+        if content_errors:
+            for error in content_errors:
+                flash(error, 'error')
+            return render_template('campaigns/create.html',
+                                 business_account=current_account.to_dict())
+        
         db.session.add(campaign)
         db.session.commit()
         
