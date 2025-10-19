@@ -900,29 +900,46 @@ function checkDatabaseHealth() {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Checking...';
     
     fetch('/business/api/database-health')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
         .then(data => {
+            console.log('Database health check response:', data);
             btn.disabled = false;
-            if (data.healthy) {
+            
+            // Backend returns overall_status: 'healthy', 'warning', 'critical', or 'error'
+            if (data.overall_status === 'healthy') {
                 btn.innerHTML = '<i class="fas fa-check-circle me-1"></i>Healthy';
                 btn.classList.add('btn-success');
                 btn.classList.remove('btn-outline-primary');
-            } else {
-                btn.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>Issues Found';
+            } else if (data.overall_status === 'warning') {
+                btn.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>Warning';
                 btn.classList.add('btn-warning');
                 btn.classList.remove('btn-outline-primary');
+            } else if (data.overall_status === 'critical') {
+                btn.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>Critical';
+                btn.classList.add('btn-danger');
+                btn.classList.remove('btn-outline-primary');
+            } else {
+                btn.innerHTML = '<i class="fas fa-times-circle me-1"></i>Error';
+                btn.classList.add('btn-danger');
+                btn.classList.remove('btn-outline-primary');
             }
+            
             setTimeout(() => { 
                 btn.innerHTML = originalText;
-                btn.classList.remove('btn-success', 'btn-warning');
+                btn.classList.remove('btn-success', 'btn-warning', 'btn-danger');
                 btn.classList.add('btn-outline-primary');
-            }, 3000);
+            }, 5000);
         })
         .catch(error => {
             console.error('Health check failed:', error);
             btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-times-circle me-1"></i>Error';
-            setTimeout(() => { btn.innerHTML = originalText; }, 3000);
+            btn.innerHTML = `<i class="fas fa-times-circle me-1"></i>Error: ${error.message}`;
+            setTimeout(() => { btn.innerHTML = originalText; }, 5000);
         });
 }
 
