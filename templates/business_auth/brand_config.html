@@ -5,6 +5,12 @@
 {% block page_class %}page-brand-config{% endblock %}
 
 {% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Settings', 'url': url_for('business_auth.admin_panel')},
+    {'label': 'Brand Settings', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
 <div class="brand-config-container">
     <!-- Header -->
     <div class="brand-config-header">

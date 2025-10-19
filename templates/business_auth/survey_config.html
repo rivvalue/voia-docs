@@ -4,20 +4,13 @@
 
 {% block page_class %}page-survey-config{% endblock %}
 
-{% block breadcrumb %}
-<div class="breadcrumb-container">
-    <div class="container">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ url_for('business_auth.admin_panel') }}">Settings Hub</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Survey Customization</li>
-            </ol>
-        </nav>
-    </div>
-</div>
-{% endblock %}
-
 {% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Settings', 'url': url_for('business_auth.admin_panel')},
+    {'label': 'Survey Customization', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
 <style>
 /* Survey configuration specific styling */
 .survey-config-header {
