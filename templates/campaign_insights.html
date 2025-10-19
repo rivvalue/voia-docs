@@ -14,7 +14,7 @@
 {% include 'components/breadcrumb.html' %}
 
 <div class="container">
-    <div data-page="campaign-insights"></div>
+    <div data-page="dashboard"></div>
     
     <!-- Page Header -->
     <div class="bg-white border-bottom" style="padding: 2.5rem 0; margin-bottom: 2rem;">
@@ -25,6 +25,11 @@
             </div>
             <div class="col-12 col-md-4 text-center text-md-end">
                 <div class="d-flex align-items-center justify-content-center justify-content-md-end gap-3">
+                    <!-- Link to Executive Summary -->
+                    <a href="{{ url_for('executive_summary') }}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-chart-line me-2"></i>Executive Summary
+                    </a>
+                    
                     <!-- Refresh Icon -->
                     <button class="btn btn-sm btn-link text-muted p-1" 
                             onclick="refreshData()" 
