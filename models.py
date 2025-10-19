@@ -738,13 +738,19 @@ class EmailConfiguration(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
     
-    # SMTP Configuration
-    smtp_server = db.Column(db.String(255), nullable=False)
+    # Email Provider Selection
+    email_provider = db.Column(db.String(20), nullable=False, default='smtp')  # 'smtp' or 'aws_ses'
+    
+    # SMTP Configuration (used for both standard SMTP and AWS SES SMTP interface)
+    smtp_server = db.Column(db.String(255), nullable=True)  # Auto-generated for AWS SES based on region
     smtp_port = db.Column(db.Integer, nullable=False, default=587)
-    smtp_username = db.Column(db.String(255), nullable=False)
-    smtp_password_encrypted = db.Column(db.Text, nullable=False)  # Encrypted password
+    smtp_username = db.Column(db.String(255), nullable=True)  # AWS SES SMTP username or standard SMTP
+    smtp_password_encrypted = db.Column(db.Text, nullable=True)  # Encrypted password
     use_tls = db.Column(db.Boolean, nullable=False, default=True)
     use_ssl = db.Column(db.Boolean, nullable=False, default=False)
+    
+    # AWS SES Specific Configuration
+    aws_region = db.Column(db.String(50), nullable=True)  # e.g., 'us-east-1', 'eu-west-1'
     
     # Sender Configuration
     sender_name = db.Column(db.String(200), nullable=False)
@@ -912,6 +918,8 @@ class EmailConfiguration(db.Model):
             'id': self.id,
             'business_account_id': self.business_account_id,
             'business_account_name': self.business_account.name if self.business_account else None,
+            'email_provider': self.email_provider,
+            'aws_region': self.aws_region,
             'smtp_server': self.smtp_server,
             'smtp_port': self.smtp_port,
             'smtp_username': self.smtp_username,
@@ -938,9 +946,18 @@ class EmailConfiguration(db.Model):
         """Validate email configuration fields"""
         errors = []
         
-        if not self.smtp_server:
-            errors.append("SMTP server is required")
+        # Provider-specific validation
+        if self.is_aws_ses():
+            # AWS SES validation
+            if not self.aws_region:
+                errors.append("AWS region is required for AWS SES")
+            # SMTP server is auto-generated for AWS SES, so don't validate it here
+        else:
+            # Standard SMTP validation
+            if not self.smtp_server:
+                errors.append("SMTP server is required")
         
+        # Common validations for both providers
         if not self.smtp_port or not (1 <= self.smtp_port <= 65535):
             errors.append("Valid SMTP port (1-65535) is required")
         
@@ -972,6 +989,21 @@ class EmailConfiguration(db.Model):
         # Check that password can actually be decrypted
         decrypted_password = self.get_smtp_password()
         return decrypted_password is not None and len(decrypted_password) > 0
+    
+    def is_aws_ses(self):
+        """Check if this configuration uses AWS SES"""
+        return self.email_provider == 'aws_ses'
+    
+    def get_ses_smtp_server(self):
+        """Get AWS SES SMTP server endpoint based on region"""
+        if not self.aws_region:
+            return None
+        return f"email-smtp.{self.aws_region}.amazonaws.com"
+    
+    def ensure_ses_smtp_server(self):
+        """Auto-generate SMTP server for AWS SES if using AWS SES provider"""
+        if self.is_aws_ses() and self.aws_region:
+            self.smtp_server = self.get_ses_smtp_server()
     
     @staticmethod
     def get_for_business_account(business_account_id):
