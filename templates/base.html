@@ -48,10 +48,22 @@
             </div>
         </div>
         <nav class="sidebar-nav">
-            <a href="{{ url_for('dashboard') }}" class="sidebar-nav-item" data-page="dashboard">
+            <div class="sidebar-nav-item has-submenu" data-page="dashboard" id="biSubmenuToggle">
                 <i class="fas fa-chart-line"></i>
                 <span>Business Intelligence</span>
-            </a>
+                <i class="fas fa-chevron-down submenu-toggle"></i>
+            </div>
+            <div class="sidebar-submenu" id="biSubmenu">
+                <a href="{{ url_for('dashboard') }}" class="sidebar-submenu-item" data-page="dashboard-overview">
+                    <span>Overview</span>
+                </a>
+                <a href="{{ url_for('executive_summary') }}" class="sidebar-submenu-item" data-page="executive-summary">
+                    <span>Executive Summary</span>
+                </a>
+                <a href="{{ url_for('campaign_insights') }}" class="sidebar-submenu-item" data-page="campaign-insights">
+                    <span>Campaign Insights</span>
+                </a>
+            </div>
             <a href="{{ url_for('campaigns.list_campaigns') }}" class="sidebar-nav-item" data-page="campaigns">
                 <i class="fas fa-bullhorn"></i>
                 <span>Campaigns</span>
