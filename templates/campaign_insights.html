@@ -113,6 +113,11 @@
                 <i class="fas fa-comments me-2" style="color: #E13A44;"></i>Survey Insights
             </button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="segmentation-tab" data-bs-toggle="tab" data-bs-target="#segmentation" type="button" role="tab" aria-controls="segmentation" aria-selected="false">
+                <i class="fas fa-users me-2" style="color: #E13A44;"></i>Segmentation Insights
+            </button>
+        </li>
     </ul>
 </div>
 
@@ -625,6 +630,92 @@
                     </div>
         </div>
     </div>
+    
+        <!-- Segmentation Insights Tab -->
+        <div class="tab-pane fade" id="segmentation" role="tabpanel" aria-labelledby="segmentation-tab">
+            <div id="segmentationEmptyState" class="alert alert-info" style="display: none;">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>No Segmentation Data Available</strong> - This campaign was created before segmentation analytics were implemented. Segmentation data is only available for campaigns created after this feature was deployed.
+            </div>
+            
+            <div id="segmentationContent">
+                <!-- NPS by Role Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-user-tie me-2" style="color: #E13A44;"></i>NPS by Role</h5>
+                                <small class="text-muted">Net Promoter Score distribution across different participant roles</small>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="npsByRoleChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- NPS by Region Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-globe me-2" style="color: #E13A44;"></i>NPS by Region</h5>
+                                <small class="text-muted">Geographic distribution of customer satisfaction</small>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="npsByRegionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- NPS by Customer Tier Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-layer-group me-2" style="color: #E13A44;"></i>NPS by Customer Tier</h5>
+                                <small class="text-muted">Customer satisfaction across different tier levels</small>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="npsByTierChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Satisfaction by Segmentation Table -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="data-table">
+                            <div class="table-header">
+                                <h5>Satisfaction Ratings by Segment</h5>
+                                <small class="text-muted">Average satisfaction scores across all segmentation dimensions</small>
+                            </div>
+                            <div class="p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Segment Type</th>
+                                                <th>Segment Name</th>
+                                                <th>Responses</th>
+                                                <th>Avg Satisfaction</th>
+                                                <th>NPS Score</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="segmentationTable">
+                                            <!-- Will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- End Tab Content -->
 
     </div>
@@ -857,4 +948,203 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- JavaScript disabled for company NPS table - using server-side rendering only -->
 <script src="{{ url_for('static', filename='js/dashboard.js') }}?v={{ range(1000, 9999) | random }}"></script>
+
+<!-- Segmentation Analytics Rendering -->
+<script>
+// Store segmentation charts globally for cleanup
+let segmentationCharts = {
+    role: null,
+    region: null,
+    tier: null
+};
+
+function renderSegmentationInsights(data) {
+    const segmentationData = data.segmentation_analytics || {};
+    
+    // Check if segmentation data exists
+    if (!segmentationData || Object.keys(segmentationData).length === 0) {
+        document.getElementById('segmentationEmptyState').style.display = 'block';
+        document.getElementById('segmentationContent').style.display = 'none';
+        return;
+    }
+    
+    document.getElementById('segmentationEmptyState').style.display = 'none';
+    document.getElementById('segmentationContent').style.display = 'block';
+    
+    // Render NPS by Role Chart
+    renderSegmentationChart('npsByRoleChart', 'role', segmentationData.nps_by_role || {},  'Role');
+    
+    // Render NPS by Region Chart
+    renderSegmentationChart('npsByRegionChart', 'region', segmentationData.nps_by_region || {}, 'Region');
+    
+    // Render NPS by Tier Chart
+    renderSegmentationChart('npsByTierChart', 'tier', segmentationData.nps_by_tier || {}, 'Customer Tier');
+    
+    // Render Segmentation Table
+    renderSegmentationTable(segmentationData);
+}
+
+function renderSegmentationChart(canvasId, chartKey, npsData, label) {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    
+    // Destroy existing chart if it exists
+    if (segmentationCharts[chartKey]) {
+        segmentationCharts[chartKey].destroy();
+    }
+    
+    const labels = Object.keys(npsData);
+    const npsScores = labels.map(key => npsData[key].nps_score || 0);
+    const responseCounts = labels.map(key => npsData[key].total_responses || 0);
+    
+    segmentationCharts[chartKey] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'NPS Score',
+                data: npsScores,
+                backgroundColor: labels.map(label => {
+                    const score = npsData[label].nps_score || 0;
+                    if (score >= 50) return 'rgba(40, 167, 69, 0.8)';
+                    if (score >= 0) return 'rgba(255, 193, 7, 0.8)';
+                    return 'rgba(220, 53, 69, 0.8)';
+                }),
+                borderColor: labels.map(label => {
+                    const score = npsData[label].nps_score || 0;
+                    if (score >= 50) return 'rgb(40, 167, 69)';
+                    if (score >= 0) return 'rgb(255, 193, 7)';
+                    return 'rgb(220, 53, 69)';
+                }),
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: `NPS Score by ${label}`
+                },
+                tooltip: {
+                    callbacks: {
+                        afterLabel: function(context) {
+                            const idx = context.dataIndex;
+                            const key = labels[idx];
+                            const metrics = npsData[key];
+                            return [
+                                `Responses: ${metrics.total_responses}`,
+                                `Promoters: ${metrics.promoters}`,
+                                `Passives: ${metrics.passives}`,
+                                `Detractors: ${metrics.detractors}`
+                            ];
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    min: -100,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value;
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'NPS Score'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: label
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderSegmentationTable(segmentationData) {
+    const tbody = document.getElementById('segmentationTable');
+    if (!tbody) return;
+    
+    let html = '';
+    
+    // Add role segments
+    const roleData = segmentationData.nps_by_role || {};
+    const roleSatisfaction = segmentationData.satisfaction_by_role || {};
+    Object.keys(roleData).forEach(role => {
+        const metrics = roleData[role];
+        const satisfaction = roleSatisfaction[role];
+        html += `
+            <tr>
+                <td><span class="badge bg-primary">Role</span></td>
+                <td>${role}</td>
+                <td>${metrics.total_responses || 0}</td>
+                <td>${satisfaction !== null && satisfaction !== undefined ? satisfaction.toFixed(2) : 'N/A'}</td>
+                <td><span class="badge ${getNPSBadgeClass(metrics.nps_score)}">${metrics.nps_score || 0}</span></td>
+            </tr>
+        `;
+    });
+    
+    // Add region segments
+    const regionData = segmentationData.nps_by_region || {};
+    const regionSatisfaction = segmentationData.satisfaction_by_region || {};
+    Object.keys(regionData).forEach(region => {
+        const metrics = regionData[region];
+        const satisfaction = regionSatisfaction[region];
+        html += `
+            <tr>
+                <td><span class="badge bg-info">Region</span></td>
+                <td>${region}</td>
+                <td>${metrics.total_responses || 0}</td>
+                <td>${satisfaction !== null && satisfaction !== undefined ? satisfaction.toFixed(2) : 'N/A'}</td>
+                <td><span class="badge ${getNPSBadgeClass(metrics.nps_score)}">${metrics.nps_score || 0}</span></td>
+            </tr>
+        `;
+    });
+    
+    // Add tier segments
+    const tierData = segmentationData.nps_by_tier || {};
+    const tierSatisfaction = segmentationData.satisfaction_by_tier || {};
+    Object.keys(tierData).forEach(tier => {
+        const metrics = tierData[tier];
+        const satisfaction = tierSatisfaction[tier];
+        html += `
+            <tr>
+                <td><span class="badge bg-warning text-dark">Tier</span></td>
+                <td>${tier}</td>
+                <td>${metrics.total_responses || 0}</td>
+                <td>${satisfaction !== null && satisfaction !== undefined ? satisfaction.toFixed(2) : 'N/A'}</td>
+                <td><span class="badge ${getNPSBadgeClass(metrics.nps_score)}">${metrics.nps_score || 0}</span></td>
+            </tr>
+        `;
+    });
+    
+    tbody.innerHTML = html || '<tr><td colspan="5" class="text-center text-muted">No segmentation data available</td></tr>';
+}
+
+function getNPSBadgeClass(score) {
+    if (score >= 50) return 'bg-success';
+    if (score >= 0) return 'bg-warning text-dark';
+    return 'bg-danger';
+}
+
+// Hook into existing dashboard rendering
+if (typeof window.originalRenderDashboard === 'undefined' && typeof renderDashboard !== 'undefined') {
+    window.originalRenderDashboard = renderDashboard;
+    renderDashboard = function(data) {
+        window.originalRenderDashboard(data);
+        renderSegmentationInsights(data);
+    };
+}
+</script>
 {% endblock %}

@@ -581,6 +581,9 @@ class CampaignKPISnapshot(db.Model):
     # Analytics Charts Data
     growth_factor_analysis_detailed = db.Column(db.Text, nullable=True)  # JSON: Detailed growth factor data
     
+    # Segmentation Analytics Data
+    segmentation_analytics = db.Column(db.Text, nullable=True)  # JSON: NPS and satisfaction by role, region, customer tier
+    
     # Snapshot Metadata
     snapshot_version = db.Column(db.String(10), nullable=False, default='v1.0')  # Track engine versions
     snapshot_created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
@@ -626,6 +629,7 @@ class CampaignKPISnapshot(db.Model):
             'company_nps_breakdown': json.loads(self.company_nps_breakdown) if self.company_nps_breakdown else [],
             'tenure_analysis': json.loads(self.tenure_analysis) if self.tenure_analysis else [],
             'growth_factor_analysis_detailed': json.loads(self.growth_factor_analysis_detailed) if self.growth_factor_analysis_detailed else {},
+            'segmentation_analytics': json.loads(self.segmentation_analytics) if self.segmentation_analytics else {},
             'snapshot_version': self.snapshot_version,
             'snapshot_created_at': self.snapshot_created_at.isoformat() if self.snapshot_created_at else None,
             'data_period_start': self.data_period_start.isoformat() if self.data_period_start else None,

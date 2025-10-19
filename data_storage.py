@@ -835,7 +835,8 @@ def get_dashboard_data(campaign_id=None):
                 ]
             },
             'company_nps_data': company_nps_data,
-            'tenure_nps_data': tenure_nps_data
+            'tenure_nps_data': tenure_nps_data,
+            'segmentation_analytics': calculate_segmentation_analytics(campaign_id) if campaign_id else {}
         }
         
     except Exception as e:
@@ -910,7 +911,8 @@ def convert_snapshot_to_dashboard_format(snapshot):
             'growth_factor_analysis': json.loads(snapshot.growth_factor_analysis_detailed) if snapshot.growth_factor_analysis_detailed else {
                 'total_growth_potential': snapshot.total_growth_potential or 0,
                 'distribution': growth_factor_distribution
-            }
+            },
+            'segmentation_analytics': json.loads(snapshot.segmentation_analytics) if snapshot.segmentation_analytics else {}
         }
         
     except Exception as e:
@@ -1135,6 +1137,135 @@ def get_company_trends():
         
     except Exception as e:
         print(f"Error getting company trends: {e}")
+        return {}
+
+
+def calculate_segmentation_analytics(campaign_id):
+    """
+    Calculate NPS and satisfaction analytics segmented by participant attributes.
+    Returns analytics grouped by role, region, and customer_tier.
+    """
+    try:
+        from models import Participant, CampaignParticipant
+        
+        # Join SurveyResponse -> CampaignParticipant -> Participant to get segmentation attributes
+        segmentation_query = db.session.query(
+            SurveyResponse.nps_score,
+            SurveyResponse.satisfaction_rating,
+            Participant.role,
+            Participant.region,
+            Participant.customer_tier
+        ).join(
+            CampaignParticipant, 
+            SurveyResponse.campaign_participant_id == CampaignParticipant.id
+        ).join(
+            Participant,
+            CampaignParticipant.participant_id == Participant.id
+        ).filter(
+            SurveyResponse.campaign_id == campaign_id,
+            SurveyResponse.nps_score.isnot(None)
+        ).all()
+        
+        if not segmentation_query:
+            return {}
+        
+        # Initialize segment collectors
+        role_segments = {}
+        region_segments = {}
+        tier_segments = {}
+        
+        # Process each response
+        for response in segmentation_query:
+            nps_score = response.nps_score
+            satisfaction = response.satisfaction_rating
+            role = response.role or 'Unspecified'
+            region = response.region or 'Unspecified'
+            tier = response.customer_tier or 'Unspecified'
+            
+            # Collect by role
+            if role not in role_segments:
+                role_segments[role] = {'nps_scores': [], 'satisfaction_scores': []}
+            role_segments[role]['nps_scores'].append(nps_score)
+            if satisfaction:
+                role_segments[role]['satisfaction_scores'].append(satisfaction)
+            
+            # Collect by region
+            if region not in region_segments:
+                region_segments[region] = {'nps_scores': [], 'satisfaction_scores': []}
+            region_segments[region]['nps_scores'].append(nps_score)
+            if satisfaction:
+                region_segments[region]['satisfaction_scores'].append(satisfaction)
+            
+            # Collect by tier
+            if tier not in tier_segments:
+                tier_segments[tier] = {'nps_scores': [], 'satisfaction_scores': []}
+            tier_segments[tier]['nps_scores'].append(nps_score)
+            if satisfaction:
+                tier_segments[tier]['satisfaction_scores'].append(satisfaction)
+        
+        # Helper function to calculate NPS metrics
+        def calculate_nps_metrics(nps_scores):
+            if not nps_scores:
+                return {}
+            total = len(nps_scores)
+            promoters = sum(1 for score in nps_scores if score >= 9)
+            passives = sum(1 for score in nps_scores if 7 <= score <= 8)
+            detractors = sum(1 for score in nps_scores if score <= 6)
+            nps = round(((promoters - detractors) / total) * 100) if total > 0 else 0
+            avg_nps = round(sum(nps_scores) / total, 1) if total > 0 else 0
+            
+            return {
+                'nps_score': nps,
+                'avg_nps': avg_nps,
+                'total_responses': total,
+                'promoters': promoters,
+                'passives': passives,
+                'detractors': detractors
+            }
+        
+        # Helper function to calculate satisfaction metrics
+        def calculate_satisfaction_metrics(satisfaction_scores):
+            if not satisfaction_scores:
+                return None
+            return round(sum(satisfaction_scores) / len(satisfaction_scores), 2)
+        
+        # Build analytics structure
+        analytics = {
+            'nps_by_role': {},
+            'nps_by_region': {},
+            'nps_by_tier': {},
+            'satisfaction_by_role': {},
+            'satisfaction_by_region': {},
+            'satisfaction_by_tier': {},
+            'response_distribution': {
+                'by_role': {},
+                'by_region': {},
+                'by_tier': {}
+            }
+        }
+        
+        # Calculate metrics for each segment
+        for role, data in role_segments.items():
+            analytics['nps_by_role'][role] = calculate_nps_metrics(data['nps_scores'])
+            analytics['satisfaction_by_role'][role] = calculate_satisfaction_metrics(data['satisfaction_scores'])
+            analytics['response_distribution']['by_role'][role] = len(data['nps_scores'])
+        
+        for region, data in region_segments.items():
+            analytics['nps_by_region'][region] = calculate_nps_metrics(data['nps_scores'])
+            analytics['satisfaction_by_region'][region] = calculate_satisfaction_metrics(data['satisfaction_scores'])
+            analytics['response_distribution']['by_region'][region] = len(data['nps_scores'])
+        
+        for tier, data in tier_segments.items():
+            analytics['nps_by_tier'][tier] = calculate_nps_metrics(data['nps_scores'])
+            analytics['satisfaction_by_tier'][tier] = calculate_satisfaction_metrics(data['satisfaction_scores'])
+            analytics['response_distribution']['by_tier'][tier] = len(data['nps_scores'])
+        
+        return analytics
+        
+    except Exception as e:
+        print(f"Error calculating segmentation analytics for campaign {campaign_id}: {e}")
+        import traceback
+        traceback.print_exc()
         return {}
 
 
@@ -1489,6 +1620,12 @@ def generate_campaign_kpi_snapshot(campaign_id):
         high_risk_accounts = serialize_for_json(full_dashboard_data.get('high_risk_accounts', []))
         print(f"   ✅ High Risk Accounts: {len(high_risk_accounts)} companies")
         
+        # Segmentation Analytics
+        segmentation_analytics = calculate_segmentation_analytics(campaign_id)
+        segmentation_analytics = serialize_for_json(segmentation_analytics)
+        segment_count = sum(len(segmentation_analytics.get(key, {})) for key in ['nps_by_role', 'nps_by_region', 'nps_by_tier'])
+        print(f"   ✅ Segmentation Analytics: {segment_count} segments")
+        
         # ============================================================================
         # CREATE SNAPSHOT RECORD
         # ============================================================================
@@ -1529,6 +1666,7 @@ def generate_campaign_kpi_snapshot(campaign_id):
             company_nps_breakdown=json.dumps(company_nps_breakdown),
             tenure_analysis=json.dumps(tenure_analysis),
             growth_factor_analysis_detailed=json.dumps(growth_factor_analysis_detailed),
+            segmentation_analytics=json.dumps(segmentation_analytics),
             data_period_start=campaign.start_date,
             data_period_end=campaign.end_date
         )
