@@ -90,6 +90,9 @@ class EmailService:
                     is_valid_result = False
                 
                 if email_config and is_valid_result:
+                    # Auto-generate SMTP server for AWS SES if needed
+                    email_config.ensure_ses_smtp_server()
+                    
                     config.update({
                         'smtp_server': email_config.smtp_server,
                         'smtp_port': email_config.smtp_port,
@@ -101,9 +104,13 @@ class EmailService:
                         'sender_email': email_config.sender_email,
                         'reply_to_email': email_config.reply_to_email,
                         'admin_emails': email_config.get_admin_emails(),
+                        'email_provider': email_config.email_provider if hasattr(email_config, 'email_provider') else 'smtp',
+                        'aws_region': email_config.aws_region if hasattr(email_config, 'aws_region') else None,
                         'source': 'business_account'
                     })
-                    logger.debug(f"SUCCESS: Using business account email configuration for account {business_account_id}")
+                    
+                    provider_info = f"AWS SES ({email_config.aws_region})" if email_config.is_aws_ses() else "SMTP"
+                    logger.debug(f"SUCCESS: Using business account email configuration for account {business_account_id} (Provider: {provider_info})")
                 else:
                     logger.error(f"FAILED: Invalid business account email configuration for account {business_account_id}, falling back to system defaults")
             except Exception as e:
