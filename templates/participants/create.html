@@ -11,150 +11,133 @@
     {'label': 'Add Participant', 'current': true}
 ] %}
 {% include 'components/breadcrumb.html' %}
-<style>
-/* Participant creation styling */
-.participant-header {
-    background: linear-gradient(135deg, rgba(var(--primary-red-rgb, 220, 53, 69), 0.1) 0%, rgba(var(--red-hover-rgb, 200, 40, 55), 0.15) 100%);
-    border: 1px solid var(--red-light);
-    color: var(--primary-black);
-    padding: 2rem 0;
-    border-radius: var(--radius-2xl);
-    margin-bottom: 2rem;
-}
-</style>
 
-<div class="container">
-    <!-- Participant Header -->
-    <div class="participant-header">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-12">
-                    <h1 class="mb-1">Add New Participant</h1>
-                    <p class="mb-0 opacity-75">Add a new participant to {{ business_account.name }} - you can assign them to campaigns later</p>
-                </div>
-            </div>
+<div class="participant-config-container">
+    <!-- Header -->
+    <div class="participant-config-header">
+        <div class="participant-config-header-content">
+            <h1>
+                <i class="fas fa-user-plus me-2" aria-hidden="true"></i>
+                Add New Participant
+            </h1>
+            <p>Add a new participant to {{ business_account.name }}</p>
         </div>
     </div>
 
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
-                    <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'info-circle' if category == 'info' else 'check-circle' }} me-2"></i>
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-
-    <div class="row justify-content-center">
-        <div class="col-lg-8 col-md-10">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="mb-0">
-                        <i class="fas fa-user-plus me-2"></i>Participant Information
-                    </h4>
-                    <p class="text-muted mb-0 mt-2">Enter the participant's details below</p>
-                </div>
-                <div class="card-body">
-                    <form method="POST" action="{{ url_for('participants.create_participant') }}">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="email" class="form-label">
-                                        <i class="fas fa-envelope me-2"></i>Email Address <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="email" class="form-control" id="email" name="email" required>
-                                    <div class="form-text">
-                                        Participant's email address for survey invitation
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="name" class="form-label">
-                                        <i class="fas fa-user me-2"></i>Full Name <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="text" class="form-control" id="name" name="name" required>
-                                    <div class="form-text">
-                                        Participant's full name
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="company_name" class="form-label">
-                                        <i class="fas fa-building me-2"></i>Company Name <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="text" class="form-control" id="company_name" name="company_name" required>
-                                    <div class="form-text">
-                                        Participant's company or organization
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <div class="d-flex justify-content-between">
-                                    <a href="{{ url_for('participants.list_participants') }}" class="btn btn-secondary">
-                                        <i class="fas fa-arrow-left me-2"></i>Cancel
-                                    </a>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-plus me-2"></i>Create Participant
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+    <!-- Configuration Form -->
+    <form method="POST" action="{{ url_for('participants.create_participant') }}" id="participantCreateForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        
+        <!-- Participant Information -->
+        <div class="participant-config-form-section">
+            <h3 class="participant-section-title">
+                <i class="fas fa-user" aria-hidden="true"></i>
+                Participant Information
+            </h3>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="participant-form-group">
+                        <label class="participant-form-label" for="email">Email Address *</label>
+                        <input type="email" 
+                               class="participant-form-control" 
+                               id="email" 
+                               name="email" 
+                               placeholder="participant@example.com" 
+                               required
+                               aria-required="true"
+                               aria-describedby="email_help">
+                        <div class="participant-help-text" id="email_help">Participant's email address for survey invitation</div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Information Card -->
-            <div class="card mt-4">
-                <div class="card-header bg-primary text-white">
-                    <h6 class="mb-0">
-                        <i class="fas fa-info-circle me-2"></i>How It Works
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="text-center mb-3">
-                                <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                                    <i class="fas fa-user-plus"></i>
-                                </div>
-                                <h6 class="mt-2">1. Create</h6>
-                                <small class="text-muted">Add participant details and assign to a campaign</small>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-center mb-3">
-                                <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                                    <i class="fas fa-link"></i>
-                                </div>
-                                <h6 class="mt-2">2. Generate Token</h6>
-                                <small class="text-muted">Unique Participant Token for Survey and Anonymization</small>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-center mb-3">
-                                <div class="bg-secondary text-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                                    <i class="fas fa-users"></i>
-                                </div>
-                                <h6 class="mt-2">3. Add to a Campaign</h6>
-                                <small class="text-muted">Assign participant to active campaigns</small>
-                            </div>
-                        </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="participant-form-group">
+                        <label class="participant-form-label" for="name">Full Name *</label>
+                        <input type="text" 
+                               class="participant-form-control" 
+                               id="name" 
+                               name="name" 
+                               placeholder="John Doe" 
+                               required
+                               aria-required="true"
+                               aria-describedby="name_help">
+                        <div class="participant-help-text" id="name_help">Participant's full name</div>
                     </div>
                 </div>
+                
+                <div class="col-md-6">
+                    <div class="participant-form-group">
+                        <label class="participant-form-label" for="company_name">Company Name *</label>
+                        <input type="text" 
+                               class="participant-form-control" 
+                               id="company_name" 
+                               name="company_name" 
+                               placeholder="Acme Corporation" 
+                               required
+                               aria-required="true"
+                               aria-describedby="company_name_help">
+                        <div class="participant-help-text" id="company_name_help">Participant's company or organization</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="participant-config-form-section">
+            <div class="participant-actions-row">
+                <div class="participant-actions-left">
+                    <a href="{{ url_for('participants.list_participants') }}" 
+                       class="participant-btn-cancel"
+                       aria-label="Cancel and return to participants list">
+                        <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                        Cancel
+                    </a>
+                </div>
+                <div class="participant-actions-right">
+                    <button type="submit" 
+                            class="participant-btn-save"
+                            aria-label="Create participant">
+                        <i class="fas fa-plus" aria-hidden="true"></i>
+                        Create Participant
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Information Card -->
+    <div class="participant-config-form-section">
+        <h3 class="participant-section-title">
+            <i class="fas fa-info-circle" aria-hidden="true"></i>
+            How It Works
+        </h3>
+        
+        <div class="participant-info-steps">
+            <div class="participant-info-step">
+                <div class="participant-step-icon">
+                    <i class="fas fa-user-plus" aria-hidden="true"></i>
+                </div>
+                <h4 class="participant-step-title">1. Create</h4>
+                <p class="participant-step-description">Add participant details to your account</p>
+            </div>
+            
+            <div class="participant-info-step">
+                <div class="participant-step-icon">
+                    <i class="fas fa-link" aria-hidden="true"></i>
+                </div>
+                <h4 class="participant-step-title">2. Generate Token</h4>
+                <p class="participant-step-description">Unique token for survey access and anonymization</p>
+            </div>
+            
+            <div class="participant-info-step">
+                <div class="participant-step-icon">
+                    <i class="fas fa-users" aria-hidden="true"></i>
+                </div>
+                <h4 class="participant-step-title">3. Assign to Campaign</h4>
+                <p class="participant-step-description">Add participant to active campaigns</p>
             </div>
         </div>
     </div>
@@ -165,12 +148,12 @@
 <script>
 // Form validation and enhancement
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.querySelector('form');
+    const form = document.getElementById('participantCreateForm');
     const submitBtn = form.querySelector('button[type="submit"]');
     
     form.addEventListener('submit', function(e) {
         // Add loading state
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating...';
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2" aria-hidden="true"></i>Creating...';
         submitBtn.disabled = true;
     });
     
