@@ -1188,6 +1188,48 @@ def dashboard():
                          business_user_name=business_user_name,
                          branding_context=branding_context)
 
+@app.route('/dashboard/executive-summary')
+@require_business_auth
+def executive_summary():
+    """Executive Summary - Strategic overview across all campaigns (Business users only)"""
+    # Get current business user
+    current_business_user = get_current_business_user()
+    business_user_name = f"{current_business_user.first_name} {current_business_user.last_name}"
+    
+    # Get branding context for authenticated business user
+    business_account_id = current_business_user.business_account_id
+    branding_context = get_branding_context(business_account_id)
+    
+    return render_template('executive_summary.html',
+                         is_business_authenticated=True,
+                         business_user_name=business_user_name,
+                         branding_context=branding_context)
+
+@app.route('/dashboard/campaign-insights')
+@require_business_auth
+def campaign_insights():
+    """Campaign Insights - Operational analytics with campaign filtering (Business users only)"""
+    try:
+        from data_storage import get_company_nps_data
+        company_nps_data = get_company_nps_data()
+    except Exception as e:
+        logger.error(f"Error loading company NPS data for campaign insights: {e}")
+        company_nps_data = []
+    
+    # Get current business user
+    current_business_user = get_current_business_user()
+    business_user_name = f"{current_business_user.first_name} {current_business_user.last_name}"
+    
+    # Get branding context for authenticated business user
+    business_account_id = current_business_user.business_account_id
+    branding_context = get_branding_context(business_account_id)
+    
+    return render_template('campaign_insights.html',
+                         company_nps_data=company_nps_data,
+                         is_business_authenticated=True,
+                         business_user_name=business_user_name,
+                         branding_context=branding_context)
+
 @app.route('/api/dashboard_data')
 def dashboard_data():
     """API endpoint for dashboard data with optional campaign filtering"""
