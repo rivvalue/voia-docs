@@ -12,10 +12,10 @@
 ] %}
 {% include 'components/breadcrumb.html' %}
 
-<div class="participant-upload-container">
+<div class="upload-container">
     <!-- Header -->
-    <div class="participant-upload-header">
-        <div class="participant-upload-header-content">
+    <div class="upload-header">
+        <div class="upload-header-content">
             <h1>
                 <i class="fas fa-upload me-2" aria-hidden="true"></i>
                 Bulk Upload Participants
@@ -41,27 +41,27 @@
     <form method="POST" action="{{ url_for('participants.upload_participants') }}" enctype="multipart/form-data" id="uploadForm">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         
-        <div class="participant-upload-form-section">
-            <h3 class="participant-upload-section-title">
+        <div class="upload-form-section">
+            <h3 class="upload-section-title">
                 <i class="fas fa-file-upload" aria-hidden="true"></i>
                 Upload CSV File
             </h3>
             
             <div class="row">
                 <div class="col-md-6">
-                    <div class="participant-upload-form-group">
-                        <label class="participant-upload-form-label" for="csv_file">
+                    <div class="upload-form-group">
+                        <label class="upload-form-label" for="csv_file">
                             CSV File *
                         </label>
                         <input type="file" 
-                               class="participant-upload-form-control" 
+                               class="upload-form-control" 
                                id="csv_file" 
                                name="csv_file" 
                                accept=".csv" 
                                required
                                aria-required="true"
                                aria-describedby="csv_file_help">
-                        <div class="participant-upload-help-text" id="csv_file_help">
+                        <div class="upload-help-text" id="csv_file_help">
                             Select a CSV file with participant information (max 5MB)
                         </div>
                     </div>
@@ -70,19 +70,19 @@
         </div>
 
         <!-- Action Buttons -->
-        <div class="participant-upload-form-section">
-            <div class="participant-upload-actions-row">
-                <div class="participant-upload-actions-left">
+        <div class="upload-form-section">
+            <div class="upload-actions-row">
+                <div class="upload-actions-left">
                     <a href="{{ url_for('participants.list_participants') }}" 
-                       class="participant-upload-btn-cancel"
+                       class="upload-btn-cancel"
                        aria-label="Cancel and return to participants list">
                         <i class="fas fa-arrow-left" aria-hidden="true"></i>
                         Cancel
                     </a>
                 </div>
-                <div class="participant-upload-actions-right">
+                <div class="upload-actions-right">
                     <button type="submit" 
-                            class="participant-upload-btn-save"
+                            class="upload-btn-save"
                             aria-label="Upload participants from CSV file">
                         <i class="fas fa-upload" aria-hidden="true"></i>
                         Upload Participants
@@ -93,15 +93,15 @@
     </form>
 
     <!-- CSV Format Information -->
-    <div class="participant-upload-form-section">
-        <h3 class="participant-upload-section-title">
+    <div class="upload-form-section">
+        <h3 class="upload-section-title">
             <i class="fas fa-check-circle" aria-hidden="true"></i>
             Required CSV Format
         </h3>
         
-        <div class="participant-upload-info-content">
+        <div class="upload-info-content">
             <p class="mb-3"><strong>Required columns:</strong></p>
-            <ul class="participant-upload-list">
+            <ul class="upload-list">
                 <li>
                     <i class="fas fa-dot-circle text-danger me-2" aria-hidden="true"></i>
                     <strong>email</strong> - Participant's email address
@@ -117,7 +117,7 @@
             </ul>
             
             <p class="mb-3 mt-4"><strong>Optional segmentation columns:</strong></p>
-            <ul class="participant-upload-list">
+            <ul class="upload-list">
                 <li>
                     <i class="fas fa-circle text-secondary me-2" aria-hidden="true"></i>
                     <strong>role</strong> - Participant's role (e.g., "C-Level", "Manager", "End User")
@@ -136,7 +136,7 @@
                 </li>
             </ul>
             
-            <div class="mt-4 participant-upload-example-box">
+            <div class="mt-4 upload-example-box">
                 <strong class="d-block mb-2">Example CSV with optional columns:</strong>
                 <code class="d-block p-3 bg-light rounded" style="font-size: 12px; overflow-x: auto;">
 email,name,company_name,role,region,customer_tier,language<br>
@@ -149,66 +149,66 @@ bob@freelance.com,Bob Johnson,Freelance Services,End User,APAC,End Users / Funct
     </div>
 
     <!-- Upload Process Information -->
-    <div class="participant-upload-form-section">
-        <h3 class="participant-upload-section-title">
+    <div class="upload-form-section">
+        <h3 class="upload-section-title">
             <i class="fas fa-info-circle" aria-hidden="true"></i>
             Upload Process
         </h3>
         
-        <div class="participant-upload-process-steps">
-            <div class="participant-upload-step">
-                <div class="participant-upload-step-icon">
+        <div class="upload-process-steps">
+            <div class="upload-step">
+                <div class="upload-step-icon">
                     <i class="fas fa-check-double" aria-hidden="true"></i>
                 </div>
-                <div class="participant-upload-step-content">
-                    <h4 class="participant-upload-step-title">1. File Validation</h4>
-                    <p class="participant-upload-step-description">System checks CSV format and validates all required columns are present</p>
+                <div class="upload-step-content">
+                    <h4 class="upload-step-title">1. File Validation</h4>
+                    <p class="upload-step-description">System checks CSV format and validates all required columns are present</p>
                 </div>
             </div>
             
-            <div class="participant-upload-step">
-                <div class="participant-upload-step-icon">
+            <div class="upload-step">
+                <div class="upload-step-icon">
                     <i class="fas fa-user-check" aria-hidden="true"></i>
                 </div>
-                <div class="participant-upload-step-content">
-                    <h4 class="participant-upload-step-title">2. Duplicate Detection</h4>
-                    <p class="participant-upload-step-description">Automatically skips participants already in your account</p>
+                <div class="upload-step-content">
+                    <h4 class="upload-step-title">2. Duplicate Detection</h4>
+                    <p class="upload-step-description">Automatically skips participants already in your account</p>
                 </div>
             </div>
             
-            <div class="participant-upload-step">
-                <div class="participant-upload-step-icon">
+            <div class="upload-step">
+                <div class="upload-step-icon">
                     <i class="fas fa-key" aria-hidden="true"></i>
                 </div>
-                <div class="participant-upload-step-content">
-                    <h4 class="participant-upload-step-title">3. Token Generation</h4>
-                    <p class="participant-upload-step-description">Generate unique tokens for secure survey access</p>
+                <div class="upload-step-content">
+                    <h4 class="upload-step-title">3. Token Generation</h4>
+                    <p class="upload-step-description">Generate unique tokens for secure survey access</p>
                 </div>
             </div>
             
-            <div class="participant-upload-step">
-                <div class="participant-upload-step-icon">
+            <div class="upload-step">
+                <div class="upload-step-icon">
                     <i class="fas fa-chart-line" aria-hidden="true"></i>
                 </div>
-                <div class="participant-upload-step-content">
-                    <h4 class="participant-upload-step-title">4. Status Report</h4>
-                    <p class="participant-upload-step-description">View detailed results including successes and any errors</p>
+                <div class="upload-step-content">
+                    <h4 class="upload-step-title">4. Status Report</h4>
+                    <p class="upload-step-description">View detailed results including successes and any errors</p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Download Template Section -->
-    <div class="participant-upload-form-section">
-        <h3 class="participant-upload-section-title">
+    <div class="upload-form-section">
+        <h3 class="upload-section-title">
             <i class="fas fa-download" aria-hidden="true"></i>
             Need a Template?
         </h3>
         
-        <div class="participant-upload-template-content">
+        <div class="upload-template-content">
             <p class="mb-3">Download a sample CSV file with all columns and example data to get started quickly</p>
             <button type="button" 
-                    class="participant-upload-btn-template" 
+                    class="upload-btn-template" 
                     onclick="downloadTemplate()"
                     aria-label="Download CSV template file">
                 <i class="fas fa-file-csv me-2" aria-hidden="true"></i>
