@@ -1118,13 +1118,22 @@ def public_survey_response(response_id):
                 current_account = get_current_business_account()
                 branding = get_branding_context(current_account)
                 
-                # Determine back URL from session or default to Campaign Insights for business users
-                back_url = session.get('last_bi_page', url_for('campaign_insights'))
+                # Determine breadcrumb based on session or default to Campaign Insights for business users
+                last_bi_page = session.get('last_bi_page', url_for('campaign_insights'))
+                
+                # Determine breadcrumb label based on the URL
+                if 'executive-summary' in last_bi_page:
+                    bi_label = 'Executive Summary'
+                elif 'campaign-insights' in last_bi_page:
+                    bi_label = 'Campaign Insights'
+                else:
+                    bi_label = 'Business Intelligence'
                 
                 return render_template('public_survey_response.html', 
                                      response=response_data,
                                      branding=branding,
-                                     back_url=back_url)
+                                     bi_url=last_bi_page,
+                                     bi_label=bi_label)
             else:
                 # Business user doesn't own this campaign
                 logger.warning(f"Business user {current_business_user.email} denied access to response {response_id} - not their campaign")
@@ -1147,13 +1156,22 @@ def public_survey_response(response_id):
         # Get default branding for public view (no business branding)
         branding = get_branding_context()
         
-        # Determine back URL from session or default to Dashboard for trial users
-        back_url = session.get('last_bi_page', url_for('dashboard'))
+        # Determine breadcrumb based on session or default to Dashboard for trial users
+        last_bi_page = session.get('last_bi_page', url_for('dashboard'))
+        
+        # Determine breadcrumb label based on the URL
+        if 'executive-summary' in last_bi_page:
+            bi_label = 'Executive Summary'
+        elif 'campaign-insights' in last_bi_page:
+            bi_label = 'Campaign Insights'
+        else:
+            bi_label = 'Business Intelligence'
         
         return render_template('public_survey_response.html', 
                              response=response_data,
                              branding=branding,
-                             back_url=back_url)
+                             bi_url=last_bi_page,
+                             bi_label=bi_label)
     
     except Exception as e:
         logger.error(f"Error accessing survey response {response_id}: {e}")
