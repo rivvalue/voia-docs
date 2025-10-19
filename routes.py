@@ -1203,6 +1203,8 @@ def executive_summary():
     return render_template('executive_summary.html',
                          is_business_authenticated=True,
                          business_user_name=business_user_name,
+                         business_user_id=current_business_user.id,
+                         business_account_id=business_account_id,
                          branding_context=branding_context)
 
 @app.route('/dashboard/campaign-insights')
@@ -1228,6 +1230,8 @@ def campaign_insights():
                          company_nps_data=company_nps_data,
                          is_business_authenticated=True,
                          business_user_name=business_user_name,
+                         business_user_id=current_business_user.id,
+                         business_account_id=business_account_id,
                          branding_context=branding_context)
 
 @app.route('/api/dashboard_data')
