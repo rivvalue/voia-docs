@@ -177,6 +177,12 @@ def create_participant():
         name = request.form.get('name', '').strip()
         company_name = request.form.get('company_name', '').strip()
         
+        # Optional segmentation attributes
+        role = request.form.get('role', '').strip() or None
+        region = request.form.get('region', '').strip() or None
+        customer_tier = request.form.get('customer_tier', '').strip() or None
+        language = request.form.get('language', '').strip() or 'en'
+        
         # Validate required fields
         if not email or not name or not company_name:
             flash('Email, name, and company name are required.', 'error')
@@ -198,6 +204,10 @@ def create_participant():
         participant.email = email
         participant.name = name
         participant.company_name = company_name if company_name else None
+        participant.role = role
+        participant.region = region
+        participant.customer_tier = customer_tier
+        participant.language = language
         participant.source = 'admin_single'  # Track that this was admin-created via single form
         
         # Generate unified token for seamless UX
@@ -313,6 +323,12 @@ def upload_participants():
                     error_count += 1
                     continue
                 
+                # Optional segmentation attributes (backward compatible)
+                role = row.get('role', '').strip() or None
+                region = row.get('region', '').strip() or None
+                customer_tier = row.get('customer_tier', '').strip() or None
+                language = row.get('language', '').strip() or 'en'
+                
                 # Check for duplicate participant (email within business account)
                 existing = Participant.query.filter_by(
                     business_account_id=current_account.id,
@@ -330,6 +346,10 @@ def upload_participants():
                 participant.email = email
                 participant.name = name
                 participant.company_name = company_name if company_name else None
+                participant.role = role
+                participant.region = region
+                participant.customer_tier = customer_tier
+                participant.language = language
                 participant.source = 'admin_bulk'  # Track that this was admin-created via bulk upload
                 
                 # Generate unified token for seamless UX
