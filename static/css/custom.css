@@ -5284,3 +5284,299 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
         max-width: 150px;
     }
 }
+
+/* ========================================
+   PARTICIPANT UPLOAD PAGE STYLES
+   Settings Hub v2 Design Patterns
+   ======================================== */
+
+.upload-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-lg);
+}
+
+/* Upload Header */
+.upload-header {
+    background: linear-gradient(135deg, rgba(var(--primary-red-rgb, 225, 58, 68), 0.1) 0%, rgba(var(--red-hover-rgb, 197, 45, 54), 0.15) 100%);
+    border: 1px solid var(--red-light);
+    color: var(--primary-black);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-2xl);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.upload-header-content h1 {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--primary-black);
+    margin-bottom: var(--spacing-sm);
+}
+
+.upload-header-content p {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+    color: var(--gray-dark);
+    margin: 0;
+}
+
+/* Upload Form Section */
+.upload-form-section {
+    background: var(--primary-white);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.upload-form-header {
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 2px solid var(--light-gray);
+}
+
+.upload-section-title {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--primary-black);
+    margin-bottom: var(--spacing-sm);
+}
+
+.upload-section-title i {
+    color: var(--primary-red);
+}
+
+.upload-section-subtitle {
+    font-size: var(--font-size-sm);
+    color: var(--gray-dark);
+    margin: 0;
+}
+
+.upload-form-body {
+    padding-top: var(--spacing-lg);
+}
+
+.upload-form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+/* Upload Info Cards */
+.upload-info-card {
+    background: var(--primary-white);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+    overflow: hidden;
+    margin-bottom: var(--spacing-xl);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.upload-info-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+}
+
+.upload-info-header {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    padding: var(--spacing-lg);
+    position: relative;
+}
+
+.upload-info-header-alt {
+    background: linear-gradient(135deg, rgba(var(--primary-red-rgb, 225, 58, 68), 0.15) 0%, rgba(var(--red-hover-rgb, 197, 45, 54), 0.2) 100%);
+}
+
+.upload-info-title {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--primary-white);
+    margin: 0;
+}
+
+.upload-info-header-alt .upload-info-title {
+    color: var(--primary-black);
+}
+
+.upload-info-title i {
+    margin-right: var(--spacing-sm);
+}
+
+.upload-info-body {
+    padding: var(--spacing-xl);
+}
+
+/* Requirements List */
+.upload-requirements-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.upload-requirements-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-sm);
+    color: var(--primary-black);
+}
+
+.upload-requirements-list li i {
+    color: var(--primary-red);
+    margin-top: 4px;
+    font-size: 10px;
+}
+
+.upload-requirements-list li strong {
+    color: var(--primary-red);
+}
+
+/* Code Block */
+.upload-code-block {
+    background: var(--bg-light);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--light-gray);
+    margin-top: var(--spacing-sm);
+}
+
+.upload-code-block code {
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: var(--font-size-xs);
+    color: var(--gray-dark);
+    line-height: 1.6;
+}
+
+/* Upload Steps */
+.upload-step {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.upload-step:last-child {
+    margin-bottom: 0;
+}
+
+.upload-step-number {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: var(--font-size-sm);
+    color: var(--primary-white);
+    flex-shrink: 0;
+}
+
+.upload-step-number-1 {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+}
+
+.upload-step-number-2 {
+    background: linear-gradient(135deg, #E13A44 0%, #C52D36 100%);
+    opacity: 0.9;
+}
+
+.upload-step-number-3 {
+    background: linear-gradient(135deg, #E13A44 0%, #C52D36 100%);
+    opacity: 0.8;
+}
+
+.upload-step-number-4 {
+    background: linear-gradient(135deg, #E13A44 0%, #C52D36 100%);
+    opacity: 0.7;
+}
+
+.upload-step-content {
+    flex: 1;
+}
+
+.upload-step-content strong {
+    display: block;
+    font-weight: 600;
+    color: var(--primary-black);
+    margin-bottom: 4px;
+}
+
+.upload-step-content small {
+    color: var(--gray-dark);
+    font-size: var(--font-size-xs);
+}
+
+/* Template Download Card */
+.upload-template-card {
+    background: linear-gradient(135deg, rgba(var(--primary-red-rgb, 225, 58, 68), 0.05) 0%, rgba(var(--red-hover-rgb, 197, 45, 54), 0.08) 100%);
+    border: 1px solid var(--red-light);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-2xl);
+    text-align: center;
+    margin-top: var(--spacing-2xl);
+}
+
+.upload-template-card h4 {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--primary-black);
+    margin-bottom: var(--spacing-sm);
+}
+
+.upload-template-card p {
+    color: var(--gray-dark);
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Mobile Responsive */
+@media (max-width: 992px) {
+    .upload-form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .upload-form-actions .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .upload-container {
+        padding: 0 var(--spacing-md);
+    }
+    
+    .upload-header {
+        padding: var(--spacing-lg);
+    }
+    
+    .upload-header-content h1 {
+        font-size: var(--font-size-xl);
+    }
+    
+    .upload-form-section {
+        padding: var(--spacing-lg);
+    }
+    
+    .upload-info-body {
+        padding: var(--spacing-lg);
+    }
+}
+
+@media (max-width: 576px) {
+    .upload-header-content h1 {
+        font-size: var(--font-size-lg);
+    }
+    
+    .upload-section-title {
+        font-size: var(--font-size-lg);
+    }
+}
