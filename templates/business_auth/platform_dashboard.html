@@ -5,6 +5,12 @@
 {% block page_class %}page-business-analytics-hub{% endblock %}
 
 {% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Platform Admin', 'url': url_for('business_auth.admin_panel')},
+    {'label': 'Platform Dashboard', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
 <style>
 /* Platform dashboard specific styling */
 .platform-header {

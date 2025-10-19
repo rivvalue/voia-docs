@@ -3,6 +3,12 @@
 {% block title %}{{ page_title }} - VOÏA Platform Admin{% endblock %}
 
 {% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Platform Admin', 'url': url_for('business_auth.admin_panel')},
+    {'label': page_title, 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
 <div class="admin-panel">
     <!-- Header -->
     <div class="admin-header">

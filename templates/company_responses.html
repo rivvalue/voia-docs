@@ -5,6 +5,12 @@
 {% block page_class %}page-company-responses{% endblock %}
 
 {% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Business Intelligence', 'url': url_for('dashboard')},
+    {'label': company_name, 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
 <style>
 /* EMERGENCY override - inject directly into page head */
 .text-warning, .text-warning:hover, .text-warning:focus, .text-warning:active,

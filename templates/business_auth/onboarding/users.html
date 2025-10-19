@@ -5,6 +5,13 @@
 {% block page_class %}page-onboarding-users{% endblock %}
 
 {% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Settings', 'url': url_for('business_auth.admin_panel')},
+    {'label': 'Account Setup', 'url': url_for('business_auth.onboarding_welcome')},
+    {'label': 'Add Team Members', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
 <style>
 /* Onboarding Users specific styling */
 .onboarding-container {

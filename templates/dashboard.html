@@ -6,6 +6,11 @@
 {% block page_class %}page-dashboard{% endblock %}
 
 {% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Business Intelligence', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
 <div class="container">
     <div data-page="dashboard"></div>
     <!-- Dashboard Header -->
