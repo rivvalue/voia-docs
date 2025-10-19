@@ -30,6 +30,7 @@ The system is a Flask web application with a multi-tiered architecture. The fron
 -   **Mandatory Onboarding System**: Extensible guided setup workflow for business account administrators.
 -   **Feature Flag System**: Production-ready infrastructure for UI version toggling.
 -   **Segmentation Analytics**: Comprehensive analytics system displaying NPS and satisfaction metrics segmented by participant attributes (role, region, customer tier). Includes a dedicated Segmentation Insights tab in Campaign Insights with interactive Chart.js visualizations showing NPS distribution across segments, detailed satisfaction ratings table, and historical preservation through campaign snapshots. Supports NULL handling by grouping unmapped participants as "Unspecified" for complete data coverage.
+-   **Demo Data Generation**: High-volume test data scripts (`generate_demo_data.py` and `generate_demo_data_simple.py`) capable of generating 1000 responses per campaign across 70 companies. Scripts automatically populate all participant segmentation fields (role, region, customer_tier, language) and enforce company-level commercial value consistency across all participants from the same company. Support campaign reuse patterns and realistic NPS distributions for staging and development testing.
 
 # External Dependencies
 -   **OpenAI API**: For advanced AI functionalities including sentiment analysis, theme extraction, and conversational surveys.
