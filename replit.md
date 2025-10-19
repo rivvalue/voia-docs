@@ -1,5 +1,5 @@
 # Overview
-The Voice of Client (VOÏA) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. Its purpose is to convert raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA provides businesses, particularly Rivvalue Inc., with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project features a production-ready multi-tenant participant management system with extensive email delivery capabilities and AI-powered survey functionalities.
+The Voice of Client (VOÏA) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. Its purpose is to convert raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA provides businesses with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project features a production-ready multi-tenant participant management system with extensive email delivery capabilities and AI-powered survey functionalities.
 
 # User Preferences
 Preferred communication style: Simple, everyday language.
@@ -9,26 +9,25 @@ Project customization: Rivvalue Inc. branding and conversational AI surveys for 
 # System Architecture
 The system is a Flask web application with a multi-tiered architecture. The frontend uses Jinja2, Bootstrap 5, custom CSS, vanilla JavaScript, and Chart.js. The backend is Flask with SQLAlchemy ORM, designed for scalability from SQLite to PostgreSQL. AI integration, primarily via OpenAI API, handles natural language processing, sentiment analysis, and conversational surveys (VOÏA), supplemented by TextBlob.
 
-Key architectural decisions and features:
--   **UI/UX**: Multi-step survey forms, interactive dashboards, chat-style interfaces for conversational surveys, and Rivvalue Inc. branding with a professional blue color scheme. Modern sidebar navigation with dark gradient theme and VOÏA red accents, mobile responsiveness, and active state highlighting. The Settings Hub features a 4-card layout with reusable components. Modernized dashboard and campaign pages feature consistent typography (Montserrat headings, Karla body), clean white backgrounds with #E13A44 red accents, lighter shadows, and standardized badge styling. The home page features a minimalist design with red accent borders for features and optimized mobile layouts. **Business Intelligence Navigation**: Collapsible submenu structure with three distinct pages - Overview (/dashboard, combined view for all users), Executive Summary (/dashboard/executive-summary, strategic KPI overview with campaign comparison and sparklines for business users), and Campaign Insights (/dashboard/campaign-insights, operational campaign-specific analytics with filtering and tabbed insights). This three-tier structure separates strategic oversight from operational analysis while maintaining backward compatibility for trial/public users. **Session-based Breadcrumb Navigation**: Intelligent back-button behavior across BI pages - Dashboard, Executive Summary, and Campaign Insights store `last_bi_page` in session; survey response pages (public_survey_response.html, company_responses.html) dynamically return users to their originating BI page. Admin pages (Audit Logs, Email Configuration, Brand Configuration, License Information, User Management, Business Login) fully redesigned with Settings Hub v2 patterns: bold red gradient headers with left-aligned flex layout (for admin pages), VOÏA brand color tokens (#E13A44 primary-red, #C52D36 red-hover) replacing ALL Tailwind colors (#10b981 green, #f59e0b orange, #ef4444 red, #3b82f6 blue, #9333ea purple, etc.), platform button patterns, comprehensive ARIA accessibility attributes (aria-labels, aria-hidden, aria-describedby, role attributes), and mobile-responsive breakpoints (992px, 768px, 576px). All inline styles (1000+ lines) migrated to custom.css using design system variables (spacing, typography, colors, shadows, radius). Emoji icons replaced with FontAwesome. Total code reduction: ~1200 lines across 4 admin pages. **Survey Response Page** (/survey-response/<id>): Fully redesigned with Settings Hub v2 patterns - VOÏA red gradient header (replacing green), 253 lines of inline CSS migrated to custom.css, comprehensive ARIA accessibility (semantic HTML: header, footer, section, article, aside, time; role attributes: main, banner, complementary, article, log, alert; aria-labels throughout), design system variables for all styling, mobile-responsive two-panel layout (sticky data panel, conversation transcript). **Breadcrumb Navigation System**: Comprehensive breadcrumb implementation across 26 business pages using reusable component (templates/components/breadcrumb.html) with Settings Hub v2 design patterns - semantic HTML (<nav>, <ol>, aria-label, aria-current), VOÏA red accent colors (#E13A44), responsive mobile optimization (truncation, horizontal scroll), and consistent navigation hierarchies aligned with sidebar structure (Business Intelligence, Campaigns, Participants, Settings, Platform Admin).
--   **Technical Implementations**:
-    -   **Survey Collection**: Multi-step forms with dynamic follow-up questions and real-time validation.
-    -   **AI Analysis Engine**: Sentiment analysis, key theme extraction, churn risk assessment, growth opportunity identification, and NPS-based growth factor analysis.
-    -   **Conversational Surveys**: AI-powered (GPT-4o) natural language interface, dynamic question generation, real-time processing, and structured data extraction.
-    -   **Data Management**: Centralized data aggregation, NPS calculation, time-based filtering, and optimized database queries.
-    -   **Authentication**: JWT token-based with email validation, admin roles, server-side token generation, and automatic invalidation post-survey. Session management includes environment-aware cookie configuration for security.
-    -   **Performance**: PostgreSQL migration, database indexing (including GIN index for full-text search), connection pooling (optimized for Neon serverless with 180s pool_recycle to prevent timeout issues), asynchronous background tasks for AI, IP-based rate limiting, optimized dashboard queries (2-3 queries vs 20+ legacy), admin-configurable response caching, index page response caching (5-minute timeout with auth-aware cache keys), Executive Summary comparison optimization, and frontend optimizations (deferring Chart.js, CDN resource hints). Critical fixes (Oct 2025): Executive Summary comparison now uses cached/optimized query path, reducing load time from 30-45s to <3s; database connection pool optimized for Neon's ~180s idle timeout to eliminate connection timeout errors.
--   **Security**: Token-based authentication, duplicate response prevention, enhanced rate limiting, and robust input validation. CSRF/XSS protection via proper cookie flags. Sentry error monitoring integration.
--   **Branding**: "VOÏA - Voice Of Client" with "AI Powered Client Insights" subtitle and a specific tagline. Multi-tenant logo system and selective trial branding.
--   **Multi-Tenant Architecture**: Business Accounts, Campaigns, and Participants with tenant isolation via `business_account_id` scoping, dual authentication, and a token system for survey access. Includes a lightweight scheduler for campaign lifecycle automation.
--   **Email Delivery System**: Multi-provider email infrastructure with AWS SES and SMTP support. Business accounts can independently choose between AWS SES (with region-based SMTP server auto-generation using dedicated SMTP credentials) or standard SMTP providers. Features include encrypted password storage, connection testing, professional VOÏA-branded templates, background task processing, delivery tracking, and configurable email content at both business account and campaign levels. Email content customization includes subject templates, intro messages, CTA button text, closing messages, and footer notes with template variable support and "use defaults" toggle options.
--   **Campaign Lifecycle Management**: Automated status transitions, multi-tenant scheduling, automatic KPI snapshot generation, and background task management for email retries.
--   **Hybrid Survey Customization**: Campaign-specific survey personalization with business account defaults for tailored AI conversations while maintaining brand identity.
--   **Hybrid Email Content Customization**: Campaign-level email content personalization with 3-tier fallback architecture (campaign override → business account defaults → hardcoded defaults). Allows customization of invitation email subject, intro message, CTA button text, closing message, and footer notes with template variable support ({participant_name}, {campaign_name}, {business_account_name}). Includes validation, XSS protection, and character limits aligned with the existing hybrid survey customization pattern.
--   **License Management System**: Enterprise-ready license management with usage tracking and enforcement, including anniversary-based calculation, and limits on campaigns, users, and participants.
--   **Business Account User Management**: Multi-tenant user management with a professional UI, license-aware counters, user creation workflows with validation, email verification, editing, role management, status controls, and admin-triggered password resets.
--   **Mandatory Onboarding System**: Extensible guided setup workflow for business account administrators with JSON-based progress tracking, license-conditional enforcement, and configurable validation system.
--   **Feature Flag System**: Production-ready infrastructure for UI version toggling with environment variable control, rollout percentage, and user toggling.
+**UI/UX**: Multi-step survey forms, interactive dashboards, chat-style interfaces for conversational surveys, and Rivvalue Inc. branding with a professional blue color scheme. Modern sidebar navigation, mobile responsiveness, and active state highlighting. The Settings Hub features a 4-card layout with reusable components. Modernized dashboard and campaign pages feature consistent typography, clean white backgrounds with red accents, lighter shadows, and standardized badge styling. The home page features a minimalist design with red accent borders for features and optimized mobile layouts. Business Intelligence Navigation includes a three-tier structure: Overview, Executive Summary, and Campaign Insights, separating strategic oversight from operational analysis. Session-based Breadcrumb Navigation ensures intelligent back-button behavior. Admin pages and the Survey Response page are fully redesigned with Settings Hub v2 patterns, featuring bold red gradient headers, VOÏA brand color tokens, comprehensive ARIA accessibility attributes, and mobile-responsive breakpoints. All inline styles are migrated to custom.css using design system variables, and emoji icons are replaced with FontAwesome. A comprehensive breadcrumb system is implemented across 26 business pages using a reusable component with consistent design patterns and responsive optimization.
+
+**Technical Implementations**:
+-   **Survey Collection**: Multi-step forms with dynamic follow-up questions and real-time validation.
+-   **AI Analysis Engine**: Sentiment analysis, key theme extraction, churn risk assessment, growth opportunity identification, and NPS-based growth factor analysis.
+-   **Conversational Surveys**: AI-powered (GPT-4o) natural language interface, dynamic question generation, real-time processing, and structured data extraction, using a hybrid prompt architecture combining structured JSON with natural language guidance, integrating participant segmentation data (role, region, customer tier, language) for personalized conversations.
+-   **Data Management**: Centralized data aggregation, NPS calculation, time-based filtering, and optimized database queries.
+-   **Authentication**: JWT token-based with email validation, admin roles, server-side token generation, and automatic invalidation post-survey.
+-   **Performance**: PostgreSQL migration, database indexing (including GIN index), connection pooling (optimized for Neon serverless), asynchronous background tasks for AI, IP-based rate limiting, optimized dashboard queries, admin-configurable response caching, index page response caching, Executive Summary comparison optimization, and frontend optimizations.
+-   **Security**: Token-based authentication, duplicate response prevention, enhanced rate limiting, robust input validation, CSRF/XSS protection, and Sentry integration.
+-   **Branding**: "VOÏA - Voice Of Client" with "AI Powered Client Insights" subtitle, specific tagline, multi-tenant logo system, and selective trial branding.
+-   **Multi-Tenant Architecture**: Business Accounts, Campaigns, and Participants with tenant isolation via `business_account_id` scoping, dual authentication, and a token system for survey access, including a lightweight scheduler.
+-   **Email Delivery System**: Multi-provider email infrastructure (AWS SES, SMTP) with business accounts choosing providers, encrypted password storage, connection testing, professional VOÏA-branded templates, background task processing, delivery tracking, and configurable email content at both business account and campaign levels, with a 3-tier fallback architecture for customization.
+-   **Campaign Lifecycle Management**: Automated status transitions, multi-tenant scheduling, automatic KPI snapshot generation, and background task management.
+-   **Hybrid Survey Customization**: Campaign-specific survey personalization with business account defaults.
+-   **License Management System**: Enterprise-ready license management with usage tracking and enforcement.
+-   **Business Account User Management**: Multi-tenant user management with professional UI, license-aware counters, and comprehensive user workflows.
+-   **Mandatory Onboarding System**: Extensible guided setup workflow for business account administrators.
+-   **Feature Flag System**: Production-ready infrastructure for UI version toggling.
 
 # External Dependencies
 -   **OpenAI API**: For advanced AI functionalities including sentiment analysis, theme extraction, and conversational surveys.
@@ -37,41 +36,3 @@ Key architectural decisions and features:
 -   **Font Awesome CDN**: For iconography.
 -   **Python Packages**: Flask, SQLAlchemy, OpenAI client library, TextBlob, cryptography, Flask-Caching.
 -   **Sentry**: For error tracking and performance monitoring.
-
-# Recent Development Progress (October 2025)
-
-## AWS SES Email Integration (October 18, 2025)
-Implemented multi-provider email infrastructure allowing business accounts to choose between AWS SES and standard SMTP providers:
--   **Provider Selection**: Business accounts can independently select AWS SES or SMTP as their email provider
--   **AWS SES Implementation**: Region-based SMTP server auto-generation (email-smtp.{region}.amazonaws.com) using dedicated SMTP credentials (not IAM keys)
--   **Multi-Tenant Configuration**: Isolated email provider settings per business account with encrypted credential storage
--   **Email Configuration UI**: Enhanced Settings Hub with provider selection, region picker for AWS SES, and connection testing
--   **Database Schema**: Extended EmailConfiguration model with email_provider and aws_region fields
--   **Security**: Dedicated SMTP credentials approach for AWS SES (username/password) with encrypted password storage
-
-## Configurable Email Content (October 18-19, 2025)
-Implemented hybrid email content customization system with 3-tier fallback architecture:
-
-### Business Account Level (October 18, 2025):
--   **Custom Email Templates**: Business accounts can customize invitation email content (subject, intro message, CTA text, closing message, footer note)
--   **Template Variables**: Support for {participant_name}, {campaign_name}, {business_account_name} with automatic substitution
--   **Use Defaults Toggle**: Simple checkbox to enable/disable custom content and fall back to hardcoded defaults
--   **Live Preview**: Real-time email preview endpoint with sample data rendering and branding integration
--   **Validation & Security**: Character limits (500 for subject, 2000 for intro/closing, 100 for CTA, 1000 for footer) and XSS protection
--   **Database Schema**: Added custom_subject_template, custom_intro_message, custom_cta_text, custom_closing_message, custom_footer_note, and use_custom_content fields to EmailConfiguration model
-
-### Campaign Level (October 19, 2025):
--   **Campaign-Specific Customization**: Extended email content customization to campaign level, following the existing hybrid survey customization pattern
--   **3-Tier Fallback Architecture**: Campaign custom content → Business account defaults → Hardcoded system defaults
--   **Campaign Creation UI**: Added "Invitation Email Content" section to campaign create/edit forms with toggle and collapsible fields
--   **Email Service Integration**: Updated send_participant_invitation() to accept campaign parameter and implement 3-tier fallback logic in _get_email_content()
--   **Database Schema**: Added use_custom_email_content, custom_subject_template, custom_intro_message, custom_cta_text, custom_closing_message, and custom_footer_note fields to Campaign model
--   **Validation Methods**: Campaign.validate_custom_email_content() and Campaign.get_email_content() for consistent content retrieval
--   **Route Handlers**: Updated campaign creation route to handle custom email content fields with validation
-
-### Technical Implementation Details:
--   **Template Variable Substitution**: Centralized _substitute_variables() method in email service
--   **Content Retrieval**: Unified get_email_content() methods in both EmailConfiguration and Campaign models
--   **Fallback Logic**: Smart field-level fallback ensuring every email has complete content from highest available tier
--   **Architect Approval**: End-to-end implementation reviewed and approved with no critical issues
--   **Database Migration**: Successfully migrated existing campaigns table with ALTER TABLE statements

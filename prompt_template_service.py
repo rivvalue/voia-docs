@@ -19,7 +19,7 @@ TOPIC_FIELD_MAP = {
     "Pricing Value": ["pricing_rating"],
     "Support Quality": ["service_rating"],
     "Improvement Suggestions": ["improvement_feedback"],
-    "Additional Feedback": ["improvement_feedback"]
+    "Additional Feedback": ["additional_comments"]
 }
 
 

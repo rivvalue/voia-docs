@@ -15,13 +15,16 @@ def normalize_company_name(company_name):
 class AIConversationalSurvey:
     """OpenAI-powered conversational survey system with adaptive questioning"""
     
-    def __init__(self, business_account_id: Optional[int] = None, campaign_id: Optional[int] = None):
+    def __init__(self, business_account_id: Optional[int] = None, campaign_id: Optional[int] = None, participant_data: Optional[Dict[str, Any]] = None):
         self.openai_client = OpenAI(api_key=os.environ.get('OPENAI_API_KEY'))
         self.conversation_history = []
         self.survey_data = {}
         self.extracted_data = {}
         self.step_count = 0
         self.is_complete = False
+        
+        # Store participant data for personalized prompts
+        self.participant_data = participant_data
         
         # NPS retry tracking to prevent infinite loops
         self.nps_retry_count = 0
@@ -35,6 +38,7 @@ class AIConversationalSurvey:
         print(f"TEMPLATE DEBUG: Initialized with business_account_id={business_account_id}, campaign_id={campaign_id}")
         print(f"TEMPLATE DEBUG: Mode={template_info['is_demo_mode']}, Company={template_info['company_name']}, Product={template_info['product_name']}")
         print(f"TEMPLATE DEBUG: Tone={template_info['conversation_tone']}, MaxQuestions={template_info['max_questions']}")
+        print(f"TEMPLATE DEBUG: Participant data available: {bool(participant_data)}")
         
     def start_conversation(self, company_name: str, respondent_name: str) -> Dict[str, Any]:
         """Start a new AI-powered conversational survey"""
@@ -685,11 +689,12 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             # Format conversation history for context
             history_text = self._format_conversation_history()
             
-            # Generate dynamic system prompt using template service
+            # Generate dynamic system prompt using template service (with participant data for hybrid prompt)
             system_prompt = self.template_service.generate_system_prompt(
                 extracted_data=self.extracted_data,
                 step_count=self.step_count,
-                conversation_history=history_text
+                conversation_history=history_text,
+                participant_data=self.participant_data
             )
             
             # Add customer's latest response and next question priority to the prompt
@@ -1056,10 +1061,10 @@ Be conversational, empathetic, and adaptive to their communication style."""
 # Global instances for session persistence
 ai_conversation_instances = {}
 
-def start_ai_conversational_survey(company_name: str, respondent_name: str, tenure_with_fc=None, business_account_id: Optional[int] = None, campaign_id: Optional[int] = None) -> Dict[str, Any]:
-    """Start a new AI-powered conversational survey session"""
+def start_ai_conversational_survey(company_name: str, respondent_name: str, tenure_with_fc=None, business_account_id: Optional[int] = None, campaign_id: Optional[int] = None, participant_data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """Start a new AI-powered conversational survey session with optional participant segmentation data"""
     conversation_id = str(uuid.uuid4())
-    ai_survey = AIConversationalSurvey(business_account_id=business_account_id, campaign_id=campaign_id)
+    ai_survey = AIConversationalSurvey(business_account_id=business_account_id, campaign_id=campaign_id, participant_data=participant_data)
     
     # If tenure data is provided from the form, pre-populate it
     if tenure_with_fc:
@@ -1093,7 +1098,8 @@ def process_ai_conversation_response(user_input: str, context: Dict[str, Any]) -
         # RECOVERY: Recreate the conversation instance from context data
         business_account_id = context.get('business_account_id')
         campaign_id = context.get('campaign_id')
-        ai_survey = AIConversationalSurvey(business_account_id=business_account_id, campaign_id=campaign_id)
+        participant_data = context.get('participant_data')  # Restore participant data if available
+        ai_survey = AIConversationalSurvey(business_account_id=business_account_id, campaign_id=campaign_id, participant_data=participant_data)
         
         # Restore survey data from context
         company_name = context.get('company_name', '')
