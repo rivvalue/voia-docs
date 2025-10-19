@@ -21,7 +21,7 @@ Key architectural decisions and features:
 -   **Security**: Token-based authentication, duplicate response prevention, enhanced rate limiting, and robust input validation. CSRF/XSS protection via proper cookie flags. Sentry error monitoring integration.
 -   **Branding**: "VOÏA - Voice Of Client" with "AI Powered Client Insights" subtitle and a specific tagline. Multi-tenant logo system and selective trial branding.
 -   **Multi-Tenant Architecture**: Business Accounts, Campaigns, and Participants with tenant isolation via `business_account_id` scoping, dual authentication, and a token system for survey access. Includes a lightweight scheduler for campaign lifecycle automation.
--   **Email Delivery System**: Custom SMTP configuration per business account with encrypted password storage, connection testing, professional VOÏA-branded templates, background task processing, and delivery tracking.
+-   **Email Delivery System**: Multi-provider email infrastructure with AWS SES and SMTP support. Business accounts can independently choose between AWS SES (with region-based SMTP server auto-generation using dedicated SMTP credentials) or standard SMTP providers. Features include encrypted password storage, connection testing, professional VOÏA-branded templates, background task processing, delivery tracking, and configurable email content at both business account and campaign levels. Email content customization includes subject templates, intro messages, CTA button text, closing messages, and footer notes with template variable support and "use defaults" toggle options.
 -   **Campaign Lifecycle Management**: Automated status transitions, multi-tenant scheduling, automatic KPI snapshot generation, and background task management for email retries.
 -   **Hybrid Survey Customization**: Campaign-specific survey personalization with business account defaults for tailored AI conversations while maintaining brand identity.
 -   **Hybrid Email Content Customization**: Campaign-level email content personalization with 3-tier fallback architecture (campaign override → business account defaults → hardcoded defaults). Allows customization of invitation email subject, intro message, CTA button text, closing message, and footer notes with template variable support ({participant_name}, {campaign_name}, {business_account_name}). Includes validation, XSS protection, and character limits aligned with the existing hybrid survey customization pattern.
@@ -37,3 +37,41 @@ Key architectural decisions and features:
 -   **Font Awesome CDN**: For iconography.
 -   **Python Packages**: Flask, SQLAlchemy, OpenAI client library, TextBlob, cryptography, Flask-Caching.
 -   **Sentry**: For error tracking and performance monitoring.
+
+# Recent Development Progress (October 2025)
+
+## AWS SES Email Integration (October 18, 2025)
+Implemented multi-provider email infrastructure allowing business accounts to choose between AWS SES and standard SMTP providers:
+-   **Provider Selection**: Business accounts can independently select AWS SES or SMTP as their email provider
+-   **AWS SES Implementation**: Region-based SMTP server auto-generation (email-smtp.{region}.amazonaws.com) using dedicated SMTP credentials (not IAM keys)
+-   **Multi-Tenant Configuration**: Isolated email provider settings per business account with encrypted credential storage
+-   **Email Configuration UI**: Enhanced Settings Hub with provider selection, region picker for AWS SES, and connection testing
+-   **Database Schema**: Extended EmailConfiguration model with email_provider and aws_region fields
+-   **Security**: Dedicated SMTP credentials approach for AWS SES (username/password) with encrypted password storage
+
+## Configurable Email Content (October 18-19, 2025)
+Implemented hybrid email content customization system with 3-tier fallback architecture:
+
+### Business Account Level (October 18, 2025):
+-   **Custom Email Templates**: Business accounts can customize invitation email content (subject, intro message, CTA text, closing message, footer note)
+-   **Template Variables**: Support for {participant_name}, {campaign_name}, {business_account_name} with automatic substitution
+-   **Use Defaults Toggle**: Simple checkbox to enable/disable custom content and fall back to hardcoded defaults
+-   **Live Preview**: Real-time email preview endpoint with sample data rendering and branding integration
+-   **Validation & Security**: Character limits (500 for subject, 2000 for intro/closing, 100 for CTA, 1000 for footer) and XSS protection
+-   **Database Schema**: Added custom_subject_template, custom_intro_message, custom_cta_text, custom_closing_message, custom_footer_note, and use_custom_content fields to EmailConfiguration model
+
+### Campaign Level (October 19, 2025):
+-   **Campaign-Specific Customization**: Extended email content customization to campaign level, following the existing hybrid survey customization pattern
+-   **3-Tier Fallback Architecture**: Campaign custom content → Business account defaults → Hardcoded system defaults
+-   **Campaign Creation UI**: Added "Invitation Email Content" section to campaign create/edit forms with toggle and collapsible fields
+-   **Email Service Integration**: Updated send_participant_invitation() to accept campaign parameter and implement 3-tier fallback logic in _get_email_content()
+-   **Database Schema**: Added use_custom_email_content, custom_subject_template, custom_intro_message, custom_cta_text, custom_closing_message, and custom_footer_note fields to Campaign model
+-   **Validation Methods**: Campaign.validate_custom_email_content() and Campaign.get_email_content() for consistent content retrieval
+-   **Route Handlers**: Updated campaign creation route to handle custom email content fields with validation
+
+### Technical Implementation Details:
+-   **Template Variable Substitution**: Centralized _substitute_variables() method in email service
+-   **Content Retrieval**: Unified get_email_content() methods in both EmailConfiguration and Campaign models
+-   **Fallback Logic**: Smart field-level fallback ensuring every email has complete content from highest available tier
+-   **Architect Approval**: End-to-end implementation reviewed and approved with no critical issues
+-   **Database Migration**: Successfully migrated existing campaigns table with ALTER TABLE statements
