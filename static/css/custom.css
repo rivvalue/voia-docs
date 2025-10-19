@@ -5937,48 +5937,60 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
    Settings Hub v2 Design Patterns
    ======================================== */
 
+/* Survey Config Container */
 .survey-config-container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 0 var(--spacing-lg);
+    padding: var(--spacing-xl);
 }
 
-/* Survey Config Header */
+/* Header Section - Matching Settings Hub v2 */
 .survey-config-header {
-    background: linear-gradient(135deg, rgba(var(--primary-red-rgb, 225, 58, 68), 0.1) 0%, rgba(var(--red-hover-rgb, 197, 45, 54), 0.15) 100%);
-    border: 1px solid var(--red-light);
-    color: var(--primary-black);
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
     padding: var(--spacing-2xl);
-    border-radius: var(--radius-2xl);
-    margin-bottom: var(--spacing-2xl);
+    margin: calc(-1 * var(--spacing-xl)) calc(-1 * var(--spacing-xl)) var(--spacing-2xl);
+    border-radius: 0;
+    color: var(--primary-white);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
 }
 
-.survey-config-header-content h1 {
+.survey-config-header-content {
+    flex: 1;
+    min-width: 250px;
+}
+
+.survey-config-header h1 {
     font-family: var(--font-family-headings);
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-3xl);
     font-weight: 700;
-    color: var(--primary-black);
-    margin-bottom: var(--spacing-sm);
+    margin: 0 0 var(--spacing-sm) 0;
+    color: var(--primary-white);
 }
 
-.survey-config-header-content p {
+.survey-config-header p {
     font-family: var(--font-family-base);
     font-size: var(--font-size-base);
-    color: var(--gray-dark);
     margin: 0;
+    opacity: 0.9;
+    color: var(--primary-white);
 }
 
-/* Config Form Sections */
-.config-form-section {
+/* Form Sections */
+.survey-config-form-section {
     background: var(--primary-white);
-    border-radius: var(--radius-2xl);
+    border-radius: var(--radius-lg);
     padding: var(--spacing-2xl);
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow-md);
     border: 1px solid var(--light-gray);
     margin-bottom: var(--spacing-2xl);
 }
 
-.section-title {
+.survey-config-section-title {
+    font-family: var(--font-family-headings);
     font-size: var(--font-size-xl);
     font-weight: 600;
     color: var(--primary-black);
@@ -5986,55 +5998,86 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-    font-family: var(--font-family-headings);
-    padding-bottom: var(--spacing-md);
-    border-bottom: 2px solid var(--light-gray);
 }
 
-.section-title i {
-    color: var(--primary-red);
+.survey-config-section-subtitle {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-sm);
+    color: var(--gray-dark);
+    margin-bottom: var(--spacing-lg);
+    font-style: italic;
 }
 
-/* Form Rows */
-.form-row {
-    display: grid;
-    gap: var(--spacing-lg);
+/* Form Fields */
+.survey-config-form-group {
     margin-bottom: var(--spacing-lg);
 }
 
-.form-row.two-col {
-    grid-template-columns: 1fr 1fr;
+.survey-config-form-label {
+    display: block;
+    font-family: var(--font-family-headings);
+    font-weight: 600;
+    color: var(--primary-black);
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-sm);
 }
 
-.form-row.three-col {
-    grid-template-columns: 1fr 1fr 1fr;
+.survey-config-form-control {
+    width: 100%;
+    padding: var(--spacing-md);
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-md);
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-sm);
+    color: var(--primary-black);
+    transition: all 0.2s ease;
+    background: var(--primary-white);
+}
+
+.survey-config-form-control:focus {
+    outline: none;
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 3px rgba(225, 58, 68, 0.1);
+}
+
+.survey-config-form-control::placeholder {
+    color: var(--gray-dark);
+    opacity: 0.6;
+}
+
+.survey-config-help-text {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-xs);
+    color: var(--gray-dark);
+    margin-top: var(--spacing-xs);
+    font-style: italic;
+    line-height: var(--line-height-normal);
 }
 
 /* Checkbox Group */
-.checkbox-group {
+.survey-config-checkbox-group {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: var(--spacing-md);
     margin-top: var(--spacing-sm);
 }
 
-.form-check {
+.survey-config-form-check {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
     padding: var(--spacing-sm);
     border: 2px solid var(--light-gray);
-    border-radius: var(--radius-lg);
-    transition: all 0.3s ease;
-    cursor: pointer;
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
 }
 
-.form-check:hover {
+.survey-config-form-check:hover {
     border-color: var(--primary-red);
-    background: rgba(var(--primary-red-rgb, 225, 58, 68), 0.02);
+    background: rgba(225, 58, 68, 0.02);
 }
 
-.form-check-input {
+.survey-config-form-check-input {
     width: 18px;
     height: 18px;
     border: 2px solid var(--light-gray);
@@ -6043,38 +6086,44 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     accent-color: var(--primary-red);
 }
 
-.form-check-input:checked {
+.survey-config-form-check-input:checked {
     background-color: var(--primary-red);
     border-color: var(--primary-red);
 }
 
-.form-check-label {
+.survey-config-form-check-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(225, 58, 68, 0.1);
+}
+
+.survey-config-form-check-label {
     cursor: pointer;
+    font-family: var(--font-family-base);
     font-size: var(--font-size-sm);
-    color: var(--gray-dark);
+    color: var(--primary-black);
     font-weight: 500;
 }
 
 /* Range Input Styles */
-.range-display {
+.survey-config-range-display {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: var(--spacing-sm);
 }
 
-.range-value {
+.survey-config-range-value {
     background: var(--primary-red);
     color: var(--primary-white);
-    padding: var(--spacing-xs) var(--spacing-sm);
+    padding: var(--spacing-xs) var(--spacing-md);
     border-radius: var(--radius-md);
     font-size: var(--font-size-sm);
     font-weight: 600;
-    min-width: 40px;
+    min-width: 50px;
     text-align: center;
 }
 
-.range-labels {
+.survey-config-range-labels {
     display: flex;
     justify-content: space-between;
     margin-top: var(--spacing-xs);
@@ -6082,13 +6131,14 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     color: var(--gray-dark);
 }
 
-/* Form Controls - Survey Config Specific */
-.survey-config-container .form-control[type="range"] {
-    padding: var(--spacing-sm);
+.survey-config-form-range {
+    width: 100%;
+    padding: var(--spacing-sm) 0;
     background: transparent;
+    border: none;
 }
 
-.survey-config-container .form-control[type="range"]::-webkit-slider-thumb {
+.survey-config-form-range::-webkit-slider-thumb {
     appearance: none;
     height: 20px;
     width: 20px;
@@ -6099,7 +6149,7 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-.survey-config-container .form-control[type="range"]::-webkit-slider-track {
+.survey-config-form-range::-webkit-slider-track {
     width: 100%;
     height: 8px;
     cursor: pointer;
@@ -6107,7 +6157,7 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     border-radius: 4px;
 }
 
-.survey-config-container .form-control[type="range"]::-moz-range-thumb {
+.survey-config-form-range::-moz-range-thumb {
     height: 20px;
     width: 20px;
     border-radius: 50%;
@@ -6117,7 +6167,7 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-.survey-config-container .form-control[type="range"]::-moz-range-track {
+.survey-config-form-range::-moz-range-track {
     width: 100%;
     height: 8px;
     cursor: pointer;
@@ -6126,32 +6176,32 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
 }
 
 /* Character Counter */
-.character-counter {
+.survey-config-character-counter {
     font-size: var(--font-size-xs);
     color: var(--gray-dark);
     text-align: right;
     margin-top: var(--spacing-xs);
 }
 
-.character-counter.warning {
+.survey-config-character-counter.warning {
     color: var(--primary-red);
 }
 
-.character-counter.error {
+.survey-config-character-counter.error {
     color: var(--primary-red);
     font-weight: 600;
 }
 
 /* Preview Box */
-.preview-box {
-    background: rgba(var(--primary-red-rgb, 225, 58, 68), 0.05);
+.survey-config-preview-box {
+    background: rgba(225, 58, 68, 0.05);
     border: 2px solid var(--red-light);
     border-radius: var(--radius-lg);
     padding: var(--spacing-lg);
     margin-top: var(--spacing-lg);
 }
 
-.preview-title {
+.survey-config-preview-title {
     font-weight: 600;
     color: var(--primary-red);
     font-size: var(--font-size-sm);
@@ -6159,116 +6209,150 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
+    font-family: var(--font-family-headings);
 }
 
-.preview-content {
+.survey-config-preview-content {
     font-size: var(--font-size-sm);
     color: var(--gray-dark);
-    line-height: 1.5;
+    line-height: var(--line-height-relaxed);
+    font-family: var(--font-family-base);
 }
 
-/* Form Actions */
-.survey-config-container .form-actions {
-    display: flex;
-    justify-content: flex-end;
+/* Buttons */
+.survey-config-btn-cancel {
+    display: inline-flex;
     align-items: center;
-    padding-top: var(--spacing-xl);
-    border-top: 2px solid var(--light-gray);
-    margin-top: var(--spacing-xl);
-    gap: var(--spacing-md);
+    gap: var(--spacing-xs);
+    background: transparent;
+    color: var(--gray-dark);
+    border: 2px solid var(--medium-gray);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-md);
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
 }
 
-/* Buttons - Survey Config Specific */
-.survey-config-container .btn-save {
+.survey-config-btn-cancel:hover {
+    background: var(--light-gray);
+    color: var(--primary-black);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.survey-config-btn-save {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
     background: var(--primary-red);
     color: var(--primary-white);
     border: 2px solid var(--primary-red);
-    padding: var(--spacing-lg) var(--spacing-2xl);
-    border-radius: var(--radius-lg);
-    font-size: var(--font-size-md);
+    padding: var(--spacing-md) var(--spacing-xl);
+    border-radius: var(--radius-md);
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-sm);
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-sm);
 }
 
-.survey-config-container .btn-save:hover {
+.survey-config-btn-save:hover:not(:disabled) {
     background: var(--red-hover);
     border-color: var(--red-hover);
-    transform: translateY(-1px);
     color: var(--primary-white);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
 }
 
-.survey-config-container .btn-secondary {
-    background: transparent;
-    color: var(--primary-red);
-    border: 2px solid var(--primary-red);
-    padding: var(--spacing-lg) var(--spacing-xl);
-    border-radius: var(--radius-lg);
-    font-size: var(--font-size-md);
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-flex;
+.survey-config-btn-save:active {
+    transform: translateY(0);
+}
+
+.survey-config-btn-save:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Button Actions Row */
+.survey-config-actions-row {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+}
+
+.survey-config-actions-left {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+}
+
+.survey-config-actions-right {
+    display: flex;
     gap: var(--spacing-sm);
 }
 
-.survey-config-container .btn-secondary:hover {
-    background: var(--red-light);
-    color: var(--primary-red);
-    transform: translateY(-1px);
+/* Mobile Responsiveness */
+@media (max-width: 992px) {
+    .survey-config-form-section {
+        padding: var(--spacing-xl);
+    }
 }
 
-/* Mobile Responsive */
 @media (max-width: 768px) {
     .survey-config-container {
-        padding: 0 var(--spacing-md);
+        padding: var(--spacing-md);
     }
     
     .survey-config-header {
-        padding: var(--spacing-lg);
-    }
-    
-    .survey-config-header-content h1 {
-        font-size: var(--font-size-xl);
-    }
-    
-    .config-form-section {
-        padding: var(--spacing-lg);
-    }
-    
-    .form-row.two-col,
-    .form-row.three-col {
-        grid-template-columns: 1fr;
-    }
-    
-    .checkbox-group {
-        grid-template-columns: 1fr;
-    }
-    
-    .form-actions {
+        padding: var(--spacing-xl);
+        margin: calc(-1 * var(--spacing-md)) calc(-1 * var(--spacing-md)) var(--spacing-xl);
         flex-direction: column;
-        gap: var(--spacing-md);
+        align-items: flex-start;
     }
     
-    .survey-config-container .btn-save,
-    .survey-config-container .btn-secondary {
+    .survey-config-header h1 {
+        font-size: var(--font-size-2xl);
+    }
+    
+    .survey-config-form-section {
+        padding: var(--spacing-lg);
+    }
+    
+    .survey-config-checkbox-group {
+        grid-template-columns: 1fr;
+    }
+    
+    .survey-config-actions-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .survey-config-actions-left,
+    .survey-config-actions-right {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .survey-config-btn-cancel,
+    .survey-config-btn-save {
         width: 100%;
         justify-content: center;
     }
 }
 
 @media (max-width: 576px) {
-    .survey-config-header-content h1 {
-        font-size: var(--font-size-lg);
+    .survey-config-header h1 {
+        font-size: var(--font-size-xl);
     }
     
-    .section-title {
+    .survey-config-section-title {
         font-size: var(--font-size-lg);
     }
 }
