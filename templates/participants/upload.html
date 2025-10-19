@@ -132,6 +132,10 @@
                 </li>
                 <li>
                     <i class="fas fa-circle text-secondary me-2" aria-hidden="true"></i>
+                    <strong>commercial_value</strong> - Company account value in USD (e.g., "250000"). All participants from the same company should have the same value
+                </li>
+                <li>
+                    <i class="fas fa-circle text-secondary me-2" aria-hidden="true"></i>
                     <strong>language</strong> - Language code (e.g., "en", "es", "fr")
                 </li>
             </ul>
@@ -139,10 +143,10 @@
             <div class="mt-4 upload-example-box">
                 <strong class="d-block mb-2">Example CSV with optional columns:</strong>
                 <code class="d-block p-3 bg-light rounded" style="font-size: 12px; overflow-x: auto;">
-email,name,company_name,role,region,customer_tier,language<br>
-john@abc.com,John Doe,ABC Corp,Manager,North America,T1: Strategic (Top 5–10% clients),en<br>
-jane@startup.io,Jane Smith,Startup Inc,C-Level,EMEA,T2: Managed (bulk of paying clients),en<br>
-bob@freelance.com,Bob Johnson,Freelance Services,End User,APAC,T3: Self-serve or small,en
+email,name,company_name,role,region,customer_tier,language,commercial_value<br>
+john@abc.com,John Doe,ABC Corp,Manager,North America,T1: Strategic (Top 5–10% clients),en,250000<br>
+jane@startup.io,Jane Smith,Startup Inc,C-Level,EMEA,T2: Managed (bulk of paying clients),en,150000<br>
+bob@freelance.com,Bob Johnson,Freelance Services,End User,APAC,T3: Self-serve or small,en,25000
                 </code>
             </div>
         </div>
@@ -254,10 +258,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Download CSV template
 function downloadTemplate() {
-    const csvContent = 'email,name,company_name,role,region,customer_tier,language\n' +
-        'john.doe@company.com,John Doe,ABC Corp,Manager,North America,T1: Strategic (Top 5–10% clients),en\n' +
-        'jane.smith@startup.io,Jane Smith,Startup Inc,C-Level,EMEA,T2: Managed (bulk of paying clients),en\n' +
-        'bob@freelance.com,Bob Johnson,Freelance Services,End User,APAC,T3: Self-serve or small,en';
+    const csvContent = 'email,name,company_name,role,region,customer_tier,language,commercial_value\n' +
+        'john.doe@company.com,John Doe,ABC Corp,Manager,North America,T1: Strategic (Top 5–10% clients),en,250000\n' +
+        'jane.smith@startup.io,Jane Smith,Startup Inc,C-Level,EMEA,T2: Managed (bulk of paying clients),en,150000\n' +
+        'bob@freelance.com,Bob Johnson,Freelance Services,End User,APAC,T3: Self-serve or small,en,25000';
     
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);

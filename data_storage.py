@@ -5,7 +5,7 @@ import logging
 from datetime import datetime, timedelta
 from sqlalchemy import func, case
 from app import db, cache
-from models import SurveyResponse, Campaign, CampaignKPISnapshot
+from models import SurveyResponse, Campaign, CampaignKPISnapshot, Participant
 from flask import request
 from cache_config import cache_config
 
@@ -492,9 +492,8 @@ def get_dashboard_data(campaign_id=None):
                 company_responses_query = company_responses_query.filter(SurveyResponse.campaign_id == campaign_id)
             company_responses = company_responses_query.all()
             
-            # Calculate max tenure, total commercial value, and company NPS
+            # Calculate max tenure and get commercial value (from participants)
             tenure_values = []
-            commercial_values = []
             for resp in company_responses:
                 if resp.tenure_with_fc:
                     # Extract numeric value from tenure string (e.g., "2-3 years" -> 3)
@@ -520,12 +519,33 @@ def get_dashboard_data(campaign_id=None):
                                 tenure_values.append(int(num_val))
                     except (ValueError, AttributeError):
                         pass
-                
-                if resp.commercial_value:
-                    commercial_values.append(resp.commercial_value)
             
             max_tenure = max(tenure_values) if tenure_values else None
-            total_commercial_value = sum(commercial_values) if commercial_values else 0
+            
+            # Get commercial_value from participant (company-level, manual input only)
+            # All participants from same company should have the same value
+            commercial_value = None
+            
+            # Get business_account_id from campaign or from a response
+            target_business_account_id = None
+            if campaign_id and campaign:
+                target_business_account_id = campaign.business_account_id
+            elif company_responses:
+                # For non-campaign views, get business_account_id from any response's campaign
+                for resp in company_responses:
+                    if resp.campaign_id:
+                        resp_campaign = Campaign.query.get(resp.campaign_id)
+                        if resp_campaign:
+                            target_business_account_id = resp_campaign.business_account_id
+                            break
+            
+            if target_business_account_id:
+                participant_sample = Participant.query.filter(
+                    func.upper(Participant.company_name) == company_key,
+                    Participant.business_account_id == target_business_account_id
+                ).first()
+                if participant_sample and participant_sample.company_commercial_value is not None:
+                    commercial_value = participant_sample.company_commercial_value
             
             # Calculate company NPS from all responses (campaign-filtered)
             total_company_responses = len(company_responses)
@@ -571,7 +591,7 @@ def get_dashboard_data(campaign_id=None):
                     'risk_count': len(risk_factors),
                     'critical_risks': critical_risk_count,
                     'max_tenure': max_tenure,
-                    'commercial_value': total_commercial_value,
+                    'commercial_value': commercial_value,
                     'company_nps': company_nps
                 })
         

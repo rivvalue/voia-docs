@@ -788,7 +788,6 @@ class TaskQueue:
                 growth_factor=analysis_result.get('growth_factor'),
                 growth_rate=analysis_result.get('growth_rate'),
                 growth_range=analysis_result.get('growth_range'),
-                commercial_value=analysis_result.get('commercial_value'),
                 campaign_id=campaign_id,
                 campaign_participant_id=campaign_participant.id,
                 source_type='transcript',
@@ -871,7 +870,6 @@ Extract the following information and respond with a valid JSON object:
 18. Growth Factor (1.0-3.0): Expected organic growth multiplier based on NPS
 19. Growth Rate: Expected growth percentage (e.g., "25%")
 20. Growth Range: NPS range (e.g., "9-10" for promoters)
-21. Commercial Value: Estimated monetary value of the relationship
 
 Respond with ONLY the JSON object, no other text:"""
 
@@ -915,8 +913,7 @@ Respond with ONLY the JSON object, no other text:"""
                 'account_risk_factors': json.dumps(analysis_data.get('account_risk_factors', [])),
                 'growth_factor': analysis_data.get('growth_factor', 1.0),
                 'growth_rate': analysis_data.get('growth_rate', '0%'),
-                'growth_range': analysis_data.get('growth_range', '0-6'),
-                'commercial_value': analysis_data.get('commercial_value', 0.0)
+                'growth_range': analysis_data.get('growth_range', '0-6')
             }
             
             return result

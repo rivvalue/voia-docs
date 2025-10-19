@@ -183,6 +183,19 @@ def create_participant():
         customer_tier = request.form.get('customer_tier', '').strip() or None
         language = request.form.get('language', '').strip() or 'en'
         
+        # Parse commercial_value (optional, company-level)
+        commercial_value = None
+        commercial_value_str = request.form.get('company_commercial_value', '').strip()
+        if commercial_value_str:
+            try:
+                commercial_value = float(commercial_value_str)
+                if commercial_value < 0:
+                    flash('Commercial value must be a positive number.', 'error')
+                    return redirect(url_for('participants.create_participant'))
+            except ValueError:
+                flash('Invalid commercial value. Please enter a valid number.', 'error')
+                return redirect(url_for('participants.create_participant'))
+        
         # Validate required fields
         if not email or not name or not company_name:
             flash('Email, name, and company name are required.', 'error')
@@ -208,6 +221,7 @@ def create_participant():
         participant.region = region
         participant.customer_tier = customer_tier
         participant.language = language
+        participant.company_commercial_value = commercial_value
         participant.source = 'admin_single'  # Track that this was admin-created via single form
         
         # Generate unified token for seamless UX
@@ -218,6 +232,21 @@ def create_participant():
         
         db.session.add(participant)
         db.session.commit()
+        
+        # Sync commercial_value to all existing participants from the same company
+        if commercial_value is not None and company_name:
+            from sqlalchemy import func
+            company_key = company_name.upper()
+            updated_count = Participant.query.filter(
+                func.upper(Participant.company_name) == company_key,
+                Participant.business_account_id == current_account.id,
+                Participant.id != participant.id  # Exclude the one we just created
+            ).update({'company_commercial_value': commercial_value}, synchronize_session=False)
+            
+            db.session.commit()
+            
+            if updated_count > 0:
+                flash(f'Commercial value synced to {updated_count} existing participant(s) from {company_name}.', 'info')
         
         # Audit logging for participant creation
         try:
@@ -308,9 +337,34 @@ def upload_participants():
         # Note: License limits are enforced per-campaign when participants are assigned to campaigns
         # Standalone participant creation doesn't have global limits
         
+        # Pre-validate commercial_value consistency across same companies
+        company_commercial_values = {}
+        for row_num, row in enumerate(participant_rows, start=2):
+            company_name = row.get('company_name', '').strip()
+            commercial_value_str = row.get('commercial_value', '').strip()
+            
+            if commercial_value_str and company_name:
+                try:
+                    commercial_value = float(commercial_value_str)
+                    if commercial_value < 0:
+                        errors.append(f"Row {row_num}: Commercial value must be positive")
+                        continue
+                    
+                    company_key = company_name.upper()
+                    if company_key in company_commercial_values:
+                        if company_commercial_values[company_key] != commercial_value:
+                            existing_value = company_commercial_values[company_key]
+                            flash(f'CSV validation error: Company "{company_name}" has conflicting commercial values: ${existing_value:,.0f} and ${commercial_value:,.0f}. All participants from the same company must have the same value.', 'error')
+                            return redirect(url_for('participants.upload_participants'))
+                    else:
+                        company_commercial_values[company_key] = commercial_value
+                except ValueError:
+                    errors.append(f"Row {row_num}: Invalid commercial value '{commercial_value_str}' - must be a number")
+        
         created_count = 0
         error_count = 0
-        errors = []
+        if not errors:
+            errors = []
         
         for row_num, row in enumerate(participant_rows, start=2):  # Start at 2 for header row
             try:
@@ -328,6 +382,21 @@ def upload_participants():
                 region = row.get('region', '').strip() or None
                 customer_tier = row.get('customer_tier', '').strip() or None
                 language = row.get('language', '').strip() or 'en'
+                
+                # Parse commercial_value (optional, company-level)
+                commercial_value = None
+                commercial_value_str = row.get('commercial_value', '').strip()
+                if commercial_value_str:
+                    try:
+                        commercial_value = float(commercial_value_str)
+                        if commercial_value < 0:
+                            errors.append(f"Row {row_num}: Commercial value must be positive")
+                            error_count += 1
+                            continue
+                    except ValueError:
+                        errors.append(f"Row {row_num}: Invalid commercial value '{commercial_value_str}'")
+                        error_count += 1
+                        continue
                 
                 # Check for duplicate participant (email within business account)
                 existing = Participant.query.filter_by(
@@ -350,6 +419,7 @@ def upload_participants():
                 participant.region = region
                 participant.customer_tier = customer_tier
                 participant.language = language
+                participant.company_commercial_value = commercial_value
                 participant.source = 'admin_bulk'  # Track that this was admin-created via bulk upload
                 
                 # Generate unified token for seamless UX
@@ -365,6 +435,18 @@ def upload_participants():
                 error_count += 1
         
         db.session.commit()
+        
+        # Sync commercial_value to all existing participants from the same companies
+        if company_commercial_values:
+            from sqlalchemy import func
+            for company_key, commercial_value in company_commercial_values.items():
+                # Update all participants with matching company (case-insensitive)
+                Participant.query.filter(
+                    func.upper(Participant.company_name) == company_key,
+                    Participant.business_account_id == current_account.id
+                ).update({'company_commercial_value': commercial_value}, synchronize_session=False)
+            
+            db.session.commit()
         
         # Audit logging for bulk participant upload
         if created_count > 0:

@@ -1191,6 +1191,9 @@ class Participant(db.Model):
     customer_tier = db.Column(db.String(50), nullable=True)  # e.g., "Enterprise", "SMB", "Startup"
     language = db.Column(db.String(10), nullable=True, default='en')  # ISO language code (en, es, fr, etc.)
     
+    # Company-level financial data (manual input only, synced across all participants from same company)
+    company_commercial_value = db.Column(db.Float, nullable=True)  # Estimated account value in USD
+    
     # Origin tracking for management visibility
     source = db.Column(db.String(20), nullable=False, default='trial', index=True)  # 'trial', 'admin_single', 'admin_bulk'
     
@@ -1221,6 +1224,7 @@ class Participant(db.Model):
             'region': self.region,
             'customer_tier': self.customer_tier,
             'language': self.language,
+            'company_commercial_value': self.company_commercial_value,
             'source': self.source,
             'token': self.token,
             'status': self.status,

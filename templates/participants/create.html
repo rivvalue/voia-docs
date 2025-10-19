@@ -170,6 +170,28 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="participant-form-group">
+                        <label class="participant-form-label" for="company_commercial_value">
+                            Company Commercial Value (Optional)
+                            <i class="fas fa-info-circle ms-1" aria-hidden="true" title="This value applies to all participants from this company"></i>
+                        </label>
+                        <input type="number" 
+                               class="participant-form-control" 
+                               id="company_commercial_value" 
+                               name="company_commercial_value"
+                               step="0.01"
+                               min="0"
+                               placeholder="e.g., 250000"
+                               aria-describedby="company_commercial_value_help">
+                        <div class="participant-help-text" id="company_commercial_value_help">
+                            Estimated account value in USD. This will be synced across all participants from the same company in your account.
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Action Buttons -->
