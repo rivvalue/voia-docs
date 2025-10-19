@@ -2242,6 +2242,8 @@ def save_email_config():
             return redirect(url_for('business_auth.admin_panel'))
         
         # Get form data
+        email_provider = request.form.get('email_provider', 'smtp').strip()
+        aws_region = request.form.get('aws_region', '').strip() if email_provider == 'aws_ses' else None
         smtp_server = request.form.get('smtp_server', '').strip()
         smtp_port = request.form.get('smtp_port', '587')
         smtp_username = request.form.get('smtp_username', '').strip()
@@ -2273,7 +2275,16 @@ def save_email_config():
             email_config = EmailConfiguration(business_account_id=current_account.id)
         
         # Update configuration
-        email_config.smtp_server = smtp_server
+        email_config.email_provider = email_provider
+        email_config.aws_region = aws_region
+        
+        # For standard SMTP, use the provided server; for AWS SES, it will be auto-generated
+        if email_provider == 'smtp':
+            email_config.smtp_server = smtp_server
+        else:
+            # Auto-generate SMTP server for AWS SES based on region
+            email_config.ensure_ses_smtp_server()
+        
         email_config.smtp_port = smtp_port
         email_config.smtp_username = smtp_username
         email_config.use_tls = use_tls
@@ -2306,6 +2317,8 @@ def save_email_config():
             changed_fields = []
             
             # Determine which fields were changed (simple approach for now)
+            if email_provider: changed_fields.append('email_provider')
+            if aws_region: changed_fields.append('aws_region')
             if smtp_server: changed_fields.append('smtp_server')
             if sender_name: changed_fields.append('sender_name')
             if sender_email: changed_fields.append('sender_email')
