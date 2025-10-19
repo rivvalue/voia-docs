@@ -48,10 +48,22 @@
             </div>
         </div>
         <nav class="sidebar-nav">
-            <a href="{{ url_for('business_auth.business_analytics') }}" class="sidebar-nav-item" data-page="dashboard">
+            <div class="sidebar-nav-item has-submenu" data-page="dashboard" id="biSubmenuToggle">
                 <i class="fas fa-chart-line"></i>
                 <span>Business Intelligence</span>
-            </a>
+                <i class="fas fa-chevron-down submenu-toggle"></i>
+            </div>
+            <div class="sidebar-submenu" id="biSubmenu">
+                <a href="{{ url_for('dashboard') }}" class="sidebar-submenu-item" data-page="dashboard-overview">
+                    <span>Overview</span>
+                </a>
+                <a href="{{ url_for('executive_summary') }}" class="sidebar-submenu-item" data-page="executive-summary">
+                    <span>Executive Summary</span>
+                </a>
+                <a href="{{ url_for('campaign_insights') }}" class="sidebar-submenu-item" data-page="campaign-insights">
+                    <span>Campaign Insights</span>
+                </a>
+            </div>
             <a href="{{ url_for('campaigns.list_campaigns') }}" class="sidebar-nav-item" data-page="campaigns">
                 <i class="fas fa-bullhorn"></i>
                 <span>Campaigns</span>
@@ -162,6 +174,37 @@
             const sidebar = document.getElementById('voiaSidebar');
             const toggleBtn = document.getElementById('sidebarToggle');
             const overlay = document.getElementById('sidebarOverlay');
+            
+            // Business Intelligence Submenu Toggle
+            const biSubmenuToggle = document.getElementById('biSubmenuToggle');
+            const biSubmenu = document.getElementById('biSubmenu');
+            
+            if (biSubmenuToggle && biSubmenu) {
+                // Check if current page is within BI section to auto-expand
+                const currentPage = document.body.getAttribute('data-page') || '';
+                const biPages = ['dashboard', 'executive-summary', 'campaign-insights'];
+                const shouldAutoExpand = biPages.some(page => currentPage.includes(page));
+                
+                if (shouldAutoExpand) {
+                    biSubmenuToggle.classList.add('open');
+                    biSubmenu.classList.add('open');
+                }
+                
+                biSubmenuToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    biSubmenuToggle.classList.toggle('open');
+                    biSubmenu.classList.toggle('open');
+                });
+            }
+            
+            // Highlight active submenu item
+            const currentPath = window.location.pathname;
+            const submenuItems = document.querySelectorAll('.sidebar-submenu-item');
+            submenuItems.forEach(item => {
+                if (item.getAttribute('href') === currentPath) {
+                    item.classList.add('active');
+                }
+            });
             
             if (toggleBtn && sidebar && overlay) {
                 // Toggle sidebar on button click
