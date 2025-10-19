@@ -3913,3 +3913,359 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
         width: 100%;
     }
 }
+
+/* ============================================
+   BRAND CONFIGURATION PAGE - PLATFORM ALIGNED
+   ============================================ */
+
+/* Brand Config Container */
+.brand-config-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--spacing-xl);
+}
+
+/* Header Section - Settings Hub v2 Pattern */
+.brand-config-header {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    padding: var(--spacing-2xl);
+    margin: calc(-1 * var(--spacing-xl)) calc(-1 * var(--spacing-xl)) var(--spacing-2xl);
+    border-radius: 0;
+    color: var(--primary-white);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+}
+
+.brand-config-header-content {
+    flex: 1;
+    min-width: 250px;
+}
+
+.brand-config-header h1 {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    margin: 0 0 var(--spacing-sm) 0;
+    color: var(--primary-white);
+}
+
+.brand-config-header p {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+    margin: 0;
+    opacity: 0.9;
+    color: var(--primary-white);
+}
+
+/* Status Alerts - VOÏA Brand Colors */
+.brand-config-status {
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-2xl);
+    border: 2px solid;
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-relaxed);
+}
+
+.brand-config-status strong {
+    font-family: var(--font-family-headings);
+    font-weight: 600;
+    font-size: var(--font-size-base);
+    display: block;
+    margin-bottom: var(--spacing-xs);
+}
+
+.brand-config-status.success {
+    background: rgba(225, 58, 68, 0.05);
+    border-color: var(--primary-red);
+    color: var(--primary-black);
+}
+
+.brand-config-status.success strong {
+    color: var(--primary-red);
+}
+
+.brand-config-status.info {
+    background: rgba(225, 58, 68, 0.03);
+    border-color: var(--red-light);
+    color: var(--primary-black);
+}
+
+.brand-config-status.info strong {
+    color: var(--red-hover);
+}
+
+/* Form Sections */
+.brand-config-form-section {
+    background: var(--primary-white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--light-gray);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.brand-section-title {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--primary-black);
+    margin-bottom: var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+/* Form Fields */
+.brand-form-group {
+    margin-bottom: var(--spacing-lg);
+}
+
+.brand-form-label {
+    display: block;
+    font-family: var(--font-family-headings);
+    font-weight: 600;
+    color: var(--primary-black);
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+}
+
+.brand-form-control {
+    width: 100%;
+    padding: var(--spacing-md);
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-md);
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-sm);
+    color: var(--primary-black);
+    transition: all 0.2s ease;
+    background: var(--primary-white);
+}
+
+.brand-form-control:focus {
+    outline: none;
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 3px rgba(225, 58, 68, 0.1);
+}
+
+.brand-form-control::placeholder {
+    color: var(--gray-dark);
+    opacity: 0.6;
+}
+
+.brand-form-control[type="file"] {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: rgba(225, 58, 68, 0.02);
+    border: 2px dashed var(--light-gray);
+}
+
+.brand-form-control[type="file"]:focus {
+    border-color: var(--primary-red);
+    background: rgba(225, 58, 68, 0.05);
+}
+
+.brand-form-control[type="color"] {
+    height: 50px;
+    cursor: pointer;
+}
+
+.brand-help-text {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-xs);
+    color: var(--gray-dark);
+    margin-top: var(--spacing-xs);
+    font-style: italic;
+    line-height: var(--line-height-normal);
+}
+
+/* Preview Section */
+.brand-preview-section {
+    background: rgba(225, 58, 68, 0.02);
+    border: 2px solid var(--red-light);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+.brand-preview-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.brand-preview-item:last-child {
+    margin-bottom: 0;
+}
+
+.brand-logo-preview {
+    max-width: 120px;
+    max-height: 80px;
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-sm);
+    background: var(--primary-white);
+    box-shadow: var(--shadow-sm);
+}
+
+.brand-logo-placeholder {
+    width: 120px;
+    height: 80px;
+    border: 2px dashed var(--light-gray);
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(225, 58, 68, 0.05);
+    color: var(--gray-dark);
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-sm);
+    text-align: center;
+    font-style: italic;
+}
+
+.brand-preview-details {
+    flex: 1;
+}
+
+.brand-preview-label {
+    font-family: var(--font-family-headings);
+    font-weight: 600;
+    color: var(--primary-black);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-xs);
+}
+
+.brand-preview-value {
+    font-family: var(--font-family-base);
+    color: var(--gray-dark);
+    font-size: var(--font-size-sm);
+    margin: 0;
+}
+
+.brand-preview-value.empty {
+    font-style: italic;
+    color: var(--gray-light);
+}
+
+/* Upload Constraints */
+.brand-upload-constraints {
+    background: rgba(225, 58, 68, 0.05);
+    border: 1px solid rgba(225, 58, 68, 0.2);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+    margin-top: var(--spacing-sm);
+}
+
+.brand-upload-constraints strong {
+    font-family: var(--font-family-headings);
+    color: var(--primary-black);
+    font-weight: 600;
+}
+
+.brand-upload-constraints ul {
+    margin: var(--spacing-xs) 0 0 0;
+    padding-left: var(--spacing-lg);
+}
+
+.brand-upload-constraints li {
+    font-family: var(--font-family-base);
+    color: var(--gray-dark);
+    font-size: var(--font-size-xs);
+    margin-bottom: var(--spacing-xs);
+}
+
+/* Color Preview */
+.brand-color-preview {
+    height: 50px;
+    border-radius: var(--radius-md);
+    border: 2px solid var(--light-gray);
+    display: flex;
+    overflow: hidden;
+}
+
+.brand-color-preview-item {
+    flex: 1;
+    transition: all 0.2s ease;
+}
+
+/* Buttons */
+.brand-btn-save {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    background: var(--primary-red);
+    color: var(--primary-white);
+    border: 2px solid var(--primary-red);
+    padding: var(--spacing-md) var(--spacing-xl);
+    border-radius: var(--radius-md);
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.brand-btn-save:hover:not(:disabled) {
+    background: var(--red-hover);
+    border-color: var(--red-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.brand-btn-save:active {
+    transform: translateY(0);
+}
+
+.brand-btn-save:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 992px) {
+    .brand-config-form-section {
+        padding: var(--spacing-xl);
+    }
+}
+
+@media (max-width: 768px) {
+    .brand-config-container {
+        padding: var(--spacing-md);
+    }
+    
+    .brand-config-header {
+        padding: var(--spacing-xl);
+        margin: calc(-1 * var(--spacing-md)) calc(-1 * var(--spacing-md)) var(--spacing-xl);
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .brand-config-header h1 {
+        font-size: var(--font-size-2xl);
+    }
+    
+    .brand-config-form-section {
+        padding: var(--spacing-lg);
+    }
+}
+
+@media (max-width: 576px) {
+    .brand-config-header h1 {
+        font-size: var(--font-size-xl);
+    }
+    
+    .brand-section-title {
+        font-size: var(--font-size-lg);
+    }
+    
+    .brand-preview-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

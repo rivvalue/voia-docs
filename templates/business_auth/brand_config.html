@@ -4,299 +4,62 @@
 
 {% block page_class %}page-brand-config{% endblock %}
 
-{% block breadcrumb %}
-<div class="breadcrumb-container">
-    <div class="container">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ url_for('business_auth.admin_panel') }}">Settings Hub</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Brand Settings</li>
-            </ol>
-        </nav>
-    </div>
-</div>
-{% endblock %}
-
 {% block content %}
-<style>
-/* Brand configuration specific styling */
-.brand-config-header {
-    background: linear-gradient(135deg, rgba(var(--primary-red-rgb, 220, 53, 69), 0.1) 0%, rgba(var(--red-hover-rgb, 200, 40, 55), 0.15) 100%);
-    border: 1px solid var(--red-light);
-    color: var(--primary-black);
-    padding: 2rem 0;
-    border-radius: var(--radius-2xl);
-    margin-bottom: 2rem;
-}
-
-.config-form-section {
-    background: var(--primary-white);
-    border-radius: var(--radius-2xl);
-    padding: var(--spacing-2xl);
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--light-gray);
-    margin-bottom: var(--spacing-2xl);
-}
-
-.form-group {
-    margin-bottom: var(--spacing-lg);
-}
-
-.form-label {
-    display: block;
-    font-weight: 600;
-    color: var(--primary-black);
-    margin-bottom: var(--spacing-sm);
-    font-size: var(--font-size-sm);
-}
-
-.form-control {
-    width: 100%;
-    padding: var(--spacing-md);
-    border: 2px solid var(--light-gray);
-    border-radius: var(--radius-lg);
-    font-size: var(--font-size-sm);
-    transition: all 0.3s ease;
-    font-family: var(--font-family-base);
-}
-
-.form-control:focus {
-    outline: none;
-    border-color: var(--primary-red);
-    box-shadow: 0 0 0 3px rgba(var(--primary-red-rgb, 220, 53, 69), 0.1);
-}
-
-.form-control[type="file"] {
-    padding: var(--spacing-sm) var(--spacing-md);
-    background: rgba(var(--primary-red-rgb, 220, 53, 69), 0.02);
-    border: 2px dashed var(--light-gray);
-}
-
-.form-control[type="file"]:focus {
-    border-color: var(--primary-red);
-    background: rgba(var(--primary-red-rgb, 220, 53, 69), 0.05);
-}
-
-.btn-save {
-    background: var(--primary-red);
-    color: var(--primary-white);
-    border: 2px solid var(--primary-red);
-    padding: var(--spacing-md) var(--spacing-xl);
-    border-radius: var(--radius-lg);
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.btn-save:hover {
-    background: var(--red-hover);
-    border-color: var(--red-hover);
-    transform: translateY(-1px);
-}
-
-.config-status {
-    padding: var(--spacing-lg);
-    border-radius: var(--radius-lg);
-    margin-bottom: var(--spacing-xl);
-    border: 2px solid;
-}
-
-.config-status.success {
-    background: rgba(34, 197, 94, 0.1);
-    border-color: #22c55e;
-    color: #15803d;
-}
-
-.config-status.info {
-    background: rgba(59, 130, 246, 0.1);
-    border-color: #3b82f6;
-    color: #1d4ed8;
-}
-
-.config-status.warning {
-    background: rgba(245, 158, 11, 0.1);
-    border-color: #f59e0b;
-    color: #d97706;
-}
-
-.preview-section {
-    background: rgba(var(--primary-red-rgb, 220, 53, 69), 0.02);
-    border: 2px solid var(--red-light);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-xl);
-    margin-bottom: var(--spacing-xl);
-}
-
-.preview-item {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-lg);
-    margin-bottom: var(--spacing-lg);
-}
-
-.preview-item:last-child {
-    margin-bottom: 0;
-}
-
-.logo-preview {
-    max-width: 120px;
-    max-height: 80px;
-    border: 2px solid var(--light-gray);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-sm);
-    background: var(--primary-white);
-    box-shadow: var(--shadow-sm);
-}
-
-.logo-placeholder {
-    width: 120px;
-    height: 80px;
-    border: 2px dashed var(--light-gray);
-    border-radius: var(--radius-lg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(var(--primary-red-rgb, 220, 53, 69), 0.05);
-    color: var(--gray-dark);
-    font-size: var(--font-size-sm);
-    text-align: center;
-    font-style: italic;
-}
-
-.preview-details {
-    flex: 1;
-}
-
-.preview-label {
-    font-weight: 600;
-    color: var(--primary-black);
-    font-size: var(--font-size-sm);
-    margin-bottom: var(--spacing-xs);
-}
-
-.preview-value {
-    color: var(--gray-dark);
-    font-size: var(--font-size-sm);
-    margin: 0;
-}
-
-.preview-value.empty {
-    font-style: italic;
-    color: var(--gray-light);
-}
-
-.help-text {
-    font-size: var(--font-size-xs);
-    color: var(--gray-dark);
-    margin-top: var(--spacing-xs);
-    font-style: italic;
-}
-
-.section-title {
-    font-size: var(--font-size-xl);
-    font-weight: 600;
-    color: var(--primary-black);
-    margin-bottom: var(--spacing-lg);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    font-family: var(--font-family-headings);
-}
-
-.breadcrumb {
-    margin-bottom: var(--spacing-xl);
-}
-
-.breadcrumb a {
-    color: var(--primary-red);
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.breadcrumb a:hover {
-    text-decoration: underline;
-}
-
-.breadcrumb span {
-    color: var(--gray-dark);
-    margin: 0 var(--spacing-sm);
-}
-
-.upload-constraints {
-    background: rgba(var(--primary-red-rgb, 220, 53, 69), 0.05);
-    border: 1px solid rgba(var(--primary-red-rgb, 220, 53, 69), 0.2);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-md);
-    margin-top: var(--spacing-sm);
-}
-
-.upload-constraints ul {
-    margin: 0;
-    padding-left: var(--spacing-lg);
-}
-
-.upload-constraints li {
-    color: var(--gray-dark);
-    font-size: var(--font-size-xs);
-    margin-bottom: var(--spacing-xs);
-}
-</style>
-
-<div class="container mt-4">
-    <!-- Breadcrumb -->
-    <div class="breadcrumb">
-        <a href="{{ url_for('business_auth.admin_panel') }}">Admin Panel</a>
-        <span>></span>
-        <span>Brand Settings</span>
-    </div>
-
+<div class="brand-config-container">
     <!-- Header -->
-    <div class="brand-config-header text-center">
-        <h1 class="mb-3">🎨 Brand Settings</h1>
-        <p class="mb-0">Customize your brand identity for {{ business_account.name }}</p>
+    <div class="brand-config-header">
+        <div class="brand-config-header-content">
+            <h1>
+                <i class="fas fa-palette me-2" aria-hidden="true"></i>
+                Brand Settings
+            </h1>
+            <p>Customize your brand identity for {{ business_account.name }}</p>
+        </div>
     </div>
 
     <!-- Current Status -->
     {% if branding_config.logo_filename or branding_config.company_display_name %}
-        <div class="config-status success">
-            <strong>✅ Branding configuration is active</strong><br>
+        <div class="brand-config-status success" role="status" aria-live="polite">
+            <strong><i class="fas fa-check-circle me-2" aria-hidden="true"></i>Branding configuration is active</strong>
             Your custom branding settings are configured and ready to use.
         </div>
     {% else %}
-        <div class="config-status info">
-            <strong>ℹ️ Default branding in use</strong><br>
+        <div class="brand-config-status info" role="status" aria-live="polite">
+            <strong><i class="fas fa-info-circle me-2" aria-hidden="true"></i>Default branding in use</strong>
             Configure your custom branding settings below to personalize your account.
         </div>
     {% endif %}
 
     <!-- Current Preview -->
-    <div class="config-form-section">
-        <h3 class="section-title">👁️ Current Brand Preview</h3>
+    <div class="brand-config-form-section">
+        <h3 class="brand-section-title">
+            <i class="fas fa-eye" aria-hidden="true"></i>
+            Current Brand Preview
+        </h3>
         
-        <div class="preview-section">
-            <div class="preview-item">
+        <div class="brand-preview-section">
+            <div class="brand-preview-item">
                 {% if branding_config.logo_filename and branding_config.get_logo_url() %}
-                    <img src="{{ branding_config.get_logo_url() }}" alt="Company Logo" class="logo-preview">
+                    <img src="{{ branding_config.get_logo_url() }}" 
+                         alt="Company Logo" 
+                         class="brand-logo-preview">
                 {% else %}
-                    <div class="logo-placeholder">
+                    <div class="brand-logo-placeholder" role="img" aria-label="No logo uploaded">
                         No logo<br>uploaded
                     </div>
                 {% endif %}
-                <div class="preview-details">
-                    <div class="preview-label">Company Logo</div>
-                    <p class="preview-value {{ 'empty' if not branding_config.logo_filename else '' }}">
+                <div class="brand-preview-details">
+                    <div class="brand-preview-label">Company Logo</div>
+                    <p class="brand-preview-value {{ 'empty' if not branding_config.logo_filename else '' }}">
                         {{ branding_config.logo_filename if branding_config.logo_filename else 'No logo uploaded' }}
                     </p>
                 </div>
             </div>
             
-            <div class="preview-item">
-                <div class="preview-details">
-                    <div class="preview-label">Company Display Name</div>
-                    <p class="preview-value {{ 'empty' if not branding_config.company_display_name else '' }}">
+            <div class="brand-preview-item">
+                <div class="brand-preview-details">
+                    <div class="brand-preview-label">Company Display Name</div>
+                    <p class="brand-preview-value {{ 'empty' if not branding_config.company_display_name else '' }}">
                         {{ branding_config.get_company_display_name() }}
                         {% if not branding_config.company_display_name %}(default: {{ business_account.name }}){% endif %}
                     </p>
@@ -310,43 +73,59 @@
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         
         <!-- Company Information -->
-        <div class="config-form-section">
-            <h3 class="section-title">🏢 Company Information</h3>
+        <div class="brand-config-form-section">
+            <h3 class="brand-section-title">
+                <i class="fas fa-building" aria-hidden="true"></i>
+                Company Information
+            </h3>
             
-            <div class="form-group">
-                <label class="form-label" for="company_display_name">Company Display Name</label>
-                <input type="text" class="form-control" id="company_display_name" name="company_display_name" 
+            <div class="brand-form-group">
+                <label class="brand-form-label" for="company_display_name">Company Display Name</label>
+                <input type="text" 
+                       class="brand-form-control" 
+                       id="company_display_name" 
+                       name="company_display_name" 
                        value="{{ branding_config.company_display_name if branding_config.company_display_name else '' }}" 
-                       placeholder="{{ business_account.name }}">
-                <div class="help-text">
+                       placeholder="{{ business_account.name }}"
+                       aria-describedby="company_display_name_help">
+                <div class="brand-help-text" id="company_display_name_help">
                     This name will be displayed in surveys and emails. Leave blank to use "{{ business_account.name }}".
                 </div>
             </div>
         </div>
 
         <!-- Color Palette -->
-        <div class="config-form-section">
-            <h3 class="section-title">🎨 Color Palette</h3>
+        <div class="brand-config-form-section">
+            <h3 class="brand-section-title">
+                <i class="fas fa-palette" aria-hidden="true"></i>
+                Color Palette
+            </h3>
             
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label" for="primary_color">Primary Color</label>
-                        <input type="color" class="form-control" id="primary_color" name="primary_color" 
-                               value="{{ branding_config.primary_color if branding_config.primary_color else '#dc3545' }}" 
-                               style="height: 50px;">
-                        <div class="help-text">
+                    <div class="brand-form-group">
+                        <label class="brand-form-label" for="primary_color">Primary Color</label>
+                        <input type="color" 
+                               class="brand-form-control" 
+                               id="primary_color" 
+                               name="primary_color" 
+                               value="{{ branding_config.primary_color if branding_config.primary_color else '#dc3545' }}"
+                               aria-describedby="primary_color_help">
+                        <div class="brand-help-text" id="primary_color_help">
                             Main brand color used for headers, buttons, and accents.
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label" for="secondary_color">Secondary Color</label>
-                        <input type="color" class="form-control" id="secondary_color" name="secondary_color" 
-                               value="{{ branding_config.secondary_color if branding_config.secondary_color else '#6c757d' }}" 
-                               style="height: 50px;">
-                        <div class="help-text">
+                    <div class="brand-form-group">
+                        <label class="brand-form-label" for="secondary_color">Secondary Color</label>
+                        <input type="color" 
+                               class="brand-form-control" 
+                               id="secondary_color" 
+                               name="secondary_color" 
+                               value="{{ branding_config.secondary_color if branding_config.secondary_color else '#6c757d' }}"
+                               aria-describedby="secondary_color_help">
+                        <div class="brand-help-text" id="secondary_color_help">
                             Supporting color for borders and subtle elements.
                         </div>
                     </div>
@@ -355,23 +134,29 @@
             
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label" for="accent_color">Accent Color</label>
-                        <input type="color" class="form-control" id="accent_color" name="accent_color" 
-                               value="{{ branding_config.accent_color if branding_config.accent_color else '#28a745' }}" 
-                               style="height: 50px;">
-                        <div class="help-text">
+                    <div class="brand-form-group">
+                        <label class="brand-form-label" for="accent_color">Accent Color</label>
+                        <input type="color" 
+                               class="brand-form-control" 
+                               id="accent_color" 
+                               name="accent_color" 
+                               value="{{ branding_config.accent_color if branding_config.accent_color else '#28a745' }}"
+                               aria-describedby="accent_color_help">
+                        <div class="brand-help-text" id="accent_color_help">
                             Highlight color for success states and call-to-action elements.
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label" for="text_color">Text Color</label>
-                        <input type="color" class="form-control" id="text_color" name="text_color" 
-                               value="{{ branding_config.text_color if branding_config.text_color else '#212529' }}" 
-                               style="height: 50px;">
-                        <div class="help-text">
+                    <div class="brand-form-group">
+                        <label class="brand-form-label" for="text_color">Text Color</label>
+                        <input type="color" 
+                               class="brand-form-control" 
+                               id="text_color" 
+                               name="text_color" 
+                               value="{{ branding_config.text_color if branding_config.text_color else '#212529' }}"
+                               aria-describedby="text_color_help">
+                        <div class="brand-help-text" id="text_color_help">
                             Primary text color for readability.
                         </div>
                     </div>
@@ -380,25 +165,37 @@
             
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label" for="background_color">Background Color</label>
-                        <input type="color" class="form-control" id="background_color" name="background_color" 
-                               value="{{ branding_config.background_color if branding_config.background_color else '#ffffff' }}" 
-                               style="height: 50px;">
-                        <div class="help-text">
+                    <div class="brand-form-group">
+                        <label class="brand-form-label" for="background_color">Background Color</label>
+                        <input type="color" 
+                               class="brand-form-control" 
+                               id="background_color" 
+                               name="background_color" 
+                               value="{{ branding_config.background_color if branding_config.background_color else '#ffffff' }}"
+                               aria-describedby="background_color_help">
+                        <div class="brand-help-text" id="background_color_help">
                             Background color for documents and reports.
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label">Color Preview</label>
-                        <div id="color-preview" style="height: 50px; border-radius: 8px; border: 2px solid #e0e0e0; display: flex;">
-                            <div id="preview-primary" style="flex: 1; background: {{ branding_config.primary_color if branding_config.primary_color else '#dc3545' }};"></div>
-                            <div id="preview-secondary" style="flex: 1; background: {{ branding_config.secondary_color if branding_config.secondary_color else '#6c757d' }};"></div>
-                            <div id="preview-accent" style="flex: 1; background: {{ branding_config.accent_color if branding_config.accent_color else '#28a745' }};"></div>
+                    <div class="brand-form-group">
+                        <label class="brand-form-label">Color Preview</label>
+                        <div class="brand-color-preview" role="img" aria-label="Color palette preview">
+                            <div class="brand-color-preview-item" 
+                                 id="preview-primary" 
+                                 style="background: {{ branding_config.primary_color if branding_config.primary_color else '#dc3545' }};"
+                                 title="Primary color"></div>
+                            <div class="brand-color-preview-item" 
+                                 id="preview-secondary" 
+                                 style="background: {{ branding_config.secondary_color if branding_config.secondary_color else '#6c757d' }};"
+                                 title="Secondary color"></div>
+                            <div class="brand-color-preview-item" 
+                                 id="preview-accent" 
+                                 style="background: {{ branding_config.accent_color if branding_config.accent_color else '#28a745' }};"
+                                 title="Accent color"></div>
                         </div>
-                        <div class="help-text">
+                        <div class="brand-help-text">
                             Live preview of your color palette.
                         </div>
                     </div>
@@ -407,18 +204,25 @@
         </div>
 
         <!-- Logo Upload -->
-        <div class="config-form-section">
-            <h3 class="section-title">🖼️ Company Logo</h3>
+        <div class="brand-config-form-section">
+            <h3 class="brand-section-title">
+                <i class="fas fa-image" aria-hidden="true"></i>
+                Company Logo
+            </h3>
             
-            <div class="form-group">
-                <label class="form-label" for="logo_file">Upload Logo</label>
-                <input type="file" class="form-control" id="logo_file" name="logo_file" 
-                       accept=".png,.jpg,.jpeg,.gif,.webp" aria-describedby="logoHelp">
-                <div class="help-text">
+            <div class="brand-form-group">
+                <label class="brand-form-label" for="logo_file">Upload Logo</label>
+                <input type="file" 
+                       class="brand-form-control" 
+                       id="logo_file" 
+                       name="logo_file" 
+                       accept=".png,.jpg,.jpeg,.gif,.webp" 
+                       aria-describedby="logo_file_help">
+                <div class="brand-help-text" id="logo_file_help">
                     Upload your company logo to personalize surveys and communications. Supported formats: PNG, JPG, JPEG, GIF, WEBP (max 5MB).
                 </div>
                 
-                <div class="upload-constraints">
+                <div class="brand-upload-constraints" role="region" aria-label="Upload requirements">
                     <strong>Upload Requirements:</strong>
                     <ul>
                         <li>Supported formats: PNG, JPG, JPEG, GIF, WEBP</li>
@@ -432,14 +236,17 @@
         </div>
 
         <!-- Save Button -->
-        <div class="config-form-section">
-            <div class="d-flex justify-content-between align-items-center">
+        <div class="brand-config-form-section">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                 <div>
-                    <button type="submit" class="btn-save">
-                        💾 Save Brand Settings
+                    <button type="submit" 
+                            class="brand-btn-save"
+                            aria-label="Save brand settings">
+                        <i class="fas fa-save" aria-hidden="true"></i>
+                        Save Brand Settings
                     </button>
                 </div>
-                <div class="help-text">
+                <div class="brand-help-text mb-0">
                     Changes will take effect immediately after saving.
                 </div>
             </div>
@@ -448,83 +255,92 @@
 </div>
 
 <script>
-// Preview uploaded logo before form submission
-document.getElementById('logo_file').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-        // Validate file size
-        if (file.size > 5 * 1024 * 1024) {
-            alert('File is too large. Please choose a file smaller than 5MB.');
-            this.value = '';
-            return;
-        }
-        
-        // Validate file type
-        const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
-        if (!allowedTypes.includes(file.type)) {
-            alert('Invalid file type. Please upload PNG, JPG, JPEG, GIF, or WEBP files only.');
-            this.value = '';
-            return;
-        }
-        
-        // Show preview for images
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                // Find the logo preview element and update it
-                const logoPreview = document.querySelector('.logo-preview');
-                const logoPlaceholder = document.querySelector('.logo-placeholder');
-                
-                if (logoPlaceholder) {
-                    // Replace placeholder with actual image
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.alt = 'Logo Preview';
-                    img.className = 'logo-preview';
-                    logoPlaceholder.parentNode.replaceChild(img, logoPlaceholder);
-                } else if (logoPreview) {
-                    // Update existing image
-                    logoPreview.src = e.target.result;
+document.addEventListener('DOMContentLoaded', function() {
+    // Preview uploaded logo before form submission
+    const logoInput = document.getElementById('logo_file');
+    if (logoInput) {
+        logoInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Validate file size
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File is too large. Please choose a file smaller than 5MB.');
+                    this.value = '';
+                    return;
                 }
-            };
-            reader.readAsDataURL(file);
+                
+                // Validate file type
+                const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
+                if (!allowedTypes.includes(file.type)) {
+                    alert('Invalid file type. Please upload PNG, JPG, JPEG, GIF, or WEBP files only.');
+                    this.value = '';
+                    return;
+                }
+                
+                // Show preview for images
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Find the logo preview element and update it
+                    const logoPreview = document.querySelector('.brand-logo-preview');
+                    const logoPlaceholder = document.querySelector('.brand-logo-placeholder');
+                    
+                    if (logoPlaceholder) {
+                        // Replace placeholder with actual image
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.alt = 'Logo Preview';
+                        img.className = 'brand-logo-preview';
+                        logoPlaceholder.parentNode.replaceChild(img, logoPlaceholder);
+                    } else if (logoPreview) {
+                        // Update existing image
+                        logoPreview.src = e.target.result;
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // Live color preview updates
+    function updateColorPreview() {
+        const primaryColor = document.getElementById('primary_color').value;
+        const secondaryColor = document.getElementById('secondary_color').value;
+        const accentColor = document.getElementById('accent_color').value;
+        
+        document.getElementById('preview-primary').style.background = primaryColor;
+        document.getElementById('preview-secondary').style.background = secondaryColor;
+        document.getElementById('preview-accent').style.background = accentColor;
+    }
+
+    // Add event listeners for color inputs
+    ['primary_color', 'secondary_color', 'accent_color'].forEach(function(id) {
+        const input = document.getElementById(id);
+        if (input) {
+            input.addEventListener('input', updateColorPreview);
         }
-    }
-});
+    });
 
-// Live color preview updates
-function updateColorPreview() {
-    const primaryColor = document.getElementById('primary_color').value;
-    const secondaryColor = document.getElementById('secondary_color').value;
-    const accentColor = document.getElementById('accent_color').value;
-    
-    document.getElementById('preview-primary').style.background = primaryColor;
-    document.getElementById('preview-secondary').style.background = secondaryColor;
-    document.getElementById('preview-accent').style.background = accentColor;
-}
-
-// Add event listeners for color inputs
-document.getElementById('primary_color').addEventListener('input', updateColorPreview);
-document.getElementById('secondary_color').addEventListener('input', updateColorPreview);
-document.getElementById('accent_color').addEventListener('input', updateColorPreview);
-
-// Form validation
-document.getElementById('brandConfigForm').addEventListener('submit', function(e) {
-    const companyName = document.getElementById('company_display_name').value.trim();
-    
-    // Optional validation - company name has reasonable length if provided
-    if (companyName && companyName.length > 200) {
-        e.preventDefault();
-        alert('Company display name is too long. Please keep it under 200 characters.');
-        return;
-    }
-    
-    // Show loading state
-    const submitBtn = document.querySelector('.btn-save');
-    if (submitBtn) {
-        submitBtn.innerHTML = '⏳ Saving...';
-        submitBtn.disabled = true;
+    // Form validation
+    const form = document.getElementById('brandConfigForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const companyName = document.getElementById('company_display_name').value.trim();
+            
+            // Optional validation - company name has reasonable length if provided
+            if (companyName && companyName.length > 200) {
+                e.preventDefault();
+                alert('Company display name is too long. Please keep it under 200 characters.');
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = form.querySelector('.brand-btn-save');
+            if (submitBtn) {
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Saving...';
+                submitBtn.disabled = true;
+            }
+        });
     }
 });
 </script>
-
 {% endblock %}
