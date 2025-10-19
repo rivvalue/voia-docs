@@ -170,6 +170,14 @@ class Campaign(db.Model):
     custom_end_message = db.Column(db.Text, nullable=True)
     custom_system_prompt = db.Column(db.Text, nullable=True)
     
+    # Campaign-specific email content customization (hybrid: campaign overrides → account defaults → hardcoded)
+    use_custom_email_content = db.Column(db.Boolean, nullable=False, default=False)
+    custom_subject_template = db.Column(db.String(500), nullable=True)
+    custom_intro_message = db.Column(db.Text, nullable=True)
+    custom_cta_text = db.Column(db.String(100), nullable=True)
+    custom_closing_message = db.Column(db.Text, nullable=True)
+    custom_footer_note = db.Column(db.Text, nullable=True)
+    
     # Anonymization setting
     anonymize_responses = db.Column(db.Boolean, nullable=False, default=False)
     
@@ -439,6 +447,74 @@ class Campaign(db.Model):
             return self.survey_goals
         # Default survey goals fallback
         return ["NPS", "Product Quality", "Support Experience", "Overall Satisfaction"]
+    
+    def validate_custom_email_content(self):
+        """Validate custom email content fields if enabled"""
+        import re
+        errors = []
+        
+        if not self.use_custom_email_content:
+            return errors  # No validation needed if not using custom content
+        
+        # Validate subject template
+        if self.custom_subject_template and len(self.custom_subject_template) > 500:
+            errors.append("Subject template must be 500 characters or less")
+        
+        # Validate intro message
+        if self.custom_intro_message and len(self.custom_intro_message) > 2000:
+            errors.append("Intro message must be 2000 characters or less")
+        
+        # Validate CTA text
+        if self.custom_cta_text and len(self.custom_cta_text) > 100:
+            errors.append("CTA text must be 100 characters or less")
+        
+        # Validate closing message
+        if self.custom_closing_message and len(self.custom_closing_message) > 2000:
+            errors.append("Closing message must be 2000 characters or less")
+        
+        # Validate footer note
+        if self.custom_footer_note and len(self.custom_footer_note) > 1000:
+            errors.append("Footer note must be 1000 characters or less")
+        
+        # Check for potentially harmful HTML tags (basic XSS prevention)
+        dangerous_pattern = re.compile(r'<script|<iframe|javascript:|onerror=|onclick=', re.IGNORECASE)
+        
+        fields_to_check = {
+            'Subject': self.custom_subject_template,
+            'Intro': self.custom_intro_message,
+            'CTA': self.custom_cta_text,
+            'Closing': self.custom_closing_message,
+            'Footer': self.custom_footer_note
+        }
+        
+        for field_name, field_value in fields_to_check.items():
+            if field_value and dangerous_pattern.search(field_value):
+                errors.append(f"{field_name} contains potentially unsafe content")
+        
+        return errors
+    
+    def get_email_content(self):
+        """
+        Get email content for this campaign.
+        Returns dict with subject, intro, cta_text, closing, footer.
+        If custom content is not used or empty, returns None for those fields.
+        """
+        if not self.use_custom_email_content:
+            return {
+                'subject_template': None,
+                'intro_message': None,
+                'cta_text': None,
+                'closing_message': None,
+                'footer_note': None
+            }
+        
+        return {
+            'subject_template': self.custom_subject_template,
+            'intro_message': self.custom_intro_message,
+            'cta_text': self.custom_cta_text,
+            'closing_message': self.custom_closing_message,
+            'footer_note': self.custom_footer_note
+        }
 
 
 class CampaignKPISnapshot(db.Model):
