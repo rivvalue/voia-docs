@@ -4,19 +4,6 @@
 
 {% block page_class %}page-audit-logs{% endblock %}
 
-{% block breadcrumb %}
-<div class="breadcrumb-container">
-    <div class="container">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ url_for('business_auth.admin_panel') }}">Settings Hub</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Account Activity Trail</li>
-            </ol>
-        </nav>
-    </div>
-</div>
-{% endblock %}
-
 {% block content %}
 <div class="audit-logs-container">
     <!-- Header -->
@@ -205,16 +192,6 @@
         {% endif %}
     </div>
     {% endif %}
-
-    <!-- Back to Admin -->
-    <div class="text-center mt-4">
-        <a href="{{ url_for('business_auth.admin_panel') }}" 
-           class="audit-back-btn"
-           aria-label="Back to Settings Hub">
-            <i class="fas fa-arrow-left" aria-hidden="true"></i>
-            Back to Settings Hub
-        </a>
-    </div>
 </div>
 
 <script>
