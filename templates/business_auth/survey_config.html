@@ -24,272 +24,368 @@
         </div>
     </div>
 
-    <form method="POST" action="{{ url_for('business_auth.save_survey_config') }}">
+    <form method="POST" action="{{ url_for('business_auth.save_survey_config') }}" id="surveyConfigForm">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        
         <!-- Company Profile Section -->
-        <div class="config-form-section">
-            <h2 class="section-title">
-                <i class="fas fa-building"></i>
+        <div class="survey-config-form-section">
+            <h3 class="survey-config-section-title">
+                <i class="fas fa-building" aria-hidden="true"></i>
                 Company Profile
-            </h2>
-            <p class="text-muted mb-4">Tell us about your business to personalize the survey conversation.</p>
+            </h3>
+            <p class="survey-config-section-subtitle">Tell us about your business to personalize the survey conversation</p>
             
-            <div class="form-row two-col">
-                <div class="form-group">
-                    <label for="industry" class="form-label">Industry</label>
-                    <select class="form-control form-select" id="industry" name="industry">
-                        <option value="">Select your industry</option>
-                        {% for industry in industry_options %}
-                            <option value="{{ industry }}" {% if business_account.industry == industry %}selected{% endif %}>
-                                {{ industry }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                    <div class="help-text">This helps tailor survey questions to your industry context.</div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="survey-config-form-group">
+                        <label class="survey-config-form-label" for="industry">Industry</label>
+                        <select class="survey-config-form-control" 
+                                id="industry" 
+                                name="industry"
+                                aria-describedby="industry_help">
+                            <option value="">Select your industry</option>
+                            {% for industry in industry_options %}
+                                <option value="{{ industry }}" {% if business_account.industry == industry %}selected{% endif %}>
+                                    {{ industry }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div class="survey-config-help-text" id="industry_help">This helps tailor survey questions to your industry context</div>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="conversation_tone" class="form-label">Conversation Tone</label>
-                    <select class="form-control form-select" id="conversation_tone" name="conversation_tone">
-                        {% for tone in tone_options %}
-                            <option value="{{ tone }}" {% if business_account.conversation_tone == tone %}selected{% endif %}>
-                                {{ tone.title() }}{% if tone == 'warm' %} & Friendly{% endif %}
-                            </option>
-                        {% endfor %}
-                    </select>
-                    <div class="help-text">Choose how the AI should communicate with your survey participants.</div>
+                <div class="col-md-6">
+                    <div class="survey-config-form-group">
+                        <label class="survey-config-form-label" for="conversation_tone">Conversation Tone</label>
+                        <select class="survey-config-form-control" 
+                                id="conversation_tone" 
+                                name="conversation_tone"
+                                aria-describedby="conversation_tone_help">
+                            {% for tone in tone_options %}
+                                <option value="{{ tone }}" {% if business_account.conversation_tone == tone %}selected{% endif %}>
+                                    {{ tone.title() }}{% if tone == 'warm' %} & Friendly{% endif %}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div class="survey-config-help-text" id="conversation_tone_help">Choose how the AI should communicate with your survey participants</div>
+                    </div>
                 </div>
             </div>
             
-            <div class="form-group">
-                <label for="company_description" class="form-label">Company Description</label>
-                <textarea class="form-control" id="company_description" name="company_description" rows="3" 
-                          maxlength="500" placeholder="Briefly describe what your company does and your mission...">{{ business_account.company_description or '' }}</textarea>
-                <div class="character-counter" id="company_description_counter">
-                    {{ (business_account.company_description or '')|length }}/500 characters
+            <div class="row">
+                <div class="col-12">
+                    <div class="survey-config-form-group">
+                        <label class="survey-config-form-label" for="company_description">Company Description</label>
+                        <textarea class="survey-config-form-control" 
+                                  id="company_description" 
+                                  name="company_description" 
+                                  rows="3" 
+                                  maxlength="500" 
+                                  placeholder="Briefly describe what your company does and your mission..."
+                                  aria-describedby="company_description_help">{{ business_account.company_description or '' }}</textarea>
+                        <div class="survey-config-character-counter" id="company_description_counter">
+                            {{ (business_account.company_description or '')|length }}/500 characters
+                        </div>
+                        <div class="survey-config-help-text" id="company_description_help">This context helps the AI understand your business and ask relevant questions</div>
+                    </div>
                 </div>
-                <div class="help-text">This context helps the AI understand your business and ask relevant questions.</div>
             </div>
             
-            <div class="form-group">
-                <label for="product_description" class="form-label">Product/Service Description</label>
-                <textarea class="form-control" id="product_description" name="product_description" rows="3" 
-                          maxlength="500" placeholder="Describe your main products or services in detail...">{{ business_account.product_description or '' }}</textarea>
-                <div class="character-counter" id="product_description_counter">
-                    {{ (business_account.product_description or '')|length }}/500 characters
+            <div class="row">
+                <div class="col-12">
+                    <div class="survey-config-form-group">
+                        <label class="survey-config-form-label" for="product_description">Product/Service Description</label>
+                        <textarea class="survey-config-form-control" 
+                                  id="product_description" 
+                                  name="product_description" 
+                                  rows="3" 
+                                  maxlength="500" 
+                                  placeholder="Describe your main products or services in detail..."
+                                  aria-describedby="product_description_help">{{ business_account.product_description or '' }}</textarea>
+                        <div class="survey-config-character-counter" id="product_description_counter">
+                            {{ (business_account.product_description or '')|length }}/500 characters
+                        </div>
+                        <div class="survey-config-help-text" id="product_description_help">Specific product details enable more targeted feedback collection</div>
+                    </div>
                 </div>
-                <div class="help-text">Specific product details enable more targeted feedback collection.</div>
             </div>
             
-            <div class="form-group">
-                <label for="target_clients_description" class="form-label">Target Customers</label>
-                <textarea class="form-control" id="target_clients_description" name="target_clients_description" rows="2" 
-                          maxlength="300" placeholder="Describe your typical customers (e.g., small business owners, CFOs, healthcare providers...)">{{ business_account.target_clients_description or '' }}</textarea>
-                <div class="character-counter" id="target_clients_description_counter">
-                    {{ (business_account.target_clients_description or '')|length }}/300 characters
+            <div class="row">
+                <div class="col-12">
+                    <div class="survey-config-form-group">
+                        <label class="survey-config-form-label" for="target_clients_description">Target Customers</label>
+                        <textarea class="survey-config-form-control" 
+                                  id="target_clients_description" 
+                                  name="target_clients_description" 
+                                  rows="2" 
+                                  maxlength="300" 
+                                  placeholder="Describe your typical customers (e.g., small business owners, CFOs, healthcare providers...)"
+                                  aria-describedby="target_clients_description_help">{{ business_account.target_clients_description or '' }}</textarea>
+                        <div class="survey-config-character-counter" id="target_clients_description_counter">
+                            {{ (business_account.target_clients_description or '')|length }}/300 characters
+                        </div>
+                        <div class="survey-config-help-text" id="target_clients_description_help">Understanding your audience helps frame questions appropriately</div>
+                    </div>
                 </div>
-                <div class="help-text">Understanding your audience helps frame questions appropriately.</div>
             </div>
         </div>
 
         <!-- Survey Goals Section -->
-        <div class="config-form-section">
-            <h2 class="section-title">
-                <i class="fas fa-bullseye"></i>
+        <div class="survey-config-form-section">
+            <h3 class="survey-config-section-title">
+                <i class="fas fa-bullseye" aria-hidden="true"></i>
                 Survey Goals
-            </h2>
-            <p class="text-muted mb-4">What do you want to learn from your survey participants?</p>
+            </h3>
+            <p class="survey-config-section-subtitle">What do you want to learn from your survey participants?</p>
             
-            <div class="form-group">
-                <label class="form-label">Primary Survey Goals (select all that apply)</label>
-                <div class="checkbox-group">
+            <div class="survey-config-form-group">
+                <label class="survey-config-form-label">Primary Survey Goals (select all that apply)</label>
+                <div class="survey-config-checkbox-group">
                     {% set current_goals = business_account.survey_goals or [] %}
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="goal_nps" name="survey_goals" value="NPS" 
+                    <div class="survey-config-form-check">
+                        <input class="survey-config-form-check-input" type="checkbox" id="goal_nps" name="survey_goals" value="NPS" 
                                {% if 'NPS' in current_goals %}checked{% endif %}>
-                        <label class="form-check-label" for="goal_nps">Net Promoter Score</label>
+                        <label class="survey-config-form-check-label" for="goal_nps">Net Promoter Score</label>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="goal_satisfaction" name="survey_goals" value="Satisfaction" 
+                    <div class="survey-config-form-check">
+                        <input class="survey-config-form-check-input" type="checkbox" id="goal_satisfaction" name="survey_goals" value="Satisfaction" 
                                {% if 'Satisfaction' in current_goals %}checked{% endif %}>
-                        <label class="form-check-label" for="goal_satisfaction">Overall Satisfaction</label>
+                        <label class="survey-config-form-check-label" for="goal_satisfaction">Overall Satisfaction</label>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="goal_product" name="survey_goals" value="Product Feedback" 
+                    <div class="survey-config-form-check">
+                        <input class="survey-config-form-check-input" type="checkbox" id="goal_product" name="survey_goals" value="Product Feedback" 
                                {% if 'Product Feedback' in current_goals %}checked{% endif %}>
-                        <label class="form-check-label" for="goal_product">Product Feedback</label>
+                        <label class="survey-config-form-check-label" for="goal_product">Product Feedback</label>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="goal_support" name="survey_goals" value="Support Quality" 
+                    <div class="survey-config-form-check">
+                        <input class="survey-config-form-check-input" type="checkbox" id="goal_support" name="survey_goals" value="Support Quality" 
                                {% if 'Support Quality' in current_goals %}checked{% endif %}>
-                        <label class="form-check-label" for="goal_support">Support Quality</label>
+                        <label class="survey-config-form-check-label" for="goal_support">Support Quality</label>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="goal_pricing" name="survey_goals" value="Pricing Perception" 
+                    <div class="survey-config-form-check">
+                        <input class="survey-config-form-check-input" type="checkbox" id="goal_pricing" name="survey_goals" value="Pricing Perception" 
                                {% if 'Pricing Perception' in current_goals %}checked{% endif %}>
-                        <label class="form-check-label" for="goal_pricing">Pricing Perception</label>
+                        <label class="survey-config-form-check-label" for="goal_pricing">Pricing Perception</label>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="goal_custom" name="survey_goals" value="Custom" 
+                    <div class="survey-config-form-check">
+                        <input class="survey-config-form-check-input" type="checkbox" id="goal_custom" name="survey_goals" value="Custom" 
                                {% if 'Custom' in current_goals %}checked{% endif %}>
-                        <label class="form-check-label" for="goal_custom">Custom Research</label>
+                        <label class="survey-config-form-check-label" for="goal_custom">Custom Research</label>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Survey Controls Section -->
-        <div class="config-form-section">
-            <h2 class="section-title">
-                <i class="fas fa-sliders-h"></i>
+        <!-- Survey Flow Controls Section -->
+        <div class="survey-config-form-section">
+            <h3 class="survey-config-section-title">
+                <i class="fas fa-sliders-h" aria-hidden="true"></i>
                 Survey Flow Controls
-            </h2>
-            <p class="text-muted mb-4">Fine-tune the survey experience and conversation pacing.</p>
+            </h3>
+            <p class="survey-config-section-subtitle">Fine-tune the survey experience and conversation pacing</p>
             
-            <div class="form-row three-col">
-                <div class="form-group">
-                    <label for="max_questions" class="form-label">Maximum Questions</label>
-                    <div class="range-display">
-                        <span class="range-value" id="max_questions_display">{{ business_account.max_questions or 8 }}</span>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="survey-config-form-group">
+                        <label class="survey-config-form-label" for="max_questions">Maximum Questions</label>
+                        <div class="survey-config-range-display">
+                            <span class="survey-config-range-value" id="max_questions_display">{{ business_account.max_questions or 8 }}</span>
+                        </div>
+                        <input type="range" 
+                               class="survey-config-form-range" 
+                               id="max_questions" 
+                               name="max_questions" 
+                               min="3" 
+                               max="15" 
+                               value="{{ business_account.max_questions or 8 }}"
+                               oninput="document.getElementById('max_questions_display').textContent = this.value"
+                               aria-describedby="max_questions_help">
+                        <div class="survey-config-range-labels">
+                            <span>3</span>
+                            <span>15</span>
+                        </div>
+                        <div class="survey-config-help-text" id="max_questions_help">Absolute limit to keep surveys concise and engaging</div>
                     </div>
-                    <input type="range" class="form-control" id="max_questions" name="max_questions" 
-                           min="3" max="15" value="{{ business_account.max_questions or 8 }}"
-                           oninput="document.getElementById('max_questions_display').textContent = this.value">
-                    <div class="range-labels">
-                        <span>3</span>
-                        <span>15</span>
-                    </div>
-                    <div class="help-text">Absolute limit to keep surveys concise and engaging.</div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="max_duration_seconds" class="form-label">Time Limit (seconds)</label>
-                    <div class="range-display">
-                        <span class="range-value" id="max_duration_display">{{ business_account.max_duration_seconds or 120 }}</span>
+                <div class="col-md-4">
+                    <div class="survey-config-form-group">
+                        <label class="survey-config-form-label" for="max_duration_seconds">Time Limit (seconds)</label>
+                        <div class="survey-config-range-display">
+                            <span class="survey-config-range-value" id="max_duration_display">{{ business_account.max_duration_seconds or 120 }}</span>
+                        </div>
+                        <input type="range" 
+                               class="survey-config-form-range" 
+                               id="max_duration_seconds" 
+                               name="max_duration_seconds" 
+                               min="60" 
+                               max="300" 
+                               step="15" 
+                               value="{{ business_account.max_duration_seconds or 120 }}"
+                               oninput="document.getElementById('max_duration_display').textContent = this.value"
+                               aria-describedby="max_duration_help">
+                        <div class="survey-config-range-labels">
+                            <span>1min</span>
+                            <span>5min</span>
+                        </div>
+                        <div class="survey-config-help-text" id="max_duration_help">Maximum time participants can spend on the survey</div>
                     </div>
-                    <input type="range" class="form-control" id="max_duration_seconds" name="max_duration_seconds" 
-                           min="60" max="300" step="15" value="{{ business_account.max_duration_seconds or 120 }}"
-                           oninput="document.getElementById('max_duration_display').textContent = this.value">
-                    <div class="range-labels">
-                        <span>1min</span>
-                        <span>5min</span>
-                    </div>
-                    <div class="help-text">Maximum time participants can spend on the survey.</div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="max_follow_ups_per_topic" class="form-label">Follow-ups per Topic</label>
-                    <div class="range-display">
-                        <span class="range-value" id="max_follow_ups_display">{{ business_account.max_follow_ups_per_topic or 2 }}</span>
+                <div class="col-md-4">
+                    <div class="survey-config-form-group">
+                        <label class="survey-config-form-label" for="max_follow_ups_per_topic">Follow-ups per Topic</label>
+                        <div class="survey-config-range-display">
+                            <span class="survey-config-range-value" id="max_follow_ups_display">{{ business_account.max_follow_ups_per_topic or 2 }}</span>
+                        </div>
+                        <input type="range" 
+                               class="survey-config-form-range" 
+                               id="max_follow_ups_per_topic" 
+                               name="max_follow_ups_per_topic" 
+                               min="1" 
+                               max="3" 
+                               value="{{ business_account.max_follow_ups_per_topic or 2 }}"
+                               oninput="document.getElementById('max_follow_ups_display').textContent = this.value"
+                               aria-describedby="max_follow_ups_help">
+                        <div class="survey-config-range-labels">
+                            <span>1</span>
+                            <span>3</span>
+                        </div>
+                        <div class="survey-config-help-text" id="max_follow_ups_help">How deep to explore each topic with follow-up questions</div>
                     </div>
-                    <input type="range" class="form-control" id="max_follow_ups_per_topic" name="max_follow_ups_per_topic" 
-                           min="1" max="3" value="{{ business_account.max_follow_ups_per_topic or 2 }}"
-                           oninput="document.getElementById('max_follow_ups_display').textContent = this.value">
-                    <div class="range-labels">
-                        <span>1</span>
-                        <span>3</span>
-                    </div>
-                    <div class="help-text">How deep to explore each topic with follow-up questions.</div>
                 </div>
             </div>
         </div>
 
         <!-- Topic Priorities Section -->
-        <div class="config-form-section">
-            <h2 class="section-title">
-                <i class="fas fa-list-ol"></i>
+        <div class="survey-config-form-section">
+            <h3 class="survey-config-section-title">
+                <i class="fas fa-list-ol" aria-hidden="true"></i>
                 Topic Priorities
-            </h2>
-            <p class="text-muted mb-4">Control which topics the survey covers first and which are optional if time runs out.</p>
+            </h3>
+            <p class="survey-config-section-subtitle">Control which topics the survey covers first and which are optional if time runs out</p>
             
-            <div class="form-row two-col">
-                <div class="form-group">
-                    <label class="form-label">Prioritized Topics (covered first)</label>
-                    <div class="checkbox-group">
-                        {% set current_priorities = business_account.prioritized_topics or [] %}
-                        {% for topic in topic_options %}
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="priority_{{ topic|replace(' ', '_')|lower }}" 
-                                   name="prioritized_topics" value="{{ topic }}" 
-                                   {% if topic in current_priorities %}checked{% endif %}>
-                            <label class="form-check-label" for="priority_{{ topic|replace(' ', '_')|lower }}">{{ topic }}</label>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="survey-config-form-group">
+                        <label class="survey-config-form-label">Prioritized Topics (covered first)</label>
+                        <div class="survey-config-checkbox-group">
+                            {% set current_priorities = business_account.prioritized_topics or [] %}
+                            {% for topic in topic_options %}
+                            <div class="survey-config-form-check">
+                                <input class="survey-config-form-check-input" 
+                                       type="checkbox" 
+                                       id="priority_{{ topic|replace(' ', '_')|lower }}" 
+                                       name="prioritized_topics" 
+                                       value="{{ topic }}" 
+                                       {% if topic in current_priorities %}checked{% endif %}>
+                                <label class="survey-config-form-check-label" for="priority_{{ topic|replace(' ', '_')|lower }}">{{ topic }}</label>
+                            </div>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
+                        <div class="survey-config-help-text">These topics will always be covered, in order of importance</div>
                     </div>
-                    <div class="help-text">These topics will always be covered, in order of importance.</div>
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label">Optional Topics (if time allows)</label>
-                    <div class="checkbox-group">
-                        {% set current_optional = business_account.optional_topics or [] %}
-                        {% for topic in topic_options %}
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="optional_{{ topic|replace(' ', '_')|lower }}" 
-                                   name="optional_topics" value="{{ topic }}" 
-                                   {% if topic in current_optional %}checked{% endif %}>
-                            <label class="form-check-label" for="optional_{{ topic|replace(' ', '_')|lower }}">{{ topic }}</label>
+                <div class="col-md-6">
+                    <div class="survey-config-form-group">
+                        <label class="survey-config-form-label">Optional Topics (if time allows)</label>
+                        <div class="survey-config-checkbox-group">
+                            {% set current_optional = business_account.optional_topics or [] %}
+                            {% for topic in topic_options %}
+                            <div class="survey-config-form-check">
+                                <input class="survey-config-form-check-input" 
+                                       type="checkbox" 
+                                       id="optional_{{ topic|replace(' ', '_')|lower }}" 
+                                       name="optional_topics" 
+                                       value="{{ topic }}" 
+                                       {% if topic in current_optional %}checked{% endif %}>
+                                <label class="survey-config-form-check-label" for="optional_{{ topic|replace(' ', '_')|lower }}">{{ topic }}</label>
+                            </div>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
+                        <div class="survey-config-help-text">These topics can be skipped if the time/question limit is reached</div>
                     </div>
-                    <div class="help-text">These topics can be skipped if the time/question limit is reached.</div>
                 </div>
             </div>
         </div>
 
         <!-- Custom Messages Section -->
-        <div class="config-form-section">
-            <h2 class="section-title">
-                <i class="fas fa-comment-dots"></i>
+        <div class="survey-config-form-section">
+            <h3 class="survey-config-section-title">
+                <i class="fas fa-comment-dots" aria-hidden="true"></i>
                 Custom Messages
-            </h2>
-            <p class="text-muted mb-4">Personalize the survey experience with custom messages.</p>
+            </h3>
+            <p class="survey-config-section-subtitle">Personalize the survey experience with custom messages</p>
             
-            <div class="form-group">
-                <label for="custom_end_message" class="form-label">Custom Completion Message</label>
-                <textarea class="form-control" id="custom_end_message" name="custom_end_message" rows="3" 
-                          maxlength="1000" placeholder="Thank you for your valuable feedback! We truly appreciate the time you've taken to help us improve...">{{ business_account.custom_end_message or '' }}</textarea>
-                <div class="character-counter" id="custom_end_message_counter">
-                    {{ (business_account.custom_end_message or '')|length }}/1000 characters
+            <div class="row">
+                <div class="col-12">
+                    <div class="survey-config-form-group">
+                        <label class="survey-config-form-label" for="custom_end_message">Custom Completion Message</label>
+                        <textarea class="survey-config-form-control" 
+                                  id="custom_end_message" 
+                                  name="custom_end_message" 
+                                  rows="3" 
+                                  maxlength="1000" 
+                                  placeholder="Thank you for your valuable feedback! We truly appreciate the time you've taken to help us improve..."
+                                  aria-describedby="custom_end_message_help">{{ business_account.custom_end_message or '' }}</textarea>
+                        <div class="survey-config-character-counter" id="custom_end_message_counter">
+                            {{ (business_account.custom_end_message or '')|length }}/1000 characters
+                        </div>
+                        <div class="survey-config-help-text" id="custom_end_message_help">This message will be shown to participants when they complete the survey. Leave blank to use the default message</div>
+                    </div>
                 </div>
-                <div class="help-text">This message will be shown to participants when they complete the survey. Leave blank to use the default message.</div>
             </div>
 
             <!-- Preview Box -->
             {% if business_account.custom_end_message %}
-            <div class="preview-box">
-                <div class="preview-title">
-                    <i class="fas fa-eye"></i>
+            <div class="survey-config-preview-box">
+                <div class="survey-config-preview-title">
+                    <i class="fas fa-eye me-2" aria-hidden="true"></i>
                     Preview: Completion Message
                 </div>
-                <div class="preview-content">
+                <div class="survey-config-preview-content">
                     {{ business_account.custom_end_message }}
                 </div>
             </div>
             {% endif %}
         </div>
 
-        <!-- Form Actions -->
-        <div class="form-actions">
-            <a href="{{ url_for('business_auth.admin_panel') }}" class="btn-secondary">
-                <i class="fas fa-arrow-left"></i>
-                Cancel
-            </a>
-            <button type="submit" class="btn-save">
-                <i class="fas fa-save"></i>
-                Save Configuration
-            </button>
+        <!-- Action Buttons -->
+        <div class="survey-config-form-section">
+            <div class="survey-config-actions-row">
+                <div class="survey-config-actions-left">
+                    <a href="{{ url_for('business_auth.admin_panel') }}" 
+                       class="survey-config-btn-cancel"
+                       aria-label="Cancel and return to settings">
+                        <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                        Cancel
+                    </a>
+                </div>
+                <div class="survey-config-actions-right">
+                    <button type="submit" 
+                            class="survey-config-btn-save"
+                            aria-label="Save survey configuration">
+                        <i class="fas fa-save" aria-hidden="true"></i>
+                        Save Configuration
+                    </button>
+                </div>
+            </div>
         </div>
     </form>
 </div>
+{% endblock %}
 
+{% block scripts %}
 <script>
 // Character counter functionality
 function updateCharacterCounter(textareaId, counterId, maxLength) {
     const textarea = document.getElementById(textareaId);
     const counter = document.getElementById(counterId);
-    const length = textarea.value.length;
     
+    if (!textarea || !counter) return;
+    
+    const length = textarea.value.length;
     counter.textContent = `${length}/${maxLength} characters`;
     
     // Update counter styling based on usage
@@ -320,37 +416,26 @@ document.addEventListener('DOMContentLoaded', function() {
             updateCharacterCounter(item.id, item.counter, item.max);
         }
     });
-});
-
-// Form validation
-document.querySelector('form').addEventListener('submit', function(e) {
-    const companyDesc = document.getElementById('company_description').value;
-    const productDesc = document.getElementById('product_description').value;
-    const targetClients = document.getElementById('target_clients_description').value;
-    const customMessage = document.getElementById('custom_end_message').value;
     
-    let hasErrors = false;
-    
-    // Check character limits
-    if (companyDesc.length > 500) {
-        alert('Company description must be 500 characters or less.');
-        hasErrors = true;
-    }
-    if (productDesc.length > 500) {
-        alert('Product description must be 500 characters or less.');
-        hasErrors = true;
-    }
-    if (targetClients.length > 300) {
-        alert('Target customers description must be 300 characters or less.');
-        hasErrors = true;
-    }
-    if (customMessage.length > 1000) {
-        alert('Custom end message must be 1000 characters or less.');
-        hasErrors = true;
-    }
-    
-    if (hasErrors) {
-        e.preventDefault();
+    // Form validation
+    const form = document.getElementById('surveyConfigForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            let hasErrors = false;
+            
+            // Check character limits
+            textareas.forEach(function(item) {
+                const textarea = document.getElementById(item.id);
+                if (textarea && textarea.value.length > item.max) {
+                    alert(`${textarea.labels[0].textContent} must be ${item.max} characters or less.`);
+                    hasErrors = true;
+                }
+            });
+            
+            if (hasErrors) {
+                e.preventDefault();
+            }
+        });
     }
 });
 </script>
