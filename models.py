@@ -1185,6 +1185,12 @@ class Participant(db.Model):
     name = db.Column(db.String(200), nullable=False)
     company_name = db.Column(db.String(200), nullable=True)
     
+    # Segmentation attributes (optional, for personalized surveys and analytics)
+    role = db.Column(db.String(100), nullable=True)  # e.g., "C-Level", "Manager", "End User"
+    region = db.Column(db.String(100), nullable=True)  # e.g., "North America", "EMEA", "APAC"
+    customer_tier = db.Column(db.String(50), nullable=True)  # e.g., "Enterprise", "SMB", "Startup"
+    language = db.Column(db.String(10), nullable=True, default='en')  # ISO language code (en, es, fr, etc.)
+    
     # Origin tracking for management visibility
     source = db.Column(db.String(20), nullable=False, default='trial', index=True)  # 'trial', 'admin_single', 'admin_bulk'
     
@@ -1211,6 +1217,10 @@ class Participant(db.Model):
             'email': self.email,
             'name': self.name,
             'company_name': self.company_name,
+            'role': self.role,
+            'region': self.region,
+            'customer_tier': self.customer_tier,
+            'language': self.language,
             'source': self.source,
             'token': self.token,
             'status': self.status,
