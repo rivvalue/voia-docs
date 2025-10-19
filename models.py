@@ -760,6 +760,14 @@ class EmailConfiguration(db.Model):
     # Admin Notification Settings
     admin_notification_emails = db.Column(db.Text, nullable=True)  # JSON array of admin emails
     
+    # Custom Email Content
+    use_custom_content = db.Column(db.Boolean, nullable=False, default=False)  # Toggle between default and custom templates
+    custom_subject_template = db.Column(db.String(200), nullable=True)  # Custom email subject
+    custom_intro_message = db.Column(db.Text, nullable=True)  # Custom introduction message
+    custom_cta_text = db.Column(db.String(50), nullable=True)  # Custom call-to-action button text
+    custom_closing_message = db.Column(db.Text, nullable=True)  # Custom closing message
+    custom_footer_note = db.Column(db.Text, nullable=True)  # Custom footer disclaimer
+    
     # Configuration Status
     is_active = db.Column(db.Boolean, nullable=False, default=True)
     is_verified = db.Column(db.Boolean, nullable=False, default=False)  # Whether SMTP config has been tested
@@ -1004,6 +1012,75 @@ class EmailConfiguration(db.Model):
         """Auto-generate SMTP server for AWS SES if using AWS SES provider"""
         if self.is_aws_ses() and self.aws_region:
             self.smtp_server = self.get_ses_smtp_server()
+    
+    def get_email_content(self):
+        """Get email content configuration (custom or default)
+        
+        Returns:
+            Dict with subject, intro, cta, closing, footer - either custom or defaults
+        """
+        import re
+        
+        # Default templates
+        defaults = {
+            'subject': "Your feedback is requested: {campaign_name}",
+            'intro': "{business_account_name} is requesting your valuable feedback through our Voice of Client system.",
+            'cta_text': "Complete Your Survey",
+            'closing': "Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.\n\nThank you for your time and valuable insights!",
+            'footer': "This is an automated message. If you have any questions, please contact the organization that sent this survey."
+        }
+        
+        # If not using custom content, return defaults
+        if not self.use_custom_content:
+            return defaults
+        
+        # Otherwise return custom content with fallback to defaults
+        return {
+            'subject': self.custom_subject_template or defaults['subject'],
+            'intro': self.custom_intro_message or defaults['intro'],
+            'cta_text': self.custom_cta_text or defaults['cta_text'],
+            'closing': self.custom_closing_message or defaults['closing'],
+            'footer': self.custom_footer_note or defaults['footer']
+        }
+    
+    def validate_custom_content(self):
+        """Validate custom email content fields
+        
+        Returns:
+            List of validation errors
+        """
+        errors = []
+        
+        if not self.use_custom_content:
+            return errors  # No validation needed if using defaults
+        
+        # Validate subject template
+        if self.custom_subject_template:
+            if len(self.custom_subject_template) > 200:
+                errors.append("Subject template must be 200 characters or less")
+        
+        # Validate CTA text
+        if self.custom_cta_text:
+            if len(self.custom_cta_text) > 50:
+                errors.append("Call-to-action text must be 50 characters or less")
+        
+        # Check for HTML tags (security - strip HTML)
+        import re
+        html_pattern = re.compile(r'<[^>]+>')
+        
+        fields_to_check = [
+            ('custom_subject_template', self.custom_subject_template),
+            ('custom_intro_message', self.custom_intro_message),
+            ('custom_cta_text', self.custom_cta_text),
+            ('custom_closing_message', self.custom_closing_message),
+            ('custom_footer_note', self.custom_footer_note)
+        ]
+        
+        for field_name, field_value in fields_to_check:
+            if field_value and html_pattern.search(field_value):
+                errors.append(f"{field_name.replace('custom_', '').replace('_', ' ').title()} cannot contain HTML tags")
+        
+        return errors
     
     @staticmethod
     def get_for_business_account(business_account_id):
