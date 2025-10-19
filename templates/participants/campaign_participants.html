@@ -3,6 +3,13 @@
 {% block title %}Campaign Participants - {{ campaign.name }} - VOÏA{% endblock %}
 
 {% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Campaigns', 'url': url_for('campaigns.list_campaigns')},
+    {'label': campaign.name, 'url': url_for('campaigns.view_campaign', campaign_id=campaign.id)},
+    {'label': 'Manage Participants', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
 <div class="container-fluid">
     <div class="row">
         <div class="col-12">
