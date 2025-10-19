@@ -5,6 +5,12 @@
 {% block page_class %}page-manage-users{% endblock %}
 
 {% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Settings', 'url': url_for('business_auth.admin_panel')},
+    {'label': 'Team Management', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
 <div class="users-container">
     <!-- Header -->
     <div class="users-header">
