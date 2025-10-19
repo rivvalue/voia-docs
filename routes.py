@@ -1129,11 +1129,15 @@ def public_survey_response(response_id):
                 else:
                     bi_label = 'Business Intelligence'
                 
+                # Get campaign information
+                campaign_name = response.campaign.name if response.campaign else 'Unknown Campaign'
+                
                 return render_template('public_survey_response.html', 
                                      response=response_data,
                                      branding=branding,
                                      bi_url=last_bi_page,
-                                     bi_label=bi_label)
+                                     bi_label=bi_label,
+                                     campaign_name=campaign_name)
             else:
                 # Business user doesn't own this campaign
                 logger.warning(f"Business user {current_business_user.email} denied access to response {response_id} - not their campaign")
@@ -1167,11 +1171,15 @@ def public_survey_response(response_id):
         else:
             bi_label = 'Business Intelligence'
         
+        # For trial responses, campaign is None
+        campaign_name = 'Trial Survey'
+        
         return render_template('public_survey_response.html', 
                              response=response_data,
                              branding=branding,
                              bi_url=last_bi_page,
-                             bi_label=bi_label)
+                             bi_label=bi_label,
+                             campaign_name=campaign_name)
     
     except Exception as e:
         logger.error(f"Error accessing survey response {response_id}: {e}")

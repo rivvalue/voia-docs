@@ -8,6 +8,8 @@
 {# Breadcrumb Navigation #}
 {% set breadcrumb_items = [
     {'label': bi_label, 'url': bi_url},
+    {'label': campaign_name, 'url': bi_url},
+    {'label': response.company_name, 'url': bi_url},
     {'label': response.respondent_name, 'current': true}
 ] %}
 {% include 'components/breadcrumb.html' %}
@@ -15,6 +17,9 @@
 <div class="container py-4" role="main" aria-label="Survey response details">
     <!-- Simple Page Header -->
     <div class="mb-4">
+        <div class="mb-2">
+            <span class="badge bg-secondary">{{ campaign_name }}</span>
+        </div>
         <h3 class="mb-2">{{ response.respondent_name }} - {{ response.company_name }}</h3>
         <div class="d-flex align-items-center gap-3">
             <span class="public-nps-score public-nps-{{ response.nps_category.lower() }}" role="status" aria-label="Net Promoter Score: {{ response.nps_score }} out of 10, {{ response.nps_category }}">
