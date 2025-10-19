@@ -3083,11 +3083,19 @@ def company_responses_page(company_name):
         # Check if user is authenticated as business user
         is_business_authenticated = current_business_user is not None
         
-        # Determine back URL from session or default based on user type
+        # Determine breadcrumb based on session or default based on user type
         if is_business_authenticated:
-            back_url = session.get('last_bi_page', url_for('campaign_insights'))
+            last_bi_page = session.get('last_bi_page', url_for('campaign_insights'))
         else:
-            back_url = session.get('last_bi_page', url_for('dashboard'))
+            last_bi_page = session.get('last_bi_page', url_for('dashboard'))
+        
+        # Determine breadcrumb label based on the URL
+        if 'executive-summary' in last_bi_page:
+            bi_label = 'Executive Summary'
+        elif 'campaign-insights' in last_bi_page:
+            bi_label = 'Campaign Insights'
+        else:
+            bi_label = 'Business Intelligence'
         
         return render_template('company_responses.html',
                              company_name=company_name,
@@ -3095,7 +3103,8 @@ def company_responses_page(company_name):
                              campaign_id=campaign_id,
                              branding=branding,
                              is_business_authenticated=is_business_authenticated,
-                             back_url=back_url)
+                             bi_url=last_bi_page,
+                             bi_label=bi_label)
     
     except Exception as e:
         logger.error(f"Error loading company responses page: {e}")

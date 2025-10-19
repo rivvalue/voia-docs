@@ -7,7 +7,7 @@
 {% block content %}
 {# Breadcrumb Navigation #}
 {% set breadcrumb_items = [
-    {'label': 'Business Intelligence', 'url': url_for('dashboard')},
+    {'label': bi_label, 'url': bi_url},
     {'label': company_name, 'current': true}
 ] %}
 {% include 'components/breadcrumb.html' %}
@@ -35,12 +35,8 @@
     <div class="row">
         <div class="col-lg-10 mx-auto">
             
-            <!-- Header with Back Navigation -->
+            <!-- Page Header -->
             <div class="mb-4">
-                <a href="{{ back_url }}" class="btn btn-outline-secondary btn-sm mb-3">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Business Intelligence
-                </a>
-                
                 <div class="d-flex justify-content-between align-items-start flex-wrap">
                     <div>
                         <h2 class="mb-1">{{ company_name }}</h2>
