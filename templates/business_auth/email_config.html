@@ -291,6 +291,151 @@
                 <div class="email-help-text" id="admin_emails_help">Comma-separated list of email addresses for admin notifications</div>
             </div>
         </div>
+        
+        <!-- Email Content Customization -->
+        <div class="email-config-form-section">
+            <h3 class="email-section-title">
+                <i class="fas fa-envelope-open-text" aria-hidden="true"></i>
+                Email Content
+            </h3>
+            
+            <div class="email-form-group">
+                <div class="email-form-check">
+                    <input type="checkbox" 
+                           class="email-form-check-input" 
+                           id="use_custom_content" 
+                           name="use_custom_content" 
+                           {{ 'checked' if email_config and email_config.use_custom_content else '' }}
+                           onchange="toggleCustomContent()"
+                           aria-describedby="use_custom_content_help">
+                    <label class="email-form-check-label" for="use_custom_content">
+                        <strong>Use custom email content</strong>
+                    </label>
+                </div>
+                <div class="email-help-text" id="use_custom_content_help">
+                    Customize the invitation email content. If unchecked, default professional templates will be used.
+                </div>
+            </div>
+            
+            <!-- Custom Content Fields (hidden by default) -->
+            <div id="custom_content_fields" style="display: none;">
+                <div class="email-form-group">
+                    <label class="email-form-label" for="custom_subject_template">
+                        Email Subject
+                        <span style="color: #999; font-weight: normal;">(Max 200 characters)</span>
+                    </label>
+                    <input type="text" 
+                           class="email-form-control" 
+                           id="custom_subject_template" 
+                           name="custom_subject_template" 
+                           value="{{ email_config.custom_subject_template if email_config else '' }}" 
+                           placeholder="Your feedback is requested: {campaign_name}"
+                           maxlength="200"
+                           oninput="updatePreview()"
+                           aria-describedby="custom_subject_help">
+                    <div class="email-help-text" id="custom_subject_help">
+                        Variables: <code>{participant_name}</code>, <code>{campaign_name}</code>, <code>{business_account_name}</code>
+                    </div>
+                </div>
+                
+                <div class="email-form-group">
+                    <label class="email-form-label" for="custom_intro_message">Introduction Message</label>
+                    <textarea class="email-form-control" 
+                              id="custom_intro_message" 
+                              name="custom_intro_message" 
+                              rows="3"
+                              placeholder="{business_account_name} is requesting your valuable feedback through our Voice of Client system."
+                              oninput="updatePreview()"
+                              aria-describedby="custom_intro_help">{{ email_config.custom_intro_message if email_config else '' }}</textarea>
+                    <div class="email-help-text" id="custom_intro_help">
+                        The opening message in the email body
+                    </div>
+                </div>
+                
+                <div class="email-form-group">
+                    <label class="email-form-label" for="custom_cta_text">
+                        Button Text
+                        <span style="color: #999; font-weight: normal;">(Max 50 characters)</span>
+                    </label>
+                    <input type="text" 
+                           class="email-form-control" 
+                           id="custom_cta_text" 
+                           name="custom_cta_text" 
+                           value="{{ email_config.custom_cta_text if email_config else '' }}" 
+                           placeholder="Complete Your Survey"
+                           maxlength="50"
+                           oninput="updatePreview()"
+                           aria-describedby="custom_cta_help">
+                    <div class="email-help-text" id="custom_cta_help">
+                        Text displayed on the survey button
+                    </div>
+                </div>
+                
+                <div class="email-form-group">
+                    <label class="email-form-label" for="custom_closing_message">Closing Message</label>
+                    <textarea class="email-form-control" 
+                              id="custom_closing_message" 
+                              name="custom_closing_message" 
+                              rows="3"
+                              placeholder="Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.&#10;&#10;Thank you for your time and valuable insights!"
+                              oninput="updatePreview()"
+                              aria-describedby="custom_closing_help">{{ email_config.custom_closing_message if email_config else '' }}</textarea>
+                    <div class="email-help-text" id="custom_closing_help">
+                        Message before the signature
+                    </div>
+                </div>
+                
+                <div class="email-form-group">
+                    <label class="email-form-label" for="custom_footer_note">Footer Disclaimer</label>
+                    <textarea class="email-form-control" 
+                              id="custom_footer_note" 
+                              name="custom_footer_note" 
+                              rows="2"
+                              placeholder="This is an automated message. If you have any questions, please contact the organization that sent this survey."
+                              oninput="updatePreview()"
+                              aria-describedby="custom_footer_help">{{ email_config.custom_footer_note if email_config else '' }}</textarea>
+                    <div class="email-help-text" id="custom_footer_help">
+                        Small print at the bottom of the email
+                    </div>
+                </div>
+                
+                <!-- Live Preview Button -->
+                <div class="email-form-group">
+                    <button type="button" 
+                            class="email-btn-test" 
+                            id="previewEmailBtn"
+                            onclick="showPreview()"
+                            aria-label="Preview email">
+                        <i class="fas fa-eye" aria-hidden="true"></i>
+                        Preview Email
+                    </button>
+                </div>
+                
+                <!-- Preview Container -->
+                <div id="emailPreviewContainer" 
+                     style="display: none; margin-top: 20px; padding: 20px; background-color: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h4 style="margin: 0; color: #333;">
+                            <i class="fas fa-eye" aria-hidden="true"></i>
+                            Email Preview
+                        </h4>
+                        <button type="button" 
+                                onclick="document.getElementById('emailPreviewContainer').style.display='none'" 
+                                style="background: none; border: none; font-size: 20px; cursor: pointer; color: #666;"
+                                aria-label="Close preview">
+                            ×
+                        </button>
+                    </div>
+                    <div id="emailPreviewContent" 
+                         style="background-color: white; padding: 20px; border-radius: 5px; min-height: 200px;">
+                        <p style="color: #999; text-align: center;">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Loading preview...
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Action Buttons -->
         <div class="email-config-form-section">
@@ -426,6 +571,67 @@ function updateSesServerDisplay() {
     }
 }
 
+// Toggle custom content fields
+function toggleCustomContent() {
+    const useCustom = document.getElementById('use_custom_content').checked;
+    const customFields = document.getElementById('custom_content_fields');
+    customFields.style.display = useCustom ? 'block' : 'none';
+}
+
+// Show email preview
+function showPreview() {
+    const previewContainer = document.getElementById('emailPreviewContainer');
+    const previewContent = document.getElementById('emailPreviewContent');
+    
+    // Show container
+    previewContainer.style.display = 'block';
+    
+    // Show loading
+    previewContent.innerHTML = '<p style="color: #999; text-align: center;"><i class="fas fa-spinner fa-spin"></i> Loading preview...</p>';
+    
+    // Get custom content values
+    const customData = {
+        subject: document.getElementById('custom_subject_template').value,
+        intro: document.getElementById('custom_intro_message').value,
+        cta_text: document.getElementById('custom_cta_text').value,
+        closing: document.getElementById('custom_closing_message').value,
+        footer: document.getElementById('custom_footer_note').value,
+        use_custom: document.getElementById('use_custom_content').checked
+    };
+    
+    // Fetch preview
+    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+    
+    fetch('{{ url_for("business_auth.preview_email_content") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify(customData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            previewContent.innerHTML = data.html;
+        } else {
+            previewContent.innerHTML = '<p style="color: #dc3545;">Preview failed: ' + (data.error || 'Unknown error') + '</p>';
+        }
+    })
+    .catch(error => {
+        previewContent.innerHTML = '<p style="color: #dc3545;">Network error: ' + error.message + '</p>';
+    });
+}
+
+// Debounced preview update (not used currently, but available for real-time updates)
+let updatePreviewTimeout;
+function updatePreview() {
+    clearTimeout(updatePreviewTimeout);
+    updatePreviewTimeout = setTimeout(() => {
+        // Could auto-update preview here if desired
+    }, 500);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const testConnectionBtn = document.getElementById('testConnectionBtn');
     const sendTestEmailBtn = document.getElementById('sendTestEmailBtn');
@@ -435,6 +641,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize provider fields on page load
     toggleProviderFields();
+    
+    // Initialize custom content fields on page load
+    toggleCustomContent();
     
     // Add region change listener
     document.getElementById('aws_region').addEventListener('change', updateSesServerDisplay);

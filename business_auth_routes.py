@@ -2294,6 +2294,17 @@ def save_email_config():
         email_config.reply_to_email = reply_to_email if reply_to_email else None
         email_config.set_admin_emails(admin_email_list)
         
+        # Custom email content
+        use_custom_content = request.form.get('use_custom_content') == 'on'
+        email_config.use_custom_content = use_custom_content
+        
+        if use_custom_content:
+            email_config.custom_subject_template = request.form.get('custom_subject_template', '').strip() or None
+            email_config.custom_intro_message = request.form.get('custom_intro_message', '').strip() or None
+            email_config.custom_cta_text = request.form.get('custom_cta_text', '').strip() or None
+            email_config.custom_closing_message = request.form.get('custom_closing_message', '').strip() or None
+            email_config.custom_footer_note = request.form.get('custom_footer_note', '').strip() or None
+        
         # Update password only if provided
         if smtp_password:
             email_config.set_smtp_password(smtp_password)
@@ -2302,6 +2313,13 @@ def save_email_config():
         validation_errors = email_config.validate_configuration()
         if validation_errors:
             for error in validation_errors:
+                flash(error, 'error')
+            return redirect(url_for('business_auth.email_config'))
+        
+        # Validate custom content if enabled
+        content_errors = email_config.validate_custom_content()
+        if content_errors:
+            for error in content_errors:
                 flash(error, 'error')
             return redirect(url_for('business_auth.email_config'))
         
@@ -2493,6 +2511,107 @@ VOÏA System
         return jsonify({
             'success': False,
             'error': f'Failed to send test email: {str(e)}'
+        }), 500
+
+
+@business_auth_bp.route('/admin/email-config/preview', methods=['POST'])
+@require_business_auth
+def preview_email_content():
+    """Preview email content with custom or default templates"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account context not found'}), 400
+        
+        # Get custom content from request
+        data = request.get_json()
+        use_custom = data.get('use_custom', False)
+        
+        # Sample data for preview
+        sample_participant_name = "John Doe"
+        sample_campaign_name = "Q4 Customer Feedback Survey"
+        sample_business_name = current_account.name
+        
+        # Build content based on custom vs default
+        if use_custom and (data.get('subject') or data.get('intro') or data.get('cta_text') or data.get('closing') or data.get('footer')):
+            # Use custom content from form
+            subject = data.get('subject') or "Your feedback is requested: {campaign_name}"
+            intro = data.get('intro') or "{business_account_name} is requesting your valuable feedback through our Voice of Client system."
+            cta_text = data.get('cta_text') or "Complete Your Survey"
+            closing = data.get('closing') or "Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.\n\nThank you for your time and valuable insights!"
+            footer = data.get('footer') or "This is an automated message. If you have any questions, please contact the organization that sent this survey."
+        else:
+            # Use defaults
+            subject = "Your feedback is requested: {campaign_name}"
+            intro = "{business_account_name} is requesting your valuable feedback through our Voice of Client system."
+            cta_text = "Complete Your Survey"
+            closing = "Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.\n\nThank you for your time and valuable insights!"
+            footer = "This is an automated message. If you have any questions, please contact the organization that sent this survey."
+        
+        # Substitute variables
+        subject = subject.replace('{participant_name}', sample_participant_name).replace('{campaign_name}', sample_campaign_name).replace('{business_account_name}', sample_business_name)
+        intro = intro.replace('{participant_name}', sample_participant_name).replace('{campaign_name}', sample_campaign_name).replace('{business_account_name}', sample_business_name)
+        closing = closing.replace('{participant_name}', sample_participant_name).replace('{campaign_name}', sample_campaign_name).replace('{business_account_name}', sample_business_name)
+        
+        # Get branding
+        from models import BrandingConfig
+        branding_config = BrandingConfig.query.filter_by(business_account_id=current_account.id).first()
+        company_name = branding_config.get_company_display_name() if branding_config else 'VOÏA - Voice Of Client'
+        tagline = 'AI Powered Client Insights'
+        logo_html = ""
+        if branding_config and branding_config.get_logo_url():
+            logo_url = branding_config.get_logo_url()
+            logo_html = f'<img src="{logo_url}" alt="{company_name}" style="max-height: 60px; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;">'
+        
+        # Build HTML preview
+        html_preview = f"""
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8f9fa; padding: 20px;">
+    <div style="background-color: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <div style="text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #E13A44;">
+            {logo_html}
+            <div style="font-size: 24px; font-weight: bold; color: #E13A44; margin-bottom: 5px;">{company_name}</div>
+            <div style="font-size: 14px; color: #666; font-style: italic;">{tagline}</div>
+        </div>
+        
+        <h2 style="color: #333; font-size: 20px;">Hello {sample_participant_name},</h2>
+        
+        <p style="color: #333; line-height: 1.6;">{intro}</p>
+        
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; border-left: 4px solid #E13A44; margin: 20px 0; font-weight: 500;">
+            <strong>Campaign:</strong> {sample_campaign_name}
+        </div>
+        
+        <div style="text-align: center; margin: 20px 0;">
+            <a href="#" style="display: inline-block; background-color: #E13A44; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: 500;">{cta_text}</a>
+        </div>
+        
+        <div style="background-color: #e7f3ff; padding: 10px; border-radius: 5px; font-size: 14px; margin: 15px 0;">
+            <strong>🔒 Security Note:</strong> This personalized link is secure and will expire in 72 hours.
+        </div>
+        
+        <p style="color: #333; line-height: 1.6; white-space: pre-line;">{closing}</p>
+        
+        <p style="color: #333;">Best regards,<br>
+        The {company_name} Team</p>
+        
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #666; text-align: center;">
+            {footer}
+        </div>
+    </div>
+</div>
+"""
+        
+        return jsonify({
+            'success': True,
+            'html': html_preview,
+            'subject': subject
+        })
+    
+    except Exception as e:
+        logger.error(f"Error generating email preview: {e}")
+        return jsonify({
+            'success': False,
+            'error': f'Failed to generate preview: {str(e)}'
         }), 500
 
 
