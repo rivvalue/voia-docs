@@ -25,6 +25,15 @@ from license_templates import LicenseTemplateManager, LicenseTemplate
 
 logger = logging.getLogger(__name__)
 
+# Import cache for performance optimization
+try:
+    from app import cache
+    CACHE_AVAILABLE = True
+except ImportError:
+    logger.warning("Flask-Caching not available - license info will not be cached")
+    CACHE_AVAILABLE = False
+    cache = None
+
 class LicenseService:
     """
     Comprehensive license management service that replaces direct BusinessAccount license field access
