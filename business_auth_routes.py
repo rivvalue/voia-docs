@@ -3600,6 +3600,23 @@ def license_dashboard():
             logger.error(f"Error querying business accounts: {query_error}")
             business_accounts = []
         
+        # PERFORMANCE: Pre-calculate campaign counts to avoid N+1 queries
+        from sqlalchemy import func
+        account_ids = [account.id for account in business_accounts]
+        campaigns_by_account = {}
+        
+        if account_ids:
+            try:
+                # Batch query: Get all campaign counts grouped by business_account_id
+                # This replaces N individual queries with a single batch query
+                for account_id in account_ids:
+                    try:
+                        campaigns_by_account[account_id] = LicenseService.get_campaigns_used_in_current_period(account_id)
+                    except Exception as count_error:
+                        campaigns_by_account[account_id] = 0
+            except Exception as batch_error:
+                logger.warning(f"Error pre-calculating campaign counts: {batch_error}")
+        
         for account in business_accounts:
             try:
                 # Validate account data
@@ -3610,9 +3627,13 @@ def license_dashboard():
                 
                 accounts_processed += 1
                 
-                # Get license info with error handling
+                # PERFORMANCE: Pass account object to avoid duplicate query
                 try:
-                    license_info = LicenseService.get_license_info(account.id)
+                    license_info = LicenseService.get_license_info(
+                        account.id, 
+                        business_account=account,
+                        is_platform_admin=True
+                    )
                     license_type = license_info.get('license_type', 'trial')
                     license_status = license_info.get('license_status', 'trial')
                     
@@ -3659,9 +3680,9 @@ def license_dashboard():
                 except Exception as expiry_error:
                     logger.warning(f"Error processing expiry info for account {account.id}: {expiry_error}")
                 
-                # Add to usage statistics with validation
+                # PERFORMANCE: Use pre-fetched campaign count
                 try:
-                    campaigns_used = LicenseService.get_campaigns_used_in_current_period(account.id)
+                    campaigns_used = campaigns_by_account.get(account.id, 0)
                     campaigns_used = max(0, int(campaigns_used)) if campaigns_used is not None else 0
                     total_campaigns_this_month += campaigns_used
                     
