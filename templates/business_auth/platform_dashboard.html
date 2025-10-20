@@ -644,6 +644,100 @@
         </div>
         {% endif %}
 
+        <!-- User Directory by Business Account -->
+        {% if dashboard_data.user_directory %}
+        <div class="platform-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-users me-2"></i>Users by Business Account
+                </h3>
+                <small class="text-muted">Most recent 20 business accounts</small>
+            </div>
+            
+            <div class="accordion" id="userDirectoryAccordion">
+                {% for account_data in dashboard_data.user_directory %}
+                <div class="account-item" style="border: 1px solid var(--light-gray); margin-bottom: 0.5rem; border-radius: var(--radius-lg);">
+                    <div style="padding: var(--spacing-md); cursor: pointer;" 
+                         data-bs-toggle="collapse" 
+                         data-bs-target="#account-{{ account_data.account_id }}" 
+                         aria-expanded="false">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="account-info">
+                                <div class="account-avatar">
+                                    {{ account_data.account_name[:2]|upper }}
+                                </div>
+                                <div class="account-details">
+                                    <h6>{{ account_data.account_name }}</h6>
+                                    <small>{{ account_data.user_count }} user{{ 's' if account_data.user_count != 1 else '' }}</small>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="account-type-badge type-{{ account_data.account_type.replace('_', '-') }}">
+                                    <i class="fas fa-{{ 'flask' if account_data.account_type == 'demo' else ('crown' if account_data.account_type == 'platform_owner' else ('building' if account_data.account_type == 'customer' else 'play')) }}" aria-hidden="true"></i>
+                                    {{ account_data.account_type|title }}
+                                </span>
+                                <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="account-{{ account_data.account_id }}" class="collapse" data-bs-parent="#userDirectoryAccordion">
+                        <div style="padding: var(--spacing-md); border-top: 1px solid var(--light-gray); background: var(--light-gray);">
+                            {% if account_data.users %}
+                            <div class="table-responsive">
+                                <table class="table table-sm mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Role</th>
+                                            <th>Status</th>
+                                            <th>Last Login</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for user in account_data.users %}
+                                        <tr>
+                                            <td>{{ user.full_name }}</td>
+                                            <td>{{ user.email }}</td>
+                                            <td>
+                                                <span class="badge bg-{{ 'danger' if user.role == 'platform_admin' else ('primary' if user.role == 'admin' else 'secondary') }}">
+                                                    {{ user.role|title }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {% if user.is_active %}
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check-circle" aria-hidden="true"></i> Active
+                                                </span>
+                                                {% else %}
+                                                <span class="badge bg-secondary">
+                                                    <i class="fas fa-times-circle" aria-hidden="true"></i> Inactive
+                                                </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">{{ user.last_login }}</small>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="text-center text-muted py-3">
+                                <i class="fas fa-user-slash" aria-hidden="true"></i>
+                                <p class="mb-0">No users in this account</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
         <!-- Quick Platform Actions -->
         <div class="platform-section">
             <div class="section-header">
