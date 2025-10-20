@@ -86,6 +86,9 @@ class LicenseTemplate:
     max_participants_per_campaign: int  # Target responses (informational)
     max_invitations_per_campaign: int   # Hard limit for invitations
     
+    # Pricing
+    annual_price: Optional[float] = None  # Annual price in USD (None for trial/custom)
+    
     # Template Properties
     is_custom: bool = False
     is_trial: bool = False
@@ -129,6 +132,7 @@ class LicenseTemplate:
             'max_users': self.max_users,
             'max_participants_per_campaign': self.max_participants_per_campaign,
             'max_invitations_per_campaign': self.max_invitations_per_campaign,
+            'annual_price': self.annual_price,
             'is_custom': self.is_custom,
             'is_trial': self.is_trial,
             'default_duration_months': self.default_duration_months,
@@ -198,6 +202,7 @@ class LicenseTemplateManager:
         max_users=5,
         max_participants_per_campaign=200,
         max_invitations_per_campaign=1000,
+        annual_price=8000.00,
         default_duration_months=12,
         features=['Basic Analytics', 'Email Support', 'Standard Templates']
     )
@@ -210,6 +215,7 @@ class LicenseTemplateManager:
         max_users=10,
         max_participants_per_campaign=1000,
         max_invitations_per_campaign=5000,
+        annual_price=12000.00,
         default_duration_months=12,
         features=['Advanced Analytics', 'Priority Support', 'Custom Templates', 'API Access']
     )
