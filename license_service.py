@@ -19,7 +19,7 @@ from datetime import datetime, date, timedelta
 from typing import Optional, Tuple, Dict, List, Any
 import logging
 import json
-from models import LicenseHistory, BusinessAccount, Campaign, db
+from models import LicenseHistory, BusinessAccount, Campaign, SurveyResponse, CampaignParticipant, db
 from sqlalchemy import and_, func
 from license_templates import LicenseTemplateManager, LicenseTemplate
 
@@ -1806,12 +1806,41 @@ class LicenseService:
                 for business_account_id, count in campaign_fallback_query:
                     campaign_counts[business_account_id] = count
             
+            # Query 4: Total Respondents - Count completed survey responses per business account
+            respondent_counts = {}
+            respondent_query = db.session.query(
+                Campaign.business_account_id,
+                func.count(SurveyResponse.id).label('count')
+            ).join(
+                SurveyResponse,
+                Campaign.id == SurveyResponse.campaign_id
+            ).filter(
+                Campaign.business_account_id.in_(account_ids)
+            ).group_by(Campaign.business_account_id).all()
+            
+            for business_account_id, count in respondent_query:
+                respondent_counts[business_account_id] = count
+            
+            # Query 5: Total Invitations - Count campaign participants (invitations sent) per business account
+            invitation_counts = {}
+            invitation_query = db.session.query(
+                CampaignParticipant.business_account_id,
+                func.count(CampaignParticipant.id).label('count')
+            ).filter(
+                CampaignParticipant.business_account_id.in_(account_ids)
+            ).group_by(CampaignParticipant.business_account_id).all()
+            
+            for business_account_id, count in invitation_query:
+                invitation_counts[business_account_id] = count
+            
             # Build result dictionary - CRITICAL FIX: Complete schema consistency
             # This fixes Issue #3: Output Schema Consistency
             result = {}
             for account in business_accounts:
                 current_license = current_licenses.get(account.id)
                 campaigns_used = campaign_counts.get(account.id, 0)
+                total_respondents = respondent_counts.get(account.id, 0)
+                total_invitations = invitation_counts.get(account.id, 0)
                 
                 # Build license info EXACTLY like get_license_info()
                 users_used = getattr(account, 'current_users_count', 0)
@@ -1832,7 +1861,9 @@ class LicenseService:
                     'users_remaining': max(0, 5 - users_used),
                     'participants_limit': 500,
                     'can_activate_campaign': campaigns_used < 4,
-                    'can_add_user': users_used < 5
+                    'can_add_user': users_used < 5,
+                    'total_respondents': total_respondents,
+                    'total_invitations': total_invitations
                 }
                 
                 if current_license:

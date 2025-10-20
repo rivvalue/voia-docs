@@ -3175,7 +3175,9 @@ def admin_licenses():
                 'users_count': license_info.get('users_used', 0),
                 'users_limit': license_info.get('users_limit', 5),
                 'expires_soon': license_info.get('expires_soon', False),
-                'days_remaining': license_info.get('days_remaining', 0)
+                'days_remaining': license_info.get('days_remaining', 0),
+                'total_respondents': license_info.get('total_respondents', 0),
+                'total_invitations': license_info.get('total_invitations', 0)
             }
             licenses_data.append(account_data)
         

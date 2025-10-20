@@ -71,6 +71,8 @@
                         <th>Status</th>
                         <th>Campaigns</th>
                         <th>Users</th>
+                        <th>Respondents</th>
+                        <th>Invitations</th>
                         <th>Expiration</th>
                         <th>Actions</th>
                     </tr>
@@ -126,6 +128,20 @@
                                         style="width: {{ user_percent }}%"></div>
                                 </div>
                                 {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="usage-info text-center">
+                                <strong class="text-success">{{ '{:,}'.format(account.get('total_respondents', 0)) }}</strong>
+                                <br>
+                                <small class="text-muted">Responses</small>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="usage-info text-center">
+                                <strong class="text-primary">{{ '{:,}'.format(account.get('total_invitations', 0)) }}</strong>
+                                <br>
+                                <small class="text-muted">Invitations</small>
                             </div>
                         </td>
                         <td>
