@@ -14,9 +14,8 @@
 <style>
 /* Platform dashboard specific styling */
 .platform-header {
-    background: linear-gradient(135deg, rgba(147, 51, 234, 0.1) 0%, rgba(129, 140, 248, 0.15) 100%);
-    border: 1px solid rgba(147, 51, 234, 0.2);
-    color: var(--primary-black);
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
     padding: 2rem 0;
     border-radius: var(--radius-2xl);
     margin-bottom: 2rem;
@@ -32,11 +31,11 @@
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #9333ea 0%, #818cf8 100%);
+    background: rgba(255, 255, 255, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: var(--primary-white);
     font-size: 1.5rem;
 }
 
@@ -67,8 +66,8 @@
 }
 
 .metric-icon.platform {
-    background: linear-gradient(135deg, #9333ea 0%, #818cf8 100%);
-    color: white;
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
 }
 
 .metric-icon.accounts {
@@ -209,9 +208,9 @@
 }
 
 .type-platform-owner {
-    background-color: rgba(147, 51, 234, 0.1);
-    color: #9333ea;
-    border: 1px solid rgba(147, 51, 234, 0.2);
+    background-color: rgba(225, 58, 68, 0.1);
+    color: var(--primary-red);
+    border: 1px solid rgba(225, 58, 68, 0.2);
 }
 
 .usage-indicator {
@@ -259,15 +258,15 @@
 }
 
 .action-btn-primary {
-    background: #9333ea;
-    color: white;
-    border-color: #9333ea;
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--primary-white);
+    border-color: rgba(255, 255, 255, 0.3);
 }
 
 .action-btn-primary:hover {
-    background: #7c3aed;
-    border-color: #7c3aed;
-    color: white;
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: var(--primary-white);
     transform: translateY(-1px);
 }
 
@@ -307,8 +306,8 @@
                             <i class="fas fa-crown"></i>
                         </div>
                         <div>
-                            <h2 class="mb-1">Business Analytics Hub</h2>
-                            <p class="mb-0 opacity-75">System-wide overview and management for {{ current_user.get_full_name() }}</p>
+                            <h2 class="mb-1" style="color: var(--primary-white);">Business Analytics Hub</h2>
+                            <p class="mb-0" style="color: var(--primary-white); opacity: 0.9;">System-wide overview and management for {{ current_user.get_full_name() }}</p>
                         </div>
                     </div>
                 </div>
