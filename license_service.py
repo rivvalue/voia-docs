@@ -1194,6 +1194,7 @@ class LicenseService:
                 max_users=license_config['max_users'], 
                 max_participants_per_campaign=license_config['max_participants_per_campaign'],
                 max_invitations_per_campaign=license_config['max_invitations_per_campaign'],
+                annual_price=license_config.get('annual_price'),
                 # Transcript analysis add-on fields
                 transcript_analysis_start_date=transcript_start_date,
                 transcript_analysis_end_date=transcript_end_date,

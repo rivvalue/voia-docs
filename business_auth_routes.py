@@ -3251,6 +3251,18 @@ def license_assignment_form(business_id):
             campaigns_used = 0
             users_count = 0
         
+        # Get license templates with pricing information
+        from license_templates import LicenseTemplateManager
+        try:
+            core_template = LicenseTemplateManager.get_template('core')
+            plus_template = LicenseTemplateManager.get_template('plus')
+            pro_template = LicenseTemplateManager.get_template('pro')
+        except Exception as template_error:
+            logger.error(f"Error retrieving license templates: {template_error}")
+            core_template = None
+            plus_template = None
+            pro_template = None
+        
         # Defensive data sanitization
         template_data = {
             'business_account': business_account,
@@ -3263,7 +3275,11 @@ def license_assignment_form(business_id):
                 'users_count': max(0, users_count),
                 'campaigns_count': max(0, campaigns_used),
                 'responses_count': 0  # TODO: Add response count when available
-            }
+            },
+            # License templates with pricing
+            'core_template': core_template,
+            'plus_template': plus_template,
+            'pro_template': pro_template
         }
         
         # Log platform admin access for audit
