@@ -1285,6 +1285,7 @@ def forgot_password():
 
 
 @business_auth_bp.route('/forgot-password/request', methods=['POST'])
+@rate_limit(limit=3)  # 3 requests per minute per IP
 def forgot_password_request():
     """Handle password reset request and send email"""
     try:
@@ -1357,6 +1358,7 @@ def reset_password(token):
 
 
 @business_auth_bp.route('/reset-password/<token>/confirm', methods=['POST'])
+@rate_limit(limit=5)  # 5 attempts per minute per IP
 def reset_password_confirm(token):
     """Handle password reset confirmation"""
     try:
