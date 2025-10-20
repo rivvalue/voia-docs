@@ -297,6 +297,219 @@ def view_campaign(campaign_id):
         return redirect(url_for('campaigns.list_campaigns'))
 
 
+@campaign_bp.route('/<int:campaign_id>/edit', methods=['GET', 'POST'])
+@require_business_auth
+@require_permission('manage_participants')
+def edit_draft_campaign(campaign_id):
+    """Edit draft campaign details (name, dates, description)"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get campaign (scoped to current business account)
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            flash('Campaign not found.', 'error')
+            return redirect(url_for('campaigns.list_campaigns'))
+        
+        # Validate: Only draft campaigns can be edited
+        if campaign.status != 'draft':
+            flash(f'Only draft campaigns can be edited. This campaign is {campaign.status}.', 'error')
+            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
+        if request.method == 'GET':
+            # Show edit form
+            return render_template('campaigns/edit.html',
+                                 campaign=campaign.to_dict(),
+                                 business_account=current_account.to_dict())
+        
+        # Handle form submission (POST)
+        name = request.form.get('name', '').strip()
+        description = request.form.get('description', '').strip()
+        start_date = request.form.get('start_date', '').strip()
+        end_date = request.form.get('end_date', '').strip()
+        
+        # Validate required fields
+        if not name or not start_date or not end_date:
+            flash('Campaign name, start date, and end date are required.', 'error')
+            return render_template('campaigns/edit.html',
+                                 campaign=campaign.to_dict(),
+                                 business_account=current_account.to_dict())
+        
+        # Validate dates
+        try:
+            start_datetime = datetime.strptime(start_date, '%Y-%m-%d')
+            end_datetime = datetime.strptime(end_date, '%Y-%m-%d')
+            
+            if start_datetime >= end_datetime:
+                flash('End date must be after start date.', 'error')
+                return render_template('campaigns/edit.html',
+                                     campaign=campaign.to_dict(),
+                                     business_account=current_account.to_dict())
+            
+            start_date_obj = start_datetime.date()
+            end_date_obj = end_datetime.date()
+            
+        except ValueError:
+            flash('Invalid date format.', 'error')
+            return render_template('campaigns/edit.html',
+                                 campaign=campaign.to_dict(),
+                                 business_account=current_account.to_dict())
+        
+        # Check if dates changed and participants already invited
+        dates_changed = (campaign.start_date != start_date_obj or campaign.end_date != end_date_obj)
+        invited_count = 0
+        
+        if dates_changed:
+            invited_count = CampaignParticipant.query.filter_by(
+                campaign_id=campaign_id,
+                business_account_id=current_account.id,
+                status='invited'
+            ).count()
+            
+            if invited_count > 0:
+                flash(f'Warning: {invited_count} participants have already been invited with the previous dates. '
+                      f'Consider re-sending invitations with updated information.', 'warning')
+        
+        # Track changes for audit log
+        changes = {}
+        if campaign.name != name:
+            changes['name'] = {'old': campaign.name, 'new': name}
+        if campaign.description != description:
+            changes['description'] = {'old': campaign.description, 'new': description}
+        if campaign.start_date != start_date_obj:
+            changes['start_date'] = {'old': campaign.start_date.isoformat(), 'new': start_date_obj.isoformat()}
+        if campaign.end_date != end_date_obj:
+            changes['end_date'] = {'old': campaign.end_date.isoformat(), 'new': end_date_obj.isoformat()}
+        
+        # Update campaign
+        campaign.name = name
+        campaign.description = description or None
+        campaign.start_date = start_date_obj
+        campaign.end_date = end_date_obj
+        
+        db.session.commit()
+        
+        # Audit log if changes were made
+        if changes:
+            try:
+                from audit_utils import queue_audit_log
+                queue_audit_log(
+                    business_account_id=current_account.id,
+                    action_type='campaign_updated',
+                    resource_type='campaign',
+                    resource_id=campaign.id,
+                    resource_name=campaign.name,
+                    details={
+                        'changes': changes,
+                        'invited_participants': invited_count if dates_changed else 0
+                    }
+                )
+            except Exception as audit_error:
+                logger.error(f"Failed to audit campaign edit: {audit_error}")
+        
+        logger.info(f"Campaign '{campaign.name}' (ID: {campaign_id}) edited by business account {current_account.id}")
+        flash(f'Campaign "{campaign.name}" updated successfully!', 'success')
+        
+        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
+    except Exception as e:
+        logger.error(f"Campaign edit error: {e}")
+        db.session.rollback()
+        flash('Failed to update campaign. Please try again.', 'error')
+        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+
+
+@campaign_bp.route('/<int:campaign_id>/delete', methods=['POST'])
+@require_business_auth
+@require_permission('manage_participants')
+def delete_draft_campaign(campaign_id):
+    """Delete draft campaign and cascade associations"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get campaign (scoped to current business account)
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            flash('Campaign not found.', 'error')
+            return redirect(url_for('campaigns.list_campaigns'))
+        
+        # Validate: Only draft campaigns can be deleted
+        if campaign.status != 'draft':
+            flash(f'Only draft campaigns can be deleted. This campaign is {campaign.status}.', 'error')
+            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
+        # Get counts for audit trail
+        participant_count = CampaignParticipant.query.filter_by(
+            campaign_id=campaign_id,
+            business_account_id=current_account.id
+        ).count()
+        
+        response_count = SurveyResponse.query.filter_by(
+            campaign_id=campaign_id
+        ).count()
+        
+        # Store campaign info for audit log (before deletion)
+        campaign_name = campaign.name
+        campaign_start = campaign.start_date.isoformat()
+        campaign_end = campaign.end_date.isoformat()
+        
+        # Delete cascade: Remove campaign_participants associations first
+        CampaignParticipant.query.filter_by(
+            campaign_id=campaign_id,
+            business_account_id=current_account.id
+        ).delete()
+        
+        # Delete the campaign
+        db.session.delete(campaign)
+        db.session.commit()
+        
+        # Audit log deletion
+        try:
+            from audit_utils import queue_audit_log
+            queue_audit_log(
+                business_account_id=current_account.id,
+                action_type='campaign_deleted',
+                resource_type='campaign',
+                resource_id=campaign_id,
+                resource_name=campaign_name,
+                details={
+                    'campaign_name': campaign_name,
+                    'start_date': campaign_start,
+                    'end_date': campaign_end,
+                    'participant_count': participant_count,
+                    'response_count': response_count,
+                    'deleted_by': session.get('business_user_email', 'unknown')
+                }
+            )
+        except Exception as audit_error:
+            logger.error(f"Failed to audit campaign deletion: {audit_error}")
+        
+        logger.info(f"Campaign '{campaign_name}' (ID: {campaign_id}) deleted by business account {current_account.id}")
+        flash(f'Campaign "{campaign_name}" has been deleted.', 'success')
+        
+        return redirect(url_for('campaigns.list_campaigns'))
+        
+    except Exception as e:
+        logger.error(f"Campaign deletion error: {e}")
+        db.session.rollback()
+        flash('Failed to delete campaign. Please try again.', 'error')
+        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+
+
 @campaign_bp.route('/<int:campaign_id>/mark-ready', methods=['POST'])
 @require_business_auth
 @require_permission('manage_participants')
