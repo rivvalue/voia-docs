@@ -2,7 +2,7 @@
 
 {% block title %}Bulk Upload Participants - {{ business_account.name }} - VOÏA{% endblock %}
 
-{% block page_class %}page-participant-upload{% endblock %}
+{% block page_class %}page-settings-participant-upload{% endblock %}
 
 {% block content %}
 {# Breadcrumb Navigation #}
@@ -12,15 +12,15 @@
 ] %}
 {% include 'components/breadcrumb.html' %}
 
-<div class="upload-container">
-    <!-- Header -->
-    <div class="upload-header">
-        <div class="upload-header-content">
-            <h1>
+<div class="settings-hub-container">
+    <!-- Settings Hub v2 Header with Red Gradient -->
+    <div class="settings-hub-header">
+        <div class="settings-hub-header-content">
+            <h1 class="settings-hub-title">
                 <i class="fas fa-upload me-2" aria-hidden="true"></i>
                 Bulk Upload Participants
             </h1>
-            <p>Upload multiple participants to {{ business_account.name }} via CSV file</p>
+            <p class="settings-hub-subtitle">Upload multiple participants to {{ business_account.name }} via CSV file</p>
         </div>
     </div>
 
@@ -41,183 +41,193 @@
     <form method="POST" action="{{ url_for('participants.upload_participants') }}" enctype="multipart/form-data" id="uploadForm">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         
-        <div class="upload-form-section">
-            <h3 class="upload-section-title">
-                <i class="fas fa-file-upload" aria-hidden="true"></i>
+        <div class="settings-section">
+            <h3 class="settings-section-title">
+                <i class="fas fa-file-upload me-2" aria-hidden="true"></i>
                 Upload CSV File
             </h3>
             
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="upload-form-group">
-                        <label class="upload-form-label" for="csv_file">
-                            CSV File *
-                        </label>
-                        <input type="file" 
-                               class="upload-form-control" 
-                               id="csv_file" 
-                               name="csv_file" 
-                               accept=".csv" 
-                               required
-                               aria-required="true"
-                               aria-describedby="csv_file_help">
-                        <div class="upload-help-text" id="csv_file_help">
-                            Select a CSV file with participant information (max 5MB)
+            <div class="settings-card">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="settings-form-group">
+                            <label class="settings-form-label" for="csv_file">
+                                CSV File *
+                            </label>
+                            <input type="file" 
+                                   class="settings-form-control" 
+                                   id="csv_file" 
+                                   name="csv_file" 
+                                   accept=".csv" 
+                                   required
+                                   aria-required="true"
+                                   aria-describedby="csv_file_help">
+                            <div class="settings-help-text" id="csv_file_help">
+                                <i class="fas fa-info-circle me-1" aria-hidden="true"></i>
+                                Select a CSV file with participant information (max 5MB)
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Action Buttons -->
-        <div class="upload-form-section">
-            <div class="upload-actions-row">
-                <div class="upload-actions-left">
-                    <a href="{{ url_for('participants.list_participants') }}" 
-                       class="upload-btn-cancel"
-                       aria-label="Cancel and return to participants list">
-                        <i class="fas fa-arrow-left" aria-hidden="true"></i>
-                        Cancel
-                    </a>
-                </div>
-                <div class="upload-actions-right">
-                    <button type="submit" 
-                            class="upload-btn-save"
-                            aria-label="Upload participants from CSV file">
-                        <i class="fas fa-upload" aria-hidden="true"></i>
-                        Upload Participants
-                    </button>
+                <!-- Action Buttons -->
+                <div class="settings-actions-row">
+                    <div class="settings-actions-left">
+                        <a href="{{ url_for('participants.list_participants') }}" 
+                           class="settings-btn-cancel"
+                           aria-label="Cancel and return to participants list">
+                            <i class="fas fa-arrow-left me-2" aria-hidden="true"></i>
+                            Cancel
+                        </a>
+                    </div>
+                    <div class="settings-actions-right">
+                        <button type="submit" 
+                                class="settings-btn-save"
+                                aria-label="Upload participants from CSV file">
+                            <i class="fas fa-upload me-2" aria-hidden="true"></i>
+                            Upload Participants
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </form>
 
     <!-- CSV Format Information -->
-    <div class="upload-form-section">
-        <h3 class="upload-section-title">
-            <i class="fas fa-check-circle" aria-hidden="true"></i>
+    <div class="settings-section">
+        <h3 class="settings-section-title">
+            <i class="fas fa-list-check me-2" aria-hidden="true"></i>
             Required CSV Format
         </h3>
         
-        <div class="upload-info-content">
-            <p class="mb-3"><strong>Required columns:</strong></p>
-            <ul class="upload-list">
-                <li>
-                    <i class="fas fa-dot-circle text-danger me-2" aria-hidden="true"></i>
-                    <strong>email</strong> - Participant's email address
-                </li>
-                <li>
-                    <i class="fas fa-dot-circle text-danger me-2" aria-hidden="true"></i>
-                    <strong>name</strong> - Participant's full name
-                </li>
-                <li>
-                    <i class="fas fa-dot-circle text-danger me-2" aria-hidden="true"></i>
-                    <strong>company_name</strong> - Participant's company name
-                </li>
-            </ul>
-            
-            <p class="mb-3 mt-4"><strong>Optional segmentation columns:</strong></p>
-            <ul class="upload-list">
-                <li>
-                    <i class="fas fa-circle text-secondary me-2" aria-hidden="true"></i>
-                    <strong>role</strong> - Participant's role (e.g., "C-Level", "Manager", "End User")
-                </li>
-                <li>
-                    <i class="fas fa-circle text-secondary me-2" aria-hidden="true"></i>
-                    <strong>region</strong> - Geographic region (e.g., "North America", "EMEA", "APAC")
-                </li>
-                <li>
-                    <i class="fas fa-circle text-secondary me-2" aria-hidden="true"></i>
-                    <strong>customer_tier</strong> - Customer segment (e.g., "T1: Strategic (Top 5–10% clients)", "T2: Managed (bulk of paying clients)", "T3: Self-serve or small")
-                </li>
-                <li>
-                    <i class="fas fa-circle text-secondary me-2" aria-hidden="true"></i>
-                    <strong>commercial_value</strong> - Company account value in USD (e.g., "250000"). All participants from the same company should have the same value
-                </li>
-                <li>
-                    <i class="fas fa-circle text-secondary me-2" aria-hidden="true"></i>
-                    <strong>language</strong> - Language code (e.g., "en", "es", "fr")
-                </li>
-            </ul>
-            
-            <div class="mt-4 upload-example-box">
-                <strong class="d-block mb-2">Example CSV with optional columns:</strong>
-                <code class="d-block p-3 bg-light rounded" style="font-size: 12px; overflow-x: auto;">
-email,name,company_name,role,region,customer_tier,language,commercial_value<br>
-john@abc.com,John Doe,ABC Corp,Manager,North America,T1: Strategic (Top 5–10% clients),en,250000<br>
-jane@startup.io,Jane Smith,Startup Inc,C-Level,EMEA,T2: Managed (bulk of paying clients),en,150000<br>
-bob@freelance.com,Bob Johnson,Freelance Services,End User,APAC,T3: Self-serve or small,en,25000
-                </code>
+        <div class="settings-card">
+            <div class="settings-info-content">
+                <p class="mb-3"><strong>Required columns:</strong></p>
+                <ul class="settings-info-list mb-4">
+                    <li>
+                        <i class="fas fa-circle-check text-danger me-2" aria-hidden="true"></i>
+                        <strong>email</strong> - Participant's email address
+                    </li>
+                    <li>
+                        <i class="fas fa-circle-check text-danger me-2" aria-hidden="true"></i>
+                        <strong>name</strong> - Participant's full name
+                    </li>
+                    <li>
+                        <i class="fas fa-circle-check text-danger me-2" aria-hidden="true"></i>
+                        <strong>company_name</strong> - Participant's company name
+                    </li>
+                </ul>
+                
+                <p class="mb-3"><strong>Optional segmentation columns:</strong></p>
+                <ul class="settings-info-list mb-4">
+                    <li>
+                        <i class="fas fa-circle text-secondary me-2" aria-hidden="true"></i>
+                        <strong>role</strong> - Participant's role (e.g., "C-Level", "Manager", "End User")
+                    </li>
+                    <li>
+                        <i class="fas fa-circle text-secondary me-2" aria-hidden="true"></i>
+                        <strong>region</strong> - Geographic region (e.g., "North America", "EMEA", "APAC")
+                    </li>
+                    <li>
+                        <i class="fas fa-circle text-secondary me-2" aria-hidden="true"></i>
+                        <strong>customer_tier</strong> - Customer segment (e.g., "T1: Strategic", "T2: Managed", "T3: Self-serve")
+                    </li>
+                    <li>
+                        <i class="fas fa-circle text-secondary me-2" aria-hidden="true"></i>
+                        <strong>commercial_value</strong> - Company account value in USD (e.g., "250000"). All participants from the same company should have the same value
+                    </li>
+                    <li>
+                        <i class="fas fa-circle text-secondary me-2" aria-hidden="true"></i>
+                        <strong>language</strong> - Language code (e.g., "en", "es", "fr")
+                    </li>
+                </ul>
+                
+                <div class="settings-example-box">
+                    <strong class="d-block mb-3">
+                        <i class="fas fa-code me-2" aria-hidden="true"></i>
+                        Example CSV with optional columns:
+                    </strong>
+                    <div class="settings-code-block">
+                        <code>email,name,company_name,role,region,customer_tier,language,commercial_value<br>
+john@abc.com,John Doe,ABC Corp,Manager,North America,T1: Strategic,en,250000<br>
+jane@startup.io,Jane Smith,Startup Inc,C-Level,EMEA,T2: Managed,en,150000<br>
+bob@freelance.com,Bob Johnson,Freelance Services,End User,APAC,T3: Self-serve,en,25000</code>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Upload Process Information -->
-    <div class="upload-form-section">
-        <h3 class="upload-section-title">
-            <i class="fas fa-info-circle" aria-hidden="true"></i>
+    <div class="settings-section">
+        <h3 class="settings-section-title">
+            <i class="fas fa-diagram-project me-2" aria-hidden="true"></i>
             Upload Process
         </h3>
         
-        <div class="upload-process-steps">
-            <div class="upload-step">
-                <div class="upload-step-icon">
-                    <i class="fas fa-check-double" aria-hidden="true"></i>
+        <div class="settings-card">
+            <div class="settings-process-steps">
+                <div class="settings-step">
+                    <div class="settings-step-icon">
+                        <i class="fas fa-check-double" aria-hidden="true"></i>
+                    </div>
+                    <div class="settings-step-content">
+                        <h4 class="settings-step-title">1. File Validation</h4>
+                        <p class="settings-step-description">System checks CSV format and validates all required columns are present</p>
+                    </div>
                 </div>
-                <div class="upload-step-content">
-                    <h4 class="upload-step-title">1. File Validation</h4>
-                    <p class="upload-step-description">System checks CSV format and validates all required columns are present</p>
+                
+                <div class="settings-step">
+                    <div class="settings-step-icon">
+                        <i class="fas fa-user-check" aria-hidden="true"></i>
+                    </div>
+                    <div class="settings-step-content">
+                        <h4 class="settings-step-title">2. Duplicate Detection</h4>
+                        <p class="settings-step-description">Automatically skips participants already in your account</p>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="upload-step">
-                <div class="upload-step-icon">
-                    <i class="fas fa-user-check" aria-hidden="true"></i>
+                
+                <div class="settings-step">
+                    <div class="settings-step-icon">
+                        <i class="fas fa-key" aria-hidden="true"></i>
+                    </div>
+                    <div class="settings-step-content">
+                        <h4 class="settings-step-title">3. Token Generation</h4>
+                        <p class="settings-step-description">Generate unique tokens for secure survey access</p>
+                    </div>
                 </div>
-                <div class="upload-step-content">
-                    <h4 class="upload-step-title">2. Duplicate Detection</h4>
-                    <p class="upload-step-description">Automatically skips participants already in your account</p>
-                </div>
-            </div>
-            
-            <div class="upload-step">
-                <div class="upload-step-icon">
-                    <i class="fas fa-key" aria-hidden="true"></i>
-                </div>
-                <div class="upload-step-content">
-                    <h4 class="upload-step-title">3. Token Generation</h4>
-                    <p class="upload-step-description">Generate unique tokens for secure survey access</p>
-                </div>
-            </div>
-            
-            <div class="upload-step">
-                <div class="upload-step-icon">
-                    <i class="fas fa-chart-line" aria-hidden="true"></i>
-                </div>
-                <div class="upload-step-content">
-                    <h4 class="upload-step-title">4. Status Report</h4>
-                    <p class="upload-step-description">View detailed results including successes and any errors</p>
+                
+                <div class="settings-step">
+                    <div class="settings-step-icon">
+                        <i class="fas fa-chart-line" aria-hidden="true"></i>
+                    </div>
+                    <div class="settings-step-content">
+                        <h4 class="settings-step-title">4. Status Report</h4>
+                        <p class="settings-step-description">View detailed results including successes and any errors</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Download Template Section -->
-    <div class="upload-form-section">
-        <h3 class="upload-section-title">
-            <i class="fas fa-download" aria-hidden="true"></i>
+    <div class="settings-section">
+        <h3 class="settings-section-title">
+            <i class="fas fa-download me-2" aria-hidden="true"></i>
             Need a Template?
         </h3>
         
-        <div class="upload-template-content">
-            <p class="mb-3">Download a sample CSV file with all columns and example data to get started quickly</p>
-            <button type="button" 
-                    class="upload-btn-template" 
-                    onclick="downloadTemplate()"
-                    aria-label="Download CSV template file">
-                <i class="fas fa-file-csv me-2" aria-hidden="true"></i>
-                Download CSV Template
-            </button>
+        <div class="settings-card">
+            <div class="settings-template-content">
+                <p class="mb-4">Download a sample CSV file with all columns and example data to get started quickly</p>
+                <button type="button" 
+                        class="settings-btn-template" 
+                        onclick="downloadTemplate()"
+                        aria-label="Download CSV template file">
+                    <i class="fas fa-file-csv me-2" aria-hidden="true"></i>
+                    Download CSV Template
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -241,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            if (file.size > 5 * 1024 * 1024) { // 5MB limit
+            if (file.size > 5 * 1024 * 1024) {
                 alert('File size must be less than 5MB.');
                 this.value = '';
                 return;
@@ -250,7 +260,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     form.addEventListener('submit', function(e) {
-        // Add loading state
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
         submitBtn.disabled = true;
     });
@@ -259,9 +268,9 @@ document.addEventListener('DOMContentLoaded', function() {
 // Download CSV template
 function downloadTemplate() {
     const csvContent = 'email,name,company_name,role,region,customer_tier,language,commercial_value\n' +
-        'john.doe@company.com,John Doe,ABC Corp,Manager,North America,T1: Strategic (Top 5–10% clients),en,250000\n' +
-        'jane.smith@startup.io,Jane Smith,Startup Inc,C-Level,EMEA,T2: Managed (bulk of paying clients),en,150000\n' +
-        'bob@freelance.com,Bob Johnson,Freelance Services,End User,APAC,T3: Self-serve or small,en,25000';
+        'john.doe@company.com,John Doe,ABC Corp,Manager,North America,T1: Strategic,en,250000\n' +
+        'jane.smith@startup.io,Jane Smith,Startup Inc,C-Level,EMEA,T2: Managed,en,150000\n' +
+        'bob@freelance.com,Bob Johnson,Freelance Services,End User,APAC,T3: Self-serve,en,25000';
     
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
