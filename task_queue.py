@@ -1111,6 +1111,24 @@ Respond with ONLY the JSON object, no other text:"""
                     logger.info(f"Auto-activated campaign '{campaign.name}' (ID: {campaign.id}) "
                                f"for business account {account_id} ({account_name})")
                     
+                    # Audit log auto-activation
+                    try:
+                        from audit_utils import queue_audit_log
+                        queue_audit_log(
+                            business_account_id=account_id,
+                            action_type='campaign_activated',
+                            resource_type='campaign',
+                            resource_id=campaign.id,
+                            resource_name=campaign.name,
+                            details={
+                                'auto_activated': True,
+                                'previous_status': 'ready',
+                                'activated_by': 'scheduler'
+                            }
+                        )
+                    except Exception as audit_error:
+                        logger.error(f"Failed to audit auto-activation of campaign {campaign.id}: {audit_error}")
+                    
                     changes_made += 1
                     # Only activate one campaign at a time
                     break
@@ -1133,6 +1151,25 @@ Respond with ONLY the JSON object, no other text:"""
                 
                 logger.info(f"Auto-completed campaign '{campaign.name}' (ID: {campaign.id}) "
                            f"for business account {account_id} ({account_name}) - expired on {campaign.end_date}")
+                
+                # Audit log auto-completion
+                try:
+                    from audit_utils import queue_audit_log
+                    queue_audit_log(
+                        business_account_id=account_id,
+                        action_type='campaign_completed',
+                        resource_type='campaign',
+                        resource_id=campaign.id,
+                        resource_name=campaign.name,
+                        details={
+                            'auto_completed': True,
+                            'previous_status': 'active',
+                            'completed_by': 'scheduler',
+                            'kpi_snapshot_generated': True
+                        }
+                    )
+                except Exception as audit_error:
+                    logger.error(f"Failed to audit auto-completion of campaign {campaign.id}: {audit_error}")
                 
                 changes_made += 1
                 
