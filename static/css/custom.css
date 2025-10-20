@@ -96,6 +96,11 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+/* Brand accent for VOÏA red Ï character */
+.voia-red-accent {
+    color: var(--primary-red);
+}
+
 /* Section Spacing Utility */
 .section-spacing {
     margin-top: 0;
