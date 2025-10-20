@@ -2,7 +2,7 @@
 The Voice of Client (VOÏA) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. Its purpose is to convert raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA provides businesses with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project features a production-ready multi-tenant participant management system with extensive email delivery capabilities, AI-powered conversational surveys with hybrid prompt architecture, and participant segmentation for personalized experiences and advanced analytics.
 
 # Recent Changes
-**October 20, 2025 - Performance Optimization Update**
+**October 20, 2025 - Performance Optimization & UX Update**
 - **LicenseService Query Optimization**: Enhanced `LicenseService.get_license_info()` to accept optional `business_account` and `is_platform_admin` parameters, eliminating duplicate database queries across all admin pages
 - **Settings Page Performance**: Reduced load time from 3.7s to <2s by passing pre-fetched BusinessAccount objects to avoid redundant 195ms queries
 - **Platform Admin Page Performance**: Reduced load time from 1.2s to <800ms with optimized object reuse patterns
@@ -13,6 +13,7 @@ The Voice of Client (VOÏA) is a Flask-based system for comprehensive customer f
   - Fixing platform admin license type validation warnings
 - **Route Optimizations**: Updated `admin_panel`, `manage_users`, and `license_dashboard` routes to leverage already-fetched objects and prevent N+1 query patterns
 - **Impact**: Eliminated 137-195ms duplicate BusinessAccount queries on every page load, resulting in 40-60% performance improvement across all Settings Hub v2 admin interfaces
+- **Login Page UX Improvement**: Removed misleading "Remember me for 7 days" checkbox and replaced with informative text explaining all sessions are 7-day by default, improving user clarity about session management
 
 # User Preferences
 Preferred communication style: Simple, everyday language.
