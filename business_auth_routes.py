@@ -1276,6 +1276,134 @@ def logout():
     return redirect(url_for('business_auth.login'))
 
 
+# ==== PASSWORD RESET ROUTES ====
+
+@business_auth_bp.route('/forgot-password', methods=['GET'])
+def forgot_password():
+    """Forgot password page - request password reset"""
+    return render_template('business_auth/forgot_password.html')
+
+
+@business_auth_bp.route('/forgot-password/request', methods=['POST'])
+def forgot_password_request():
+    """Handle password reset request and send email"""
+    try:
+        email = request.form.get('email', '').strip().lower()
+        
+        if not email:
+            flash('Please enter your email address.', 'error')
+            return redirect(url_for('business_auth.forgot_password'))
+        
+        # Find user by email
+        user = BusinessAccountUser.query.filter_by(email=email).first()
+        
+        # Always show success message (security: don't reveal if email exists)
+        flash('If an account exists with that email, you will receive a password reset link shortly.', 'success')
+        
+        if user and user.is_active_user:
+            # Generate password reset token
+            reset_token = user.generate_password_reset_token()
+            db.session.commit()
+            
+            # Send password reset email
+            from email_service import email_service
+            result = email_service.send_password_reset_email(
+                user_email=user.email,
+                user_first_name=user.first_name,
+                user_last_name=user.last_name,
+                reset_token=reset_token,
+                business_account_id=user.business_account_id
+            )
+            
+            if result['success']:
+                logger.info(f"Password reset email sent to {email}")
+            else:
+                logger.error(f"Failed to send password reset email to {email}: {result.get('error')}")
+        else:
+            # Log attempt for inactive or non-existent users
+            logger.warning(f"Password reset requested for non-existent or inactive user: {email}")
+        
+        return redirect(url_for('business_auth.login'))
+        
+    except Exception as e:
+        logger.error(f"Password reset request error: {e}")
+        flash('An error occurred. Please try again.', 'error')
+        return redirect(url_for('business_auth.forgot_password'))
+
+
+@business_auth_bp.route('/reset-password/<token>', methods=['GET'])
+def reset_password(token):
+    """Reset password page with token validation"""
+    try:
+        # Find user by reset token
+        user = BusinessAccountUser.query.filter_by(password_reset_token=token).first()
+        
+        if not user:
+            flash('Invalid or expired password reset link.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Validate token
+        if not user.validate_password_reset_token(token):
+            flash('This password reset link has expired. Please request a new one.', 'error')
+            return redirect(url_for('business_auth.forgot_password'))
+        
+        # Show reset password form
+        return render_template('business_auth/reset_password.html', token=token)
+        
+    except Exception as e:
+        logger.error(f"Reset password page error: {e}")
+        flash('An error occurred. Please try again.', 'error')
+        return redirect(url_for('business_auth.login'))
+
+
+@business_auth_bp.route('/reset-password/<token>/confirm', methods=['POST'])
+def reset_password_confirm(token):
+    """Handle password reset confirmation"""
+    try:
+        password = request.form.get('password', '')
+        confirm_password = request.form.get('confirm_password', '')
+        
+        # Validate inputs
+        if not password or not confirm_password:
+            flash('Please fill in all required fields.', 'error')
+            return redirect(url_for('business_auth.reset_password', token=token))
+        
+        if password != confirm_password:
+            flash('Passwords do not match. Please try again.', 'error')
+            return redirect(url_for('business_auth.reset_password', token=token))
+        
+        if len(password) < 8:
+            flash('Password must be at least 8 characters long.', 'error')
+            return redirect(url_for('business_auth.reset_password', token=token))
+        
+        # Find user by reset token
+        user = BusinessAccountUser.query.filter_by(password_reset_token=token).first()
+        
+        if not user:
+            flash('Invalid or expired password reset link.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Validate token
+        if not user.validate_password_reset_token(token):
+            flash('This password reset link has expired. Please request a new one.', 'error')
+            return redirect(url_for('business_auth.forgot_password'))
+        
+        # Reset password
+        user.reset_password(password)
+        db.session.commit()
+        
+        logger.info(f"Password reset successful for user {user.email}")
+        flash('Your password has been reset successfully. Please log in with your new password.', 'success')
+        
+        return redirect(url_for('business_auth.login'))
+        
+    except Exception as e:
+        logger.error(f"Password reset confirmation error: {e}")
+        db.session.rollback()
+        flash('An error occurred while resetting your password. Please try again.', 'error')
+        return redirect(url_for('business_auth.reset_password', token=token))
+
+
 # ==== UI VERSION TOGGLE (PHASE 2B FEATURE FLAGS) ====
 
 @business_auth_bp.route('/toggle-ui-version', methods=['POST'])
