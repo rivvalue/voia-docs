@@ -307,9 +307,14 @@ def manage_users():
             flash('User not found.', 'error')
             return redirect(url_for('business_auth.login'))
         
-        # Get license information using LicenseService
+        # PERFORMANCE: Pass business_account to avoid duplicate query
         from license_service import LicenseService
-        license_info = LicenseService.get_license_info(current_account_id)
+        is_platform_admin = current_user.is_platform_admin()
+        license_info = LicenseService.get_license_info(
+            current_account_id,
+            business_account=business_account,
+            is_platform_admin=is_platform_admin
+        )
         
         # Get all users for this business account
         users = BusinessAccountUser.get_by_business_account(current_account_id)
@@ -1367,9 +1372,14 @@ def admin_panel():
         user_id = session.get('business_user_id')
         current_business_user = BusinessAccountUser.query.get(user_id)
         
-        # Get license information for this business account
+        # PERFORMANCE: Pass business_account to avoid duplicate query
         from license_service import LicenseService
-        license_info = LicenseService.get_license_info(business_account.id)
+        is_platform_admin = current_business_user.is_platform_admin() if current_business_user else False
+        license_info = LicenseService.get_license_info(
+            business_account.id, 
+            business_account=business_account,
+            is_platform_admin=is_platform_admin
+        )
         
         # Load admin panel data for all account types (security enforced by decorators)
         from models import Campaign, SurveyResponse, Participant, CampaignParticipant, EmailDelivery

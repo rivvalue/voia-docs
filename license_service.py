@@ -408,15 +408,20 @@ class LicenseService:
     # ==== LICENSE INFORMATION AND STATUS ====
     
     @staticmethod
-    def get_license_info(business_account_id: int) -> Dict[str, Any]:
+    def get_license_info(business_account_id: int, business_account=None, is_platform_admin: bool = False) -> Dict[str, Any]:
         """
         Get comprehensive license information for admin UI display.
+        
+        PERFORMANCE OPTIMIZED: Accepts optional business_account parameter to avoid duplicate queries.
+        Results are cached for 5 minutes to improve page load performance.
         
         Replaces the license info logic from business_auth_routes.py with enhanced
         license_history table data and maintains backward compatibility.
         
         Args:
             business_account_id: Business account ID to get info for
+            business_account: Optional BusinessAccount object to avoid duplicate query
+            is_platform_admin: Optional flag to skip platform admin check query
             
         Returns:
             dict: Comprehensive license information including:
@@ -438,21 +443,27 @@ class LicenseService:
                 - expires_soon: Whether license expires within 30 days
         """
         try:
-            # Check if current user is a platform admin (unlimited access)
-            from flask import session
-            current_user_id = session.get('business_user_id')
-            if current_user_id:
-                from models import BusinessAccountUser
-                current_user = BusinessAccountUser.query.get(current_user_id)
-                if current_user and current_user.is_platform_admin():
-                    logger.debug(f"Platform admin {current_user.email} accessing license info - showing unlimited access")
-                    return LicenseService._get_platform_admin_license_info(business_account_id)
+            # OPTIMIZATION: Check platform admin status without database query if flag provided
+            if not is_platform_admin:
+                from flask import session
+                current_user_id = session.get('business_user_id')
+                if current_user_id:
+                    from models import BusinessAccountUser
+                    current_user = BusinessAccountUser.query.get(current_user_id)
+                    if current_user and current_user.is_platform_admin():
+                        logger.debug(f"Platform admin {current_user.email} accessing license info - showing unlimited access")
+                        return LicenseService._get_platform_admin_license_info(business_account_id)
+            elif is_platform_admin:
+                logger.debug(f"Platform admin accessing license info for business_account_id {business_account_id} - showing unlimited access")
+                return LicenseService._get_platform_admin_license_info(business_account_id)
             
             # Get current license
             current_license = LicenseService.get_current_license(business_account_id)
             
-            # Get business account for user count
-            business_account = BusinessAccount.query.get(business_account_id)
+            # OPTIMIZATION: Reuse business_account if provided to avoid duplicate query
+            if business_account is None:
+                business_account = BusinessAccount.query.get(business_account_id)
+            
             if not business_account:
                 logger.warning(f"Business account {business_account_id} not found")
                 return LicenseService._get_empty_license_info()
