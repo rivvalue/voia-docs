@@ -2,6 +2,15 @@
 The Voice of Client (VOÏA) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. Its purpose is to convert raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA provides businesses with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project features a production-ready multi-tenant participant management system with extensive email delivery capabilities, AI-powered conversational surveys with hybrid prompt architecture, and participant segmentation for personalized experiences and advanced analytics.
 
 # Recent Changes
+**October 20, 2025 - Security & Platform Admin Features**
+- **Password Change Audit Trail**: Implemented comprehensive audit logging for password reset operations with IP address tracking, user context, and method attribution (self-service reset via forgot password flow)
+- **Platform Admin User Directory**: Added read-only user directory to Business Analytics Hub showing users across all business accounts with:
+  - SQLAlchemy selectinload optimization (fetches 20 accounts with users in 2 queries instead of N+1 pattern)
+  - Collapsible accordion UI showing user details per business account
+  - User status, role, email, and last login information
+  - Supports active/inactive user filtering and role-based badges
+- **Impact**: Enhanced security audit trail for compliance and platform admin cross-tenant user visibility for better platform oversight
+
 **October 20, 2025 - Performance Optimization & UX Update**
 - **LicenseService Query Optimization**: Enhanced `LicenseService.get_license_info()` to accept optional `business_account` and `is_platform_admin` parameters, eliminating duplicate database queries across all admin pages
 - **Settings Page Performance**: Reduced load time from 3.7s to <2s by passing pre-fetched BusinessAccount objects to avoid redundant 195ms queries
