@@ -3355,9 +3355,17 @@ def process_license_assignment():
                 if participants_limit:
                     participants_value = int(participants_limit)
                     if participants_value < 1 or participants_value > 1000000:
-                        flash('Maximum participants per campaign must be between 1 and 1,000,000.', 'error')
+                        flash('Maximum target responses per campaign must be between 1 and 1,000,000.', 'error')
                         return redirect(url_for('business_auth.license_assignment_form', business_id=business_id))
                     custom_config['max_participants_per_campaign'] = participants_value
+                
+                invitations_limit = request.form.get('max_invitations_per_campaign', '').strip()
+                if invitations_limit:
+                    invitations_value = int(invitations_limit)
+                    if invitations_value < 1 or invitations_value > 5000000:
+                        flash('Maximum invitations per campaign must be between 1 and 5,000,000.', 'error')
+                        return redirect(url_for('business_auth.license_assignment_form', business_id=business_id))
+                    custom_config['max_invitations_per_campaign'] = invitations_value
                     
             except ValueError:
                 flash('Custom limit values must be valid positive numbers.', 'error')

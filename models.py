@@ -2160,7 +2160,8 @@ class LicenseHistory(db.Model):
     # License Limits (stored here for historical accuracy)
     max_campaigns_per_year = db.Column(db.Integer, nullable=False, default=4)
     max_users = db.Column(db.Integer, nullable=False, default=5)
-    max_participants_per_campaign = db.Column(db.Integer, nullable=False, default=500)
+    max_participants_per_campaign = db.Column(db.Integer, nullable=False, default=500)  # Target responses
+    max_invitations_per_campaign = db.Column(db.Integer, nullable=False, default=2500)  # Hard limit for invitations
     
     # Add-on Features
     has_transcript_analysis = db.Column(db.Boolean, nullable=False, default=False)  # Transcript analysis add-on
@@ -2193,6 +2194,7 @@ class LicenseHistory(db.Model):
             'max_campaigns_per_year': self.max_campaigns_per_year,
             'max_users': self.max_users,
             'max_participants_per_campaign': self.max_participants_per_campaign,
+            'max_invitations_per_campaign': self.max_invitations_per_campaign,
             'has_transcript_analysis': self.has_transcript_analysis,
             'transcript_analysis_start_date': self.transcript_analysis_start_date.isoformat() if self.transcript_analysis_start_date else None,
             'transcript_analysis_end_date': self.transcript_analysis_end_date.isoformat() if self.transcript_analysis_end_date else None,

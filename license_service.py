@@ -301,16 +301,18 @@ class LicenseService:
     @staticmethod
     def can_add_participants(business_account_id: int, campaign_id: int, additional_count: int) -> bool:
         """
-        Check if campaign can add more participants based on current license limits.
+        Check if campaign can add more participants (invitations) based on current license limits.
         Platform administrators have unlimited access.
+        
+        Note: This checks invitation capacity, not response targets. Responses are never limited.
         
         Args:
             business_account_id: Business account ID to check
             campaign_id: Campaign ID to check
-            additional_count: Number of additional participants to add
+            additional_count: Number of additional participants to invite
             
         Returns:
-            bool: True if campaign can add the participants, False otherwise
+            bool: True if campaign can invite the participants, False otherwise
         """
         try:
             # Check if current user is a platform admin (unlimited access)
@@ -320,28 +322,28 @@ class LicenseService:
                 from models import BusinessAccountUser
                 current_user = BusinessAccountUser.query.get(current_user_id)
                 if current_user and current_user.is_platform_admin():
-                    logger.debug(f"Platform admin {current_user.email} bypassing participant limit check")
+                    logger.debug(f"Platform admin {current_user.email} bypassing invitation limit check")
                     return True
-            # Get current license limits
+            # Get current license limits (use max_invitations_per_campaign for enforcement)
             current_license = LicenseService.get_current_license(business_account_id)
-            max_participants = current_license.max_participants_per_campaign if current_license else 500
+            max_invitations = current_license.max_invitations_per_campaign if current_license else 2500
             
-            # Get current participant count for this campaign
+            # Get current participant count for this campaign (all invitations)
             from models import CampaignParticipant
             current_count = CampaignParticipant.query.filter_by(
                 campaign_id=campaign_id,
                 business_account_id=business_account_id
             ).count()
             
-            can_add = (current_count + additional_count) <= max_participants
+            can_add = (current_count + additional_count) <= max_invitations
             
-            logger.debug(f"Participant limit check for campaign {campaign_id}: "
-                        f"{current_count}+{additional_count}/{max_participants} participants, can_add={can_add}")
+            logger.debug(f"Invitation limit check for campaign {campaign_id}: "
+                        f"{current_count}+{additional_count}/{max_invitations} invitations, can_add={can_add}")
             
             return can_add
             
         except Exception as e:
-            logger.error(f"Failed to check participant limit for campaign {campaign_id}: {e}")
+            logger.error(f"Failed to check invitation limit for campaign {campaign_id}: {e}")
             return False
     
     @staticmethod
@@ -1191,6 +1193,7 @@ class LicenseService:
                 max_campaigns_per_year=license_config['max_campaigns_per_year'],
                 max_users=license_config['max_users'], 
                 max_participants_per_campaign=license_config['max_participants_per_campaign'],
+                max_invitations_per_campaign=license_config['max_invitations_per_campaign'],
                 # Transcript analysis add-on fields
                 transcript_analysis_start_date=transcript_start_date,
                 transcript_analysis_end_date=transcript_end_date,
@@ -1568,22 +1571,22 @@ class LicenseService:
             except Exception as e:
                 logger.warning(f"Could not validate campaign usage for business_id {business_id}: {e}")
             
-            # Check 3: Max participants across active campaigns vs target limit
+            # Check 3: Max invitations across active campaigns vs target limit
             try:
                 from models import CampaignParticipant
-                max_participants_query = db.session.query(
+                max_invitations_query = db.session.query(
                     func.max(func.count(CampaignParticipant.id))
                 ).join(Campaign).filter(
                     Campaign.business_account_id == business_id,
                     Campaign.status.in_(['active', 'ready'])  # Only check active campaigns
                 ).group_by(Campaign.id)
                 
-                max_participants_result = max_participants_query.scalar()
-                max_participants_used = max_participants_result or 0
+                max_invitations_result = max_invitations_query.scalar()
+                max_invitations_used = max_invitations_result or 0
                 
-                if max_participants_used > target_template.max_participants_per_campaign:
+                if max_invitations_used > target_template.max_invitations_per_campaign:
                     validation_errors.append(
-                        f"Max participants in active campaign ({max_participants_used}) exceeds target limit ({target_template.max_participants_per_campaign})"
+                        f"Max invitations in active campaign ({max_invitations_used}) exceeds target limit ({target_template.max_invitations_per_campaign})"
                     )
             except Exception as e:
                 logger.warning(f"Could not validate participant usage for business_id {business_id}: {e}")

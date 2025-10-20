@@ -83,7 +83,8 @@ class LicenseTemplate:
     # License Limits
     max_campaigns_per_year: int
     max_users: int
-    max_participants_per_campaign: int
+    max_participants_per_campaign: int  # Target responses (informational)
+    max_invitations_per_campaign: int   # Hard limit for invitations
     
     # Template Properties
     is_custom: bool = False
@@ -111,6 +112,10 @@ class LicenseTemplate:
             raise ValueError("max_users must be positive")
         if self.max_participants_per_campaign <= 0:
             raise ValueError("max_participants_per_campaign must be positive")
+        if self.max_invitations_per_campaign <= 0:
+            raise ValueError("max_invitations_per_campaign must be positive")
+        if self.max_invitations_per_campaign < self.max_participants_per_campaign:
+            raise ValueError("max_invitations_per_campaign must be >= max_participants_per_campaign")
         if self.default_duration_months <= 0:
             raise ValueError("default_duration_months must be positive")
     
@@ -123,6 +128,7 @@ class LicenseTemplate:
             'max_campaigns_per_year': self.max_campaigns_per_year,
             'max_users': self.max_users,
             'max_participants_per_campaign': self.max_participants_per_campaign,
+            'max_invitations_per_campaign': self.max_invitations_per_campaign,
             'is_custom': self.is_custom,
             'is_trial': self.is_trial,
             'default_duration_months': self.default_duration_months,
@@ -164,6 +170,11 @@ class LicenseTemplate:
                 raise ValueError("max_participants_per_campaign must be a positive integer")
             config['max_participants_per_campaign'] = custom_config['max_participants_per_campaign']
         
+        if 'max_invitations_per_campaign' in custom_config:
+            if not isinstance(custom_config['max_invitations_per_campaign'], int) or custom_config['max_invitations_per_campaign'] <= 0:
+                raise ValueError("max_invitations_per_campaign must be a positive integer")
+            config['max_invitations_per_campaign'] = custom_config['max_invitations_per_campaign']
+        
         if 'duration_months' in custom_config:
             if not isinstance(custom_config['duration_months'], int) or custom_config['duration_months'] <= 0:
                 raise ValueError("duration_months must be a positive integer")
@@ -182,10 +193,11 @@ class LicenseTemplateManager:
     CORE_TEMPLATE = LicenseTemplate(
         license_type='core',
         display_name='Core',
-        description='Basic license for small teams with essential features',
+        description='Small teams - 200 target responses (up to 1,000 invitations)',
         max_campaigns_per_year=4,
         max_users=5,
         max_participants_per_campaign=200,
+        max_invitations_per_campaign=1000,
         default_duration_months=12,
         features=['Basic Analytics', 'Email Support', 'Standard Templates']
     )
@@ -193,10 +205,11 @@ class LicenseTemplateManager:
     PLUS_TEMPLATE = LicenseTemplate(
         license_type='plus',
         display_name='Plus',
-        description='Enhanced license for growing teams with advanced features',
+        description='Growing teams - 1,000 target responses (up to 5,000 invitations)',
         max_campaigns_per_year=4,
         max_users=10,
-        max_participants_per_campaign=2000,
+        max_participants_per_campaign=1000,
+        max_invitations_per_campaign=5000,
         default_duration_months=12,
         features=['Advanced Analytics', 'Priority Support', 'Custom Templates', 'API Access']
     )
@@ -204,10 +217,11 @@ class LicenseTemplateManager:
     PRO_TEMPLATE = LicenseTemplate(
         license_type='pro',
         display_name='Pro',
-        description='Fully customizable license for enterprise teams',
+        description='Enterprise teams - 10,000 target responses (up to 50,000 invitations)',
         max_campaigns_per_year=12,  # Default for Pro, but customizable
         max_users=25,  # Default for Pro, but customizable
         max_participants_per_campaign=10000,  # Default for Pro, but customizable
+        max_invitations_per_campaign=50000,  # Default for Pro, but customizable
         is_custom=True,
         default_duration_months=12,
         features=['Custom Analytics', 'Dedicated Support', 'White Label', 'Custom Integrations', 'SLA Guarantee']
@@ -216,10 +230,11 @@ class LicenseTemplateManager:
     TRIAL_TEMPLATE = LicenseTemplate(
         license_type='trial',
         display_name='Trial',
-        description='Trial license for evaluation purposes',
+        description='Evaluation - 50 target responses (up to 250 invitations)',
         max_campaigns_per_year=1,
         max_users=2,
         max_participants_per_campaign=50,
+        max_invitations_per_campaign=250,
         is_trial=True,
         default_duration_months=1,
         features=['Basic Features', 'Limited Support']
