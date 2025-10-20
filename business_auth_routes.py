@@ -1867,6 +1867,40 @@ def business_analytics_hub():
             }
         }
         
+        # === USER DIRECTORY: Optimized query with eager loading ===
+        from sqlalchemy.orm import selectinload
+        
+        # Fetch top 20 recent business accounts with their users in 2 queries (optimized)
+        accounts_with_users = BusinessAccount.query\
+            .options(selectinload(BusinessAccount.users))\
+            .order_by(BusinessAccount.created_at.desc())\
+            .limit(20)\
+            .all()
+        
+        # Prepare user directory data
+        user_directory = []
+        for account in accounts_with_users:
+            user_list = []
+            for user in account.users:
+                user_list.append({
+                    'id': user.id,
+                    'full_name': user.get_full_name(),
+                    'email': user.email,
+                    'role': user.role,
+                    'is_active': user.is_active_user,
+                    'last_login': user.last_login_at.strftime('%Y-%m-%d %H:%M') if user.last_login_at else 'Never'
+                })
+            
+            user_directory.append({
+                'account_id': account.id,
+                'account_name': account.name,
+                'account_type': account.account_type,
+                'user_count': len(user_list),
+                'users': user_list
+            })
+        
+        dashboard_data['user_directory'] = user_directory
+        
         logger.info(f"Platform admin {current_user.email} accessed platform dashboard")
         
         return render_template('business_auth/platform_dashboard.html',
