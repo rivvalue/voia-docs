@@ -9,6 +9,7 @@ from models import BusinessAccountUser, UserSession, BusinessAccount, EmailConfi
 from rate_limiter import rate_limit
 from license_service import LicenseService
 from feature_flags import feature_flags
+from audit_utils import queue_audit_log
 import logging
 from datetime import datetime, timedelta, date
 import json
@@ -1393,6 +1394,23 @@ def reset_password_confirm(token):
         # Reset password
         user.reset_password(password)
         db.session.commit()
+        
+        # Audit log password reset
+        try:
+            client_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', 'unknown'))
+            queue_audit_log(
+                business_account_id=user.business_account_id,
+                action_type='password_reset',
+                user_email=user.email,
+                user_name=user.get_full_name(),
+                ip_address=client_ip,
+                details={
+                    'method': 'self_service_reset',
+                    'via': 'forgot_password_flow'
+                }
+            )
+        except Exception as audit_error:
+            logger.error(f"Failed to audit password reset for {user.email}: {audit_error}")
         
         logger.info(f"Password reset successful for user {user.email}")
         flash('Your password has been reset successfully. Please log in with your new password.', 'success')
