@@ -3638,8 +3638,13 @@ def license_dashboard():
                     license_status = license_info.get('license_status', 'trial')
                     
                     # Validate license type and status values
-                    valid_license_types = ['core', 'plus', 'pro', 'trial']
-                    valid_license_statuses = ['active', 'expired', 'trial', 'suspended']
+                    valid_license_types = ['core', 'plus', 'pro', 'trial', 'platform_admin']
+                    valid_license_statuses = ['active', 'expired', 'trial', 'suspended', 'unlimited']
+                    
+                    # Skip platform_admin accounts from statistics (they're not real customer accounts)
+                    if license_type == 'platform_admin':
+                        accounts_processed -= 1  # Don't count platform admin in statistics
+                        continue
                     
                     if license_type not in valid_license_types:
                         logger.warning(f"Invalid license_type '{license_type}' for account {account.id}")
