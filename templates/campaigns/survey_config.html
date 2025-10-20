@@ -340,8 +340,7 @@
                                 {% for topic in ['Pricing Value', 'Additional Comments', 'Feature Requests', 'Competitor Comparison', 'Usage Frequency', 'Referral Likelihood'] %}
                                 <div class="multi-select-item">
                                     <input type="checkbox" id="optional_{{ loop.index }}" name="optional_topics" value="{{ topic }}" 
-                                           {% if campaign.optional_topics and topic in campaign.optional_topics %}checked{% endif %}
-                                           {% if topic == 'Pricing Value' %}checked{% endif %}>
+                                           {% if campaign.optional_topics and topic in campaign.optional_topics %}checked{% endif %}>
                                     <label for="optional_{{ loop.index }}" class="form-check-label">{{ topic }}</label>
                                 </div>
                                 {% endfor %}
@@ -407,14 +406,9 @@
                 <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-2"></i>Back to Campaign
                 </a>
-                <div>
-                    <button type="button" class="btn btn-outline-primary me-2" onclick="previewConfig()">
-                        <i class="fas fa-eye me-2"></i>Preview Changes
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-2"></i>Save Configuration
-                    </button>
-                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Save Configuration
+                </button>
             </div>
         </form>
     </div>
@@ -480,50 +474,5 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
-
-// Preview configuration changes
-function previewConfig() {
-    const form = document.querySelector('form');
-    const formData = new FormData(form);
-    
-    let summary = "Configuration Summary:\n\n";
-    
-    // Product focus
-    const productDesc = formData.get('product_description');
-    if (productDesc) {
-        summary += `Product: ${productDesc.substring(0, 100)}${productDesc.length > 100 ? '...' : ''}\n`;
-    }
-    
-    // Survey goals
-    const goals = formData.getAll('survey_goals');
-    if (goals.length > 0) {
-        summary += `Goals: ${goals.join(', ')}\n`;
-    }
-    
-    // Controls
-    summary += `Max Questions: ${formData.get('max_questions')}\n`;
-    summary += `Max Duration: ${formData.get('max_duration_seconds')} seconds\n`;
-    summary += `Max Follow-ups: ${formData.get('max_follow_ups_per_topic')}\n`;
-    
-    // Prioritized topics
-    const prioritized = formData.getAll('prioritized_topics');
-    if (prioritized.length > 0) {
-        summary += `Priority Topics: ${prioritized.join(', ')}\n`;
-    }
-    
-    // Optional topics
-    const optional = formData.getAll('optional_topics');
-    if (optional.length > 0) {
-        summary += `Optional Topics: ${optional.join(', ')}\n`;
-    }
-    
-    // Custom end message
-    const endMessage = formData.get('custom_end_message');
-    if (endMessage) {
-        summary += `\nCustom End Message:\n"${endMessage}"\n`;
-    }
-    
-    alert(summary);
-}
 </script>
 {% endblock %}
