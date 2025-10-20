@@ -148,7 +148,7 @@
                                             <p class="text-muted mb-0" style="font-size: var(--font-size-sm);">Essential features for small teams</p>
                                         </div>
                                         <div class="text-end">
-                                            <div style="font-size: var(--font-size-xl); font-weight: 600; color: var(--primary-red);">${'{ :,}'.format(core_template.annual_price|int) if core_template and core_template.annual_price else 'N/A' }}</div>
+                                            <div style="font-size: var(--font-size-xl); font-weight: 600; color: var(--primary-red);">{{ "${:,}".format(core_template.annual_price|int) if core_template and core_template.annual_price else 'N/A' }}</div>
                                             <div class="text-muted" style="font-size: var(--font-size-xs);">per year</div>
                                         </div>
                                     </div>
@@ -193,7 +193,7 @@
                                             <p class="text-muted mb-0" style="font-size: var(--font-size-sm);">Advanced features for growing teams</p>
                                         </div>
                                         <div class="text-end">
-                                            <div style="font-size: var(--font-size-xl); font-weight: 600; color: var(--primary-red);">${'{:,}'.format(plus_template.annual_price|int) if plus_template and plus_template.annual_price else 'N/A' }</div>
+                                            <div style="font-size: var(--font-size-xl); font-weight: 600; color: var(--primary-red);">{{ "${:,}".format(plus_template.annual_price|int) if plus_template and plus_template.annual_price else 'N/A' }}</div>
                                             <div class="text-muted" style="font-size: var(--font-size-xs);">per year</div>
                                         </div>
                                     </div>
