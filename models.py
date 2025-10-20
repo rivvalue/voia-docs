@@ -1417,6 +1417,34 @@ class BusinessAccountUser(UserMixin, db.Model):
         self.password_reset_expires = datetime.utcnow() + timedelta(hours=24)
         return self.password_reset_token
     
+    def validate_password_reset_token(self, token):
+        """Validate password reset token and check expiration"""
+        if not self.password_reset_token or not self.password_reset_expires:
+            return False
+        
+        if self.password_reset_token != token:
+            return False
+        
+        # Check if token is expired
+        current_time = datetime.utcnow()
+        
+        # Convert to naive datetime if password_reset_expires is timezone-aware
+        expiry_time = self.password_reset_expires
+        if hasattr(expiry_time, 'tzinfo') and expiry_time.tzinfo is not None:
+            expiry_time = expiry_time.replace(tzinfo=None)
+        
+        if current_time > expiry_time:
+            return False
+        
+        return True
+    
+    def reset_password(self, new_password):
+        """Reset password and clear reset token"""
+        self.set_password(new_password)
+        self.password_reset_token = None
+        self.password_reset_expires = None
+        return True
+    
     def generate_email_verification_token(self):
         """Generate email verification token"""
         self.email_verification_token = str(uuid.uuid4())

@@ -1052,6 +1052,226 @@ If you did not expect this invitation, please ignore this message.
                 'business_account_name': business_account_name
             }
 
+    def send_password_reset_email(self,
+                                   user_email: str,
+                                   user_first_name: str,
+                                   user_last_name: str,
+                                   reset_token: str,
+                                   email_delivery_id: Optional[int] = None,
+                                   business_account_id: Optional[int] = None) -> Dict:
+        """
+        Send password reset email with secure reset link
+        
+        Args:
+            user_email: User's email address
+            user_first_name: User's first name
+            user_last_name: User's last name
+            reset_token: Secure UUID token for password reset
+            email_delivery_id: Optional EmailDelivery record ID for tracking
+            business_account_id: Business account ID to use their SMTP configuration
+            
+        Returns:
+            Dict with success status and details
+        """
+        
+        try:
+            # Get branding configuration
+            branding = self._get_branding_config(business_account_id)
+            
+            # Generate reset URL
+            from flask import url_for
+            reset_url = url_for('business_auth.reset_password', token=reset_token, _external=True)
+            
+            # Email subject
+            subject = f"Reset Your Password - {branding['company_name']}"
+            
+            # User's full name
+            user_full_name = f"{user_first_name} {user_last_name}"
+            
+            # Text body for password reset
+            text_body = f"""
+Password Reset Request
+
+Dear {user_full_name},
+
+We received a request to reset the password for your {branding['company_name']} business account.
+
+To reset your password, please click the link below:
+{reset_url}
+
+This secure password reset link will expire in 24 hours for security purposes.
+
+If you did not request a password reset, please ignore this email. Your password will remain unchanged.
+
+Best regards,
+The {branding['company_name']} Team
+{branding['tagline']}
+
+---
+This is an automated system message. Please do not reply to this email.
+If you did not request this password reset, please ignore this message.
+"""
+            
+            # HTML body for password reset
+            html_body = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Password Reset - {branding['company_name']}</title>
+    <style>
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }}
+        .container {{
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+        .header {{
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #E13A44;
+        }}
+        .logo {{
+            font-size: 28px;
+            font-weight: bold;
+            color: #E13A44;
+            margin-bottom: 5px;
+        }}
+        .tagline {{
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }}
+        .reset-message {{
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            border-left: 4px solid #E13A44;
+            margin: 20px 0;
+        }}
+        .cta-button {{
+            display: inline-block;
+            background-color: #E13A44;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+        }}
+        .cta-button:hover {{
+            background-color: #c12e38;
+        }}
+        .footer {{
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            font-size: 12px;
+            color: #666;
+        }}
+        .security-notice {{
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 15px 0;
+            font-size: 14px;
+        }}
+        .warning-box {{
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 14px;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">{branding['company_name']}</div>
+            <div class="tagline">{branding['tagline']}</div>
+        </div>
+        
+        <div class="reset-message">
+            <h2 style="margin-top: 0; color: #E13A44;">Password Reset Request</h2>
+            <p>Dear <strong>{user_full_name}</strong>,</p>
+            <p>We received a request to reset the password for your business account.</p>
+        </div>
+        
+        <p style="text-align: center;">
+            <a href="{reset_url}" class="cta-button">Reset Your Password</a>
+        </p>
+        
+        <div class="security-notice">
+            <strong>Security Notice:</strong> This password reset link will expire in 24 hours for your security.
+        </div>
+        
+        <div class="warning-box">
+            <strong>Did Not Request This?</strong><br>
+            If you did not request a password reset, please ignore this email. Your password will remain unchanged and secure.
+        </div>
+        
+        <div class="footer">
+            <p>Best regards,<br>
+            The {branding['company_name']} Team</p>
+            <hr style="margin: 15px 0;">
+            <p><em>This is an automated system message. Please do not reply to this email.<br>
+            If you did not request this password reset, please ignore this message.</em></p>
+        </div>
+    </div>
+</body>
+</html>
+"""
+            
+            # Send email using business account SMTP configuration
+            result = self.send_email(
+                to_emails=user_email,
+                subject=subject,
+                text_body=text_body,
+                html_body=html_body,
+                email_delivery_id=email_delivery_id,
+                business_account_id=business_account_id
+            )
+            
+            # Add password reset-specific metadata
+            if result['success']:
+                result.update({
+                    'email_type': 'password_reset',
+                    'user_email': user_email,
+                    'user_name': user_full_name,
+                    'reset_url': reset_url
+                })
+                
+                logger.info(f"Password reset email sent successfully to {user_email}")
+            
+            return result
+            
+        except Exception as e:
+            error_msg = f"Failed to send password reset email to {user_email}: {str(e)}"
+            logger.error(error_msg)
+            
+            return {
+                'success': False,
+                'error': error_msg,
+                'email_type': 'password_reset',
+                'user_email': user_email
+            }
+
     def send_campaign_notification(self,
                                    notification_type: str,
                                    campaign_name: str,
