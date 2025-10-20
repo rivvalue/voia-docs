@@ -1135,7 +1135,6 @@ def login():
     try:
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
-        remember_me = request.form.get('remember_me') == 'on'
         
         if not email or not password:
             flash('Email and password are required', 'error')
@@ -1185,7 +1184,7 @@ def login():
         session['business_account_name'] = user.business_account.name
         session['business_user_name'] = user.get_full_name()  # User's actual name for display
         session['user_role'] = user.role
-        session.permanent = True  # Always use permanent session (7-day lifetime from app config)
+        session.permanent = True  # 7-day session lifetime for all users (configured in app.py)
         
         logger.info(f"Business account user {email} logged in successfully")
         flash(f'Welcome back, {user.get_full_name()}!', 'success')
