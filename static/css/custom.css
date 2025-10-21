@@ -293,6 +293,11 @@ p, .text-body {
     z-index: 10003 !important;
 }
 
+/* Hide navbar for conversational survey pages */
+.page-conversational-business .navbar {
+    display: none !important;
+}
+
 .dropdown-item {
     color: var(--primary-black);
     font-size: var(--font-size-sm);

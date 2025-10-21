@@ -194,22 +194,6 @@
         </div>
     </div>
 
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a href="{{ url_for('business_auth.admin_panel') }}">Admin Panel</a>
-            </li>
-            <li class="breadcrumb-item">
-                <a href="{{ url_for('campaigns.list_campaigns') }}">Campaigns</a>
-            </li>
-            <li class="breadcrumb-item">
-                <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}">{{ campaign.name }}</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">Survey Configuration</li>
-        </ol>
-    </nav>
-
     <!-- Survey Configuration Form -->
     <div class="form-container">
         {% if campaign.status in ['active', 'completed'] %}
