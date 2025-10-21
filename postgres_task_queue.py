@@ -169,28 +169,32 @@ class PostgresTaskQueue:
         
         while self.running:
             try:
-                # Claim next task atomically
-                task = self._claim_next_task(worker_name)
-                
-                if task:
-                    # Reset poll interval on successful claim
-                    poll_interval = self.poll_interval
-                    consecutive_empty_polls = 0
+                # All database operations need Flask app context
+                with app.app_context():
+                    # Claim next task atomically
+                    task = self._claim_next_task(worker_name)
                     
-                    logger.debug(f"Worker {worker_name} processing task: {task['task_type']} (id={task['id']})")
-                    
-                    # Process the task
-                    with app.app_context():
+                    if task:
+                        # Reset poll interval on successful claim
+                        poll_interval = self.poll_interval
+                        consecutive_empty_polls = 0
+                        
+                        logger.debug(f"Worker {worker_name} processing task: {task['task_type']} (id={task['id']})")
+                        
+                        # Process the task
                         success = self._process_task(task, worker_name)
                         
                         if success:
                             self._mark_task_completed(task['id'])
                         else:
                             self._mark_task_failed(task['id'], "Task processing returned False")
-                else:
-                    # No tasks available - exponential backoff
-                    consecutive_empty_polls += 1
-                    poll_interval = min(30, self.poll_interval * (1.5 ** min(consecutive_empty_polls, 5)))
+                    else:
+                        # No tasks available - exponential backoff
+                        consecutive_empty_polls += 1
+                        poll_interval = min(30, self.poll_interval * (1.5 ** min(consecutive_empty_polls, 5)))
+                
+                # Sleep outside app context
+                if not task:
                     sleep(poll_interval)
                 
             except Exception as e:
