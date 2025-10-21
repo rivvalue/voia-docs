@@ -8118,3 +8118,119 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
 .export-modal-icon {
     font-size: 3rem;
 }
+
+/* ========================================
+   Campaign Participant Summary Card
+   ======================================== */
+
+.campaign-participant-summary-card {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-sm);
+}
+
+.participant-summary-header {
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.participant-summary-header h5 {
+    margin: 0;
+    color: var(--primary-black);
+    font-weight: 600;
+}
+
+.participant-summary-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    background: var(--gray-lightest);
+    border-left: 4px solid var(--gray-medium);
+    transition: all 0.2s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-completed {
+    border-left-color: var(--success-green);
+}
+
+.stat-invited {
+    border-left-color: var(--info-blue);
+}
+
+.stat-pending {
+    border-left-color: var(--warning-yellow);
+}
+
+.stat-icon {
+    font-size: 2rem;
+    opacity: 0.6;
+}
+
+.stat-completed .stat-icon {
+    color: var(--success-green);
+}
+
+.stat-invited .stat-icon {
+    color: var(--info-blue);
+}
+
+.stat-pending .stat-icon {
+    color: var(--warning-yellow);
+}
+
+.stat-content {
+    flex: 1;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-black);
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--gray-dark);
+    margin-top: var(--spacing-xs);
+}
+
+.stat-percentage {
+    font-size: 0.75rem;
+    color: var(--gray-medium);
+    font-weight: 600;
+    margin-top: var(--spacing-xs);
+}
+
+.participant-summary-actions {
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--border-light);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .participant-summary-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+}

@@ -271,24 +271,26 @@ def view_campaign(campaign_id):
             flash('Campaign not found.', 'error')
             return redirect(url_for('campaigns.list_campaigns'))
         
-        # Get campaign participants with eager loading to prevent N+1 queries
-        campaign_participants = CampaignParticipant.query.filter_by(
-            campaign_id=campaign_id,
-            business_account_id=current_account.id
-        ).options(joinedload(CampaignParticipant.participant)).all()
+        # Get participant summary stats (optimized - no full list loading)
+        from sqlalchemy import func, case
         
-        participants_data = []
-        for cp in campaign_participants:
-            if cp.participant:
-                participant_data = cp.participant.to_dict()
-                participant_data.update({
-                    'association_id': cp.id,
-                    'token': cp.token,  # Add campaign-participant token
-                    'status': cp.status,
-                    'invited_at': cp.invited_at.isoformat() if cp.invited_at else None,
-                    'completed_at': cp.completed_at.isoformat() if cp.completed_at else None
-                })
-                participants_data.append(participant_data)
+        participant_stats = db.session.query(
+            func.count(CampaignParticipant.id).label('total'),
+            func.count(case((CampaignParticipant.status == 'completed', 1))).label('completed'),
+            func.count(case((CampaignParticipant.status == 'invited', 1))).label('invited'),
+            func.count(case((CampaignParticipant.status == 'pending', 1))).label('pending')
+        ).filter(
+            CampaignParticipant.campaign_id == campaign_id,
+            CampaignParticipant.business_account_id == current_account.id
+        ).first()
+        
+        # Build stats dictionary
+        campaign_participant_stats = {
+            'total': participant_stats.total if participant_stats else 0,
+            'completed': participant_stats.completed if participant_stats else 0,
+            'invited': participant_stats.invited if participant_stats else 0,
+            'pending': participant_stats.pending if participant_stats else 0
+        }
         
         # Get campaign data with engagement metrics
         campaign_data = campaign.to_dict()
@@ -300,7 +302,7 @@ def view_campaign(campaign_id):
         
         return render_template('campaigns/view.html',
                              campaign=campaign_data,
-                             participants=participants_data,
+                             participant_stats=campaign_participant_stats,
                              business_account=current_account.to_dict(),
                              has_transcript_analysis=has_transcript_analysis)
         
