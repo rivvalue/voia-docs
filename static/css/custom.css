@@ -7363,8 +7363,9 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     height: auto;
     max-width: 300px;
     object-fit: contain;
-    filter: brightness(0) invert(1);
-    opacity: 0.95;
+    background: white;
+    padding: 0.5rem;
+    border-radius: 8px;
 }
 
 .conv-hero-welcome {
