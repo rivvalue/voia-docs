@@ -1159,10 +1159,35 @@ Respond with ONLY the JSON object, no other text:"""
                     
                     # Activate the campaign
                     campaign.status = 'active'
+                    
+                    # Generate tokens for all campaign participants
+                    import uuid
+                    from datetime import datetime
+                    campaign_participants = CampaignParticipant.query.filter_by(
+                        campaign_id=campaign.id,
+                        business_account_id=account_id
+                    ).all()
+                    
+                    token_success_count = 0
+                    for cp in campaign_participants:
+                        try:
+                            # Generate token if missing
+                            if not cp.token:
+                                cp.token = str(uuid.uuid4())
+                            
+                            # Update status and timestamp
+                            if cp.status == 'pending':
+                                cp.status = 'invited'
+                                cp.invited_at = datetime.utcnow()
+                            
+                            token_success_count += 1
+                        except Exception as e:
+                            logger.error(f"Error generating token for participant {cp.id} in campaign {campaign.id}: {e}")
+                    
                     db.session.commit()
                     
                     logger.info(f"Auto-activated campaign '{campaign.name}' (ID: {campaign.id}) "
-                               f"for business account {account_id} ({account_name})")
+                               f"for business account {account_id} ({account_name}) with {token_success_count} tokens generated")
                     
                     # Audit log auto-activation
                     try:
