@@ -2,6 +2,18 @@
 The Voice of Client (VOÏA) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. Its purpose is to convert raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA provides businesses with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project features a production-ready multi-tenant participant management system with extensive email delivery capabilities, AI-powered conversational surveys with hybrid prompt architecture, and participant segmentation for personalized experiences and advanced analytics.
 
 # Recent Changes
+**October 21, 2025 - Email Reminder System**
+- **Automated Email Reminders**: Comprehensive reminder system to increase campaign response rates with configurable reminder delays and metrics tracking
+  - Campaign-level settings: toggle reminder enabled/disabled, configurable delay (3, 5, 7, 10, 14 days)
+  - SQL-optimized eligibility queries using PostgreSQL interval arithmetic with batch processing (1000-record safety limit)
+  - Single reminder per participant with composite indexes: idx_campaign_participant_reminder (campaign_id, status, invited_at), idx_email_reminder_lookup (campaign_participant_id, email_type)
+  - Staggered delivery over 4-8 hours with EmailDelivery tracking (email_type='reminder')
+  - Reminder metrics dashboard: displays reminders sent count and conversion rate with DISTINCT counting to avoid overcounting
+  - Short-circuit optimization: skips reminder metric queries when reminder_enabled=False
+  - Input validation: reminder_delay_days restricted to [3,5,7,10,14] with safe fallback to 7 days
+  - Integration: ReminderService, EmailService template reuse, TaskQueue scheduler, campaign create/edit UI
+- **Impact**: Automated follow-up system to boost survey completion rates while maintaining performance at scale (thousands of participants)
+
 **October 20, 2025 - Security & Platform Admin Features**
 - **Password Change Audit Trail**: Implemented comprehensive audit logging for password reset operations with IP address tracking, user context, and method attribution (self-service reset via forgot password flow)
 - **Platform Admin User Directory**: Added read-only user directory to Business Analytics Hub showing users across all business accounts with:
@@ -45,7 +57,7 @@ The system is a Flask web application with a multi-tiered architecture. The fron
 -   **Branding**: "VOÏA - Voice Of Client" with "AI Powered Client Insights" subtitle, specific tagline, multi-tenant logo system, and selective trial branding.
 -   **Multi-Tenant Architecture**: Business Accounts, Campaigns, and Participants with tenant isolation via `business_account_id` scoping, dual authentication, and a token system for survey access, including a lightweight scheduler. Participant entities support optional segmentation attributes (role, region, customer_tier, language) for personalized survey experiences and advanced analytics segmentation.
 -   **Manual Commercial Value Tracking**: Company-level commercial value system for accurate account intelligence, stored on the Participant model, with CSV upload validation and automatic synchronization across participants from the same company.
--   **Email Delivery System**: Multi-provider email infrastructure (AWS SES, SMTP) with business accounts choosing providers, encrypted password storage, connection testing, professional VOÏA-branded templates, background task processing, delivery tracking, and configurable email content at both business account and campaign levels, with a 3-tier fallback architecture for customization.
+-   **Email Delivery System**: Multi-provider email infrastructure (AWS SES, SMTP) with business accounts choosing providers, encrypted password storage, connection testing, professional VOÏA-branded templates, background task processing, delivery tracking, and configurable email content at both business account and campaign levels, with a 3-tier fallback architecture for customization. Includes automated reminder system with campaign-level configuration (toggle, delay), SQL-optimized batch processing (1000-record safety limit), EmailDelivery tracking with email_type='reminder', and reminder metrics (sent count, conversion rate with DISTINCT counting) displayed on campaign dashboard.
 -   **Campaign Lifecycle Management**: Automated status transitions, multi-tenant scheduling, automatic KPI snapshot generation, and background task management with comprehensive audit logging for both manual and automated actions. Draft campaigns support full editability (name, dates, description) and deletion with cascade removal of participant associations, all protected by status validation and multi-tenant security. Manual lifecycle control preserves user agency with explicit transitions: draft → ready → active → completed. All campaign status changes (manual or scheduler-driven) are logged to the audit trail with attribution metadata.
 -   **Hybrid Survey Customization**: Campaign-specific survey personalization with business account defaults.
 -   **License Management System**: Enterprise-ready license management with usage tracking and enforcement.
