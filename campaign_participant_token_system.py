@@ -192,23 +192,41 @@ def generate_participant_survey_url(association_id, base_url="https://vocsa.repl
         }
 
 
-def mark_survey_completed(association_id, survey_response_id):
-    """Mark a campaign-participant association as completed"""
+def mark_survey_completed(association_id, survey_response_id, auto_commit=True):
+    """
+    Mark a campaign-participant association as completed.
+    
+    Args:
+        association_id: CampaignParticipant ID to mark as completed
+        survey_response_id: SurveyResponse ID that was created
+        auto_commit: If True, commits immediately (legacy behavior). 
+                     If False, caller must commit (atomic transaction pattern).
+    
+    Returns:
+        CampaignParticipant object if successful, None otherwise
+    """
     try:
         # Import models here to avoid circular imports
         from models import CampaignParticipant, db
         
         association = CampaignParticipant.query.filter_by(id=association_id).first()
         if not association:
-            return False
+            logger.error(f"Association {association_id} not found")
+            return None
         
         association.status = 'completed'
         association.completed_at = datetime.utcnow()
-        db.session.commit()
         
-        logger.info(f"Marked association {association_id} as completed with response {survey_response_id}")
-        return True
+        if auto_commit:
+            db.session.commit()
+            logger.info(f"Marked association {association_id} as completed with response {survey_response_id} (auto-commit)")
+        else:
+            logger.info(f"Marked association {association_id} as completed with response {survey_response_id} (deferred commit)")
+        
+        return association
         
     except Exception as e:
         logger.error(f"Error marking survey completed for association {association_id}: {e}")
-        return False
+        if auto_commit:
+            db.session.rollback()
+        return None

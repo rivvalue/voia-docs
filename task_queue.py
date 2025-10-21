@@ -25,6 +25,8 @@ class TaskQueue:
         self.scheduler_thread = None
         self.last_scheduler_run = None
         self.scheduler_interval = 300  # 5 minutes in seconds
+        self.last_reconciliation_run = None
+        self.reconciliation_interval = 86400  # 24 hours in seconds (nightly)
         
     def start(self):
         """Start the task queue workers and scheduler"""
@@ -998,6 +1000,15 @@ Respond with ONLY the JSON object, no other text:"""
                                     self.last_scheduler_run = now
                                     if changes_made > 0:
                                         logger.info(f"Campaign scheduler completed: {changes_made} campaigns processed")
+                                    
+                                    # Run nightly reconciliation (24 hours interval)
+                                    if (self.last_reconciliation_run is None or 
+                                        (now - self.last_reconciliation_run).total_seconds() >= self.reconciliation_interval):
+                                        logger.info("Running nightly participant status reconciliation")
+                                        reconciled = self._run_participant_status_reconciliation()
+                                        self.last_reconciliation_run = now
+                                        if reconciled > 0:
+                                            logger.info(f"Nightly reconciliation: {reconciled} records fixed")
                                 finally:
                                     # Always release the lock
                                     self._release_scheduler_lock(123456)
@@ -1095,6 +1106,81 @@ Respond with ONLY the JSON object, no other text:"""
             db.session.rollback()
             
         return retry_count
+    
+    def _run_participant_status_reconciliation(self):
+        """
+        Reconcile participant status with survey responses (drift healing).
+        Finds CampaignParticipant records where status != 'completed' but a response exists.
+        This fixes historical inconsistencies caused by non-atomic status updates.
+        Uses atomic transactions for each reconciliation batch.
+        """
+        reconciled_count = 0
+        
+        try:
+            logger.info("Starting participant status reconciliation")
+            
+            # Find all campaign-participant associations that:
+            # 1. Status is not 'completed'
+            # 2. Have a linked survey response (via campaign_participant_id)
+            # Use read-only query to avoid locking during scan
+            incomplete_association_ids = db.session.query(
+                CampaignParticipant.id,
+                CampaignParticipant.participant_id,
+                CampaignParticipant.campaign_id,
+                CampaignParticipant.status
+            ).filter(
+                CampaignParticipant.status != 'completed',
+                CampaignParticipant.id.in_(
+                    db.session.query(SurveyResponse.campaign_participant_id).filter(
+                        SurveyResponse.campaign_participant_id.isnot(None)
+                    )
+                )
+            ).all()
+            
+            # Process each association in a separate transaction for safety
+            for assoc_id, participant_id, campaign_id, old_status in incomplete_association_ids:
+                try:
+                    # Start a new scoped transaction for each update
+                    association = CampaignParticipant.query.filter_by(id=assoc_id).first()
+                    if not association:
+                        continue
+                    
+                    # Find the linked response to get created timestamp
+                    response = SurveyResponse.query.filter_by(
+                        campaign_participant_id=assoc_id
+                    ).first()
+                    
+                    if response:
+                        association.status = 'completed'
+                        association.completed_at = response.created_at
+                        
+                        # Commit this individual reconciliation
+                        db.session.commit()
+                        
+                        reconciled_count += 1
+                        logger.info(
+                            f"Reconciled participant {participant_id} "
+                            f"in campaign {campaign_id}: "
+                            f"{old_status} -> completed (response created at {response.created_at})"
+                        )
+                
+                except Exception as e:
+                    logger.error(f"Error reconciling association {assoc_id}: {e}")
+                    db.session.rollback()
+                    # Continue with next association
+                    continue
+            
+            # Log final summary
+            if reconciled_count > 0:
+                logger.info(f"✅ Participant status reconciliation completed: {reconciled_count} records fixed")
+            else:
+                logger.debug("Participant status reconciliation: No drift detected")
+            
+        except Exception as e:
+            logger.error(f"Participant status reconciliation failed: {e}")
+            db.session.rollback()
+        
+        return reconciled_count
     
     def _process_account_campaigns(self, business_account, today):
         """Process campaign transitions for a specific business account"""

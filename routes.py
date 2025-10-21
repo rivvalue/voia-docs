@@ -1004,23 +1004,30 @@ def submit_survey():
                     # Continue without participant linkage to maintain backward compatibility
             
             db.session.add(response)
-        db.session.commit()
         
-        # Mark association as completed if using new token system
+        # Mark association as completed if using new token system (BEFORE commit for atomicity)
         # Fallback: Look up association_id from database if missing from session
         if not association_id and campaign_id and authenticated_email:
             association_id = lookup_association_id_fallback(authenticated_email, campaign_id)
             if association_id:
                 # Also link the response to the association
                 response.campaign_participant_id = association_id
-                db.session.commit()
         
+        # Update association status BEFORE commit (atomic transaction like trial users)
+        # Use helper function with auto_commit=False to preserve audit trail and future extensibility
         if association_id:
             try:
                 import campaign_participant_token_system
-                campaign_participant_token_system.mark_survey_completed(association_id, response.id)
+                campaign_participant_token_system.mark_survey_completed(
+                    association_id, 
+                    response.id, 
+                    auto_commit=False  # Atomic: commit together with response
+                )
             except Exception as e:
                 logger.error(f"Failed to mark association completed: {e}")
+        
+        # Single atomic commit for both response and status update
+        db.session.commit()
         
         # Queue AI analysis for background processing
         try:

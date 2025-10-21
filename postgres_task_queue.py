@@ -60,6 +60,8 @@ class PostgresTaskQueue:
         self.last_scheduler_run = None
         self.scheduler_interval = scheduler_interval
         self.stale_task_threshold = stale_task_threshold
+        self.last_reconciliation_run = None
+        self.reconciliation_interval = 86400  # 24 hours in seconds (nightly)
         self.lock = Lock()
         
         logger.info(f"PostgresTaskQueue initialized: {max_workers} workers, {poll_interval}s poll, scheduler: {scheduler_interval}s, stale threshold: {stale_task_threshold}min")
@@ -470,6 +472,15 @@ class PostgresTaskQueue:
                                     self.last_scheduler_run = now
                                     if changes_made > 0:
                                         logger.info(f"PostgreSQL queue scheduler completed: {changes_made} campaigns processed")
+                                    
+                                    # Run nightly reconciliation (24 hours interval)
+                                    if (self.last_reconciliation_run is None or 
+                                        (now - self.last_reconciliation_run).total_seconds() >= self.reconciliation_interval):
+                                        logger.info("Running nightly participant status reconciliation")
+                                        reconciled = temp_queue._run_participant_status_reconciliation()
+                                        self.last_reconciliation_run = now
+                                        if reconciled > 0:
+                                            logger.info(f"Nightly reconciliation: {reconciled} records fixed")
                                 finally:
                                     temp_queue._release_scheduler_lock(123456)
                             else:
@@ -518,7 +529,9 @@ class PostgresTaskQueue:
                 'workers': len(self.workers),
                 'running': self.running,
                 'last_scheduler_run': self.last_scheduler_run.isoformat() if self.last_scheduler_run else None,
+                'last_reconciliation_run': self.last_reconciliation_run.isoformat() if self.last_reconciliation_run else None,
                 'scheduler_interval': self.scheduler_interval,
+                'reconciliation_interval': self.reconciliation_interval,
                 'queue_type': 'postgresql'
             }
         except Exception as e:
