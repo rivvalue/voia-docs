@@ -24,7 +24,15 @@
             <span class="public-nps-score public-nps-{{ response.nps_category.lower() }}" role="status" aria-label="Net Promoter Score: {{ response.nps_score }} out of 10, {{ response.nps_category }}">
                 NPS: {{ response.nps_score }}/10
             </span>
-            <span class="text-muted">{{ response.created_at[:10] if response.created_at else 'Unknown' }}</span>
+            <span class="text-muted">
+                {% if response.updated_at %}
+                    {{ response.updated_at[:10] }} <small>(updated)</small>
+                {% elif response.created_at %}
+                    {{ response.created_at[:10] }}
+                {% else %}
+                    Unknown
+                {% endif %}
+            </span>
         </div>
     </div>
 

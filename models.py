@@ -112,6 +112,7 @@ class SurveyResponse(db.Model):
             'source_type': self.source_type,
             'transcript_filename': self.transcript_filename,
             'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
             'analyzed_at': self.analyzed_at.isoformat() if self.analyzed_at else None
         }
     
