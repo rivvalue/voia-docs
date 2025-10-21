@@ -267,8 +267,9 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         # Extract NPS score - only if we're in the NPS collection step and don't have it yet
         import re
         
-        # Extract NPS score if we don't have it yet and input looks like a number
-        if not self.extracted_data.get('nps_score') and re.search(r'\b([0-9]|10)\b', user_input):
+        # Extract NPS score ONLY during steps 1-3 (before satisfaction questions start at step 4)
+        # This prevents "1" or "5" from satisfaction questions being misinterpreted as NPS
+        if not self.extracted_data.get('nps_score') and self.step_count <= 3 and re.search(r'\b([0-9]|10)\b', user_input):
             print(f"Attempting NPS extraction at step {self.step_count} for input: '{user_input}'")
             nps_patterns = [
                 r'(?:score|rating|give|rate).*?(10|[0-9])',  # Fixed: 10 before single digits
@@ -284,7 +285,9 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             
             for pattern in nps_patterns:
                 matches = re.findall(pattern, user_input, re.IGNORECASE)
-                for match in matches:
+                # Use LAST match to handle "scale of 1 to 10, I give it 7" → extracts 7, not 1
+                if matches:
+                    match = matches[-1]  # Take the last match
                     score = int(match)
                     if 0 <= score <= 10:
                         extracted['nps_score'] = score
@@ -357,7 +360,8 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             # Try service patterns first (most likely in this context)
             for pattern in service_patterns:
                 matches = re.findall(pattern, user_input, re.IGNORECASE)
-                for match in matches:
+                if matches:  # Use LAST match to handle "scale 1-5, I rate it 4" → extracts 4, not 1
+                    match = matches[-1]
                     rating = int(match)
                     if 1 <= rating <= 5 and not self.extracted_data.get('service_rating'):
                         extracted['service_rating'] = rating
@@ -370,7 +374,8 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             if not extracted.get('satisfaction_rating'):
                 for pattern in satisfaction_patterns:
                     matches = re.findall(pattern, user_input, re.IGNORECASE)
-                    for match in matches:
+                    if matches:  # Use LAST match
+                        match = matches[-1]
                         rating = int(match)
                         if 1 <= rating <= 5 and not self.extracted_data.get('satisfaction_rating'):
                             extracted['satisfaction_rating'] = rating
@@ -383,7 +388,8 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             if not extracted.get('product_value_rating'):
                 for pattern in product_patterns:
                     matches = re.findall(pattern, user_input, re.IGNORECASE)
-                    for match in matches:
+                    if matches:  # Use LAST match
+                        match = matches[-1]
                         rating = int(match)
                         if 1 <= rating <= 5 and not self.extracted_data.get('product_value_rating'):
                             extracted['product_value_rating'] = rating
@@ -396,7 +402,8 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             if not extracted.get('pricing_rating'):
                 for pattern in pricing_patterns:
                     matches = re.findall(pattern, user_input, re.IGNORECASE)
-                    for match in matches:
+                    if matches:  # Use LAST match
+                        match = matches[-1]
                         rating = int(match)
                         if 1 <= rating <= 5 and not self.extracted_data.get('pricing_rating'):
                             extracted['pricing_rating'] = rating
@@ -409,7 +416,8 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             if not extracted.get('support_rating'):
                 for pattern in support_patterns:
                     matches = re.findall(pattern, user_input, re.IGNORECASE)
-                    for match in matches:
+                    if matches:  # Use LAST match
+                        match = matches[-1]
                         rating = int(match)
                         if 1 <= rating <= 5 and not self.extracted_data.get('support_rating'):
                             extracted['support_rating'] = rating
@@ -422,7 +430,8 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             if not any(extracted.get(key) for key in ['service_rating', 'satisfaction_rating', 'product_value_rating', 'pricing_rating', 'support_rating']):
                 for pattern in generic_rating_patterns:
                     matches = re.findall(pattern, user_input, re.IGNORECASE)
-                    for match in matches:
+                    if matches:  # Use LAST match
+                        match = matches[-1]
                         rating = int(match)
                         if 1 <= rating <= 5:
                             # Try to infer which rating based on conversation context/step
