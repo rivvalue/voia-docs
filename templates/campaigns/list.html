@@ -12,7 +12,7 @@
 {% include 'components/breadcrumb.html' %}
 
 <!-- Campaign Header -->
-<div class="header-gradient-primary" style="padding: var(--spacing-xl); margin-bottom: var(--spacing-xl);">
+<div class="header-gradient-primary campaign-page-header">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-8">
@@ -67,7 +67,7 @@
             {% endif %}
         </div>
         {% if campaign.status == 'completed' %}
-        <div id="regenerateLink_{{ campaign.id }}" style="display: none; margin-top: 2px;">
+        <div id="regenerateLink_{{ campaign.id }}" class="d-none mt-1">
             <a href="#" onclick="regenerateExecutiveReport({{ campaign.id }}, '{{ campaign.name|e }}'); return false;" 
                class="text-muted text-decoration-none small">
                 <i class="fas fa-sync-alt"></i>
@@ -81,7 +81,7 @@
     <div class="campaign-card" onclick="location.href='{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}'">
         <div class="campaign-card-header">
             <div class="d-flex justify-content-between align-items-start">
-                <h5 class="mb-0" style="color: var(--primary-black);">{{ campaign.name }}</h5>
+                <h5 class="mb-0 campaign-card-title">{{ campaign.name }}</h5>
                 <span class="campaign-status status-{{ campaign.status }}">
                     {{ campaign.status|title }}
                 </span>
@@ -109,13 +109,13 @@
             </div>
             
             <!-- Engagement Metrics -->
-            <div class="row text-center py-2" style="background-color: rgba(var(--primary-red-rgb, 225, 58, 68), 0.05); border-radius: 8px;">
+            <div class="row text-center py-2 campaign-metrics-box">
                 <div class="col-6">
-                    <div class="small text-muted">📧 Sent</div>
+                    <div class="small text-muted"><i class="fas fa-envelope"></i> Sent</div>
                     <div class="fw-bold small">{{ campaign.engagement_metrics.invitations_sent }}</div>
                 </div>
                 <div class="col-6">
-                    <div class="small text-muted">✅ Done</div>
+                    <div class="small text-muted"><i class="fas fa-check-circle"></i> Done</div>
                     <div class="fw-bold small">{{ campaign.engagement_metrics.surveys_completed }}</div>
                 </div>
             </div>
@@ -217,7 +217,7 @@
         </div>
 
         <!-- Grid View -->
-        <div id="gridView" class="campaigns-grid" style="display: none;">
+        <div id="gridView" class="campaigns-grid d-none">
             {% for campaign in campaigns %}
             <div data-status="{{ campaign.status }}">
                 {{ campaign_card(campaign) }}
@@ -272,7 +272,7 @@
                 
                 <div id="exportCompleteContent" style="display: none;">
                     <div class="text-center">
-                        <i class="fas fa-check-circle text-success mb-3" style="font-size: 3rem;"></i>
+                        <i class="fas fa-check-circle text-success mb-3 export-modal-icon"></i>
                         <h5>Export Complete!</h5>
                         <p class="text-muted mb-4">Your campaign data has been successfully exported.</p>
                         <a id="downloadExportLink" href="#" class="btn btn-success btn-lg">
@@ -283,7 +283,7 @@
                 
                 <div id="exportErrorContent" style="display: none;">
                     <div class="text-center">
-                        <i class="fas fa-exclamation-triangle text-danger mb-3" style="font-size: 3rem;"></i>
+                        <i class="fas fa-exclamation-triangle text-danger mb-3 export-modal-icon"></i>
                         <h5>Export Failed</h5>
                         <p class="text-muted mb-4" id="exportErrorMessage">An error occurred while exporting your data.</p>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -639,13 +639,13 @@ function switchView(viewType) {
     const gridBtn = document.getElementById('gridViewBtn');
 
     if (viewType === 'list') {
-        listView.style.display = 'block';
-        gridView.style.display = 'none';
+        listView.classList.remove('d-none');
+        gridView.classList.add('d-none');
         listBtn.classList.add('active');
         gridBtn.classList.remove('active');
     } else if (viewType === 'grid') {
-        listView.style.display = 'none';
-        gridView.style.display = 'grid';
+        listView.classList.add('d-none');
+        gridView.classList.remove('d-none');
         listBtn.classList.remove('active');
         gridBtn.classList.add('active');
     }

@@ -8087,3 +8087,34 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
         grid-template-columns: 1fr;
     }
 }
+
+/* ========== Campaign Page Header Standardization ========== */
+.campaign-page-header {
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+/* Campaign Metrics Box (grid view engagement metrics) */
+.campaign-metrics-box {
+    background-color: rgba(var(--primary-red-rgb, 225, 58, 68), 0.05);
+    border-radius: var(--radius-md);
+}
+
+.campaign-metrics-box .text-muted {
+    color: var(--gray-dark) !important;
+}
+
+.campaign-metrics-box i {
+    color: var(--primary-red);
+    margin-right: var(--spacing-xs);
+}
+
+/* Campaign Card Title */
+.campaign-card-title {
+    color: var(--primary-black);
+}
+
+/* Export Modal Icon Sizing */
+.export-modal-icon {
+    font-size: 3rem;
+}
