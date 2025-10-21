@@ -8118,3 +8118,96 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
 .export-modal-icon {
     font-size: 3rem;
 }
+
+/* ========================================
+   Campaign Actions Buttons (Settings Hub v2)
+   ======================================== */
+
+/* Primary Action Button - VOÏA Red */
+.btn-action-primary {
+    background: linear-gradient(135deg, var(--primary-red) 0%, #c41e3a 100%);
+    color: white;
+    border: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-action-primary:hover {
+    background: linear-gradient(135deg, #c41e3a 0%, #a01729 100%);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+.btn-action-primary:active {
+    transform: translateY(0);
+}
+
+/* Campaign Actions Wrapper */
+.campaign-actions-wrapper {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Secondary Actions Button Group */
+.campaign-actions-secondary {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.campaign-actions-secondary .btn {
+    border-color: var(--gray-light);
+    color: var(--gray-dark);
+    transition: all 0.2s ease;
+}
+
+.campaign-actions-secondary .btn:hover {
+    background-color: var(--gray-lightest);
+    border-color: var(--gray-medium);
+    color: var(--primary-black);
+}
+
+.campaign-actions-secondary .btn:focus {
+    box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.15);
+}
+
+/* Ensure proper spacing in button groups */
+.btn-group-sm > .btn {
+    min-width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Mobile Responsive - Stack actions vertically on small screens */
+@media (max-width: 768px) {
+    .campaign-actions-wrapper {
+        flex-direction: column;
+        gap: 6px;
+        width: 100%;
+    }
+    
+    .campaign-actions-secondary {
+        width: 100%;
+    }
+    
+    .campaign-actions-secondary .btn {
+        flex: 1;
+    }
+}
+
+/* Touch targets for mobile accessibility */
+@media (max-width: 576px) {
+    .btn-group-sm > .btn {
+        min-width: 44px;
+        height: 44px;
+    }
+}
+
+/* Improved action cell alignment in table view */
+.actions-cell {
+    white-space: nowrap;
+    vertical-align: middle !important;
+}
