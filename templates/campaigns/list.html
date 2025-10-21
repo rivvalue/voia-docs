@@ -348,21 +348,26 @@
 }
 </style>
 
-<div class="container">
-    <!-- Campaign Header -->
-    <div class="bg-white border-bottom" style="padding: 2.5rem 0; margin-bottom: 2rem;">
+<!-- Campaign Header -->
+<div class="header-gradient-primary" style="padding: var(--spacing-xl); margin-bottom: var(--spacing-xl);">
+    <div class="container">
         <div class="row align-items-center">
-            <div class="col-md-8 mb-3 mb-md-0">
-                <h1 class="h2 mb-2">Campaign Management</h1>
-                <p class="text-muted mb-0">Manage survey campaigns for {{ business_account.name }}</p>
+            <div class="col-md-8">
+                <h1 class="page-title mb-1">Campaign Management</h1>
+                <p class="page-subtitle mb-0">Manage survey campaigns for {{ business_account.name }}</p>
             </div>
-            <div class="col-md-4 text-end">
-                <a href="{{ url_for('campaigns.create_campaign') }}" class="btn btn-primary create-campaign-btn">
-                    <i class="fas fa-plus me-2"></i>Create Campaign
-                </a>
+            <div class="col-md-4">
+                <div class="text-end">
+                    <a href="{{ url_for('campaigns.create_campaign') }}" class="create-campaign-btn">
+                        <i class="fas fa-plus me-2"></i>Create Campaign
+                    </a>
+                </div>
             </div>
         </div>
     </div>
+</div>
+
+<div class="container">
 
     {# Campaign Action Buttons Macro #}
     {% macro campaign_actions(campaign, view_type='table') %}
