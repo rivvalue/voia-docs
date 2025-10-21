@@ -7321,22 +7321,19 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
    ============================================ */
 
 .page-conversational-business {
-    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-    min-height: 100vh;
+    background: #f8f9fa;
 }
 
 /* Hero Section */
 .conv-hero {
     background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
-    padding: var(--spacing-3xl) var(--spacing-xl);
-    margin-bottom: var(--spacing-2xl);
-    border-radius: var(--radius-2xl);
-    box-shadow: var(--shadow-lg);
+    padding: 2rem 1.5rem;
+    margin-bottom: 2rem;
     color: var(--primary-white);
 }
 
 .conv-hero-content {
-    max-width: 900px;
+    max-width: 1140px;
     margin: 0 auto;
 }
 
