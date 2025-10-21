@@ -181,6 +181,10 @@ class Campaign(db.Model):
     # Anonymization setting
     anonymize_responses = db.Column(db.Boolean, nullable=False, default=False)
     
+    # Reminder email configuration
+    reminder_enabled = db.Column(db.Boolean, nullable=False, default=False)
+    reminder_delay_days = db.Column(db.Integer, nullable=False, default=5)
+    
     # Metadata
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     completed_at = db.Column(db.DateTime, nullable=True)
@@ -1283,6 +1287,7 @@ class CampaignParticipant(db.Model):
         db.UniqueConstraint('campaign_id', 'participant_id', name='uq_campaign_participant'),
         db.Index('idx_campaign_participant', 'campaign_id', 'participant_id'),
         db.Index('idx_campaign_participant_business', 'business_account_id'),
+        db.Index('idx_campaign_participant_reminder', 'campaign_id', 'status', 'invited_at'),
     )
     
     id = db.Column(db.Integer, primary_key=True)
@@ -1818,6 +1823,8 @@ class EmailDelivery(db.Model):
         db.Index('idx_email_participant', 'participant_id'),
         # Index for email type queries
         db.Index('idx_email_type', 'email_type'),
+        # Index for reminder duplicate checking
+        db.Index('idx_email_reminder_lookup', 'campaign_participant_id', 'email_type'),
     )
     
     id = db.Column(db.Integer, primary_key=True)
