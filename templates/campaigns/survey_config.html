@@ -212,8 +212,16 @@
 
     <!-- Survey Configuration Form -->
     <div class="form-container">
+        {% if campaign.status in ['active', 'completed'] %}
+        <div class="alert alert-info mb-4" role="alert">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>View-Only Mode:</strong> This campaign is {{ campaign.status }} and its survey settings cannot be modified. You can view the current configuration below.
+        </div>
+        {% endif %}
+        
         <form method="POST" action="{{ url_for('campaigns.save_survey_config', campaign_id=campaign.id) }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% set is_readonly = campaign.status in ['active', 'completed'] %}
             
             <!-- Product Focus Section -->
             <div class="form-section">
@@ -227,14 +235,16 @@
                 <div class="mb-3">
                     <label for="product_description" class="form-label">Product/Service Description</label>
                     <textarea class="form-control" id="product_description" name="product_description" rows="3" 
-                              placeholder="Describe your main products or services (e.g., 'Cloud-based accounting software for small businesses')">{{ campaign.product_description or '' }}</textarea>
+                              placeholder="Describe your main products or services (e.g., 'Cloud-based accounting software for small businesses')"
+                              {% if is_readonly %}disabled{% endif %}>{{ campaign.product_description or '' }}</textarea>
                     <div class="form-text">Help the AI understand what you offer to ask better questions</div>
                 </div>
                 
                 <div class="mb-3">
                     <label for="target_clients_description" class="form-label">Target Clients</label>
                     <textarea class="form-control" id="target_clients_description" name="target_clients_description" rows="2" 
-                              placeholder="Describe your ideal customers (e.g., 'Small business owners, CFOs, accounting firms')">{{ campaign.target_clients_description or '' }}</textarea>
+                              placeholder="Describe your ideal customers (e.g., 'Small business owners, CFOs, accounting firms')"
+                              {% if is_readonly %}disabled{% endif %}>{{ campaign.target_clients_description or '' }}</textarea>
                     <div class="form-text">Who are you primarily serving? This helps tailor conversation tone and questions</div>
                 </div>
             </div>
@@ -253,7 +263,8 @@
                     <div class="checkbox-item">
                         <input type="checkbox" id="goal_{{ loop.index }}" name="survey_goals" value="{{ goal }}" 
                                {% if campaign.survey_goals and goal in campaign.survey_goals %}checked{% endif %}
-                               {% if goal == 'NPS' %}checked{% endif %}>
+                               {% if goal == 'NPS' %}checked{% endif %}
+                               {% if is_readonly %}disabled{% endif %}>
                         <label for="goal_{{ loop.index }}" class="form-check-label">{{ goal }}</label>
                     </div>
                     {% endfor %}
@@ -276,7 +287,8 @@
                             <label for="max_questions" class="form-label">Max Questions</label>
                             <div class="form-group-inline">
                                 <input type="number" class="form-control" id="max_questions" name="max_questions" 
-                                       value="{{ campaign.max_questions or 8 }}" min="3" max="15">
+                                       value="{{ campaign.max_questions or 8 }}" min="3" max="15"
+                                       {% if is_readonly %}disabled{% endif %}>
                                 <span class="range-info">(3-15)</span>
                             </div>
                             <div class="form-text">Hard limit on conversation length</div>
@@ -287,7 +299,8 @@
                             <label for="max_duration_seconds" class="form-label">Max Duration (seconds)</label>
                             <div class="form-group-inline">
                                 <input type="number" class="form-control" id="max_duration_seconds" name="max_duration_seconds" 
-                                       value="{{ campaign.max_duration_seconds or 120 }}" min="60" max="300">
+                                       value="{{ campaign.max_duration_seconds or 120 }}" min="60" max="300"
+                                       {% if is_readonly %}disabled{% endif %}>
                                 <span class="range-info">(60-300)</span>
                             </div>
                             <div class="form-text">Time limit for entire conversation</div>
@@ -298,7 +311,8 @@
                             <label for="max_follow_ups_per_topic" class="form-label">Max Follow-ups per Topic</label>
                             <div class="form-group-inline">
                                 <input type="number" class="form-control" id="max_follow_ups_per_topic" name="max_follow_ups_per_topic" 
-                                       value="{{ campaign.max_follow_ups_per_topic or 2 }}" min="1" max="3">
+                                       value="{{ campaign.max_follow_ups_per_topic or 2 }}" min="1" max="3"
+                                       {% if is_readonly %}disabled{% endif %}>
                                 <span class="range-info">(1-3)</span>
                             </div>
                             <div class="form-text">Control topic depth exploration</div>
@@ -325,7 +339,8 @@
                                 <div class="multi-select-item">
                                     <input type="checkbox" id="priority_{{ loop.index }}" name="prioritized_topics" value="{{ topic }}" 
                                            {% if campaign.prioritized_topics and topic in campaign.prioritized_topics %}checked{% endif %}
-                                           {% if topic in ['NPS Score', 'Product Quality', 'Support Experience'] %}checked{% endif %}>
+                                           {% if topic in ['NPS Score', 'Product Quality', 'Support Experience'] %}checked{% endif %}
+                                           {% if is_readonly %}disabled{% endif %}>
                                     <label for="priority_{{ loop.index }}" class="form-check-label">{{ topic }}</label>
                                 </div>
                                 {% endfor %}
@@ -340,7 +355,8 @@
                                 {% for topic in ['Pricing Value', 'Additional Comments', 'Feature Requests', 'Competitor Comparison', 'Usage Frequency', 'Referral Likelihood'] %}
                                 <div class="multi-select-item">
                                     <input type="checkbox" id="optional_{{ loop.index }}" name="optional_topics" value="{{ topic }}" 
-                                           {% if campaign.optional_topics and topic in campaign.optional_topics %}checked{% endif %}>
+                                           {% if campaign.optional_topics and topic in campaign.optional_topics %}checked{% endif %}
+                                           {% if is_readonly %}disabled{% endif %}>
                                     <label for="optional_{{ loop.index }}" class="form-check-label">{{ topic }}</label>
                                 </div>
                                 {% endfor %}
@@ -356,7 +372,8 @@
                 <div class="mb-3">
                     <label for="custom_end_message" class="form-label">Custom End Message</label>
                     <textarea class="form-control" id="custom_end_message" name="custom_end_message" rows="3" 
-                              placeholder="Optional custom thank you message for survey completion">{{ campaign.custom_end_message or '' }}</textarea>
+                              placeholder="Optional custom thank you message for survey completion"
+                              {% if is_readonly %}disabled{% endif %}>{{ campaign.custom_end_message or '' }}</textarea>
                     <div class="form-text">Personalized message shown when participants complete the survey</div>
                     {% if campaign.custom_end_message %}
                     <div class="preview-container" id="end_message_preview">
@@ -381,7 +398,8 @@
                     <div class="mb-3">
                         <label for="custom_system_prompt" class="form-label">Custom System Prompt</label>
                         <textarea class="form-control" id="custom_system_prompt" name="custom_system_prompt" rows="5" 
-                                  placeholder="Optional: Override the default AI system prompt with custom instructions">{{ campaign.custom_system_prompt or '' }}</textarea>
+                                  placeholder="Optional: Override the default AI system prompt with custom instructions"
+                                  {% if is_readonly %}disabled{% endif %}>{{ campaign.custom_system_prompt or '' }}</textarea>
                         <div class="form-text">
                             Advanced: Custom instructions for the AI conversation engine. Leave blank to use intelligent defaults.
                         </div>
@@ -406,9 +424,11 @@
                 <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left me-2"></i>Back to Campaign
                 </a>
+                {% if not is_readonly %}
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save me-2"></i>Save Configuration
                 </button>
+                {% endif %}
             </div>
         </form>
     </div>
