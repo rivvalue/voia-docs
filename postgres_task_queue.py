@@ -115,7 +115,8 @@ class PostgresTaskQueue:
             business_account_id = task_payload.get('business_account_id')
             campaign_id = task_payload.get('campaign_id')
             
-            # Insert task into database
+            # Insert task into database - use CAST to avoid parameter style conflicts
+            json_str = json.dumps(task_payload)
             result = db.session.execute(
                 text("""
                     INSERT INTO task_queue (
@@ -123,14 +124,14 @@ class PostgresTaskQueue:
                         scheduled_at, business_account_id, campaign_id,
                         created_at, updated_at, retry_count, max_retries
                     ) VALUES (
-                        :task_type, :task_data::jsonb, :priority, 'pending',
+                        :task_type, CAST(:task_data AS jsonb), :priority, 'pending',
                         NOW(), :business_account_id, :campaign_id,
                         NOW(), NOW(), 0, 3
                     ) RETURNING id
                 """),
                 {
                     'task_type': task_type,
-                    'task_data': json.dumps(task_payload),
+                    'task_data': json_str,
                     'priority': priority,
                     'business_account_id': business_account_id,
                     'campaign_id': campaign_id
