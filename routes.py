@@ -2606,6 +2606,9 @@ def finalize_conversation():
             existing_response.improvement_feedback = structured_data.get('improvement_feedback')
             existing_response.recommendation_reason = structured_data.get('recommendation_reason')
             existing_response.additional_comments = structured_data.get('additional_comments')
+            # 🔧 CRITICAL FIX: Save conversation transcript
+            existing_response.conversation_history = survey_data.get('conversation_history')
+            existing_response.source_type = 'conversational'
             # Update campaign if there's an active one, otherwise preserve existing
             if campaign_id:
                 existing_response.campaign_id = campaign_id
@@ -2629,6 +2632,8 @@ def finalize_conversation():
                 improvement_feedback=structured_data.get('improvement_feedback'),
                 recommendation_reason=structured_data.get('recommendation_reason'),
                 additional_comments=structured_data.get('additional_comments'),
+                conversation_history=survey_data.get('conversation_history'),  # 🔧 CRITICAL FIX: Save conversation transcript
+                source_type='conversational',  # 🔧 CRITICAL FIX: Mark as conversational survey
                 campaign_id=campaign_id,
                 campaign_participant_id=association_id  # Link to campaign-participant association
             )
