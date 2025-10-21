@@ -881,6 +881,12 @@ def submit_survey():
         
         # Determine NPS category
         nps_score = int(data['nps_score'])
+        satisfaction_rating_value = data.get('satisfaction_rating')
+        
+        # CRITICAL DEBUG LOGGING - Track potential data swap bug
+        logger.critical(f"🔍 SUBMIT_SURVEY - NPS received: {nps_score}, Satisfaction received: {satisfaction_rating_value}")
+        logger.critical(f"🔍 SUBMIT_SURVEY - Full data: {data}")
+        
         if nps_score >= 9:
             nps_category = 'Promoter'
         elif nps_score >= 7:
