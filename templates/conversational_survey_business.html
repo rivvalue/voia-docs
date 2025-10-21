@@ -25,17 +25,25 @@
             </div>
 
             <!-- Hero Section with Personalized Welcome -->
-            <div class="hero-section text-center mb-4">
-                {% if branding and branding.logo_url %}
-                    <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}" height="60" class="mb-3">
-                {% endif %}
-                <h1 class="display-1 fw-bold mb-2" style="font-size: 4.5rem; font-family: 'Montserrat', sans-serif;">VO<span style="color: #E13A44;">Ï</span>A</h1>
-                <p class="fs-4 mb-2" style="color: #000000; font-weight: 400; font-family: 'Karla', sans-serif;">
-                    Hi {{ participant_name }}, thank you for participating
-                </p>
-                <p class="text-muted" style="font-size: 0.95rem;">
-                    {{ branding.company_name if branding and branding.company_name else 'We' }} value your feedback
-                </p>
+            <div class="hero-section mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h1 class="display-1 fw-bold mb-0" style="font-size: 4.5rem; font-family: 'Montserrat', sans-serif;">VO<span style="color: #E13A44;">Ï</span>A</h1>
+                    </div>
+                    {% if branding and branding.logo_url %}
+                    <div>
+                        <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}" style="max-height: 100px; height: auto; max-width: 250px; object-fit: contain;">
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="text-center">
+                    <p class="fs-4 mb-2" style="color: #000000; font-weight: 400; font-family: 'Karla', sans-serif;">
+                        Hi {{ participant_name }}, thank you for participating
+                    </p>
+                    <p class="text-muted" style="font-size: 0.95rem;">
+                        {{ branding.company_name if branding and branding.company_name else 'We' }} value your feedback
+                    </p>
+                </div>
             </div>
 
             <!-- Survey Setup -->
