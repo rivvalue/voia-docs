@@ -1293,11 +1293,31 @@ Respond with ONLY the JSON object, no other text:"""
             'scheduler_interval': self.scheduler_interval
         }
 
-# Global task queue instance
-task_queue = TaskQueue(max_workers=3)  # Start with 3 workers for AI analysis
+# Global task queue instance - conditionally initialized based on feature flag
+task_queue = None  # Will be initialized in start_task_queue()
 
 def start_task_queue():
-    """Start the global task queue"""
+    """Start the global task queue (in-memory or PostgreSQL based on feature flag)"""
+    global task_queue
+    
+    # Import queue configuration
+    from queue_config import queue_config
+    
+    if queue_config.is_postgres_enabled():
+        # Use PostgreSQL-backed persistent queue
+        from postgres_task_queue import PostgresTaskQueue
+        task_queue = PostgresTaskQueue(
+            max_workers=queue_config.get_worker_count(),
+            poll_interval=queue_config.get_poll_interval(),
+            scheduler_interval=queue_config.get_scheduler_interval(),
+            stale_task_threshold=queue_config.get_stale_task_threshold()
+        )
+        logger.info("✅ PostgreSQL task queue initialized")
+    else:
+        # Use in-memory queue (current/default)
+        task_queue = TaskQueue(max_workers=3)
+        logger.info("📝 In-memory task queue initialized (default)")
+    
     task_queue.start()
 
 def add_analysis_task(response_id):
