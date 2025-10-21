@@ -34,43 +34,37 @@
 
     {# Campaign Action Buttons Macro #}
     {% macro campaign_actions(campaign, view_type='table') %}
-        {% set action_class = 'campaign-actions-wrapper' %}
+        {% set action_class = 'table-actions' if view_type == 'table' else 'campaign-card-actions' %}
         <div class="{{ action_class }}" {% if view_type == 'card' %}onclick="event.stopPropagation();"{% endif %}>
-            {# Primary Action - View Campaign #}
             <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" 
-               class="btn btn-action-primary btn-sm" title="View Campaign">
+               class="btn btn-outline-primary btn-sm" title="View Details">
                 <i class="fas fa-eye"></i>
-                <span class="d-none d-lg-inline ms-1">View</span>
             </a>
-            
-            {# Secondary Actions Group #}
-            <div class="btn-group btn-group-sm campaign-actions-secondary" role="group">
-                {% if campaign.status in ['active', 'completed'] %}
-                <a href="{{ url_for('dashboard') }}?campaign_id={{ campaign.id }}" 
-                   class="btn btn-outline-secondary" title="View Analytics">
-                    <i class="fas fa-chart-bar"></i>
-                </a>
-                {% endif %}
-                <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" 
-                   class="btn btn-outline-secondary" title="Manage Participants">
-                    <i class="fas fa-users"></i>
-                </a>
-                {% if campaign.status in ['active', 'completed'] %}
-                <button type="button" class="btn btn-outline-secondary" 
-                        onclick="startCampaignExport({{ campaign.id }}, '{{ campaign.name|e }}')"
-                        title="Export Data">
-                    <i class="fas fa-download"></i>
-                </button>
-                {% endif %}
-                {% if campaign.status == 'completed' %}
-                <button type="button" id="execReportBtn_{{ campaign.id }}" 
-                        class="btn btn-outline-secondary" 
-                        onclick="downloadExecutiveReport({{ campaign.id }}, '{{ campaign.name|e }}')"
-                        title="Executive Report">
-                    <i class="fas fa-file-pdf"></i>
-                </button>
-                {% endif %}
-            </div>
+            {% if campaign.status in ['active', 'completed'] %}
+            <a href="{{ url_for('dashboard') }}?campaign_id={{ campaign.id }}" 
+               class="btn btn-outline-success btn-sm" title="Analytics">
+                <i class="fas fa-chart-bar"></i>
+            </a>
+            {% endif %}
+            <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" 
+               class="btn btn-outline-secondary btn-sm" title="Manage Participants">
+                <i class="fas fa-users"></i>
+            </a>
+            {% if campaign.status in ['active', 'completed'] %}
+            <button type="button" class="btn btn-outline-info btn-sm" 
+                    onclick="startCampaignExport({{ campaign.id }}, '{{ campaign.name|e }}')"
+                    title="Export Data">
+                <i class="fas fa-download"></i>
+            </button>
+            {% endif %}
+            {% if campaign.status == 'completed' %}
+            <button type="button" id="execReportBtn_{{ campaign.id }}" 
+                    class="btn btn-outline-primary btn-sm" 
+                    onclick="downloadExecutiveReport({{ campaign.id }}, '{{ campaign.name|e }}')"
+                    title="Executive Report">
+                <i class="fas fa-file-pdf"></i>
+            </button>
+            {% endif %}
         </div>
         {% if campaign.status == 'completed' %}
         <div id="regenerateLink_{{ campaign.id }}" class="d-none mt-1">
