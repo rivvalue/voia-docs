@@ -418,7 +418,11 @@
                 <div class="data-item">
                     <span class="data-label">Submitted:</span>
                     <span class="data-value">
-                        {% if response.created_at %}
+                        {% if response.updated_at %}
+                            {% set display_date = response.updated_at[:10] if response.updated_at else 'N/A' %}
+                            {% set display_time = response.updated_at[11:16] if response.updated_at and response.updated_at|length > 16 else '' %}
+                            {{ display_date }} {{ display_time }} <span style="color: #666; font-size: 0.9em;">(updated)</span>
+                        {% elif response.created_at %}
                             {% set created_date = response.created_at[:10] if response.created_at else 'N/A' %}
                             {% set created_time = response.created_at[11:16] if response.created_at and response.created_at|length > 16 else '' %}
                             {{ created_date }} {{ created_time }}

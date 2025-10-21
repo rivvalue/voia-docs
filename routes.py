@@ -942,6 +942,8 @@ def submit_survey():
             # Update association if available (new system)
             if association_id:
                 existing_response.campaign_participant_id = association_id
+            # Track when response was last updated
+            existing_response.updated_at = datetime.utcnow()
 
             response = existing_response
         else:
@@ -2615,6 +2617,8 @@ def finalize_conversation():
             # Update association if available (new system)
             if association_id:
                 existing_response.campaign_participant_id = association_id
+            # Track when response was last updated
+            existing_response.updated_at = datetime.utcnow()
 
             response = existing_response
         else:

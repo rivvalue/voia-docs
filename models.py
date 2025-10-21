@@ -74,6 +74,7 @@ class SurveyResponse(db.Model):
     
     # Metadata
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow, index=True)
     analyzed_at = db.Column(db.DateTime, index=True)
     
     def to_dict(self):
