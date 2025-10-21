@@ -6,80 +6,74 @@
 
 {% block content %}
 <div data-page="conversational-business"></div>
+
+<!-- Hero Section -->
+<div class="conv-hero">
+    <div class="conv-hero-content">
+        <div class="text-center mb-4">
+            <span class="conv-campaign-badge">
+                <i class="fas fa-poll"></i>{{ campaign_name }}
+            </span>
+            {% if campaign_start_date and campaign_end_date %}
+            <div class="conv-campaign-dates">
+                <i class="fas fa-calendar-alt me-1"></i>
+                {{ campaign_start_date.strftime('%B %d, %Y') }} - {{ campaign_end_date.strftime('%B %d, %Y') }}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="conv-hero-header">
+            <div class="conv-hero-branding">
+                <h1>VO<span class="accent">Ï</span>A</h1>
+            </div>
+            {% if branding and branding.logo_url %}
+            <div class="conv-hero-logo">
+                <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}">
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="conv-hero-welcome">
+            <h2>Hi {{ participant_name }}, thank you for participating</h2>
+            <p>{{ branding.company_name if branding and branding.company_name else 'We' }} value your feedback</p>
+        </div>
+    </div>
+</div>
+
 <div class="container mt-4">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <!-- Campaign Context Badge -->
-            <div class="text-center mb-3">
-                <span class="badge" style="background-color: #E13A44; color: white; font-size: 0.875rem; padding: 0.5rem 1rem; border-radius: 50px;">
-                    <i class="fas fa-poll me-2"></i>{{ campaign_name }}
-                </span>
-                {% if campaign_start_date and campaign_end_date %}
-                <div class="mt-2">
-                    <small class="text-muted" style="font-size: 0.85rem;">
-                        <i class="fas fa-calendar-alt me-1"></i>
-                        {{ campaign_start_date.strftime('%B %d, %Y') }} - {{ campaign_end_date.strftime('%B %d, %Y') }}
-                    </small>
-                </div>
-                {% endif %}
-            </div>
-
-            <!-- Hero Section with Personalized Welcome -->
-            <div class="hero-section mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div>
-                        <h1 class="display-1 fw-bold mb-0" style="font-size: 4.5rem; font-family: 'Montserrat', sans-serif;">VO<span style="color: #E13A44;">Ï</span>A</h1>
-                    </div>
-                    {% if branding and branding.logo_url %}
-                    <div>
-                        <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}" style="max-height: 100px; height: auto; max-width: 250px; object-fit: contain;">
-                    </div>
-                    {% endif %}
-                </div>
-                <div class="text-center">
-                    <p class="fs-4 mb-2" style="color: #000000; font-weight: 400; font-family: 'Karla', sans-serif;">
-                        Hi {{ participant_name }}, thank you for participating
-                    </p>
-                    <p class="text-muted" style="font-size: 0.95rem;">
-                        {{ branding.company_name if branding and branding.company_name else 'We' }} value your feedback
-                    </p>
-                </div>
-            </div>
-
+        <div class="col-lg-8">
             <!-- Survey Setup -->
-            <div id="surveySetup" class="card mb-4" style="box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: none;">
-                <div class="card-header" style="background-color: #ffffff; border-bottom: 1px solid #e5e5e5;">
-                    <h5 class="mb-0" style="font-family: 'Montserrat', sans-serif; font-weight: 600;">
-                        <i class="fas fa-user-circle me-2" style="color: #E13A44;"></i>Your Information
+            <div id="surveySetup" class="conv-card mb-4">
+                <div class="conv-card-header">
+                    <h5>
+                        <i class="fas fa-user-circle"></i>Your Information
                     </h5>
-                    <small class="text-muted">Participating on behalf of {{ participant_company }}</small>
+                    <small>Participating on behalf of {{ participant_company }}</small>
                 </div>
-                <div class="card-body" style="padding: 1.5rem;">
-                    <form id="setupForm">
+                <div class="conv-card-body">
+                    <form id="setupForm" class="conv-form">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         
                         <div class="mb-3">
                             <label for="companyName" class="form-label">Company Name</label>
                             <input type="text" class="form-control" id="companyName" required 
-                                   value="{{ participant_company }}" readonly
-                                   style="background-color: #f8f9fa;">
+                                   value="{{ participant_company }}" readonly>
                         </div>
                         
                         <div class="mb-3">
                             <label for="respondentName" class="form-label">Your Name</label>
                             <input type="text" class="form-control" id="respondentName" required 
-                                   value="{{ participant_name }}" readonly
-                                   style="background-color: #f8f9fa;">
+                                   value="{{ participant_name }}" readonly>
                         </div>
                         
                         <div class="mb-3">
                             <label for="respondentEmail" class="form-label">Email Address</label>
                             <input type="email" class="form-control" id="respondentEmail" required 
-                                   value="{{ email }}" readonly
-                                   style="background-color: #f8f9fa;">
+                                   value="{{ email }}" readonly>
                         </div>
                         
-                        <div class="mb-3">
+                        <div class="mb-4">
                             <label for="tenureWithFc" class="form-label">
                                 How long have you been working with {{ branding.company_name if branding and branding.company_name else 'us' }}?
                             </label>
@@ -95,7 +89,7 @@
                             </select>
                         </div>
                         
-                        <button type="submit" class="btn btn-lg w-100" style="background-color: #E13A44; border: none; color: white; font-weight: 500; padding: 0.75rem; font-family: 'Karla', sans-serif;">
+                        <button type="submit" class="btn btn-lg w-100 conv-btn-primary">
                             <i class="fas fa-comments me-2"></i>Start Conversation
                         </button>
                     </form>
@@ -103,32 +97,32 @@
             </div>
 
             <!-- Conversation Interface -->
-            <div id="conversationInterface" class="card" style="display: none; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: none;">
-                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #ffffff; border-bottom: 1px solid #e5e5e5;">
-                    <h5 class="mb-0" style="font-family: 'Montserrat', sans-serif;">VO<span style="color: #E13A44;">Ï</span>A</h5>
-                    <div class="progress" style="width: 200px;">
-                        <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-danger" 
-                             role="progressbar" style="width: 0%; background-color: #E13A44 !important;"></div>
+            <div id="conversationInterface" class="conv-card" style="display: none;">
+                <div class="conv-card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">VO<span class="accent" style="color: #E13A44;">Ï</span>A</h5>
+                    <div class="conv-progress">
+                        <div id="progressBar" class="conv-progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" style="width: 0%;"></div>
                     </div>
                 </div>
                 
-                <div class="card-body" style="padding: 1.5rem;">
+                <div class="conv-card-body">
                     <!-- Chat Messages -->
-                    <div id="chatMessages" class="mb-4" style="height: 400px; overflow-y: auto; background-color: #f8f9fa; border: none; border-radius: 0.5rem; padding: 1rem;">
+                    <div id="chatMessages" class="conv-chat-container mb-4">
                         <!-- Messages will be populated here -->
                     </div>
                     
                     <!-- Input Area -->
-                    <div id="inputArea">
+                    <div id="inputArea" class="conv-input-area">
                         <div class="input-group">
                             <textarea id="userInput" class="form-control" rows="3" 
                                       placeholder="Type your response here..."></textarea>
-                            <button id="sendButton" class="btn" type="button" style="background-color: #E13A44; border: none; color: white;">
+                            <button id="sendButton" class="btn" type="button">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                         </div>
-                        <div class="form-text">
-                            <i class="fas fa-lightbulb me-1" style="color: #E13A44;"></i>
+                        <div class="conv-tip">
+                            <i class="fas fa-lightbulb"></i>
                             Tip: Speak naturally! VOÏA understands conversational responses.
                         </div>
                     </div>
@@ -136,9 +130,9 @@
             </div>
 
             <!-- Loading State -->
-            <div id="loadingState" class="card" style="display: none; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: none;">
-                <div class="card-body text-center" style="padding: 3rem 2rem;">
-                    <div class="spinner-border mb-3" role="status" style="color: #E13A44;">
+            <div id="loadingState" class="conv-card" style="display: none;">
+                <div class="conv-card-body text-center" style="padding: 3rem 2rem;">
+                    <div class="spinner-border mb-3" style="color: #E13A44;">
                         <span class="visually-hidden">Loading...</span>
                     </div>
                     <h5 style="font-family: 'Montserrat', sans-serif;">VOÏA is processing your response...</h5>
@@ -146,31 +140,27 @@
                 </div>
             </div>
 
-            <!-- Survey Complete - Business Participant Version -->
-            <div id="surveyComplete" class="card" style="display: none; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: none;">
-                <div class="card-body text-center" style="padding: 3rem 2rem;">
-                    <div class="success-icon mb-4">
-                        <i class="fas fa-check-circle" style="font-size: 4rem; color: #E13A44;"></i>
+            <!-- Survey Complete -->
+            <div id="surveyComplete" class="conv-card" style="display: none;">
+                <div class="conv-complete">
+                    <div class="conv-complete-icon">
+                        <i class="fas fa-check-circle"></i>
                     </div>
                     
-                    <h4 class="mb-3" style="font-family: 'Montserrat', sans-serif; font-weight: 600;">
-                        Thank you, {{ participant_name }}!
-                    </h4>
+                    <h4>Thank you, {{ participant_name }}!</h4>
                     
-                    <p class="lead mb-2" style="font-family: 'Karla', sans-serif;">
+                    <p class="lead mb-2">
                         Your feedback for <strong>{{ campaign_name }}</strong> has been successfully submitted.
                     </p>
                     
                     {% if custom_end_message %}
                     <!-- Custom Completion Message from Campaign Settings -->
-                    <div class="alert" style="background-color: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 0.5rem; margin: 2rem 0;">
-                        <p class="mb-0" style="color: #1a1a1a; font-family: 'Karla', sans-serif; line-height: 1.6;">
-                            {{ custom_end_message }}
-                        </p>
+                    <div class="conv-complete-message">
+                        <p class="mb-0">{{ custom_end_message }}</p>
                     </div>
                     {% else %}
                     <!-- Default Completion Message -->
-                    <p class="text-muted mb-4" style="font-family: 'Karla', sans-serif;">
+                    <p class="text-muted mb-4">
                         Your insights help us continuously improve our services. Thank you for taking the time to share your experience.
                     </p>
                     {% endif %}
@@ -182,49 +172,29 @@
                         </h5>
                         <ul class="text-start" style="list-style: none; padding-left: 0; font-family: 'Karla', sans-serif;">
                             <li class="mb-2">
-                                <i class="fas fa-check text-success me-2"></i>
-                                Your feedback will be reviewed by our team
+                                <i class="fas fa-robot me-2" style="color: #E13A44;"></i>
+                                Our AI analyzes your feedback to extract key insights
                             </li>
                             <li class="mb-2">
-                                <i class="fas fa-check text-success me-2"></i>
-                                We aggregate responses to identify trends and improvement areas
+                                <i class="fas fa-chart-bar me-2" style="color: #E13A44;"></i>
+                                Your responses contribute to comprehensive analytics
                             </li>
-                            <li class="mb-2">
-                                <i class="fas fa-check text-success me-2"></i>
-                                You may be contacted if we need clarification
+                            <li>
+                                <i class="fas fa-users me-2" style="color: #E13A44;"></i>
+                                We use your input to improve our services and client experience
                             </li>
                         </ul>
                     </div>
                     
-                    <!-- Close Window Instruction -->
-                    <div class="mt-4 pt-3" style="border-top: 1px solid #e5e7eb;">
-                        <p class="text-muted mb-2" style="font-size: 0.95rem; font-family: 'Karla', sans-serif;">
-                            <i class="fas fa-window-close me-2" style="color: #8A8A8A;"></i>
-                            You can now close this window
-                        </p>
-                        {% if branding and branding.contact_email %}
-                        <p class="text-muted" style="font-size: 0.85rem;">
-                            Questions? Contact us at 
-                            <a href="mailto:{{ branding.contact_email }}" style="color: #E13A44; text-decoration: none;">
-                                {{ branding.contact_email }}
-                            </a>
-                        </p>
-                        {% endif %}
-                    </div>
+                    <small class="text-muted">You can now close this window.</small>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<script>
-// Pass authentication and campaign context to JavaScript
-window.isAuthenticated = true;
-window.userEmail = '{{ email }}';
-window.campaignName = '{{ campaign_name }}';
-window.participantName = '{{ participant_name }}';
+{% endblock %}
 
-console.log('Business participant conversational survey loaded - Campaign: {{ campaign_name }}');
-</script>
+{% block scripts %}
 <script src="{{ url_for('static', filename='js/conversational_survey.js') }}"></script>
 {% endblock %}
