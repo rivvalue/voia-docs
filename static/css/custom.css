@@ -7329,8 +7329,8 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
 .conv-hero {
     background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
     padding: var(--spacing-3xl) var(--spacing-xl);
-    margin: 0 calc(-50vw + 50%) var(--spacing-2xl);
-    border-radius: 0 0 var(--radius-2xl) var(--radius-2xl);
+    margin-bottom: var(--spacing-2xl);
+    border-radius: var(--radius-2xl);
     box-shadow: var(--shadow-lg);
     color: var(--primary-white);
 }
