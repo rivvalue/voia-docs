@@ -444,7 +444,11 @@ function updateReportButtonText(campaignId, isAvailable) {
     // Show/hide regenerate link based on availability
     const regenerateLink = document.getElementById(`regenerateLink_${campaignId}`);
     if (regenerateLink) {
-        regenerateLink.style.display = isAvailable ? 'block' : 'none';
+        if (isAvailable) {
+            regenerateLink.classList.remove('d-none');
+        } else {
+            regenerateLink.classList.add('d-none');
+        }
     }
 }
 
