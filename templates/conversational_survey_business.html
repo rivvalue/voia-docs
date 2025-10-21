@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}{{ campaign_name }} - VOÏA Survey{% endblock %}
+
+{% block page_class %}page-conversational-business{% endblock %}
+
+{% block content %}
+<div data-page="conversational-business"></div>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Campaign Context Badge -->
+            <div class="text-center mb-3">
+                <span class="badge" style="background-color: #E13A44; color: white; font-size: 0.875rem; padding: 0.5rem 1rem; border-radius: 50px;">
+                    <i class="fas fa-poll me-2"></i>{{ campaign_name }}
+                </span>
+            </div>
+
+            <!-- Hero Section with Personalized Welcome -->
+            <div class="hero-section text-center mb-4">
+                {% if branding and branding.logo_url %}
+                    <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}" height="60" class="mb-3">
+                {% endif %}
+                <h1 class="display-1 fw-bold mb-2" style="font-size: 4.5rem; font-family: 'Montserrat', sans-serif;">VO<span style="color: #E13A44;">Ï</span>A</h1>
+                <p class="fs-4 mb-2" style="color: #000000; font-weight: 400; font-family: 'Karla', sans-serif;">
+                    Hi {{ participant_name }}, thank you for participating
+                </p>
+                <p class="text-muted" style="font-size: 0.95rem;">
+                    {{ branding.company_name if branding and branding.company_name else 'We' }} value your feedback
+                </p>
+            </div>
+
+            <!-- Survey Setup -->
+            <div id="surveySetup" class="card mb-4" style="box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: none;">
+                <div class="card-header" style="background-color: #ffffff; border-bottom: 1px solid #e5e5e5;">
+                    <h5 class="mb-0" style="font-family: 'Montserrat', sans-serif; font-weight: 600;">
+                        <i class="fas fa-user-circle me-2" style="color: #E13A44;"></i>Your Information
+                    </h5>
+                    <small class="text-muted">Participating on behalf of {{ participant_company }}</small>
+                </div>
+                <div class="card-body" style="padding: 1.5rem;">
+                    <form id="setupForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        
+                        <div class="mb-3">
+                            <label for="companyName" class="form-label">Company Name</label>
+                            <input type="text" class="form-control" id="companyName" required 
+                                   value="{{ participant_company }}" readonly
+                                   style="background-color: #f8f9fa;">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="respondentName" class="form-label">Your Name</label>
+                            <input type="text" class="form-control" id="respondentName" required 
+                                   value="{{ participant_name }}" readonly
+                                   style="background-color: #f8f9fa;">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="respondentEmail" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="respondentEmail" required 
+                                   value="{{ email }}" readonly
+                                   style="background-color: #f8f9fa;">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="tenureWithFc" class="form-label">
+                                How long have you been working with {{ branding.company_name if branding and branding.company_name else 'us' }}?
+                            </label>
+                            <select class="form-select" id="tenureWithFc" required>
+                                <option value="">Select duration...</option>
+                                <option value="Less than 6 months">Less than 6 months</option>
+                                <option value="6 months - 1 year">6 months - 1 year</option>
+                                <option value="1-2 years">1-2 years</option>
+                                <option value="2-3 years">2-3 years</option>
+                                <option value="3-5 years">3-5 years</option>
+                                <option value="5-10 years">5-10 years</option>
+                                <option value="More than 10 years">More than 10 years</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-lg w-100" style="background-color: #E13A44; border: none; color: white; font-weight: 500; padding: 0.75rem; font-family: 'Karla', sans-serif;">
+                            <i class="fas fa-comments me-2"></i>Start Conversation
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Conversation Interface -->
+            <div id="conversationInterface" class="card" style="display: none; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: none;">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #ffffff; border-bottom: 1px solid #e5e5e5;">
+                    <h5 class="mb-0" style="font-family: 'Montserrat', sans-serif;">VO<span style="color: #E13A44;">Ï</span>A</h5>
+                    <div class="progress" style="width: 200px;">
+                        <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-danger" 
+                             role="progressbar" style="width: 0%; background-color: #E13A44 !important;"></div>
+                    </div>
+                </div>
+                
+                <div class="card-body" style="padding: 1.5rem;">
+                    <!-- Chat Messages -->
+                    <div id="chatMessages" class="mb-4" style="height: 400px; overflow-y: auto; background-color: #f8f9fa; border: none; border-radius: 0.5rem; padding: 1rem;">
+                        <!-- Messages will be populated here -->
+                    </div>
+                    
+                    <!-- Input Area -->
+                    <div id="inputArea">
+                        <div class="input-group">
+                            <textarea id="userInput" class="form-control" rows="3" 
+                                      placeholder="Type your response here..."></textarea>
+                            <button id="sendButton" class="btn" type="button" style="background-color: #E13A44; border: none; color: white;">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div class="form-text">
+                            <i class="fas fa-lightbulb me-1" style="color: #E13A44;"></i>
+                            Tip: Speak naturally! VOÏA understands conversational responses.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="card" style="display: none; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: none;">
+                <div class="card-body text-center" style="padding: 3rem 2rem;">
+                    <div class="spinner-border mb-3" role="status" style="color: #E13A44;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h5 style="font-family: 'Montserrat', sans-serif;">VOÏA is processing your response...</h5>
+                    <p class="text-muted">Please wait while VOÏA analyzes your feedback</p>
+                </div>
+            </div>
+
+            <!-- Survey Complete - Business Participant Version -->
+            <div id="surveyComplete" class="card" style="display: none; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: none;">
+                <div class="card-body text-center" style="padding: 3rem 2rem;">
+                    <div class="success-icon mb-4">
+                        <i class="fas fa-check-circle" style="font-size: 4rem; color: #E13A44;"></i>
+                    </div>
+                    
+                    <h4 class="mb-3" style="font-family: 'Montserrat', sans-serif; font-weight: 600;">
+                        Thank you, {{ participant_name }}!
+                    </h4>
+                    
+                    <p class="lead mb-2" style="font-family: 'Karla', sans-serif;">
+                        Your feedback for <strong>{{ campaign_name }}</strong> has been successfully submitted.
+                    </p>
+                    
+                    {% if custom_end_message %}
+                    <!-- Custom Completion Message from Campaign Settings -->
+                    <div class="alert" style="background-color: #f8f9fa; border: 1px solid #e5e7eb; border-radius: 0.5rem; margin: 2rem 0;">
+                        <p class="mb-0" style="color: #1a1a1a; font-family: 'Karla', sans-serif; line-height: 1.6;">
+                            {{ custom_end_message }}
+                        </p>
+                    </div>
+                    {% else %}
+                    <!-- Default Completion Message -->
+                    <p class="text-muted mb-4" style="font-family: 'Karla', sans-serif;">
+                        Your insights help us continuously improve our services. Thank you for taking the time to share your experience.
+                    </p>
+                    {% endif %}
+                    
+                    <!-- What Happens Next Section -->
+                    <div class="border rounded p-4 mb-4" style="background-color: #f8f9fa; border-color: #e5e7eb !important;">
+                        <h5 class="mb-3" style="font-family: 'Montserrat', sans-serif; font-weight: 600;">
+                            <i class="fas fa-info-circle me-2" style="color: #E13A44;"></i>What Happens Next?
+                        </h5>
+                        <ul class="text-start" style="list-style: none; padding-left: 0; font-family: 'Karla', sans-serif;">
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Your feedback will be reviewed by our team
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                We aggregate responses to identify trends and improvement areas
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                You may be contacted if we need clarification
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Close Window Instruction -->
+                    <div class="mt-4 pt-3" style="border-top: 1px solid #e5e7eb;">
+                        <p class="text-muted mb-2" style="font-size: 0.95rem; font-family: 'Karla', sans-serif;">
+                            <i class="fas fa-window-close me-2" style="color: #8A8A8A;"></i>
+                            You can now close this window
+                        </p>
+                        {% if branding and branding.contact_email %}
+                        <p class="text-muted" style="font-size: 0.85rem;">
+                            Questions? Contact us at 
+                            <a href="mailto:{{ branding.contact_email }}" style="color: #E13A44; text-decoration: none;">
+                                {{ branding.contact_email }}
+                            </a>
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Pass authentication and campaign context to JavaScript
+window.isAuthenticated = true;
+window.userEmail = '{{ email }}';
+window.campaignName = '{{ campaign_name }}';
+window.participantName = '{{ participant_name }}';
+
+console.log('Business participant conversational survey loaded - Campaign: {{ campaign_name }}');
+</script>
+<script src="{{ url_for('static', filename='js/conversational_survey.js') }}"></script>
+{% endblock %}

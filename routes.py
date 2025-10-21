@@ -2410,14 +2410,41 @@ def conversational_survey():
             
             # Get branding context based on business_account_id from verification
             branding = get_branding_context(verification.get('business_account_id'))
-            return render_template('conversational_survey.html', 
-                                 authenticated=verification['authenticated'], 
-                                 email=verification['email'], 
-                                 user_email=verification['email'],
-                                 participant_name=verification.get('participant_name'),
-                                 participant_company=verification.get('participant_company'),
-                                 campaign_name=verification.get('campaign_name'),
-                                 branding=branding)
+            
+            # Route to appropriate template based on participant type
+            participant_name = verification.get('participant_name')
+            campaign_name = verification.get('campaign_name')
+            
+            if participant_name and campaign_name:
+                # Business participant - use dedicated business template
+                # Get custom_end_message from campaign if available
+                custom_end_message = None
+                campaign_id = session.get('campaign_id')
+                if campaign_id:
+                    from models import Campaign
+                    campaign = Campaign.query.get(campaign_id)
+                    if campaign:
+                        custom_end_message = campaign.custom_end_message
+                
+                return render_template('conversational_survey_business.html',
+                                     authenticated=verification['authenticated'],
+                                     email=verification['email'],
+                                     user_email=verification['email'],
+                                     participant_name=participant_name,
+                                     participant_company=verification.get('participant_company'),
+                                     campaign_name=campaign_name,
+                                     custom_end_message=custom_end_message,
+                                     branding=branding)
+            else:
+                # Demo user - use existing template
+                return render_template('conversational_survey.html', 
+                                     authenticated=verification['authenticated'], 
+                                     email=verification['email'], 
+                                     user_email=verification['email'],
+                                     participant_name=participant_name,
+                                     participant_company=verification.get('participant_company'),
+                                     campaign_name=campaign_name,
+                                     branding=branding)
         else:
             # Fallback to simple token system for backward compatibility
             import simple_token_system
