@@ -239,10 +239,17 @@ class PostgresTaskQueue:
             if row:
                 db.session.commit()
                 # Convert row to dict
+                # PostgreSQL JSONB is already parsed as dict by psycopg2
+                task_data = row[2]
+                if isinstance(task_data, str):
+                    task_data = json.loads(task_data)
+                elif task_data is None:
+                    task_data = {}
+                
                 return {
                     'id': row[0],
                     'task_type': row[1],
-                    'task_data': json.loads(row[2]) if row[2] else {},
+                    'task_data': task_data,
                     'status': row[3],
                     'priority': row[4],
                     'scheduled_at': row[5],

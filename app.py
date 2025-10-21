@@ -68,6 +68,14 @@ db_config.set_environment(app_env)
 app.config["SQLALCHEMY_DATABASE_URI"] = db_config.get_database_url()
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = db_config.get_engine_options()
 
+# Configure SERVER_NAME for background workers to generate URLs
+# This is required for url_for() to work outside request context (e.g., in email workers)
+replit_domain = os.environ.get('REPLIT_DEV_DOMAIN')
+if replit_domain:
+    app.config['SERVER_NAME'] = replit_domain
+    app.config['PREFERRED_URL_SCHEME'] = 'https'
+    logger.info(f"✅ Server name configured for workers: {replit_domain}")
+
 # Enable SQL query logging for debugging (Phase 2: Query Optimization)
 ENABLE_SQL_PROFILING = os.environ.get('ENABLE_SQL_PROFILING', 'true').lower() == 'true'
 if ENABLE_SQL_PROFILING:
