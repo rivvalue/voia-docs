@@ -53,6 +53,41 @@ def anonymize_response_data(campaign, response_data):
     
     return response_data
 
+def lookup_association_id_fallback(authenticated_email: str, campaign_id: int):
+    """
+    Fallback mechanism to find campaign_participant association_id when missing from session.
+    
+    Args:
+        authenticated_email: The participant's email
+        campaign_id: The campaign ID
+        
+    Returns:
+        association_id if found, None otherwise
+    """
+    try:
+        # Find the participant by email
+        participant = Participant.query.filter_by(email=authenticated_email).first()
+        if not participant:
+            logger.warning(f"Fallback: No participant found for email {authenticated_email}")
+            return None
+        
+        # Find the campaign participant association
+        association = CampaignParticipant.query.filter_by(
+            campaign_id=campaign_id,
+            participant_id=participant.id
+        ).first()
+        
+        if association:
+            logger.info(f"Fallback: Found association_id {association.id} for {authenticated_email} in campaign {campaign_id}")
+            return association.id
+        else:
+            logger.warning(f"Fallback: No association found for {authenticated_email} in campaign {campaign_id}")
+            return None
+            
+    except Exception as e:
+        logger.error(f"Failed to lookup association_id: {e}")
+        return None
+
 # Health check endpoint to prevent 404 flood
 @app.route('/api', methods=['GET', 'HEAD'])
 def api_health_check():
@@ -767,6 +802,14 @@ def submit_survey_form():
         db.session.commit()
         
         # Mark association as completed if using new token system
+        # Fallback: Look up association_id from database if missing from session
+        if not association_id and campaign_id and authenticated_email:
+            association_id = lookup_association_id_fallback(authenticated_email, campaign_id)
+            if association_id:
+                # Also link the response to the association
+                response.campaign_participant_id = association_id
+                db.session.commit()
+        
         if association_id:
             try:
                 import campaign_participant_token_system
@@ -943,6 +986,14 @@ def submit_survey():
         db.session.commit()
         
         # Mark association as completed if using new token system
+        # Fallback: Look up association_id from database if missing from session
+        if not association_id and campaign_id and authenticated_email:
+            association_id = lookup_association_id_fallback(authenticated_email, campaign_id)
+            if association_id:
+                # Also link the response to the association
+                response.campaign_participant_id = association_id
+                db.session.commit()
+        
         if association_id:
             try:
                 import campaign_participant_token_system
@@ -2613,6 +2664,14 @@ def finalize_conversation():
         db.session.commit()
         
         # Mark association as completed if using new token system
+        # Fallback: Look up association_id from database if missing from session
+        if not association_id and campaign_id and authenticated_email:
+            association_id = lookup_association_id_fallback(authenticated_email, campaign_id)
+            if association_id:
+                # Also link the response to the association
+                response.campaign_participant_id = association_id
+                db.session.commit()
+        
         if association_id:
             import campaign_participant_token_system
             campaign_participant_token_system.mark_survey_completed(association_id, response.id)
