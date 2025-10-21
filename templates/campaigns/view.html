@@ -205,86 +205,112 @@
             </div>
         {% endif %}
 
-                    <!-- Campaign Actions -->
-                    <div class="action-buttons">
-                        <h4 class="mb-3">Campaign Actions</h4>
+                    <!-- Campaign Actions Card -->
+                    <div class="campaign-actions-card">
+                        <h4 class="campaign-actions-title">Campaign Actions</h4>
                         
                         {% if campaign.status == 'draft' %}
-                            <!-- Edit Campaign Button -->
-                            <a href="{{ url_for('campaigns.edit_draft_campaign', campaign_id=campaign.id) }}" class="btn btn-primary me-2">
-                                <i class="fas fa-edit me-2"></i>Edit Campaign
-                            </a>
-                            
-                            <!-- Delete Campaign Button -->
-                            <button type="button" class="btn btn-danger me-2" onclick="confirmDelete()">
-                                <i class="fas fa-trash-alt me-2"></i>Delete Draft
-                            </button>
-                            
-                            <!-- Mark as Ready Button -->
-                            <form method="POST" action="{{ url_for('campaigns.mark_ready', campaign_id=campaign.id) }}" style="display: inline;">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <button type="submit" class="btn btn-success me-2"
-                                        {% if not campaign.description or participants|length == 0 %}disabled{% endif %}
-                                        onclick="return confirm('Mark this campaign as ready for activation? You will not be able to modify campaign details after this.');">
-                                    <i class="fas fa-check me-2"></i>Mark as Ready
-                                </button>
-                            </form>
-                            
-                            <br><br>
-                            {% if not campaign.description or participants|length == 0 %}
-                            <small class="text-muted">
-                                Campaign needs description and at least one participant to be marked ready.
-                            </small>
-                            {% else %}
-                            <small class="text-muted">
-                                <i class="fas fa-info-circle me-1"></i>Draft campaigns can be freely edited or deleted. Once marked ready, campaign details become locked.
-                            </small>
-                            {% endif %}
+                            <!-- Draft State Actions -->
+                            <div class="campaign-actions-content">
+                                <div class="campaign-actions-primary">
+                                    <a href="{{ url_for('campaigns.edit_draft_campaign', campaign_id=campaign.id) }}" 
+                                       class="btn btn-primary btn-lg">
+                                        <i class="fas fa-edit me-2"></i>Edit Campaign
+                                    </a>
+                                </div>
+                                
+                                <div class="campaign-actions-secondary">
+                                    <form method="POST" action="{{ url_for('campaigns.mark_ready', campaign_id=campaign.id) }}" class="d-inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-success"
+                                                {% if not campaign.description or participants|length == 0 %}disabled{% endif %}
+                                                onclick="return confirm('Mark this campaign as ready for activation? You will not be able to modify campaign details after this.');">
+                                            <i class="fas fa-check me-2"></i>Mark as Ready
+                                        </button>
+                                    </form>
+                                    
+                                    <button type="button" class="btn btn-outline-danger" onclick="confirmDelete()">
+                                        <i class="fas fa-trash-alt me-2"></i>Delete Draft
+                                    </button>
+                                </div>
+                                
+                                <div class="campaign-actions-helper">
+                                    {% if not campaign.description or participants|length == 0 %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>
+                                        <span>Campaign needs description and at least one participant to be marked ready.</span>
+                                    {% else %}
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        <span>Draft campaigns can be freely edited or deleted. Once marked ready, campaign details become locked.</span>
+                                    {% endif %}
+                                </div>
+                            </div>
                             
                         {% elif campaign.status == 'ready' %}
-                            <form method="POST" action="{{ url_for('campaigns.activate_campaign', campaign_id=campaign.id) }}" style="display: inline;">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <button type="submit" class="btn btn-primary me-2"
-                                        onclick="return confirm('Activate this campaign? Participants will be notified and the campaign will begin collecting responses.');">
-                                    <i class="fas fa-play me-2"></i>Activate Campaign
-                                </button>
-                            </form>
-                            <small class="text-info">Campaign is ready for activation</small>
+                            <!-- Ready State Actions -->
+                            <div class="campaign-actions-content">
+                                <div class="campaign-actions-primary">
+                                    <form method="POST" action="{{ url_for('campaigns.activate_campaign', campaign_id=campaign.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-primary btn-lg"
+                                                onclick="return confirm('Activate this campaign? Participants will be notified and the campaign will begin collecting responses.');">
+                                            <i class="fas fa-play me-2"></i>Activate Campaign
+                                        </button>
+                                    </form>
+                                </div>
+                                
+                                <div class="campaign-actions-helper campaign-actions-helper-info">
+                                    <i class="fas fa-check-circle me-1"></i>
+                                    <span>Campaign is ready for activation</span>
+                                </div>
+                            </div>
                             
                         {% elif campaign.status == 'active' %}
-                            <!-- Send Invitations Button -->
-                            <form method="POST" action="{{ url_for('campaigns.send_bulk_invitations', campaign_id=campaign.id) }}" style="display: inline;">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <button type="submit" class="btn btn-success me-2"
-                                        data-bs-toggle="tooltip" 
-                                        data-bs-placement="top" 
-                                        title="This will only send invitations to participants who haven't been invited yet. Already invited participants will not receive duplicate emails."
-                                        onclick="return confirm('Send email invitations to all participants who have not been invited yet?');">
-                                    <i class="fas fa-envelope me-2"></i>Send Invitations
-                                </button>
-                            </form>
-                            <br>
-                            <small class="text-muted d-block mt-2 mb-3">
-                                <i class="fas fa-info-circle me-1"></i>
-                                <strong>Note:</strong> This button only sends invitations to participants who haven't been invited yet. Already invited participants will not receive duplicate emails.
-                            </small>
-                            
-                            <!-- Complete Campaign Button -->
-                            <form method="POST" action="{{ url_for('campaigns.complete_campaign', campaign_id=campaign.id) }}" style="display: inline;">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <button type="submit" class="btn btn-warning me-2"
-                                        onclick="return confirm('Complete this campaign early? This will stop response collection and mark the campaign as finished.');">
-                                    <i class="fas fa-stop me-2"></i>Complete Campaign
-                                </button>
-                            </form>
-                            
-                            <br><br>
-                            <small class="text-success"><i class="fas fa-info-circle me-1"></i>Campaign is currently active and collecting responses</small>
+                            <!-- Active State Actions -->
+                            <div class="campaign-actions-content">
+                                <div class="campaign-actions-primary">
+                                    <form method="POST" action="{{ url_for('campaigns.send_bulk_invitations', campaign_id=campaign.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-primary btn-lg"
+                                                data-bs-toggle="tooltip" 
+                                                data-bs-placement="top" 
+                                                title="This will only send invitations to participants who haven't been invited yet."
+                                                onclick="return confirm('Send email invitations to all participants who have not been invited yet?');">
+                                            <i class="fas fa-envelope me-2"></i>Send Invitations
+                                        </button>
+                                    </form>
+                                </div>
+                                
+                                <div class="campaign-actions-secondary">
+                                    <form method="POST" action="{{ url_for('campaigns.complete_campaign', campaign_id=campaign.id) }}" class="d-inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-outline-secondary"
+                                                onclick="return confirm('Complete this campaign early? This will stop response collection and mark the campaign as finished.');">
+                                            <i class="fas fa-stop me-2"></i>Complete Campaign
+                                        </button>
+                                    </form>
+                                </div>
+                                
+                                <div class="campaign-actions-helper">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    <strong>Note:</strong> Send Invitations only targets participants who haven't been invited yet. Already invited participants will not receive duplicate emails.
+                                </div>
+                                
+                                <div class="campaign-actions-status campaign-actions-status-success">
+                                    <i class="fas fa-chart-line me-1"></i>
+                                    <span>Campaign is currently active and collecting responses</span>
+                                </div>
+                            </div>
                             
                         {% elif campaign.status == 'completed' %}
-                            <div class="alert alert-success">
-                                <i class="fas fa-flag-checkered me-2"></i>
-                                <strong>Campaign Completed:</strong> This campaign finished on {{ campaign.completed_at[:10] if campaign.completed_at else campaign.end_date }}
+                            <!-- Completed State -->
+                            <div class="campaign-actions-content">
+                                <div class="campaign-actions-completed">
+                                    <i class="fas fa-flag-checkered me-2"></i>
+                                    <div>
+                                        <strong>Campaign Completed</strong>
+                                        <p class="mb-0">This campaign finished on {{ campaign.completed_at[:10] if campaign.completed_at else campaign.end_date }}</p>
+                                    </div>
+                                </div>
                             </div>
                         {% endif %}
                     </div>
