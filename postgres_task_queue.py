@@ -123,8 +123,8 @@ class PostgresTaskQueue:
                         scheduled_at, business_account_id, campaign_id,
                         created_at, updated_at, retry_count, max_retries
                     ) VALUES (
-                        %(task_type)s, %(task_data)s::jsonb, %(priority)s, 'pending',
-                        NOW(), %(business_account_id)s, %(campaign_id)s,
+                        :task_type, :task_data::jsonb, :priority, 'pending',
+                        NOW(), :business_account_id, :campaign_id,
                         NOW(), NOW(), 0, 3
                     ) RETURNING id
                 """),
