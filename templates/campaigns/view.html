@@ -50,7 +50,12 @@
             <div class="info-label">End Date</div>
         </div>
         <div class="info-item">
-            <div class="info-value">{{ participants|length }}</div>
+            <div class="info-value" 
+                 data-bs-toggle="tooltip" 
+                 data-bs-placement="top" 
+                 title="Total participants associated with this campaign">
+                {{ participant_stats.total }}
+            </div>
             <div class="info-label">Participants</div>
         </div>
         <div class="info-item">
@@ -75,15 +80,28 @@
         </div>
         <!-- Engagement Metrics -->
         <div class="info-item">
-            <div class="info-value">{{ campaign.engagement_metrics.invitations_sent }}</div>
+            <div class="info-value" 
+                 data-bs-toggle="tooltip" 
+                 data-bs-placement="top" 
+                 title="Successfully delivered email invitations via AWS SES/SMTP">
+                {{ campaign.engagement_metrics.invitations_sent }}
+            </div>
             <div class="info-label"><i class="fas fa-envelope"></i> Invitations Sent</div>
         </div>
         <div class="info-item">
-            <div class="info-value">{{ campaign.engagement_metrics.surveys_completed }}</div>
-            <div class="info-label"><i class="fas fa-check-circle"></i> Surveys Completed</div>
+            <div class="info-value" 
+                 data-bs-toggle="tooltip" 
+                 data-bs-placement="top" 
+                 title="Total survey responses logged in the database">
+                {{ campaign.engagement_metrics.surveys_completed }}
+            </div>
+            <div class="info-label"><i class="fas fa-check-circle"></i> Responses Received</div>
         </div>
         <div class="info-item">
-            <div class="info-value">
+            <div class="info-value" 
+                 data-bs-toggle="tooltip" 
+                 data-bs-placement="top" 
+                 title="Percentage of total participants who completed surveys (Responses / Total Participants)">
                 {% if campaign.engagement_metrics.participation_rate is not none %}
                     {{ campaign.engagement_metrics.participation_rate }}%
                 {% else %}
@@ -93,7 +111,10 @@
             <div class="info-label"><i class="fas fa-chart-bar"></i> Participation Rate</div>
         </div>
         <div class="info-item">
-            <div class="info-value">
+            <div class="info-value" 
+                 data-bs-toggle="tooltip" 
+                 data-bs-placement="top" 
+                 title="Conversion rate from sent invitations to completed surveys (Responses / Invitations Sent)">
                 {% if campaign.engagement_metrics.email_success_rate is not none %}
                     {{ campaign.engagement_metrics.email_success_rate }}%
                 {% else %}
@@ -104,11 +125,19 @@
         </div>
         {% if campaign.reminder_enabled %}
         <div class="info-item">
-            <div class="info-value">{{ campaign.engagement_metrics.reminders_sent }}</div>
+            <div class="info-value" 
+                 data-bs-toggle="tooltip" 
+                 data-bs-placement="top" 
+                 title="Number of reminder emails sent to participants">
+                {{ campaign.engagement_metrics.reminders_sent }}
+            </div>
             <div class="info-label"><i class="fas fa-bell"></i> Reminders Sent</div>
         </div>
         <div class="info-item">
-            <div class="info-value">
+            <div class="info-value" 
+                 data-bs-toggle="tooltip" 
+                 data-bs-placement="top" 
+                 title="Percentage of participants who completed surveys after receiving a reminder">
                 {% if campaign.engagement_metrics.reminder_conversion_rate is not none %}
                     {{ campaign.engagement_metrics.reminder_conversion_rate }}%
                 {% else %}
@@ -160,7 +189,10 @@
                 </div>
                 
                 <div class="participant-summary-stats">
-                    <div class="stat-item stat-completed">
+                    <div class="stat-item stat-completed" 
+                         data-bs-toggle="tooltip" 
+                         data-bs-placement="top" 
+                         title="Participants whose status was marked as completed in the system">
                         <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
                         <div class="stat-content">
                             <div class="stat-value">{{ participant_stats.completed }}</div>
@@ -171,7 +203,10 @@
                         </div>
                     </div>
                     
-                    <div class="stat-item stat-invited">
+                    <div class="stat-item stat-invited" 
+                         data-bs-toggle="tooltip" 
+                         data-bs-placement="top" 
+                         title="Participants whose status is 'invited' (invitation sent but not yet completed)">
                         <div class="stat-icon"><i class="fas fa-envelope"></i></div>
                         <div class="stat-content">
                             <div class="stat-value">{{ participant_stats.invited }}</div>
@@ -182,7 +217,10 @@
                         </div>
                     </div>
                     
-                    <div class="stat-item stat-pending">
+                    <div class="stat-item stat-pending" 
+                         data-bs-toggle="tooltip" 
+                         data-bs-placement="top" 
+                         title="Participants not yet invited to the campaign">
                         <div class="stat-icon"><i class="fas fa-clock"></i></div>
                         <div class="stat-content">
                             <div class="stat-value">{{ participant_stats.pending }}</div>
@@ -475,6 +513,12 @@
 <script>
 // Transcript upload and management functionality
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
     const uploadForm = document.getElementById('transcript-upload-form');
     const uploadProgress = document.getElementById('upload-progress');
     const uploadStatus = document.getElementById('upload-status');
@@ -651,7 +695,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Delete draft campaign confirmation
 function confirmDelete() {
-    const participantCount = {{ participants|length }};
+    const participantCount = {{ participant_stats.total }};
     let message = 'Are you sure you want to delete this draft campaign?';
     
     if (participantCount > 0) {
