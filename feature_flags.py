@@ -39,6 +39,7 @@ class FeatureFlags:
         self.settings_hub_enabled = os.environ.get('FEATURE_SETTINGS_HUB_V2', 'false').lower() == 'true'
         self.settings_hub_rollout = int(os.environ.get('SETTINGS_HUB_ROLLOUT_PERCENTAGE', '0'))
         self.toggle_enabled = os.environ.get('FEATURE_UI_TOGGLE', 'true').lower() == 'true'
+        self.force_v2 = os.environ.get('FORCE_V2_FOR_BUSINESS_USERS', 'false').lower() == 'true'
         
         # Update FLAGS dict with runtime values from environment
         self.FLAGS['sidebar_navigation']['enabled'] = self.sidebar_enabled
@@ -49,7 +50,8 @@ class FeatureFlags:
         
         logger.info(f"Feature Flags initialized - Sidebar: {self.sidebar_enabled}, "
                    f"Rollout: {self.rollout_percentage}%, Settings Hub v2: {self.settings_hub_enabled}, "
-                   f"Settings Hub Rollout: {self.settings_hub_rollout}%, Toggle: {self.toggle_enabled}")
+                   f"Settings Hub Rollout: {self.settings_hub_rollout}%, Toggle: {self.toggle_enabled}, "
+                   f"Force V2: {self.force_v2}")
     
     def is_feature_enabled(self, feature_name):
         """Check if a feature flag is enabled (reads from updated FLAGS dict)"""
@@ -61,9 +63,10 @@ class FeatureFlags:
         
         Priority order:
         1. URL parameter (?ui=v2) - highest priority for testing
-        2. Session preference (user manually toggled)
-        3. Rollout percentage (gradual deployment)
-        4. Default to v1 (current UI)
+        2. Force V2 flag (if authenticated business user)
+        3. Session preference (user manually toggled)
+        4. Rollout percentage (gradual deployment)
+        5. Default to v1 (current UI)
         
         Returns:
             str: 'v1' or 'v2'
@@ -74,13 +77,18 @@ class FeatureFlags:
             logger.debug(f"UI version from URL parameter: {url_version}")
             return url_version
         
-        # 2. Check session preference (user toggle)
+        # 2. Check force V2 flag for authenticated business users
+        if self.force_v2 and session.get('business_user_id'):
+            logger.debug("UI version forced to v2 for authenticated business user")
+            return 'v2'
+        
+        # 3. Check session preference (user toggle)
         session_version = session.get('ui_version')
         if session_version in ['v1', 'v2']:
             logger.debug(f"UI version from session: {session_version}")
             return session_version
         
-        # 3. Check rollout percentage (gradual deployment)
+        # 4. Check rollout percentage (gradual deployment)
         if self.sidebar_enabled and self.rollout_percentage > 0:
             import random
             if user_id:
@@ -96,7 +104,7 @@ class FeatureFlags:
                 logger.debug(f"UI version v2 from rollout (user_id: {user_id})")
                 return 'v2'
         
-        # 4. Default to v1 (current UI)
+        # 5. Default to v1 (current UI)
         logger.debug("UI version defaulting to v1")
         return 'v1'
     
@@ -135,6 +143,10 @@ class FeatureFlags:
     def can_user_toggle(self):
         """Check if current user is allowed to manually toggle UI version"""
         return self.toggle_enabled
+    
+    def is_v2_forced(self):
+        """Check if V2 is being forced for all authenticated business users"""
+        return self.force_v2
 
 
 # Global feature flags instance
