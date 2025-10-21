@@ -1113,11 +1113,7 @@ def survey_config(campaign_id):
             flash('Campaign not found.', 'error')
             return redirect(url_for('campaigns.list_campaigns'))
         
-        # Check if campaign can be modified
-        if campaign.status in ['active', 'completed']:
-            flash(f'Survey configuration cannot be modified for {campaign.status} campaigns.', 'warning')
-            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
-        
+        # Allow viewing for all statuses - template handles read-only mode for active/completed
         return render_template('campaigns/survey_config.html',
                              campaign=campaign.to_dict(),
                              business_account=current_account.to_dict())
