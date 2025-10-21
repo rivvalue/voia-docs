@@ -780,6 +780,262 @@ The {branding['company_name']} Team
                 'participant_email': participant_email
             }
 
+    def send_participant_reminder(self, 
+                                  participant_email: str,
+                                  participant_name: str,
+                                  campaign_name: str,
+                                  survey_token: str,
+                                  business_account_name: str,
+                                  email_delivery_id: Optional[int] = None,
+                                  business_account_id: Optional[int] = None,
+                                  campaign=None) -> Dict:
+        """
+        Send reminder email to a participant who hasn't completed the survey.
+        
+        Reuses the same template infrastructure as participant invitations but with
+        modified messaging to indicate this is a reminder rather than initial invitation.
+        
+        Args:
+            participant_email: Participant's email
+            participant_name: Participant's name
+            campaign_name: Campaign name
+            survey_token: JWT token for survey access
+            business_account_name: Business account name
+            email_delivery_id: Optional EmailDelivery record ID for tracking
+            business_account_id: Optional business account ID for tenant-specific configuration
+            campaign: Optional Campaign object for campaign-specific email content
+            
+        Returns:
+            Dict with success status and details
+        """
+        
+        try:
+            # Get branding configuration for this business account
+            branding = self._get_branding_config(business_account_id)
+            
+            # Get custom email content with 3-tier fallback (campaign → email_config → defaults)
+            email_content = self._get_email_content(business_account_id, campaign=campaign)
+            
+            # Generate survey URL (using the correct 'survey' route)
+            survey_url = url_for('survey', token=survey_token, _external=True)
+            
+            # Template variables for substitution
+            template_vars = {
+                'participant_name': participant_name,
+                'campaign_name': campaign_name,
+                'business_account_name': business_account_name,
+                'survey_url': survey_url
+            }
+            
+            # Email subject with reminder indicator
+            subject = f"Reminder: {self._substitute_variables(email_content['subject'], template_vars)}"
+            
+            # Build text body with reminder-specific messaging
+            intro_text = self._substitute_variables(email_content['intro'], template_vars)
+            closing_text = self._substitute_variables(email_content['closing'], template_vars)
+            footer_text = self._substitute_variables(email_content['footer'], template_vars)
+            
+            text_body = f"""
+Hello {participant_name},
+
+We wanted to remind you about an opportunity to share your feedback with us.
+
+{intro_text}
+
+Campaign: {campaign_name}
+
+If you haven't already completed the survey, please click the link below:
+{survey_url}
+
+This personalized link is secure and will remain active until the campaign ends.
+
+Your input is valuable to us, and we appreciate you taking the time to participate.
+
+{closing_text}
+
+Best regards,
+The {branding['company_name']} Team
+{branding['tagline']}
+
+---
+{footer_text}
+"""
+            
+            # HTML body with branding support
+            logo_html = ""
+            if branding['logo_url']:
+                logo_url = branding['logo_url']
+                company_name = branding['company_name']
+                logo_html = f'<img src="{logo_url}" alt="{company_name}" style="max-height: 60px; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;">'
+            
+            html_body = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Survey Reminder - {campaign_name}</title>
+    <style>
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }}
+        .container {{
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+        .header {{
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #E13A44;
+        }}
+        .logo {{
+            font-size: 24px;
+            font-weight: bold;
+            color: #E13A44;
+            margin-bottom: 5px;
+        }}
+        .tagline {{
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }}
+        .reminder-badge {{
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }}
+        .campaign-name {{
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #E13A44;
+            margin: 20px 0;
+            font-weight: 500;
+        }}
+        .cta-button {{
+            display: inline-block;
+            background-color: #E13A44;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: 500;
+            text-align: center;
+        }}
+        .cta-button:hover {{
+            background-color: #c12e3a;
+        }}
+        .footer {{
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }}
+        .security-note {{
+            background-color: #e7f3ff;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            margin: 15px 0;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            {logo_html}
+            <div class="logo">{branding['company_name']}</div>
+            <div class="tagline">{branding['tagline']}</div>
+        </div>
+        
+        <div style="text-align: center;">
+            <span class="reminder-badge">⏰ Friendly Reminder</span>
+        </div>
+        
+        <h2>Hello {participant_name},</h2>
+        
+        <p>We wanted to remind you about an opportunity to share your feedback with us.</p>
+        
+        <p>{intro_text}</p>
+        
+        <div class="campaign-name">
+            <strong>Campaign:</strong> {campaign_name}
+        </div>
+        
+        <p>If you haven't already completed the survey, please take a few moments to share your thoughts.</p>
+        
+        <div style="text-align: center;">
+            <a href="{survey_url}" class="cta-button">{email_content['cta_text']}</a>
+        </div>
+        
+        <div class="security-note">
+            <strong>🔒 Security Note:</strong> This personalized link is secure and will remain active until the campaign ends.
+        </div>
+        
+        <p>Your input is valuable to us, and we appreciate you taking the time to participate.</p>
+        
+        <p style="white-space: pre-line;">{closing_text}</p>
+        
+        <p>Best regards,<br>
+        The {branding['company_name']} Team</p>
+        
+        <div class="footer">
+            {footer_text}
+        </div>
+    </div>
+</body>
+</html>
+"""
+            
+            # Send the email
+            result = self.send_email(
+                to_emails=participant_email,
+                subject=subject,
+                text_body=text_body,
+                html_body=html_body,
+                email_delivery_id=email_delivery_id,
+                business_account_id=business_account_id
+            )
+            
+            # Add reminder-specific metadata
+            if result['success']:
+                result.update({
+                    'email_type': 'reminder',
+                    'campaign_name': campaign_name,
+                    'participant_name': participant_name,
+                    'survey_token': survey_token[:20] + '...'  # Truncated for logging
+                })
+            
+            return result
+            
+        except Exception as e:
+            error_msg = f"Failed to send participant reminder to {participant_email}: {str(e)}"
+            logger.error(error_msg)
+            
+            return {
+                'success': False,
+                'error': error_msg,
+                'email_type': 'reminder',
+                'participant_email': participant_email
+            }
+
     def send_business_account_invitation(self, 
                                          user_email: str,
                                          user_first_name: str,
