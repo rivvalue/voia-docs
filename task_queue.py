@@ -1029,6 +1029,8 @@ Respond with ONLY the JSON object, no other text:"""
                     changes_made += account_changes
                 except Exception as e:
                     logger.error(f"Error processing campaigns for business account {account.id}: {e}")
+                    # Rollback the failed transaction to prevent cascade failures
+                    db.session.rollback()
                     # Continue with other accounts
             
             # Process email retries
@@ -1037,6 +1039,8 @@ Respond with ONLY the JSON object, no other text:"""
                 changes_made += retry_changes
             except Exception as e:
                 logger.error(f"Error processing email retries: {e}")
+                # Rollback the failed transaction
+                db.session.rollback()
             
             return changes_made
                     
@@ -1087,6 +1091,8 @@ Respond with ONLY the JSON object, no other text:"""
             
         except Exception as e:
             logger.error(f"Email retry processing failed: {e}")
+            # Rollback on error
+            db.session.rollback()
             
         return retry_count
     
