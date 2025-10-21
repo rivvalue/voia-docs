@@ -197,5 +197,10 @@
 {% endblock %}
 
 {% block scripts %}
+<script>
+// Pass authentication status to JavaScript
+window.isAuthenticated = {{ 'true' if authenticated else 'false' }};
+window.userEmail = '{{ email or '' }}';
+</script>
 <script src="{{ url_for('static', filename='js/conversational_survey.js') }}"></script>
 {% endblock %}
