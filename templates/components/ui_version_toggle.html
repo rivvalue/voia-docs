@@ -1,5 +1,5 @@
 <!-- UI Version Toggle Component (Phase 2b) -->
-{% if can_toggle_ui %}
+{% if can_toggle_ui and not force_v2_enabled %}
 <div class="ui-version-toggle" style="display: inline-flex; align-items: center; gap: 8px;">
     <span class="badge" style="
         background: {% if ui_version == 'v2' %}#4CAF50{% else %}#E13A44{% endif %};
