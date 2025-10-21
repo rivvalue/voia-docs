@@ -879,8 +879,8 @@ def send_individual_invitation(participant_id):
             flash('Participant not found.', 'error')
             return redirect(url_for('participants.list_participants'))
         
-        # Check if email service is configured
-        if not email_service.is_configured():
+        # Check if email service is configured for this business account
+        if not email_service.is_configured(current_account.id):
             flash('Email service is not configured. Please configure SMTP settings first.', 'error')
             return redirect(url_for('participants.list_participants'))
         
@@ -1010,8 +1010,8 @@ def send_campaign_participant_invitation(campaign_id, participant_id):
             flash(f'Cannot send invitations for {campaign.status} campaign. Campaign must be active.', 'error')
             return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
         
-        # Check if email service is configured
-        if not email_service.is_configured():
+        # Check if email service is configured for this business account
+        if not email_service.is_configured(current_account.id):
             flash('Email service is not configured. Please configure SMTP settings first.', 'error')
             return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
         

@@ -833,8 +833,8 @@ def send_bulk_invitations(campaign_id):
             flash(f'Cannot send invitations for {campaign.status} campaign. Campaign must be active.', 'error')
             return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
-        # Check if email service is configured
-        if not email_service.is_configured():
+        # Check if email service is configured for this business account
+        if not email_service.is_configured(current_account.id):
             flash('Email service is not configured. Please configure SMTP settings first.', 'error')
             return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
@@ -1028,8 +1028,8 @@ def resend_failed_invitations(campaign_id):
             flash('Campaign not found.', 'error')
             return redirect(url_for('campaigns.list_campaigns'))
         
-        # Check if email service is configured
-        if not email_service.is_configured():
+        # Check if email service is configured for this business account
+        if not email_service.is_configured(current_account.id):
             flash('Email service is not configured. Please configure SMTP settings first.', 'error')
             return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
