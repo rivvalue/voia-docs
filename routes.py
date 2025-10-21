@@ -265,6 +265,10 @@ def verify_survey_access(token):
             'participant_name': participant.name,
             'participant_company': participant.company_name,
             'campaign_name': campaign.name,
+            'business_account_id': uuid_participant.business_account_id,
+            'campaign_id': campaign.id,
+            'participant_id': participant.id,
+            'association_id': uuid_participant.id,
             'token': token
         }
     
