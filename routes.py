@@ -608,16 +608,25 @@ def survey():
         # Use centralized token verification
         verification = verify_survey_access(token)
         if verification['valid']:
-            # Get branding context based on business_account_id from verification
-            branding = get_branding_context(verification.get('business_account_id'))
-            return render_template('survey_choice.html', 
-                                 authenticated=verification['authenticated'],
-                                 email=verification['email'], 
-                                 user_email=verification['user_email'],
-                                 participant_name=verification['participant_name'],
-                                 participant_company=verification['participant_company'],
-                                 campaign_name=verification['campaign_name'],
-                                 branding=branding)
+            # Check if this is a business participant (invited via campaign)
+            participant_name = verification.get('participant_name')
+            campaign_name = verification.get('campaign_name')
+            
+            if participant_name and campaign_name:
+                # Business participant - redirect to conversational survey (no choice)
+                logger.info(f"Business participant detected, redirecting to conversational survey: {participant_name}")
+                return redirect(url_for('conversational_survey', token=token))
+            else:
+                # Demo user - show choice page
+                branding = get_branding_context(verification.get('business_account_id'))
+                return render_template('survey_choice.html', 
+                                     authenticated=verification['authenticated'],
+                                     email=verification['email'], 
+                                     user_email=verification['user_email'],
+                                     participant_name=participant_name,
+                                     participant_company=verification['participant_company'],
+                                     campaign_name=campaign_name,
+                                     branding=branding)
         else:
             # Get default branding for unauthenticated users
             branding = get_branding_context()
