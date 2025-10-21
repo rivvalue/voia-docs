@@ -11,130 +11,33 @@
     {'label': campaign.name, 'current': true}
 ] %}
 {% include 'components/breadcrumb.html' %}
-<style>
-/* Campaign view specific styling */
-.campaign-header {
-    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
-    color: var(--primary-white);
-    padding: 2rem 0;
-    border-radius: var(--radius-2xl);
-    margin-bottom: 2rem;
-}
 
-.campaign-details {
-    background: var(--primary-white);
-    border-radius: var(--radius-2xl);
-    padding: var(--spacing-2xl);
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--light-gray);
-    margin-bottom: 2rem;
-}
-
-.status-badge {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    border-radius: 25px;
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-.status-draft {
-    background-color: var(--light-gray);
-    color: var(--gray-dark);
-}
-
-.status-ready {
-    background-color: var(--red-light);
-    color: var(--primary-red);
-}
-
-.status-active {
-    background-color: #d4edda;
-    color: #155724;
-}
-
-.status-completed {
-    background-color: var(--medium-gray);
-    color: var(--primary-white);
-}
-
-.participant-list {
-    background: var(--light-gray);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-lg);
-    margin-top: 1rem;
-}
-
-.participant-item {
-    background: var(--primary-white);
-    border-radius: var(--radius-md);
-    padding: var(--spacing-md);
-    margin-bottom: 0.5rem;
-    border: 1px solid var(--medium-gray);
-}
-
-.participant-item:last-child {
-    margin-bottom: 0;
-}
-
-.action-buttons {
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 2px solid var(--light-gray);
-}
-
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.info-item {
-    text-align: center;
-    padding: 1rem;
-    background: var(--light-gray);
-    border-radius: var(--radius-md);
-}
-
-.info-value {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--primary-red);
-    margin-bottom: 0.25rem;
-}
-
-.info-label {
-    font-size: 0.9rem;
-    color: var(--gray-dark);
-}
-</style>
-
-<div class="container">
-    <!-- Campaign Header -->
-    <div class="campaign-header">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-8">
-                    <h1 class="mb-1">{{ campaign.name }}</h1>
-                    <p class="mb-0 opacity-75">{{ campaign.description or "No description provided" }}</p>
-                </div>
-                <div class="col-md-4 text-end">
-                    <span class="status-badge status-{{ campaign.status }}">
-                        {% if campaign.status == 'draft' %}
-                            <i class="fas fa-edit me-2"></i>Draft
-                        {% elif campaign.status == 'ready' %}
-                            <i class="fas fa-check-circle me-2"></i>Ready
-                        {% elif campaign.status == 'active' %}
-                            <i class="fas fa-play-circle me-2"></i>Active
-                        {% elif campaign.status == 'completed' %}
-                            <i class="fas fa-flag-checkered me-2"></i>Completed
-                        {% endif %}
-                    </span>
-                </div>
+<!-- Campaign Header -->
+<div class="header-gradient-primary" style="padding: var(--spacing-xl); margin-bottom: var(--spacing-xl);">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="page-title mb-1">{{ campaign.name }}</h1>
+                <p class="page-subtitle mb-0">{{ campaign.description or "No description provided" }}</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <span class="campaign-status-badge status-{{ campaign.status }}">
+                    {% if campaign.status == 'draft' %}
+                        <i class="fas fa-edit me-2"></i>Draft
+                    {% elif campaign.status == 'ready' %}
+                        <i class="fas fa-check-circle me-2"></i>Ready
+                    {% elif campaign.status == 'active' %}
+                        <i class="fas fa-play-circle me-2"></i>Active
+                    {% elif campaign.status == 'completed' %}
+                        <i class="fas fa-flag-checkered me-2"></i>Completed
+                    {% endif %}
+                </span>
             </div>
         </div>
     </div>
+</div>
+
+<div class="container">
 
     <!-- Campaign Information Grid -->
     <div class="info-grid">
@@ -173,11 +76,11 @@
         <!-- Engagement Metrics -->
         <div class="info-item">
             <div class="info-value">{{ campaign.engagement_metrics.invitations_sent }}</div>
-            <div class="info-label">📧 Invitations Sent</div>
+            <div class="info-label"><i class="fas fa-envelope"></i> Invitations Sent</div>
         </div>
         <div class="info-item">
             <div class="info-value">{{ campaign.engagement_metrics.surveys_completed }}</div>
-            <div class="info-label">✅ Surveys Completed</div>
+            <div class="info-label"><i class="fas fa-check-circle"></i> Surveys Completed</div>
         </div>
         <div class="info-item">
             <div class="info-value">
@@ -187,7 +90,7 @@
                     N/A
                 {% endif %}
             </div>
-            <div class="info-label">📊 Participation Rate</div>
+            <div class="info-label"><i class="fas fa-chart-bar"></i> Participation Rate</div>
         </div>
         <div class="info-item">
             <div class="info-value">
@@ -197,12 +100,12 @@
                     N/A
                 {% endif %}
             </div>
-            <div class="info-label">📤 Email Success Rate</div>
+            <div class="info-label"><i class="fas fa-paper-plane"></i> Email Success Rate</div>
         </div>
         {% if campaign.reminder_enabled %}
         <div class="info-item">
             <div class="info-value">{{ campaign.engagement_metrics.reminders_sent }}</div>
-            <div class="info-label">🔔 Reminders Sent</div>
+            <div class="info-label"><i class="fas fa-bell"></i> Reminders Sent</div>
         </div>
         <div class="info-item">
             <div class="info-value">
@@ -212,7 +115,7 @@
                     N/A
                 {% endif %}
             </div>
-            <div class="info-label">📈 Reminder Conversion</div>
+            <div class="info-label"><i class="fas fa-chart-line"></i> Reminder Conversion</div>
         </div>
         {% endif %}
     </div>
