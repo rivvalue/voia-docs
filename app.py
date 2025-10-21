@@ -320,6 +320,7 @@ def inject_ui_version():
     return {
         'ui_version': ui_version,
         'can_toggle_ui': feature_flags.can_user_toggle(),
+        'force_v2_enabled': feature_flags.is_v2_forced(),
         'sidebar_enabled': feature_flags.is_feature_enabled('sidebar_navigation'),
         'business_user_id': user_id,
         'business_user_email': session.get('business_user_email', '')
