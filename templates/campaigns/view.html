@@ -354,6 +354,16 @@
                             <small class="text-info">Campaign is ready for activation</small>
                             
                         {% elif campaign.status == 'active' %}
+                            <!-- Send Invitations Button -->
+                            <form method="POST" action="{{ url_for('campaigns.send_bulk_invitations', campaign_id=campaign.id) }}" style="display: inline;">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-success me-2"
+                                        onclick="return confirm('Send email invitations to all participants who have not been invited yet?');">
+                                    <i class="fas fa-envelope me-2"></i>Send Invitations
+                                </button>
+                            </form>
+                            
+                            <!-- Complete Campaign Button -->
                             <form method="POST" action="{{ url_for('campaigns.complete_campaign', campaign_id=campaign.id) }}" style="display: inline;">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="btn btn-warning me-2"
@@ -361,7 +371,9 @@
                                     <i class="fas fa-stop me-2"></i>Complete Campaign
                                 </button>
                             </form>
-                            <small class="text-success">Campaign is currently active and collecting responses</small>
+                            
+                            <br><br>
+                            <small class="text-success"><i class="fas fa-info-circle me-1"></i>Campaign is currently active and collecting responses</small>
                             
                         {% elif campaign.status == 'completed' %}
                             <div class="alert alert-success">
