@@ -476,9 +476,9 @@
             <div class="conversation-transcript">
                 {% if conversation_history %}
                     {% for message in conversation_history %}
-                    <div class="message message-{{ 'ai' if message.role == 'ai' or message.role == 'assistant' else 'user' }}">
-                        <div class="message-avatar avatar-{{ 'ai' if message.role == 'ai' or message.role == 'assistant' else 'user' }}">
-                            {% if message.role == 'ai' or message.role == 'assistant' %}
+                    <div class="message message-{{ 'ai' if message.role == 'ai' or message.role == 'assistant' or message.sender == 'ai' else 'user' }}">
+                        <div class="message-avatar avatar-{{ 'ai' if message.role == 'ai' or message.role == 'assistant' or message.sender == 'ai' else 'user' }}">
+                            {% if message.role == 'ai' or message.role == 'assistant' or message.sender == 'ai' %}
                                 AI
                             {% else %}
                                 {{ participant.name[:2].upper() if participant.name else 'U' }}
@@ -488,7 +488,7 @@
                             {% if search_query and message.get('highlighted_content') %}
                                 {{ message.highlighted_content|safe }}
                             {% else %}
-                                {{ message.content or message.get('text', 'No content') }}
+                                {{ message.content or message.message or message.get('text', 'No content') }}
                             {% endif %}
                             {% if message.timestamp %}
                             <div class="message-timestamp">
