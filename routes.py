@@ -2420,6 +2420,9 @@ def conversational_survey():
             session['campaign_id'] = verification.get('campaign_id')
             session['participant_id'] = verification.get('participant_id')
             session['business_account_id'] = verification.get('business_account_id')
+            session['participant_name'] = verification.get('participant_name')
+            session['campaign_name'] = verification.get('campaign_name')
+            session['participant_company'] = verification.get('participant_company')
             
             # Get branding context based on business_account_id from verification
             branding = get_branding_context(verification.get('business_account_id'))
@@ -2428,8 +2431,11 @@ def conversational_survey():
             participant_name = verification.get('participant_name')
             campaign_name = verification.get('campaign_name')
             
+            logger.info(f"Routing decision - participant_name: {participant_name}, campaign_name: {campaign_name}")
+            
             if participant_name and campaign_name:
                 # Business participant - use dedicated business template
+                logger.info(f"✅ Using BUSINESS template for {participant_name}")
                 # Get campaign details including dates and custom_end_message
                 custom_end_message = None
                 campaign_start_date = None
@@ -2443,6 +2449,7 @@ def conversational_survey():
                         campaign_start_date = campaign.start_date
                         campaign_end_date = campaign.end_date
                 
+                logger.info(f"🟢 RETURNING BUSINESS TEMPLATE NOW for {participant_name}")
                 return render_template('conversational_survey_business.html',
                                      authenticated=verification['authenticated'],
                                      email=verification['email'],
@@ -2456,6 +2463,7 @@ def conversational_survey():
                                      branding=branding)
             else:
                 # Demo user - use existing template
+                logger.info("🔴 RETURNING DEMO TEMPLATE NOW (no participant/campaign)")
                 return render_template('conversational_survey.html', 
                                      authenticated=verification['authenticated'], 
                                      email=verification['email'], 
@@ -2484,20 +2492,54 @@ def conversational_survey():
         # Check if already authenticated via session
         if session.get('auth_token'):
             email = session.get('auth_email')
+            participant_name = session.get('participant_name')
+            campaign_name = session.get('campaign_name')
             
             # Allow response updates - don't block existing responses
             # existing_response = SurveyResponse.query.filter_by(respondent_email=email).first()
             # if existing_response:
             #     # Show completion message instead of survey form
-            #     return render_template('conversational_survey_completed.html', 
+            #     # return render_template('conversational_survey_completed.html', 
             #                          email=email,
             #                          user_email=email,
             #                          completion_date=existing_response.created_at.strftime("%B %d, %Y"),
             #                          show_alternatives=True)
                                      
             # Get branding context from session
-            branding = get_branding_context()
-            return render_template('conversational_survey.html', authenticated=True, email=email, user_email=email, branding=branding)
+            branding = get_branding_context(session.get('business_account_id'))
+            
+            # Route to appropriate template based on session data
+            if participant_name and campaign_name:
+                # Business participant - use dedicated business template
+                logger.info(f"✅ Session-based: Using BUSINESS template for {participant_name}")
+                # Get campaign details
+                custom_end_message = None
+                campaign_start_date = None
+                campaign_end_date = None
+                campaign_id = session.get('campaign_id')
+                if campaign_id:
+                    from models import Campaign
+                    campaign = Campaign.query.get(campaign_id)
+                    if campaign:
+                        custom_end_message = campaign.custom_end_message
+                        campaign_start_date = campaign.start_date
+                        campaign_end_date = campaign.end_date
+                
+                return render_template('conversational_survey_business.html',
+                                     authenticated=True,
+                                     email=email,
+                                     user_email=email,
+                                     participant_name=participant_name,
+                                     participant_company=session.get('participant_company'),
+                                     campaign_name=campaign_name,
+                                     campaign_start_date=campaign_start_date,
+                                     campaign_end_date=campaign_end_date,
+                                     custom_end_message=custom_end_message,
+                                     branding=branding)
+            else:
+                # Demo user - use existing template
+                logger.info("Session-based: Using DEMO template")
+                return render_template('conversational_survey.html', authenticated=True, email=email, user_email=email, branding=branding)
         else:
             # Redirect unauthenticated users to auth page instead of showing broken page
             return redirect(url_for('server_auth'))
