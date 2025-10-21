@@ -182,6 +182,19 @@ def create_campaign():
         campaign.status = 'draft'  # Initial status
         campaign.anonymize_responses = anonymize_responses
         
+        # Reminder settings with validation
+        reminder_enabled = 'reminder_enabled' in request.form
+        try:
+            reminder_delay_days = int(request.form.get('reminder_delay_days', 7))
+            # Validate delay is in allowed range
+            if reminder_delay_days not in [3, 5, 7, 10, 14]:
+                reminder_delay_days = 7  # Safe fallback
+        except (ValueError, TypeError):
+            reminder_delay_days = 7  # Safe fallback
+        
+        campaign.reminder_enabled = reminder_enabled
+        campaign.reminder_delay_days = reminder_delay_days
+        
         # Custom email content
         use_custom_email_content = request.form.get('use_custom_email_content') == 'on'
         campaign.use_custom_email_content = use_custom_email_content
@@ -388,11 +401,28 @@ def edit_draft_campaign(campaign_id):
         if campaign.end_date != end_date_obj:
             changes['end_date'] = {'old': campaign.end_date.isoformat(), 'new': end_date_obj.isoformat()}
         
+        # Reminder settings with validation
+        reminder_enabled = 'reminder_enabled' in request.form
+        try:
+            reminder_delay_days = int(request.form.get('reminder_delay_days', 7))
+            # Validate delay is in allowed range
+            if reminder_delay_days not in [3, 5, 7, 10, 14]:
+                reminder_delay_days = 7  # Safe fallback
+        except (ValueError, TypeError):
+            reminder_delay_days = 7  # Safe fallback
+        
+        if campaign.reminder_enabled != reminder_enabled:
+            changes['reminder_enabled'] = {'old': campaign.reminder_enabled, 'new': reminder_enabled}
+        if campaign.reminder_delay_days != reminder_delay_days:
+            changes['reminder_delay_days'] = {'old': campaign.reminder_delay_days, 'new': reminder_delay_days}
+        
         # Update campaign
         campaign.name = name
         campaign.description = description or None
         campaign.start_date = start_date_obj
         campaign.end_date = end_date_obj
+        campaign.reminder_enabled = reminder_enabled
+        campaign.reminder_delay_days = reminder_delay_days
         
         db.session.commit()
         

@@ -312,12 +312,48 @@ class Campaign(db.Model):
         if invitations_sent > 0:
             email_success_rate = round((surveys_completed / invitations_sent) * 100, 1)
         
+        # Only calculate reminder metrics if reminders are enabled
+        reminders_sent = 0
+        reminder_conversions = 0
+        reminder_conversion_rate = None
+        
+        if self.reminder_enabled:
+            # Count sent reminders
+            reminders_sent = EmailDelivery.query.filter_by(
+                campaign_id=self.id,
+                status='sent',
+                email_type='reminder'
+            ).count()
+            
+            # Calculate reminder conversion rate
+            # (responses that came after reminder was sent)
+            if reminders_sent > 0:
+                # Count DISTINCT participants who responded after receiving a reminder
+                # This avoids overcounting if multiple reminder emails exist per participant
+                reminder_conversions = db.session.query(
+                    func.count(func.distinct(SurveyResponse.campaign_participant_id))
+                ).select_from(SurveyResponse).join(
+                    EmailDelivery,
+                    EmailDelivery.campaign_participant_id == SurveyResponse.campaign_participant_id
+                ).filter(
+                    SurveyResponse.campaign_id == self.id,
+                    EmailDelivery.campaign_id == self.id,
+                    EmailDelivery.email_type == 'reminder',
+                    EmailDelivery.status == 'sent',
+                    SurveyResponse.created_at > EmailDelivery.sent_at
+                ).scalar() or 0
+                
+                reminder_conversion_rate = round((reminder_conversions / reminders_sent) * 100, 1)
+        
         return {
             'invitations_sent': invitations_sent,
             'surveys_completed': surveys_completed,
             'total_participants': total_participants,
             'participation_rate': participation_rate,
-            'email_success_rate': email_success_rate
+            'email_success_rate': email_success_rate,
+            'reminders_sent': reminders_sent,
+            'reminder_conversions': reminder_conversions,
+            'reminder_conversion_rate': reminder_conversion_rate
         }
     
     def close_campaign(self):

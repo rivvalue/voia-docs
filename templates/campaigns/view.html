@@ -199,6 +199,22 @@
             </div>
             <div class="info-label">📤 Email Success Rate</div>
         </div>
+        {% if campaign.reminder_enabled %}
+        <div class="info-item">
+            <div class="info-value">{{ campaign.engagement_metrics.reminders_sent }}</div>
+            <div class="info-label">🔔 Reminders Sent</div>
+        </div>
+        <div class="info-item">
+            <div class="info-value">
+                {% if campaign.engagement_metrics.reminder_conversion_rate is not none %}
+                    {{ campaign.engagement_metrics.reminder_conversion_rate }}%
+                {% else %}
+                    N/A
+                {% endif %}
+            </div>
+            <div class="info-label">📈 Reminder Conversion</div>
+        </div>
+        {% endif %}
     </div>
 
     <!-- Campaign Details with Tabs -->

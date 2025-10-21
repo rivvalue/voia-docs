@@ -142,6 +142,50 @@
                 </div>
             </div>
 
+            <!-- Reminder Settings -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-bell"></i>Email Reminder Settings
+                </h3>
+                
+                <div class="mb-4">
+                    <div class="form-check form-switch" style="padding-left: 2.5rem;">
+                        <input class="form-check-input" type="checkbox" id="reminder_enabled" name="reminder_enabled" 
+                               {% if campaign.reminder_enabled %}checked{% endif %} style="cursor: pointer;">
+                        <label class="form-check-label" for="reminder_enabled" style="cursor: pointer;">
+                            <strong>Send reminder emails to non-respondents</strong>
+                        </label>
+                    </div>
+                    <div class="form-text" style="margin-left: 2.5rem; margin-top: 0.5rem;">
+                        Automatically send a follow-up email to participants who haven't completed the survey
+                    </div>
+                </div>
+
+                <div id="reminderDelayFields">
+                    <div class="mb-3">
+                        <label for="reminder_delay_days" class="form-label">Days to Wait Before Reminder</label>
+                        <select class="form-select" id="reminder_delay_days" name="reminder_delay_days">
+                            <option value="3" {% if campaign.reminder_delay_days == 3 %}selected{% endif %}>3 days</option>
+                            <option value="5" {% if campaign.reminder_delay_days == 5 %}selected{% endif %}>5 days</option>
+                            <option value="7" {% if campaign.reminder_delay_days == 7 or not campaign.reminder_delay_days %}selected{% endif %}>7 days (recommended)</option>
+                            <option value="10" {% if campaign.reminder_delay_days == 10 %}selected{% endif %}>10 days</option>
+                            <option value="14" {% if campaign.reminder_delay_days == 14 %}selected{% endif %}>14 days</option>
+                        </select>
+                        <div class="form-text">How many days after the invitation should we send the reminder?</div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>How it works:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li>Reminders are sent only to participants who haven't responded yet</li>
+                            <li>Only one reminder is sent per participant</li>
+                            <li>Reminders are processed daily during active campaigns</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
             <!-- Form Actions -->
             <div class="d-flex justify-content-between">
                 <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="btn btn-outline-secondary">
@@ -177,5 +221,21 @@ document.getElementById('start_date').addEventListener('change', function() {
         document.getElementById('end_date').value = '';
     }
 });
+
+// Toggle reminder delay fields
+function toggleReminderFields() {
+    const checkbox = document.getElementById('reminder_enabled');
+    const fieldsContainer = document.getElementById('reminderDelayFields');
+    
+    if (checkbox.checked) {
+        fieldsContainer.style.display = 'block';
+    } else {
+        fieldsContainer.style.display = 'none';
+    }
+}
+
+// Initialize reminder toggle
+document.getElementById('reminder_enabled').addEventListener('change', toggleReminderFields);
+toggleReminderFields(); // Initialize on page load
 </script>
 {% endblock %}
