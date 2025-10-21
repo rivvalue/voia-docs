@@ -181,6 +181,16 @@ class TaskQueue:
                     logger.info(f"Worker {worker_id} completed transcript analysis for campaign {campaign_id}, participant {participant_name}")
                 else:
                     logger.error(f"Worker {worker_id} failed transcript analysis task")
+                    
+            elif task_type == 'send_reminder_email':
+                # Process reminder email task (EmailDelivery record already created)
+                success = self._process_reminder_email_task(task_data, worker_id)
+                
+                if success:
+                    participant_email = task_data.get('participant_email', 'unknown')
+                    logger.info(f"Worker {worker_id} completed reminder email to {participant_email}")
+                else:
+                    logger.error(f"Worker {worker_id} failed reminder email task")
                         
         except Exception as e:
             logger.error(f"Error processing task {task}: {e}")
@@ -257,6 +267,43 @@ class TaskQueue:
         except Exception as e:
             logger.error(f"Audit log task processing error: {e}")
             # Don't let audit failures break the system - just log the error
+            return False
+    
+    def _process_reminder_email_task(self, task_data, worker_id):
+        """Process a reminder email task (EmailDelivery record already created)"""
+        email_delivery = None
+        try:
+            email_delivery_id = task_data.get('email_delivery_id')
+            
+            if not email_delivery_id:
+                logger.error("No email_delivery_id provided for reminder email task")
+                return False
+            
+            # Get the EmailDelivery record
+            email_delivery = EmailDelivery.query.get(email_delivery_id)
+            if not email_delivery:
+                logger.error(f"EmailDelivery record {email_delivery_id} not found")
+                return False
+            
+            # Send the reminder email
+            result = email_service.send_participant_reminder(
+                participant_email=task_data['participant_email'],
+                participant_name=task_data['participant_name'],
+                campaign_name=task_data['campaign_name'],
+                survey_token=task_data['survey_token'],
+                business_account_name=task_data['business_account_name'],
+                email_delivery_id=email_delivery_id,
+                business_account_id=task_data.get('business_account_id'),
+                campaign=None  # Could optionally pass campaign object for custom content
+            )
+            
+            return result['success']
+            
+        except Exception as e:
+            logger.error(f"Reminder email task processing error: {e}")
+            if email_delivery:
+                email_delivery.mark_failed(f"Task processing error: {str(e)}", is_permanent=False)
+                db.session.commit()
             return False
     
     def _create_email_delivery_record(self, task_data):
