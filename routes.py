@@ -2426,14 +2426,18 @@ def conversational_survey():
             
             if participant_name and campaign_name:
                 # Business participant - use dedicated business template
-                # Get custom_end_message from campaign if available
+                # Get campaign details including dates and custom_end_message
                 custom_end_message = None
+                campaign_start_date = None
+                campaign_end_date = None
                 campaign_id = session.get('campaign_id')
                 if campaign_id:
                     from models import Campaign
                     campaign = Campaign.query.get(campaign_id)
                     if campaign:
                         custom_end_message = campaign.custom_end_message
+                        campaign_start_date = campaign.start_date
+                        campaign_end_date = campaign.end_date
                 
                 return render_template('conversational_survey_business.html',
                                      authenticated=verification['authenticated'],
@@ -2442,6 +2446,8 @@ def conversational_survey():
                                      participant_name=participant_name,
                                      participant_company=verification.get('participant_company'),
                                      campaign_name=campaign_name,
+                                     campaign_start_date=campaign_start_date,
+                                     campaign_end_date=campaign_end_date,
                                      custom_end_message=custom_end_message,
                                      branding=branding)
             else:

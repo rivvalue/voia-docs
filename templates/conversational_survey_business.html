@@ -14,6 +14,14 @@
                 <span class="badge" style="background-color: #E13A44; color: white; font-size: 0.875rem; padding: 0.5rem 1rem; border-radius: 50px;">
                     <i class="fas fa-poll me-2"></i>{{ campaign_name }}
                 </span>
+                {% if campaign_start_date and campaign_end_date %}
+                <div class="mt-2">
+                    <small class="text-muted" style="font-size: 0.85rem;">
+                        <i class="fas fa-calendar-alt me-1"></i>
+                        {{ campaign_start_date.strftime('%B %d, %Y') }} - {{ campaign_end_date.strftime('%B %d, %Y') }}
+                    </small>
+                </div>
+                {% endif %}
             </div>
 
             <!-- Hero Section with Personalized Welcome -->
