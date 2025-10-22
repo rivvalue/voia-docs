@@ -164,6 +164,9 @@ def queue_audit_log(business_account_id, action_type, resource_name=None,
                    user_email=None, user_name=None, ip_address=None):
     """Queue audit log entry for async processing"""
     try:
+        # CRITICAL: Capture the actual action timestamp NOW (before any queuing delays)
+        action_timestamp = datetime.utcnow()
+        
         # Auto-detect user context if not provided
         if not user_email or not business_account_id:
             context = get_current_user_context()
@@ -194,7 +197,8 @@ def queue_audit_log(business_account_id, action_type, resource_name=None,
             'resource_id': resource_id,
             'resource_name': resource_name,
             'details': sanitized_details,
-            'ip_address': ip_address
+            'ip_address': ip_address,
+            'created_at': action_timestamp  # Preserve actual action time
         }
         
         # Add to task queue for async processing

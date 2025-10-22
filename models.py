@@ -2127,7 +2127,8 @@ class AuditLog(db.Model):
     @staticmethod
     def create_audit_entry(business_account_id, action_type, action_description, 
                           user_email=None, user_name=None, resource_type=None, 
-                          resource_id=None, resource_name=None, details=None, ip_address=None):
+                          resource_id=None, resource_name=None, details=None, ip_address=None,
+                          created_at=None):
         """Create a new audit log entry"""
         audit = AuditLog(
             business_account_id=business_account_id,
@@ -2138,7 +2139,8 @@ class AuditLog(db.Model):
             resource_type=resource_type,
             resource_id=str(resource_id) if resource_id else None,
             resource_name=resource_name,
-            ip_address=ip_address
+            ip_address=ip_address,
+            created_at=created_at or datetime.utcnow()  # Use passed timestamp or fallback
         )
         
         if details:
