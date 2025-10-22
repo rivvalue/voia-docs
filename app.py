@@ -206,6 +206,11 @@ try:
         from flask import g
         import time
         g.start_time = time.time()
+        
+        # CRITICAL: Set up task queue in request context for async processing
+        # This enables audit logs and background tasks to use PostgreSQL queue
+        from task_queue import task_queue
+        g.task_queue = task_queue
     
     @app.after_request
     def after_request(response):
