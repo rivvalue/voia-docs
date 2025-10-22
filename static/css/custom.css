@@ -8033,6 +8033,52 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     letter-spacing: 0.5px;
 }
 
+/* Info Icon for Popovers */
+.info-icon {
+    color: var(--medium-gray);
+    font-size: var(--font-size-xs);
+    margin-left: 0.35rem;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    vertical-align: middle;
+}
+
+.info-icon:hover {
+    color: var(--primary-red);
+}
+
+/* Popover customization */
+.popover {
+    max-width: 300px;
+    font-family: var(--font-family-base);
+}
+
+.popover-body {
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-relaxed);
+    color: var(--neutral-dark);
+}
+
+/* Participant stat items info icons */
+.stat-label .info-icon {
+    display: inline-block;
+    margin-left: 0.25rem;
+    font-size: 0.7rem;
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+    .info-icon {
+        font-size: 0.875rem;
+        margin-left: 0.5rem;
+    }
+    
+    .popover {
+        max-width: 280px;
+        font-size: var(--font-size-sm);
+    }
+}
+
 /* Participant List */
 .page-campaign-details .participant-list {
     background: var(--light-gray);

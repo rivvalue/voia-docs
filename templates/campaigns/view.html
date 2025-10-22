@@ -50,13 +50,15 @@
             <div class="info-label">End Date</div>
         </div>
         <div class="info-item">
-            <div class="info-value" 
-                 data-bs-toggle="tooltip" 
-                 data-bs-placement="top" 
-                 title="Total participants associated with this campaign">
-                {{ participant_stats.total }}
+            <div class="info-value">{{ participant_stats.total }}</div>
+            <div class="info-label">
+                Participants
+                <i class="fas fa-info-circle info-icon" 
+                   data-bs-toggle="popover" 
+                   data-bs-trigger="click" 
+                   data-bs-placement="top"
+                   data-bs-content="Total participants associated with this campaign across all statuses (pending, invited, completed)."></i>
             </div>
-            <div class="info-label">Participants</div>
         </div>
         <div class="info-item">
             <div class="info-value">
@@ -71,80 +73,113 @@
             <div class="info-label">
                 {% if campaign.status == 'active' %}
                     Days Remaining
+                    <i class="fas fa-info-circle info-icon" 
+                       data-bs-toggle="popover" 
+                       data-bs-trigger="click" 
+                       data-bs-placement="top"
+                       data-bs-content="Number of days until the campaign end date. Campaign will automatically transition to 'completed' status after this period."></i>
                 {% elif campaign.status == 'completed' %}
                     Days Since Ended
+                    <i class="fas fa-info-circle info-icon" 
+                       data-bs-toggle="popover" 
+                       data-bs-trigger="click" 
+                       data-bs-placement="top"
+                       data-bs-content="Number of days since the campaign ended. Campaign data is preserved for historical analysis and reporting."></i>
                 {% else %}
                     Days Until Start
+                    <i class="fas fa-info-circle info-icon" 
+                       data-bs-toggle="popover" 
+                       data-bs-trigger="click" 
+                       data-bs-placement="top"
+                       data-bs-content="Number of days until the campaign starts. Campaign will automatically transition to 'active' status on the start date."></i>
                 {% endif %}
             </div>
         </div>
         <!-- Engagement Metrics -->
         <div class="info-item">
-            <div class="info-value" 
-                 data-bs-toggle="tooltip" 
-                 data-bs-placement="top" 
-                 title="Successfully delivered email invitations via AWS SES/SMTP">
-                {{ campaign.engagement_metrics.invitations_sent }}
+            <div class="info-value">{{ campaign.engagement_metrics.invitations_sent }}</div>
+            <div class="info-label">
+                <i class="fas fa-envelope"></i> Invitations Sent
+                <i class="fas fa-info-circle info-icon" 
+                   data-bs-toggle="popover" 
+                   data-bs-trigger="click" 
+                   data-bs-placement="top"
+                   data-bs-content="Successfully delivered email invitations via AWS SES/SMTP. This counts actual deliveries tracked by EmailDelivery records."></i>
             </div>
-            <div class="info-label"><i class="fas fa-envelope"></i> Invitations Sent</div>
         </div>
         <div class="info-item">
-            <div class="info-value" 
-                 data-bs-toggle="tooltip" 
-                 data-bs-placement="top" 
-                 title="Total survey responses logged in the database">
-                {{ campaign.engagement_metrics.surveys_completed }}
+            <div class="info-value">{{ campaign.engagement_metrics.surveys_completed }}</div>
+            <div class="info-label">
+                <i class="fas fa-check-circle"></i> Responses Received
+                <i class="fas fa-info-circle info-icon" 
+                   data-bs-toggle="popover" 
+                   data-bs-trigger="click" 
+                   data-bs-placement="top"
+                   data-bs-content="Total survey responses logged in the database. This tracks actual response submissions regardless of participant status."></i>
             </div>
-            <div class="info-label"><i class="fas fa-check-circle"></i> Responses Received</div>
         </div>
         <div class="info-item">
-            <div class="info-value" 
-                 data-bs-toggle="tooltip" 
-                 data-bs-placement="top" 
-                 title="Percentage of total participants who completed surveys (Responses / Total Participants)">
+            <div class="info-value">
                 {% if campaign.engagement_metrics.participation_rate is not none %}
                     {{ campaign.engagement_metrics.participation_rate }}%
                 {% else %}
                     N/A
                 {% endif %}
             </div>
-            <div class="info-label"><i class="fas fa-chart-bar"></i> Participation Rate</div>
+            <div class="info-label">
+                <i class="fas fa-chart-bar"></i> Participation Rate
+                <i class="fas fa-info-circle info-icon" 
+                   data-bs-toggle="popover" 
+                   data-bs-trigger="click" 
+                   data-bs-placement="top"
+                   data-bs-content="Percentage of total participants who completed surveys. Calculated as: (Responses Received / Total Participants) × 100."></i>
+            </div>
         </div>
         <div class="info-item">
-            <div class="info-value" 
-                 data-bs-toggle="tooltip" 
-                 data-bs-placement="top" 
-                 title="Conversion rate from sent invitations to completed surveys (Responses / Invitations Sent)">
+            <div class="info-value">
                 {% if campaign.engagement_metrics.email_success_rate is not none %}
                     {{ campaign.engagement_metrics.email_success_rate }}%
                 {% else %}
                     N/A
                 {% endif %}
             </div>
-            <div class="info-label"><i class="fas fa-paper-plane"></i> Email Success Rate</div>
+            <div class="info-label">
+                <i class="fas fa-paper-plane"></i> Email Success Rate
+                <i class="fas fa-info-circle info-icon" 
+                   data-bs-toggle="popover" 
+                   data-bs-trigger="click" 
+                   data-bs-placement="top"
+                   data-bs-content="Conversion rate from sent invitations to completed surveys. Calculated as: (Responses Received / Invitations Sent) × 100."></i>
+            </div>
         </div>
         {% if campaign.reminder_enabled %}
         <div class="info-item">
-            <div class="info-value" 
-                 data-bs-toggle="tooltip" 
-                 data-bs-placement="top" 
-                 title="Number of reminder emails sent to participants">
-                {{ campaign.engagement_metrics.reminders_sent }}
+            <div class="info-value">{{ campaign.engagement_metrics.reminders_sent }}</div>
+            <div class="info-label">
+                <i class="fas fa-bell"></i> Reminders Sent
+                <i class="fas fa-info-circle info-icon" 
+                   data-bs-toggle="popover" 
+                   data-bs-trigger="click" 
+                   data-bs-placement="top"
+                   data-bs-content="Number of reminder emails sent to participants who haven't completed surveys. Reminders are sent automatically based on campaign settings."></i>
             </div>
-            <div class="info-label"><i class="fas fa-bell"></i> Reminders Sent</div>
         </div>
         <div class="info-item">
-            <div class="info-value" 
-                 data-bs-toggle="tooltip" 
-                 data-bs-placement="top" 
-                 title="Percentage of participants who completed surveys after receiving a reminder">
+            <div class="info-value">
                 {% if campaign.engagement_metrics.reminder_conversion_rate is not none %}
                     {{ campaign.engagement_metrics.reminder_conversion_rate }}%
                 {% else %}
                     N/A
                 {% endif %}
             </div>
-            <div class="info-label"><i class="fas fa-chart-line"></i> Reminder Conversion</div>
+            <div class="info-label">
+                <i class="fas fa-chart-line"></i> Reminder Conversion
+                <i class="fas fa-info-circle info-icon" 
+                   data-bs-toggle="popover" 
+                   data-bs-trigger="click" 
+                   data-bs-placement="top"
+                   data-bs-content="Percentage of participants who completed surveys after receiving a reminder. Measures the effectiveness of reminder campaigns."></i>
+            </div>
         </div>
         {% endif %}
     </div>
@@ -189,42 +224,54 @@
                 </div>
                 
                 <div class="participant-summary-stats">
-                    <div class="stat-item stat-completed" 
-                         data-bs-toggle="tooltip" 
-                         data-bs-placement="top" 
-                         title="Participants whose status was marked as completed in the system">
+                    <div class="stat-item stat-completed">
                         <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
                         <div class="stat-content">
                             <div class="stat-value">{{ participant_stats.completed }}</div>
-                            <div class="stat-label">Completed</div>
+                            <div class="stat-label">
+                                Completed
+                                <i class="fas fa-info-circle info-icon" 
+                                   data-bs-toggle="popover" 
+                                   data-bs-trigger="click" 
+                                   data-bs-placement="top"
+                                   data-bs-content="Participants whose status was marked as 'completed' in the system. Status is updated when a survey response is successfully submitted."></i>
+                            </div>
                             {% if participant_stats.total > 0 %}
                             <div class="stat-percentage">{{ ((participant_stats.completed / participant_stats.total) * 100)|round(0)|int }}%</div>
                             {% endif %}
                         </div>
                     </div>
                     
-                    <div class="stat-item stat-invited" 
-                         data-bs-toggle="tooltip" 
-                         data-bs-placement="top" 
-                         title="Participants whose status is 'invited' (invitation sent but not yet completed)">
+                    <div class="stat-item stat-invited">
                         <div class="stat-icon"><i class="fas fa-envelope"></i></div>
                         <div class="stat-content">
                             <div class="stat-value">{{ participant_stats.invited }}</div>
-                            <div class="stat-label">Invited</div>
+                            <div class="stat-label">
+                                Invited
+                                <i class="fas fa-info-circle info-icon" 
+                                   data-bs-toggle="popover" 
+                                   data-bs-trigger="click" 
+                                   data-bs-placement="top"
+                                   data-bs-content="Participants whose status is 'invited'. This means an invitation email was sent but they haven't completed the survey yet."></i>
+                            </div>
                             {% if participant_stats.total > 0 %}
                             <div class="stat-percentage">{{ ((participant_stats.invited / participant_stats.total) * 100)|round(0)|int }}%</div>
                             {% endif %}
                         </div>
                     </div>
                     
-                    <div class="stat-item stat-pending" 
-                         data-bs-toggle="tooltip" 
-                         data-bs-placement="top" 
-                         title="Participants not yet invited to the campaign">
+                    <div class="stat-item stat-pending">
                         <div class="stat-icon"><i class="fas fa-clock"></i></div>
                         <div class="stat-content">
                             <div class="stat-value">{{ participant_stats.pending }}</div>
-                            <div class="stat-label">Pending</div>
+                            <div class="stat-label">
+                                Pending
+                                <i class="fas fa-info-circle info-icon" 
+                                   data-bs-toggle="popover" 
+                                   data-bs-trigger="click" 
+                                   data-bs-placement="top"
+                                   data-bs-content="Participants not yet invited to the campaign. They are associated with the campaign but haven't received invitations."></i>
+                            </div>
                             {% if participant_stats.total > 0 %}
                             <div class="stat-percentage">{{ ((participant_stats.pending / participant_stats.total) * 100)|round(0)|int }}%</div>
                             {% endif %}
@@ -513,10 +560,23 @@
 <script>
 // Transcript upload and management functionality
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize Bootstrap tooltips
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
+    // Initialize Bootstrap popovers for info icons
+    const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    const popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl, {
+            trigger: 'click',
+            html: true,
+            sanitize: false
+        });
+    });
+    
+    // Close popovers when clicking outside
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('[data-bs-toggle="popover"]')) {
+            popoverList.forEach(function(popover) {
+                popover.hide();
+            });
+        }
     });
     
     const uploadForm = document.getElementById('transcript-upload-form');
