@@ -282,6 +282,7 @@ p, .text-body {
     border-color: var(--primary-white);
     border-radius: var(--radius-md);
     padding: var(--spacing-sm);
+    display: none; /* Hidden on mobile */
 }
 
 .navbar-toggler:focus {
