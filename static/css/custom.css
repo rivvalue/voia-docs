@@ -7688,10 +7688,10 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
 }
 
 .status-filter {
-    padding: 0.25rem 0.75rem;
+    padding: 0.375rem 0.75rem;
     border: 2px solid transparent;
-    border-radius: 20px;
-    font-size: 0.8rem;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -7700,35 +7700,40 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
 
 .status-filter:hover {
     text-decoration: none;
+    transform: translateY(-1px);
 }
 
 .status-filter.all {
-    background-color: #f5f5f5;
-    color: #1a1a1a;
+    background: var(--light-gray);
+    color: var(--neutral-dark);
+    border: 1px solid var(--medium-gray);
 }
 
 .status-filter.draft {
-    background-color: #f5f5f5;
-    color: #6b7280;
+    background: rgba(138, 138, 138, 0.1);
+    color: var(--gray-dark);
+    border: 1px solid var(--medium-gray);
 }
 
 .status-filter.ready {
-    background-color: rgba(225, 58, 68, 0.1);
-    color: var(--primary-red);
+    background: var(--light-gray);
+    color: var(--neutral-dark);
+    border: 1px solid var(--medium-gray);
 }
 
 .status-filter.active {
-    background-color: rgba(225, 58, 68, 0.1);
-    color: var(--primary-red);
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
 }
 
 .status-filter.completed {
-    background-color: #f5f5f5;
-    color: #6b7280;
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
 }
 
 .status-filter.active-filter {
-    border-color: currentColor;
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 3px rgba(225, 58, 68, 0.1);
     transform: scale(1.05);
 }
 
@@ -7773,30 +7778,32 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
 
 .campaign-status {
     display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
     font-weight: 600;
 }
 
 .status-draft {
-    background-color: #f5f5f5;
-    color: #6b7280;
+    background: rgba(138, 138, 138, 0.1);
+    color: var(--gray-dark);
+    border: 1px solid var(--medium-gray);
 }
 
 .status-ready {
-    background-color: rgba(225, 58, 68, 0.1);
-    color: var(--primary-red);
+    background: var(--light-gray);
+    color: var(--neutral-dark);
+    border: 1px solid var(--medium-gray);
 }
 
 .status-active {
-    background-color: rgba(225, 58, 68, 0.1);
-    color: var(--primary-red);
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
 }
 
 .status-completed {
-    background-color: #f5f5f5;
-    color: #6b7280;
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
 }
 
 .table-actions {
