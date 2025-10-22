@@ -8403,61 +8403,91 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
    ======================================== */
 
 .page-campaign-participants {
-    background: var(--primary-white);
-    min-height: 100vh;
+    max-width: 1400px;
+    margin: 0 auto;
     padding: var(--spacing-xl);
 }
 
-/* Hero Header - Bold Red Gradient */
-.campaign-participants-hero {
+/* Header Section - Matching Settings Hub v2 */
+.campaign-participants-header {
     background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
     padding: var(--spacing-2xl);
-    border-radius: var(--radius-lg);
-    margin-bottom: var(--spacing-2xl);
-    box-shadow: var(--shadow-md);
+    margin: calc(-1 * var(--spacing-xl)) calc(-1 * var(--spacing-xl)) var(--spacing-2xl);
+    border-radius: 0;
+    color: var(--primary-white);
+    text-align: center;
 }
 
-.campaign-participants-hero-title {
+.campaign-participants-header h1 {
     font-family: var(--font-family-headings);
     font-size: var(--font-size-3xl);
     font-weight: 700;
+    margin: 0 0 var(--spacing-sm) 0;
     color: var(--primary-white);
-    margin-bottom: var(--spacing-sm);
-    letter-spacing: var(--letter-spacing-tight);
 }
 
-.campaign-participants-hero-subtitle {
+.campaign-participants-header p {
     font-family: var(--font-family-base);
     font-size: var(--font-size-base);
-    color: rgba(255, 255, 255, 0.9);
-    margin-bottom: var(--spacing-lg);
+    margin: 0;
+    opacity: 0.9;
+    color: var(--primary-white);
 }
 
-.campaign-participants-hero-meta {
-    display: flex;
-    align-items: center;
+/* Statistics Grid */
+.campaign-participants-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: var(--spacing-lg);
-    flex-wrap: wrap;
+    margin-bottom: var(--spacing-2xl);
 }
 
-.campaign-participants-hero-actions {
-    margin-top: var(--spacing-lg);
+.campaign-participants-stat-card {
+    background: var(--primary-white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--light-gray);
+    text-align: center;
+    transition: all 0.2s ease;
 }
 
-/* Content Sections with Red Accent Border */
+.campaign-participants-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.campaign-participants-stat-number {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-4xl);
+    font-weight: 700;
+    color: var(--primary-red);
+    margin-bottom: var(--spacing-xs);
+}
+
+.campaign-participants-stat-label {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-sm);
+    color: var(--gray-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+/* Content Sections - Simple White Cards */
 .campaign-participants-section {
     background: var(--primary-white);
     border-radius: var(--radius-lg);
     padding: var(--spacing-xl);
     margin-bottom: var(--spacing-xl);
-    border-left: 4px solid var(--primary-red);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--light-gray);
     transition: all 0.2s ease;
 }
 
 .campaign-participants-section:hover {
-    box-shadow: var(--shadow-md);
-    border-left-color: var(--red-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
 }
 
 .campaign-participants-section-header {
@@ -8573,25 +8603,25 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
 
 /* Alert Styling */
 .campaign-participants-alert {
-    border-left: 4px solid var(--primary-red);
     border-radius: var(--radius-md);
     padding: var(--spacing-md);
     font-family: var(--font-family-base);
+    border: 1px solid;
 }
 
 .campaign-participants-alert-info {
     background: rgba(23, 162, 184, 0.1);
-    border-left-color: #17a2b8;
+    border-color: #17a2b8;
 }
 
 .campaign-participants-alert-warning {
     background: rgba(255, 193, 7, 0.1);
-    border-left-color: #ffc107;
+    border-color: #ffc107;
 }
 
 .campaign-participants-alert-success {
     background: rgba(40, 167, 69, 0.1);
-    border-left-color: #28a745;
+    border-color: #28a745;
 }
 
 /* Stats Sidebar */
@@ -8599,8 +8629,8 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     background: var(--primary-white);
     border-radius: var(--radius-lg);
     padding: var(--spacing-xl);
-    border-left: 4px solid #28a745;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--light-gray);
 }
 
 .campaign-participants-stats-card h6 {
@@ -8648,43 +8678,9 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     margin-bottom: var(--spacing-lg);
 }
 
-/* Status Info Card */
-.campaign-participants-status-card {
-    background: var(--primary-white);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-xl);
-    border-left: 4px solid var(--primary-red);
-    box-shadow: var(--shadow-sm);
-}
-
-.campaign-participants-status-header {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    font-family: var(--font-family-headings);
-    font-weight: 600;
-    color: var(--primary-white);
-    margin-bottom: 0;
-}
-
-.campaign-participants-status-row {
-    padding: var(--spacing-md) 0;
-    border-bottom: 1px solid var(--light-gray);
-}
-
-.campaign-participants-status-row:last-child {
-    border-bottom: none;
-}
-
-.campaign-participants-status-label {
-    font-family: var(--font-family-headings);
-    font-weight: 600;
-    color: var(--neutral-dark);
-}
-
-.campaign-participants-status-value {
+/* Status Info */
+.campaign-participants-status-info {
     font-family: var(--font-family-base);
-    color: var(--primary-black);
 }
 
 .campaign-participants-status-explanation {
