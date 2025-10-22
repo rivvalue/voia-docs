@@ -227,6 +227,13 @@ p, .text-body {
     z-index: 10000 !important;
 }
 
+/* Desktop: 3x taller navbar */
+@media (min-width: 768px) {
+    .navbar {
+        padding: calc(var(--spacing-lg) * 3) 0;
+    }
+}
+
 .navbar-brand {
     font-family: var(--font-family-headings);
     color: var(--primary-white) !important;
