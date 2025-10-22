@@ -7727,7 +7727,7 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
 }
 
 .status-filter.completed {
-    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    background: linear-gradient(135deg, var(--neutral-dark) 0%, var(--gray-dark) 100%);
     color: var(--primary-white);
 }
 
@@ -7802,7 +7802,7 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
 }
 
 .status-completed {
-    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    background: linear-gradient(135deg, var(--neutral-dark) 0%, var(--gray-dark) 100%);
     color: var(--primary-white);
 }
 
