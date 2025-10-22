@@ -219,7 +219,7 @@ p, .text-body {
 
 /* Navigation and header styling */
 .navbar {
-    background-color: var(--primary-black) !important;
+    background: linear-gradient(180deg, #1a1a1a 0%, #2d2d2d 100%) !important;
     border-bottom: 2px solid var(--primary-red);
     padding: var(--spacing-lg) 0;
     box-shadow: var(--shadow-sm);
