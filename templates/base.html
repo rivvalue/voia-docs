@@ -107,7 +107,7 @@
             <!-- Centered Welcome Text (for unauthenticated users) -->
             {% if not is_business_authenticated %}
             <div class="position-absolute top-50 start-50 translate-middle">
-                <a class="navbar-brand text-center text-nowrap" href="{{ url_for('index') }}" style="font-size: 1.25rem; font-weight: 500;">
+                <a class="navbar-brand text-center text-nowrap navbar-welcome-text" href="{{ url_for('index') }}">
                     Welcome to VO<span style="color: #E13A44;">Ï</span>A Demo
                 </a>
             </div>

@@ -237,6 +237,18 @@ p, .text-body {
     transition: all 0.2s ease;
 }
 
+/* Centered Welcome Text - Responsive sizing */
+.navbar-welcome-text {
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+
+@media (min-width: 768px) {
+    .navbar-welcome-text {
+        font-size: 3.75rem; /* 3x larger: 1.25rem * 3 = 3.75rem */
+    }
+}
+
 .navbar-brand:hover {
     color: var(--primary-red) !important;
     transform: translateY(-1px);
