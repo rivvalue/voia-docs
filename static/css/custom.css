@@ -8397,3 +8397,336 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
         padding: var(--spacing-lg);
     }
 }
+
+/* ========================================
+   CAMPAIGN PARTICIPANTS PAGE - Settings Hub v2 Pattern
+   ======================================== */
+
+.page-campaign-participants {
+    background: var(--primary-white);
+    min-height: 100vh;
+    padding: var(--spacing-xl);
+}
+
+/* Hero Header - Bold Red Gradient */
+.campaign-participants-hero {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    padding: var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-2xl);
+    box-shadow: var(--shadow-md);
+}
+
+.campaign-participants-hero-title {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    color: var(--primary-white);
+    margin-bottom: var(--spacing-sm);
+    letter-spacing: var(--letter-spacing-tight);
+}
+
+.campaign-participants-hero-subtitle {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: var(--spacing-lg);
+}
+
+.campaign-participants-hero-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+    flex-wrap: wrap;
+}
+
+.campaign-participants-hero-actions {
+    margin-top: var(--spacing-lg);
+}
+
+/* Content Sections with Red Accent Border */
+.campaign-participants-section {
+    background: var(--primary-white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+    border-left: 4px solid var(--primary-red);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
+}
+
+.campaign-participants-section:hover {
+    box-shadow: var(--shadow-md);
+    border-left-color: var(--red-hover);
+}
+
+.campaign-participants-section-header {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--primary-black);
+    margin-bottom: var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.campaign-participants-section-header i {
+    color: var(--primary-red);
+}
+
+/* VOÏA Brand Badge Styling */
+.badge-voiia-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: var(--primary-white);
+    font-weight: 600;
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+}
+
+.badge-voiia-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+    color: var(--primary-black);
+    font-weight: 600;
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+}
+
+.badge-voiia-secondary {
+    background: linear-gradient(135deg, var(--medium-gray) 0%, var(--gray-dark) 100%);
+    color: var(--primary-white);
+    font-weight: 600;
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+}
+
+.badge-voiia-info {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    color: var(--primary-white);
+    font-weight: 600;
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+}
+
+.badge-voiia-primary {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+    font-weight: 600;
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+}
+
+/* Typography - Montserrat & Karla */
+.campaign-participants-section h5,
+.campaign-participants-section h6 {
+    font-family: var(--font-family-headings);
+}
+
+.campaign-participants-section p,
+.campaign-participants-section label,
+.campaign-participants-section .form-text {
+    font-family: var(--font-family-base);
+}
+
+/* Table Styling */
+.campaign-participants-table {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.campaign-participants-table thead th {
+    font-family: var(--font-family-headings);
+    font-weight: 600;
+    color: var(--neutral-dark);
+    border-bottom: 2px solid var(--primary-red);
+    padding: var(--spacing-md);
+}
+
+.campaign-participants-table tbody td {
+    font-family: var(--font-family-base);
+    padding: var(--spacing-md);
+    vertical-align: middle;
+}
+
+.campaign-participants-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.campaign-participants-table tbody tr:hover {
+    background-color: rgba(225, 58, 68, 0.05);
+}
+
+/* Custom Focus States */
+.campaign-participants-section button:focus,
+.campaign-participants-section input:focus,
+.campaign-participants-section select:focus,
+.campaign-participants-section .btn:focus {
+    outline: 2px solid var(--primary-red);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba(225, 58, 68, 0.1);
+}
+
+/* Alert Styling */
+.campaign-participants-alert {
+    border-left: 4px solid var(--primary-red);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    font-family: var(--font-family-base);
+}
+
+.campaign-participants-alert-info {
+    background: rgba(23, 162, 184, 0.1);
+    border-left-color: #17a2b8;
+}
+
+.campaign-participants-alert-warning {
+    background: rgba(255, 193, 7, 0.1);
+    border-left-color: #ffc107;
+}
+
+.campaign-participants-alert-success {
+    background: rgba(40, 167, 69, 0.1);
+    border-left-color: #28a745;
+}
+
+/* Stats Sidebar */
+.campaign-participants-stats-card {
+    background: var(--primary-white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    border-left: 4px solid #28a745;
+    box-shadow: var(--shadow-sm);
+}
+
+.campaign-participants-stats-card h6 {
+    font-family: var(--font-family-headings);
+    font-weight: 600;
+    color: var(--primary-white);
+    margin-bottom: 0;
+}
+
+.campaign-participants-stats-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm) 0;
+    font-family: var(--font-family-base);
+}
+
+.campaign-participants-stats-divider {
+    border-top: 2px solid var(--light-gray);
+    margin: var(--spacing-md) 0;
+}
+
+/* Empty State */
+.campaign-participants-empty {
+    text-align: center;
+    padding: var(--spacing-3xl) var(--spacing-lg);
+}
+
+.campaign-participants-empty i {
+    font-size: 4rem;
+    color: var(--medium-gray);
+    margin-bottom: var(--spacing-lg);
+}
+
+.campaign-participants-empty h6 {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-lg);
+    color: var(--gray-dark);
+    margin-bottom: var(--spacing-md);
+}
+
+.campaign-participants-empty p {
+    font-family: var(--font-family-base);
+    color: var(--gray-dark);
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Status Info Card */
+.campaign-participants-status-card {
+    background: var(--primary-white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    border-left: 4px solid var(--primary-red);
+    box-shadow: var(--shadow-sm);
+}
+
+.campaign-participants-status-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-family: var(--font-family-headings);
+    font-weight: 600;
+    color: var(--primary-white);
+    margin-bottom: 0;
+}
+
+.campaign-participants-status-row {
+    padding: var(--spacing-md) 0;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.campaign-participants-status-row:last-child {
+    border-bottom: none;
+}
+
+.campaign-participants-status-label {
+    font-family: var(--font-family-headings);
+    font-weight: 600;
+    color: var(--neutral-dark);
+}
+
+.campaign-participants-status-value {
+    font-family: var(--font-family-base);
+    color: var(--primary-black);
+}
+
+.campaign-participants-status-explanation {
+    padding: var(--spacing-md);
+    background: var(--light-gray);
+    border-radius: var(--radius-md);
+    margin-top: var(--spacing-md);
+}
+
+.campaign-participants-status-explanation strong {
+    font-family: var(--font-family-headings);
+    display: block;
+    margin-bottom: var(--spacing-xs);
+}
+
+.campaign-participants-status-explanation p {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-sm);
+    margin-bottom: 0;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .page-campaign-participants {
+        padding: var(--spacing-md);
+    }
+    
+    .campaign-participants-hero {
+        padding: var(--spacing-lg);
+    }
+    
+    .campaign-participants-hero-title {
+        font-size: var(--font-size-2xl);
+    }
+    
+    .campaign-participants-section {
+        padding: var(--spacing-md);
+    }
+    
+    .campaign-participants-hero-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+}
