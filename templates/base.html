@@ -121,16 +121,6 @@
                         {% include 'components/ui_version_toggle.html' %}
                     </li>
                     {% endif %}
-                    
-                    <!-- User Indicator (for survey authentication) -->
-                    {% if user_email and not is_business_authenticated %}
-                    <li class="nav-item">
-                        <span class="navbar-text ms-3">
-                            <i class="fas fa-user-circle me-2 text-success"></i>
-                            <small class="text-success fw-bold">{{ user_email }}</small>
-                        </span>
-                    </li>
-                    {% endif %}
                 </ul>
             </div>
             
