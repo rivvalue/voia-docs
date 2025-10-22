@@ -198,7 +198,7 @@ def queue_audit_log(business_account_id, action_type, resource_name=None,
             'resource_name': resource_name,
             'details': sanitized_details,
             'ip_address': ip_address,
-            'created_at': action_timestamp  # Preserve actual action time
+            'created_at': action_timestamp.isoformat()  # Convert to ISO string for JSON serialization
         }
         
         # Add to task queue for async processing

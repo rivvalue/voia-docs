@@ -2130,6 +2130,10 @@ class AuditLog(db.Model):
                           resource_id=None, resource_name=None, details=None, ip_address=None,
                           created_at=None):
         """Create a new audit log entry"""
+        # Parse created_at if it's an ISO string (from queue), otherwise use as-is
+        if created_at and isinstance(created_at, str):
+            created_at = datetime.fromisoformat(created_at)
+        
         audit = AuditLog(
             business_account_id=business_account_id,
             user_email=user_email,
