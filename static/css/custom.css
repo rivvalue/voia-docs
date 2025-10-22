@@ -266,6 +266,11 @@ p, .text-body {
     text-align: center;
 }
 
+/* Hide welcome text on business login page */
+.page-business-login .navbar-welcome-text {
+    display: none;
+}
+
 .navbar-brand:hover {
     color: var(--primary-red) !important;
     transform: translateY(-1px);
