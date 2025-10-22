@@ -10,496 +10,438 @@
     {'label': 'Manage Participants', 'current': true}
 ] %}
 {% include 'components/breadcrumb.html' %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <!-- Campaign Header -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h4 class="mb-0">
-                                <i class="fas fa-users me-2"></i>{{ campaign.name }} Participants
-                            </h4>
-                            <p class="text-muted mb-0 mt-2">
-                                Campaign Status: <span class="badge bg-{% if campaign.status == 'active' %}success{% elif campaign.status == 'ready' %}warning{% elif campaign.status == 'draft' %}secondary{% else %}info{% endif %}">
-                                    {{ campaign.status|title }}
-                                </span>
-                                | {{ campaign_stats.total }} participants assigned
-                            </p>
-                        </div>
-                        <a href="{{ url_for('participants.list_participants') }}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left me-2"></i>Back to Participants
-                        </a>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Add Participants Section -->
-            {% if campaign.status in ['draft', 'ready'] %}
-                {% if available_participants %}
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="fas fa-user-plus me-2"></i>Add Participants to Campaign
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <form method="POST" action="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <div class="mb-3">
-                                        <label for="participant_ids" class="form-label">
-                                            <i class="fas fa-users me-2"></i>Select Participants
-                                        </label>
-                                        <select class="form-select" id="participant_ids" name="participant_ids" multiple required>
-                                            {% for participant in available_participants %}
-                                            <option value="{{ participant.id }}">
-                                                {{ participant.name }} ({{ participant.email }})
-                                                {% if participant.company_name %} - {{ participant.company_name }}{% endif %}
-                                            </option>
-                                            {% endfor %}
-                                        </select>
-                                        <div class="form-text">
-                                            Hold Ctrl/Cmd to select multiple participants
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label">&nbsp;</label>
-                                    <div class="d-grid">
-                                        <button type="submit" class="btn btn-success">
-                                            <i class="fas fa-plus me-2"></i>Add Selected Participants
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                {% else %}
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="fas fa-user-plus me-2"></i>Add Participants to Campaign
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle me-2"></i>
-                            <strong>All Available Participants Assigned:</strong> 
-                            All participants in your account are already assigned to this campaign.
-                            <a href="{{ url_for('participants.create_participant') }}" class="btn btn-sm btn-primary ms-2">
-                                <i class="fas fa-user-plus me-1"></i>Create New Participant
-                            </a>
-                        </div>
-                    </div>
-                </div>
+<div class="page-campaign-participants">
+    <!-- Bold Red Gradient Hero Header -->
+    <div class="campaign-participants-hero">
+        <h1 class="campaign-participants-hero-title">
+            <i class="fas fa-users me-2" aria-hidden="true"></i>{{ campaign.name }}
+        </h1>
+        <p class="campaign-participants-hero-subtitle">
+            Manage participants for this campaign
+        </p>
+        <div class="campaign-participants-hero-meta">
+            <span class="{% if campaign.status == 'completed' %}badge-voiia-success{% elif campaign.status == 'active' %}badge-voiia-success{% elif campaign.status == 'ready' %}badge-voiia-warning{% elif campaign.status == 'draft' %}badge-voiia-secondary{% else %}badge-voiia-info{% endif %}" role="status" aria-label="Campaign status: {{ campaign.status|title }}">
+                {% if campaign.status == 'draft' %}
+                    <i class="fas fa-edit me-1" aria-hidden="true"></i>Draft
+                {% elif campaign.status == 'ready' %}
+                    <i class="fas fa-check-circle me-1" aria-hidden="true"></i>Ready
+                {% elif campaign.status == 'active' %}
+                    <i class="fas fa-play-circle me-1" aria-hidden="true"></i>Active
+                {% elif campaign.status == 'completed' %}
+                    <i class="fas fa-flag-checkered me-1" aria-hidden="true"></i>Completed
                 {% endif %}
-            {% else %}
-                <!-- Campaign status prevents adding participants -->
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h5 class="mb-0 text-muted">
-                            <i class="fas fa-user-plus me-2"></i>Add Participants to Campaign
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="alert alert-warning">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            <strong>Participants Cannot Be Modified:</strong> 
-                            This campaign is {{ campaign.status }}. Participants can only be added or removed when the campaign is in draft or ready status.
-                            {% if campaign.status == 'active' %}
-                                <br><small class="text-muted">Campaign is currently collecting responses. Wait until completion to modify participants.</small>
-                            {% elif campaign.status == 'completed' %}
-                                <br><small class="text-muted">Campaign has finished. Participant list is now locked.</small>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            {% endif %}
+            </span>
+            <span class="text-white">
+                <i class="fas fa-users me-1" aria-hidden="true"></i>
+                <strong>{{ campaign_stats.total }}</strong> participants assigned
+            </span>
+        </div>
+        <div class="campaign-participants-hero-actions">
+            <a href="{{ url_for('participants.list_participants') }}" class="btn btn-light" aria-label="Back to all participants">
+                <i class="fas fa-arrow-left me-2" aria-hidden="true"></i>Back to Participants
+            </a>
+        </div>
+    </div>
 
-            <!-- Search Campaign Participants -->
-            <div class="card mt-4">
-                <div class="card-body">
-                    <form method="GET" action="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}">
-                        <div class="row align-items-end">
-                            <div class="col-md-8">
-                                <label for="search" class="form-label">Search Campaign Participants</label>
-                                <input type="text" class="form-control" id="search" name="search" 
-                                       value="{{ search_query or '' }}" 
-                                       placeholder="Search participants by name, email, or company...">
-                            </div>
-                            <div class="col-md-4">
-                                <div class="btn-group w-100">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-search me-1"></i>Search
-                                    </button>
-                                    {% if search_query %}
-                                    <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" class="btn btn-outline-secondary">
-                                        <i class="fas fa-times me-1"></i>Clear
-                                    </a>
-                                    {% endif %}
-                                </div>
+    <!-- Add Participants Section -->
+    {% if campaign.status in ['draft', 'ready'] %}
+        {% if available_participants %}
+        <div class="campaign-participants-section">
+            <h5 class="campaign-participants-section-header">
+                <i class="fas fa-user-plus" aria-hidden="true"></i>Add Participants to Campaign
+            </h5>
+            <form method="POST" action="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" aria-label="Add participants form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label for="participant_ids" class="form-label">
+                                <i class="fas fa-users me-2" aria-hidden="true"></i>Select Participants
+                            </label>
+                            <select class="form-select" id="participant_ids" name="participant_ids" multiple required 
+                                    aria-label="Select participants to add to campaign" 
+                                    aria-describedby="participant-select-help">
+                                {% for participant in available_participants %}
+                                <option value="{{ participant.id }}">
+                                    {{ participant.name }} ({{ participant.email }})
+                                    {% if participant.company_name %} - {{ participant.company_name }}{% endif %}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text" id="participant-select-help">
+                                Hold Ctrl/Cmd to select multiple participants
                             </div>
                         </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Current Participants -->
-            <div class="card mt-4">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">
-                            <i class="fas fa-list me-2"></i>Current Participants
-                            {% if search_query %}
-                                <small class="text-muted">({{ current_participants|length }} found for "{{ search_query }}")</small>
-                            {% else %}
-                                <small class="text-muted">({{ current_participants|length }})</small>
-                            {% endif %}
-                        </h5>
-                        {% if current_participants %}
-                        <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-outline-info btn-sm" onclick="copyAllTokens()">
-                                <i class="fas fa-copy me-2"></i>Copy All Survey Links
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success" aria-label="Add selected participants to campaign">
+                                <i class="fas fa-plus me-2" aria-hidden="true"></i>Add Selected Participants
                             </button>
                         </div>
-                        {% endif %}
                     </div>
                 </div>
-                <div class="card-body">
-                    {% if current_participants %}
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th><i class="fas fa-user me-2"></i>Participant</th>
-                                    <th><i class="fas fa-envelope me-2"></i>Email</th>
-                                    <th><i class="fas fa-building me-2"></i>Company</th>
-                                    <th><i class="fas fa-info-circle me-2"></i>Status</th>
-                                    <th><i class="fas fa-calendar me-2"></i>Progress</th>
-                                    <th><i class="fas fa-link me-2"></i>Survey Link</th>
-                                    <th><i class="fas fa-cogs me-2"></i>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for participant in current_participants %}
-                                <tr>
-                                    <td>
-                                        <strong>{{ participant.name }}</strong>
-                                    </td>
-                                    <td>
-                                        <a href="mailto:{{ participant.email }}" class="text-decoration-none">
-                                            {{ participant.email }}
-                                        </a>
-                                    </td>
-                                    <td>
-                                        {% if participant.company_name %}
-                                            {{ participant.company_name }}
-                                        {% else %}
-                                            <span class="text-muted">-</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <span class="badge bg-{% if participant.status == 'completed' %}success{% elif participant.status == 'started' %}warning{% else %}secondary{% endif %}">
-                                            {{ participant.status|title }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="small text-muted">
-                                            {% if participant.invited_at %}
-                                                <i class="fas fa-paper-plane me-1"></i>Invited: {{ participant.invited_at[:10] }}<br>
-                                            {% endif %}
-                                            {% if participant.started_at %}
-                                                <i class="fas fa-play me-1"></i>Started: {{ participant.started_at[:10] }}<br>
-                                            {% endif %}
-                                            {% if participant.completed_at %}
-                                                <i class="fas fa-check me-1"></i>Completed: {{ participant.completed_at[:10] }}
-                                            {% endif %}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        {% if participant.token %}
-                                        <div class="input-group input-group-sm">
-                                            <input type="text" class="form-control token-input" 
-                                                   value="{{ url_for('survey', token=participant.token, _external=True) }}" 
-                                                   readonly>
-                                            <button class="btn btn-outline-secondary" type="button" 
-                                                    onclick="copyToken(this, '{{ participant.name }}')">
-                                                <i class="fas fa-copy"></i>
-                                            </button>
-                                        </div>
-                                        {% else %}
-                                        <span class="text-muted">No token</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <div class="btn-group-vertical btn-group-sm" role="group">
-                                            <!-- Remove from Campaign -->
-                                            {% if campaign.status in ['draft', 'ready'] %}
-                                            <form method="POST" action="{{ url_for('participants.remove_campaign_participant', campaign_id=campaign.id, association_id=participant.association_id) }}" 
-                                                  onsubmit="return confirm('Remove {{ participant.name }} from this campaign?')" class="d-inline">
-                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                                                <button type="submit" class="btn btn-outline-danger btn-sm">
-                                                    <i class="fas fa-times me-1"></i>Remove
-                                                </button>
-                                            </form>
-                                            {% else %}
-                                            <button type="button" class="btn btn-outline-secondary btn-sm" disabled 
-                                                    title="Cannot remove participants from {{ campaign.status }} campaign">
-                                                <i class="fas fa-lock me-1"></i>Locked
-                                            </button>
-                                            {% endif %}
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    {% else %}
-                    <div class="text-center py-5">
-                        <i class="fas fa-users text-muted mb-3" style="font-size: 3rem;"></i>
-                        <h6 class="text-muted">No participants assigned to this campaign yet</h6>
-                        {% if available_participants %}
-                        <p class="text-muted">Use the form above to add participants to this campaign.</p>
-                        {% else %}
-                        <p class="text-muted">Create participants first, then assign them to campaigns.</p>
-                        <a href="{{ url_for('participants.create_participant') }}" class="btn btn-primary mt-3">
-                            <i class="fas fa-user-plus me-2"></i>Create First Participant
+            </form>
+        </div>
+        {% else %}
+        <div class="campaign-participants-section">
+            <h5 class="campaign-participants-section-header">
+                <i class="fas fa-user-plus" aria-hidden="true"></i>Add Participants to Campaign
+            </h5>
+            <div class="campaign-participants-alert campaign-participants-alert-info" role="alert">
+                <i class="fas fa-info-circle me-2" aria-hidden="true"></i>
+                <strong>All Available Participants Assigned:</strong> 
+                All participants in your account are already assigned to this campaign.
+                <a href="{{ url_for('participants.create_participant') }}" class="btn btn-sm btn-primary ms-2" aria-label="Create new participant">
+                    <i class="fas fa-user-plus me-1" aria-hidden="true"></i>Create New Participant
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    {% else %}
+        <!-- Campaign status prevents adding participants -->
+        <div class="campaign-participants-section">
+            <h5 class="campaign-participants-section-header text-muted">
+                <i class="fas fa-user-plus" aria-hidden="true"></i>Add Participants to Campaign
+            </h5>
+            <div class="campaign-participants-alert campaign-participants-alert-warning" role="alert">
+                <i class="fas fa-exclamation-triangle me-2" aria-hidden="true"></i>
+                <strong>Participants Cannot Be Modified:</strong> 
+                This campaign is {{ campaign.status }}. Participants can only be added or removed when the campaign is in draft or ready status.
+                {% if campaign.status == 'active' %}
+                    <br><small class="text-muted">Campaign is currently collecting responses. Wait until completion to modify participants.</small>
+                {% elif campaign.status == 'completed' %}
+                    <br><small class="text-muted">Campaign has finished. Participant list is now locked.</small>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Search Campaign Participants -->
+    <div class="campaign-participants-section">
+        <form method="GET" action="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" aria-label="Search participants form">
+            <div class="row align-items-end">
+                <div class="col-md-8">
+                    <label for="search" class="form-label">Search Campaign Participants</label>
+                    <input type="text" class="form-control" id="search" name="search" 
+                           value="{{ search_query or '' }}" 
+                           placeholder="Search participants by name, email, or company..."
+                           aria-label="Search participants by name, email, or company">
+                </div>
+                <div class="col-md-4">
+                    <div class="btn-group w-100" role="group" aria-label="Search actions">
+                        <button type="submit" class="btn btn-primary" aria-label="Search participants">
+                            <i class="fas fa-search me-1" aria-hidden="true"></i>Search
+                        </button>
+                        {% if search_query %}
+                        <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" class="btn btn-outline-secondary" aria-label="Clear search">
+                            <i class="fas fa-times me-1" aria-hidden="true"></i>Clear
                         </a>
                         {% endif %}
                     </div>
-                    {% endif %}
                 </div>
             </div>
+        </form>
+    </div>
 
-            <!-- Campaign Status Information -->
-            <div class="row mt-4">
-                <div class="col-md-8">
-                    <div class="card">
-                        <div class="card-header bg-{% if campaign.status == 'active' %}success{% elif campaign.status == 'ready' %}warning{% elif campaign.status == 'draft' %}secondary{% elif campaign.status == 'completed' %}info{% else %}secondary{% endif %} text-white">
-                            <h6 class="mb-0">
-                                <i class="fas fa-info-circle me-2"></i>Campaign Status & Participant Management
-                            </h6>
+    <!-- Current Participants -->
+    <div class="campaign-participants-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="campaign-participants-section-header mb-0">
+                <i class="fas fa-list" aria-hidden="true"></i>Current Participants
+                {% if search_query %}
+                    <small class="text-muted">({{ current_participants|length }} found for "{{ search_query }}")</small>
+                {% else %}
+                    <small class="text-muted">({{ current_participants|length }})</small>
+                {% endif %}
+            </h5>
+            {% if current_participants %}
+            <div class="btn-group" role="group" aria-label="Participant actions">
+                <button type="button" class="btn btn-outline-info btn-sm" onclick="copyAllTokens()" aria-label="Copy all survey links to clipboard">
+                    <i class="fas fa-copy me-2" aria-hidden="true"></i>Copy All Survey Links
+                </button>
+            </div>
+            {% endif %}
+        </div>
+        
+        {% if current_participants %}
+        <div class="table-responsive">
+            <table class="table table-hover campaign-participants-table" aria-label="Campaign participants table">
+                <thead>
+                    <tr>
+                        <th scope="col"><i class="fas fa-user me-2" aria-hidden="true"></i>Participant</th>
+                        <th scope="col"><i class="fas fa-envelope me-2" aria-hidden="true"></i>Email</th>
+                        <th scope="col"><i class="fas fa-building me-2" aria-hidden="true"></i>Company</th>
+                        <th scope="col"><i class="fas fa-info-circle me-2" aria-hidden="true"></i>Status</th>
+                        <th scope="col"><i class="fas fa-calendar me-2" aria-hidden="true"></i>Progress</th>
+                        <th scope="col"><i class="fas fa-link me-2" aria-hidden="true"></i>Survey Link</th>
+                        <th scope="col"><i class="fas fa-cogs me-2" aria-hidden="true"></i>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for participant in current_participants %}
+                    <tr>
+                        <td>
+                            <strong>{{ participant.name }}</strong>
+                        </td>
+                        <td>
+                            <a href="mailto:{{ participant.email }}" class="text-decoration-none" aria-label="Email {{ participant.name }}">
+                                {{ participant.email }}
+                            </a>
+                        </td>
+                        <td>
+                            {% if participant.company_name %}
+                                {{ participant.company_name }}
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="{% if participant.status == 'completed' %}badge-voiia-success{% elif participant.status == 'started' %}badge-voiia-warning{% else %}badge-voiia-secondary{% endif %}" role="status" aria-label="Status: {{ participant.status|title }}">
+                                {{ participant.status|title }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="small text-muted">
+                                {% if participant.invited_at %}
+                                    <i class="fas fa-paper-plane me-1" aria-hidden="true"></i>Invited: {{ participant.invited_at[:10] }}<br>
+                                {% endif %}
+                                {% if participant.started_at %}
+                                    <i class="fas fa-play me-1" aria-hidden="true"></i>Started: {{ participant.started_at[:10] }}<br>
+                                {% endif %}
+                                {% if participant.completed_at %}
+                                    <i class="fas fa-check me-1" aria-hidden="true"></i>Completed: {{ participant.completed_at[:10] }}
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            {% if participant.token %}
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control token-input" 
+                                       value="{{ url_for('survey', token=participant.token, _external=True) }}" 
+                                       readonly
+                                       aria-label="Survey link for {{ participant.name }}">
+                                <button class="btn btn-outline-secondary" type="button" 
+                                        onclick="copyToken(this, '{{ participant.name }}')"
+                                        aria-label="Copy survey link for {{ participant.name }}">
+                                    <i class="fas fa-copy" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            {% else %}
+                            <span class="text-muted">No token</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group-vertical btn-group-sm" role="group" aria-label="Participant actions">
+                                <!-- Remove from Campaign -->
+                                {% if campaign.status in ['draft', 'ready'] %}
+                                <form method="POST" action="{{ url_for('participants.remove_campaign_participant', campaign_id=campaign.id, association_id=participant.association_id) }}" 
+                                      onsubmit="return confirm('Remove {{ participant.name }} from this campaign?')" class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" aria-label="Remove {{ participant.name }} from campaign">
+                                        <i class="fas fa-times me-1" aria-hidden="true"></i>Remove
+                                    </button>
+                                </form>
+                                {% else %}
+                                <button type="button" class="btn btn-outline-secondary btn-sm" disabled 
+                                        title="Cannot remove participants from {{ campaign.status }} campaign"
+                                        aria-label="Cannot remove participant - campaign is {{ campaign.status }}">
+                                    <i class="fas fa-lock me-1" aria-hidden="true"></i>Locked
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="campaign-participants-empty" role="status" aria-live="polite">
+            <i class="fas fa-users" aria-hidden="true"></i>
+            <h6>No participants assigned to this campaign yet</h6>
+            {% if available_participants %}
+            <p>Use the form above to add participants to this campaign.</p>
+            {% else %}
+            <p>Create participants first, then assign them to campaigns.</p>
+            <a href="{{ url_for('participants.create_participant') }}" class="btn btn-primary mt-3" aria-label="Create first participant">
+                <i class="fas fa-user-plus me-2" aria-hidden="true"></i>Create First Participant
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Campaign Status Information & Stats -->
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <div class="campaign-participants-status-card">
+                <div class="card-header bg-{% if campaign.status == 'active' %}success{% elif campaign.status == 'ready' %}warning{% elif campaign.status == 'draft' %}secondary{% elif campaign.status == 'completed' %}info{% else %}secondary{% endif %} text-white" style="border-radius: 0.5rem 0.5rem 0 0;">
+                    <h6 class="campaign-participants-status-header">
+                        <i class="fas fa-info-circle" aria-hidden="true"></i>Campaign Status & Participant Management
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="campaign-participants-status-row row">
+                        <div class="col-sm-3">
+                            <span class="campaign-participants-status-label">Campaign Name:</span>
                         </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-sm-3">
-                                    <strong>Campaign Name:</strong>
-                                </div>
-                                <div class="col-sm-9">
-                                    {{ campaign.name }}
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                                <div class="col-sm-3">
-                                    <strong>Current Status:</strong>
-                                </div>
-                                <div class="col-sm-9">
-                                    <span class="badge bg-{% if campaign.status == 'active' %}success{% elif campaign.status == 'ready' %}warning{% elif campaign.status == 'draft' %}secondary{% elif campaign.status == 'completed' %}info{% else %}secondary{% endif %} me-2">
-                                        {% if campaign.status == 'draft' %}
-                                            <i class="fas fa-edit me-1"></i>Draft
-                                        {% elif campaign.status == 'ready' %}
-                                            <i class="fas fa-check-circle me-1"></i>Ready
-                                        {% elif campaign.status == 'active' %}
-                                            <i class="fas fa-play-circle me-1"></i>Active
-                                        {% elif campaign.status == 'completed' %}
-                                            <i class="fas fa-flag-checkered me-1"></i>Completed
-                                        {% endif %}
-                                    </span>
-                                    
-                                    <!-- Status explanation -->
-                                    {% if campaign.status == 'draft' %}
-                                        <span class="text-success">✓ Can add/remove participants</span>
-                                    {% elif campaign.status == 'ready' %}
-                                        <span class="text-success">✓ Can add/remove participants</span>
-                                    {% elif campaign.status == 'active' %}
-                                        <span class="text-warning">⚠️ Participant list locked - collecting responses</span>
-                                    {% elif campaign.status == 'completed' %}
-                                        <span class="text-muted">🔒 Participant list permanently locked</span>
-                                    {% endif %}
-                                </div>
-                            </div>
+                        <div class="col-sm-9">
+                            <span class="campaign-participants-status-value">{{ campaign.name }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="campaign-participants-status-row row">
+                        <div class="col-sm-3">
+                            <span class="campaign-participants-status-label">Current Status:</span>
+                        </div>
+                        <div class="col-sm-9">
+                            <span class="{% if campaign.status == 'completed' %}badge-voiia-success{% elif campaign.status == 'active' %}badge-voiia-success{% elif campaign.status == 'ready' %}badge-voiia-warning{% elif campaign.status == 'draft' %}badge-voiia-secondary{% else %}badge-voiia-info{% endif %} me-2" role="status">
+                                {% if campaign.status == 'draft' %}
+                                    <i class="fas fa-edit me-1" aria-hidden="true"></i>Draft
+                                {% elif campaign.status == 'ready' %}
+                                    <i class="fas fa-check-circle me-1" aria-hidden="true"></i>Ready
+                                {% elif campaign.status == 'active' %}
+                                    <i class="fas fa-play-circle me-1" aria-hidden="true"></i>Active
+                                {% elif campaign.status == 'completed' %}
+                                    <i class="fas fa-flag-checkered me-1" aria-hidden="true"></i>Completed
+                                {% endif %}
+                            </span>
                             
-                            <!-- Detailed status explanation -->
-                            <hr>
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="p-3 bg-light rounded">
-                                        {% if campaign.status == 'draft' %}
-                                            <strong class="text-primary">Draft Campaign:</strong>
-                                            <p class="mb-1 small">The campaign is being prepared. You can freely add or remove participants, modify campaign details, and prepare for launch.</p>
-                                        {% elif campaign.status == 'ready' %}
-                                            <strong class="text-warning">Ready for Activation:</strong>
-                                            <p class="mb-1 small">Campaign is prepared and ready to go live. You can still add or remove participants until the campaign is activated.</p>
-                                        {% elif campaign.status == 'active' %}
-                                            <strong class="text-success">Active Campaign:</strong>
-                                            <p class="mb-1 small">Campaign is live and collecting survey responses. Participant list is locked to maintain data integrity. Wait for completion to modify participants.</p>
-                                        {% elif campaign.status == 'completed' %}
-                                            <strong class="text-info">Completed Campaign:</strong>
-                                            <p class="mb-1 small">Campaign has finished. All data is preserved and participant list is permanently locked to maintain historical accuracy.</p>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <hr>
-                            <div class="row">
-                                <div class="col-sm-3">
-                                    <strong>Created:</strong>
-                                </div>
-                                <div class="col-sm-9">
-                                    {{ campaign.created_at[:10] if campaign.created_at else 'N/A' }}
-                                </div>
+                            <!-- Status explanation -->
+                            {% if campaign.status == 'draft' %}
+                                <span class="text-success"><i class="fas fa-check" aria-hidden="true"></i> Can add/remove participants</span>
+                            {% elif campaign.status == 'ready' %}
+                                <span class="text-success"><i class="fas fa-check" aria-hidden="true"></i> Can add/remove participants</span>
+                            {% elif campaign.status == 'active' %}
+                                <span class="text-warning"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Participant list locked - collecting responses</span>
+                            {% elif campaign.status == 'completed' %}
+                                <span class="text-muted"><i class="fas fa-lock" aria-hidden="true"></i> Participant list permanently locked</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Detailed status explanation -->
+                    <div class="campaign-participants-status-row row">
+                        <div class="col-12">
+                            <div class="campaign-participants-status-explanation">
+                                {% if campaign.status == 'draft' %}
+                                    <strong class="text-primary">Draft Campaign:</strong>
+                                    <p>The campaign is being prepared. You can freely add or remove participants, modify campaign details, and prepare for launch.</p>
+                                {% elif campaign.status == 'ready' %}
+                                    <strong class="text-warning">Ready for Activation:</strong>
+                                    <p>Campaign is prepared and ready to go live. You can still add or remove participants until the campaign is activated.</p>
+                                {% elif campaign.status == 'active' %}
+                                    <strong class="text-success">Active Campaign:</strong>
+                                    <p>Campaign is live and collecting survey responses. Participant list is locked to maintain data integrity. Wait for completion to modify participants.</p>
+                                {% elif campaign.status == 'completed' %}
+                                    <strong class="text-info">Completed Campaign:</strong>
+                                    <p>Campaign has finished. All data is preserved and participant list is permanently locked to maintain historical accuracy.</p>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="campaign-participants-status-row row">
+                        <div class="col-sm-3">
+                            <span class="campaign-participants-status-label">Created:</span>
+                        </div>
+                        <div class="col-sm-9">
+                            <span class="campaign-participants-status-value">{{ campaign.created_at[:10] if campaign.created_at else 'N/A' }}</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card">
-                        <div class="card-header bg-success text-white">
-                            <h6 class="mb-0">
-                                <i class="fas fa-chart-line me-2"></i>Participation Stats
-                            </h6>
-                        </div>
-                        <div class="card-body">
-                            {% set invited_count = campaign_stats.invited %}
-                            {% set started_count = campaign_stats.started %}
-                            {% set completed_count = campaign_stats.completed %}
-                            
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>Invited:</span>
-                                <span class="badge bg-secondary">{{ invited_count }}</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>Started:</span>
-                                <span class="badge bg-warning">{{ started_count }}</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>Completed:</span>
-                                <span class="badge bg-success">{{ completed_count }}</span>
-                            </div>
-                            <hr>
-                            <div class="d-flex justify-content-between">
-                                <strong>Total:</strong>
-                                <strong><span class="badge bg-primary">{{ campaign_stats.total }}</span></strong>
-                            </div>
-                        </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="campaign-participants-stats-card">
+                <div class="card-header bg-success text-white" style="border-radius: 0.5rem 0.5rem 0 0;">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-line me-2" aria-hidden="true"></i>Participation Stats
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% set invited_count = campaign_stats.invited %}
+                    {% set started_count = campaign_stats.started %}
+                    {% set completed_count = campaign_stats.completed %}
+                    
+                    <div class="campaign-participants-stats-item">
+                        <span>Invited:</span>
+                        <span class="badge-voiia-secondary" role="status">{{ invited_count }}</span>
+                    </div>
+                    <div class="campaign-participants-stats-item">
+                        <span>Started:</span>
+                        <span class="badge-voiia-warning" role="status">{{ started_count }}</span>
+                    </div>
+                    <div class="campaign-participants-stats-item">
+                        <span>Completed:</span>
+                        <span class="badge-voiia-success" role="status">{{ completed_count }}</span>
+                    </div>
+                    <div class="campaign-participants-stats-divider"></div>
+                    <div class="campaign-participants-stats-item">
+                        <strong>Total:</strong>
+                        <strong><span class="badge-voiia-primary" role="status">{{ campaign_stats.total }}</span></strong>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
 <script>
-// Copy individual survey token
+// Copy individual token
 function copyToken(button, participantName) {
-    const tokenInput = button.closest('.input-group').querySelector('.token-input');
-    tokenInput.select();
+    const input = button.previousElementSibling;
+    input.select();
     document.execCommand('copy');
     
-    // Visual feedback
-    const originalHtml = button.innerHTML;
-    button.innerHTML = '<i class="fas fa-check"></i>';
+    const originalHTML = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i>';
     button.classList.remove('btn-outline-secondary');
     button.classList.add('btn-success');
     
     setTimeout(() => {
-        button.innerHTML = originalHtml;
+        button.innerHTML = originalHTML;
         button.classList.remove('btn-success');
         button.classList.add('btn-outline-secondary');
     }, 2000);
-    
-    // Show toast notification
-    showToast(`Survey link copied for ${participantName}`, 'success');
 }
 
-// Copy all survey tokens
+// Copy all tokens
 function copyAllTokens() {
     const tokenInputs = document.querySelectorAll('.token-input');
-    let allTokens = [];
+    let allTokens = '';
     
-    tokenInputs.forEach(input => {
-        allTokens.push(input.value);
-    });
-    
-    if (allTokens.length === 0) {
-        showToast('No survey links available to copy', 'warning');
-        return;
-    }
-    
-    const allTokensText = allTokens.join('\n');
-    
-    // Copy to clipboard
-    navigator.clipboard.writeText(allTokensText).then(() => {
-        showToast(`Copied ${allTokens.length} survey links to clipboard`, 'success');
-    }).catch(err => {
-        // Fallback for older browsers
-        const textArea = document.createElement('textarea');
-        textArea.value = allTokensText;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        showToast(`Copied ${allTokens.length} survey links to clipboard`, 'success');
-    });
-}
-
-// Toast notification function
-function showToast(message, type = 'info') {
-    // Create toast element
-    const toast = document.createElement('div');
-    toast.className = `alert alert-${type} position-fixed top-0 end-0 m-3`;
-    toast.style.zIndex = '9999';
-    toast.innerHTML = `
-        <div class="d-flex align-items-center">
-            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
-            ${message}
-        </div>
-    `;
-    
-    document.body.appendChild(toast);
-    
-    // Remove toast after 3 seconds
-    setTimeout(() => {
-        if (toast.parentNode) {
-            toast.parentNode.removeChild(toast);
+    tokenInputs.forEach((input, index) => {
+        allTokens += input.value;
+        if (index < tokenInputs.length - 1) {
+            allTokens += '\n';
         }
-    }, 3000);
+    });
+    
+    const tempTextArea = document.createElement('textarea');
+    tempTextArea.value = allTokens;
+    document.body.appendChild(tempTextArea);
+    tempTextArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempTextArea);
+    
+    alert(`Copied ${tokenInputs.length} survey links to clipboard!`);
 }
 
-// Multi-select enhancement
+// Initialize Bootstrap popovers if any
 document.addEventListener('DOMContentLoaded', function() {
-    const selectElement = document.getElementById('participant_ids');
-    if (selectElement) {
-        // Add some visual enhancements
-        selectElement.style.minHeight = '120px';
-        
-        // Form submission enhancement
-        const form = selectElement.closest('form');
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                if (selectElement.selectedOptions.length === 0) {
-                    e.preventDefault();
-                    showToast('Please select at least one participant to add', 'warning');
-                    return false;
-                }
-                
-                // Add loading state
-                const submitBtn = form.querySelector('button[type="submit"]');
-                if (submitBtn) {
-                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Adding...';
-                    submitBtn.disabled = true;
-                }
+    const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    if (typeof bootstrap !== 'undefined' && bootstrap.Popover) {
+        popoverTriggerList.map(function (popoverTriggerEl) {
+            return new bootstrap.Popover(popoverTriggerEl, {
+                trigger: 'click',
+                html: true
             });
-        }
+        });
     }
 });
 </script>
