@@ -104,14 +104,17 @@
             </div>
             {% endif %}
             
+            <!-- Centered Welcome Text (for unauthenticated users) -->
+            {% if not is_business_authenticated %}
+            <div class="mx-auto">
+                <a class="navbar-brand text-center" href="{{ url_for('index') }}" style="font-size: 1.25rem; font-weight: 500;">
+                    Welcome to VO<span style="color: #E13A44;">Ï</span>A Demo
+                </a>
+            </div>
+            {% endif %}
+            
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    {% if not is_business_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('index') }}">Welcome to VO<span style="color: #E13A44;">Ï</span>A Demo</a>
-                    </li>
-                    {% endif %}
-                    
                     <!-- Business Authentication - UI Version Toggle (inside collapsible menu) -->
                     {% if is_business_authenticated %}
                     <li class="nav-item d-flex align-items-center me-3">
