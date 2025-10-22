@@ -7727,8 +7727,9 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
 }
 
 .status-filter.completed {
-    background: linear-gradient(135deg, var(--neutral-dark) 0%, var(--gray-dark) 100%);
-    color: var(--primary-white);
+    background: rgba(225, 58, 68, 0.1);
+    color: var(--primary-red);
+    border: 1px solid rgba(225, 58, 68, 0.3);
 }
 
 .status-filter.active-filter {
@@ -7802,8 +7803,9 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
 }
 
 .status-completed {
-    background: linear-gradient(135deg, var(--neutral-dark) 0%, var(--gray-dark) 100%);
-    color: var(--primary-white);
+    background: rgba(225, 58, 68, 0.1);
+    color: var(--primary-red);
+    border: 1px solid rgba(225, 58, 68, 0.3);
 }
 
 .table-actions {
