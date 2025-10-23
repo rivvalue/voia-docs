@@ -106,10 +106,9 @@
     }
     .feature-highlight {
         background: rgba(225, 58, 68, 0.05);
-        border-left: 4px solid #E13A44;
         padding: 1.5rem;
         margin: 1rem 0;
-        border-radius: 0 10px 10px 0;
+        border-radius: 10px;
         height: 100%;
         display: flex;
         flex-direction: column;
@@ -125,21 +124,11 @@
         margin-top: 6rem !important;
     }
     
-    /* Feature Tile with Partial Top Border */
+    /* Feature Tile without border */
     .feature-tile {
         position: relative;
         padding: 1rem 1.25rem 1rem 1rem;
         text-align: left;
-    }
-    
-    .feature-tile::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 16%;
-        height: 3px;
-        background: #E13A44;
     }
     
     /* Mobile Optimization */
@@ -284,7 +273,7 @@
         </div>
 
         <div class="row g-5 section-spacing">
-            <!-- Pillar 1: Launch Your Campaign -->
+            <!-- Pillar 1: Join a Live Campaign -->
             <div class="col-md-4">
                 <div class="demo-card card h-100 border-0">
                     <div class="card-body p-5 text-center">
@@ -293,7 +282,7 @@
                                 <i class="fas fa-comments" style="color: #E13A44; font-size: 2rem;"></i>
                             </div>
                         </div>
-                        <h4 class="card-title mb-3" style="font-weight: 600; color: #1a1a1a;">Launch Your Campaign</h4>
+                        <h4 class="card-title mb-3" style="font-weight: 600; color: #1a1a1a;">Join a Live Campaign</h4>
                         <p class="card-text text-muted mb-4" style="line-height: 1.6;">Launch campaigns at decision-critical moments. AI-powered conversations feel natural, capture NPS, and reveal the "why" behind the numbers.</p>
                         <a href="{{ url_for('demo_intro') }}" class="btn w-100 py-3" style="background: #E13A44; border: none; color: white; font-weight: 500; border-radius: 8px; transition: all 0.3s ease;" onmouseover="this.style.background='#c12d37'" onmouseout="this.style.background='#E13A44'">
                             Start Demo
@@ -345,16 +334,16 @@
                 <h3 class="mb-5 fs-3" style="color: #6c757d; font-family: 'Montserrat', sans-serif; font-weight: 500;">Proven Results from Campaign-Based Intelligence</h3>
                 <div class="d-flex justify-content-center align-items-center gap-5 flex-wrap">
                     <div class="px-4" style="border-right: 1px solid #dee2e6;">
-                        <h2 class="mb-2" style="color: #E13A44; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 2rem;">2 Minutes</h2>
-                        <p class="mb-0" style="color: #6c757d; font-size: 0.9rem;">Average survey completion time</p>
+                        <h2 class="mb-2" style="color: #E13A44; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 2rem;">10x</h2>
+                        <p class="mb-0" style="color: #6c757d; font-size: 0.9rem;">Speed-to-Insight</p>
                     </div>
                     <div class="px-4" style="border-right: 1px solid #dee2e6;">
-                        <h2 class="mb-2" style="color: #E13A44; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 2rem;">10x Faster</h2>
-                        <p class="mb-0" style="color: #6c757d; font-size: 0.9rem;">Insights vs. traditional analysis</p>
+                        <h2 class="mb-2" style="color: #E13A44; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 2rem;">4x</h2>
+                        <p class="mb-0" style="color: #6c757d; font-size: 0.9rem;">More actionable insights</p>
                     </div>
                     <div class="px-4">
-                        <h2 class="mb-2" style="color: #E13A44; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 2rem;">95% Accuracy</h2>
-                        <p class="mb-0" style="color: #6c757d; font-size: 0.9rem;">AI sentiment detection rate</p>
+                        <h2 class="mb-2" style="color: #E13A44; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 2rem;">98%</h2>
+                        <p class="mb-0" style="color: #6c757d; font-size: 0.9rem;">Accuracy</p>
                     </div>
                 </div>
             </div>
