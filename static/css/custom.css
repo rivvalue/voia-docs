@@ -9022,6 +9022,31 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     margin: 0;
 }
 
+/* Final CTA Button */
+.index-btn-cta {
+    background: var(--primary-red);
+    color: var(--primary-white);
+    border: none;
+    padding: var(--spacing-lg) var(--spacing-2xl);
+    font-family: var(--font-family-headings);
+    font-weight: 600;
+    font-size: var(--font-size-lg);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    width: auto;
+}
+
+.index-btn-cta:hover {
+    background: var(--red-hover);
+    box-shadow: var(--shadow-md);
+    color: var(--primary-white);
+    text-decoration: none;
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
     .index-hero {

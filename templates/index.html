@@ -7,408 +7,179 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Karla:wght@400;500;600&display=swap" rel="stylesheet">
-
-<style>
-    /* Brand Typography */
-    h1, h2, h3, h4, h5, h6, .card-title {
-        font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
-        font-weight: 600;
-    }
-    
-    body, p, .card-text, .lead {
-        font-family: 'Karla', -apple-system, BlinkMacSystemFont, sans-serif;
-        font-weight: 400;
-        line-height: 1.7;
-    }
-    
-    /* Optimal reading width */
-    .hero-section p, .card-text {
-        max-width: 65ch;
-        margin-left: auto;
-        margin-right: auto;
-    }
-    
-    .hero-section {
-        background: #ffffff;
-        padding: 4rem 2rem;
-        margin-bottom: 6rem;
-    }
-    .demo-card {
-        border: 1px solid #f1f1f1;
-        border-radius: 12px;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        background: #ffffff;
-        position: relative;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .demo-card .card-body {
-        display: flex;
-        flex-direction: column;
-        flex: 1;
-    }
-    
-    .demo-card .card-body .btn {
-        margin-top: auto;
-    }
-    .demo-card:hover {
-        box-shadow: var(--shadow-md);
-        border-color: var(--primary-red);
-    }
-    .cta-button {
-        background: linear-gradient(135deg, #E13A44 0%, #c12d37 100%);
-        border: none;
-        padding: 1rem 2rem;
-        font-size: 1.3rem;
-        font-weight: 600;
-        border-radius: 50px;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(225, 58, 68, 0.3);
-        color: #FFFFFF;
-    }
-    .cta-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(225, 58, 68, 0.4);
-    }
-    .sneak-peek-badge {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 20px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        display: inline-block;
-        margin-bottom: 1rem;
-        animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
-        100% { transform: scale(1); }
-    }
-    .feature-highlight {
-        background: rgba(225, 58, 68, 0.05);
-        padding: 1.5rem;
-        margin: 1rem 0;
-        border-radius: 10px;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-    
-    .mb-6 {
-        margin-bottom: 6rem !important;
-    }
-    
-    .mt-6 {
-        margin-top: 6rem !important;
-    }
-    
-    /* Feature Tile without border */
-    .feature-tile {
-        position: relative;
-        padding: 1rem 1.25rem 1rem 1rem;
-        text-align: left;
-    }
-    
-    /* Mobile Optimization */
-    @media (max-width: 768px) {
-        .hero-section {
-            padding: 2rem 1.5rem;
-            margin-bottom: 3rem;
-        }
-        
-        .hero-section h1 {
-            font-size: 5rem !important;
-        }
-        
-        .hero-section p {
-            font-size: 1.75rem !important;
-        }
-        
-        .demo-card .card-body {
-            padding: 1.5rem !important;
-        }
-        
-        .demo-card .rounded-circle {
-            width: 60px !important;
-            height: 60px !important;
-        }
-        
-        .demo-card i {
-            font-size: 1.5rem !important;
-        }
-        
-        .demo-card .btn {
-            padding: 0.5rem 1.25rem !important;
-            font-size: 0.95rem !important;
-        }
-        
-        .mt-6, .mb-6 {
-            margin-top: 2rem !important;
-            margin-bottom: 2rem !important;
-        }
-    }
-    
-    @media (max-width: 576px) {
-        .hero-section {
-            padding: 1.5rem 1rem;
-        }
-        
-        .hero-section h1 {
-            font-size: 3.5rem !important;
-        }
-        
-        .hero-section p {
-            font-size: 1.5rem !important;
-        }
-        
-        .demo-card .card-body {
-            padding: 1rem !important;
-        }
-        
-        .demo-card .rounded-circle {
-            width: 50px !important;
-            height: 50px !important;
-        }
-        
-        .demo-card i {
-            font-size: 1.25rem !important;
-        }
-        
-        .demo-card .btn {
-            padding: 0.5rem 1rem !important;
-            font-size: 0.9rem !important;
-            width: 100%;
-        }
-    }
-    
-    @media (max-width: 375px) {
-        .hero-section h1 {
-            font-size: 2.5rem !important;
-        }
-        
-        .hero-section p {
-            font-size: 1.1rem !important;
-        }
-        
-        .demo-card .card-body {
-            padding: 0.75rem !important;
-        }
-        
-        .demo-card .rounded-circle {
-            width: 45px !important;
-            height: 45px !important;
-        }
-        
-        .demo-card i {
-            font-size: 1.1rem !important;
-        }
-    }
-    
-    /* Metrics Section Mobile - Stack vertically with proper borders */
-    @media (max-width: 768px) {
-        .d-flex.gap-5 > div[style*="border-right"] {
-            border-right: none !important;
-            border-bottom: 1px solid #dee2e6 !important;
-            padding-bottom: 1.5rem !important;
-            margin-bottom: 1.5rem !important;
-        }
-        
-        .d-flex.gap-5 > div:last-child {
-            border-bottom: none !important;
-            margin-bottom: 0 !important;
-            padding-bottom: 0 !important;
-        }
-    }
-    
-    /* Hero CTAs Mobile Padding */
-    @media (max-width: 576px) {
-        .hero-section .btn {
-            margin: 0.5rem 1rem !important;
-        }
-        
-        .cta-button {
-            padding: 0.8rem 1.5rem !important;
-            font-size: 1.1rem !important;
-        }
-    }
-</style>
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-lg-10 mx-auto">
-        <!-- Hero Section -->
-        <div class="hero-section text-center">
-            <h1 class="display-1 fw-bold mb-3" style="font-size: 8rem;">VO<span style="color: #E13A44;">Ï</span>A</h1>
-            <p class="fs-1 mb-5" style="color: #000000; font-weight: 400;">Turning voices into value</p>
-        </div>
-        <!-- What You'll Experience Section -->
-        <div class="text-center section-spacing">
-            <div class="py-4 px-4" style="background: #E13A44; border-radius: 12px;">
-                <p class="lead text-white mb-0" style="font-size: 1.25rem; line-height: 1.8;">Run a real customer feedback scenario.<br>
-                Choose between a classic survey or an AI-driven conversational flow, then explore the live dashboard with NPS scoring, sentiment, themes, and growth signals.</p>
-            </div>
-        </div>
+<main role="main" aria-label="VOÏA Demo Homepage">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <!-- Hero Section -->
+            <header class="index-hero text-center">
+                <h1 class="index-hero-title">VO<span class="index-hero-accent">Ï</span>A</h1>
+                <p class="index-hero-subtitle">Turning voices into value</p>
+            </header>
 
-        <div class="row g-5 section-spacing">
-            <!-- Pillar 1: Join a Live Campaign -->
-            <div class="col-md-4">
-                <div class="demo-card card h-100 border-0">
-                    <div class="card-body p-5 text-center">
-                        <div class="mb-4">
-                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background: rgba(225, 58, 68, 0.08);">
-                                <i class="fas fa-comments" style="color: #E13A44; font-size: 2rem;"></i>
+            <!-- What You'll Experience Section -->
+            <section class="text-center" aria-labelledby="experience-heading">
+                <h2 id="experience-heading" class="visually-hidden">What You'll Experience</h2>
+                <div class="index-cta-banner">
+                    <p class="index-cta-text">Run a real customer feedback scenario.<br>
+                    Choose between a classic survey or an AI-driven conversational flow, then explore the live dashboard with NPS scoring, sentiment, themes, and growth signals.</p>
+                </div>
+            </section>
+
+            <!-- Demo Pillars -->
+            <section aria-labelledby="demo-pillars-heading">
+                <h2 id="demo-pillars-heading" class="visually-hidden">Demo Features</h2>
+                <div class="row g-5 section-spacing">
+                    <!-- Pillar 1: Join a Live Campaign -->
+                    <div class="col-md-4">
+                        <article class="index-demo-card">
+                            <div class="index-demo-card-body">
+                                <div class="index-icon-circle" aria-hidden="true">
+                                    <i class="fas fa-comments"></i>
+                                </div>
+                                <h3 class="index-demo-card-title">Join a Live Campaign</h3>
+                                <p class="index-demo-card-text">Launch campaigns at decision-critical moments. AI-powered conversations feel natural, capture NPS, and reveal the "why" behind the numbers.</p>
+                                <a href="{{ url_for('demo_intro') }}" class="index-btn-primary" aria-label="Start Demo - Join a Live Campaign">
+                                    Start Demo
+                                </a>
+                            </div>
+                        </article>
+                    </div>
+
+                    <!-- Pillar 2: Instant AI Discovery -->
+                    <div class="col-md-4">
+                        <article class="index-demo-card">
+                            <div class="index-demo-card-body">
+                                <div class="index-icon-circle" aria-hidden="true">
+                                    <i class="fas fa-lightbulb"></i>
+                                </div>
+                                <h3 class="index-demo-card-title">Instant AI Discovery</h3>
+                                <p class="index-demo-card-text">No manual work required. AI automatically processes every response for NPS scoring, sentiment analysis, and churn risk assessment—all in real-time as your campaign runs.</p>
+                                <a href="{{ url_for('demo_intro') }}" class="index-btn-secondary" aria-label="See AI in Action - Instant AI Discovery">
+                                    See AI in Action
+                                </a>
+                            </div>
+                        </article>
+                    </div>
+
+                    <!-- Pillar 3: Act on Strategic Insights -->
+                    <div class="col-md-4">
+                        <article class="index-demo-card">
+                            <div class="index-demo-card-body">
+                                <div class="index-icon-circle" aria-hidden="true">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <h3 class="index-demo-card-title">Act on Strategic Insights</h3>
+                                <p class="index-demo-card-text">Campaign dashboard reveals what matters: churn risks to address, satisfaction trends, growth opportunities. Know exactly what to do next quarter.</p>
+                                <a href="{{ url_for('dashboard') }}" class="index-btn-dark" aria-label="See Live Insights - Strategic Dashboard">
+                                    See Live Insights
+                                </a>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Trust & Metrics Section -->
+            <section class="index-metrics-section" aria-labelledby="metrics-heading">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <h2 id="metrics-heading" class="index-metrics-title">Proven Results from Campaign-Based Intelligence</h2>
+                        <div class="index-metrics-grid" role="list">
+                            <div class="index-metric-item" role="listitem">
+                                <div class="index-metric-number" aria-label="10 times speed improvement">10x</div>
+                                <p class="index-metric-label">Speed-to-Insight</p>
+                            </div>
+                            <div class="index-metric-item" role="listitem">
+                                <div class="index-metric-number" aria-label="4 times more insights">4x</div>
+                                <p class="index-metric-label">More actionable insights</p>
+                            </div>
+                            <div class="index-metric-item" role="listitem">
+                                <div class="index-metric-number" aria-label="98 percent accuracy">98%</div>
+                                <p class="index-metric-label">Accuracy</p>
                             </div>
                         </div>
-                        <h4 class="card-title mb-3" style="font-weight: 600; color: #1a1a1a;">Join a Live Campaign</h4>
-                        <p class="card-text text-muted mb-4" style="line-height: 1.6;">Launch campaigns at decision-critical moments. AI-powered conversations feel natural, capture NPS, and reveal the "why" behind the numbers.</p>
-                        <a href="{{ url_for('demo_intro') }}" class="btn w-100 py-3" style="background: #E13A44; border: none; color: white; font-weight: 500; border-radius: 8px; transition: all 0.3s ease;" onmouseover="this.style.background='#c12d37'" onmouseout="this.style.background='#E13A44'">
-                            Start Demo
-                        </a>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <!-- Pillar 2: Instant AI Discovery -->
-            <div class="col-md-4">
-                <div class="demo-card card h-100 border-0">
-                    <div class="card-body p-5 text-center">
-                        <div class="mb-4">
-                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background: rgba(225, 58, 68, 0.08);">
-                                <i class="fas fa-lightbulb" style="color: #E13A44; font-size: 2rem;"></i>
-                            </div>
-                        </div>
-                        <h4 class="card-title mb-3" style="font-weight: 600; color: #1a1a1a;">Instant AI Discovery</h4>
-                        <p class="card-text text-muted mb-4" style="line-height: 1.6;">No manual work required. AI automatically processes every response for NPS scoring, sentiment analysis, and churn risk assessment—all in real-time as your campaign runs.</p>
-                        <a href="{{ url_for('demo_intro') }}" class="btn w-100 py-3" style="background: rgba(225, 58, 68, 0.9); border: none; color: white; font-weight: 500; border-radius: 8px; transition: all 0.3s ease;" onmouseover="this.style.background='#E13A44'" onmouseout="this.style.background='rgba(225, 58, 68, 0.9)'">
-                            See AI in Action
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Pillar 3: Act on Strategic Insights -->
-            <div class="col-md-4">
-                <div class="demo-card card h-100 border-0">
-                    <div class="card-body p-5 text-center">
-                        <div class="mb-4">
-                            <div class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px; background: rgba(225, 58, 68, 0.08);">
-                                <i class="fas fa-chart-line" style="color: #E13A44; font-size: 2rem;"></i>
-                            </div>
-                        </div>
-                        <h4 class="card-title mb-3" style="font-weight: 600; color: #1a1a1a;">Act on Strategic Insights</h4>
-                        <p class="card-text text-muted mb-4" style="line-height: 1.6;">Campaign dashboard reveals what matters: churn risks to address, satisfaction trends, growth opportunities. Know exactly what to do next quarter.</p>
-                        <a href="{{ url_for('dashboard') }}" class="btn w-100 py-3" style="background: #000000; border: none; color: white; font-weight: 500; border-radius: 8px; transition: all 0.3s ease;" onmouseover="this.style.background='#333333'" onmouseout="this.style.background='#000000'">
-                            See Live Insights
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Trust & Metrics Section -->
-        <div class="row section-spacing">
-            <div class="col-12 text-center">
-                <h3 class="mb-5 fs-3" style="color: #6c757d; font-family: 'Montserrat', sans-serif; font-weight: 500;">Proven Results from Campaign-Based Intelligence</h3>
-                <div class="d-flex justify-content-center align-items-center gap-5 flex-wrap">
-                    <div class="px-4" style="border-right: 1px solid #dee2e6;">
-                        <h2 class="mb-2" style="color: #E13A44; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 2rem;">10x</h2>
-                        <p class="mb-0" style="color: #6c757d; font-size: 0.9rem;">Speed-to-Insight</p>
-                    </div>
-                    <div class="px-4" style="border-right: 1px solid #dee2e6;">
-                        <h2 class="mb-2" style="color: #E13A44; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 2rem;">4x</h2>
-                        <p class="mb-0" style="color: #6c757d; font-size: 0.9rem;">More actionable insights</p>
-                    </div>
-                    <div class="px-4">
-                        <h2 class="mb-2" style="color: #E13A44; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 2rem;">98%</h2>
-                        <p class="mb-0" style="color: #6c757d; font-size: 0.9rem;">Accuracy</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Key Features Section -->
-        <div class="text-center section-spacing">
-            <h3 class="mb-5 fs-3" style="color: #6c757d; font-family: 'Montserrat', sans-serif; font-weight: 500;">Complete Intelligence Platform</h3>
-            <div class="row" style="--bs-gutter-y: 2rem; --bs-gutter-x: 1.5rem;">
+            <!-- Key Features Section -->
+            <section class="index-features-section text-center" aria-labelledby="features-heading">
+                <h2 id="features-heading" class="index-features-title">Complete Intelligence Platform</h2>
+                <div class="row g-4">
                     <div class="col-md-4 col-6">
-                        <div class="feature-tile">
-                            <p class="mb-0" style="color: #000000; font-size: 1.05rem;">AI-powered survey intelligence</p>
+                        <div class="index-feature-tile">
+                            <p class="index-feature-text">AI-powered survey intelligence</p>
                         </div>
                     </div>
                     <div class="col-md-4 col-6">
-                        <div class="feature-tile">
-                            <p class="mb-0" style="color: #000000; font-size: 1.05rem;">Transcript analysis for key accounts</p>
+                        <div class="index-feature-tile">
+                            <p class="index-feature-text">Transcript analysis for key accounts</p>
                         </div>
                     </div>
                     <div class="col-md-4 col-6">
-                        <div class="feature-tile">
-                            <p class="mb-0" style="color: #000000; font-size: 1.05rem;">Exec-level insights</p>
+                        <div class="index-feature-tile">
+                            <p class="index-feature-text">Exec-level insights</p>
                         </div>
                     </div>
                     <div class="col-md-4 col-6">
-                        <div class="feature-tile">
-                            <p class="mb-0" style="color: #000000; font-size: 1.05rem;">White-label brand configuration</p>
+                        <div class="index-feature-tile">
+                            <p class="index-feature-text">White-label brand configuration</p>
                         </div>
                     </div>
                     <div class="col-md-4 col-6">
-                        <div class="feature-tile">
-                            <p class="mb-0" style="color: #000000; font-size: 1.05rem;">Analytics & business intelligence</p>
+                        <div class="index-feature-tile">
+                            <p class="index-feature-text">Analytics & business intelligence</p>
                         </div>
                     </div>
                     <div class="col-md-4 col-6">
-                        <div class="feature-tile">
-                            <p class="mb-0" style="color: #000000; font-size: 1.05rem;">Participant management</p>
+                        <div class="index-feature-tile">
+                            <p class="index-feature-text">Participant management</p>
                         </div>
                     </div>
                     <div class="col-md-4 col-6">
-                        <div class="feature-tile">
-                            <p class="mb-0" style="color: #000000; font-size: 1.05rem;">Campaign management</p>
+                        <div class="index-feature-tile">
+                            <p class="index-feature-text">Campaign management</p>
                         </div>
                     </div>
                     <div class="col-md-4 col-6">
-                        <div class="feature-tile">
-                            <p class="mb-0" style="color: #000000; font-size: 1.05rem;">User management</p>
+                        <div class="index-feature-tile">
+                            <p class="index-feature-text">User management</p>
                         </div>
                     </div>
                     <div class="col-md-4 col-6">
-                        <div class="feature-tile">
-                            <p class="mb-0" style="color: #000000; font-size: 1.05rem;">Engagement management</p>
+                        <div class="index-feature-tile">
+                            <p class="index-feature-text">Engagement management</p>
                         </div>
                     </div>
                     <div class="col-md-4 col-6">
-                        <div class="feature-tile">
-                            <p class="mb-0" style="color: #000000; font-size: 1.05rem;">Security & authentication</p>
+                        <div class="index-feature-tile">
+                            <p class="index-feature-text">Security & authentication</p>
                         </div>
                     </div>
                     <div class="col-md-4 col-6">
-                        <div class="feature-tile">
-                            <p class="mb-0" style="color: #000000; font-size: 1.05rem;">Multi-tenant business management</p>
+                        <div class="index-feature-tile">
+                            <p class="index-feature-text">Email automation</p>
                         </div>
                     </div>
                     <div class="col-md-4 col-6">
-                        <div class="feature-tile">
-                            <p class="mb-0" style="color: #000000; font-size: 1.05rem;">Long-term data retention</p>
+                        <div class="index-feature-tile">
+                            <p class="index-feature-text">Real-time reporting</p>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </section>
 
-        <!-- CTA Section -->
-        <div class="text-center section-spacing">
-            <h3 class="mb-4" style="color: #1a1a1a; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 2rem;">Ready to hear what your clients are really saying?</h3>
-            <p class="mb-5" style="color: #6c757d; font-size: 1.1rem; max-width: 600px; margin-left: auto; margin-right: auto;">Connect with our team to see how VOÏA can deliver strategic insights for your business.</p>
-            <a href="https://www.rivvalue.com/voia#pricing" target="_blank" rel="noopener noreferrer" class="btn btn-lg px-5 py-3" style="background: #E13A44; border: none; color: white; font-weight: 600; border-radius: 8px; font-size: 1.1rem; transition: all 0.3s ease; font-family: 'Montserrat', sans-serif;" onmouseover="this.style.background='#c12d37'" onmouseout="this.style.background='#E13A44'">
-                Contact Sales
-            </a>
+            <!-- Final CTA -->
+            <section class="text-center section-spacing" aria-labelledby="cta-heading">
+                <h2 id="cta-heading" class="visually-hidden">Get Started with VOÏA</h2>
+                <a href="https://www.rivvalue.com/voia#pricing" target="_blank" rel="noopener noreferrer" class="index-btn-cta" aria-label="View Pricing Plans">
+                    <i class="fas fa-rocket me-2" aria-hidden="true"></i>Get Started Today
+                </a>
+            </section>
         </div>
     </div>
-</div>
+</main>
 {% endblock %}
