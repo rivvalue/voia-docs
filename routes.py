@@ -3252,13 +3252,17 @@ def company_responses_page(company_name):
             flash('Campaign not found or not accessible', 'error')
             return redirect(url_for('dashboard'))
         
-        # Get branding
-        from business_auth_routes import get_current_business_account
-        current_account = get_current_business_account()
-        branding = get_branding_context(current_account)
-        
         # Check if user is authenticated as business user
         is_business_authenticated = current_business_user is not None
+        
+        # Get branding context based on authentication
+        if is_business_authenticated and current_business_user:
+            # Authenticated business user - get their branding
+            business_account_id = current_business_user.business_account_id
+            branding_context = get_branding_context(business_account_id)
+        else:
+            # Trial/demo user - get demo branding (Archelo Group - ID 1)
+            branding_context = get_branding_context(business_account_id=1)
         
         # Determine breadcrumb based on session or default based on user type
         if is_business_authenticated:
@@ -3278,7 +3282,7 @@ def company_responses_page(company_name):
                              company_name=company_name,
                              campaign=campaign,
                              campaign_id=campaign_id,
-                             branding=branding,
+                             branding_context=branding_context,
                              is_business_authenticated=is_business_authenticated,
                              bi_url=last_bi_page,
                              bi_label=bi_label)
