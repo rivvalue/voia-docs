@@ -520,7 +520,12 @@ def simple_auth():
 @app.route('/server-auth', methods=['GET', 'POST'])
 def server_auth():
     """Server-side authentication - no JavaScript required"""
-    return render_template('server_auth.html', user_email=None)
+    # Get demo branding for trial users
+    branding_context = get_branding_context(business_account_id=1)
+    return render_template('server_auth.html', 
+                         user_email=None,
+                         branding_context=branding_context,
+                         is_business_authenticated=False)
 
 @app.route('/server-auth/generate', methods=['POST'])
 def server_auth_generate():
@@ -534,7 +539,12 @@ def server_auth_generate():
                 'success': False,
                 'error': 'Email address is required'
             }
-            return render_template('server_auth.html', token_result=token_result)
+            # Get demo branding for trial users
+            branding_context = get_branding_context(business_account_id=1)
+            return render_template('server_auth.html', 
+                                 token_result=token_result,
+                                 branding_context=branding_context,
+                                 is_business_authenticated=False)
         
         # Use ultra-simple token system to avoid all import issues
         import simple_token_system
@@ -555,7 +565,12 @@ def server_auth_generate():
             }
         
         app.logger.info(f"Server-side token generated for {email}")
-        return render_template('server_auth.html', token_result=token_result)
+        # Get demo branding for trial users
+        branding_context = get_branding_context(business_account_id=1)
+        return render_template('server_auth.html', 
+                             token_result=token_result,
+                             branding_context=branding_context,
+                             is_business_authenticated=False)
         
     except Exception as e:
         app.logger.error(f"Server-side token generation failed: {e}")
@@ -563,7 +578,12 @@ def server_auth_generate():
             'success': False,
             'error': f'Token generation failed: {str(e)}'
         }
-        return render_template('server_auth.html', token_result=token_result)
+        # Get demo branding for trial users
+        branding_context = get_branding_context(business_account_id=1)
+        return render_template('server_auth.html', 
+                             token_result=token_result,
+                             branding_context=branding_context,
+                             is_business_authenticated=False)
 
 @app.route('/survey/<token>')
 def survey_with_token(token):
