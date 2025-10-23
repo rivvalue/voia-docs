@@ -6,11 +6,20 @@
 
 {% block content %}
 {# Breadcrumb Navigation #}
-{% set breadcrumb_items = [
-    {'label': bi_label, 'url': bi_url},
-    {'label': campaign_name, 'url': bi_url},
-    {'label': response.respondent_name, 'current': true}
-] %}
+{% if campaign_name == 'Trial Survey' %}
+    {# Simplified breadcrumb for trial responses - skip campaign level #}
+    {% set breadcrumb_items = [
+        {'label': bi_label, 'url': bi_url},
+        {'label': response.respondent_name, 'current': true}
+    ] %}
+{% else %}
+    {# Full breadcrumb for business campaign responses #}
+    {% set breadcrumb_items = [
+        {'label': bi_label, 'url': bi_url},
+        {'label': campaign_name, 'url': bi_url},
+        {'label': response.respondent_name, 'current': true}
+    ] %}
+{% endif %}
 {% include 'components/breadcrumb.html' %}
 
 <div class="container py-4" role="main" aria-label="Survey response details">
