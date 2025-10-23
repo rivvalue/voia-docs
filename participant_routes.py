@@ -196,6 +196,19 @@ def create_participant():
                 flash('Invalid commercial value. Please enter a valid number.', 'error')
                 return redirect(url_for('participants.create_participant'))
         
+        # Parse tenure_years (optional)
+        tenure_years = None
+        tenure_years_str = request.form.get('tenure_years', '').strip()
+        if tenure_years_str:
+            try:
+                tenure_years = float(tenure_years_str)
+                if tenure_years < 0:
+                    flash('Tenure must be a positive number.', 'error')
+                    return redirect(url_for('participants.create_participant'))
+            except ValueError:
+                flash('Invalid tenure value. Please enter a valid number.', 'error')
+                return redirect(url_for('participants.create_participant'))
+        
         # Validate required fields
         if not email or not name or not company_name:
             flash('Email, name, and company name are required.', 'error')
@@ -222,6 +235,7 @@ def create_participant():
         participant.customer_tier = customer_tier
         participant.language = language
         participant.company_commercial_value = commercial_value
+        participant.tenure_years = tenure_years
         participant.source = 'admin_single'  # Track that this was admin-created via single form
         
         # Generate unified token for seamless UX
@@ -275,6 +289,175 @@ def create_participant():
         logger.error(f"Error creating participant: {e}")
         flash('Error creating participant.', 'error')
         return redirect(url_for('participants.create_participant'))
+
+
+@participant_bp.route('/<int:participant_id>/edit', methods=['GET', 'POST'])
+@require_business_auth
+@require_permission('manage_participants')
+def edit_participant(participant_id):
+    """Edit existing participant with conditional email locking"""
+    
+    try:
+        current_account = get_current_business_account()
+        if not current_account or not current_account.id:
+            flash('Business account context not found.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get participant (scoped to current business account)
+        participant = Participant.query.filter_by(
+            id=participant_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not participant:
+            flash('Participant not found.', 'error')
+            return redirect(url_for('participants.list_participants'))
+        
+        # Check if participant has survey history (determines email editability)
+        has_history = participant.has_survey_history()
+        
+        if request.method == 'GET':
+            # Show edit form with prefilled values
+            return render_template('participants/edit.html',
+                                 participant=participant.to_dict(),
+                                 has_survey_history=has_history,
+                                 business_account=current_account.to_dict() if current_account else {})
+        
+        # Handle form submission (POST)
+        # Extract form data
+        email = request.form.get('email', '').strip().lower()
+        name = request.form.get('name', '').strip()
+        company_name = request.form.get('company_name', '').strip()
+        
+        # Optional segmentation attributes
+        role = request.form.get('role', '').strip() or None
+        region = request.form.get('region', '').strip() or None
+        customer_tier = request.form.get('customer_tier', '').strip() or None
+        language = request.form.get('language', '').strip() or 'en'
+        
+        # Parse commercial_value (optional, company-level)
+        commercial_value = None
+        commercial_value_str = request.form.get('company_commercial_value', '').strip()
+        if commercial_value_str:
+            try:
+                commercial_value = float(commercial_value_str)
+                if commercial_value < 0:
+                    flash('Commercial value must be a positive number.', 'error')
+                    return redirect(url_for('participants.edit_participant', participant_id=participant_id))
+            except ValueError:
+                flash('Invalid commercial value. Please enter a valid number.', 'error')
+                return redirect(url_for('participants.edit_participant', participant_id=participant_id))
+        
+        # Parse tenure_years (optional)
+        tenure_years = None
+        tenure_years_str = request.form.get('tenure_years', '').strip()
+        if tenure_years_str:
+            try:
+                tenure_years = float(tenure_years_str)
+                if tenure_years < 0:
+                    flash('Tenure must be a positive number.', 'error')
+                    return redirect(url_for('participants.edit_participant', participant_id=participant_id))
+            except ValueError:
+                flash('Invalid tenure value. Please enter a valid number.', 'error')
+                return redirect(url_for('participants.edit_participant', participant_id=participant_id))
+        
+        # Validate required fields
+        if not email or not name or not company_name:
+            flash('Email, name, and company name are required.', 'error')
+            return redirect(url_for('participants.edit_participant', participant_id=participant_id))
+        
+        # CRITICAL: Block email changes if participant has survey history
+        if has_history and email != participant.email:
+            flash('Email cannot be changed - this participant has survey history (responses, campaigns, or email deliveries).', 'error')
+            return redirect(url_for('participants.edit_participant', participant_id=participant_id))
+        
+        # If email changed and no survey history, check for duplicates
+        if email != participant.email:
+            existing = Participant.query.filter_by(
+                business_account_id=current_account.id,
+                email=email
+            ).first()
+            
+            if existing:
+                flash(f'Participant with email {email} already exists in your account.', 'error')
+                return redirect(url_for('participants.edit_participant', participant_id=participant_id))
+        
+        # Track changes for audit logging
+        changes = {}
+        if participant.email != email:
+            changes['email'] = {'old': participant.email, 'new': email}
+        if participant.name != name:
+            changes['name'] = {'old': participant.name, 'new': name}
+        if participant.company_name != company_name:
+            changes['company_name'] = {'old': participant.company_name, 'new': company_name}
+        if participant.role != role:
+            changes['role'] = {'old': participant.role, 'new': role}
+        if participant.region != region:
+            changes['region'] = {'old': participant.region, 'new': region}
+        if participant.customer_tier != customer_tier:
+            changes['customer_tier'] = {'old': participant.customer_tier, 'new': customer_tier}
+        if participant.language != language:
+            changes['language'] = {'old': participant.language, 'new': language}
+        if participant.company_commercial_value != commercial_value:
+            changes['company_commercial_value'] = {'old': participant.company_commercial_value, 'new': commercial_value}
+        if participant.tenure_years != tenure_years:
+            changes['tenure_years'] = {'old': participant.tenure_years, 'new': tenure_years}
+        
+        # Update participant fields
+        participant.email = email
+        participant.name = name
+        participant.company_name = company_name
+        participant.role = role
+        participant.region = region
+        participant.customer_tier = customer_tier
+        participant.language = language
+        participant.company_commercial_value = commercial_value
+        participant.tenure_years = tenure_years
+        
+        db.session.commit()
+        
+        # Sync commercial_value to all existing participants from the same company (if changed)
+        if 'company_commercial_value' in changes and commercial_value is not None and company_name:
+            from sqlalchemy import func
+            company_key = company_name.upper()
+            updated_count = Participant.query.filter(
+                func.upper(Participant.company_name) == company_key,
+                Participant.business_account_id == current_account.id,
+                Participant.id != participant.id  # Exclude current participant
+            ).update({'company_commercial_value': commercial_value}, synchronize_session=False)
+            
+            db.session.commit()
+            
+            if updated_count > 0:
+                flash(f'Commercial value synced to {updated_count} existing participant(s) from {company_name}.', 'info')
+        
+        # Audit logging for participant update
+        if changes:
+            try:
+                queue_audit_log(
+                    business_account_id=current_account.id,
+                    action_type='participant_updated',
+                    resource_type='participant',
+                    resource_id=participant.id,
+                    resource_name=participant.name,
+                    details={
+                        'changes': changes,
+                        'has_survey_history': has_history
+                    }
+                )
+            except Exception as audit_error:
+                logger.error(f"Failed to log participant update audit: {audit_error}")
+        
+        account_name = current_account.name if current_account and hasattr(current_account, 'name') else 'Unknown'
+        logger.info(f"Updated participant {email} (Business Account: {account_name})")
+        flash(f'Participant {name} updated successfully.', 'success')
+        return redirect(url_for('participants.list_participants'))
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error editing participant: {e}")
+        flash('Error updating participant.', 'error')
+        return redirect(url_for('participants.list_participants'))
 
 
 @participant_bp.route('/upload', methods=['GET', 'POST'])
@@ -398,6 +581,21 @@ def upload_participants():
                         error_count += 1
                         continue
                 
+                # Parse tenure_years (optional)
+                tenure_years = None
+                tenure_years_str = row.get('tenure_years', '').strip()
+                if tenure_years_str:
+                    try:
+                        tenure_years = float(tenure_years_str)
+                        if tenure_years < 0:
+                            errors.append(f"Row {row_num}: Tenure must be positive")
+                            error_count += 1
+                            continue
+                    except ValueError:
+                        errors.append(f"Row {row_num}: Invalid tenure value '{tenure_years_str}'")
+                        error_count += 1
+                        continue
+                
                 # Check for duplicate participant (email within business account)
                 existing = Participant.query.filter_by(
                     business_account_id=current_account.id,
@@ -420,6 +618,7 @@ def upload_participants():
                 participant.customer_tier = customer_tier
                 participant.language = language
                 participant.company_commercial_value = commercial_value
+                participant.tenure_years = tenure_years
                 participant.source = 'admin_bulk'  # Track that this was admin-created via bulk upload
                 
                 # Generate unified token for seamless UX
@@ -506,17 +705,9 @@ def delete_participant(participant_id):
             flash('Participant not found.', 'error')
             return redirect(url_for('participants.list_participants'))
         
-        # Check for existing campaign associations (prevent FK constraint violations)
-        # Use eager loading to prevent N+1 query when accessing campaign names
-        existing_associations = CampaignParticipant.query.filter_by(
-            participant_id=participant_id
-        ).options(joinedload(CampaignParticipant.campaign)).all()
-        
-        if existing_associations:
-            # Show which campaigns they're associated with
-            campaign_names = [assoc.campaign.name for assoc in existing_associations]
-            campaigns_text = ', '.join(campaign_names)
-            flash(f'Cannot delete participant {participant.name} - they are associated with campaigns: {campaigns_text}. Remove from campaigns first.', 'error')
+        # CRITICAL: Check if participant has survey history (prevents data integrity issues)
+        if participant.has_survey_history():
+            flash(f'Cannot delete participant {participant.name} - they have survey history (responses, campaigns, or email deliveries). This protects data integrity.', 'error')
             return redirect(url_for('participants.list_participants'))
         
         participant_name = participant.name

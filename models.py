@@ -1240,6 +1240,9 @@ class Participant(db.Model):
     # Company-level financial data (manual input only, synced across all participants from same company)
     company_commercial_value = db.Column(db.Float, nullable=True)  # Estimated account value in USD
     
+    # Participant tenure tracking (optional, represents years using the product/service)
+    tenure_years = db.Column(db.Float, nullable=True)  # Years of product/service usage (e.g., 2.5 years)
+    
     # Origin tracking for management visibility
     source = db.Column(db.String(20), nullable=False, default='trial', index=True)  # 'trial', 'admin_single', 'admin_bulk'
     
@@ -1271,6 +1274,7 @@ class Participant(db.Model):
             'customer_tier': self.customer_tier,
             'language': self.language,
             'company_commercial_value': self.company_commercial_value,
+            'tenure_years': self.tenure_years,
             'source': self.source,
             'token': self.token,
             'status': self.status,
@@ -1316,6 +1320,45 @@ class Participant(db.Model):
             self.status = 'invited'  # Trial users are immediately invited
         else:
             self.status = 'created'   # Business participants are created but not campaign-specific yet
+    
+    def has_survey_history(self):
+        """
+        Check if participant has any survey history (responses, campaign associations, or email deliveries).
+        Used to determine if email can be edited or participant can be deleted.
+        CRITICAL: All checks are scoped to participant's business account for multi-tenant isolation.
+        
+        Returns:
+            bool: True if participant has any survey-related data within their business account
+        """
+        # Check for CampaignParticipant associations
+        has_campaign_associations = CampaignParticipant.query.filter_by(
+            participant_id=self.id
+        ).first() is not None
+        
+        if has_campaign_associations:
+            return True
+        
+        # Check for SurveyResponse records (by email for legacy data)
+        # CRITICAL: Join to Campaign to enforce business account scoping
+        from sqlalchemy import and_
+        has_responses = db.session.query(SurveyResponse).join(
+            Campaign, SurveyResponse.campaign_id == Campaign.id
+        ).filter(
+            and_(
+                SurveyResponse.respondent_email == self.email,
+                Campaign.business_account_id == self.business_account_id
+            )
+        ).first() is not None
+        
+        if has_responses:
+            return True
+        
+        # Check for EmailDelivery records (sent or pending)
+        has_email_deliveries = EmailDelivery.query.filter_by(
+            participant_id=self.id
+        ).first() is not None
+        
+        return has_email_deliveries
 
 
 class CampaignParticipant(db.Model):

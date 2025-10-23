@@ -228,6 +228,7 @@
                                     <th class="hide-on-tablet">Origin</th>
                                     <th>Status</th>
                                     <th class="hide-on-tablet">Created</th>
+                                    <th class="text-end">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -287,6 +288,24 @@
                                                 -
                                             {% endif %}
                                         </small>
+                                    </td>
+                                    <td data-label="Actions" class="text-end">
+                                        <div class="btn-group btn-group-sm" role="group" aria-label="Participant actions">
+                                            <a href="{{ url_for('participants.edit_participant', participant_id=participant.id) }}" 
+                                               class="btn btn-outline-primary"
+                                               title="Edit participant"
+                                               aria-label="Edit {{ participant.name }}">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" 
+                                                    class="btn btn-outline-danger delete-participant-btn"
+                                                    data-participant-id="{{ participant.id }}"
+                                                    data-participant-name="{{ participant.name }}"
+                                                    title="Delete participant"
+                                                    aria-label="Delete {{ participant.name }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -375,4 +394,42 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Delete participant confirmation
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteButtons = document.querySelectorAll('.delete-participant-btn');
+    
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const participantId = this.getAttribute('data-participant-id');
+            const participantName = this.getAttribute('data-participant-name');
+            
+            if (confirm(`Are you sure you want to delete participant "${participantName}"?\n\nThis action cannot be undone. The participant can only be deleted if they have no survey history.`)) {
+                // Create and submit a delete form
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/business/participants/${participantId}/delete`;
+                
+                // Add CSRF token
+                const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                if (csrfToken) {
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = 'csrf_token';
+                    csrfInput.value = csrfToken.getAttribute('content');
+                    form.appendChild(csrfInput);
+                }
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    });
+});
+</script>
 {% endblock %}
