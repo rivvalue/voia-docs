@@ -2469,12 +2469,20 @@ def conversational_survey():
             session['campaign_name'] = verification.get('campaign_name')
             session['participant_company'] = verification.get('participant_company')
             
-            # Get branding context based on business_account_id from verification
-            branding = get_branding_context(verification.get('business_account_id'))
-            
             # Route to appropriate template based on participant type
             participant_name = verification.get('participant_name')
             campaign_name = verification.get('campaign_name')
+            business_account_id = verification.get('business_account_id')
+            
+            # Determine if this is a business participant
+            is_business_authenticated = business_account_id is not None and business_account_id != 1
+            
+            # Get branding context
+            if is_business_authenticated:
+                branding_context = get_branding_context(business_account_id)
+            else:
+                # Trial user - get demo branding
+                branding_context = get_branding_context(business_account_id=1)
             
             logger.info(f"Routing decision - participant_name: {participant_name}, campaign_name: {campaign_name}")
             
@@ -2505,7 +2513,9 @@ def conversational_survey():
                                      campaign_start_date=campaign_start_date,
                                      campaign_end_date=campaign_end_date,
                                      custom_end_message=custom_end_message,
-                                     branding=branding)
+                                     branding=branding_context,
+                                     branding_context=branding_context,
+                                     is_business_authenticated=is_business_authenticated)
             else:
                 # Demo user - use existing template
                 logger.info("🔴 RETURNING DEMO TEMPLATE NOW (no participant/campaign)")
@@ -2516,7 +2526,9 @@ def conversational_survey():
                                      participant_name=participant_name,
                                      participant_company=verification.get('participant_company'),
                                      campaign_name=campaign_name,
-                                     branding=branding)
+                                     branding=branding_context,
+                                     branding_context=branding_context,
+                                     is_business_authenticated=False)
         else:
             # Fallback to simple token system for backward compatibility
             import simple_token_system
@@ -2525,14 +2537,26 @@ def conversational_survey():
                 email = fallback_verification.get('email')
                 session['auth_token'] = token
                 session['auth_email'] = email
-                # Get branding context for fallback verification
-                branding = get_branding_context()
-                return render_template('conversational_survey.html', authenticated=True, email=email, user_email=email, branding=branding)
+                # Get demo branding for trial users
+                branding_context = get_branding_context(business_account_id=1)
+                return render_template('conversational_survey.html', 
+                                     authenticated=True, 
+                                     email=email, 
+                                     user_email=email, 
+                                     branding=branding_context,
+                                     branding_context=branding_context,
+                                     is_business_authenticated=False)
             else:
                 error_msg = verification.get('error', 'Invalid or expired token')
-                # Get default branding for error cases
-                branding = get_branding_context()
-                return render_template('conversational_survey.html', authenticated=False, error=error_msg, user_email=None, branding=branding)
+                # Get demo branding for error cases
+                branding_context = get_branding_context(business_account_id=1)
+                return render_template('conversational_survey.html', 
+                                     authenticated=False, 
+                                     error=error_msg, 
+                                     user_email=None, 
+                                     branding=branding_context,
+                                     branding_context=branding_context,
+                                     is_business_authenticated=False)
     else:
         # Check if already authenticated via session
         if session.get('auth_token'):
@@ -2550,8 +2574,16 @@ def conversational_survey():
             #                          completion_date=existing_response.created_at.strftime("%B %d, %Y"),
             #                          show_alternatives=True)
                                      
-            # Get branding context from session
-            branding = get_branding_context(session.get('business_account_id'))
+            # Determine if this is a business participant
+            business_account_id = session.get('business_account_id')
+            is_business_authenticated = business_account_id is not None and business_account_id != 1
+            
+            # Get branding context
+            if is_business_authenticated:
+                branding_context = get_branding_context(business_account_id)
+            else:
+                # Trial user - get demo branding
+                branding_context = get_branding_context(business_account_id=1)
             
             # Route to appropriate template based on session data
             if participant_name and campaign_name:
@@ -2580,11 +2612,19 @@ def conversational_survey():
                                      campaign_start_date=campaign_start_date,
                                      campaign_end_date=campaign_end_date,
                                      custom_end_message=custom_end_message,
-                                     branding=branding)
+                                     branding=branding_context,
+                                     branding_context=branding_context,
+                                     is_business_authenticated=is_business_authenticated)
             else:
                 # Demo user - use existing template
                 logger.info("Session-based: Using DEMO template")
-                return render_template('conversational_survey.html', authenticated=True, email=email, user_email=email, branding=branding)
+                return render_template('conversational_survey.html', 
+                                     authenticated=True, 
+                                     email=email, 
+                                     user_email=email, 
+                                     branding=branding_context,
+                                     branding_context=branding_context,
+                                     is_business_authenticated=False)
         else:
             # Redirect unauthenticated users to auth page instead of showing broken page
             return redirect(url_for('server_auth'))
