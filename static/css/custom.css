@@ -9145,6 +9145,12 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     box-shadow: var(--shadow-md);
 }
 
+/* Override red accent to white inside red banner for contrast */
+.demo-hero-section .voia-red-accent {
+    color: var(--primary-white);
+    font-weight: 700;
+}
+
 .demo-page-header {
     font-family: var(--font-family-headings);
     font-size: var(--font-size-4xl);
