@@ -3255,7 +3255,7 @@ def company_responses_page(company_name):
         # Get branding
         from business_auth_routes import get_current_business_account
         current_account = get_current_business_account()
-        branding = get_branding_context(current_account)
+        branding_context = get_branding_context(current_account)
         
         # Check if user is authenticated as business user
         is_business_authenticated = current_business_user is not None
@@ -3278,7 +3278,7 @@ def company_responses_page(company_name):
                              company_name=company_name,
                              campaign=campaign,
                              campaign_id=campaign_id,
-                             branding=branding,
+                             branding_context=branding_context,
                              is_business_authenticated=is_business_authenticated,
                              bi_url=last_bi_page,
                              bi_label=bi_label)
