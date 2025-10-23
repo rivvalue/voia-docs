@@ -9155,7 +9155,7 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     font-family: var(--font-family-headings);
     font-size: var(--font-size-4xl);
     font-weight: 800;
-    color: var(--primary-white);
+    color: var(--text-black);
     margin-bottom: var(--spacing-lg);
     letter-spacing: var(--letter-spacing-tight);
     text-align: center;
