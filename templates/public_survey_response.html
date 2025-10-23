@@ -244,6 +244,7 @@
 </div>
 
 <!-- Footer note -->
+{% if not is_business_authenticated %}
 <footer class="container mt-4" role="contentinfo">
     <div class="alert alert-light text-center" role="note">
         <small class="text-muted">
@@ -252,5 +253,6 @@
             Business survey responses require authentication to access.
         </small>
     </div>
-</div>
+</footer>
+{% endif %}
 {% endblock %}

@@ -1193,9 +1193,8 @@ def public_survey_response(response_id):
                 response_data = response.to_dict()
                 
                 # Get business account branding
-                from business_auth_routes import get_current_business_account
-                current_account = get_current_business_account()
-                branding = get_branding_context(current_account)
+                business_account_id = current_business_user.business_account_id
+                branding_context = get_branding_context(business_account_id)
                 
                 # Determine breadcrumb based on session or default to Campaign Insights for business users
                 last_bi_page = session.get('last_bi_page', url_for('campaign_insights'))
@@ -1213,7 +1212,9 @@ def public_survey_response(response_id):
                 
                 return render_template('public_survey_response.html', 
                                      response=response_data,
-                                     branding=branding,
+                                     branding=branding_context,
+                                     branding_context=branding_context,
+                                     is_business_authenticated=True,
                                      bi_url=last_bi_page,
                                      bi_label=bi_label,
                                      campaign_name=campaign_name)
@@ -1236,8 +1237,8 @@ def public_survey_response(response_id):
         # Convert response to dict for template
         response_data = response.to_dict()
         
-        # Get default branding for public view (no business branding)
-        branding = get_branding_context()
+        # Get demo branding for public view (Archelo Group - ID 1)
+        branding_context = get_branding_context(business_account_id=1)
         
         # Determine breadcrumb based on session or default to Dashboard for trial users
         last_bi_page = session.get('last_bi_page', url_for('dashboard'))
@@ -1255,7 +1256,9 @@ def public_survey_response(response_id):
         
         return render_template('public_survey_response.html', 
                              response=response_data,
-                             branding=branding,
+                             branding=branding_context,
+                             branding_context=branding_context,
+                             is_business_authenticated=False,
                              bi_url=last_bi_page,
                              bi_label=bi_label,
                              campaign_name=campaign_name)
