@@ -54,24 +54,8 @@
         margin-top: auto;
     }
     .demo-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.08);
-        border-color: #e5e5e5;
-    }
-    .demo-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 2px;
-        background: #E13A44;
-        transform: scaleX(0);
-        transform-origin: left;
-        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .demo-card:hover::before {
-        transform: scaleX(1);
+        box-shadow: var(--shadow-md);
+        border-color: var(--primary-red);
     }
     .cta-button {
         background: linear-gradient(135deg, #E13A44 0%, #c12d37 100%);
