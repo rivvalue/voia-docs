@@ -8801,7 +8801,8 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     font-family: var(--font-family-base);
     font-size: var(--font-size-2xl);
     color: var(--primary-black);
-    font-weight: 400;
+    font-weight: 500;
+    line-height: 1.4;
     margin-bottom: var(--spacing-2xl);
 }
 
@@ -8959,8 +8960,8 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
 
 .index-metrics-title {
     font-family: var(--font-family-headings);
-    font-size: var(--font-size-xl);
-    font-weight: 500;
+    font-size: var(--font-size-4xl);
+    font-weight: 700;
     color: var(--gray-dark);
     margin-bottom: var(--spacing-2xl);
 }
@@ -9010,8 +9011,8 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
 
 .index-features-title {
     font-family: var(--font-family-headings);
-    font-size: var(--font-size-xl);
-    font-weight: 500;
+    font-size: var(--font-size-4xl);
+    font-weight: 700;
     color: var(--gray-dark);
     margin-bottom: var(--spacing-2xl);
 }
@@ -9105,6 +9106,14 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
         border-bottom: none;
         margin-bottom: 0;
         padding-bottom: 0;
+    }
+    
+    .index-metrics-title {
+        font-size: var(--font-size-2xl);
+    }
+    
+    .index-features-title {
+        font-size: var(--font-size-2xl);
     }
 }
 
