@@ -687,8 +687,17 @@ def survey_form():
         # Use centralized token verification
         verification = verify_survey_access(token)
         if verification['valid']:
-            # Get branding context based on business_account_id from verification
-            branding = get_branding_context(verification.get('business_account_id'))
+            # Check if this is a business participant
+            business_account_id = verification.get('business_account_id')
+            is_business_authenticated = business_account_id is not None and business_account_id != 1
+            
+            # Get branding context
+            if is_business_authenticated:
+                branding_context = get_branding_context(business_account_id)
+            else:
+                # Trial user - get demo branding
+                branding_context = get_branding_context(business_account_id=1)
+            
             return render_template('survey.html', 
                                  authenticated=verification['authenticated'],
                                  email=verification['email'], 
@@ -696,21 +705,25 @@ def survey_form():
                                  participant_name=verification['participant_name'],
                                  participant_company=verification['participant_company'],
                                  campaign_name=verification['campaign_name'],
-                                 branding=branding)
+                                 branding=branding_context,
+                                 branding_context=branding_context,
+                                 is_business_authenticated=is_business_authenticated)
         else:
-            # Get default branding for unauthenticated users
-            branding = get_branding_context()
+            # Get demo branding for unauthenticated trial users
+            branding_context = get_branding_context(business_account_id=1)
             return render_template('survey.html', 
                                  authenticated=False, 
                                  error=verification['error'], 
                                  user_email=None,
-                                 branding=branding)
+                                 branding=branding_context,
+                                 branding_context=branding_context,
+                                 is_business_authenticated=False)
     else:
         # Check if already authenticated via session
         if session.get('auth_token'):
             email = session.get('auth_email')
-            # Get branding context from session
-            branding = get_branding_context()
+            # Get demo branding for trial users (session-based access)
+            branding_context = get_branding_context(business_account_id=1)
             # For session-based access, we may not have all participant details
             return render_template('survey.html', 
                                  authenticated=True, 
@@ -719,7 +732,9 @@ def survey_form():
                                  participant_name=None,
                                  participant_company=None,
                                  campaign_name=None,
-                                 branding=branding)
+                                 branding=branding_context,
+                                 branding_context=branding_context,
+                                 is_business_authenticated=False)
         else:
             # Redirect unauthenticated users to auth page instead of showing broken page
             return redirect(url_for('server_auth'))
