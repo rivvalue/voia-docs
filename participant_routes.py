@@ -797,6 +797,170 @@ def regenerate_token(participant_id):
     return redirect(url_for('participants.list_participants'))
 
 
+@participant_bp.route('/bulk-edit', methods=['POST'])
+@require_business_auth
+@require_permission('manage_participants')
+def bulk_edit_participants():
+    """
+    Bulk edit participants - maximum 50 at a time
+    Allowed fields: role, region, customer_tier, language, tenure_years, company_commercial_value
+    Excluded: company_name (too risky), email (locked for survey history)
+    """
+    
+    MAX_BATCH_SIZE = 50
+    
+    try:
+        current_account = get_current_business_account()
+        if not current_account or not current_account.id:
+            return jsonify({
+                'success': False,
+                'error': 'Business account context not found'
+            }), 401
+        
+        # Parse request data
+        data = request.get_json()
+        participant_ids = data.get('participant_ids', [])
+        updates = data.get('updates', {})
+        
+        # Validate batch size
+        if len(participant_ids) > MAX_BATCH_SIZE:
+            return jsonify({
+                'success': False,
+                'error': 'Batch limit exceeded',
+                'message': f'Bulk edits limited to {MAX_BATCH_SIZE} participants. Please apply this batch before selecting more.',
+                'max_allowed': MAX_BATCH_SIZE,
+                'requested': len(participant_ids)
+            }), 413
+        
+        if not participant_ids:
+            return jsonify({
+                'success': False,
+                'error': 'No participants selected'
+            }), 400
+        
+        if not updates:
+            return jsonify({
+                'success': False,
+                'error': 'No updates provided'
+            }), 400
+        
+        # Validate allowed fields only
+        allowed_fields = {'role', 'region', 'customer_tier', 'language', 'tenure_years', 'company_commercial_value'}
+        invalid_fields = set(updates.keys()) - allowed_fields
+        if invalid_fields:
+            return jsonify({
+                'success': False,
+                'error': f'Invalid fields: {", ".join(invalid_fields)}. Company name cannot be edited in bulk.'
+            }), 400
+        
+        # Generate unique bulk operation ID for audit trail correlation
+        bulk_operation_id = str(uuid.uuid4())
+        
+        # Fetch participants (scoped to current business account)
+        participants = Participant.query.filter(
+            Participant.id.in_(participant_ids),
+            Participant.business_account_id == current_account.id
+        ).all()
+        
+        if not participants:
+            return jsonify({
+                'success': False,
+                'error': 'No valid participants found'
+            }), 404
+        
+        # Track results
+        updated_count = 0
+        skipped_count = 0
+        skipped_participants = []
+        
+        # Process updates in transaction
+        with db.session.begin_nested():
+            for participant in participants:
+                # Check if customer_tier is being changed and participant has survey history
+                if 'customer_tier' in updates and participant.has_survey_history():
+                    skipped_count += 1
+                    skipped_participants.append({
+                        'id': participant.id,
+                        'name': participant.name,
+                        'reason': 'Customer tier locked (has survey history)'
+                    })
+                    continue
+                
+                # Track changes for audit
+                changes = {}
+                
+                # Apply updates
+                for field, new_value in updates.items():
+                    old_value = getattr(participant, field, None)
+                    
+                    # Only update if value actually changed
+                    if old_value != new_value:
+                        changes[field] = {
+                            'old': old_value,
+                            'new': new_value
+                        }
+                        setattr(participant, field, new_value)
+                
+                # If no changes, skip audit logging
+                if not changes:
+                    continue
+                
+                # Sync commercial value across same company if changed
+                if 'company_commercial_value' in changes and participant.company_name:
+                    normalized_company = participant.company_name.strip().lower()
+                    same_company_participants = Participant.query.filter(
+                        db.func.lower(db.func.trim(Participant.company_name)) == normalized_company,
+                        Participant.business_account_id == current_account.id
+                    ).all()
+                    
+                    for other_participant in same_company_participants:
+                        if other_participant.id != participant.id:
+                            other_participant.company_commercial_value = new_value
+                
+                updated_count += 1
+                
+                # Audit logging for each participant update
+                try:
+                    queue_audit_log(
+                        business_account_id=current_account.id,
+                        action_type='participant_updated',
+                        resource_type='participant',
+                        resource_id=participant.id,
+                        resource_name=participant.name,
+                        details={
+                            'email': participant.email,
+                            'changes': changes,
+                            'bulk_operation_id': bulk_operation_id,
+                            'has_survey_history': participant.has_survey_history()
+                        }
+                    )
+                except Exception as audit_error:
+                    logger.error(f"Failed to log bulk participant update audit: {audit_error}")
+        
+        db.session.commit()
+        
+        account_name = current_account.name if current_account and hasattr(current_account, 'name') else 'Unknown'
+        logger.info(f"Bulk edit completed: {updated_count} updated, {skipped_count} skipped (Bulk ID: {bulk_operation_id}, Business Account: {account_name})")
+        
+        return jsonify({
+            'success': True,
+            'updated': updated_count,
+            'skipped': skipped_count,
+            'skipped_participants': skipped_participants,
+            'bulk_operation_id': bulk_operation_id,
+            'message': f'Successfully updated {updated_count} participant(s). {skipped_count} skipped due to restrictions.'
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error in bulk edit: {e}")
+        return jsonify({
+            'success': False,
+            'error': 'An error occurred during bulk edit',
+            'details': str(e)
+        }), 500
+
+
 # ==============================================================================
 # CAMPAIGN-PARTICIPANT ASSOCIATION MANAGEMENT ROUTES
 # ==============================================================================
