@@ -9351,3 +9351,717 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
         padding: var(--spacing-md) var(--spacing-xl);
     }
 }
+
+/* ===================================
+   SERVER AUTH PAGE V2 STYLES
+   =================================== */
+
+/* Auth Page Container */
+.auth-page-container {
+    padding: var(--spacing-3xl) 0;
+}
+
+/* Auth Hero Section */
+.auth-hero {
+    text-center: center;
+    margin-bottom: var(--spacing-3xl);
+}
+
+.auth-page-title {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-4xl);
+    font-weight: 700;
+    margin-bottom: var(--spacing-md);
+}
+
+.auth-page-subtitle {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-xl);
+    color: var(--gray-dark);
+    margin-bottom: var(--spacing-lg);
+}
+
+.auth-info-alert {
+    background: var(--light-gray);
+    border: 1px solid var(--primary-red);
+    color: var(--primary-red);
+    display: inline-block;
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    margin-top: var(--spacing-md);
+}
+
+.auth-info-alert small {
+    color: var(--primary-red);
+}
+
+/* Auth Main Card */
+.auth-main-card {
+    background: var(--primary-white);
+    border: none;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+}
+
+.auth-card-body {
+    padding: var(--spacing-3xl);
+}
+
+/* Email Banner Section */
+.auth-email-banner {
+    margin-bottom: var(--spacing-lg);
+}
+
+.auth-email-heading {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-2xl);
+    font-weight: 600;
+    margin-bottom: var(--spacing-md);
+}
+
+.auth-email-subtext {
+    font-family: var(--font-family-base);
+    color: var(--gray-dark);
+    font-size: var(--font-size-sm);
+}
+
+/* Archelo Logo (to be removed but keep class for now) */
+.server-auth-logo {
+    height: 120px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Form Elements */
+.auth-form-label {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-xl);
+    font-weight: 500;
+    margin-bottom: var(--spacing-xs);
+}
+
+.auth-form-input {
+    font-size: var(--font-size-lg);
+}
+
+/* Survey Type Selection Cards */
+.survey-type-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-lg);
+    position: relative;
+    overflow: hidden;
+    background: var(--primary-white);
+    height: 100%;
+}
+
+.survey-type-card:hover {
+    border-color: var(--primary-red);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(225, 58, 68, 0.15);
+}
+
+.survey-type-card.selected {
+    border: 3px solid var(--primary-red);
+    box-shadow: 0 0 0 1px rgba(225, 58, 68, 0.3);
+    background: rgba(225, 58, 68, 0.05);
+}
+
+.survey-type-card .card-body {
+    text-align: center;
+    padding: var(--spacing-2xl);
+}
+
+.survey-type-icon {
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-4xl);
+}
+
+.survey-type-icon.conversational {
+    color: var(--primary-red);
+}
+
+.survey-type-icon.traditional {
+    color: var(--gray-dark);
+}
+
+.survey-type-title {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+}
+
+.survey-type-description {
+    font-family: var(--font-family-base);
+    color: var(--gray-dark);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+}
+
+/* Survey Type Badges */
+.survey-type-badge {
+    transition: all 0.3s ease;
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    font-weight: 500;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    display: inline-block;
+    margin-top: var(--spacing-sm);
+}
+
+.survey-type-badge.recommended {
+    background: var(--light-gray);
+    color: var(--gray-dark);
+    border: 1px solid var(--medium-gray);
+}
+
+.survey-type-badge.traditional {
+    background: var(--light-gray);
+    color: var(--gray-dark);
+    border: 1px solid var(--medium-gray);
+}
+
+.survey-type-card.selected .survey-type-badge {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+    border: 1px solid var(--primary-red);
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(225, 58, 68, 0.4);
+    transform: scale(1.05);
+}
+
+/* Submit Button */
+.auth-submit-btn {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    border: none;
+    color: var(--primary-white);
+    font-family: var(--font-family-headings);
+    font-weight: 600;
+    font-size: var(--font-size-lg);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    transition: all 0.3s ease;
+    width: 100%;
+    box-shadow: var(--shadow-md);
+}
+
+.auth-submit-btn:hover {
+    background: linear-gradient(135deg, var(--red-hover) 0%, #a52730 100%);
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+    color: var(--primary-white);
+}
+
+/* Token Result Alerts */
+.auth-success-alert {
+    background: #d4edda;
+    border: 1px solid #28a745;
+    color: #155724;
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    margin-top: var(--spacing-lg);
+}
+
+.auth-error-alert {
+    background: #f8d7da;
+    border: 1px solid #dc3545;
+    color: #721c24;
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    margin-top: var(--spacing-lg);
+}
+
+.auth-success-alert h5,
+.auth-error-alert h5 {
+    font-family: var(--font-family-headings);
+    font-weight: 700;
+    margin-bottom: var(--spacing-sm);
+}
+
+/* Survey Start Button (Dynamic) */
+.auth-survey-start-btn {
+    background: #28a745;
+    border: none;
+    color: var(--primary-white);
+    font-family: var(--font-family-headings);
+    font-weight: 600;
+    font-size: var(--font-size-lg);
+    padding: var(--spacing-lg) var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.auth-survey-start-btn:hover {
+    background: #218838;
+    color: var(--primary-white);
+    text-decoration: none;
+    transform: translateY(-2px);
+}
+
+/* Privacy Notice */
+.auth-privacy-notice {
+    text-align: center;
+    margin-top: var(--spacing-md);
+}
+
+.auth-privacy-notice small {
+    color: var(--gray-dark);
+    font-size: var(--font-size-sm);
+}
+
+/* Hide survey type radio inputs */
+.survey-type-radio {
+    display: none;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .auth-page-container {
+        padding: var(--spacing-xl) 0;
+    }
+    
+    .auth-card-body {
+        padding: var(--spacing-xl);
+    }
+    
+    .auth-page-title {
+        font-size: var(--font-size-3xl);
+    }
+    
+    .survey-type-card .card-body {
+        padding: var(--spacing-lg);
+    }
+    
+    .server-auth-logo {
+        height: 80px;
+        margin-top: var(--spacing-md);
+    }
+}
+
+/* ===================================
+   CONVERSATIONAL SURVEY PAGE V2 STYLES
+   =================================== */
+
+/* Conversational Survey Page */
+.page-conversational {
+    background: var(--primary-white);
+}
+
+/* Hero Section */
+.conv-hero-section {
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+}
+
+.conv-hero-logo {
+    height: 60px;
+    width: auto;
+    margin-bottom: var(--spacing-lg);
+}
+
+.conv-hero-title {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-4xl);
+    font-weight: 700;
+    margin-bottom: var(--spacing-md);
+}
+
+.conv-hero-subtitle {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-2xl);
+    color: var(--primary-black);
+    font-weight: 400;
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Auth Check Card */
+.conv-auth-card {
+    background: var(--primary-white);
+    border: none;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--spacing-lg);
+}
+
+.conv-auth-card-body {
+    padding: var(--spacing-2xl);
+    text-align: center;
+}
+
+.conv-auth-warning {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    color: #856404;
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+}
+
+.conv-auth-btn {
+    background: var(--primary-red);
+    border: none;
+    color: var(--primary-white);
+    font-family: var(--font-family-headings);
+    font-weight: 600;
+    padding: var(--spacing-md) var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.conv-auth-btn:hover {
+    background: var(--red-hover);
+    color: var(--primary-white);
+    text-decoration: none;
+}
+
+/* Survey Setup Card */
+.conv-setup-card {
+    background: var(--primary-white);
+    border: none;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--spacing-lg);
+}
+
+.conv-setup-header {
+    background: var(--primary-white);
+    border-bottom: 1px solid var(--light-gray);
+    padding: var(--spacing-lg);
+}
+
+.conv-setup-header h5 {
+    font-family: var(--font-family-headings);
+    font-weight: 600;
+    margin-bottom: var(--spacing-xs);
+}
+
+.conv-setup-body {
+    padding: var(--spacing-xl);
+}
+
+.conv-form-label {
+    font-family: var(--font-family-base);
+    font-weight: 500;
+    margin-bottom: var(--spacing-sm);
+}
+
+.conv-start-btn {
+    background: var(--primary-red);
+    border: none;
+    color: var(--primary-white);
+    font-family: var(--font-family-headings);
+    font-weight: 500;
+    font-size: var(--font-size-lg);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+.conv-start-btn:hover {
+    background: var(--red-hover);
+    color: var(--primary-white);
+}
+
+/* Conversation Interface Card */
+.conv-interface-card {
+    background: var(--primary-white);
+    border: none;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.conv-interface-header {
+    background: var(--primary-white);
+    border-bottom: 1px solid var(--light-gray);
+    padding: var(--spacing-lg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.conv-interface-header h5 {
+    font-family: var(--font-family-headings);
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+.conv-progress-container {
+    width: 200px;
+}
+
+.conv-progress-bar {
+    background: var(--primary-red);
+}
+
+.conv-interface-body {
+    padding: var(--spacing-xl);
+}
+
+/* Chat Messages Area */
+.conv-chat-messages {
+    height: 400px;
+    overflow-y: auto;
+    background: var(--light-gray);
+    border: none;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+/* Input Area */
+.conv-input-area textarea {
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--medium-gray);
+}
+
+.conv-send-btn {
+    background: var(--primary-red);
+    border: none;
+    color: var(--primary-white);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    transition: all 0.3s ease;
+}
+
+.conv-send-btn:hover {
+    background: var(--red-hover);
+    color: var(--primary-white);
+}
+
+.conv-input-tip {
+    font-size: var(--font-size-sm);
+    color: var(--gray-dark);
+    margin-top: var(--spacing-sm);
+}
+
+.conv-input-tip i {
+    color: var(--primary-red);
+}
+
+/* Loading State Card */
+.conv-loading-card {
+    background: var(--primary-white);
+    border: none;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.conv-loading-body {
+    padding: var(--spacing-3xl) var(--spacing-2xl);
+    text-align: center;
+}
+
+.conv-loading-spinner {
+    color: var(--primary-red);
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.conv-loading-body h5 {
+    font-family: var(--font-family-headings);
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+}
+
+.conv-loading-body p {
+    color: var(--gray-dark);
+}
+
+/* Survey Complete Card */
+.conv-complete-card {
+    background: var(--primary-white);
+    border: none;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.conv-complete-body {
+    padding: var(--spacing-3xl) var(--spacing-2xl);
+    text-align: center;
+}
+
+.conv-success-icon {
+    margin-bottom: var(--spacing-lg);
+}
+
+.conv-success-icon i {
+    font-size: 4rem;
+    color: var(--primary-red);
+}
+
+.conv-complete-body h4 {
+    font-family: var(--font-family-headings);
+    font-weight: 700;
+    margin-bottom: var(--spacing-md);
+}
+
+.conv-complete-body .lead {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-sm);
+}
+
+/* Dashboard Button */
+.conv-dashboard-btn {
+    background: var(--primary-red);
+    border: none;
+    color: var(--primary-white);
+    font-family: var(--font-family-headings);
+    font-weight: 600;
+    font-size: var(--font-size-lg);
+    padding: var(--spacing-lg) var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.conv-dashboard-btn:hover {
+    background: var(--red-hover);
+    color: var(--primary-white);
+    text-decoration: none;
+    transform: translateY(-2px);
+}
+
+/* Next Steps Section */
+.conv-next-steps {
+    background: var(--light-gray);
+    border: 1px solid var(--medium-gray);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.conv-next-steps h5 {
+    font-family: var(--font-family-headings);
+    font-weight: 600;
+    margin-bottom: var(--spacing-md);
+}
+
+.conv-next-steps h5 i {
+    color: var(--primary-red);
+}
+
+.conv-next-steps p {
+    color: var(--gray-dark);
+    margin-bottom: var(--spacing-md);
+}
+
+/* Action Buttons in Next Steps */
+.conv-action-btn-outline {
+    border: 1px solid var(--primary-red);
+    color: var(--primary-red);
+    background: var(--primary-white);
+    font-family: var(--font-family-headings);
+    font-weight: 600;
+    font-size: var(--font-size-lg);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.conv-action-btn-outline:hover {
+    background: var(--primary-red);
+    color: var(--primary-white);
+    text-decoration: none;
+}
+
+.conv-action-btn-solid {
+    background: var(--primary-red);
+    border: none;
+    color: var(--primary-white);
+    font-family: var(--font-family-headings);
+    font-weight: 600;
+    font-size: var(--font-size-lg);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.conv-action-btn-solid:hover {
+    background: var(--red-hover);
+    color: var(--primary-white);
+    text-decoration: none;
+}
+
+.conv-btn-helper-text {
+    color: var(--gray-dark);
+    font-size: var(--font-size-sm);
+    display: block;
+    margin-top: var(--spacing-sm);
+}
+
+/* Return Home Button */
+.conv-home-btn {
+    border: 1px solid var(--gray-dark);
+    color: var(--gray-dark);
+    background: var(--primary-white);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.conv-home-btn:hover {
+    background: var(--light-gray);
+    color: var(--primary-black);
+    text-decoration: none;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .conv-hero-title {
+        font-size: var(--font-size-3xl);
+    }
+    
+    .conv-hero-subtitle {
+        font-size: var(--font-size-lg);
+    }
+    
+    .conv-chat-messages {
+        height: 300px;
+    }
+    
+    .conv-progress-container {
+        width: 150px;
+    }
+    
+    .conv-setup-body,
+    .conv-interface-body,
+    .conv-complete-body {
+        padding: var(--spacing-lg);
+    }
+    
+    .conv-action-btn-outline,
+    .conv-action-btn-solid {
+        font-size: var(--font-size-base);
+        padding: var(--spacing-md);
+    }
+}
+
+/* V2 Utility Classes */
+.v2-hidden {
+    display: none !important;
+}
+
+.v2-visible {
+    display: block !important;
+}

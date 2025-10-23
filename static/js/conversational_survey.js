@@ -1,4 +1,20 @@
 // Conversational AI Survey JavaScript
+// V2 Utility Functions for Show/Hide
+function hideElement(id) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.classList.add("v2-hidden");
+        el.classList.remove("v2-visible");
+    }
+}
+
+function showElement(id) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.classList.add("v2-visible");
+        el.classList.remove("v2-hidden");
+    }
+}
 console.log('=== CONVERSATIONAL_SURVEY.JS LOADED SUCCESSFULLY ===');
 
 let conversationState = {
@@ -42,20 +58,13 @@ function initializeAuthentication() {
 }
 
 function showAuthRequired() {
-    const authCheck = document.getElementById('authCheck');
-    const surveySetup = document.getElementById('surveySetup');
-    
-    if (authCheck) {
-        authCheck.style.display = 'block';
-    }
-    if (surveySetup) {
-        surveySetup.style.display = 'none';
-    }
+    showElement('authCheck');
+    hideElement('surveySetup');
 }
 
 function showSurveySetup() {
-    document.getElementById('authCheck').style.display = 'none';
-    document.getElementById('surveySetup').style.display = 'block';
+    hideElement('authCheck');
+    showElement('surveySetup');
 }
 
 function setupEventListeners() {
@@ -408,17 +417,17 @@ function formatMessageSafe(message) {
 
 // Add missing helper functions
 function showLoadingState() {
-    document.getElementById('surveySetup').style.display = 'none';
-    document.getElementById('conversationInterface').style.display = 'none';
-    document.getElementById('loadingState').style.display = 'block';
-    document.getElementById('surveyComplete').style.display = 'none';
+    hideElement('surveySetup');
+    hideElement('conversationInterface');
+    showElement('loadingState');
+    hideElement('surveyComplete');
 }
 
 function showConversationInterface() {
-    document.getElementById('surveySetup').style.display = 'none';
-    document.getElementById('conversationInterface').style.display = 'block';
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('surveyComplete').style.display = 'none';
+    hideElement('surveySetup');
+    showElement('conversationInterface');
+    hideElement('loadingState');
+    hideElement('surveyComplete');
 }
 
 function showTypingIndicator() {
@@ -447,10 +456,10 @@ function updateProgress(progress) {
 }
 
 function finalizeSurvey() {
-    document.getElementById('surveySetup').style.display = 'none';
-    document.getElementById('conversationInterface').style.display = 'none';
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('surveyComplete').style.display = 'block';
+    hideElement('surveySetup');
+    hideElement('conversationInterface');
+    hideElement('loadingState');
+    showElement('surveyComplete');
 }
 
 function showTypingIndicator() {
@@ -483,21 +492,21 @@ function updateProgress(progress) {
 }
 
 function showConversationInterface() {
-    document.getElementById('surveySetup').style.display = 'none';
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('conversationInterface').style.display = 'block';
+    hideElement('surveySetup');
+    hideElement('loadingState');
+    showElement('conversationInterface');
 }
 
 function showLoadingState() {
-    document.getElementById('surveySetup').style.display = 'none';
-    document.getElementById('conversationInterface').style.display = 'none';
-    document.getElementById('loadingState').style.display = 'block';
+    hideElement('surveySetup');
+    hideElement('conversationInterface');
+    showElement('loadingState');
 }
 
 function finalizeSurvey() {
     console.log('=== FINALIZE CONVERSATIONAL SURVEY CALLED ===');
     // Hide input area
-    document.getElementById('inputArea').style.display = 'none';
+    hideElement('inputArea');
     
     // Show loading state
     showLoadingState();
@@ -536,14 +545,14 @@ function finalizeSurvey() {
         console.error('Error finalizing survey:', error);
         // Show error message in UI instead of alert
         addMessage('ai', 'I apologize, but there was an error finalizing your survey. Please try refreshing the page or contact support if the issue persists.');
-        document.getElementById('inputArea').style.display = 'block'; // Re-enable input
+        showElement('inputArea'); // Re-enable input
     });
 }
 
 function showSurveyComplete() {
-    document.getElementById('loadingState').style.display = 'none';
-    document.getElementById('conversationInterface').style.display = 'none';
-    document.getElementById('surveyComplete').style.display = 'block';
+    hideElement('loadingState');
+    hideElement('conversationInterface');
+    showElement('surveyComplete');
     
     // Update progress to 100%
     updateProgress(100);

@@ -2,221 +2,164 @@
 
 {% block title %}Authentication - VOÏA{% endblock %}
 
-{% block extra_head %}
-<style>
-    .survey-type-card {
-        transition: all 0.3s ease;
-        cursor: pointer;
-        border: 2px solid #e9ecef;
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .survey-type-card:hover {
-        border-color: #E13A44;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(225, 58, 68, 0.15);
-    }
-    
-
-    
-    .survey-type-card .card-header {
-        background: transparent;
-        border-bottom: 1px solid rgba(0,0,0,0.1);
-        transition: all 0.3s ease;
-    }
-    
-    .survey-type-card.selected .card-header {
-        background: linear-gradient(135deg, #E13A44 0%, #c12d37 100%);
-        color: white;
-        border-bottom: none;
-    }
-    
-    .survey-type-card .badge {
-        transition: all 0.3s ease;
-        font-size: 1rem;
-        line-height: 1.6;
-        padding: 0.6rem 1.2rem;
-        font-weight: 500;
-        border: 1px solid transparent;
-    }
-    
-    .survey-type-card.selected .badge {
-        background: linear-gradient(135deg, #E13A44 0%, #c12d37 100%) !important;
-        color: white !important;
-        border: 1px solid #E13A44;
-        font-weight: 700;
-        box-shadow: 0 4px 15px rgba(225, 58, 68, 0.4);
-        transform: scale(1.05);
-    }
-    
-    .survey-type-card:not(.selected) .badge {
-        background: #f8f9fa;
-        color: #6c757d;
-        border: 1px solid #dee2e6;
-    }
-    
-    .survey-type-radio {
-        display: none;
-    }
-    
-    /* Remove any remaining dot indicators */
-    .selection-indicator {
-        display: none !important;
-    }
-    
-
-    
-    .tagline {
-        color: #E13A44;
-        font-size: 1.1rem;
-        font-weight: 500;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
+<main class="auth-page-container" aria-labelledby="auth-main-heading">
+    <div class="container-fluid">
+        <!-- Header -->
+        <header class="auth-hero text-center">
+            <h1 id="auth-main-heading" class="auth-page-title">VO<span class="voia-red-accent">Ï</span>A - Turning voices into value</h1>
+            <p class="auth-page-subtitle">
+                A lightweight, AI-powered Voice of Client experience designed for small and medium businesses.
+            </p>
+            <div class="auth-info-alert" role="status">
+                <small>
+                    <div><i class="fas fa-clock me-1" aria-hidden="true"></i>Takes under 2 minutes
+                    <i class="fas fa-users ms-3 me-1" aria-hidden="true"></i>Simulates a real customer or employee feedback flow</div>
+                    <div class="mt-1"><i class="fas fa-chart-bar me-1" aria-hidden="true"></i>Includes live insight dashboard right after completion
+                    <i class="fas fa-shield-alt ms-3 me-1" aria-hidden="true"></i>Anonymous data collection</div>
+                </small>
+            </div>
+        </header>
 
-
-<div class="container-fluid py-5">
-    <!-- Header -->
-    <div class="text-center mb-5">
-        <h1 class="display-4 fw-bold mb-3">VO<span style="color: #E13A44;">Ï</span>A - Turning voices into value</h1>
-        <p class="fs-5 text-muted mb-4">
-            A lightweight, AI-powered Voice of Client experience designed for small and medium businesses.
-        </p>
-        <div class="alert alert-light border-primary d-inline-block mt-3">
-            <small class="text-primary">
-                <div><i class="fas fa-clock me-1"></i>Takes under 2 minutes
-                <i class="fas fa-users ms-3 me-1"></i>Simulates a real customer or employee feedback flow</div>
-                <div class="mt-1"><i class="fas fa-chart-bar me-1"></i>Includes live insight dashboard right after completion
-                <i class="fas fa-shield-alt ms-3 me-1"></i>Anonymous data collection</div>
-            </small>
-        </div>
-    </div>
-
-    <div class="row justify-content-center">
-        <div class="col-xl-8">
-            <div class="card border-0 shadow-lg">
-                <div class="card-body p-5">
-                    <!-- Server-side form submission -->
-                    <form method="POST" action="{{ url_for('server_auth_generate') }}">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <div class="mb-4">
-                            <!-- Email Banner with Logo -->
-                            <div class="row align-items-center mb-4">
-                                <div class="col-12 col-md-8 mb-3 mb-md-0">
-                                    <h4 class="mb-3 fw-semibold">Enter an email to generate a secure session token.</h4>
-                                    <small class="text-muted">No spam, no subscriptions. Just a hands-on look at how VOÏA works.</small>
-                                </div>
-                                <div class="col-12 col-md-4 text-center text-md-end">
-                                    <img src="{{ url_for('static', filename='images/archelo-logo.png') }}" alt="Archelo Group" class="server-auth-logo" style="height: 120px; width: auto; object-fit: contain; filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));">
-                                </div>
+        <div class="row justify-content-center">
+            <div class="col-xl-8">
+                <article class="auth-main-card card">
+                    <div class="auth-card-body card-body">
+                        <!-- Server-side form submission -->
+                        <form method="POST" action="{{ url_for('server_auth_generate') }}" aria-labelledby="form-heading">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            
+                            <div class="auth-email-banner mb-4">
+                                <h2 id="form-heading" class="auth-email-heading">Enter an email to generate a secure session token.</h2>
+                                <small class="auth-email-subtext">No spam, no subscriptions. Just a hands-on look at how VOÏA works.</small>
                             </div>
-                            <label for="email" class="form-label fs-5">Email Address</label>
-                            <small class="text-muted d-block mb-2">Used only to create a secure session. We won't contact you.</small>
-                            <input type="email" class="form-control form-control-lg" name="email" 
-                                   value="{{ request.form.get('email', '') }}" 
-                                   placeholder="Enter your email address" required>
-                        </div>
-                        
-                        <!-- Survey Type Selection -->
-                        <div class="mb-4">
-                            <label class="form-label fs-5">Choose Your Survey Experience</label>
-                            <div class="row g-3 mt-2">
-                                <div class="col-md-6">
-                                    <div class="survey-type-card card h-100" onclick="selectSurveyType('conversational', this)">
-                                        <div class="card-body text-center p-4">
-                                            <div class="mb-3">
-                                                <i class="fas fa-comments fa-3x text-primary"></i>
+                            
+                            <div class="mb-4">
+                                <label for="email" class="form-label auth-form-label">Email Address</label>
+                                <small class="text-muted d-block mb-2">Used only to create a secure session. We won't contact you.</small>
+                                <input type="email" 
+                                       class="form-control auth-form-input" 
+                                       id="email"
+                                       name="email" 
+                                       value="{{ request.form.get('email', '') }}" 
+                                       placeholder="Enter your email address" 
+                                       required
+                                       aria-required="true"
+                                       aria-describedby="email-help">
+                                <div id="email-help" class="visually-hidden">Enter your email to generate a secure session token</div>
+                            </div>
+                            
+                            <!-- Survey Type Selection -->
+                            <div class="mb-4">
+                                <label class="form-label auth-form-label">Choose Your Survey Experience</label>
+                                <div class="row g-3 mt-2" role="group" aria-labelledby="survey-type-heading">
+                                    <h3 id="survey-type-heading" class="visually-hidden">Survey Type Options</h3>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="survey-type-card card" 
+                                             onclick="selectSurveyType('conversational', this)"
+                                             role="button"
+                                             tabindex="0"
+                                             aria-pressed="false"
+                                             onkeypress="if(event.key==='Enter'||event.key===' '){selectSurveyType('conversational', this)}">
+                                            <div class="card-body">
+                                                <div class="survey-type-icon conversational">
+                                                    <i class="fas fa-comments" aria-hidden="true"></i>
+                                                </div>
+                                                <h4 class="survey-type-title">Conversational Interface</h4>
+                                                <p class="survey-type-description">Engage with our natural language processing system to demonstrate advanced dialogue-based data collection.</p>
+                                                <span class="survey-type-badge recommended">
+                                                    <i class="fas fa-star me-1" aria-hidden="true"></i>Recommended
+                                                </span>
                                             </div>
-                                            <h5 class="card-title">Conversational Interface</h5>
-                                            <p class="card-text text-muted">Engage with our natural language processing system to demonstrate advanced dialogue-based data collection.</p>
-                                            <span class="badge bg-success mt-2">
-                                                <i class="fas fa-star me-1"></i>Recommended
-                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-6">
+                                        <div class="survey-type-card card" 
+                                             onclick="selectSurveyType('traditional', this)"
+                                             role="button"
+                                             tabindex="0"
+                                             aria-pressed="false"
+                                             onkeypress="if(event.key==='Enter'||event.key===' '){selectSurveyType('traditional', this)}">
+                                            <div class="card-body">
+                                                <div class="survey-type-icon traditional">
+                                                    <i class="fas fa-list-alt" aria-hidden="true"></i>
+                                                </div>
+                                                <h4 class="survey-type-title">Structured Questionnaire</h4>
+                                                <p class="survey-type-description">Traditional form-based methodology for comparative analysis against conversational approaches.</p>
+                                                <span class="survey-type-badge traditional">
+                                                    <i class="fas fa-clipboard-check me-1" aria-hidden="true"></i>Traditional Method
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="survey-type-card card h-100" onclick="selectSurveyType('traditional', this)">
-                                        <div class="card-body text-center p-4">
-                                            <div class="mb-3">
-                                                <i class="fas fa-list-alt fa-3x text-secondary"></i>
-                                            </div>
-                                            <h5 class="card-title">Structured Questionnaire</h5>
-                                            <p class="card-text text-muted">Traditional form-based methodology for comparative analysis against conversational approaches.</p>
-                                            <span class="badge bg-secondary mt-2">
-                                                <i class="fas fa-clipboard-check me-1"></i>Traditional Method
-                                            </span>
-                                        </div>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="auth-submit-btn btn" aria-label="Generate secure authentication token">
+                                    <i class="fas fa-key me-2" aria-hidden="true"></i>
+                                    Generate Secure Token
+                                </button>
+                            </div>
+                            
+                            <div class="auth-privacy-notice">
+                                <small>
+                                    <i class="fas fa-shield-alt me-1" aria-hidden="true"></i>
+                                    All data in this demo is anonymized. Read our privacy commitment for more info.
+                                </small>
+                            </div>
+                        </form>
+                        
+                        <!-- Display results if available -->
+                        {% if token_result %}
+                        <div class="mt-4">
+                            {% if token_result.success %}
+                                <div class="auth-success-alert alert" role="alert">
+                                    <h5><i class="fas fa-check-circle me-2" aria-hidden="true"></i>Token Generated Successfully!</h5>
+                                    <p><strong>Email:</strong> {{ token_result.email }}</p>
+                                    <p><strong>Token:</strong> <code>{{ token_result.token }}</code></p>
+                                    <p><strong>Expires in:</strong> {{ token_result.expires_in }} seconds</p>
+                                    
+                                    <div class="mt-3">
+                                        <a href="{{ url_for('conversational_survey') }}?token={{ token_result.token }}" 
+                                           id="dynamicSurveyButton"
+                                           class="auth-survey-start-btn btn btn-lg"
+                                           data-conversational-url="{{ url_for('conversational_survey') }}?token={{ token_result.token }}"
+                                           data-traditional-url="{{ url_for('survey') }}?token={{ token_result.token }}"
+                                           aria-label="Start selected survey type">
+                                            <i class="fas fa-comments me-2" id="buttonIcon" aria-hidden="true"></i>
+                                            <span id="buttonText">Start Conversational Survey</span>
+                                        </a>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg py-3" style="background: linear-gradient(135deg, #E13A44 0%, #c12d37 100%); border: none; font-weight: 600;">
-                                <i class="fas fa-key me-2"></i>
-                                Generate Secure Token
-                            </button>
-                        </div>
-                        <div class="text-center mt-3">
-                            <small class="text-muted">
-                                <i class="fas fa-shield-alt me-1"></i>
-                                All data in this demo is anonymized. Read our privacy commitment for more info.
-                            </small>
-                        </div>
-                    </form>
-                    
-                    <!-- Display results if available -->
-                    {% if token_result %}
-                    <div class="mt-4">
-                        {% if token_result.success %}
-                            <div class="alert alert-success">
-                                <h5>✅ Token Generated Successfully!</h5>
-                                <p><strong>Email:</strong> {{ token_result.email }}</p>
-                                <p><strong>Token:</strong> <code>{{ token_result.token }}</code></p>
-                                <p><strong>Expires in:</strong> {{ token_result.expires_in }} seconds</p>
-                                
-                                <div class="mt-3">
-                                    <a href="{{ url_for('conversational_survey') }}?token={{ token_result.token }}" 
-                                       id="dynamicSurveyButton"
-                                       class="btn btn-success btn-lg"
-                                       data-conversational-url="{{ url_for('conversational_survey') }}?token={{ token_result.token }}"
-                                       data-traditional-url="{{ url_for('survey') }}?token={{ token_result.token }}">
-                                        <i class="fas fa-comments me-2" id="buttonIcon"></i>
-                                        <span id="buttonText">Start Conversational Survey →</span>
-                                    </a>
+                            {% else %}
+                                <div class="auth-error-alert alert" role="alert">
+                                    <h5><i class="fas fa-exclamation-circle me-2" aria-hidden="true"></i>Token Generation Failed</h5>
+                                    <p>{{ token_result.error }}</p>
                                 </div>
-                            </div>
-                        {% else %}
-                            <div class="alert alert-danger">
-                                <h5>❌ Token Generation Failed</h5>
-                                <p>{{ token_result.error }}</p>
-                            </div>
+                            {% endif %}
+                        </div>
                         {% endif %}
                     </div>
-                    {% endif %}
-                </div>
+                </article>
             </div>
         </div>
     </div>
-</div>
+</main>
 
 <script>
 function selectSurveyType(type, cardElement) {
-    // Remove selected class and reset styles from all cards
+    // Remove selected class from all cards
     document.querySelectorAll('.survey-type-card').forEach(card => {
         card.classList.remove('selected');
-        card.style.border = '2px solid #e9ecef';
-        card.style.boxShadow = '';
-        card.style.backgroundColor = '';
-        card.style.transform = '';
+        card.setAttribute('aria-pressed', 'false');
     });
     
     // Add selected class to clicked card
     cardElement.classList.add('selected');
+    cardElement.setAttribute('aria-pressed', 'true');
     
     // Set the survey type in a hidden input
     let hiddenInput = document.getElementById('survey_type_input');
@@ -228,11 +171,6 @@ function selectSurveyType(type, cardElement) {
         document.querySelector('form').appendChild(hiddenInput);
     }
     hiddenInput.value = type;
-    
-    // Apply red border to selected card only
-    cardElement.style.border = '3px solid #E13A44';
-    cardElement.style.boxShadow = '0 0 0 1px rgba(225, 58, 68, 0.3)';
-    cardElement.style.backgroundColor = 'rgba(225, 58, 68, 0.05)';
     
     // Update the survey button if token is already generated
     updateSurveyButton(type);
@@ -247,11 +185,11 @@ function updateSurveyButton(surveyType) {
         if (surveyType === 'conversational') {
             button.href = button.getAttribute('data-conversational-url');
             buttonIcon.className = 'fas fa-comments me-2';
-            buttonText.textContent = 'Start Conversational Survey →';
+            buttonText.textContent = 'Start Conversational Survey';
         } else {
             button.href = button.getAttribute('data-traditional-url');
             buttonIcon.className = 'fas fa-list-alt me-2';
-            buttonText.textContent = 'Start Traditional Survey →';
+            buttonText.textContent = 'Start Traditional Survey';
         }
     }
 }
@@ -262,15 +200,26 @@ document.addEventListener('DOMContentLoaded', function() {
     const previousSelection = '{{ request.form.get("survey_type", "conversational") }}';
     
     // Find the card for the previous selection
-    const selectedCard = document.querySelector(`.survey-type-card[onclick*="${previousSelection}"]`);
+    const allCards = document.querySelectorAll('.survey-type-card');
+    let selectedCard = null;
+    
+    allCards.forEach(card => {
+        const onclickAttr = card.getAttribute('onclick');
+        if (onclickAttr && onclickAttr.includes(previousSelection)) {
+            selectedCard = card;
+        }
+    });
+    
     if (selectedCard) {
         selectSurveyType(previousSelection, selectedCard);
     } else {
         // Fallback to conversational if no previous selection
-        const conversationalCard = document.querySelector('.survey-type-card[onclick*="conversational"]');
-        if (conversationalCard) {
-            selectSurveyType('conversational', conversationalCard);
-        }
+        allCards.forEach(card => {
+            const onclickAttr = card.getAttribute('onclick');
+            if (onclickAttr && onclickAttr.includes('conversational')) {
+                selectSurveyType('conversational', card);
+            }
+        });
     }
     
     // Initialize button text based on current selection
