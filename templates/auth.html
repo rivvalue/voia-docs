@@ -277,7 +277,7 @@ function startSelectedSurvey() {
     if (conversationalSelected) {
         surveyUrl = "{{ url_for('conversational_survey') }}";
     } else if (traditionalSelected) {
-        surveyUrl = "{{ url_for('survey') }}";
+        surveyUrl = "{{ url_for('survey_form') }}";
     } else {
         // Default to conversational if nothing selected
         surveyUrl = "{{ url_for('conversational_survey') }}";

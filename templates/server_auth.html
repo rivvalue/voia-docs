@@ -127,7 +127,7 @@
                                            id="dynamicSurveyButton"
                                            class="auth-survey-start-btn btn btn-lg"
                                            data-conversational-url="{{ url_for('conversational_survey') }}?token={{ token_result.token }}"
-                                           data-traditional-url="{{ url_for('survey') }}?token={{ token_result.token }}"
+                                           data-traditional-url="{{ url_for('survey_form') }}?token={{ token_result.token }}"
                                            aria-label="Start selected survey type">
                                             <i class="fas fa-comments me-2" id="buttonIcon" aria-hidden="true"></i>
                                             <span id="buttonText">Start Conversational Survey</span>
