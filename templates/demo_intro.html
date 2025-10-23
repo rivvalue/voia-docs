@@ -2,368 +2,189 @@
 
 {% block title %}Welcome to Your VOÏA Demo{% endblock %}
 
-{% block extra_head %}
-<style>
-/* Cache buster: 20250908-132100 - final fixes applied */
-    .demo-page {
-        background: #ffffff;
-        min-height: 100vh;
-        padding: 0;
-    }
-    
-    .hero-section {
-        background: #ffffff;
-        padding: 5rem 0 3rem 0;
-        border-bottom: 1px solid #f0f0f0;
-        margin-bottom: 4rem;
-    }
-    
-    .content-section {
-        padding: 4rem 0;
-        margin-bottom: 4rem;
-    }
-    
-    .info-card {
-        background: #ffffff;
-        border: 1px solid #f1f1f1;
-        border-radius: 16px;
-        padding: 3rem;
-        height: 100%;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    
-    .info-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.08);
-        border-color: #e5e5e5;
-    }
-    
-    
-    .feature-grid {
-        display: flex !important;
-        align-items: center !important;
-        gap: 1rem !important;
-        margin-bottom: 1.5rem !important;
-    }
-    
-    .feature-icon {
-        width: 40px;
-        height: 40px;
-        background: rgba(225, 58, 68, 0.08);
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #E13A44;
-        font-size: 1.1rem;
-        flex-shrink: 0;
-    }
-    
-    .bottom-card .feature-icon {
-        color: #E13A44 !important;
-        background: rgba(225, 58, 68, 0.08) !important;
-    }
-    
-    .continue-section {
-        background: #fafafa;
-        padding: 4rem 0 6rem 0 !important;
-        border-top: 1px solid #f0f0f0;
-        border-radius: 16px;
-        margin-top: 4rem;
-        margin-bottom: 2rem;
-    }
-    
-    .continue-button {
-        background: #E13A44;
-        border: none;
-        padding: 1.2rem 3rem;
-        font-size: 1.3rem !important;
-        font-weight: 600;
-        border-radius: 12px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        color: white;
-        box-shadow: 0 8px 32px rgba(225, 58, 68, 0.2);
-    }
-    
-    .continue-button:hover {
-        background: #c12d37;
-        transform: translateY(-2px);
-        box-shadow: 0 12px 40px rgba(225, 58, 68, 0.3);
-        color: white;
-        text-decoration: none;
-    }
-    
-    .section-title {
-        font-weight: 700;
-        color: #1a1a1a;
-        margin-bottom: 0.5rem;
-        font-size: 1.5rem;
-    }
-    
-    .section-subtitle {
-        color: #6b7280;
-        font-size: 1rem;
-        line-height: 1.6;
-        margin-bottom: 2rem;
-    }
-    
-    .company-logo {
-        width: 20px;
-        height: auto;
-        margin-left: 0.5rem;
-        opacity: 0.9;
-    }
-    
-    .section-header {
-        display: flex;
-        align-items: center;
-        margin-bottom: 0.5rem;
-    }
-    
-    .feature-text {
-        color: #4b5563;
-        font-size: 0.95rem;
-        line-height: 1.6;
-        margin: 0;
-    }
-    
-    .expectation-item {
-        display: flex;
-        align-items: flex-start;
-        margin-bottom: 1rem;
-        padding: 0.75rem 0;
-    }
-    
-    .expectation-dot {
-        width: 6px;
-        height: 6px;
-        background: #E13A44;
-        border-radius: 50%;
-        margin-top: 0.75rem;
-        margin-right: 1rem;
-        flex-shrink: 0;
-    }
-    
-    .page-header {
-        font-size: 3rem;
-        font-weight: 800;
-        color: #1a1a1a;
-        margin-bottom: 1.5rem;
-        letter-spacing: -0.02em;
-    }
-    
-    .page-subtitle {
-        font-size: 1.25rem;
-        color: #6b7280;
-        font-weight: 400;
-        line-height: 1.6;
-        max-width: 800px;
-        margin: 0 auto 1rem auto;
-    }
-    
-    .scenario-text {
-        font-size: 1.1rem;
-        color: #374151;
-        line-height: 1.7;
-        max-width: 900px;
-        margin: 0 auto;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="row">
-    <div class="col-lg-10 mx-auto">
-        <div class="demo-page">
-    <!-- Hero Section -->
-    <div class="hero-section">
-        <div class="row">
-            <div class="col-lg-10 mx-auto">
-                <div class="row align-items-center">
-                    <div class="col-lg-12">
-                        <div class="text-left" style="max-width: none;">
-                            <h1 class="page-header" style="text-align: center; margin-bottom: 1.5rem;">Welcome to Your VO<span style="color: #E13A44;">Ï</span>A Demo</h1>
-                            
-                            <!-- Full width tagline -->
-                            <p class="page-subtitle" style="text-align: left; margin-bottom: 2rem; max-width: none;">
-                                You're about to experience how VO<span style="color: #E13A44;">Ï</span>A turns open-ended feedback into actionable insights — in minutes.
-                            </p>
-                            
-                            <!-- Left content, Right logo layout -->
-                            <div class="row align-items-center">
-                                <div class="col-12 col-md-8 mb-3 mb-md-0">
-                                    <p class="scenario-text" style="text-align: left; max-width: none; margin: 0;">
-                                        In this simulation, you'll step into the role of a customer invited by <strong>Archelo Group</strong>, a growing workplace solutions provider, to share feedback on their existing product: <strong>ArcheloFlow</strong>.
+<main class="demo-page" aria-labelledby="demo-main-heading">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <!-- Hero Section -->
+            <header class="demo-hero-section" aria-labelledby="demo-main-heading">
+                <div class="row">
+                    <div class="col-lg-10 mx-auto">
+                        <div class="row align-items-center">
+                            <div class="col-lg-12">
+                                <h1 id="demo-main-heading" class="demo-page-header">Welcome to Your VO<span class="voia-red-accent">Ï</span>A Demo</h1>
+                                
+                                <p class="demo-page-subtitle">
+                                    You're about to experience how VO<span class="voia-red-accent">Ï</span>A turns open-ended feedback into actionable insights — in minutes.
+                                </p>
+                                
+                                <!-- Left content, Right logo layout -->
+                                <div class="row align-items-center">
+                                    <div class="col-12 col-md-8 mb-3 mb-md-0">
+                                        <p class="demo-scenario-text">
+                                            In this simulation, you'll step into the role of a customer invited by <strong>Archelo Group</strong>, a growing workplace solutions provider, to share feedback on their existing product: <strong>ArcheloFlow</strong>.
+                                        </p>
+                                    </div>
+                                    <div class="col-12 col-md-4 text-center text-md-end">
+                                        <img src="{{ url_for('static', filename='images/archelo-logo.png') }}" alt="Archelo Group Logo" class="demo-logo">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Section -->
+            <section class="demo-content-section" aria-labelledby="demo-content-heading">
+                <h2 id="demo-content-heading" class="visually-hidden">Demo Information</h2>
+                <div class="row">
+                    <div class="col-lg-10 mx-auto">
+                        <!-- Top Row -->
+                        <div class="row demo-row-spacing">
+                            <!-- About Archelo Group -->
+                            <div class="col-md-6">
+                                <article class="demo-info-card">
+                                    <h3 class="demo-section-title">About Archelo Group</h3>
+                                    <p class="demo-section-subtitle">
+                                        Archelo Group helps mid-sized companies improve remote onboarding, internal communication, and employee engagement through its flagship platform, <strong>ArcheloFlow</strong>.
                                     </p>
-                                </div>
-                                <div class="col-12 col-md-4 text-center text-md-end">
-                                    <img src="{{ url_for('static', filename='images/archelo-logo.png') }}" alt="Archelo Group" class="demo-logo" style="height: 160px; width: auto; object-fit: contain; filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));">
-                                </div>
+                                    <p class="demo-feature-text">
+                                        As part of their continuous improvement process, they've launched a feedback initiative using Rivvalue's VoC agent — <strong>VO<span class="voia-red-accent">Ï</span>A</strong> — and you've been invited to participate.
+                                    </p>
+                                </article>
+                            </div>
+                            
+                            <!-- What You'll Do -->
+                            <div class="col-md-6">
+                                <article class="demo-info-card">
+                                    <h3 class="demo-section-title">What You'll Do</h3>
+                                    <p class="demo-section-subtitle">
+                                        Simple steps to experience the power of AI-driven feedback collection.
+                                    </p>
+                                    
+                                    <ul class="demo-expectation-list">
+                                        <li class="demo-expectation-item">
+                                            <span class="demo-expectation-dot" aria-hidden="true"></span>
+                                            <span class="demo-feature-text">Choose your preferred feedback method: AI-powered conversational flow or traditional survey</span>
+                                        </li>
+                                        
+                                        <li class="demo-expectation-item">
+                                            <span class="demo-expectation-dot" aria-hidden="true"></span>
+                                            <span class="demo-feature-text">Answer a few quick questions, just like a real customer would</span>
+                                        </li>
+                                        
+                                        <li class="demo-expectation-item">
+                                            <span class="demo-expectation-dot" aria-hidden="true"></span>
+                                            <span class="demo-feature-text">Explore the live insights dashboard, instantly generated from your input</span>
+                                        </li>
+                                    </ul>
+                                </article>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Content Section -->
-    <div class="content-section">
-        <div class="row">
-            <div class="col-lg-10 mx-auto">
-            <!-- Top Row -->
-            <div class="row" style="margin-bottom: 3rem;">
-                <!-- About Archelo Group -->
-                <div class="col-md-6">
-                    <div class="info-card" style="height: 100%;">
-                        <div class="section-header">
-                            <h3 class="section-title">About Archelo Group</h3>
+                        <!-- Bottom Row -->
+                        <div class="row">
+                            <!-- Real-time Insights -->
+                            <div class="col-md-6">
+                                <article class="demo-info-card">
+                                    <h3 class="demo-section-title">What You'll See, in Real-time</h3>
+                                    <p class="demo-section-subtitle">
+                                        Instant analytics and insights generated from your feedback.
+                                    </p>
+                                    
+                                    <div class="demo-feature-grid">
+                                        <div class="demo-feature-icon" aria-hidden="true">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <span class="demo-feature-text">NPS score & distribution</span>
+                                    </div>
+                                    
+                                    <div class="demo-feature-grid">
+                                        <div class="demo-feature-icon" aria-hidden="true">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </div>
+                                        <span class="demo-feature-text">Churn risk flags</span>
+                                    </div>
+                                    
+                                    <div class="demo-feature-grid">
+                                        <div class="demo-feature-icon" aria-hidden="true">
+                                            <i class="fas fa-rocket"></i>
+                                        </div>
+                                        <span class="demo-feature-text">Growth opportunities</span>
+                                    </div>
+                                    
+                                    <div class="demo-feature-grid">
+                                        <div class="demo-feature-icon" aria-hidden="true">
+                                            <i class="fas fa-brain"></i>
+                                        </div>
+                                        <span class="demo-feature-text">Key sentiment & themes</span>
+                                    </div>
+                                    
+                                    <div class="demo-feature-grid">
+                                        <div class="demo-feature-icon" aria-hidden="true">
+                                            <i class="fas fa-building"></i>
+                                        </div>
+                                        <span class="demo-feature-text">Account-level takeaways</span>
+                                    </div>
+                                </article>
+                            </div>
+                            
+                            <!-- What to Expect -->
+                            <div class="col-md-6">
+                                <article class="demo-info-card">
+                                    <h3 class="demo-section-title">What to Expect</h3>
+                                    <p class="demo-section-subtitle">
+                                        Quick, secure, and completely anonymous demo experience.
+                                    </p>
+                                    
+                                    <div class="demo-feature-grid">
+                                        <div class="demo-feature-icon" aria-hidden="true">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <span class="demo-feature-text">Total time: Less than 2 minutes</span>
+                                    </div>
+                                    
+                                    <div class="demo-feature-grid">
+                                        <div class="demo-feature-icon" aria-hidden="true">
+                                            <i class="fas fa-shield-alt"></i>
+                                        </div>
+                                        <span class="demo-feature-text">No login, no spam, no setup</span>
+                                    </div>
+                                    
+                                    <div class="demo-feature-grid">
+                                        <div class="demo-feature-icon" aria-hidden="true">
+                                            <i class="fas fa-user-secret"></i>
+                                        </div>
+                                        <span class="demo-feature-text">All responses are anonymized and used only for demonstration</span>
+                                    </div>
+                                </article>
+                            </div>
                         </div>
-                        <p class="section-subtitle">
-                            Archelo Group helps mid-sized companies improve remote onboarding, internal communication, and employee engagement through its flagship platform, <strong>ArcheloFlow</strong>.
-                        </p>
-                        <p class="feature-text">
-                            As part of their continuous improvement process, they've launched a feedback initiative using Rivvalue's VoC agent — <strong>VO<span style="color: #E13A44;">Ï</span>A</strong> — and you've been invited to participate.
-                        </p>
                     </div>
                 </div>
-                
-                <!-- What You'll Do -->
-                <div class="col-md-6">
-                    <div class="info-card" style="height: 100%;">
-                        <h3 class="section-title">What You'll Do</h3>
-                        <p class="section-subtitle">
-                            Simple steps to experience the power of AI-driven feedback collection.
-                        </p>
-                        
-                        <div class="expectation-item">
-                            <div class="expectation-dot"></div>
-                            <div class="feature-text">Choose your preferred feedback method: AI-powered conversational flow or traditional survey</div>
-                        </div>
-                        
-                        <div class="expectation-item">
-                            <div class="expectation-dot"></div>
-                            <div class="feature-text">Answer a few quick questions, just like a real customer would</div>
-                        </div>
-                        
-                        <div class="expectation-item">
-                            <div class="expectation-dot"></div>
-                            <div class="feature-text">Explore the live insights dashboard, instantly generated from your input</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            </section>
 
-            <!-- Bottom Row -->
-            <div class="row">
-                <!-- Real-time Insights -->
-                <div class="col-md-6">
-                    <div class="info-card bottom-card" style="height: 100%;">
-                        <h3 class="section-title">What You'll See, in Real-time</h3>
-                        <p class="section-subtitle">
-                            Instant analytics and insights generated from your feedback.
-                        </p>
-                        
-                        <div class="feature-grid" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
-                            <div class="feature-icon" style="color: #E13A44; background: rgba(225, 58, 68, 0.08);">
-                                <i class="fas fa-chart-line"></i>
+            <!-- Continue Section -->
+            <section class="demo-continue-section" aria-labelledby="demo-cta-heading">
+                <div class="row">
+                    <div class="col-lg-10 mx-auto">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-6 text-center">
+                                <h2 id="demo-cta-heading" class="demo-section-title">Ready to Begin?</h2>
+                                <p class="demo-section-subtitle">
+                                    Click below to continue to the secure session setup and begin the survey experience.
+                                </p>
+                                
+                                <a href="{{ url_for('auth') }}" class="demo-btn-continue" aria-label="Continue to Survey">
+                                    <i class="fas fa-play" aria-hidden="true"></i>Continue
+                                </a>
                             </div>
-                            <div class="feature-text">NPS score & distribution</div>
-                        </div>
-                        
-                        <div class="feature-grid" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
-                            <div class="feature-icon" style="color: #E13A44; background: rgba(225, 58, 68, 0.08);">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </div>
-                            <div class="feature-text">Churn risk flags</div>
-                        </div>
-                        
-                        <div class="feature-grid" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
-                            <div class="feature-icon" style="color: #E13A44; background: rgba(225, 58, 68, 0.08);">
-                                <i class="fas fa-rocket"></i>
-                            </div>
-                            <div class="feature-text">Growth opportunities</div>
-                        </div>
-                        
-                        <div class="feature-grid" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
-                            <div class="feature-icon" style="color: #E13A44; background: rgba(225, 58, 68, 0.08);">
-                                <i class="fas fa-brain"></i>
-                            </div>
-                            <div class="feature-text">Key sentiment & themes</div>
-                        </div>
-                        
-                        <div class="feature-grid" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
-                            <div class="feature-icon" style="color: #E13A44; background: rgba(225, 58, 68, 0.08);">
-                                <i class="fas fa-building"></i>
-                            </div>
-                            <div class="feature-text">Account-level takeaways</div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- What to Expect -->
-                <div class="col-md-6">
-                    <div class="info-card bottom-card" style="height: 100%;">
-                        <h3 class="section-title">What to Expect</h3>
-                        <p class="section-subtitle">
-                            Quick, secure, and completely anonymous demo experience.
-                        </p>
-                        
-                        <div class="feature-grid" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
-                            <div class="feature-icon" style="color: #E13A44; background: rgba(225, 58, 68, 0.08);">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <div class="feature-text">Total time: Less than 2 minutes</div>
-                        </div>
-                        
-                        <div class="feature-grid" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
-                            <div class="feature-icon" style="color: #E13A44; background: rgba(225, 58, 68, 0.08);">
-                                <i class="fas fa-shield-alt"></i>
-                            </div>
-                            <div class="feature-text">No login, no spam, no setup</div>
-                        </div>
-                        
-                        <div class="feature-grid" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
-                            <div class="feature-icon" style="color: #E13A44; background: rgba(225, 58, 68, 0.08);">
-                                <i class="fas fa-user-secret"></i>
-                            </div>
-                            <div class="feature-text">All responses are anonymized and used only for demonstration</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            </div>
+            </section>
         </div>
     </div>
-
-    <!-- Continue Section -->
-    <div class="continue-section" style="padding: 4rem 0 6rem 0; background: #fafafa; border-top: 1px solid #f0f0f0; margin-top: 4rem;">
-        <div class="row">
-            <div class="col-lg-10 mx-auto">
-                <div class="row justify-content-center">
-                    <div class="col-lg-6">
-                    <div class="text-center">
-                        <h3 class="section-title mb-3">Ready to Begin?</h3>
-                        <p class="section-subtitle mb-4">
-                            Click below to continue to the secure session setup and begin the survey experience.
-                        </p>
-                        
-                        <a href="{{ url_for('auth') }}" class="continue-button" style="font-size: 1.3rem; background: #E13A44; border: none; padding: 1.2rem 3rem; font-weight: 600; border-radius: 12px; text-decoration: none; display: inline-flex; align-items: center; color: white;">
-                            <i class="fas fa-play me-2"></i>Continue
-                        </a>
-                    </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-        </div>
-    </div>
-</div>
+</main>
 {% endblock %}
