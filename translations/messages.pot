@@ -1,17 +1,17 @@
-# English translations for VOÏA.
-# Copyright (C) 2025 Rivvalue Inc
-# This file is distributed under the same license as the VOÏA project.
+# Translations template for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 #
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: VOÏA 1.0\n"
-"Report-Msgid-Bugs-To: support@rivvalue.com\n"
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2025-10-24 23:53+0000\n"
-"PO-Revision-Date: 2025-10-24 07:35+0000\n"
-"Last-Translator: Rivvalue Team\n"
-"Language: en\n"
-"Language-Team: English\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -3648,50 +3648,4 @@ msgstr ""
 #: templates/participants/upload.html:226
 msgid "Download CSV template file"
 msgstr ""
-
-#~ msgid "How long have you been working with FC inc?"
-#~ msgstr ""
-
-#~ msgid "Hi {{ participant_name }}, thank you for participating"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "How long have you been working "
-#~ "with {{ branding.company_name if branding "
-#~ "and branding.company_name else 'us' }}?"
-#~ msgstr ""
-
-#~ msgid "Thank you, {{ participant_name }}!"
-#~ msgstr ""
-
-#~ msgid "Refresh data"
-#~ msgstr ""
-
-#~ msgid "Click to view full trends"
-#~ msgstr ""
-
-#~ msgid "Search by company name..."
-#~ msgstr ""
-
-#~ msgid "Companies with High or Critical churn risk level based on AI assessment"
-#~ msgstr ""
-
-#~ msgid "Companies with High or Critical churn risk level"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Shows account health balance: Risk-Heavy"
-#~ " (risks outweigh opportunities), High "
-#~ "Potential (opportunities with minimal risks),"
-#~ " or Balanced"
-#~ msgstr ""
-
-#~ msgid "Search company, opportunities, risks..."
-#~ msgstr ""
-
-#~ msgid "Search by company name, participant name, or email..."
-#~ msgstr ""
-
-#~ msgid "Search by respondent name or email..."
-#~ msgstr ""
 

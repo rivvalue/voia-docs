@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-24 23:47+0000\n"
+"POT-Creation-Date: 2025-10-24 23:53+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -460,10 +460,6 @@ msgstr "Que souhaitez-vous faire ensuite ?"
 msgid "Comprehensive customer feedback insights and analysis"
 msgstr "Insights et analyses complètes des retours clients"
 
-#: templates/dashboard.html:35
-msgid "Refresh data"
-msgstr "Actualiser les données"
-
 #: templates/dashboard.html:49
 msgid "High-level overview of key performance indicators across all campaigns"
 msgstr ""
@@ -489,13 +485,6 @@ msgstr "Campagnes"
 #: templates/dashboard.html:988
 msgid "Responses"
 msgstr "Réponses"
-
-#: templates/dashboard.html:72 templates/dashboard.html:78
-#: templates/dashboard.html:84 templates/dashboard.html:90
-#: templates/dashboard.html:96 templates/dashboard.html:102
-#: templates/dashboard.html:108 templates/dashboard.html:114
-msgid "Click to view full trends"
-msgstr "Cliquez pour voir les tendances complètes"
 
 #: templates/dashboard.html:77 templates/dashboard.html:937
 msgid "NPS"
@@ -580,10 +569,6 @@ msgstr "À propos de l'analyse des transcriptions"
 #, fuzzy
 msgid "Search"
 msgstr "Effacer la recherche"
-
-#: templates/dashboard.html:215 templates/dashboard.html:639
-msgid "Search by company name..."
-msgstr "Rechercher par nom d'entreprise..."
 
 #: templates/dashboard.html:218
 #, fuzzy
@@ -684,11 +669,6 @@ msgstr "Comparer les KPI entre différentes campagnes"
 msgid "Select Campaign"
 msgstr "Modifier la campagne"
 
-#: templates/dashboard.html:308 templates/dashboard.html:524
-#: templates/dashboard.html:532
-msgid "Clear Filter"
-msgstr "Effacer le filtre"
-
 #: templates/dashboard.html:318 templates/dashboard.html:844
 msgid "Details"
 msgstr "Détails"
@@ -724,40 +704,17 @@ msgstr "Affichage des données de la campagne active"
 msgid "NPS Score"
 msgstr "Score NPS"
 
-#: templates/dashboard.html:416
-msgid "Companies with High or Critical churn risk level based on AI assessment"
-msgstr ""
-"Entreprises présentant un risque de résiliation élevé ou critique selon "
-"l'évaluation de l'IA"
-
 #: templates/dashboard.html:435
 msgid "High Churn Risk Accounts"
 msgstr "Comptes à risque élevé de résiliation"
-
-#: templates/dashboard.html:437
-msgid "Companies with High or Critical churn risk level"
-msgstr "Entreprises présentant un risque de résiliation élevé ou critique"
 
 #: templates/dashboard.html:450
 msgid "Key Themes"
 msgstr "Thèmes clés"
 
-#: templates/dashboard.html:470
-msgid ""
-"Shows account health balance: Risk-Heavy (risks outweigh opportunities), "
-"High Potential (opportunities with minimal risks), or Balanced"
-msgstr ""
-"Affiche l'équilibre de la santé du compte : Risque élevé (les risques "
-"dépassent les opportunités), Fort potentiel (opportunités avec peu de "
-"risques) ou Équilibré"
-
 #: templates/dashboard.html:473
 msgid "Risk vs Opportunity Balance by Company"
 msgstr "Équilibre Risque vs Opportunité par Entreprise"
-
-#: templates/dashboard.html:483
-msgid "Search company, opportunities, risks..."
-msgstr "Rechercher une entreprise, des opportunités ou des risques..."
 
 #: templates/dashboard.html:488
 #, fuzzy
@@ -821,6 +778,10 @@ msgstr "A des Risques"
 #: templates/dashboard.html:519
 msgid "No Risks"
 msgstr "Aucun Risque"
+
+#: templates/dashboard.html:524 templates/dashboard.html:532
+msgid "Clear Filter"
+msgstr "Effacer le filtre"
 
 #: templates/dashboard.html:541
 msgid "Account Intelligence pagination"
@@ -924,10 +885,6 @@ msgstr "Ancienneté :"
 msgid "Tenure NPS pagination"
 msgstr "Pagination du NPS par ancienneté"
 
-#: templates/dashboard.html:811
-msgid "Search by company name, participant name, or email..."
-msgstr "Rechercher par nom d'entreprise, nom de participant ou e-mail..."
-
 #: templates/dashboard.html:838
 msgid "Tenure with FC inc"
 msgstr "Ancienneté avec FC inc"
@@ -964,10 +921,6 @@ msgstr "Pagination des réponses à l'enquête"
 #: templates/participants/list.html:1303 templates/participants/upload.html:34
 msgid "Close"
 msgstr "Fermer"
-
-#: templates/dashboard.html:907
-msgid "Search by respondent name or email..."
-msgstr "Rechercher par nom ou e-mail du répondant..."
 
 #: templates/dashboard.html:914
 msgid "Newest First"
@@ -2685,6 +2638,7 @@ msgid "Maximum Invitations per Campaign"
 msgstr "Nombre maximal d'invitations par campagne"
 
 #: templates/business_auth/licenses/assignment_form.html:304
+#, fuzzy, python-format
 msgid ""
 "Hard limit on survey invitations (typically 5x responses for ~20%% "
 "response rate)"
@@ -3719,6 +3673,7 @@ msgid "Select tier (optional)"
 msgstr "Sélectionnez une catégorie (optionnel)"
 
 #: templates/participants/create.html:145 templates/participants/edit.html:193
+#, fuzzy, python-format
 msgid "T1: Strategic (Top 5–10%% clients)"
 msgstr "T1 : Stratégique (5–10 % des meilleurs clients)"
 
@@ -3927,4 +3882,43 @@ msgstr "Télécharger le modèle de fichier CSV"
 
 #~ msgid "4 times more insights"
 #~ msgstr "4 fois plus d'analyses"
+
+#~ msgid "Refresh data"
+#~ msgstr "Actualiser les données"
+
+#~ msgid "Click to view full trends"
+#~ msgstr "Cliquez pour voir les tendances complètes"
+
+#~ msgid "Search by company name..."
+#~ msgstr "Rechercher par nom d'entreprise..."
+
+#~ msgid "Companies with High or Critical churn risk level based on AI assessment"
+#~ msgstr ""
+#~ "Entreprises présentant un risque de "
+#~ "résiliation élevé ou critique selon "
+#~ "l'évaluation de l'IA"
+
+#~ msgid "Companies with High or Critical churn risk level"
+#~ msgstr "Entreprises présentant un risque de résiliation élevé ou critique"
+
+#~ msgid ""
+#~ "Shows account health balance: Risk-Heavy"
+#~ " (risks outweigh opportunities), High "
+#~ "Potential (opportunities with minimal risks),"
+#~ " or Balanced"
+#~ msgstr ""
+#~ "Affiche l'équilibre de la santé du "
+#~ "compte : Risque élevé (les risques "
+#~ "dépassent les opportunités), Fort potentiel"
+#~ " (opportunités avec peu de risques) "
+#~ "ou Équilibré"
+
+#~ msgid "Search company, opportunities, risks..."
+#~ msgstr "Rechercher une entreprise, des opportunités ou des risques..."
+
+#~ msgid "Search by company name, participant name, or email..."
+#~ msgstr "Rechercher par nom d'entreprise, nom de participant ou e-mail..."
+
+#~ msgid "Search by respondent name or email..."
+#~ msgstr "Rechercher par nom ou e-mail du répondant..."
 
