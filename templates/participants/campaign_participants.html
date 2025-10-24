@@ -41,6 +41,116 @@
         </div>
     </div>
 
+    <!-- Filter Available Participants -->
+    {% if campaign.status in ['draft', 'ready'] and available_participants %}
+    <div class="campaign-participants-section">
+        <div class="filter-panel-header" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse" role="button">
+            <h5 class="filter-panel-title">
+                <i class="fas fa-filter me-2" aria-hidden="true"></i>Filter Available Participants
+                <i class="fas fa-chevron-down ms-2 filter-panel-chevron" aria-hidden="true"></i>
+            </h5>
+        </div>
+        <div class="collapse" id="filterCollapse">
+            <form method="GET" action="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" id="filterForm" aria-label="Filter participants form">
+                <div class="row g-3 mb-3">
+                    <!-- Company Filter -->
+                    <div class="col-md-4">
+                        <label for="filter_company" class="form-label">Company</label>
+                        <select class="form-select filter-select" id="filter_company" name="filter_company" multiple 
+                                aria-label="Filter by company">
+                            {% for company in filter_options.companies %}
+                            <option value="{{ company }}" {% if company in active_filters.companies %}selected{% endif %}>
+                                {{ company }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Role Filter -->
+                    <div class="col-md-4">
+                        <label for="filter_role" class="form-label">Role</label>
+                        <select class="form-select filter-select" id="filter_role" name="filter_role" multiple 
+                                aria-label="Filter by role">
+                            {% for role in filter_options.roles %}
+                            <option value="{{ role }}" {% if role in active_filters.roles %}selected{% endif %}>
+                                {{ role }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Region Filter -->
+                    <div class="col-md-4">
+                        <label for="filter_region" class="form-label">Region</label>
+                        <select class="form-select filter-select" id="filter_region" name="filter_region" multiple 
+                                aria-label="Filter by region">
+                            {% for region in filter_options.regions %}
+                            <option value="{{ region }}" {% if region in active_filters.regions %}selected{% endif %}>
+                                {{ region }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row g-3 mb-3">
+                    <!-- Customer Tier Filter -->
+                    <div class="col-md-4">
+                        <label for="filter_tier" class="form-label">Customer Tier</label>
+                        <select class="form-select filter-select" id="filter_tier" name="filter_tier" multiple 
+                                aria-label="Filter by customer tier">
+                            {% for tier in filter_options.tiers %}
+                            <option value="{{ tier }}" {% if tier in active_filters.tiers %}selected{% endif %}>
+                                {{ tier }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Language Filter -->
+                    <div class="col-md-4">
+                        <label for="filter_language" class="form-label">Language</label>
+                        <select class="form-select filter-select" id="filter_language" name="filter_language" multiple 
+                                aria-label="Filter by language">
+                            {% for language in filter_options.languages %}
+                            <option value="{{ language }}" {% if language in active_filters.languages %}selected{% endif %}>
+                                {{ language }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Tenure Filter -->
+                    <div class="col-md-4">
+                        <label for="filter_tenure" class="form-label">Tenure (Years)</label>
+                        <select class="form-select filter-select" id="filter_tenure" name="filter_tenure" multiple 
+                                aria-label="Filter by tenure">
+                            {% for tenure in filter_options.tenure_ranges %}
+                            <option value="{{ tenure }}" {% if tenure in active_filters.tenure_ranges %}selected{% endif %}>
+                                {{ tenure }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-voïa-red" aria-label="Apply filters">
+                        <i class="fas fa-check me-2" aria-hidden="true"></i>Apply Filters
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" id="clearFiltersBtn" aria-label="Clear all filters">
+                        <i class="fas fa-times me-2" aria-hidden="true"></i>Clear Filters
+                    </button>
+                    <small class="text-muted ms-3">
+                        <i class="fas fa-info-circle me-1" aria-hidden="true"></i>
+                        Showing {{ available_participants|length }} available participants
+                    </small>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Add Participants Section -->
     {% if campaign.status in ['draft', 'ready'] %}
         {% if available_participants %}
@@ -87,6 +197,16 @@
             <h5 class="campaign-participants-section-header">
                 <i class="fas fa-user-plus" aria-hidden="true"></i>Add Participants to Campaign
             </h5>
+            {% if active_filters.companies or active_filters.roles or active_filters.regions or active_filters.tiers or active_filters.languages or active_filters.tenure_ranges %}
+            <div class="campaign-participants-alert campaign-participants-alert-warning" role="alert">
+                <i class="fas fa-filter me-2" aria-hidden="true"></i>
+                <strong>No Participants Match Your Filters:</strong> 
+                No available participants match the selected filters. Try adjusting your filter criteria.
+                <button type="button" class="btn btn-sm btn-outline-secondary ms-2" onclick="document.getElementById('clearFiltersBtn').click();" aria-label="Clear all filters">
+                    <i class="fas fa-times me-1" aria-hidden="true"></i>Clear Filters
+                </button>
+            </div>
+            {% else %}
             <div class="campaign-participants-alert campaign-participants-alert-info" role="alert">
                 <i class="fas fa-info-circle me-2" aria-hidden="true"></i>
                 <strong>All Available Participants Assigned:</strong> 
@@ -95,6 +215,7 @@
                     <i class="fas fa-user-plus me-1" aria-hidden="true"></i>Create New Participant
                 </a>
             </div>
+            {% endif %}
         </div>
         {% endif %}
     {% else %}
@@ -362,8 +483,41 @@ function copyAllTokens() {
     alert(`Copied ${tokenInputs.length} survey links to clipboard!`);
 }
 
-// Initialize Bootstrap popovers if any
+// Filter panel functionality
 document.addEventListener('DOMContentLoaded', function() {
+    // Handle collapse icon rotation
+    const filterHeader = document.querySelector('.filter-panel-header');
+    const filterCollapse = document.getElementById('filterCollapse');
+    
+    if (filterHeader && filterCollapse) {
+        filterCollapse.addEventListener('shown.bs.collapse', function() {
+            filterHeader.setAttribute('aria-expanded', 'true');
+        });
+        
+        filterCollapse.addEventListener('hidden.bs.collapse', function() {
+            filterHeader.setAttribute('aria-expanded', 'false');
+        });
+    }
+    
+    // Clear all filters button
+    const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+    if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', function() {
+            // Clear all multi-select filters
+            const filterSelects = document.querySelectorAll('.filter-select');
+            filterSelects.forEach(select => {
+                select.selectedIndex = -1;
+                Array.from(select.options).forEach(option => {
+                    option.selected = false;
+                });
+            });
+            
+            // Submit the form to refresh the list
+            document.getElementById('filterForm').submit();
+        });
+    }
+    
+    // Initialize Bootstrap popovers if any
     const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
     if (typeof bootstrap !== 'undefined' && bootstrap.Popover) {
         popoverTriggerList.map(function (popoverTriggerEl) {
