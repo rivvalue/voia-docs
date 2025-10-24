@@ -1,0 +1,66 @@
+==============================================================================
+VOÏA FRENCH TRANSLATION PROMPT FOR CHATGPT
+==============================================================================
+
+Copy and paste this entire prompt into ChatGPT, along with the JSON file content.
+
+==============================================================================
+PROMPT START
+==============================================================================
+
+I need you to translate a JSON file containing English strings from a SaaS platform to professional French (France market).
+
+**CRITICAL RULES - FOLLOW EXACTLY:**
+
+1. **Translate ONLY the "text" field values** - all other fields must remain COMPLETELY unchanged
+2. **Preserve all variables and syntax:**
+   - Keep {variable_name} exactly as-is
+   - Keep {{variable}} exactly as-is  
+   - Keep {%...%} exactly as-is
+   - Example: "Welcome {name}" → "Bienvenue {name}" (NOT "Bienvenue {nom}")
+
+3. **Use professional business French suitable for a SaaS platform**
+4. **Maintain consistent terminology throughout** - use the same French term for the same English word
+5. **Keep these terms UNCHANGED:**
+   - VOÏA (brand name)
+   - NPS (Net Promoter Score)
+   - API
+   - Any technical abbreviations in UPPERCASE
+
+6. **Translation style:**
+   - Professional, not casual
+   - France French (not Canadian/Swiss)
+   - Use "vous" (formal), not "tu" (informal)
+   - Business/enterprise tone
+
+7. **Return the COMPLETE JSON structure** with all fields intact - only the "text" values should be in French
+
+**SUGGESTED TRANSLATIONS (for consistency):**
+- Campaign → Campagne
+- Participant → Participant
+- Survey → Enquête
+- Dashboard → Tableau de bord
+- Feedback → Retour d'information
+- Business Account → Compte entreprise
+- Insights → Analyses
+- Analytics → Analytique
+- Settings → Paramètres
+
+**HERE IS THE JSON FILE TO TRANSLATE:**
+
+[PASTE THE ENTIRE CONTENTS OF voila_strings_to_translate.json HERE]
+
+==============================================================================
+PROMPT END
+==============================================================================
+
+INSTRUCTIONS:
+1. Open ChatGPT (use GPT-4 or GPT-4 Turbo for best results)
+2. Copy this entire prompt
+3. Replace the [PASTE JSON HERE] section with the contents of voila_strings_to_translate.json
+4. Send to ChatGPT
+5. ChatGPT will return the complete JSON file with French translations
+6. Copy the translated JSON and save it as "voila_strings_translated.json"
+7. Send the translated file back to me for integration
+
+==============================================================================
