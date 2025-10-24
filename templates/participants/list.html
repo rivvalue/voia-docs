@@ -1292,7 +1292,12 @@ function submitBulkEdit() {
             updates: updates
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             // Close modal
@@ -1315,14 +1320,14 @@ function submitBulkEdit() {
             // Reload page to show updated data
             window.location.reload();
         } else {
-            alert(`Error: ${data.error}\n${data.message || ''}`);
+            alert(`Error: ${data.error}\n${data.message || data.details || ''}`);
             applyBtn.disabled = false;
             applyBtn.innerHTML = '<i class="fas fa-check me-1"></i>Apply Changes';
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred while updating participants.');
+        alert(`An error occurred while updating participants.\nDetails: ${error.message}`);
         applyBtn.disabled = false;
         applyBtn.innerHTML = '<i class="fas fa-check me-1"></i>Apply Changes';
     });
