@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Simple Authentication Test{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Génération de jeton simple</h4>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Adresse e-mail</label>
+                        <input type="email" class="form-control" id="email" value="test@example.com" required>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary" onclick="generateToken()">
+                            Générer un jeton
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="clearResults()">
+                            Effacer les résultats
+                        </button>
+                    </div>
+                    
+                    <div id="results" class="mt-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/simple-auth.js') }}"></script>
+<script>
+async function generateToken() {
+    const email = document.getElementById('email').value;
+    const resultsDiv = document.getElementById('results');
+    
+    if (!email) {
+        addResult('Please enter an email address', 'danger');
+        return;
+    }
+    
+    addResult('Generating token...', 'info');
+    
+    try {
+        const result = await window.simpleAuth.requestToken(email);
+        
+        if (result.token) {
+            addResult(`SUCCESS: Token generated for ${result.email}`, 'success');
+            addResult(`Token: ${result.token}`, 'success');
+            
+            // Store token
+            localStorage.setItem('auth_token', result.token);
+            localStorage.setItem('auth_email', result.email);
+            
+            addResult('Token saved to localStorage', 'info');
+        } else {
+            addResult(`ERROR: ${result.error || 'Unknown error'}`, 'danger');
+        }
+    } catch (error) {
+        addResult(`FAILED: ${error.message}`, 'danger');
+        console.error('Token generation failed:', error);
+    }
+}
+
+function addResult(message, type = 'info') {
+    const resultsDiv = document.getElementById('results');
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        <strong>${new Date().toLocaleTimeString()}</strong>: ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    resultsDiv.appendChild(alertDiv);
+    alertDiv.scrollIntoView({ behavior: 'smooth' });
+}
+
+function clearResults() {
+    document.getElementById('results').innerHTML = '';
+}
+</script>
+{% endblock %}

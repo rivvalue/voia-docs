@@ -20,7 +20,7 @@
                 <i class="fas fa-upload me-2" aria-hidden="true"></i>
                 Bulk Upload Participants
             </h1>
-            <p class="settings-hub-subtitle">Téléversez plusieurs participants vers {{ business_account.name }} via un fichier CSV</p>
+            <p class="settings-hub-subtitle">{{ _('Upload multiple participants to {{ business_account.name }} via CSV file') }}</p>
         </div>
     </div>
 
@@ -31,7 +31,7 @@
                 <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show mb-4" role="alert" aria-live="assertive">
                     <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'info-circle' if category == 'info' else 'check-circle' }}" aria-hidden="true"></i>
                     {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ _('Close') }}"></button>
                 </div>
             {% endfor %}
         {% endif %}
@@ -52,7 +52,7 @@
                     <div class="col-md-8">
                         <div class="settings-form-group">
                             <label class="settings-form-label" for="csv_file">
-                                Fichier CSV *
+                                {{ _('CSV File *') }}
                             </label>
                             <input type="file" 
                                    class="settings-form-control" 
@@ -75,7 +75,7 @@
                     <div class="settings-actions-left">
                         <a href="{{ url_for('participants.list_participants') }}" 
                            class="settings-btn-cancel"
-                           aria-label="Annuler et revenir à la liste des participants">
+                           aria-label="{{ _('Cancel and return to participants list') }}">
                             <i class="fas fa-arrow-left me-2" aria-hidden="true"></i>
                             Cancel
                         </a>
@@ -83,7 +83,7 @@
                     <div class="settings-actions-right">
                         <button type="submit" 
                                 class="settings-btn-save"
-                                aria-label="Téléverser des participants à partir d'un fichier CSV">
+                                aria-label="{{ _('Upload participants from CSV file') }}">
                             <i class="fas fa-upload me-2" aria-hidden="true"></i>
                             Upload Participants
                         </button>
@@ -172,8 +172,8 @@ bob@freelance.com,Bob Johnson,Freelance Services,End User,APAC,T3: Self-serve,en
                         <i class="fas fa-check-double" aria-hidden="true"></i>
                     </div>
                     <div class="settings-step-content">
-                        <h4 class="settings-step-title">1. Validation du fichier</h4>
-                        <p class="settings-step-description">Le système vérifie le format CSV et valide la présence de toutes les colonnes requises</p>
+                        <h4 class="settings-step-title">{{ _('1. File Validation') }}</h4>
+                        <p class="settings-step-description">{{ _('System checks CSV format and validates all required columns are present') }}</p>
                     </div>
                 </div>
                 
@@ -182,8 +182,8 @@ bob@freelance.com,Bob Johnson,Freelance Services,End User,APAC,T3: Self-serve,en
                         <i class="fas fa-user-check" aria-hidden="true"></i>
                     </div>
                     <div class="settings-step-content">
-                        <h4 class="settings-step-title">2. Détection des doublons</h4>
-                        <p class="settings-step-description">Ignore automatiquement les participants déjà présents dans votre compte</p>
+                        <h4 class="settings-step-title">{{ _('2. Duplicate Detection') }}</h4>
+                        <p class="settings-step-description">{{ _('Automatically skips participants already in your account') }}</p>
                     </div>
                 </div>
                 
@@ -192,8 +192,8 @@ bob@freelance.com,Bob Johnson,Freelance Services,End User,APAC,T3: Self-serve,en
                         <i class="fas fa-key" aria-hidden="true"></i>
                     </div>
                     <div class="settings-step-content">
-                        <h4 class="settings-step-title">3. Génération de jetons</h4>
-                        <p class="settings-step-description">Générez des jetons uniques pour un accès sécurisé à l'enquête</p>
+                        <h4 class="settings-step-title">{{ _('3. Token Generation') }}</h4>
+                        <p class="settings-step-description">{{ _('Generate unique tokens for secure survey access') }}</p>
                     </div>
                 </div>
                 
@@ -202,8 +202,8 @@ bob@freelance.com,Bob Johnson,Freelance Services,End User,APAC,T3: Self-serve,en
                         <i class="fas fa-chart-line" aria-hidden="true"></i>
                     </div>
                     <div class="settings-step-content">
-                        <h4 class="settings-step-title">4. Rapport d'état</h4>
-                        <p class="settings-step-description">Consultez les résultats détaillés, y compris les réussites et les erreurs</p>
+                        <h4 class="settings-step-title">{{ _('4. Status Report') }}</h4>
+                        <p class="settings-step-description">{{ _('View detailed results including successes and any errors') }}</p>
                     </div>
                 </div>
             </div>
@@ -219,11 +219,11 @@ bob@freelance.com,Bob Johnson,Freelance Services,End User,APAC,T3: Self-serve,en
         
         <div class="settings-card">
             <div class="settings-template-content">
-                <p class="mb-4">Téléchargez un fichier CSV d'exemple contenant toutes les colonnes et des données exemples pour commencer rapidement</p>
+                <p class="mb-4">{{ _('Download a sample CSV file with all columns and example data to get started quickly') }}</p>
                 <button type="button" 
                         class="settings-btn-template" 
                         onclick="downloadTemplate()"
-                        aria-label="Télécharger le modèle de fichier CSV">
+                        aria-label="{{ _('Download CSV template file') }}">
                     <i class="fas fa-file-csv me-2" aria-hidden="true"></i>
                     Download CSV Template
                 </button>

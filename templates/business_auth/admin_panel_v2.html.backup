@@ -1,0 +1,1075 @@
+{% extends "base.html" %}
+
+{% block title %}Settings Hub - VOÏA Business Account{% endblock %}
+
+{% block page_class %}page-settings-hub-v2{% endblock %}
+
+{% block content %}
+<style>
+/* Settings Hub v2 - Modern 4-Card Layout */
+
+/* Container adjustments for sidebar */
+.settings-hub-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--spacing-xl);
+}
+
+/* Header Section */
+.settings-hub-header {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    padding: var(--spacing-2xl);
+    margin: calc(-1 * var(--spacing-xl)) calc(-1 * var(--spacing-xl)) var(--spacing-2xl);
+    border-radius: 0;
+    color: var(--primary-white);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+}
+
+.settings-hub-header-content {
+    flex: 1;
+    min-width: 250px;
+}
+
+.settings-hub-title {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    margin: 0 0 var(--spacing-sm) 0;
+    color: var(--primary-white);
+}
+
+.settings-hub-subtitle {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+    margin: 0;
+    opacity: 0.9;
+    color: var(--primary-white);
+}
+
+/* Header Actions */
+.settings-hub-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+}
+
+.settings-action-btn {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--primary-white);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.settings-action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+.settings-action-btn:active {
+    transform: translateY(0);
+}
+
+.help-icon-btn {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 767px) {
+    .settings-hub-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .settings-hub-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+/* Account Badge */
+.account-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    margin-bottom: var(--spacing-xl);
+    background: var(--red-light);
+    color: var(--primary-red);
+    border: 1px solid var(--primary-red);
+}
+
+/* 4-Card Grid System - Full Width Stacked */
+.settings-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-2xl);
+}
+
+/* Settings Card */
+.settings-card {
+    background: var(--primary-white);
+    border-radius: var(--radius-2xl);
+    border: 1px solid var(--light-gray);
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.settings-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--primary-red);
+}
+
+/* Card Header */
+.settings-card-header {
+    padding: var(--spacing-xl);
+    border-bottom: 1px solid var(--light-gray);
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--primary-white);
+    transition: background-color 0.2s ease;
+}
+
+.settings-card-header:hover {
+    background: linear-gradient(135deg, rgba(225, 58, 68, 0.03) 0%, rgba(225, 58, 68, 0.05) 100%);
+}
+
+.settings-card-header.expanded {
+    background: var(--red-light);
+    border-bottom-color: var(--primary-red);
+}
+
+.settings-card-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.settings-card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-lg);
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+}
+
+.settings-card-title {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    margin: 0;
+    color: var(--primary-black);
+}
+
+.settings-card-toggle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(225, 58, 68, 0.1);
+    color: var(--primary-red);
+    transition: all 0.2s ease;
+}
+
+.settings-card-toggle i {
+    transition: transform 0.3s ease;
+}
+
+.settings-card-header.expanded .settings-card-toggle i {
+    transform: rotate(180deg);
+}
+
+/* Card Content */
+.settings-card-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+}
+
+.settings-card-content.expanded {
+    max-height: 2000px; /* Large enough for content */
+    opacity: 1;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease-in 0.1s;
+}
+
+.settings-card-body {
+    padding: var(--spacing-xl);
+}
+
+/* Aide Tooltips */
+.help-tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.help-tooltip .tooltip-text {
+    visibility: hidden;
+    width: 280px;
+    background-color: var(--primary-black);
+    color: var(--primary-white);
+    text-align: left;
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+    position: absolute;
+    z-index: 1000;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -140px;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+    box-shadow: var(--shadow-xl);
+}
+
+.help-tooltip .tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -8px;
+    border-width: 8px;
+    border-style: solid;
+    border-color: var(--primary-black) transparent transparent transparent;
+}
+
+.help-tooltip:hover .tooltip-text,
+.help-tooltip:focus .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Mobile tooltip adjustment */
+@media (max-width: 767px) {
+    .help-tooltip .tooltip-text {
+        width: 200px;
+        margin-left: -100px;
+        font-size: var(--font-size-xs);
+    }
+}
+
+/* Empty state for cards */
+.card-empty-state {
+    text-align: center;
+    padding: var(--spacing-2xl) var(--spacing-lg);
+    color: var(--gray-dark);
+}
+
+.card-empty-state i {
+    font-size: var(--font-size-3xl);
+    margin-bottom: var(--spacing-md);
+    opacity: 0.5;
+    color: var(--medium-gray);
+}
+
+/* Mobile: Full-width cards */
+@media (max-width: 767px) {
+    .settings-hub-container {
+        padding: var(--spacing-md);
+    }
+    
+    .settings-hub-header {
+        margin: calc(-1 * var(--spacing-md)) calc(-1 * var(--spacing-md)) var(--spacing-lg);
+        padding: var(--spacing-xl);
+    }
+    
+    .settings-grid {
+        gap: var(--spacing-md);
+    }
+    
+    .settings-card {
+        border-radius: var(--radius-xl);
+    }
+}
+
+/* Settings Items within Cards */
+.settings-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-md);
+    transition: background-color 0.2s ease;
+    gap: var(--spacing-md);
+}
+
+.settings-item:last-child {
+    margin-bottom: 0;
+}
+
+.settings-item:hover {
+    background-color: rgba(225, 58, 68, 0.03);
+}
+
+.settings-item-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex: 1;
+}
+
+.settings-item-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-lg);
+    background: rgba(225, 58, 68, 0.1);
+    color: var(--primary-red);
+    flex-shrink: 0;
+}
+
+.settings-item-info {
+    flex: 1;
+}
+
+.settings-item-title {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    margin: 0 0 var(--spacing-xs) 0;
+    color: var(--primary-black);
+}
+
+.settings-item-desc {
+    font-size: var(--font-size-sm);
+    color: var(--gray-dark);
+    margin: 0;
+}
+
+/* Stats within cards */
+.settings-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+}
+
+.settings-stat {
+    text-align: center;
+    padding: var(--spacing-md);
+    background: rgba(225, 58, 68, 0.05);
+    border-radius: var(--radius-lg);
+}
+
+.settings-stat-number {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--primary-red);
+    margin: 0 0 var(--spacing-xs) 0;
+    font-family: var(--font-family-headings);
+}
+
+.settings-stat-label {
+    font-size: var(--font-size-xs);
+    color: var(--gray-dark);
+    margin: 0;
+}
+
+/* Accessibility */
+.settings-card-header:focus {
+    outline: 3px solid var(--primary-red);
+    outline-offset: 2px;
+}
+
+.settings-card-header:focus:not(:focus-visible) {
+    outline: none;
+}
+</style>
+
+<div class="settings-hub-container">
+    <!-- Header -->
+    <div class="settings-hub-header">
+        <div class="settings-hub-header-content">
+            <h1 class="settings-hub-title">
+                <i class="fas fa-cog me-2"></i>Settings Hub
+            </h1>
+            <p class="settings-hub-subtitle">
+                Gérez votre compte, votre équipe, vos données et vos paramètres système
+            </p>
+        </div>
+        <div class="settings-hub-actions">
+            <button class="settings-action-btn" onclick="expandAll()" aria-label="Développer toutes les sections">
+                <i class="fas fa-chevron-down"></i>
+                <span>Tout développer</span>
+            </button>
+            <button class="settings-action-btn" onclick="collapseAll()" aria-label="Réduire toutes les sections">
+                <i class="fas fa-chevron-up"></i>
+                <span>Tout réduire</span>
+            </button>
+            <div class="help-tooltip">
+                <button class="settings-action-btn help-icon-btn" aria-label="Aide">
+                    <i class="fas fa-question-circle"></i>
+                </button>
+                <span class="tooltip-text">
+                    <strong>Settings Hub</strong><br>
+                    Use the cards below to manage your account settings, team members, data exports, and system configuration. Click any card to expand and view options.
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Type Badge -->
+    <div class="account-type-badge">
+        <i class="fas fa-{{ 'flask' if business_account.account_type == 'demo' else 'building' }}"></i>
+        {{ 'Demo Environment' if business_account.account_type == 'demo' else 'Customer Account' }}
+    </div>
+
+    <!-- 4-Card Grid -->
+    <div class="settings-grid">
+        <!-- Card 1: Paramètres du compte -->
+        <div class="settings-card">
+            <div class="settings-card-header" 
+                 onclick="toggleCard('account-settings')" 
+                 role="button" 
+                 tabindex="0"
+                 aria-expanded="false"
+                 aria-controls="account-settings-content">
+                <div class="settings-card-title-wrapper">
+                    <div class="settings-card-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <h2 class="settings-card-title">Paramètres du compte</h2>
+                </div>
+                <div class="settings-card-toggle">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            <div class="settings-card-content" id="account-settings-content">
+                <div class="settings-card-body">
+                    <!-- Configuration de l'e-mail -->
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Configuration de l'e-mail</h4>
+                                <p class="settings-item-desc">Configurez les paramètres SMTP pour l'envoi des invitations à l'enquête</p>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('business_auth.email_config') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-cog me-1"></i>Configure
+                        </a>
+                    </div>
+
+                    <!-- Configuration de la marque -->
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-palette"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Configuration de la marque</h4>
+                                <p class="settings-item-desc">Personnalisez les couleurs, le logo et l'identité visuelle de votre marque</p>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('business_auth.brand_config') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-paint-brush me-1"></i>Customize
+                        </a>
+                    </div>
+
+                    <!-- Paramètres par défaut de l'enquête -->
+                    {% if business_account.account_type in ['core', 'plus', 'demo'] %}
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-comment-dots"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Paramètres par défaut de l'enquête</h4>
+                                <p class="settings-item-desc">Définissez les paramètres de conversation IA par défaut pour les enquêtes</p>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('business_auth.survey_config') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-sliders-h me-1"></i>Configure
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2: Gestion des utilisateurs -->
+        <div class="settings-card">
+            <div class="settings-card-header" 
+                 onclick="toggleCard('user-management')" 
+                 role="button" 
+                 tabindex="0"
+                 aria-expanded="false"
+                 aria-controls="user-management-content">
+                <div class="settings-card-title-wrapper">
+                    <div class="settings-card-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h2 class="settings-card-title">Gestion des utilisateurs</h2>
+                </div>
+                <div class="settings-card-toggle">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            <div class="settings-card-content" id="user-management-content">
+                <div class="settings-card-body">
+                    {% if current_user.has_permission('manage_users') %}
+                    <!-- Membres de l'équipe -->
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Membres de l'équipe</h4>
+                                <p class="settings-item-desc">Ajoutez et gérez les membres de votre équipe pour votre compte entreprise</p>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('business_auth.manage_users') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-user-plus me-1"></i>Manage Users
+                        </a>
+                    </div>
+
+                    <!-- Usage Stats -->
+                    {% if admin_data.license_info %}
+                    <div class="settings-stats">
+                        <div class="settings-stat">
+                            <div class="settings-stat-number">{{ admin_data.license_info.users_used }}</div>
+                            <div class="settings-stat-label">Utilisateurs actifs</div>
+                        </div>
+                        <div class="settings-stat">
+                            <div class="settings-stat-number">{{ admin_data.license_info.users_limit }}</div>
+                            <div class="settings-stat-label">Limite d'utilisateurs</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% else %}
+                    <div class="card-empty-state">
+                        <i class="fas fa-lock"></i>
+                        <p>Autorisation requise</p>
+                        <small class="text-muted">Contact your administrator for user management access</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 3: Gestion des données -->
+        <div class="settings-card">
+            <div class="settings-card-header" 
+                 onclick="toggleCard('data-management')" 
+                 role="button" 
+                 tabindex="0"
+                 aria-expanded="false"
+                 aria-controls="data-management-content">
+                <div class="settings-card-title-wrapper">
+                    <div class="settings-card-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h2 class="settings-card-title">Gestion des données</h2>
+                </div>
+                <div class="settings-card-toggle">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            <div class="settings-card-content" id="data-management-content">
+                <div class="settings-card-body">
+                    <!-- Data Export -->
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-download"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Exporter les données</h4>
+                                <p class="settings-item-desc">Exportez toutes les réponses aux enquêtes pour l'analyse et les rapports</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline-primary btn-sm" onclick="exportAllData()" id="exportBtn">
+                            <i class="fas fa-file-export me-1"></i>Export
+                        </button>
+                    </div>
+
+                    <!-- Journaux d'audit -->
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-clipboard-list"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Journaux d'audit</h4>
+                                <p class="settings-item-desc">Consultez l'activité du système et l'historique des actions utilisateur</p>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('business_auth.audit_logs') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-history me-1"></i>View Logs
+                        </a>
+                    </div>
+
+                    <!-- Santé de la base de données -->
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-heartbeat"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Santé de la base de données</h4>
+                                <p class="settings-item-desc">Surveillez l'état de la connexion et les performances de la base de données</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline-primary btn-sm" onclick="checkDatabaseHealth()">
+                            <i class="fas fa-stethoscope me-1"></i>Check Status
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 4: Paramètres du système -->
+        <div class="settings-card">
+            <div class="settings-card-header" 
+                 onclick="toggleCard('system-settings')" 
+                 role="button" 
+                 tabindex="0"
+                 aria-expanded="false"
+                 aria-controls="system-settings-content">
+                <div class="settings-card-title-wrapper">
+                    <div class="settings-card-icon">
+                        <i class="fas fa-sliders-h"></i>
+                    </div>
+                    <h2 class="settings-card-title">Paramètres du système</h2>
+                </div>
+                <div class="settings-card-toggle">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            <div class="settings-card-content" id="system-settings-content">
+                <div class="settings-card-body">
+                    <!-- Informations sur la licence -->
+                    {% if admin_data.license_info %}
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-certificate"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Informations sur la licence</h4>
+                                <p class="settings-item-desc">{{ admin_data.license_info.license_type|title }} - {{ admin_data.license_info.status|title }}</p>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('business_auth.license_info') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-info-circle me-1"></i>Details
+                        </a>
+                    </div>
+
+                    <!-- License Stats -->
+                    <div class="settings-stats">
+                        <div class="settings-stat">
+                            <div class="settings-stat-number">{{ admin_data.license_info.campaigns_used }}/{{ admin_data.license_info.campaigns_limit }}</div>
+                            <div class="settings-stat-label">Campaigns</div>
+                        </div>
+                        <div class="settings-stat">
+                            <div class="settings-stat-number">{{ admin_data.license_info.users_used }}/{{ admin_data.license_info.users_limit }}</div>
+                            <div class="settings-stat-label">Users</div>
+                        </div>
+                        <div class="settings-stat">
+                            <div class="settings-stat-number">{{ admin_data.license_info.participants_per_campaign_limit }}</div>
+                            <div class="settings-stat-label">Max Participants</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Indicateurs de performance -->
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Indicateurs de performance</h4>
+                                <p class="settings-item-desc">Surveillez les performances du système et l'état du cache</p>
+                            </div>
+                        </div>
+                        <a href="/business/admin/performance-metrics" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-chart-line me-1"></i>View Metrics
+                        </a>
+                    </div>
+
+                    <!-- Scheduler Status -->
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Planificateur de campagnes</h4>
+                                <p class="settings-item-desc">Afficher et gérer le cycle de vie automatisé des campagnes</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-outline-primary btn-sm" onclick="checkSchedulerStatus()">
+                            <i class="fas fa-sync me-1"></i>Check Status
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 5: Administration de la plateforme (Platform Admin Only) -->
+        {% if current_user.role == 'platform_admin' or current_user.is_platform_admin() %}
+        <div class="settings-card">
+            <div class="settings-card-header" 
+                 onclick="toggleCard('platform-administration')" 
+                 role="button" 
+                 tabindex="0"
+                 aria-expanded="false"
+                 aria-controls="platform-administration-content">
+                <div class="settings-card-title-wrapper">
+                    <div class="settings-card-icon">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <h2 class="settings-card-title">Administration de la plateforme</h2>
+                </div>
+                <div class="settings-card-toggle">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            <div class="settings-card-content" id="platform-administration-content">
+                <div class="settings-card-body">
+                    <!-- Centre d'analytique d'entreprise -->
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Centre d'analytique d'entreprise</h4>
+                                <p class="settings-item-desc">Indicateurs globaux, utilisation des licences et intelligence d'affaires</p>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('business_auth.business_analytics_hub') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-external-link-alt me-1"></i>View Dashboard
+                        </a>
+                    </div>
+
+                    <!-- Business Account Onboarding -->
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Intégrer un compte entreprise</h4>
+                                <p class="settings-item-desc">Créez et configurez de nouveaux comptes d'entreprise avec attribution de licence</p>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('business_auth.business_account_onboarding') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-plus-circle me-1"></i>Onboard
+                        </a>
+                    </div>
+
+                    <!-- License Dashboard -->
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-certificate"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Gestion des licences</h4>
+                                <p class="settings-item-desc">Utilisation des licences inter-locataires, tendances et suivi de conformité</p>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('business_auth.license_dashboard') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-chart-pie me-1"></i>View Dashboard
+                        </a>
+                    </div>
+
+                    <!-- Administrateurs de la plateforme -->
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Administrateurs de la plateforme</h4>
+                                <p class="settings-item-desc">Gérez les comptes et autorisations des administrateurs inter-locataires</p>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('business_auth.manage_users') }}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-users-cog me-1"></i>Manage
+                        </a>
+                    </div>
+
+                    <!-- Platform Admin Badge -->
+                    <div class="alert alert-info mt-3 mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Cross-Tenant Access:</strong> These tools operate across all business accounts. Use with caution.
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Accordion toggle functionality
+function toggleCard(cardId) {
+    const header = event.currentTarget;
+    const content = document.getElementById(cardId + '-content');
+    const isExpanded = header.classList.contains('expanded');
+    
+    // Close all other cards (single-open mode)
+    document.querySelectorAll('.settings-card-header').forEach(h => {
+        if (h !== header) {
+            h.classList.remove('expanded');
+            h.setAttribute('aria-expanded', 'false');
+        }
+    });
+    
+    document.querySelectorAll('.settings-card-content').forEach(c => {
+        if (c !== content) {
+            c.classList.remove('expanded');
+        }
+    });
+    
+    // Toggle current card
+    if (isExpanded) {
+        header.classList.remove('expanded');
+        header.setAttribute('aria-expanded', 'false');
+        content.classList.remove('expanded');
+    } else {
+        header.classList.add('expanded');
+        header.setAttribute('aria-expanded', 'true');
+        content.classList.add('expanded');
+    }
+}
+
+// Expand all cards
+function expandAll() {
+    document.querySelectorAll('.settings-card-header').forEach(header => {
+        header.classList.add('expanded');
+        header.setAttribute('aria-expanded', 'true');
+    });
+    
+    document.querySelectorAll('.settings-card-content').forEach(content => {
+        content.classList.add('expanded');
+    });
+}
+
+// Collapse all cards
+function collapseAll() {
+    document.querySelectorAll('.settings-card-header').forEach(header => {
+        header.classList.remove('expanded');
+        header.setAttribute('aria-expanded', 'false');
+    });
+    
+    document.querySelectorAll('.settings-card-content').forEach(content => {
+        content.classList.remove('expanded');
+    });
+}
+
+// Enhanced keyboard navigation support
+document.addEventListener('DOMContentLoaded', function() {
+    const headers = Array.from(document.querySelectorAll('.settings-card-header'));
+    
+    headers.forEach((header, index) => {
+        // Enter/Space to toggle
+        header.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                header.click();
+            }
+        });
+        
+        // Arrow key navigation
+        header.addEventListener('keydown', function(e) {
+            let newIndex;
+            
+            switch(e.key) {
+                case 'ArrowDown':
+                case 'ArrowRight':
+                    e.preventDefault();
+                    newIndex = (index + 1) % headers.length;
+                    headers[newIndex].focus();
+                    break;
+                    
+                case 'ArrowUp':
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    newIndex = (index - 1 + headers.length) % headers.length;
+                    headers[newIndex].focus();
+                    break;
+                    
+                case 'Home':
+                    e.preventDefault();
+                    headers[0].focus();
+                    break;
+                    
+                case 'End':
+                    e.preventDefault();
+                    headers[headers.length - 1].focus();
+                    break;
+            }
+        });
+    });
+    
+    // Smooth scroll to focused element
+    headers.forEach(header => {
+        header.addEventListener('focus', function() {
+            header.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+    });
+});
+
+// Export all data functionality
+function exportAllData() {
+    const btn = document.getElementById('exportBtn');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Exporting...';
+    
+    fetch('/api/export_data')
+        .then(response => response.blob())
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `voia_export_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            a.remove();
+            
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-check me-1"></i>Exported';
+            setTimeout(() => { btn.innerHTML = originalText; }, 3000);
+        })
+        .catch(error => {
+            console.error('Export failed:', error);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>Failed';
+            setTimeout(() => { btn.innerHTML = originalText; }, 3000);
+        });
+}
+
+// Database health check
+function checkDatabaseHealth() {
+    const btn = event.currentTarget;
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Checking...';
+    
+    fetch('/business/api/database-health')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Database health check response:', data);
+            btn.disabled = false;
+            
+            // Backend returns overall_status: 'healthy', 'warning', 'critical', or 'error'
+            if (data.overall_status === 'healthy') {
+                btn.innerHTML = '<i class="fas fa-check-circle me-1"></i>Healthy';
+                btn.classList.add('btn-success');
+                btn.classList.remove('btn-outline-primary');
+            } else if (data.overall_status === 'warning') {
+                btn.innerHTML = '<i class="fas fa-exclamation-triangle me-1"></i>Warning';
+                btn.classList.add('btn-warning');
+                btn.classList.remove('btn-outline-primary');
+            } else if (data.overall_status === 'critical') {
+                btn.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>Critical';
+                btn.classList.add('btn-danger');
+                btn.classList.remove('btn-outline-primary');
+            } else {
+                btn.innerHTML = '<i class="fas fa-times-circle me-1"></i>Error';
+                btn.classList.add('btn-danger');
+                btn.classList.remove('btn-outline-primary');
+            }
+            
+            setTimeout(() => { 
+                btn.innerHTML = originalText;
+                btn.classList.remove('btn-success', 'btn-warning', 'btn-danger');
+                btn.classList.add('btn-outline-primary');
+            }, 5000);
+        })
+        .catch(error => {
+            console.error('Health check failed:', error);
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fas fa-times-circle me-1"></i>Error: ${error.message}`;
+            setTimeout(() => { btn.innerHTML = originalText; }, 5000);
+        });
+}
+
+// Scheduler status check
+function checkSchedulerStatus() {
+    const btn = event.currentTarget;
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Checking...';
+    
+    fetch('/business/admin/scheduler/status')
+        .then(response => response.json())
+        .then(data => {
+            btn.disabled = false;
+            if (data.running) {
+                btn.innerHTML = '<i class="fas fa-play-circle me-1"></i>Running';
+                btn.classList.add('btn-success');
+                btn.classList.remove('btn-outline-primary');
+            } else {
+                btn.innerHTML = '<i class="fas fa-pause-circle me-1"></i>Stopped';
+                btn.classList.add('btn-warning');
+                btn.classList.remove('btn-outline-primary');
+            }
+            setTimeout(() => { 
+                btn.innerHTML = originalText;
+                btn.classList.remove('btn-success', 'btn-warning');
+                btn.classList.add('btn-outline-primary');
+            }, 3000);
+        })
+        .catch(error => {
+            console.error('Scheduler check failed:', error);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-times-circle me-1"></i>Error';
+            setTimeout(() => { btn.innerHTML = originalText; }, 3000);
+        });
+}
+</script>
+{% endblock %}

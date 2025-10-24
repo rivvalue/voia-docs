@@ -1,0 +1,1150 @@
+{% extends "base.html" %}
+{% set needs_charts = True %}
+
+{% block title %}Analyses de campagne - VOÏA - Voice Of Client Agent{% endblock %}
+
+{% block page_class %}page-dashboard{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Business Intelligence', 'url': url_for('dashboard')},
+    {'label': 'Analyses de campagne', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+<div class="container">
+    <div data-page="dashboard"></div>
+    <!-- Dashboard Header -->
+    <div class="bg-white border-bottom" style="padding: 2.5rem 0; margin-bottom: 2rem;">
+        <div class="row align-items-center">
+            <div class="col-12 col-md-8 mb-3 mb-md-0">
+                <h1 class="h2 mb-2">Analyses de campagne</h1>
+                <p class="text-muted mb-0">Analyses de performance spécifiques à la campagne et informations issues de l'enquête</p>
+            </div>
+            <div class="col-12 col-md-4 text-center text-md-end">
+                <div class="d-flex align-items-center justify-content-center justify-content-md-end gap-3">
+                    <!-- Link to Executive Summary -->
+                    <a href="{{ url_for('executive_summary') }}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-chart-line me-2"></i>Executive Summary
+                    </a>
+                    
+                    <!-- Refresh Icon -->
+                    <button class="btn btn-sm btn-link text-muted p-1" 
+                            onclick="refreshData()" 
+                            title="Actualiser les données">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Analyses de campagne Section -->
+<div class="bg-white border rounded mb-4" style="padding: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+<div class="dashboard-navigation mb-4">
+        <!-- Filtre d'analyse de campagne (Only for Insights) -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="border rounded" style="padding: 1.5rem; background-color: #f8f9fa;">
+                    <!-- Header -->
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="mb-1"><i class="fas fa-filter me-2" style="color: #E13A44;"></i>Filtre d'analyse de campagne</h6>
+                            <small class="text-muted">Compare KPIs across different campaigns</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Filter Controls -->
+                    <div class="row align-items-center mb-2">
+                        <div class="col-12 col-md-auto mb-2 mb-md-0">
+                            <label for="campaignFilter" class="form-label mb-0">Campagne :</label>
+                        </div>
+                        <div class="col-12 col-md">
+                            <div class="d-flex gap-2 align-items-center">
+                                <select class="form-select" id="campaignFilter" onchange="applyCampaignFilter()" style="max-width: 400px;">
+                                    <option value="">Sélectionner la campagne</option>
+                                    <!-- Will be populated by JavaScript -->
+                                </select>
+                                <button class="btn btn-outline-secondary btn-sm" onclick="clearCampaignFilter()" title="Effacer le filtre">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Campaign Metadata (appears when campaign selected) -->
+                    <div id="selectedCampaignInfo" class="mt-3 pt-3 border-top" style="display: none; background-color: #f8f9fa; margin: 0 -1.5rem -1.5rem; padding: 1rem 1.5rem !important; border-radius: 0 0 0.375rem 0.375rem;">
+                        <div class="d-flex gap-2 align-items-center flex-wrap">
+                            <small class="text-muted me-2">Campaign Détails:</small>
+                            <span class="badge bg-light text-dark border" id="selectedCampaignDates">
+                                <i class="fas fa-calendar-alt me-1"></i><span class="campaign-dates-text"></span>
+                            </span>
+                            <span class="badge" id="selectedCampaignStatus">
+                                <span class="campaign-status-text"></span>
+                            </span>
+                            <span class="badge text-dark border" id="selectedCampaignDaysLeft" style="display: none; background: #f5f5f5;">
+                                <i class="fas fa-clock me-1" style="color: #E13A44;"></i><span class="campaign-days-text"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    <!-- Main Navigation Tabs -->
+    <ul class="nav nav-tabs mb-4" id="dashboardNav" role="tablist" style="border-bottom: 1px solid #e5e5e5;">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
+                <i class="fas fa-tachometer-alt me-2" style="color: #E13A44;"></i>Overview
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="intelligence-tab" data-bs-toggle="tab" data-bs-target="#intelligence" type="button" role="tab" aria-controls="intelligence" aria-selected="false">
+                <i class="fas fa-brain me-2" style="color: #E13A44;"></i>Intelligence de compte
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="analytics" aria-selected="false">
+                <i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>Analytics
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="survey-insights-tab" data-bs-toggle="tab" data-bs-target="#survey-insights" type="button" role="tab" aria-controls="survey-insights" aria-selected="false">
+                <i class="fas fa-comments me-2" style="color: #E13A44;"></i>Survey Insights
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="segmentation-tab" data-bs-toggle="tab" data-bs-target="#segmentation" type="button" role="tab" aria-controls="segmentation" aria-selected="false">
+                <i class="fas fa-users me-2" style="color: #E13A44;"></i>Segmentation Insights
+            </button>
+        </li>
+    </ul>
+</div>
+
+    <!-- Loading state (positioned below campaign filter) -->
+    <div class="loading-card" id="loadingIndicator">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Chargement des données du tableau de bord...</span>
+        </div>
+        <div class="loading-text">Chargement des données du tableau de bord...</div>
+    </div>
+
+    <!-- Dashboard Content (toggles during loading) -->
+    <div class="d-none" id="dashboardContent">
+        <!-- Tab Content -->
+        <div class="tab-content" id="dashboardTabContent">
+        <!-- Overview Tab -->
+        <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+            <!-- Active Campaign Banner -->
+            <div class="row mb-4" id="activeCampaignBanner" style="display: none;">
+                <div class="col-12">
+                    <div class="alert d-flex align-items-center border rounded" style="background: #fff; border-color: #E13A44 !important; padding: 1rem;">
+                        <i class="fas fa-bullhorn me-3" style="color: #E13A44;"></i>
+                        <div>
+                            <strong>Survey Insights</strong> - Currently showing data from active campaign: 
+                            <span id="activeCampaignName" class="fw-bold">Nom de la campagne</span>
+                            <span class="ms-2 text-muted" id="activeCampaignDates">Jan 1 - Dec 31, 2024</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="row mb-4 g-3">
+                <div class="col">
+                    <div class="kpi-card kpi-success">
+                        <div class="kpi-value text-primary" id="npsScore">0</div>
+                        <div class="kpi-label">Score NPS</div>
+                        <div class="kpi-trend" id="npsScoreTrend">Indicateur de satisfaction globale</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="kpi-card kpi-primary">
+                        <div class="kpi-value text-success" id="totalRéponses">0</div>
+                        <div class="kpi-label">Nombre total de réponses</div>
+                        <div class="kpi-trend" id="totalRéponsesTrend">Retours d'information collectés depuis le début</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="kpi-card kpi-info">
+                        <div class="kpi-value text-info" id="recentRéponses">0</div>
+                        <div class="kpi-label">Récent (30 jours)</div>
+                        <div class="kpi-trend" id="recentRéponsesTrend">Derniers retours clients</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="kpi-card kpi-danger">
+                        <div class="kpi-value text-danger" id="highRiskCount">0</div>
+                        <div class="kpi-label">
+                            Comptes à risque élevé de résiliation
+                            <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top" 
+                               title="Companies with Élevé or Critique churn risk level based on AI assessment" style="font-size: 0.8em; opacity: 0.7;"></i>
+                        </div>
+                        <div class="kpi-trend" id="highRiskTrend">Risque imminent de résiliation (élevé/critique)</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="kpi-card kpi-success">
+                        <div class="kpi-value text-success" id="growthPotential">0%</div>
+                        <div class="kpi-label">Potentiel de croissance</div>
+                        <div class="kpi-trend" id="growthPotentialTrend">Opportunité d'expansion du chiffre d'affaires</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comptes à risque élevé de résiliation & Thèmes clés Summary -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <h5>Comptes à risque élevé de résiliation
+                                <i class="fas fa-info-circle ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                   title="Companies with Élevé or Critique churn risk level" style="font-size: 0.8em; opacity: 0.7;"></i>
+                            </h5>
+                        </div>
+                        <div class="card-body" style="height: 550px; overflow-y: auto; padding: 1.5rem;">
+                            <div id="highRiskAccounts">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <h5>Thèmes clés</h5>
+                        </div>
+                        <div class="card-body" style="height: 550px;">
+                            <div class="chart-container">
+                                <canvas id="themesChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Intelligence de compte Tab -->
+        <div class="tab-pane fade" id="intelligence" role="tabpanel" aria-labelledby="intelligence-tab">
+            <!-- Intelligence de compte - Unified View -->
+            <div class="chart-card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        Intelligence de compte
+                        <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top" 
+                           title="Shows account health balance: Risk-Heavy (risks outweigh opportunities), Élevé Potential (opportunities with minimal risks), or Équilibred" 
+                           style="font-size: 0.8em; opacity: 0.7;"></i>
+                    </h5>
+                    <small class="text-muted">Risk vs Opportunity Équilibre by Entreprise</small>
+                </div>
+                <div class="card-body">
+                            <!-- Rechercher and Filters -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <label for="accountIntelRechercher" class="form-label">Rechercher</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                        <input type="text" class="form-control" id="accountIntelRechercher" 
+                                               placeholder="Rechercher company, opportunities, risks..." 
+                                               onkeyup="searchAccountIntelligence()">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="accountÉquilibreFilter" class="form-label">Équilibre</label>
+                                    <select class="form-select" id="accountÉquilibreFilter" onchange="searchAccountIntelligence()">
+                                        <option value="">Tous</option>
+                                        <option value="risk_heavy">Risk-Heavy</option>
+                                        <option value="balanced">Équilibred</option>
+                                        <option value="opportunity_heavy">Élevé Potential</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="accountRiskFilter" class="form-label">Niveau de risque</label>
+                                    <select class="form-select" id="accountRiskFilter" onchange="searchAccountIntelligence()">
+                                        <option value="">Tous</option>
+                                        <option value="critical">Critique</option>
+                                        <option value="high">Élevé</option>
+                                        <option value="medium">Moyen</option>
+                                        <option value="low">Faible</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="accountOppFilter" class="form-label">Opportunités</label>
+                                    <select class="form-select" id="accountOppFilter" onchange="searchAccountIntelligence()">
+                                        <option value="">Tous</option>
+                                        <option value="yes">Has Opportunités</option>
+                                        <option value="no">No Opportunités</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="accountRisksFilter" class="form-label">Avec risques</label>
+                                    <select class="form-select" id="accountRisksFilter" onchange="searchAccountIntelligence()">
+                                        <option value="">Tous</option>
+                                        <option value="yes">Avec risques</option>
+                                        <option value="no">Sans risques</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <!-- Results Count and Effacer le filtres -->
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <span id="accountIntelCount" class="text-muted">Chargement...</span>
+                                    <span id="accountIntelFiltersActive" class="badge ms-2" style="display: none; background: rgba(225, 58, 68, 0.1); color: #E13A44;"></span>
+                                </div>
+                                <button class="btn btn-sm btn-outline-secondary" id="accountIntelClearFilters" 
+                                        onclick="clearAccountIntelFilters()" style="display: none;">
+                                    <i class="fas fa-times me-1"></i>Effacer le filtres
+                                </button>
+                            </div>
+                            
+                            <div id="accountIntelligence">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                            
+                            <!-- Pagination Controls -->
+                            <nav aria-label="Intelligence de compte pagination" id="accountIntelPaginationContainer" style="display: none;">
+                                <ul class="pagination justify-content-center" id="accountIntelPagination"></ul>
+                            </nav>
+                        </div>
+                    </div>
+        </div>
+
+        <!-- Analytics Tab -->
+        <div class="tab-pane fade" id="analytics" role="tabpanel" aria-labelledby="analytics-tab">
+            <!-- Charts Row -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-6">
+            <div class="chart-card">
+                <div class="card-header">
+                    <h5>Répartition du NPS</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="npsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-card">
+                <div class="card-header">
+                    <h5>Analyse de sentiment</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="sentimentChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tenure Distribution -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-6">
+            <div class="chart-card">
+                <div class="card-header">
+                    <h5>Répartition de l'ancienneté client</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="tenureChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-card">
+                <div class="card-header">
+                    <h5>Analyse du facteur de croissance basé sur le NPS</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="growthFactorChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+            <!-- Notes moyennes -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <h5>Notes moyennes</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="ratingsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Survey Insights Tab -->
+        <div class="tab-pane fade" id="survey-insights" role="tabpanel" aria-labelledby="survey-insights-tab">
+            <!-- Entreprise NPS Segregation Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="data-table">
+                        <div class="table-header">
+                            <h5>NPS par entreprise cliente</h5>
+                            <small class="text-muted">Strategic account management - NPS scores segregated by company evaluating Archelo Group</small>
+                        </div>
+                        <div class="p-3">
+                            <!-- Rechercher and Filter Controls -->
+                            <div class="row align-items-end mb-3">
+                                <div class="col-md-5">
+                                    <label for="companyRechercher" class="form-label">Rechercher</label>
+                                    <input type="text" class="form-control" id="companyRechercher" 
+                                           placeholder="Rechercher by company name...">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="companyNpsFilter" class="form-label">Catégorie NPS</label>
+                                    <select class="form-select" id="companyNpsFilter" onchange="searchEntrepriseNPS()">
+                                        <option value="">Tous Companies</option>
+                                        <option value="promoters">Promoteurs (9-10)</option>
+                                        <option value="passives">Neutres (7-8)</option>
+                                        <option value="detractors">Détracteurs (0-6)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="btn-group w-100">
+                                        <button type="button" class="btn btn-primary" onclick="searchEntrepriseNPS()">
+                                            <i class="fas fa-search me-1"></i>Rechercher
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="clearEntrepriseRechercher()">
+                                            <i class="fas fa-times me-1"></i>Clear
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted" id="companyRechercherInfo"></small>
+                            </div>
+                        </div>
+                        <div class="p-0">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Entreprise Name</th>
+                                            <th>Répondants</th>
+                                            <th>Avg Individual NPS</th>
+                                            <th>Entreprise NPS</th>
+                                            <th>Distribution</th>
+                                            <th>Niveau de risque</th>
+                                            <th>Latest Response</th>
+                                            <th>Latest Risque de résiliation</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="companyNpsTableServerSide" style="display: table-row-group !important; visibility: visible !important;">
+                                        {% if company_nps_data %}
+                                            <!-- Server-side data: {{ company_nps_data|length }} companies -->
+                                            {% for company in company_nps_data %}
+                                            <tr>
+                                                <td><strong>{{ company.company_name }}</strong></td>
+                                                <td>{{ company.total_responses }}</td>
+                                                <td>{{ company.avg_nps }}</td>
+                                                <td>
+                                                    <span class="badge {% if company.company_nps > 20 %}bg-success{% elif company.company_nps >= -20 %}bg-secondary{% else %}bg-danger{% endif %}">
+                                                        {% if company.company_nps > 0 %}+{% endif %}{{ company.company_nps }}
+                                                    </span>
+                                                </td>
+                                                <td><small>{{ company.promoters }}P / {{ company.passives }}Pa / {{ company.detractors }}D</small></td>
+                                                <td>
+                                                    <span class="badge {% if company.risk_level == 'Faible' %}bg-success{% elif company.risk_level == 'Moyen' %}bg-secondary{% elif company.risk_level == 'Élevé' %}bg-danger{% elif company.risk_level == 'Critique' %}bg-dark{% else %}bg-secondary{% endif %}">
+                                                        {{ company.risk_level }}
+                                                    </span>
+                                                </td>
+                                                <td>{{ company.latest_response or 'N/A' }}</td>
+                                                <td>{{ company.latest_churn_risk or 'N/A' }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        {% else %}
+                                            <!-- No server-side data found -->
+                                            <tr><td colspan="8" class="text-center text-muted">No company data available yet</td></tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Pagination Controls for Entreprise NPS Table -->
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div class="pagination-info">
+                                    <small class="text-muted" id="companyPaginationInfo">Chargement...</small>
+                                </div>
+                                <nav aria-label="Entreprise NPS pagination">
+                                    <ul class="pagination pagination-sm mb-0" id="companyPaginationControls">
+                                        <!-- Will be populated by JavaScript -->
+                                    </ul>
+                                </nav>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    <strong>Entreprise NPS</strong> = (% Promoters - % Detractors) within each company |
+                                    <strong>Niveau de risques:</strong> 
+                                    <span class="badge bg-success">Faible (>20)</span>
+                                    <span class="badge bg-secondary">Moyen (-20 to 20)</span>
+                                    <span class="badge bg-danger">Élevé (≤-20)</span>
+                                    <span class="badge bg-dark">Critique (≤-50)</span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NPS par ancienneté Segregation Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="data-table">
+                        <div class="table-header">
+                            <h5>NPS par ancienneté client</h5>
+                            <small class="text-muted">Customer lifecycle insights - NPS scores segregated by length of business relationship</small>
+                        </div>
+                        <div class="p-0">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Groupe d'ancienneté</th>
+                                            <th>Répondants</th>
+                                            <th>Avg Individual NPS</th>
+                                            <th>NPS par ancienneté</th>
+                                            <th>Distribution</th>
+                                            <th>Niveau de risque</th>
+                                            <th>Latest Response</th>
+                                            <th>Latest Risque de résiliation</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tenureNpsTable">
+                                        <!-- Will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Pagination Controls for NPS par ancienneté Table -->
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div class="pagination-info">
+                                    <small class="text-muted" id="tenurePaginationInfo">Chargement...</small>
+                                </div>
+                                <nav aria-label="NPS par ancienneté pagination">
+                                    <ul class="pagination pagination-sm mb-0" id="tenurePaginationControls">
+                                        <!-- Will be populated by JavaScript -->
+                                    </ul>
+                                </nav>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    <strong>NPS par ancienneté</strong> = (% Promoters - % Detractors) within each tenure group |
+                                    <strong>Niveau de risques:</strong> 
+                                    <span class="badge bg-success">Faible (>20)</span>
+                                    <span class="badge bg-secondary">Moyen (-20 to 20)</span>
+                                    <span class="badge bg-danger">Élevé (≤-20)</span>
+                                    <span class="badge bg-dark">Critique (≤-50)</span>
+                                    <span class="badge bg-secondary">Insufficient Data (&lt;2 responses)</span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Réponses Table -->
+            <div class="chart-card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0">Réponses récentes aux enquêtes</h5>
+                            <small class="text-muted" id="responsesRechercherInfo"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                            <!-- Rechercher and Filter Controls -->
+                            <div class="row align-items-end mb-3">
+                                <div class="col-md-5">
+                                    <label for="responsesRechercher" class="form-label">Rechercher</label>
+                                    <input type="text" class="form-control" id="responsesRechercher" 
+                                           placeholder="Rechercher by company name, participant name, or email...">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="npsFilter" class="form-label">Catégorie NPS</label>
+                                    <select class="form-select" id="npsFilter" onchange="searchSurveyRéponses()">
+                                        <option value="">Tous Réponses</option>
+                                        <option value="promoters">Promoteurs (9-10)</option>
+                                        <option value="passives">Neutres (7-8)</option>
+                                        <option value="detractors">Détracteurs (0-6)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="btn-group w-100">
+                                        <button type="button" class="btn btn-primary" onclick="searchSurveyRéponses()">
+                                            <i class="fas fa-search me-1"></i>Rechercher
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="clearRéponsesRechercher()">
+                                            <i class="fas fa-times me-1"></i>Clear
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Entreprise</th>
+                                            <th>Tenure with FC inc</th>
+                                            <th>Score NPS</th>
+                                            <th>Catégorie</th>
+                                            <th>Sentiment</th>
+                                            <th>Risque de résiliation</th>
+                                            <th>Date</th>
+                                            <th>Détails</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="responsesTable">
+                                        <!-- Will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Pagination Controls -->
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div class="pagination-info">
+                                    <small class="text-muted" id="paginationInfo">Chargement...</small>
+                                </div>
+                                <nav aria-label="Pagination des réponses à l'enquête">
+                                    <ul class="pagination pagination-sm mb-0" id="paginationControls">
+                                        <!-- Will be populated by JavaScript -->
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+        </div>
+    </div>
+    
+        <!-- Segmentation Insights Tab -->
+        <div class="tab-pane fade" id="segmentation" role="tabpanel" aria-labelledby="segmentation-tab">
+            <div id="segmentationEmptyState" class="alert alert-info" style="display: none;">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>No Segmentation Data Available</strong> - This campaign was created before segmentation analytics were implemented. Segmentation data is only available for campaigns created after this feature was deployed.
+            </div>
+            
+            <div id="segmentationContent">
+                <!-- NPS par rôle Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-user-tie me-2" style="color: #E13A44;"></i>NPS par rôle</h5>
+                                <small class="text-muted">Net Promoter Score distribution across different participant roles</small>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="npsByRoleChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- NPS par région Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-globe me-2" style="color: #E13A44;"></i>NPS par région</h5>
+                                <small class="text-muted">Geographic distribution of customer satisfaction</small>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="npsByRegionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- NPS par catégorie de clients Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-layer-group me-2" style="color: #E13A44;"></i>NPS par catégorie de clients</h5>
+                                <small class="text-muted">Customer satisfaction across different tier levels</small>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="npsByTierChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Satisfaction by Segmentation Table -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="data-table">
+                            <div class="table-header">
+                                <h5>Évaluations de satisfaction par segment</h5>
+                                <small class="text-muted">Average satisfaction scores across all segmentation dimensions</small>
+                            </div>
+                            <div class="p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Type de segment</th>
+                                                <th>Nom du segment</th>
+                                                <th>Réponses</th>
+                                                <th>Satisfaction moyenne</th>
+                                                <th>Score NPS</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="segmentationTable">
+                                            <!-- Will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- End Tab Content -->
+
+    </div>
+</div>
+<!-- End Analyses de campagne Section -->
+
+    <!-- End Dashboard Content -->
+</div>
+<!-- End Dashboard Column -->
+
+<!-- Entreprise Réponses Modal -->
+<div class="modal fade" id="companyRéponsesModal" tabindex="-1" aria-labelledby="companyRéponsesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" style="background-color: #ffffff; border: 2px solid #2E5090;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #2E5090 0%, #1a3560 100%); border-bottom: 2px solid #E13A44;">
+                <div class="w-100">
+                    <h5 class="modal-title text-white mb-2" id="companyRéponsesModalLabel">
+                        <i class="fas fa-building me-2"></i><span id="modalEntrepriseName"></span>
+                    </h5>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <span class="badge bg-light text-dark">
+                            <i class="fas fa-flag me-1"></i><span id="modalCampaignName"></span>
+                        </span>
+                        <span class="badge" style="background-color: #2E5090; color: white;">
+                            <i class="fas fa-poll me-1"></i><span id="modalResponseCount">0</span> Réponses
+                        </span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body" style="background-color: #f8f9fa;">
+                <!-- Rechercher and Filters -->
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            <span class="input-group-text" style="background-color: #ffffff; border-color: #dee2e6;">
+                                <i class="fas fa-search" style="color: #8A8A8A;"></i>
+                            </span>
+                            <input type="text" class="form-control" id="companyResponseRechercher" 
+                                   placeholder="Rechercher by respondent name or email..."
+                                   style="background-color: #ffffff; border-color: #dee2e6; color: #212529;">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="companyResponseSort" 
+                                style="background-color: #ffffff; border-color: #dee2e6; color: #212529;">
+                            <option value="created_at_desc">Les plus récents</option>
+                            <option value="created_at_asc">Les plus anciens</option>
+                            <option value="nps_score_desc">Élevéest NPS</option>
+                            <option value="nps_score_asc">Faibleest NPS</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Loading State -->
+                <div id="companyRéponsesLoading" class="text-center py-5">
+                    <div class="spinner-border" style="color: #2E5090;" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <p class="mt-2" style="color: #8A8A8A;">Chargement des réponses...</p>
+                </div>
+                
+                <!-- Réponses Table -->
+                <div id="companyRéponsesContent" style="display: none;">
+                    <div class="table-responsive">
+                        <table class="table table-hover" style="background-color: #ffffff;">
+                            <thead style="background-color: #2E5090; color: white; position: sticky; top: 0; z-index: 10;">
+                                <tr>
+                                    <th style="width: 20%;">Répondant</th>
+                                    <th style="width: 10%; text-align: center;">NPS</th>
+                                    <th style="width: 50%;" class="text-center">Évaluations</th>
+                                    <th style="width: 15%;">Date</th>
+                                    <th style="width: 5%; text-align: center;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="companyRéponsesTableBody">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div style="color: #8A8A8A;">
+                            <span id="companyRéponsesPaginationInfo"></span>
+                        </div>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0" id="companyRéponsesPagination">
+                                <!-- Will be populated by JavaScript -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                
+                <!-- No Data State -->
+                <div id="companyRéponsesNoData" class="text-center py-5" style="display: none;">
+                    <i class="fas fa-inbox fa-4x mb-3" style="color: #BDBDBD;"></i>
+                    <h5 style="color: #8A8A8A;">No Réponses Found</h5>
+                    <p style="color: #8A8A8A;">Aucune réponse d'enquête ne correspond à vos critères de recherche.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- KPI Trends Modal -->
+<div class="modal fade" id="kpiTrendsModal" tabindex="-1" aria-labelledby="kpiTrendsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-white border-bottom">
+                <h5 class="modal-title" id="kpiTrendsModalLabel">
+                    <i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>Campaign KPI Trends
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body" style="background-color: #FFFFFF;">
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Réponses</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-responses" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Score NPS</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-nps" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Entreprises analysées</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-companies" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Critique Risk</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-critical" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Satisfaction</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-satisfaction" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Valeur du produit</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-product" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Tarification</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-pricing" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Service</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-service" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-white border-top">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<!-- Pass business authentication status to JavaScript -->
+<script>
+    window.isBusinessAuthenticated = {{ 'true' if is_business_authenticated else 'false' }};
+</script>
+
+<!-- Hash redirect handler for old bookmarks -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const hash = window.location.hash;
+    
+    // Handle old bookmark hashes
+    if (hash) {
+        // Redirect #admin-tools to Settings page
+        if (hash === '#admin-tools') {
+            window.location.href = "{{ url_for('business_auth.admin_panel') }}";
+            return;
+        }
+    }
+});
+</script>
+
+<!-- JavaScript disabled for company NPS table - using server-side rendering only -->
+<script src="{{ url_for('static', filename='js/dashboard.js') }}?v={{ range(1000, 9999) | random }}"></script>
+
+<!-- Segmentation Analytics Rendering -->
+<script>
+// Store segmentation charts globally for cleanup
+let segmentationCharts = {
+    role: null,
+    region: null,
+    tier: null
+};
+
+function renderSegmentationInsights(data) {
+    const segmentationData = data.segmentation_analytics || {};
+    
+    // Check if segmentation data exists
+    if (!segmentationData || Object.keys(segmentationData).length === 0) {
+        document.getElementById('segmentationEmptyState').style.display = 'block';
+        document.getElementById('segmentationContent').style.display = 'none';
+        return;
+    }
+    
+    document.getElementById('segmentationEmptyState').style.display = 'none';
+    document.getElementById('segmentationContent').style.display = 'block';
+    
+    // Render NPS par rôle Chart
+    renderSegmentationChart('npsByRoleChart', 'role', segmentationData.nps_by_role || {},  'Role');
+    
+    // Render NPS par région Chart
+    renderSegmentationChart('npsByRegionChart', 'region', segmentationData.nps_by_region || {}, 'Region');
+    
+    // Render NPS by Tier Chart
+    renderSegmentationChart('npsByTierChart', 'tier', segmentationData.nps_by_tier || {}, 'Customer Tier');
+    
+    // Render Segmentation Table
+    renderSegmentationTable(segmentationData);
+}
+
+function renderSegmentationChart(canvasId, chartKey, npsData, label) {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    
+    // Destroy existing chart if it exists
+    if (segmentationCharts[chartKey]) {
+        segmentationCharts[chartKey].destroy();
+    }
+    
+    const labels = Object.keys(npsData);
+    const npsScores = labels.map(key => npsData[key].nps_score || 0);
+    const responseCounts = labels.map(key => npsData[key].total_responses || 0);
+    
+    segmentationCharts[chartKey] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Score NPS',
+                data: npsScores,
+                backgroundColor: labels.map(label => {
+                    const score = npsData[label].nps_score || 0;
+                    if (score >= 50) return 'rgba(40, 167, 69, 0.8)';
+                    if (score >= 0) return 'rgba(255, 193, 7, 0.8)';
+                    return 'rgba(220, 53, 69, 0.8)';
+                }),
+                borderColor: labels.map(label => {
+                    const score = npsData[label].nps_score || 0;
+                    if (score >= 50) return 'rgb(40, 167, 69)';
+                    if (score >= 0) return 'rgb(255, 193, 7)';
+                    return 'rgb(220, 53, 69)';
+                }),
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: `Score NPS by ${label}`
+                },
+                tooltip: {
+                    callbacks: {
+                        afterLabel: function(context) {
+                            const idx = context.dataIndex;
+                            const key = labels[idx];
+                            const metrics = npsData[key];
+                            return [
+                                `Réponses: ${metrics.total_responses}`,
+                                `Promoters: ${metrics.promoters}`,
+                                `Passives: ${metrics.passives}`,
+                                `Detractors: ${metrics.detractors}`
+                            ];
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    min: -100,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value;
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Score NPS'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: label
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderSegmentationTable(segmentationData) {
+    const tbody = document.getElementById('segmentationTable');
+    if (!tbody) return;
+    
+    let html = '';
+    
+    // Add role segments
+    const roleData = segmentationData.nps_by_role || {};
+    const roleSatisfaction = segmentationData.satisfaction_by_role || {};
+    Object.keys(roleData).forEach(role => {
+        const metrics = roleData[role];
+        const satisfaction = roleSatisfaction[role];
+        html += `
+            <tr>
+                <td><span class="badge bg-primary">Role</span></td>
+                <td>${role}</td>
+                <td>${metrics.total_responses || 0}</td>
+                <td>${satisfaction !== null && satisfaction !== undefined ? satisfaction.toFixed(2) : 'N/A'}</td>
+                <td><span class="badge ${getNPSBadgeClass(metrics.nps_score)}">${metrics.nps_score || 0}</span></td>
+            </tr>
+        `;
+    });
+    
+    // Add region segments
+    const regionData = segmentationData.nps_by_region || {};
+    const regionSatisfaction = segmentationData.satisfaction_by_region || {};
+    Object.keys(regionData).forEach(region => {
+        const metrics = regionData[region];
+        const satisfaction = regionSatisfaction[region];
+        html += `
+            <tr>
+                <td><span class="badge bg-info">Region</span></td>
+                <td>${region}</td>
+                <td>${metrics.total_responses || 0}</td>
+                <td>${satisfaction !== null && satisfaction !== undefined ? satisfaction.toFixed(2) : 'N/A'}</td>
+                <td><span class="badge ${getNPSBadgeClass(metrics.nps_score)}">${metrics.nps_score || 0}</span></td>
+            </tr>
+        `;
+    });
+    
+    // Add tier segments
+    const tierData = segmentationData.nps_by_tier || {};
+    const tierSatisfaction = segmentationData.satisfaction_by_tier || {};
+    Object.keys(tierData).forEach(tier => {
+        const metrics = tierData[tier];
+        const satisfaction = tierSatisfaction[tier];
+        html += `
+            <tr>
+                <td><span class="badge bg-warning text-dark">Tier</span></td>
+                <td>${tier}</td>
+                <td>${metrics.total_responses || 0}</td>
+                <td>${satisfaction !== null && satisfaction !== undefined ? satisfaction.toFixed(2) : 'N/A'}</td>
+                <td><span class="badge ${getNPSBadgeClass(metrics.nps_score)}">${metrics.nps_score || 0}</span></td>
+            </tr>
+        `;
+    });
+    
+    tbody.innerHTML = html || '<tr><td colspan="5" class="text-center text-muted">No segmentation data available</td></tr>';
+}
+
+function getNPSBadgeClass(score) {
+    if (score >= 50) return 'bg-success';
+    if (score >= 0) return 'bg-warning text-dark';
+    return 'bg-danger';
+}
+
+// Hook into existing dashboard rendering
+if (typeof window.originalRenderDashboard === 'undefined' && typeof renderDashboard !== 'undefined') {
+    window.originalRenderDashboard = renderDashboard;
+    renderDashboard = function(data) {
+        window.originalRenderDashboard(data);
+        renderSegmentationInsights(data);
+    };
+}
+</script>
+{% endblock %}

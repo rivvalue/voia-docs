@@ -1,0 +1,323 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Participant - {{ business_account.name }} - VOÏA{% endblock %}
+
+{% block page_class %}page-participant-edit{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Participants', 'url': url_for('participants.list_participants')},
+    {'label': 'Edit Participant', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+
+<div class="participant-config-container">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="mb-4">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'info-circle' if category == 'info' else 'check-circle' }} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    
+    <!-- Header -->
+    <div class="participant-config-header">
+        <div class="participant-config-header-content">
+            <h1>
+                <i class="fas fa-user-edit me-2" aria-hidden="true"></i>
+                Edit Participant
+            </h1>
+            <p>Mettre à jour le participant information for {{ business_account.name }}</p>
+        </div>
+    </div>
+
+    {% if has_survey_history %}
+    <!-- Survey History Warning -->
+    <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
+        <i class="fas fa-lock fa-2x me-3" aria-hidden="true"></i>
+        <div>
+            <h5 class="alert-heading mb-1">Email Address Locked</h5>
+            <p class="mb-0">
+                This participant has survey history (responses, campaign associations, or email deliveries). 
+                The email address cannot be changed to protect data integrity.
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Configuration Form -->
+    <form method="POST" action="{{ url_for('participants.edit_participant', participant_id=participant.id) }}" id="participantEditForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        {% if has_survey_history %}
+        {# Hidden field to submit email when visible field is disabled #}
+        <input type="hidden" name="email" value="{{ participant.email }}"/>
+        {% endif %}
+        
+        <!-- Participant Information -->
+        <div class="participant-config-form-section">
+            <h3 class="participant-section-title">
+                <i class="fas fa-user" aria-hidden="true"></i>
+                Participant Information
+            </h3>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="participant-form-group">
+                        <label class="participant-form-label" for="email">
+                            Email Address *
+                            {% if has_survey_history %}
+                            <i class="fas fa-lock ms-1 text-muted" aria-hidden="true" title="E-mail verrouillé - historique d'enquête existant"></i>
+                            {% endif %}
+                        </label>
+                        <input type="email" 
+                               class="participant-form-control" 
+                               id="email" 
+                               name="email" 
+                               value="{{ participant.email }}"
+                               placeholder="participant@example.com" 
+                               required
+                               {% if has_survey_history %}readonly disabled{% endif %}
+                               aria-required="true"
+                               aria-describedby="email_help">
+                        <div class="participant-help-text" id="email_help">
+                            {% if has_survey_history %}
+                            Email address cannot be changed (survey history exists)
+                            {% else %}
+                            Participant's email address for survey invitation
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="participant-form-group">
+                        <label class="participant-form-label" for="name">Nom complet *</label>
+                        <input type="text" 
+                               class="participant-form-control" 
+                               id="name" 
+                               name="name" 
+                               value="{{ participant.name }}"
+                               placeholder="John Doe" 
+                               required
+                               aria-required="true"
+                               aria-describedby="name_help">
+                        <div class="participant-help-text" id="name_help">Nom complet du participant</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="participant-form-group">
+                        <label class="participant-form-label" for="company_name">Nom de l'entreprise *</label>
+                        <input type="text" 
+                               class="participant-form-control" 
+                               id="company_name" 
+                               name="company_name" 
+                               value="{{ participant.company_name }}"
+                               placeholder="Acme Corporation" 
+                               required
+                               aria-required="true"
+                               aria-describedby="company_name_help">
+                        <div class="participant-help-text" id="company_name_help">Entreprise ou organisation du participant</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Segmentation Attributes (Optionnel) -->
+        <div class="participant-config-form-section">
+            <h3 class="participant-section-title">
+                <i class="fas fa-tags" aria-hidden="true"></i>
+                Segmentation Attributes
+                <span class="badge bg-secondary ms-2">Optionnel</span>
+            </h3>
+            <p class="participant-help-text mb-3">Update segmentation data for personalized surveys and advanced analytics</p>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="participant-form-group">
+                        <label class="participant-form-label" for="role">Rôle</label>
+                        <select class="participant-form-control" 
+                                id="role" 
+                                name="role"
+                                aria-describedby="role_help">
+                            <option value="">Sélectionnez un rôle (optionnel)</option>
+                            <option value="C-Level" {% if participant.role == "C-Level" %}selected{% endif %}>Cadre dirigeant (C-Level)</option>
+                            <option value="VP" {% if participant.role == "VP" %}selected{% endif %}>VP / Directeur</option>
+                            <option value="Gestionnaire" {% if participant.role == "Gestionnaire" %}selected{% endif %}>Gestionnaire</option>
+                            <option value="Chef d'équipe" {% if participant.role == "Chef d'équipe" %}selected{% endif %}>Chef d'équipe</option>
+                            <option value="Utilisateur final" {% if participant.role == "Utilisateur final" %}selected{% endif %}>Utilisateur final</option>
+                            <option value="Autre" {% if participant.role == "Autre" %}selected{% endif %}>Autre</option>
+                        </select>
+                        <div class="participant-help-text" id="role_help">Rôle du participant pour la personnalisation de l'enquête selon le rôle</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="participant-form-group">
+                        <label class="participant-form-label" for="region">Région</label>
+                        <select class="participant-form-control" 
+                                id="region" 
+                                name="region"
+                                aria-describedby="region_help">
+                            <option value="">Sélectionnez une région (optionnel)</option>
+                            <option value="Amérique du Nord" {% if participant.region == "Amérique du Nord" %}selected{% endif %}>Amérique du Nord</option>
+                            <option value="LATAM" {% if participant.region == "LATAM" %}selected{% endif %}>Amérique latine (LATAM)</option>
+                            <option value="EMEA" {% if participant.region == "EMEA" %}selected{% endif %}>Europe, Moyen-Orient et Afrique (EMEA)</option>
+                            <option value="APAC" {% if participant.region == "APAC" %}selected{% endif %}>Asie-Pacifique (APAC)</option>
+                            <option value="Autre" {% if participant.region == "Autre" %}selected{% endif %}>Autre</option>
+                        </select>
+                        <div class="participant-help-text" id="region_help">Région géographique pour des analyses régionales</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="participant-form-group">
+                        <label class="participant-form-label" for="customer_tier">Catégorie de client</label>
+                        <select class="participant-form-control" 
+                                id="customer_tier" 
+                                name="customer_tier"
+                                aria-describedby="customer_tier_help">
+                            <option value="">Sélectionnez une catégorie (optionnel)</option>
+                            <option value="T1 : Stratégique (5–10 % des meilleurs clients)" {% if participant.customer_tier == "T1 : Stratégique (5–10 % des meilleurs clients)" %}selected{% endif %}>T1 : Stratégique (5–10 % des meilleurs clients)</option>
+                            <option value="T2 : Gérés (majorité des clients payants)" {% if participant.customer_tier == "T2 : Gérés (majorité des clients payants)" %}selected{% endif %}>T2 : Gérés (majorité des clients payants)</option>
+                            <option value="T3 : Libre-service ou petit client" {% if participant.customer_tier == "T3 : Libre-service ou petit client" %}selected{% endif %}>T3 : Libre-service ou petit client</option>
+                        </select>
+                        <div class="participant-help-text" id="customer_tier_help">Segment client pour l'analyse par catégorie</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="participant-form-group">
+                        <label class="participant-form-label" for="language">Langue préférée</label>
+                        <select class="participant-form-control" 
+                                id="language" 
+                                name="language"
+                                aria-describedby="language_help">
+                            <option value="en" {% if participant.language == "en" %}selected{% endif %}>English</option>
+                            <option value="es" {% if participant.language == "es" %}selected{% endif %}>Spanish</option>
+                            <option value="fr" {% if participant.language == "fr" %}selected{% endif %}>French</option>
+                            <option value="de" {% if participant.language == "de" %}selected{% endif %}>German</option>
+                            <option value="pt" {% if participant.language == "pt" %}selected{% endif %}>Portuguese</option>
+                            <option value="zh" {% if participant.language == "zh" %}selected{% endif %}>Chinese</option>
+                            <option value="ja" {% if participant.language == "ja" %}selected{% endif %}>Japanese</option>
+                            <option value="other" {% if participant.language == "other" %}selected{% endif %}>Autre</option>
+                        </select>
+                        <div class="participant-help-text" id="language_help">Langue principale pour la prise en charge multilingue future</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="participant-form-group">
+                        <label class="participant-form-label" for="tenure_years">
+                            Ancienneté (années)
+                        </label>
+                        <input type="number" 
+                               class="participant-form-control" 
+                               id="tenure_years" 
+                               name="tenure_years"
+                               value="{{ participant.tenure_years if participant.tenure_years is not none else '' }}"
+                               step="0.1"
+                               min="0"
+                               max="99.9"
+                               placeholder="e.g., 2.5"
+                               aria-describedby="tenure_years_help">
+                        <div class="participant-help-text" id="tenure_years_help">
+                            Nombre d'années d'utilisation de votre produit/service par le participant (optionnel)
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="participant-form-group">
+                        <label class="participant-form-label" for="company_commercial_value">
+                            Valeur commerciale de l'entreprise
+                            <i class="fas fa-info-circle ms-1" aria-hidden="true" title="Cette valeur s'applique à tous les participants de cette entreprise"></i>
+                        </label>
+                        <input type="number" 
+                               class="participant-form-control" 
+                               id="company_commercial_value" 
+                               name="company_commercial_value"
+                               value="{{ participant.company_commercial_value if participant.company_commercial_value is not none else '' }}"
+                               step="0.01"
+                               min="0"
+                               placeholder="e.g., 250000"
+                               aria-describedby="company_commercial_value_help">
+                        <div class="participant-help-text" id="company_commercial_value_help">
+                            Valeur estimée du compte en USD. Cette valeur sera synchronisée pour tous les participants de la même entreprise dans votre compte.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="participant-config-form-section">
+            <div class="participant-actions-row">
+                <div class="participant-actions-left">
+                    <a href="{{ url_for('participants.list_participants') }}" 
+                       class="participant-btn-cancel"
+                       aria-label="Annuler et revenir à la liste des participants">
+                        <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                        Cancel
+                    </a>
+                </div>
+                <div class="participant-actions-right">
+                    <button type="submit" 
+                            class="participant-btn-save"
+                            aria-label="Mettre à jour le participant">
+                        <i class="fas fa-save" aria-hidden="true"></i>
+                        Update Participant
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form validation and enhancement
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('participantEditForm');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    form.addEventListener('submit', function(e) {
+        // Add loading state
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2" aria-hidden="true"></i>Updating...';
+        submitBtn.disabled = true;
+    });
+    
+    // Auto-format email field (if not disabled)
+    const emailField = document.getElementById('email');
+    if (!emailField.hasAttribute('disabled')) {
+        emailField.addEventListener('blur', function() {
+            this.value = this.value.toLowerCase().trim();
+        });
+    }
+    
+    // Auto-format name field
+    const nameField = document.getElementById('name');
+    nameField.addEventListener('blur', function() {
+        // Capitalize first letter of each word
+        this.value = this.value.replace(/\w\S*/g, function(txt) {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        });
+    });
+});
+</script>
+{% endblock %}

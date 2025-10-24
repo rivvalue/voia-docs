@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Survey Submitted - {% if branding and branding.company_name %}{{ branding.company_name }}{% else %}VOÏA{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-body text-center">
+                {% if branding and branding.logo_url %}
+                    <div class="mb-4">
+                        <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}" class="img-fluid" style="max-height: 80px;">
+                    </div>
+                {% endif %}
+                <div class="success-icon mb-4">
+                    <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                </div>
+                <h4 class="text-success mb-3">Merci de partager votre retour d'information avec nous.</h4>
+                {% if branding and branding.company_name %}
+                    <p class="lead mb-2">Your feedback has been successfully analyzed by {{ branding.company_name }} Intelligence.</p>
+                {% else %}
+                    <p class="lead mb-2">Votre retour d'information a été analysé avec succès par VOÏA Intelligence.</p>
+                {% endif %}
+                
+                <!-- Dashboard Button -->
+                <div class="mb-4">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-chart-bar me-2"></i>View Analytics Dashboard
+                    </a>
+                </div>
+                
+                <p class="text-muted mb-4">Cela conclut votre démonstration des capacités de notre agent Voice of Client.</p>
+                
+                <!-- Next Steps Section -->
+                <div class="border rounded p-4 mb-4" style="background-color: #f8f9fa;">
+                    <h5 class="mb-3"><i class="fas fa-rocket me-2 text-primary"></i>Quelle est la prochaine étape ?</h5>
+                    <p class="text-muted mb-3">Découvrez toute la puissance de l'agent Voice of Client pour votre organisation.</p>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <a href="{{ url_for('server_auth') }}" class="btn btn-outline-primary btn-lg w-100">
+                                <i class="fas fa-redo me-2"></i>Try Another Session
+                            </a>
+                            <small class="text-muted d-block mt-2">Experience traditional survey with different scenarios</small>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="mailto:info@rivvalue.com?subject=Voice of Client Agent - Full Service Inquiry&body=Hi Rivvalue team,%0A%0AI just completed the traditional survey demonstration and I'm interested in learning more about implementing the full Voice of Client Agent service for my organization.%0A%0APlease contact me to discuss how this can benefit our customer feedback strategy.%0A%0AThank you!" 
+                               class="btn btn-primary btn-lg w-100">
+                                <i class="fas fa-envelope me-2"></i>Contact Rivvalue
+                            </a>
+                            <small class="text-muted d-block mt-2">Implement full VoC Agent for your business</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Cross-promotion section -->
+                    <div class="mt-4 pt-3 border-top">
+                        <p class="mb-3"><strong>Want to try our AI-powered conversational survey?</strong></p>
+                        <a href="{{ url_for('conversational_survey') }}" class="btn btn-outline-info">
+                            <i class="fas fa-comments me-2"></i>Try Conversational Survey
+                        </a>
+                        {% if branding and branding.company_name %}
+                            <small class="text-muted d-block mt-2">Experience natural conversation with {{ branding.company_name }} Intelligence</small>
+                        {% else %}
+                            <small class="text-muted d-block mt-2">Experience natural conversation with VOÏA Intelligence</small>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Additional Options -->
+                <div class="mt-4">
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-home me-2"></i>Return Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

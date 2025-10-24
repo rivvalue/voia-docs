@@ -1,0 +1,782 @@
+{% extends "base.html" %}
+
+{% block title %}{{ campaign.name }} - Campaign Details{% endblock %}
+
+{% block page_class %}page-campaign-details{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Campaigns', 'url': url_for('campaigns.list_campaigns')},
+    {'label': campaign.name, 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+
+<!-- Campaign Header -->
+<div class="header-gradient-primary campaign-page-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="page-title mb-1">{{ campaign.name }}</h1>
+                <p class="page-subtitle mb-0">{{ campaign.description or "No description provided" }}</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <span class="campaign-status-badge status-{{ campaign.status }}">
+                    {% if campaign.status == 'draft' %}
+                        <i class="fas fa-edit me-2"></i>Draft
+                    {% elif campaign.status == 'ready' %}
+                        <i class="fas fa-check-circle me-2"></i>Ready
+                    {% elif campaign.status == 'active' %}
+                        <i class="fas fa-play-circle me-2"></i>Active
+                    {% elif campaign.status == 'completed' %}
+                        <i class="fas fa-flag-checkered me-2"></i>Completed
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- Campaign Information Grid -->
+    <div class="info-grid">
+        <div class="info-item">
+            <div class="info-value">{{ campaign.start_date }}</div>
+            <div class="info-label">Start Date</div>
+        </div>
+        <div class="info-item">
+            <div class="info-value">{{ campaign.end_date }}</div>
+            <div class="info-label">End Date</div>
+        </div>
+        <div class="info-item">
+            <div class="info-value">{{ participant_stats.total }}</div>
+            <div class="info-label">
+                Participants
+                <i class="fas fa-info-circle info-icon" 
+                   data-bs-toggle="popover" 
+                   data-bs-trigger="click" 
+                   data-bs-placement="top"
+                   data-bs-content="Total participants associated with this campaign across all statuses (pending, invited, completed)."></i>
+            </div>
+        </div>
+        <div class="info-item">
+            <div class="info-value">
+                {% if campaign.days_remaining is not none and campaign.days_remaining >= 0 %}
+                    {{ campaign.days_remaining }}
+                {% elif campaign.days_since_ended is not none and campaign.days_since_ended >= 0 %}
+                    {{ campaign.days_since_ended }}
+                {% else %}
+                    0
+                {% endif %}
+            </div>
+            <div class="info-label">
+                {% if campaign.status == 'active' %}
+                    Days Remaining
+                    <i class="fas fa-info-circle info-icon" 
+                       data-bs-toggle="popover" 
+                       data-bs-trigger="click" 
+                       data-bs-placement="top"
+                       data-bs-content="Number of days until the campaign end date. Campaign will automatically transition to 'completed' status after this period."></i>
+                {% elif campaign.status == 'completed' %}
+                    Days Since Ended
+                    <i class="fas fa-info-circle info-icon" 
+                       data-bs-toggle="popover" 
+                       data-bs-trigger="click" 
+                       data-bs-placement="top"
+                       data-bs-content="Number of days since the campaign ended. Campaign data is preserved for historical analysis and reporting."></i>
+                {% else %}
+                    Days Until Start
+                    <i class="fas fa-info-circle info-icon" 
+                       data-bs-toggle="popover" 
+                       data-bs-trigger="click" 
+                       data-bs-placement="top"
+                       data-bs-content="Number of days until the campaign starts. Campaign will automatically transition to 'active' status on the start date."></i>
+                {% endif %}
+            </div>
+        </div>
+        <!-- Engagement Metrics -->
+        <div class="info-item">
+            <div class="info-value">{{ campaign.engagement_metrics.invitations_sent }}</div>
+            <div class="info-label">
+                <i class="fas fa-envelope"></i> Invitations Sent
+                <i class="fas fa-info-circle info-icon" 
+                   data-bs-toggle="popover" 
+                   data-bs-trigger="click" 
+                   data-bs-placement="top"
+                   data-bs-content="Successfully delivered email invitations via AWS SES/SMTP. This counts actual deliveries tracked by EmailDelivery records."></i>
+            </div>
+        </div>
+        <div class="info-item">
+            <div class="info-value">{{ campaign.engagement_metrics.surveys_completed }}</div>
+            <div class="info-label">
+                <i class="fas fa-check-circle"></i> Responses Received
+                <i class="fas fa-info-circle info-icon" 
+                   data-bs-toggle="popover" 
+                   data-bs-trigger="click" 
+                   data-bs-placement="top"
+                   data-bs-content="Total survey responses logged in the database. This tracks actual response submissions regardless of participant status."></i>
+            </div>
+        </div>
+        <div class="info-item">
+            <div class="info-value">
+                {% if campaign.engagement_metrics.participation_rate is not none %}
+                    {{ campaign.engagement_metrics.participation_rate }}%
+                {% else %}
+                    N/A
+                {% endif %}
+            </div>
+            <div class="info-label">
+                <i class="fas fa-chart-bar"></i> Participation Rate
+                <i class="fas fa-info-circle info-icon" 
+                   data-bs-toggle="popover" 
+                   data-bs-trigger="click" 
+                   data-bs-placement="top"
+                   data-bs-content="Percentage of total participants who completed surveys. Calculated as: (Responses Received / Total Participants) × 100."></i>
+            </div>
+        </div>
+        <div class="info-item">
+            <div class="info-value">
+                {% if campaign.engagement_metrics.email_success_rate is not none %}
+                    {{ campaign.engagement_metrics.email_success_rate }}%
+                {% else %}
+                    N/A
+                {% endif %}
+            </div>
+            <div class="info-label">
+                <i class="fas fa-paper-plane"></i> Email Success Rate
+                <i class="fas fa-info-circle info-icon" 
+                   data-bs-toggle="popover" 
+                   data-bs-trigger="click" 
+                   data-bs-placement="top"
+                   data-bs-content="Conversion rate from sent invitations to completed surveys. Calculated as: (Responses Received / Invitations Sent) × 100."></i>
+            </div>
+        </div>
+        {% if campaign.reminder_enabled %}
+        <div class="info-item">
+            <div class="info-value">{{ campaign.engagement_metrics.reminders_sent }}</div>
+            <div class="info-label">
+                <i class="fas fa-bell"></i> Reminders Sent
+                <i class="fas fa-info-circle info-icon" 
+                   data-bs-toggle="popover" 
+                   data-bs-trigger="click" 
+                   data-bs-placement="top"
+                   data-bs-content="Number of reminder emails sent to participants who haven't completed surveys. Reminders are sent automatically based on campaign settings."></i>
+            </div>
+        </div>
+        <div class="info-item">
+            <div class="info-value">
+                {% if campaign.engagement_metrics.reminder_conversion_rate is not none %}
+                    {{ campaign.engagement_metrics.reminder_conversion_rate }}%
+                {% else %}
+                    N/A
+                {% endif %}
+            </div>
+            <div class="info-label">
+                <i class="fas fa-chart-line"></i> Reminder Conversion
+                <i class="fas fa-info-circle info-icon" 
+                   data-bs-toggle="popover" 
+                   data-bs-trigger="click" 
+                   data-bs-placement="top"
+                   data-bs-content="Percentage of participants who completed surveys after receiving a reminder. Measures the effectiveness of reminder campaigns."></i>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Campaign Details with Tabs -->
+    <div class="campaign-details">
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs mb-3" id="campaignTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="participants-tab" data-bs-toggle="tab" data-bs-target="#participants-pane" type="button" role="tab" aria-controls="participants-pane" aria-selected="true">
+                    <i class="fas fa-users me-2"></i>Campaign Participants
+                </button>
+            </li>
+            {% if campaign.status == 'active' or campaign.status == 'completed' %}
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="responses-tab" data-bs-toggle="tab" data-bs-target="#responses-pane" type="button" role="tab" aria-controls="responses-pane" aria-selected="false">
+                    <i class="fas fa-comments me-2"></i>Individual Responses
+                    <span class="badge bg-danger ms-1">{{ campaign.engagement_metrics.surveys_completed }}</span>
+                </button>
+            </li>
+            {% if has_transcript_analysis %}
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="transcripts-tab" data-bs-toggle="tab" data-bs-target="#transcripts-pane" type="button" role="tab" aria-controls="transcripts-pane" aria-selected="false">
+                    <i class="fas fa-file-alt me-2"></i>Transcript Analysis
+                    <span class="badge bg-info ms-1" id="transcripts-count">0</span>
+                </button>
+            </li>
+            {% endif %}
+            {% endif %}
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="campaignTabContent">
+            <!-- Participants Tab -->
+            <div class="tab-pane fade show active" id="participants-pane" role="tabpanel" aria-labelledby="participants-tab">
+        
+        {% if participant_stats.total > 0 %}
+            <!-- Participant Summary Card -->
+            <div class="campaign-participant-summary-card">
+                <div class="participant-summary-header">
+                    <h5><i class="fas fa-users me-2"></i>Campaign Participants ({{ participant_stats.total }})</h5>
+                </div>
+                
+                <div class="participant-summary-stats">
+                    <div class="stat-item stat-completed">
+                        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                        <div class="stat-content">
+                            <div class="stat-value">{{ participant_stats.completed }}</div>
+                            <div class="stat-label">
+                                Completed
+                                <i class="fas fa-info-circle info-icon" 
+                                   data-bs-toggle="popover" 
+                                   data-bs-trigger="click" 
+                                   data-bs-placement="top"
+                                   data-bs-content="Participants whose status was marked as 'completed' in the system. Status is updated when a survey response is successfully submitted."></i>
+                            </div>
+                            {% if participant_stats.total > 0 %}
+                            <div class="stat-percentage">{{ ((participant_stats.completed / participant_stats.total) * 100)|round(0)|int }}%</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item stat-invited">
+                        <div class="stat-icon"><i class="fas fa-envelope"></i></div>
+                        <div class="stat-content">
+                            <div class="stat-value">{{ participant_stats.invited }}</div>
+                            <div class="stat-label">
+                                Invited
+                                <i class="fas fa-info-circle info-icon" 
+                                   data-bs-toggle="popover" 
+                                   data-bs-trigger="click" 
+                                   data-bs-placement="top"
+                                   data-bs-content="Participants whose status is 'invited'. This means an invitation email was sent but they haven't completed the survey yet."></i>
+                            </div>
+                            {% if participant_stats.total > 0 %}
+                            <div class="stat-percentage">{{ ((participant_stats.invited / participant_stats.total) * 100)|round(0)|int }}%</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item stat-pending">
+                        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                        <div class="stat-content">
+                            <div class="stat-value">{{ participant_stats.pending }}</div>
+                            <div class="stat-label">
+                                En attente
+                                <i class="fas fa-info-circle info-icon" 
+                                   data-bs-toggle="popover" 
+                                   data-bs-trigger="click" 
+                                   data-bs-placement="top"
+                                   data-bs-content="Participants not yet invited to the campaign. They are associated with the campaign but haven't received invitations."></i>
+                            </div>
+                            {% if participant_stats.total > 0 %}
+                            <div class="stat-percentage">{{ ((participant_stats.pending / participant_stats.total) * 100)|round(0)|int }}%</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="participant-summary-actions">
+                    <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" 
+                       class="btn btn-primary btn-lg">
+                        <i class="fas fa-users-cog me-2"></i>Manage Participants
+                    </a>
+                    <a href="{{ url_for('campaigns.survey_config', campaign_id=campaign.id) }}" 
+                       class="btn btn-outline-secondary">
+                        <i class="fas fa-cog me-2"></i>Survey Settings
+                        {% if campaign.has_campaign_customization %}
+                        <span class="badge bg-success ms-1">
+                            <i class="fas fa-check"></i>
+                        </span>
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            <!-- Empty State -->
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>No Participants:</strong> Add participants to this campaign before marking it as ready.
+                <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" class="btn btn-sm btn-primary ms-2">
+                    <i class="fas fa-user-plus me-1"></i>Add Participants
+                </a>
+            </div>
+        {% endif %}
+
+                    <!-- Actions de la campagne Card -->
+                    <div class="campaign-actions-card">
+                        <h4 class="campaign-actions-title">Actions de la campagne</h4>
+                        
+                        {% if campaign.status == 'draft' %}
+                            <!-- Draft State Actions -->
+                            <div class="campaign-actions-content">
+                                <div class="campaign-actions-primary">
+                                    <a href="{{ url_for('campaigns.edit_draft_campaign', campaign_id=campaign.id) }}" 
+                                       class="btn btn-primary btn-lg">
+                                        <i class="fas fa-edit me-2"></i>Edit Campaign
+                                    </a>
+                                </div>
+                                
+                                <div class="campaign-actions-secondary">
+                                    <form method="POST" action="{{ url_for('campaigns.mark_ready', campaign_id=campaign.id) }}" class="d-inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-success"
+                                                {% if not campaign.description or participant_stats.total == 0 %}disabled{% endif %}
+                                                onclick="return confirm('Mark this campaign as ready for activation? You will not be able to modify campaign details after this.');">
+                                            <i class="fas fa-check me-2"></i>Mark as Ready
+                                        </button>
+                                    </form>
+                                    
+                                    <button type="button" class="btn btn-outline-danger" onclick="confirmDelete()">
+                                        <i class="fas fa-trash-alt me-2"></i>Delete Draft
+                                    </button>
+                                </div>
+                                
+                                <div class="campaign-actions-helper">
+                                    {% if not campaign.description or participant_stats.total == 0 %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>
+                                        <span>La campagne doit contenir une description et au moins un participant pour être marquée comme prête.</span>
+                                    {% else %}
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        <span>Les campagnes brouillon peuvent être librement modifiées ou supprimées. Une fois marquées comme prêtes, les détails deviennent verrouillés.</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                        {% elif campaign.status == 'ready' %}
+                            <!-- Ready State Actions -->
+                            <div class="campaign-actions-content">
+                                <div class="campaign-actions-primary">
+                                    <form method="POST" action="{{ url_for('campaigns.activate_campaign', campaign_id=campaign.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-primary btn-lg"
+                                                onclick="return confirm('Activate this campaign? Participants will be notified and the campaign will begin collecting responses.');">
+                                            <i class="fas fa-play me-2"></i>Activate Campaign
+                                        </button>
+                                    </form>
+                                </div>
+                                
+                                <div class="campaign-actions-helper campaign-actions-helper-info">
+                                    <i class="fas fa-check-circle me-1"></i>
+                                    <span>La campagne est prête pour activation</span>
+                                </div>
+                            </div>
+                            
+                        {% elif campaign.status == 'active' %}
+                            <!-- Active State Actions -->
+                            <div class="campaign-actions-content">
+                                <div class="campaign-actions-primary">
+                                    <form method="POST" action="{{ url_for('campaigns.send_bulk_invitations', campaign_id=campaign.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-primary btn-lg"
+                                                data-bs-toggle="tooltip" 
+                                                data-bs-placement="top" 
+                                                title="Cela n'enverra des invitations qu'aux participants qui n'ont pas encore été invités."
+                                                onclick="return confirm('Send email invitations to all participants who have not been invited yet?');">
+                                            <i class="fas fa-envelope me-2"></i>Send Invitations
+                                        </button>
+                                    </form>
+                                </div>
+                                
+                                <div class="campaign-actions-secondary">
+                                    <form method="POST" action="{{ url_for('campaigns.complete_campaign', campaign_id=campaign.id) }}" class="d-inline">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-outline-secondary"
+                                                onclick="return confirm('Complete this campaign early? This will stop response collection and mark the campaign as finished.');">
+                                            <i class="fas fa-stop me-2"></i>Complete Campaign
+                                        </button>
+                                    </form>
+                                </div>
+                                
+                                <div class="campaign-actions-helper">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    <strong>Note:</strong> Send Invitations only targets participants who haven't been invited yet. Already invited participants will not receive duplicate emails.
+                                </div>
+                                
+                                <div class="campaign-actions-status campaign-actions-status-success">
+                                    <i class="fas fa-chart-line me-1"></i>
+                                    <span>La campagne est actuellement active et recueille des réponses</span>
+                                </div>
+                            </div>
+                            
+                        {% elif campaign.status == 'completed' %}
+                            <!-- Completed State -->
+                            <div class="campaign-actions-content">
+                                <div class="campaign-actions-completed">
+                                    <i class="fas fa-flag-checkered me-2"></i>
+                                    <div>
+                                        <strong>Campaign Completed</strong>
+                                        <p class="mb-0">Cette campagne s'est terminée le {{ campaign.completed_at[:10] if campaign.completed_at else campaign.end_date }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            
+            <!-- Individual Responses Tab -->
+            {% if campaign.status == 'active' or campaign.status == 'completed' %}
+            <div class="tab-pane fade" id="responses-pane" role="tabpanel" aria-labelledby="responses-tab">
+                <div class="text-center py-4">
+                    <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">Visualisation des réponses individuelles</h4>
+                    <p class="text-muted mb-4">Consultez et analysez les réponses individuelles des participants ainsi que les transcriptions de conversation.</p>
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <div class="row text-center">
+                                        <div class="col-md-6 mb-3">
+                                            <h5 class="text-primary">{{ campaign.engagement_metrics.surveys_completed }}</h5>
+                                            <small class="text-muted">Total Responses</small>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <h5 class="text-success">
+                                                {% if campaign.engagement_metrics.participation_rate %}
+                                                    {{ campaign.engagement_metrics.participation_rate }}%
+                                                {% else %}
+                                                    N/A
+                                                {% endif %}
+                                            </h5>
+                                            <small class="text-muted">Response Rate</small>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                    <div class="d-grid">
+                                        <a href="{{ url_for('campaigns.campaign_responses', campaign_id=campaign.id) }}" class="btn btn-danger">
+                                            <i class="fas fa-eye me-2"></i>View All Individual Responses
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Transcript Analysis Tab -->
+            {% if has_transcript_analysis %}
+            <div class="tab-pane fade" id="transcripts-pane" role="tabpanel" aria-labelledby="transcripts-tab">
+                <div class="row">
+                    <div class="col-md-6">
+                        <!-- Upload Transcript Section -->
+                        <div class="card h-100">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-upload me-2"></i>Upload Meeting Transcript
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="transcript-upload-form" enctype="multipart/form-data">
+                                    <div class="mb-3">
+                                        <label for="transcript-file" class="form-label">Sélectionner une transcription (fichiers .txt uniquement)</label>
+                                        <input type="file" class="form-control" id="transcript-file" name="transcript_file" accept=".txt" required>
+                                        <div class="form-text">Téléversez les transcriptions de réunions pour extraire automatiquement les insights du sondage.</div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="participant-name" class="form-label">Nom du participant <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="participant-name" name="participant_name" required placeholder="Saisir le nom complet du participant">
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="participant-email" class="form-label">Courriel du participant <span class="text-danger">*</span></label>
+                                        <input type="email" class="form-control" id="participant-email" name="participant_email" required placeholder="participant@entreprise.com">
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="participant-company" class="form-label">Nom de l'entreprise <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="participant-company" name="participant_company" required placeholder="Saisir le nom de l'entreprise">
+                                    </div>
+                                    
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-info">
+                                            <i class="fas fa-brain me-2"></i>Upload & Analyze with VOÏA
+                                        </button>
+                                    </div>
+                                </form>
+                                
+                                <!-- Upload Progress -->
+                                <div id="upload-progress" class="mt-3" style="display: none;">
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                    <small class="text-muted mt-1 d-block">Processing transcript with AI...</small>
+                                </div>
+                                
+                                <!-- Upload Status -->
+                                <div id="upload-status" class="mt-3"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <!-- Processed Transcripts Section -->
+                        <div class="card h-100">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-list me-2"></i>Processed Transcripts
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="transcripts-list">
+                                    <div class="text-center py-3">
+                                        <i class="fas fa-file-alt fa-2x text-muted mb-2"></i>
+                                        <p class="text-muted mb-0">Aucune transcription traitée pour le moment</p>
+                                        <small class="text-muted">Upload a transcript to get started</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Feature Information -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <div class="row align-items-center">
+                                <div class="col-md-1 text-center">
+                                    <i class="fas fa-info-circle fa-2x"></i>
+                                </div>
+                                <div class="col-md-11">
+                                    <h6 class="alert-heading mb-1">À propos de l'analyse des transcriptions</h6>
+                                    <p class="mb-0">VOÏA analyse les transcriptions de réunions pour en extraire les scores NPS, le sentiment, les thèmes et les insights exploitables. Téléversez des fichiers .txt provenant d'appels téléphoniques, de réunions vidéo ou de discussions en personne pour générer automatiquement des réponses de sondage et les intégrer à vos analyses de campagne.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Transcript upload and management functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Bootstrap popovers for info icons
+    const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    const popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl, {
+            trigger: 'click',
+            html: true,
+            sanitize: false
+        });
+    });
+    
+    // Close popovers when clicking outside
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('[data-bs-toggle="popover"]')) {
+            popoverList.forEach(function(popover) {
+                popover.hide();
+            });
+        }
+    });
+    
+    const uploadForm = document.getElementById('transcript-upload-form');
+    const uploadProgress = document.getElementById('upload-progress');
+    const uploadStatus = document.getElementById('upload-status');
+    const transcriptsList = document.getElementById('transcripts-list');
+    const transcriptsCount = document.getElementById('transcripts-count');
+    
+    // Load existing transcripts when tab is shown
+    document.getElementById('transcripts-tab').addEventListener('shown.bs.tab', function() {
+        loadTranscripts();
+    });
+    
+    // Handle transcript upload
+    if (uploadForm) {
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const fileInput = document.getElementById('transcript-file');
+            
+            if (!fileInput.files[0]) {
+                showUploadStatus('Please select a transcript file.', 'danger');
+                return;
+            }
+            
+            // Show progress
+            showProgress();
+            
+            // Upload transcript
+            fetch(`/business/api/campaigns/{{ campaign.id }}/transcripts/upload`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                hideProgress();
+                
+                if (data.success) {
+                    showUploadStatus('Transcript uploaded successfully! AI analysis is processing in the background.', 'success');
+                    uploadForm.reset();
+                    
+                    // Reload transcripts list after a short delay
+                    setTimeout(() => {
+                        loadTranscripts();
+                    }, 2000);
+                } else {
+                    showUploadStatus(data.error || 'Upload failed. Please try again.', 'danger');
+                }
+            })
+            .catch(error => {
+                hideProgress();
+                showUploadStatus('Network error. Please try again.', 'danger');
+                console.error('Upload error:', error);
+            });
+        });
+    }
+    
+    function showProgress() {
+        uploadProgress.style.display = 'block';
+        uploadStatus.innerHTML = '';
+        
+        // Animate progress bar
+        const progressBar = uploadProgress.querySelector('.progress-bar');
+        let width = 0;
+        const interval = setInterval(() => {
+            width += 10;
+            progressBar.style.width = width + '%';
+            if (width >= 90) {
+                clearInterval(interval);
+            }
+        }, 200);
+    }
+    
+    function hideProgress() {
+        uploadProgress.style.display = 'none';
+    }
+    
+    function showUploadStatus(message, type) {
+        uploadStatus.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+    }
+    
+    function loadTranscripts() {
+        fetch(`/business/api/campaigns/{{ campaign.id }}/transcripts`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayTranscripts(data.transcripts);
+                    updateTranscriptsCount(data.transcripts.length);
+                } else {
+                    console.error('Failed to load transcripts:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading transcripts:', error);
+            });
+    }
+    
+    function displayTranscripts(transcripts) {
+        if (transcripts.length === 0) {
+            transcriptsList.innerHTML = `
+                <div class="text-center py-3">
+                    <i class="fas fa-file-alt fa-2x text-muted mb-2"></i>
+                    <p class="text-muted mb-0">Aucune transcription traitée pour le moment</p>
+                    <small class="text-muted">Upload a transcript to get started</small>
+                </div>
+            `;
+            return;
+        }
+        
+        const transcriptsHtml = transcripts.map(transcript => `
+            <div class="transcript-item border-bottom pb-2 mb-2">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">${transcript.participant_name}</h6>
+                        <small class="text-muted d-block">${transcript.participant_email}</small>
+                        <small class="text-muted">${transcript.participant_company}</small>
+                    </div>
+                    <div class="text-end">
+                        <small class="text-muted d-block">${new Date(transcript.analyzed_at).toLocaleDateString()}</small>
+                        <div class="btn-group btn-group-sm mt-1">
+                            <button class="btn btn-outline-info btn-sm" onclick="downloadTranscript(${transcript.id})" title="Download transcript">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm" onclick="viewResponse(${transcript.id})" title="View analysis results">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                ${transcript.nps_score !== null ? `
+                    <div class="mt-2">
+                        <span class="badge bg-${transcript.nps_score >= 9 ? 'success' : transcript.nps_score >= 7 ? 'warning' : 'danger'}">
+                            NPS: ${transcript.nps_score}/10
+                        </span>
+                        <span class="badge bg-secondary ms-1">${transcript.sentiment_label}</span>
+                    </div>
+                ` : ''}
+            </div>
+        `).join('');
+        
+        transcriptsList.innerHTML = transcriptsHtml;
+    }
+    
+    function updateTranscriptsCount(count) {
+        transcriptsCount.textContent = count;
+    }
+    
+    // Global functions for transcript actions
+    window.downloadTranscript = function(transcriptId) {
+        window.location.href = `/business/api/transcripts/${transcriptId}/download`;
+    };
+    
+    window.viewResponse = function(transcriptId) {
+        // Find the transcript response and navigate to individual response view
+        fetch(`/business/api/campaigns/{{ campaign.id }}/transcripts`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const transcript = data.transcripts.find(t => t.id === transcriptId);
+                    if (transcript && transcript.participant_id) {
+                        window.location.href = `/business/campaigns/{{ campaign.id }}/responses/${transcript.participant_id}`;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error finding transcript response:', error);
+            });
+    };
+});
+
+// Delete draft campaign confirmation
+function confirmDelete() {
+    const participantCount = {{ participant_stats.total }};
+    let message = 'Are you sure you want to delete this draft campaign?';
+    
+    if (participantCount > 0) {
+        message = `This campaign has ${participantCount} participant${participantCount > 1 ? 's' : ''} associated with it.\n\nAre you sure you want to delete this draft campaign? This action cannot be undone.`;
+    }
+    
+    if (confirm(message)) {
+        // Create a form and submit it
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '{{ url_for("campaigns.delete_draft_campaign", campaign_id=campaign.id) }}';
+        
+        const csrfToken = document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = 'csrf_token';
+        csrfToken.value = '{{ csrf_token() }}';
+        form.appendChild(csrfToken);
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+{% endblock %}

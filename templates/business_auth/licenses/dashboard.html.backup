@@ -1,0 +1,389 @@
+{% extends "business_auth/base.html" %}
+{% set needs_charts = True %}
+
+{% block title %}License Management Dashboard - VOÏA Platform Admin{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Platform Admin', 'url': url_for('business_auth.admin_panel')},
+    {'label': 'License Dashboard', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+
+<div class="admin-panel">
+    <!-- Header -->
+    <div class="admin-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="admin-title">
+                    <i class="fas fa-certificate me-3"></i>License Management Dashboard
+                </h1>
+                <p class="admin-subtitle">Surveillez et gérez toutes les licences de comptes entreprise sur la plateforme</p>
+            </div>
+            <div class="col-md-4 text-end">
+                {% if is_platform_admin %}
+                <a href="{{ url_for('business_auth.admin_licenses', filter='all') }}" class="btn btn-primary me-2">
+                    <i class="fas fa-list me-2"></i>View All
+                </a>
+                {% else %}
+                <a href="{{ url_for('business_auth.business_license_overview', filter='overview') }}" class="btn btn-primary me-2">
+                    <i class="fas fa-list me-2"></i>Overview
+                </a>
+                {% endif %}
+                <a href="{{ url_for('business_auth.admin_panel') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Back
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- License Statistics -->
+    <div class="admin-section">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-chart-bar"></i>
+                License Statistics
+            </h3>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4 col-lg-2">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-total">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-value">{{ license_stats.total_accounts or 0 }}</div>
+                    <div class="stat-label">Nombre total de comptes</div>
+                    {% if license_stats.account_growth %}
+                    <div class="stat-trend {{ 'positive' if license_stats.account_growth > 0 else 'negative' }}">
+                        <i class="fas fa-{{ 'arrow-up' if license_stats.account_growth > 0 else 'arrow-down' }}"></i>
+                        {{ license_stats.account_growth }}% this month
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-md-4 col-lg-2">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-core">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-value">{{ license_stats.core_licenses or 0 }}</div>
+                    <div class="stat-label">Licences Core</div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-lg-2">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-plus">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <div class="stat-value">{{ license_stats.plus_licenses or 0 }}</div>
+                    <div class="stat-label">Licences Plus</div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-lg-2">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-pro">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <div class="stat-value">{{ license_stats.pro_licenses or 0 }}</div>
+                    <div class="stat-label">Licences Pro</div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-lg-2">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-trial">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-value">{{ license_stats.trial_accounts or 0 }}</div>
+                    <div class="stat-label">Comptes d'essai</div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-lg-2">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon-expiring">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-value">{{ license_stats.expiring_soon or 0 }}</div>
+                    <div class="stat-label">Expire bientôt</div>
+                    {% if license_stats.expiring_soon > 0 %}
+                    <div class="stat-trend negative">
+                        <i class="fas fa-clock"></i>
+                        Next 30 days
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alerts and Notifications -->
+    {% if alerts %}
+    <div class="admin-section">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-bell"></i>
+                Alerts & Notifications
+            </h3>
+        </div>
+        {% for alert in alerts %}
+        <div class="alert alert-{{ alert.type }} border-start border-4 border-{{ 'warning' if alert.type == 'warning' else 'info' if alert.type == 'info' else 'danger' }}" role="alert">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <strong>
+                        <i class="fas fa-{{ 'exclamation-triangle' if alert.type == 'warning' else 'info-circle' if alert.type == 'info' else 'times-circle' }} me-2"></i>
+                        {{ alert.title }}
+                    </strong>
+                    <p class="mb-1 mt-2">{{ alert.message }}</p>
+                    <small class="text-muted">{{ alert.timestamp.strftime('%B %d, %Y at %I:%M %p') if alert.timestamp else '' }}</small>
+                </div>
+                {% if alert.action_url %}
+                <a href="{{ alert.action_url }}" class="btn btn-sm btn-outline-primary">
+                    {{ alert.action_text or 'View Details' }}
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Charts and Recent Activity -->
+    <div class="row">
+        <!-- License Distribution Chart -->
+        <div class="col-lg-6">
+            <div class="admin-section">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="fas fa-chart-pie"></i>
+                        License Distribution
+                    </h3>
+                </div>
+                <div class="card">
+                    <div class="card-body chart-container">
+                        <canvas id="licenseChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent License Activity -->
+        <div class="col-lg-6">
+            <div class="admin-section">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="fas fa-history"></i>
+                        Recent License Activity
+                    </h3>
+                    {% if is_platform_admin %}
+                    <a href="{{ url_for('business_auth.admin_licenses', filter='all') }}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-external-link-alt me-1"></i>View All
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('business_auth.business_license_overview', filter='overview') }}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-external-link-alt me-1"></i>View Details
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="card">
+                    <div class="card-body activity-container">
+                        {% if recent_activities %}
+                            {% for activity in recent_activities %}
+                            <div class="activity-item">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div class="activity-content flex-grow-1">
+                                        <div class="fw-semibold text-dark">{{ activity.description }}</div>
+                                        <small class="text-muted">
+                                            <i class="fas fa-user me-1"></i>{{ activity.performed_by }}
+                                            {% if activity.business_name %}
+                                            | <i class="fas fa-building me-1"></i>{{ activity.business_name }}
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                    <small class="text-muted text-nowrap ms-3">
+                                        {{ activity.timestamp.strftime('%b %d, %I:%M %p') if activity.timestamp else '' }}
+                                    </small>
+                                </div>
+                                {% if not loop.last %}<hr class="my-2">{% endif %}
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-history fa-3x mb-3 empty-state-icon"></i>
+                            <p>Aucune activité de licence récente</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="admin-section">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-bolt"></i>
+                Quick Actions
+            </h3>
+        </div>
+        <div class="row g-3">
+            {% if is_platform_admin %}
+            <div class="col-md-6 col-lg-3">
+                <a href="{{ url_for('business_auth.admin_licenses', filter='all') }}" class="quick-action-card">
+                    <i class="fas fa-list"></i>
+                    <span>Afficher tous les comptes</span>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <a href="{{ url_for('business_auth.admin_licenses', filter='expiring') }}" class="quick-action-card">
+                    <i class="fas fa-clock"></i>
+                    <span>Licences en expiration</span>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <a href="{{ url_for('business_auth.admin_licenses', filter='trial') }}" class="quick-action-card">
+                    <i class="fas fa-flask"></i>
+                    <span>Comptes d'essai</span>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <a href="{{ url_for('business_auth.admin_licenses', filter='usage') }}" class="quick-action-card">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Rapports d'utilisation élevée</span>
+                </a>
+            </div>
+            {% else %}
+            <div class="col-md-6 col-lg-3">
+                <a href="{{ url_for('business_auth.business_license_overview', filter='overview') }}" class="quick-action-card">
+                    <i class="fas fa-list"></i>
+                    <span>Aperçu des licences</span>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <a href="{{ url_for('business_auth.business_license_overview', filter='expiring') }}" class="quick-action-card">
+                    <i class="fas fa-clock"></i>
+                    <span>Détails de l'expiration</span>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <a href="{{ url_for('business_auth.license_info') }}" class="quick-action-card">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Informations sur la licence</span>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <a href="{{ url_for('business_auth.business_license_overview', filter='usage') }}" class="quick-action-card">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Détails d'utilisation</span>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // License Distribution Chart
+    const ctx = document.getElementById('licenseChart');
+    if (ctx) {
+        // Get colors from CSS custom properties
+        const rootStyles = getComputedStyle(document.documentElement);
+        const coreColor = rootStyles.getPropertyValue('--primary-red').trim();
+        const plusColor = rootStyles.getPropertyValue('--license-plus-primary').trim();
+        const proColor = rootStyles.getPropertyValue('--license-pro-primary').trim();
+        const trialColor = rootStyles.getPropertyValue('--license-trial-primary').trim();
+        const whiteColor = rootStyles.getPropertyValue('--primary-white').trim();
+        const neutralDark = rootStyles.getPropertyValue('--neutral-dark').trim();
+        
+        // Helper function to convert hex to rgba
+        function hexToRgba(hex, opacity) {
+            const r = parseInt(hex.slice(1, 3), 16);
+            const g = parseInt(hex.slice(3, 5), 16);
+            const b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+        }
+        
+        new Chart(ctx.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Core', 'Plus', 'Pro', 'Trial'],
+                datasets: [{
+                    data: [
+                        {{ license_stats.core_licenses or 0 }},
+                        {{ license_stats.plus_licenses or 0 }},
+                        {{ license_stats.pro_licenses or 0 }},
+                        {{ license_stats.trial_accounts or 0 }}
+                    ],
+                    backgroundColor: [
+                        coreColor,
+                        plusColor,
+                        proColor,
+                        trialColor
+                    ],
+                    borderWidth: 3,
+                    borderColor: whiteColor
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            font: {
+                                family: 'Karla, sans-serif',
+                                size: 13,
+                                weight: '500'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: hexToRgba(neutralDark, 0.95),
+                        padding: 12,
+                        titleFont: {
+                            family: 'Karla, sans-serif',
+                            size: 14,
+                            weight: '600'
+                        },
+                        bodyFont: {
+                            family: 'Karla, sans-serif',
+                            size: 13
+                        },
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+
+{% endblock %}

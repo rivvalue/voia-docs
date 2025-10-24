@@ -22,7 +22,7 @@
 {% endif %}
 {% include 'components/breadcrumb.html' %}
 
-<div class="container py-4" role="main" aria-label="Détails de la réponse à l'enquête">
+<div class="container py-4" role="main" aria-label="{{ _('Survey response details') }}">
     <!-- Simple Page Header -->
     <div class="mb-4">
         <div class="mb-2">
@@ -48,7 +48,7 @@
     <!-- Main Content Grid -->
     <div class="public-container">
         <!-- Analysis Data Panel -->
-        <aside class="public-data-panel" role="complementary" aria-label="Données d'analyse des réponses à l'enquête">
+        <aside class="public-data-panel" role="complementary" aria-label="{{ _('Survey response analysis data') }}">
             <!-- Basic Information -->
             <section class="public-section" aria-labelledby="response-info-heading">
                 <h5 class="public-section-title" id="response-info-heading">
@@ -56,20 +56,20 @@
                     Response Information
                 </h5>
                 <div class="public-data-item">
-                    <span class="public-data-label">Répondant :</span>
+                    <span class="public-data-label">{{ _('Respondent:') }}</span>
                     <span class="public-data-value">{{ response.respondent_name }}</span>
                 </div>
                 <div class="public-data-item">
-                    <span class="public-data-label">Entreprise :</span>
+                    <span class="public-data-label">{{ _('Company:') }}</span>
                     <span class="public-data-value">{{ response.company_name }}</span>
                 </div>
                 <div class="public-data-item">
-                    <span class="public-data-label">E-mail :</span>
+                    <span class="public-data-label">{{ _('Email:') }}</span>
                     <span class="public-data-value">{{ response.respondent_email }}</span>
                 </div>
                 {% if response.tenure_with_fc %}
                 <div class="public-data-item">
-                    <span class="public-data-label">Ancienneté :</span>
+                    <span class="public-data-label">{{ _('Tenure:') }}</span>
                     <span class="public-data-value">{{ response.tenure_with_fc }}</span>
                 </div>
                 {% endif %}
@@ -82,7 +82,7 @@
                     Ratings & Scores
                 </h5>
                 <div class="public-data-item">
-                    <span class="public-data-label">Score NPS :</span>
+                    <span class="public-data-label">{{ _('NPS Score:') }}</span>
                     <span class="public-data-value">
                         <span class="public-nps-score public-nps-{{ response.nps_category.lower() }}">
                             {{ response.nps_score }}/10 ({{ response.nps_category }})
@@ -91,19 +91,19 @@
                 </div>
                 {% if response.satisfaction_rating %}
                 <div class="public-data-item">
-                    <span class="public-data-label">Satisfaction :</span>
+                    <span class="public-data-label">{{ _('Satisfaction:') }}</span>
                     <span class="public-data-value">{{ response.satisfaction_rating }}/5</span>
                 </div>
                 {% endif %}
                 {% if response.product_value_rating %}
                 <div class="public-data-item">
-                    <span class="public-data-label">Valeur du produit :</span>
+                    <span class="public-data-label">{{ _('Product Value:') }}</span>
                     <span class="public-data-value">{{ response.product_value_rating }}/5</span>
                 </div>
                 {% endif %}
                 {% if response.service_rating %}
                 <div class="public-data-item">
-                    <span class="public-data-label">Qualité du service :</span>
+                    <span class="public-data-label">{{ _('Service Quality:') }}</span>
                     <span class="public-data-value">{{ response.service_rating }}/5</span>
                 </div>
                 {% endif %}
@@ -123,9 +123,9 @@
                     AI Analysis
                 </h5>
                 <div class="public-data-item">
-                    <span class="public-data-label">Sentiment :</span>
+                    <span class="public-data-label">{{ _('Sentiment:') }}</span>
                     <span class="public-data-value">
-                        <span class="public-sentiment-indicator public-sentiment-{{ response.sentiment_label.lower() }}" role="status" aria-label="Sentiment : {{ response.sentiment_label }}">
+                        <span class="public-sentiment-indicator public-sentiment-{{ response.sentiment_label.lower() }}" role="status" aria-label="{{ _('Sentiment:') }} {{ response.sentiment_label }}">
                             {% if response.sentiment_label.lower() == 'positive' %}
                                 <i class="fas fa-smile" aria-hidden="true"></i>
                             {% elif response.sentiment_label.lower() == 'negative' %}
@@ -139,7 +139,7 @@
                 </div>
                 {% if response.sentiment_score %}
                 <div class="public-data-item">
-                    <span class="public-data-label">Score de sentiment :</span>
+                    <span class="public-data-label">{{ _('Sentiment Score:') }}</span>
                     <span class="public-data-value">{{ "%.2f"|format(response.sentiment_score) }}</span>
                 </div>
                 {% endif %}
@@ -153,7 +153,7 @@
                     <i class="fas fa-tags" aria-hidden="true"></i>
                     Key Themes
                 </h5>
-                <div class="public-themes-list" role="list" aria-label="Thèmes clés identifiés">
+                <div class="public-themes-list" role="list" aria-label="{{ _('Key themes identified') }}">
                     {% for theme in response.key_themes %}
                         <span class="public-theme-tag" role="listitem">{{ theme }}</span>
                     {% endfor %}
@@ -168,7 +168,7 @@
                     <i class="fas fa-chart-line" aria-hidden="true"></i>
                     Growth Opportunities
                 </h5>
-                <div class="public-opportunities-list" role="list" aria-label="Opportunités de croissance identifiées">
+                <div class="public-opportunities-list" role="list" aria-label="{{ _('Growth opportunities identified') }}">
                     {% for opportunity in response.growth_opportunities %}
                         <span class="public-opportunity-tag" role="listitem">{{ opportunity }}</span>
                     {% endfor %}
@@ -185,7 +185,7 @@
             </h5>
             
             {% if response.conversation_history and response.conversation_history|length > 0 %}
-            <div class="public-conversation" role="log" aria-label="Historique de la conversation">
+            <div class="public-conversation" role="log" aria-label="{{ _('Conversation history') }}">
                 {% for message in response.conversation_history %}
                 <div class="public-message public-message-{{ message.role }}" role="article" aria-label="{{ 'AI message' if message.role == 'ai' else 'User message' }}">
                     <div class="public-message-avatar public-avatar-{{ message.role }}" aria-hidden="true">

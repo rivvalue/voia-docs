@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Enquête déjà complétée - VOÏA Voice of Client{% endblock %}
+{% block title %}{{ _('Survey Already Completed') }} - VOÏA Voice of Client{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
@@ -14,9 +14,9 @@
                     </div>
                     
                     <!-- Completion Message -->
-                    <h2 class="card-title text-success mb-3">Enquête déjà complétée</h2>
+                    <h2 class="card-title text-success mb-3">{{ _('Survey Already Completed') }}</h2>
                     <p class="text-muted mb-4">
-                        Merci ! Vous avez déjà soumis votre retour d'information le <strong>{{ completion_date }}</strong> 
+                        {{ _('Thank you! You have already submitted your feedback on') }} <strong>{{ completion_date }}</strong> 
                         using the email address <strong>{{ email }}</strong>.
                     </p>
                     
@@ -30,7 +30,7 @@
                     {% if show_alternatives %}
                     <!-- Alternative Options -->
                     <div class="mb-4">
-                        <h5 class="mb-3">Que souhaitez-vous faire ensuite ?</h5>
+                        <h5 class="mb-3">{{ _('What would you like to do next?') }}</h5>
                         
                         <div class="d-grid gap-3">
                             <!-- Try Conversational Survey -->

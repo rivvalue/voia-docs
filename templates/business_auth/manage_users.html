@@ -94,7 +94,7 @@
             <thead>
                 <tr>
                     <th scope="col">User</th>
-                    <th scope="col">Rôle</th>
+                    <th scope="col">{{ _('Role') }}</th>
                     <th scope="col">Status</th>
                     <th scope="col">Last Login</th>
                     <th scope="col">Actions</th>
@@ -239,7 +239,7 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="email" class="form-label">Adresse e-mail <span class="text-danger" aria-label="required">*</span></label>
+                        <label for="email" class="form-label">{{ _('Email Address') }} <span class="text-danger" aria-label="required">*</span></label>
                         <input type="email" 
                                class="form-control" 
                                id="email" 
@@ -253,7 +253,7 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="role" class="form-label">Rôle</label>
+                        <label for="role" class="form-label">{{ _('Role') }}</label>
                         <select class="form-select" id="role" name="role" aria-describedby="role_help">
                             <option value="manager">Manager - Can manage campaigns and participants</option>
                             <option value="viewer">Viewer - Can only view data and reports</option>
@@ -262,7 +262,7 @@
                             <option value="platform_admin">Platform Admin - Cross-tenant platform management</option>
                             {% endif %}
                         </select>
-                        <div class="form-text" id="role_help">Rôle determines what features the user can access.</div>
+                        <div class="form-text" id="role_help">{{ _('Role') }} determines what features the user can access.</div>
                     </div>
                     
                     <div class="alert alert-info mb-0" role="status">
@@ -322,7 +322,7 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="edit_email" class="form-label">Adresse e-mail <span class="text-danger" aria-label="required">*</span></label>
+                        <label for="edit_email" class="form-label">{{ _('Email Address') }} <span class="text-danger" aria-label="required">*</span></label>
                         <input type="email" 
                                class="form-control" 
                                id="edit_email" 
@@ -333,7 +333,7 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="edit_role" class="form-label">Rôle</label>
+                        <label for="edit_role" class="form-label">{{ _('Role') }}</label>
                         <select class="form-select" id="edit_role" name="role" aria-describedby="edit_role_help">
                             <option value="manager">Manager - Can manage campaigns and participants</option>
                             <option value="viewer">Viewer - Can only view data and reports</option>
@@ -342,7 +342,7 @@
                             <option value="platform_admin">Platform Admin - Cross-tenant platform management</option>
                             {% endif %}
                         </select>
-                        <div class="form-text" id="edit_role_help">Rôle determines what features the user can access.</div>
+                        <div class="form-text" id="edit_role_help">{{ _('Role') }} determines what features the user can access.</div>
                     </div>
                 </div>
                 <div class="modal-footer">

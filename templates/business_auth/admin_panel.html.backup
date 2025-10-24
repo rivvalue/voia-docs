@@ -1,0 +1,1166 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Panel - Vocsa Business Account{% endblock %}
+
+{% block page_class %}page-admin-panel{% endblock %}
+
+{% block content %}
+<style>
+/* Admin panel specific styling */
+
+.admin-welcome {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.admin-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.admin-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.stat-card {
+    background: var(--primary-white);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+    margin-bottom: var(--spacing-xl);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.stat-icon.primary {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+}
+
+.stat-icon.success {
+    background: linear-gradient(135deg, var(--red-light) 0%, var(--primary-red) 100%);
+    color: var(--primary-white);
+}
+
+.stat-icon.warning {
+    background: linear-gradient(135deg, var(--red-light) 0%, var(--primary-red) 100%);
+    color: var(--primary-black);
+}
+
+.stat-icon.info {
+    background: linear-gradient(135deg, rgba(var(--primary-red-rgb, 220, 53, 69), 0.2) 0%, rgba(var(--red-hover-rgb, 200, 40, 55), 0.3) 100%);
+    color: var(--primary-red);
+}
+
+.stat-number {
+    font-size: var(--font-size-4xl);
+    font-weight: 700;
+    color: var(--primary-black);
+    margin: 0;
+    font-family: var(--font-family-headings);
+}
+
+.stat-label {
+    color: var(--gray-dark);
+    font-size: var(--font-size-sm);
+    margin: 0;
+    font-family: var(--font-family-base);
+}
+
+.admin-section {
+    background: var(--primary-white);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 2px solid var(--light-gray);
+}
+
+.section-title {
+    font-size: var(--font-size-2xl);
+    font-weight: 600;
+    color: var(--primary-black);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-family: var(--font-family-headings);
+}
+
+.campaign-item, .response-item {
+    padding: var(--spacing-xl);
+    border: 1px solid var(--light-gray);
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--spacing-lg);
+    transition: all 0.3s ease;
+    background: var(--primary-white);
+    position: relative;
+    overflow: hidden;
+}
+
+.campaign-item:hover, .response-item:hover {
+    border-color: var(--primary-red);
+    background-color: rgba(var(--primary-red-rgb, 220, 53, 69), 0.02);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.campaign-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.campaign-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary-black);
+    margin: 0;
+    font-family: var(--font-family-headings);
+    line-height: 1.3;
+}
+
+.campaign-metric {
+    font-size: 0.95rem;
+    color: var(--gray-dark);
+    margin: 0.5rem 0 1.25rem 0;
+    font-family: var(--font-family-base);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.campaign-metric i {
+    opacity: 0.7;
+    font-size: 0.85rem;
+}
+
+.campaign-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.campaign-actions .btn {
+    padding: 0.5rem 1.2rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    border: 1.5px solid transparent;
+    text-decoration: none;
+}
+
+.campaign-primary-btn {
+    background: var(--primary-red);
+    color: var(--primary-white);
+    border-color: var(--primary-red) !important;
+}
+
+.campaign-primary-btn:hover {
+    background: var(--red-hover);
+    border-color: var(--red-hover) !important;
+    color: var(--primary-white);
+    transform: translateY(-1px);
+}
+
+.campaign-secondary-btn {
+    background: transparent;
+    color: var(--primary-red);
+    border-color: var(--primary-red) !important;
+}
+
+.campaign-secondary-btn:hover {
+    background: var(--red-light);
+    color: var(--primary-red);
+    border-color: var(--primary-red) !important;
+    transform: translateY(-1px);
+}
+
+.campaign-details-toggle {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(var(--primary-red-rgb, 220, 53, 69), 0.1);
+    color: var(--primary-red);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0.6;
+}
+
+.campaign-details-toggle:hover {
+    opacity: 1;
+    background: rgba(var(--primary-red-rgb, 220, 53, 69), 0.15);
+    transform: scale(1.1);
+}
+
+.campaign-expanded-details {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--light-gray);
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.campaign-expanded-details.show {
+    display: block;
+}
+
+.campaign-expanded-details .detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.campaign-expanded-details .detail-label {
+    color: var(--gray-dark);
+    font-weight: 500;
+}
+
+.campaign-expanded-details .detail-value {
+    color: var(--primary-black);
+    font-weight: 400;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.campaign-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.campaign-status i {
+    font-size: 0.7rem;
+}
+
+.status-active {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: rgb(22, 163, 74);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.status-ready {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: rgb(37, 99, 235);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.status-draft {
+    background-color: rgba(251, 191, 36, 0.1);
+    color: rgb(217, 119, 6);
+    border: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.status-completed {
+    background-color: var(--light-gray);
+    color: var(--primary-black);
+    border: 1px solid var(--medium-gray);
+}
+
+.btn-admin {
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-admin:hover {
+    transform: translateY(-1px);
+}
+
+.account-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.account-demo {
+    background-color: var(--red-light);
+    color: var(--primary-red);
+    border: 1px solid var(--primary-red);
+}
+
+.account-customer {
+    background-color: var(--light-gray);
+    color: var(--primary-black);
+    border: 1px solid var(--medium-gray);
+}
+
+.quick-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.quick-action-btn {
+    padding: var(--spacing-lg);
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-xl);
+    background: var(--primary-white);
+    color: var(--primary-black);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    text-align: center;
+    font-family: var(--font-family-base);
+}
+
+.quick-action-btn:hover {
+    border-color: var(--primary-red);
+    background-color: var(--red-light);
+    color: var(--primary-red);
+    transform: translateY(-2px);
+}
+
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-3xl) var(--spacing-lg);
+    color: var(--gray-dark);
+    font-family: var(--font-family-base);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+</style>
+
+<div class="container-fluid">
+    <!-- Admin Header -->
+    <div class="header-gradient-primary" style="padding: var(--spacing-xl); margin-bottom: var(--spacing-xl);">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-12 col-lg-6">
+                    <div class="admin-welcome">
+                        <div class="admin-avatar">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <div>
+                            <h2 class="page-title mb-1">Bienvenue {{ current_user.get_full_name() }}</h2>
+                            <p class="page-subtitle mb-0">{{ business_account.name }}, {% if current_user.role == 'platform_admin' %}Platform Administrator{% elif current_user.role == 'business_account_admin' %}Administrator{% elif current_user.role == 'manager' %}Gérerr{% elif current_user.role == 'viewer' %}Viewer{% else %}{{ current_user.role|title }}{% endif %}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-6">
+                    <div class="admin-actions">
+                        <!-- Platform Admin Section - Always Visible -->
+                        {% if current_user.role == 'platform_admin' or current_user.is_platform_admin() %}
+                        <a href="{{ url_for('business_auth.business_analytics_hub') }}" class="btn btn-admin me-2" title="Centre d'analytique d'entreprise avec une intelligence complète de la plateforme" style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%); border-color: var(--primary-red); color: white;">
+                            <i class="fas fa-chart-line me-2"></i><span class="d-none d-sm-inline">Centre d'analytique d'entreprise</span><span class="d-sm-none">Analytique</span>
+                        </a>
+                        <a href="{{ url_for('business_auth.business_account_onboarding') }}" class="btn btn-success btn-admin me-2" title="Créer de nouveaux comptes d'entreprise avec attribution de licence">
+                            <i class="fas fa-plus-circle me-2"></i><span class="d-none d-sm-inline">Intégrer une entreprise</span><span class="d-sm-none">Intégrer</span>
+                        </a>
+                        <a href="{{ url_for('business_auth.license_dashboard') }}" class="btn btn-primary btn-admin me-2" title="Tableau de bord et aperçu de la gestion des licences">
+                            <i class="fas fa-tachometer-alt me-2"></i>License Dashboard
+                        </a>
+                        {% endif %}
+                        
+                        <!-- Primary Actions - Always Visible -->
+                        <a href="{{ url_for('campaigns.list_campaigns') }}" class="btn btn-primary btn-admin me-2" title="Gérer survey campaigns">
+                            <i class="fas fa-bullhorn me-2"></i><span class="d-none d-sm-inline">Gérer </span>Campaigns
+                        </a>
+                        <a href="{{ url_for('participants.list_participants') }}" class="btn btn-primary btn-admin me-2" title="Gérer survey participants">
+                            <i class="fas fa-users me-2"></i><span class="d-none d-sm-inline">Gérer </span>Participants
+                        </a>
+                        
+                        <!-- Quick Actions Dropdown -->
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-outline-primary btn-admin dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Actions rapides et paramètres">
+                                <i class="fas fa-cog me-2"></i>Quick Actions
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <!-- Analytique -->
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.business_analytics') }}" title="Afficher les analyses et les informations">
+                                        <i class="fas fa-chart-bar me-2 text-primary"></i>View Analytique
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                
+                                <!-- Configuration Actions -->
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.email_config') }}" title="Configurer les paramètres d'e-mail">
+                                        <i class="fas fa-envelope-open-text me-2 text-primary"></i>Email Config
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.brand_config') }}" title="Configurer les paramètres de marque">
+                                        <i class="fas fa-paint-brush me-2 text-primary"></i>Brand Settings
+                                    </a>
+                                </li>
+                                {% if business_account.account_type in ['customer', 'demo'] %}
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.survey_config') }}" title="Personnaliser l'expérience d'enquête et les paramètres de conversation">
+                                        <i class="fas fa-cog me-2 text-primary"></i>Survey Customization
+                                    </a>
+                                </li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                
+                                <!-- Gérerment Actions -->
+                                {% if current_user.has_permission('manage_users') %}
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.manage_users') }}" title="Gérer team members and users">
+                                        <i class="fas fa-users me-2 text-success"></i>Gérer Users
+                                    </a>
+                                </li>
+                                {% endif %}
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.license_info') }}" title="Afficher les informations de licence et les statistiques d'utilisation">
+                                        <i class="fas fa-certificate me-2 text-info"></i>License Info
+                                    </a>
+                                </li>
+                                {% if current_user.role == 'platform_admin' %}
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.license_info') }}" title="Afficher tous les comptes d'entreprise et les attributions de licence">
+                                        <i class="fas fa-building me-2 text-warning"></i>Gérer Licenses
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item d-lg-none" href="{{ url_for('business_auth.business_account_onboarding') }}" title="Créer de nouveaux comptes d'entreprise avec attribution de licence">
+                                        <i class="fas fa-plus-circle me-2 text-success"></i>Intégrer une entreprise
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item d-lg-none" href="{{ url_for('business_auth.license_dashboard') }}" title="Tableau de bord et aperçu de la gestion des licences">
+                                        <i class="fas fa-tachometer-alt me-2 text-primary"></i>License Dashboard
+                                    </a>
+                                </li>
+                                {% endif %}
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.audit_logs') }}" title="Afficher l'historique des activités du compte">
+                                        <i class="fas fa-clipboard-list me-2 text-secondary"></i>Audit Trail
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                
+                                <!-- Logout -->
+                                <li>
+                                    <a class="dropdown-item text-danger" href="{{ url_for('business_auth.logout') }}">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Account Type Badge -->
+        <div class="account-badge {{ 'account-demo' if business_account.account_type == 'demo' else 'account-customer' }}">
+            <i class="fas fa-{{ 'flask' if business_account.account_type == 'demo' else 'building' }} me-2"></i>
+            {{ 'Demo Environment' if business_account.account_type == 'demo' else 'Customer Account' }}
+        </div>
+
+        <!-- Team Gérerment Section (Admin Only) -->
+        {% if current_user.has_permission('manage_users') %}
+        <div class="admin-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-users"></i>
+                    Team Gérerment
+                </h3>
+                <a href="{{ url_for('business_auth.manage_users') }}" class="btn btn-primary btn-admin">
+                    <i class="fas fa-user-plus me-2"></i>Gérer Users
+                </a>
+            </div>
+            <p class="text-muted mb-0">Ajoutez et gérez les membres de votre équipe pour votre compte entreprise. Utilisation actuelle : {{ admin_data.license_info.users_used if admin_data.license_info else 1 }}/{{ admin_data.license_info.users_limit if admin_data.license_info else 5 }} utilisateurs.</p>
+        </div>
+        {% endif %}
+
+        <!-- Campaign Gérerment Section -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-bullhorn"></i>
+                    Campaign Gérerment
+                </h3>
+                <a href="{{ url_for('campaigns.list_campaigns') }}" class="btn btn-primary btn-admin">
+                    <i class="fas fa-cogs me-2"></i>Gérer Campaigns
+                </a>
+            </div>
+            <p class="text-muted mb-0">Créez et gérez des campagnes d'enquête pour votre compte entreprise.</p>
+        </div>
+
+        <!-- Statistics Overview -->
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon primary">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="stat-number">{{ admin_data.stats.total_responses }}</h3>
+                    <p class="stat-label">Nombre total de réponses</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon success">
+                        <i class="fas fa-bullhorn"></i>
+                    </div>
+                    <h3 class="stat-number">{{ admin_data.stats.total_campaigns }}</h3>
+                    <p class="stat-label">Nombre total de campagnes</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon info">
+                        <i class="fas fa-play-circle"></i>
+                    </div>
+                    <h3 class="stat-number">{{ admin_data.stats.get('active_campaigns', 0) }}</h3>
+                    <p class="stat-label">Campagnes actives</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon warning">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="stat-number">{{ admin_data.stats.get('total_participants', 0) }}</h3>
+                    <p class="stat-label">Nombre total de participants</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email Invitations Statistics -->
+        {% if admin_data.stats.get('email_stats') %}
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon success">
+                        <i class="fas fa-envelope-open"></i>
+                    </div>
+                    <h3 class="stat-number">{{ admin_data.stats.email_stats.sent_invitations }}</h3>
+                    <p class="stat-label">Invitations envoyées</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon info">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3 class="stat-number">{{ admin_data.stats.email_stats.pending_invitations }}</h3>
+                    <p class="stat-label">Invitations en attente</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3 class="stat-number">{{ admin_data.stats.email_stats.failed_invitations }}</h3>
+                    <p class="stat-label">Invitations échouées</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon primary">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h3 class="stat-number">{{ admin_data.stats.email_stats.total_invitations }}</h3>
+                    <p class="stat-label">Nombre total d'invitations</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- License Information Section -->
+        {% if admin_data.license_info %}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="admin-section">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="fas fa-certificate"></i>
+                            Current License Status
+                        </h3>
+                        <div>
+                            {% if admin_data.license_info.expires_soon %}
+                            <span class="badge bg-warning text-dark me-2">
+                                <i class="fas fa-exclamation-triangle me-1"></i>Expires Soon
+                            </span>
+                            {% endif %}
+                            <a href="{{ url_for('business_auth.license_info') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-info-circle me-1"></i>View Details
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <!-- Type de licence & Status -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="stat-card">
+                                <div class="stat-icon 
+                                    {% if admin_data.license_info.license_status == 'active' %}success
+                                    {% elif admin_data.license_info.license_status == 'trial' %}warning
+                                    {% else %}info
+                                    {% endif %}">
+                                    <i class="fas 
+                                        {% if admin_data.license_info.license_status == 'active' %}fa-check-circle
+                                        {% elif admin_data.license_info.license_status == 'trial' %}fa-hourglass-half
+                                        {% else %}fa-certificate
+                                        {% endif %}"></i>
+                                </div>
+                                <h3 class="stat-number">{{ admin_data.license_info.license_type|title }}</h3>
+                                <p class="stat-label">Type de licence</p>
+                                {% if admin_data.license_info.license_status == 'trial' %}
+                                <small class="text-muted">Trial Mode</small>
+                                {% elif admin_data.license_info.license_end %}
+                                <small class="text-muted">
+                                    {% if admin_data.license_info.days_remaining > 0 %}
+                                        {{ admin_data.license_info.days_remaining }} days remaining
+                                    {% elif admin_data.license_info.days_since_expired > 0 %}
+                                        Expired {{ admin_data.license_info.days_since_expired }} days ago
+                                    {% else %}
+                                        Expires today
+                                    {% endif %}
+                                </small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Campaign Usage -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="stat-card">
+                                <div class="stat-icon 
+                                    {% if admin_data.license_info.campaigns_remaining > 0 %}info
+                                    {% else %}warning
+                                    {% endif %}">
+                                    <i class="fas fa-bullhorn"></i>
+                                </div>
+                                <h3 class="stat-number">{{ admin_data.license_info.campaigns_used }}/{{ admin_data.license_info.campaigns_limit }}</h3>
+                                <p class="stat-label">Campagnes utilisées</p>
+                                <small class="text-muted">{{ admin_data.license_info.campaigns_remaining }} remaining</small>
+                            </div>
+                        </div>
+                        
+                        <!-- User Usage -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="stat-card">
+                                <div class="stat-icon 
+                                    {% if admin_data.license_info.users_remaining > 0 %}success
+                                    {% else %}warning
+                                    {% endif %}">
+                                    <i class="fas fa-user-friends"></i>
+                                </div>
+                                <h3 class="stat-number">{{ admin_data.license_info.users_used }}/{{ admin_data.license_info.users_limit }}</h3>
+                                <p class="stat-label">Membres de l'équipe</p>
+                                <small class="text-muted">{{ admin_data.license_info.users_remaining }} remaining</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Participant Limit -->
+                        <div class="col-lg-3 col-md-6">
+                            <div class="stat-card">
+                                <div class="stat-icon primary">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <h3 class="stat-number">{{ admin_data.license_info.participants_limit }}</h3>
+                                <p class="stat-label">Nombre maximum de participants</p>
+                                <small class="text-muted">Per campaign limit</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- License Upgrade Notice -->
+                    {% if admin_data.license_info.license_status == 'trial' or admin_data.license_info.campaigns_remaining <= 1 or admin_data.license_info.users_remaining <= 1 %}
+                    <div class="alert alert-warning mt-3" role="alert">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            <div class="flex-grow-1">
+                                {% if admin_data.license_info.license_status == 'trial' %}
+                                <strong>Trial Account:</strong> You're using a trial version. 
+                                {% elif admin_data.license_info.campaigns_remaining <= 1 %}
+                                <strong>Campaign Limit:</strong> You're approaching your campaign limit. 
+                                {% elif admin_data.license_info.users_remaining <= 1 %}
+                                <strong>User Limit:</strong> You're approaching your team member limit. 
+                                {% endif %}
+                                Consider upgrading for unlimited access to all features.
+                            </div>
+                            {% if current_user.role == 'platform_admin' %}
+                            <a href="{{ url_for('business_auth.admin_licenses') }}" class="btn btn-primary btn-sm ms-2">
+                                <i class="fas fa-arrow-up me-1"></i>Gérer Licenses
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Campaign Gérerment for All Account Types -->
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Recent Campaigns -->
+                <div class="admin-section">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="fas fa-bullhorn"></i>
+                            Campaigns
+                        </h3>
+                    </div>
+                    
+                    {% if admin_data.campaigns %}
+                        {% for campaign in admin_data.campaigns %}
+                        <div class="campaign-item" onclick="toggleCampaignDetails('campaign-{{ campaign.id }}')">
+                            <!-- Details toggle button -->
+                            <button class="campaign-details-toggle" onclick="event.stopPropagation(); toggleCampaignDetails('campaign-{{ campaign.id }}')" title="Afficher plus de détails">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            
+                            <!-- Campaign Header -->
+                            <div class="campaign-card-header">
+                                <h4 class="campaign-title">{{ campaign.name }}</h4>
+                                <span class="campaign-status 
+                                    {% if campaign.status == 'active' %}status-active
+                                    {% elif campaign.status == 'ready' %}status-ready
+                                    {% elif campaign.status == 'draft' %}status-draft
+                                    {% else %}status-completed
+                                    {% endif %}">
+                                    {% if campaign.status == 'active' %}
+                                        <i class="fas fa-play-circle"></i>Active
+                                    {% elif campaign.status == 'ready' %}
+                                        <i class="fas fa-check-circle"></i>Ready
+                                    {% elif campaign.status == 'draft' %}
+                                        <i class="fas fa-edit"></i>Draft
+                                    {% elif campaign.status == 'completed' %}
+                                        <i class="fas fa-flag-checkered"></i>Completed
+                                    {% else %}
+                                        {{ campaign.status|title }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                            
+                            <!-- Key Metric (based on campaign status) -->
+                            <div class="campaign-metric">
+                                {% if campaign.status == 'draft' and campaign.days_until_start > 0 %}
+                                    <i class="fas fa-calendar-alt"></i>
+                                    Starts in {{ campaign.days_until_start }} day{{ 's' if campaign.days_until_start != 1 else '' }}
+                                {% elif campaign.status == 'active' and campaign.days_remaining > 0 %}
+                                    <i class="fas fa-clock"></i>
+                                    {{ campaign.days_remaining }} day{{ 's' if campaign.days_remaining != 1 else '' }} remaining
+                                {% elif campaign.status == 'completed' %}
+                                    <i class="fas fa-chart-line"></i>
+                                    {{ campaign.response_count }} total responses
+                                {% else %}
+                                    <i class="fas fa-info-circle"></i>
+                                    {{ campaign.response_count }} responses collected
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Primary Actions (max 2 buttons based on status) -->
+                            <div class="campaign-actions" onclick="event.stopPropagation();">
+                                {% if campaign.status == 'active' %}
+                                    <a href="{{ url_for('business_auth.business_analytics') }}?campaign_id={{ campaign.id }}" class="btn campaign-primary-btn">
+                                        <i class="fas fa-chart-bar me-1"></i>View Analytique
+                                    </a>
+                                    <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" class="btn campaign-secondary-btn">
+                                        <i class="fas fa-users me-1"></i>Gérer Participants
+                                    </a>
+                                {% elif campaign.status == 'completed' %}
+                                    <a href="{{ url_for('business_auth.business_analytics') }}?campaign_id={{ campaign.id }}" class="btn campaign-primary-btn">
+                                        <i class="fas fa-chart-bar me-1"></i>View Results
+                                    </a>
+                                    <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="btn campaign-secondary-btn">
+                                        <i class="fas fa-eye me-1"></i>View Details
+                                    </a>
+                                {% elif campaign.status == 'draft' %}
+                                    <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="btn campaign-primary-btn">
+                                        <i class="fas fa-edit me-1"></i>Edit Campaign
+                                    </a>
+                                    <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" class="btn campaign-secondary-btn">
+                                        <i class="fas fa-users me-1"></i>Add Participants
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="btn campaign-primary-btn">
+                                        <i class="fas fa-eye me-1"></i>View Details
+                                    </a>
+                                    <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" class="btn campaign-secondary-btn">
+                                        <i class="fas fa-users me-1"></i>Participants
+                                    </a>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Expanded Details (hidden by default) -->
+                            <div class="campaign-expanded-details" id="campaign-{{ campaign.id }}-details">
+                                <div class="detail-row">
+                                    <span class="detail-label">Description :</span>
+                                    <span class="detail-value">{{ campaign.description or 'No description provided' }}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Durée :</span>
+                                    <span class="detail-value">{{ campaign.start_date }} to {{ campaign.end_date }}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Réponses :</span>
+                                    <span class="detail-value">{{ campaign.response_count }} collected</span>
+                                </div>
+                                {% if campaign.status == 'active' and campaign.days_remaining > 0 %}
+                                <div class="detail-row">
+                                    <span class="detail-label">Temps restant :</span>
+                                    <span class="detail-value">{{ campaign.days_remaining }} days</span>
+                                </div>
+                                {% elif campaign.status == 'draft' and campaign.days_until_start > 0 %}
+                                <div class="detail-row">
+                                    <span class="detail-label">Commence dans :</span>
+                                    <span class="detail-value">{{ campaign.days_until_start }} days</span>
+                                </div>
+                                {% elif campaign.status == 'completed' and campaign.days_since_ended > 0 %}
+                                <div class="detail-row">
+                                    <span class="detail-label">Terminées :</span>
+                                    <span class="detail-value">{{ campaign.days_since_ended }} days ago</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-bullhorn"></i>
+                            <h5>Aucune campagne trouvée</h5>
+                            <p>Les campagnes de démonstration apparaîtront ici une fois créées.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <!-- Recent Responses -->
+                <div class="admin-section">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="fas fa-comments"></i>
+                            Recent Responses
+                        </h3>
+                    </div>
+                    
+                    {% if admin_data.recent_responses %}
+                        {% for response in admin_data.recent_responses[:5] %}
+                        <div class="response-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">{{ response.respondent_name }}</h6>
+                                    <p class="mb-1 text-muted">{{ response.company_name }}</p>
+                                    <small class="text-muted">NPS: {{ response.nps_score }}/10</small>
+                                </div>
+                                <small class="text-muted">
+                                    {{ response.created_at[:10] if response.created_at else 'N/A' }}
+                                </small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-comments"></i>
+                            <h6>Aucune réponse récente</h6>
+                            <p class="small">Les réponses apparaîtront ici au fur et à mesure de leur réception.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-bolt"></i>
+                    Quick Actions
+                </h3>
+            </div>
+            <div class="quick-actions">
+                <a href="{{ url_for('business_auth.business_analytics') }}" class="quick-action-btn">
+                    <i class="fas fa-chart-bar d-block mb-2"></i>
+                    <strong>View Dashboard</strong><br>
+                    <small>Analytique & Insights</small>
+                </a>
+                <a href="{{ url_for('conversational_survey') }}" class="quick-action-btn">
+                    <i class="fas fa-robot d-block mb-2"></i>
+                    <strong>Test AI Survey</strong><br>
+                    <small>Conversational Interface</small>
+                </a>
+                <a href="{{ url_for('survey') }}" class="quick-action-btn">
+                    <i class="fas fa-list d-block mb-2"></i>
+                    <strong>Test Form Survey</strong><br>
+                    <small>Traditional Interface</small>
+                </a>
+                <a href="{{ url_for('server_auth') }}" class="quick-action-btn">
+                    <i class="fas fa-key d-block mb-2"></i>
+                    <strong>Generate Token</strong><br>
+                    <small>Survey Access Token</small>
+                </a>
+            </div>
+        </div>
+
+
+        <!-- Data Gérerment -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-database"></i>
+                    Data Gérerment
+                </h3>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card border-0" style="background: var(--light-gray);">
+                        <div class="card-body text-center">
+                            <i class="fas fa-download fa-3x text-primary mb-3"></i>
+                            <h5>Exporter toutes les données</h5>
+                            <p class="text-muted small">Exportez toutes les réponses aux enquêtes de l'ensemble des campagnes pour l'analyse et les rapports.</p>
+                            <button class="btn btn-primary" onclick="exportAllData()" id="exportAllBtn">
+                                <i class="fas fa-download me-2"></i>Export Full Dataset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-0" style="background: var(--light-gray);">
+                        <div class="card-body">
+                            <h6 class="mb-3"><i class="fas fa-info-circle me-2 text-primary"></i>Informations sur l'exportation</h6>
+                            <ul class="small mb-0" style="list-style: none; padding-left: 0;">
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Inclut toutes les campagnes</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Format JSON pour une analyse facilitée</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Données de réponse complètes</li>
+                                <li class="mb-0"><i class="fas fa-check text-success me-2"></i>Accès administrateur requis</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Session Info -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-info-circle"></i>
+                    Session Information
+                </h3>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Account:</strong> {{ business_account.name }}</p>
+                    <p><strong>User:</strong> {{ current_user.full_name }} ({{ current_user.email }})</p>
+                    <p><strong>Role:</strong> {{ current_user.role|title }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Account Type:</strong> {{ business_account.account_type|title }}</p>
+                    <p><strong>Status:</strong> 
+                        <span class="badge bg-success">{{ business_account.status|title }}</span>
+                    </p>
+                    <p><strong>Environment:</strong> 
+                        <span class="badge bg-info">{{ 'Demo' if business_account.account_type == 'demo' else 'Production' }}</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-refresh session status
+function checkSessionStatus() {
+    fetch('{{ url_for("business_auth.session_status") }}')
+        .then(response => response.json())
+        .then(data => {
+            if (!data.authenticated) {
+                alert('Your session has expired. Please log in again.');
+                window.location.href = '{{ url_for("business_auth.login") }}';
+            }
+        })
+        .catch(error => {
+            console.error('Session check failed:', error);
+        });
+}
+
+// Check session every 30 minutes
+setInterval(checkSessionStatus, 30 * 60 * 1000);
+
+// Add loading states to buttons
+document.querySelectorAll('.quick-action-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const icon = this.querySelector('i');
+        const originalClass = icon.className;
+        icon.className = 'fas fa-spinner fa-spin d-block mb-2';
+        
+        setTimeout(() => {
+            icon.className = originalClass;
+        }, 3000);
+    });
+});
+
+// Progressive disclosure for campaign details
+function toggleCampaignDetails(campaignId) {
+    const detailsElement = document.getElementById(campaignId + '-details');
+    const toggleButton = document.querySelector(`[onclick*="${campaignId}"] .campaign-details-toggle i`);
+    
+    if (!detailsElement || !toggleButton) return;
+    
+    const isExpanded = detailsElement.classList.contains('show');
+    
+    if (isExpanded) {
+        // Collapse
+        detailsElement.classList.remove('show');
+        toggleButton.className = 'fas fa-chevron-down';
+        detailsElement.style.maxHeight = '0';
+    } else {
+        // Expand
+        detailsElement.classList.add('show');
+        toggleButton.className = 'fas fa-chevron-up';
+        detailsElement.style.maxHeight = detailsElement.scrollHeight + 'px';
+    }
+}
+
+// Enhanced button interactions
+document.addEventListener('DOMContentLoaded', function() {
+    // Add smooth transitions to campaign cards
+    document.querySelectorAll('.campaign-item').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+    
+    // Prevent card click when clicking on action buttons
+    document.querySelectorAll('.campaign-actions a').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    });
+});
+
+// Export all data function (moved from ADMIN tab to Settings)
+function exportAllData() {
+    const btn = document.getElementById('exportAllBtn');
+    const originalHTML = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Exporting...';
+    btn.disabled = true;
+    
+    fetch('/api/export_data', {
+        method: 'GET',
+        credentials: 'include'
+    })
+    .then(response => {
+        if (response.status === 403 || response.status === 401) {
+            alert('Authentication required. Please log in to export data.');
+            window.location.href = '/business/login';
+            return null;
+        }
+        if (!response.ok) {
+            return response.json().then(err => {
+                throw new Error(err.error || `HTTP error! status: ${response.status}`);
+            });
+        }
+        return response.clone().text().then(text => {
+            try {
+                return JSON.parse(text);
+            } catch(e) {
+                throw new Error('Failed to parse server response. The data might be too large.');
+            }
+        });
+    })
+    .then(result => {
+        if (!result) return;
+        
+        const data = result.data || result;
+        const dataStr = JSON.stringify(data, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const fileName = `voïa_full_export_${new Date().toISOString().split('T')[0]}.json`;
+        
+        const linkElement = document.createElement('a');
+        linkElement.setAttribute('href', url);
+        linkElement.setAttribute('download', fileName);
+        linkElement.click();
+        
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+        
+        if (result.export_info) {
+            alert(`Export successful! ${result.export_info.total_responses} responses exported.`);
+        }
+    })
+    .catch(error => {
+        console.error('Error exporting data:', error);
+        alert(`Error exporting data: ${error.message}`);
+    })
+    .finally(() => {
+        btn.innerHTML = originalHTML;
+        btn.disabled = false;
+    });
+}
+
+</script>
+{% endblock %}

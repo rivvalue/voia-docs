@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de génération de jeton</title>
+    <style>
+        body { padding: 20px; font-family: Arial, sans-serif; }
+        .result { margin: 10px 0; padding: 10px; background: #f5f5f5; }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e8; color: #2e7d32; }
+        button { padding: 10px 20px; margin: 5px; }
+        input { padding: 8px; margin: 5px; width: 300px; }
+    </style>
+</head>
+<body>
+    <h1>Test de génération de jeton</h1>
+    
+    <div>
+        <input type="email" id="emailInput" placeholder="Saisissez l'adresse e-mail" value="test@example.com">
+        <button onclick="testTokenGeneration()">Générer un jeton</button>
+        <button onclick="clearResults()">Effacer les résultats</button>
+    </div>
+    
+    <div id="results"></div>
+    
+    <script>
+    async function testTokenGeneration() {
+        const email = document.getElementById('emailInput').value.trim();
+        const resultsDiv = document.getElementById('results');
+        
+        if (!email) {
+            addResult('Please enter an email address', 'error');
+            return;
+        }
+        
+        addResult('Starting token generation test...', 'info');
+        
+        try {
+            // Test 1: Check current URL
+            addResult(`Current URL: ${window.location.origin}`, 'info');
+            addResult(`Full URL: ${window.location.href}`, 'info');
+            
+            // Test 2: Smart URL construction for different domains
+            let tokenUrl;
+            const host = window.location.host;
+            addResult(`Host: ${host}`, 'info');
+            addResult(`Protocol: ${window.location.protocol}`, 'info');
+            addResult(`Origin: ${window.location.origin}`, 'info');
+            
+            // Domain-specific URL strategy
+            if (host.includes('.replit.app') || host.includes('localhost') || host.includes('127.0.0.1')) {
+                // Replit domains and localhost - use relative paths
+                tokenUrl = '/auth/request-token';
+                addResult('Using relative URL for Replit/localhost', 'info');
+            } else {
+                // Custom domains - use absolute URLs
+                tokenUrl = `${window.location.origin}/auth/request-token`;
+                addResult('Using absolute URL for custom domain', 'info');
+            }
+            addResult(`Final token URL: ${tokenUrl}`, 'info');
+            
+            // Test 3: Test browser fetch support
+            if (typeof fetch === 'undefined') {
+                addResult('ERROR: fetch() not supported in this browser', 'error');
+                return;
+            }
+            addResult('fetch() is supported', 'success');
+            
+            // Test 4: Make the request with detailed error handling
+            addResult('Making request...', 'info');
+            let response;
+            try {
+                response = await fetch(tokenUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email: email })
+                });
+                addResult('Request completed', 'success');
+            } catch (fetchError) {
+                addResult(`FETCH ERROR: ${fetchError.message}`, 'error');
+                addResult(`Fetch error type: ${fetchError.name}`, 'error');
+                addResult(`Fetch error stack: ${fetchError.stack}`, 'error');
+                return;
+            }
+            
+            addResult(`Response status: ${response.status}`, response.ok ? 'success' : 'error');
+            addResult(`Response status text: ${response.statusText}`, 'info');
+            addResult(`Response type: ${response.type}`, 'info');
+            addResult(`Response URL: ${response.url}`, 'info');
+            
+            // Test 5: Check response headers
+            try {
+                const headerEntries = [...response.headers.entries()];
+                addResult(`Response headers count: ${headerEntries.length}`, 'info');
+                headerEntries.forEach(([key, value]) => {
+                    addResult(`Header ${key}: ${value}`, 'info');
+                });
+            } catch (headerError) {
+                addResult(`Header parsing error: ${headerError.message}`, 'error');
+            }
+            
+            // Test 6: Parse response
+            let data;
+            try {
+                const responseText = await response.text();
+                addResult(`Raw response: ${responseText}`, 'info');
+                data = JSON.parse(responseText);
+                addResult('JSON parsing successful', 'success');
+            } catch (parseError) {
+                addResult(`JSON PARSE ERROR: ${parseError.message}`, 'error');
+                return;
+            }
+            
+            if (response.ok) {
+                addResult(`SUCCESS: Token generated for ${data.email}`, 'success');
+                addResult(`Token: ${data.token.substring(0, 50)}...`, 'success');
+                addResult(`Expires in: ${data.expires_in} seconds`, 'info');
+                addResult(`Message: ${data.message}`, 'success');
+            } else {
+                addResult(`ERROR: ${data.error || 'Unknown error'}`, 'error');
+                addResult(`Error code: ${data.code || 'N/A'}`, 'error');
+            }
+            
+        } catch (error) {
+            addResult(`UNEXPECTED ERROR: ${error.message}`, 'error');
+            addResult(`Error type: ${error.name}`, 'error');
+            addResult(`Error stack: ${error.stack}`, 'error');
+        }
+    }
+    
+    function addResult(message, type = 'info') {
+        const resultsDiv = document.getElementById('results');
+        const div = document.createElement('div');
+        div.className = `result ${type}`;
+        div.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${message}`;
+        resultsDiv.appendChild(div);
+        div.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function clearResults() {
+        document.getElementById('results').innerHTML = '';
+    }
+    </script>
+</body>
+</html>

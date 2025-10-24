@@ -11,7 +11,7 @@
 #}
 
 {% if breadcrumb_items and breadcrumb_items|length > 0 %}
-<nav class="breadcrumb-nav" aria-label="Navigation par fil d'Ariane">
+<nav class="breadcrumb-nav" aria-label="{{ _('Breadcrumb navigation') }}">
     <div class="container">
         <ol class="breadcrumb-list">
             {% for item in breadcrumb_items %}
@@ -21,7 +21,7 @@
                     </li>
                 {% else %}
                     <li class="breadcrumb-item">
-                        <a href="{{ item.url }}" class="breadcrumb-link" aria-label="Aller à {{ item.label }}">
+                        <a href="{{ item.url }}" class="breadcrumb-link" aria-label="{{ _('Navigate to {{ item.label }}') }}">
                             {{ item.label }}
                         </a>
                         <i class="fas fa-chevron-right breadcrumb-separator" aria-hidden="true"></i>

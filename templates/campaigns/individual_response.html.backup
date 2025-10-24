@@ -1,0 +1,542 @@
+{% extends "base.html" %}
+
+{% block title %}{{ participant.name }} - Response Details{% endblock %}
+
+{% block page_class %}page-individual-response{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Campaigns', 'url': url_for('campaigns.list_campaigns')},
+    {'label': campaign.name, 'url': url_for('campaigns.view_campaign', campaign_id=campaign.id)},
+    {'label': 'Responses', 'url': url_for('campaigns.campaign_responses', campaign_id=campaign.id)},
+    {'label': participant.name, 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+<style>
+/* Individual response specific styling */
+.response-header {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+    padding: 1.5rem 0;
+    border-radius: var(--radius-2xl);
+    margin-bottom: 2rem;
+}
+
+.response-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    min-height: 70vh;
+}
+
+.structured-data-panel {
+    background: var(--primary-white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-lg);
+    height: fit-content;
+    position: sticky;
+    top: 2rem;
+}
+
+.conversation-panel {
+    background: var(--primary-white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-lg);
+}
+
+.data-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.data-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.section-title {
+    color: var(--primary-red);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.section-title i {
+    margin-right: 0.5rem;
+}
+
+.data-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    padding: 0.25rem 0;
+}
+
+.data-label {
+    font-weight: 500;
+    color: var(--gray-dark);
+}
+
+.data-value {
+    color: var(--primary-dark);
+    font-weight: 500;
+}
+
+.nps-score {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.nps-promoter {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.nps-passive {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.nps-detractor {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.conversation-transcript {
+    max-height: 70vh;
+    overflow-y: auto;
+    background: var(--light-gray);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+}
+
+.message {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.message-ai {
+    justify-content: flex-start;
+}
+
+.message-user {
+    justify-content: flex-end;
+    flex-direction: row-reverse;
+}
+
+.message-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.avatar-ai {
+    background-color: var(--primary-red);
+    color: var(--primary-white);
+}
+
+.avatar-user {
+    background-color: var(--primary-blue);
+    color: var(--primary-white);
+}
+
+.message-content {
+    background: var(--primary-white);
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1rem;
+    max-width: 70%;
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.message-ai .message-content {
+    border-bottom-left-radius: 4px;
+}
+
+.message-user .message-content {
+    border-bottom-right-radius: 4px;
+    background-color: var(--red-light);
+}
+
+.message-timestamp {
+    font-size: 0.75rem;
+    color: var(--gray-dark);
+    margin-top: 0.25rem;
+    opacity: 0.7;
+}
+
+.search-highlight {
+    background-color: yellow;
+    padding: 0.1rem 0.2rem;
+    border-radius: 3px;
+}
+
+.themes-list, .risk-factors-list, .opportunities-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.theme-tag, .risk-tag, .opportunity-tag {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.theme-tag {
+    background-color: var(--red-light);
+    color: var(--primary-red);
+}
+
+.risk-tag {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.opportunity-tag {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.sentiment-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.sentiment-positive {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.sentiment-negative {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.sentiment-neutral {
+    background-color: var(--light-gray);
+    color: var(--gray-dark);
+}
+
+.search-container {
+    background: var(--primary-white);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    margin-bottom: 1rem;
+    border: 1px solid var(--light-gray);
+}
+
+@media (max-width: 768px) {
+    .response-container {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .structured-data-panel {
+        position: static;
+        order: 2;
+    }
+    
+    .conversation-panel {
+        order: 1;
+    }
+    
+    .message-content {
+        max-width: 85%;
+    }
+}
+</style>
+
+<div class="container">
+    <!-- Response Header -->
+    <div class="response-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-1">{{ participant.name or 'Unknown Participant' }}</h1>
+                    <p class="mb-0 opacity-75">{{ participant.email or 'No email' }} | {{ campaign.name }}</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="{{ url_for('campaigns.campaign_responses', campaign_id=campaign.id) }}{% if search_query %}?search={{ search_query }}{% endif %}" class="btn btn-outline-light">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Responses
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Container for Transcript Highlighting -->
+    {% if search_query %}
+    <div class="search-container">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <i class="fas fa-search text-muted me-2"></i>
+                <span class="text-muted">Résultats de recherche mis en surbrillance pour : <strong>"{{ search_query }}"</strong></span>
+            </div>
+            <a href="{{ url_for('campaigns.individual_response', campaign_id=campaign.id, participant_id=participant.id) }}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-times me-1"></i>Clear Search
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Main Response Container -->
+    <div class="response-container">
+        <!-- Structured Data Panel (Left Side) -->
+        <div class="structured-data-panel">
+            <!-- Basic Information -->
+            <div class="data-section">
+                <h3 class="section-title">
+                    <i class="fas fa-user"></i>Participant Information
+                </h3>
+                <div class="data-item">
+                    <span class="data-label">Nom :</span>
+                    <span class="data-value">{{ response.respondent_name or 'Unknown' }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">E-mail :</span>
+                    <span class="data-value">{{ response.respondent_email or 'No email' }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Company:</span>
+                    <span class="data-value">{{ response.company_name or 'Unknown' }}</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Ancienneté :</span>
+                    <span class="data-value">{{ response.tenure_with_fc or 'Not specified' }}</span>
+                </div>
+            </div>
+
+            <!-- NPS and Ratings -->
+            <div class="data-section">
+                <h3 class="section-title">
+                    <i class="fas fa-star"></i>Ratings & Scores
+                </h3>
+                <div class="data-item">
+                    <span class="data-label">NPS Score:</span>
+                    <span class="nps-score nps-{{ response.nps_category.lower() if response.nps_category else 'unknown' }}">
+                        {{ response.nps_score if response.nps_score is not none else 'N/A' }}
+                    </span>
+                </div>
+                {% if response.satisfaction_rating %}
+                <div class="data-item">
+                    <span class="data-label">Satisfaction :</span>
+                    <span class="data-value">{{ response.satisfaction_rating }}/5</span>
+                </div>
+                {% endif %}
+                {% if response.product_value_rating %}
+                <div class="data-item">
+                    <span class="data-label">Product Value:</span>
+                    <span class="data-value">{{ response.product_value_rating }}/5</span>
+                </div>
+                {% endif %}
+                {% if response.service_rating %}
+                <div class="data-item">
+                    <span class="data-label">Service Quality:</span>
+                    <span class="data-value">{{ response.service_rating }}/5</span>
+                </div>
+                {% endif %}
+                {% if response.pricing_rating %}
+                <div class="data-item">
+                    <span class="data-label">Pricing:</span>
+                    <span class="data-value">{{ response.pricing_rating }}/5</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- AI Analysis -->
+            <div class="data-section">
+                <h3 class="section-title">
+                    <i class="fas fa-brain"></i>AI Analysis
+                </h3>
+                {% if response.sentiment_label %}
+                <div class="data-item">
+                    <span class="data-label">Sentiment:</span>
+                    <span class="sentiment-indicator sentiment-{{ response.sentiment_label.lower() if response.sentiment_label else 'neutral' }}">
+                        {% if response.sentiment_label.lower() == 'positive' %}
+                            <i class="fas fa-smile"></i>
+                        {% elif response.sentiment_label.lower() == 'negative' %}
+                            <i class="fas fa-frown"></i>
+                        {% else %}
+                            <i class="fas fa-meh"></i>
+                        {% endif %}
+                        {{ response.sentiment_label }}
+                        {% if response.sentiment_score %}({{ "%.2f"|format(response.sentiment_score) }}){% endif %}
+                    </span>
+                </div>
+                {% endif %}
+                
+                {% if response.churn_risk_level %}
+                <div class="data-item">
+                    <span class="data-label">Churn Risk:</span>
+                    <span class="data-value">{{ response.churn_risk_level }} 
+                        {% if response.churn_risk_score %}({{ "%.1f"|format(response.churn_risk_score * 10) }}%){% endif %}
+                    </span>
+                </div>
+                {% endif %}
+
+                {% if response.key_themes %}
+                <div class="mb-3">
+                    <span class="data-label d-block mb-2">Key Themes:</span>
+                    <div class="themes-list">
+                        {% for theme in response.key_themes %}
+                        <span class="theme-tag">{{ theme }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Response Metadata -->
+            <div class="data-section">
+                <h3 class="section-title">
+                    <i class="fas fa-info-circle"></i>Response Metadata
+                </h3>
+                <div class="data-item">
+                    <span class="data-label">Submitted:</span>
+                    <span class="data-value">
+                        {% if response.updated_at %}
+                            {% set display_date = response.updated_at[:10] if response.updated_at else 'N/A' %}
+                            {% set display_time = response.updated_at[11:16] if response.updated_at and response.updated_at|length > 16 else '' %}
+                            {{ display_date }} {{ display_time }} <span style="color: #666; font-size: 0.9em;">(updated)</span>
+                        {% elif response.created_at %}
+                            {% set created_date = response.created_at[:10] if response.created_at else 'N/A' %}
+                            {% set created_time = response.created_at[11:16] if response.created_at and response.created_at|length > 16 else '' %}
+                            {{ created_date }} {{ created_time }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="data-item">
+                    <span class="data-label">Campaign:</span>
+                    <span class="data-value">{{ campaign.name }}</span>
+                </div>
+                {% if response.commercial_value %}
+                <div class="data-item">
+                    <span class="data-label">Commercial Value:</span>
+                    <span class="data-value">${{ "{:,.0f}".format(response.commercial_value) }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Text Responses -->
+            {% if response.improvement_feedback or response.recommendation_reason or response.additional_comments %}
+            <div class="data-section">
+                <h3 class="section-title">
+                    <i class="fas fa-comment-alt"></i>Written Feedback
+                </h3>
+                {% if response.improvement_feedback %}
+                <div class="mb-2">
+                    <span class="data-label d-block">Improvement Feedback:</span>
+                    <p class="text-muted">{{ response.improvement_feedback }}</p>
+                </div>
+                {% endif %}
+                {% if response.recommendation_reason %}
+                <div class="mb-2">
+                    <span class="data-label d-block">Recommendation Reason:</span>
+                    <p class="text-muted">{{ response.recommendation_reason }}</p>
+                </div>
+                {% endif %}
+                {% if response.additional_comments %}
+                <div class="mb-2">
+                    <span class="data-label d-block">Additional Comments:</span>
+                    <p class="text-muted">{{ response.additional_comments }}</p>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Conversation Panel (Right Side) -->
+        <div class="conversation-panel">
+            <h3 class="section-title">
+                <i class="fas fa-comments"></i>Conversation Transcript
+            </h3>
+            
+            <div class="conversation-transcript">
+                {% if conversation_history %}
+                    {% for message in conversation_history %}
+                    <div class="message message-{{ 'ai' if message.role == 'ai' or message.role == 'assistant' or message.sender == 'ai' else 'user' }}">
+                        <div class="message-avatar avatar-{{ 'ai' if message.role == 'ai' or message.role == 'assistant' or message.sender == 'ai' else 'user' }}">
+                            {% if message.role == 'ai' or message.role == 'assistant' or message.sender == 'ai' %}
+                                AI
+                            {% else %}
+                                {{ participant.name[:2].upper() if participant.name else 'U' }}
+                            {% endif %}
+                        </div>
+                        <div class="message-content">
+                            {% if search_query and message.get('highlighted_content') %}
+                                {{ message.highlighted_content|safe }}
+                            {% else %}
+                                {{ message.content or message.message or message.get('text', 'No content') }}
+                            {% endif %}
+                            {% if message.timestamp %}
+                            <div class="message-timestamp">
+                                {% if message.timestamp %}
+                                    {% if message.timestamp == 'now' %}
+                                        Now
+                                    {% else %}
+                                        {{ message.timestamp if message.timestamp and message.timestamp != 'now' else 'Now' }}
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-comment-slash fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No Conversation History</h5>
+                        <p class="text-muted">This response doesn't contain conversational transcript data.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-scroll to bottom of transcript
+document.addEventListener('DOMContentLoaded', function() {
+    const transcript = document.querySelector('.conversation-transcript');
+    if (transcript) {
+        transcript.scrollTop = transcript.scrollHeight;
+    }
+});
+
+// Add smooth scrolling for internal links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth'
+        });
+    });
+});
+</script>
+{% endblock %}

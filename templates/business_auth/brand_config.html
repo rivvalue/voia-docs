@@ -19,7 +19,7 @@
                 <i class="fas fa-palette me-2" aria-hidden="true"></i>
                 Brand Settings
             </h1>
-            <p>Personnalisez votre identité de marque pour {{ business_account.name }}</p>
+            <p>{{ _('Customize your brand identity for {{ business_account.name }}') }}</p>
         </div>
     </div>
 
@@ -47,24 +47,24 @@
             <div class="brand-preview-item">
                 {% if branding_config.logo_filename and branding_config.get_logo_url() %}
                     <img src="{{ branding_config.get_logo_url() }}" 
-                         alt="Logo de l'entreprise" 
+                         alt="{{ _('Company Logo') }}" 
                          class="brand-logo-preview">
                 {% else %}
-                    <div class="brand-logo-placeholder" role="img" aria-label="Aucun logo uploaded">
-                        Aucun logo<br>uploaded
+                    <div class="brand-logo-placeholder" role="img" aria-label="{{ _('No logo') }} uploaded">
+                        {{ _('No logo') }}<br>uploaded
                     </div>
                 {% endif %}
                 <div class="brand-preview-details">
-                    <div class="brand-preview-label">Logo de l'entreprise</div>
+                    <div class="brand-preview-label">{{ _('Company Logo') }}</div>
                     <p class="brand-preview-value {{ 'empty' if not branding_config.logo_filename else '' }}">
-                        {{ branding_config.logo_filename if branding_config.logo_filename else 'Aucun logo uploaded' }}
+                        {{ branding_config.logo_filename if branding_config.logo_filename else '{{ _('No logo') }} uploaded' }}
                     </p>
                 </div>
             </div>
             
             <div class="brand-preview-item">
                 <div class="brand-preview-details">
-                    <div class="brand-preview-label">Nom d'affichage de l'entreprise</div>
+                    <div class="brand-preview-label">{{ _('Company Display Name') }}</div>
                     <p class="brand-preview-value {{ 'empty' if not branding_config.company_display_name else '' }}">
                         {{ branding_config.get_company_display_name() }}
                         {% if not branding_config.company_display_name %}(default: {{ business_account.name }}){% endif %}
@@ -86,7 +86,7 @@
             </h3>
             
             <div class="brand-form-group">
-                <label class="brand-form-label" for="company_display_name">Nom d'affichage de l'entreprise</label>
+                <label class="brand-form-label" for="company_display_name">{{ _('Company Display Name') }}</label>
                 <input type="text" 
                        class="brand-form-control" 
                        id="company_display_name" 
@@ -95,7 +95,7 @@
                        placeholder="{{ business_account.name }}"
                        aria-describedby="company_display_name_help">
                 <div class="brand-help-text" id="company_display_name_help">
-                    Ce nom sera affiché dans les enquêtes et les e-mails. Laissez vide pour utiliser « {{ business_account.name }} ».
+                    {{ _('This name will be displayed in surveys and emails. Leave blank to use "{{ business_account.name }}".') }}
                 </div>
             </div>
         </div>
@@ -110,7 +110,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="brand-form-group">
-                        <label class="brand-form-label" for="primary_color">Couleur principale</label>
+                        <label class="brand-form-label" for="primary_color">{{ _('Primary Color') }}</label>
                         <input type="color" 
                                class="brand-form-control" 
                                id="primary_color" 
@@ -118,13 +118,13 @@
                                value="{{ branding_config.primary_color if branding_config.primary_color else '#dc3545' }}"
                                aria-describedby="primary_color_help">
                         <div class="brand-help-text" id="primary_color_help">
-                            Couleur principale de la marque utilisée pour les en-têtes, les boutons et les accents.
+                            {{ _('Main brand color used for headers, buttons, and accents.') }}
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="brand-form-group">
-                        <label class="brand-form-label" for="secondary_color">Couleur secondaire</label>
+                        <label class="brand-form-label" for="secondary_color">{{ _('Secondary Color') }}</label>
                         <input type="color" 
                                class="brand-form-control" 
                                id="secondary_color" 
@@ -132,7 +132,7 @@
                                value="{{ branding_config.secondary_color if branding_config.secondary_color else '#6c757d' }}"
                                aria-describedby="secondary_color_help">
                         <div class="brand-help-text" id="secondary_color_help">
-                            Couleur complémentaire pour les bordures et les éléments discrets.
+                            {{ _('Supporting color for borders and subtle elements.') }}
                         </div>
                     </div>
                 </div>
@@ -141,7 +141,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="brand-form-group">
-                        <label class="brand-form-label" for="accent_color">Couleur d'accent</label>
+                        <label class="brand-form-label" for="accent_color">{{ _('Accent Color') }}</label>
                         <input type="color" 
                                class="brand-form-control" 
                                id="accent_color" 
@@ -149,13 +149,13 @@
                                value="{{ branding_config.accent_color if branding_config.accent_color else '#28a745' }}"
                                aria-describedby="accent_color_help">
                         <div class="brand-help-text" id="accent_color_help">
-                            Couleur de surbrillance pour les états de succès et les éléments d'appel à l'action.
+                            {{ _('Highlight color for success states and call-to-action elements.') }}
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="brand-form-group">
-                        <label class="brand-form-label" for="text_color">Couleur du texte</label>
+                        <label class="brand-form-label" for="text_color">{{ _('Text Color') }}</label>
                         <input type="color" 
                                class="brand-form-control" 
                                id="text_color" 
@@ -163,7 +163,7 @@
                                value="{{ branding_config.text_color if branding_config.text_color else '#212529' }}"
                                aria-describedby="text_color_help">
                         <div class="brand-help-text" id="text_color_help">
-                            Couleur de texte principale pour la lisibilité.
+                            {{ _('Primary text color for readability.') }}
                         </div>
                     </div>
                 </div>
@@ -172,7 +172,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="brand-form-group">
-                        <label class="brand-form-label" for="background_color">Couleur d'arrière-plan</label>
+                        <label class="brand-form-label" for="background_color">{{ _('Background Color') }}</label>
                         <input type="color" 
                                class="brand-form-control" 
                                id="background_color" 
@@ -180,13 +180,13 @@
                                value="{{ branding_config.background_color if branding_config.background_color else '#ffffff' }}"
                                aria-describedby="background_color_help">
                         <div class="brand-help-text" id="background_color_help">
-                            Couleur d'arrière-plan pour les documents et les rapports.
+                            {{ _('Background color for documents and reports.') }}
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="brand-form-group">
-                        <label class="brand-form-label">Aperçu des couleurs</label>
+                        <label class="brand-form-label">{{ _('Color Preview') }}</label>
                         <div class="brand-color-preview" role="img" aria-label="Color palette preview">
                             <div class="brand-color-preview-item" 
                                  id="preview-primary" 
@@ -202,7 +202,7 @@
                                  title="Accent color"></div>
                         </div>
                         <div class="brand-help-text">
-                            Aperçu en direct de votre palette de couleurs.
+                            {{ _('Live preview of your color palette.') }}
                         </div>
                     </div>
                 </div>
@@ -213,11 +213,11 @@
         <div class="brand-config-form-section">
             <h3 class="brand-section-title">
                 <i class="fas fa-image" aria-hidden="true"></i>
-                Logo de l'entreprise
+                {{ _('Company Logo') }}
             </h3>
             
             <div class="brand-form-group">
-                <label class="brand-form-label" for="logo_file">Téléverser le logo</label>
+                <label class="brand-form-label" for="logo_file">{{ _('Upload Logo') }}</label>
                 <input type="file" 
                        class="brand-form-control" 
                        id="logo_file" 
@@ -225,17 +225,17 @@
                        accept=".png,.jpg,.jpeg,.gif,.webp" 
                        aria-describedby="logo_file_help">
                 <div class="brand-help-text" id="logo_file_help">
-                    Téléversez le logo de votre entreprise pour personnaliser les enquêtes et les communications. Formats pris en charge : PNG, JPG, JPEG, GIF, WEBP (max 5 Mo).
+                    {{ _('Upload your company logo to personalize surveys and communications. Supported formats: PNG, JPG, JPEG, GIF, WEBP (max 5MB).') }}
                 </div>
                 
                 <div class="brand-upload-constraints" role="region" aria-label="Upload requirements">
                     <strong>Upload Requirements:</strong>
                     <ul>
-                        <li>Formats pris en charge : PNG, JPG, JPEG, GIF, WEBP</li>
-                        <li>Taille maximale du fichier : 5 Mo</li>
-                        <li>Dimensions recommandées : 400x200 pixels ou ratio similaire</li>
-                        <li>Arrière-plan transparent recommandé pour les fichiers PNG</li>
-                        <li>Format PNG recommandé pour les logos avec transparence</li>
+                        <li>{{ _('Supported formats: PNG, JPG, JPEG, GIF, WEBP') }}</li>
+                        <li>{{ _('Maximum file size: 5MB') }}</li>
+                        <li>{{ _('Recommended dimensions: 400x200 pixels or similar ratio') }}</li>
+                        <li>{{ _('Transparent background recommended for PNG files') }}</li>
+                        <li>{{ _('PNG format recommended for logos with transparency') }}</li>
                     </ul>
                 </div>
             </div>
@@ -253,7 +253,7 @@
                     </button>
                 </div>
                 <div class="brand-help-text mb-0">
-                    Les modifications prendront effet immédiatement après l'enregistrement.
+                    {{ _('Changes will take effect immediately after saving.') }}
                 </div>
             </div>
         </div>

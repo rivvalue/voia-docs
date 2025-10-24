@@ -1,0 +1,413 @@
+{% extends "business_auth/base.html" %}
+
+{% block title %}{{ page_title }} - VOÏA Business Portal{% endblock %}
+
+{% block content %}
+<div class="admin-panel">
+    <!-- Header -->
+    <div class="admin-header">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="admin-title">
+                    <i class="fas fa-certificate me-3"></i>{{ page_title }}
+                </h1>
+                <p class="admin-subtitle">Détails et informations d'utilisation de la licence pour {{ account_data.name }}</p>
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="{{ url_for('business_auth.license_dashboard') }}" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                </a>
+                <a href="{{ url_for('business_auth.admin_panel') }}" class="btn btn-primary">
+                    <i class="fas fa-home me-2"></i>Admin Panel
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- License Status Card -->
+    <div class="admin-section">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-info-circle"></i>
+                Current License Status
+            </h3>
+        </div>
+        
+        <div class="license-status-card">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="license-detail">
+                        <label>Type de licence :</label>
+                        <span class="license-type license-{{ account_data.license_type }}">
+                            {{ account_data.license_type|title }}
+                        </span>
+                    </div>
+                    <div class="license-detail">
+                        <label>Statut :</label>
+                        <span class="license-status status-{{ account_data.license_status }}">
+                            {{ account_data.license_status|title }}
+                            {% if account_data.expires_soon and account_data.days_remaining > 0 %}
+                                (Expires in {{ account_data.days_remaining }} days)
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    {% if account_data.license_start %}
+                    <div class="license-detail">
+                        <label>Période de licence :</label>
+                        <span>{{ account_data.license_start.strftime('%B %d, %Y') }} - 
+                              {{ account_data.license_end.strftime('%B %d, %Y') if account_data.license_end else 'Ongoing' }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="license-detail">
+                        <label>Type de compte :</label>
+                        <span>{{ account_data.account_type|title }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Usage Statistics -->
+    <div class="admin-section">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-chart-bar"></i>
+                Current Usage
+            </h3>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="usage-card">
+                    <div class="usage-header">
+                        <h4><i class="fas fa-bullhorn me-2"></i>Campagnes</h4>
+                    </div>
+                    <div class="usage-stats">
+                        <div class="usage-numbers">
+                            <span class="current">{{ account_data.campaigns_used }}</span>
+                            <span class="separator">/</span>
+                            <span class="limit">{{ account_data.campaigns_limit }}</span>
+                        </div>
+                        <div class="usage-bar">
+                            {% set campaign_percentage = (account_data.campaigns_used / account_data.campaigns_limit * 100) if account_data.campaigns_limit > 0 else 0 %}
+                            <div class="usage-progress">
+                                <div class="usage-fill" style="width: {{ campaign_percentage }}%"></div>
+                            </div>
+                        </div>
+                        <small class="usage-label">Used this license period</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="usage-card">
+                    <div class="usage-header">
+                        <h4><i class="fas fa-users me-2"></i>Utilisateurs</h4>
+                    </div>
+                    <div class="usage-stats">
+                        <div class="usage-numbers">
+                            <span class="current">{{ account_data.users_count }}</span>
+                            <span class="separator">/</span>
+                            <span class="limit">{{ account_data.users_limit }}</span>
+                        </div>
+                        <div class="usage-bar">
+                            {% set user_percentage = (account_data.users_count / account_data.users_limit * 100) if account_data.users_limit > 0 else 0 %}
+                            <div class="usage-progress">
+                                <div class="usage-fill" style="width: {{ user_percentage }}%"></div>
+                            </div>
+                        </div>
+                        <small class="usage-label">Active users in account</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter-Specific Content -->
+    {% if filter_type == 'usage' %}
+    <div class="admin-section">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-analytics"></i>
+                Detailed Usage Analysis
+            </h3>
+        </div>
+        
+        <div class="usage-analysis">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="analysis-card">
+                        <h5>Analyses d'utilisation des campagnes</h5>
+                        {% set campaign_percentage = (account_data.campaigns_used / account_data.campaigns_limit * 100) if account_data.campaigns_limit > 0 else 0 %}
+                        {% if campaign_percentage > 80 %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                You're using {{ "%.0f"|format(campaign_percentage) }}% of your campaign limit. Consider upgrading your license.
+                            </div>
+                        {% elif campaign_percentage > 60 %}
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                You're using {{ "%.0f"|format(campaign_percentage) }}% of your campaign limit. You have {{ account_data.campaigns_limit - account_data.campaigns_used }} campaigns remaining.
+                            </div>
+                        {% else %}
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Your campaign usage is within comfortable limits. You have {{ account_data.campaigns_limit - account_data.campaigns_used }} campaigns remaining.
+                            </div>
+                        {% endif %}
+                        
+                        <h5>Analyses des comptes utilisateurs</h5>
+                        {% set user_percentage = (account_data.users_count / account_data.users_limit * 100) if account_data.users_limit > 0 else 0 %}
+                        {% if user_percentage > 80 %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                You're using {{ "%.0f"|format(user_percentage) }}% of your user limit. Consider upgrading your license to add more users.
+                            </div>
+                        {% else %}
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Your user count is within limits. You can add {{ account_data.users_limit - account_data.users_count }} more users.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if filter_type == 'expiring' %}
+    <div class="admin-section">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-clock"></i>
+                License Expiration Information
+            </h3>
+        </div>
+        
+        <div class="expiration-info">
+            {% if account_data.license_end %}
+                {% if account_data.expires_soon %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>License Expiring Soon!</strong>
+                        Your license will expire on {{ account_data.license_end.strftime('%B %d, %Y') }} 
+                        ({{ account_data.days_remaining }} days remaining).
+                        Please contact support to renew your license.
+                    </div>
+                {% else %}
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>License Active</strong>
+                        Your license is valid until {{ account_data.license_end.strftime('%B %d, %Y') }}
+                        ({{ account_data.days_remaining }} days remaining).
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Trial Account</strong>
+                    You are currently using a trial account. Contact support for licensing options.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Quick Actions -->
+    <div class="admin-section">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-bolt"></i>
+                Quick Actions
+            </h3>
+        </div>
+        
+        <div class="quick-actions-grid">
+            <a href="{{ url_for('business_auth.license_info') }}" class="dashboard-action-btn">
+                <i class="fas fa-info-circle"></i>
+                <span>Informations détaillées sur la licence</span>
+            </a>
+            
+            <a href="{{ url_for('campaigns.list_campaigns') }}" class="dashboard-action-btn">
+                <i class="fas fa-bullhorn"></i>
+                <span>Manage Campagnes</span>
+            </a>
+            
+            <a href="{{ url_for('participants.list_participants') }}" class="dashboard-action-btn">
+                <i class="fas fa-users"></i>
+                <span>Manage Utilisateurs</span>
+            </a>
+            
+            <a href="{{ url_for('business_auth.admin_panel') }}" class="dashboard-action-btn">
+                <i class="fas fa-cog"></i>
+                <span>Paramètres</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.license-status-card {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--light-gray, #e0e0e0);
+    border-radius: var(--radius-lg, 12px);
+    padding: var(--spacing-xl, 24px);
+    margin-bottom: var(--spacing-lg, 20px);
+}
+
+.license-detail {
+    margin-bottom: var(--spacing-md, 16px);
+}
+
+.license-detail label {
+    font-weight: 600;
+    color: var(--gray-dark, #555);
+    display: block;
+    margin-bottom: var(--spacing-xs, 4px);
+}
+
+.license-type {
+    padding: 4px 12px;
+    border-radius: var(--radius-md, 8px);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85em;
+}
+
+.license-type.license-core { background: #e3f2fd; color: #1565c0; }
+.license-type.license-plus { background: #e8f5e8; color: #2e7d32; }
+.license-type.license-pro { background: #f3e5f5; color: #7b1fa2; }
+.license-type.license-trial { background: #fff3e0; color: #f57c00; }
+
+.license-status {
+    padding: 4px 12px;
+    border-radius: var(--radius-md, 8px);
+    font-weight: 600;
+    text-transform: capitalize;
+}
+
+.status-active { background: #e8f5e8; color: #2e7d32; }
+.status-expired { background: #ffebee; color: #c62828; }
+.status-trial { background: #fff3e0; color: #f57c00; }
+
+.usage-card {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--light-gray, #e0e0e0);
+    border-radius: var(--radius-lg, 12px);
+    padding: var(--spacing-lg, 20px);
+    height: 100%;
+}
+
+.usage-header h4 {
+    margin: 0 0 var(--spacing-md, 16px) 0;
+    color: var(--gray-dark, #555);
+}
+
+.usage-numbers {
+    text-align: center;
+    margin-bottom: var(--spacing-md, 16px);
+}
+
+.usage-numbers .current {
+    font-size: 2.5em;
+    font-weight: 700;
+    color: var(--primary-red, #e13a44);
+}
+
+.usage-numbers .separator {
+    font-size: 1.5em;
+    color: var(--gray-medium, #777);
+    margin: 0 8px;
+}
+
+.usage-numbers .limit {
+    font-size: 1.8em;
+    font-weight: 600;
+    color: var(--gray-dark, #555);
+}
+
+.usage-progress {
+    width: 100%;
+    height: 8px;
+    background: var(--light-gray, #e0e0e0);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: var(--spacing-sm, 12px);
+}
+
+.usage-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-red, #e13a44), var(--red-hover, #c62d37));
+    transition: width 0.3s ease;
+}
+
+.usage-label {
+    display: block;
+    text-align: center;
+    color: var(--gray-medium, #777);
+}
+
+.analysis-card {
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--light-gray, #e0e0e0);
+    border-radius: var(--radius-lg, 12px);
+    padding: var(--spacing-lg, 20px);
+}
+
+.analysis-card h5 {
+    margin-top: var(--spacing-lg, 20px);
+    margin-bottom: var(--spacing-md, 16px);
+    color: var(--gray-dark, #555);
+}
+
+.analysis-card h5:first-child {
+    margin-top: 0;
+}
+
+.expiration-info {
+    margin-bottom: var(--spacing-lg, 20px);
+}
+
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg, 20px);
+    margin-top: var(--spacing-lg, 20px);
+}
+
+.dashboard-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--spacing-lg, 20px);
+    background: var(--card-bg, #ffffff);
+    border: 2px solid var(--light-gray, #e0e0e0);
+    border-radius: var(--radius-lg, 12px);
+    color: var(--gray-dark, #555);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    gap: var(--spacing-sm, 12px);
+}
+
+.dashboard-action-btn:hover {
+    border-color: var(--primary-red, #e13a44);
+    color: var(--primary-red, #e13a44);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.15));
+    text-decoration: none;
+}
+
+.dashboard-action-btn i {
+    font-size: 1.5em;
+    margin-bottom: var(--spacing-xs, 4px);
+}
+
+.dashboard-action-btn span {
+    font-weight: 600;
+    text-align: center;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,755 @@
+{% extends "base.html" %}
+
+{% block title %}Email Configuration - {{ business_account.name }}{% endblock %}
+
+{% block page_class %}page-email-config{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Settings', 'url': url_for('business_auth.admin_panel')},
+    {'label': 'Email Configuration', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+<div class="email-config-container">
+    <!-- Header -->
+    <div class="email-config-header">
+        <div class="email-config-header-content">
+            <h1>
+                <i class="fas fa-envelope me-2" aria-hidden="true"></i>
+                Email Configuration
+            </h1>
+            <p>Configure SMTP settings for {{ business_account.name }}</p>
+        </div>
+    </div>
+
+    <!-- Current Status -->
+    {% if email_config %}
+        {% if email_config.is_verified %}
+            <div class="email-config-status success" role="status" aria-live="polite">
+                <strong><i class="fas fa-check-circle me-2" aria-hidden="true"></i>Email configuration is active and verified</strong>
+                Last tested: {{ email_config.last_test_at.strftime('%Y-%m-%d %H:%M:%S') if email_config.last_test_at else 'Never' }} UTC
+            </div>
+        {% else %}
+            <div class="email-config-status warning" role="alert" aria-live="polite">
+                <strong><i class="fas fa-exclamation-triangle me-2" aria-hidden="true"></i>Email configuration exists but not verified</strong>
+                Please test your configuration to ensure it works properly.
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="email-config-status error" role="alert" aria-live="polite">
+            <strong><i class="fas fa-times-circle me-2" aria-hidden="true"></i>No email configuration found</strong>
+            Configure your SMTP settings below to enable email sending for your account.
+        </div>
+    {% endif %}
+
+    <!-- Configuration Form -->
+    <form method="POST" action="{{ url_for('business_auth.save_email_config') }}" id="emailConfigForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        
+        <!-- Email Provider Selection -->
+        <div class="email-config-form-section">
+            <h3 class="email-section-title">
+                <i class="fas fa-cloud" aria-hidden="true"></i>
+                Email Provider
+            </h3>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="email-form-group">
+                        <label class="email-form-label" for="email_provider">Email Provider *</label>
+                        <select class="email-form-control" 
+                                id="email_provider" 
+                                name="email_provider" 
+                                required
+                                aria-required="true"
+                                aria-describedby="email_provider_help"
+                                onchange="toggleProviderFields()">
+                            <option value="smtp" {{ 'selected' if not email_config or email_config.email_provider == 'smtp' else '' }}>Standard SMTP</option>
+                            <option value="aws_ses" {{ 'selected' if email_config and email_config.email_provider == 'aws_ses' else '' }}>AWS SES</option>
+                        </select>
+                        <div class="email-help-text" id="email_provider_help">Choose your email delivery provider</div>
+                    </div>
+                </div>
+                
+                <!-- AWS Region (shown only for AWS SES) -->
+                <div class="col-md-6" id="aws_region_field" style="display: none;">
+                    <div class="email-form-group">
+                        <label class="email-form-label" for="aws_region">AWS Region *</label>
+                        <select class="email-form-control" 
+                                id="aws_region" 
+                                name="aws_region"
+                                aria-describedby="aws_region_help">
+                            <option value="">Select a region</option>
+                            <option value="us-east-1" {{ 'selected' if email_config and email_config.aws_region == 'us-east-1' else '' }}>US East (N. Virginia)</option>
+                            <option value="us-east-2" {{ 'selected' if email_config and email_config.aws_region == 'us-east-2' else '' }}>États-Unis Est (Ohio)</option>
+                            <option value="us-west-1" {{ 'selected' if email_config and email_config.aws_region == 'us-west-1' else '' }}>États-Unis Ouest (N. Californie)</option>
+                            <option value="us-west-2" {{ 'selected' if email_config and email_config.aws_region == 'us-west-2' else '' }}>États-Unis Ouest (Oregon)</option>
+                            <option value="ca-central-1" {{ 'selected' if email_config and email_config.aws_region == 'ca-central-1' else '' }}>Canada (Centre)</option>
+                            <option value="eu-west-1" {{ 'selected' if email_config and email_config.aws_region == 'eu-west-1' else '' }}>Europe (Irlande)</option>
+                            <option value="eu-west-2" {{ 'selected' if email_config and email_config.aws_region == 'eu-west-2' else '' }}>Europe (Londres)</option>
+                            <option value="eu-west-3" {{ 'selected' if email_config and email_config.aws_region == 'eu-west-3' else '' }}>Europe (Paris)</option>
+                            <option value="eu-central-1" {{ 'selected' if email_config and email_config.aws_region == 'eu-central-1' else '' }}>Europe (Francfort)</option>
+                            <option value="ap-south-1" {{ 'selected' if email_config and email_config.aws_region == 'ap-south-1' else '' }}>Asie-Pacifique (Mumbai)</option>
+                            <option value="ap-northeast-1" {{ 'selected' if email_config and email_config.aws_region == 'ap-northeast-1' else '' }}>Asie-Pacifique (Tokyo)</option>
+                            <option value="ap-northeast-2" {{ 'selected' if email_config and email_config.aws_region == 'ap-northeast-2' else '' }}>Asie-Pacifique (Séoul)</option>
+                            <option value="ap-southeast-1" {{ 'selected' if email_config and email_config.aws_region == 'ap-southeast-1' else '' }}>Asie-Pacifique (Singapour)</option>
+                            <option value="ap-southeast-2" {{ 'selected' if email_config and email_config.aws_region == 'ap-southeast-2' else '' }}>Asie-Pacifique (Sydney)</option>
+                            <option value="sa-east-1" {{ 'selected' if email_config and email_config.aws_region == 'sa-east-1' else '' }}>Amérique du Sud (São Paulo)</option>
+                        </select>
+                        <div class="email-help-text" id="aws_region_help">Sélectionnez la région AWS où vous avez configuré SES</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Serveur SMTP Settings -->
+        <div class="email-config-form-section">
+            <h3 class="email-section-title">
+                <i class="fas fa-server" aria-hidden="true"></i>
+                Serveur SMTP Settings
+            </h3>
+            
+            <div class="row">
+                <!-- Standard SMTP server field (hidden for AWS SES) -->
+                <div class="col-md-8" id="smtp_server_field">
+                    <div class="email-form-group">
+                        <label class="email-form-label" for="smtp_server">Serveur SMTP *</label>
+                        <input type="text" 
+                               class="email-form-control" 
+                               id="smtp_server" 
+                               name="smtp_server" 
+                               value="{{ email_config.smtp_server if email_config else '' }}" 
+                               placeholder="smtp.gmail.com"
+                               aria-describedby="smtp_server_help">
+                        <div class="email-help-text" id="smtp_server_help">Adresse du serveur SMTP de votre fournisseur de messagerie</div>
+                    </div>
+                </div>
+                
+                <!-- AWS SES info field (shown for AWS SES) -->
+                <div class="col-md-8" id="aws_ses_server_info" style="display: none;">
+                    <div class="email-form-group">
+                        <label class="email-form-label">Serveur SMTP</label>
+                        <div class="email-form-control" style="background-color: #f8f9fa; cursor: not-allowed;" readonly>
+                            <span id="ses_server_display">Généré automatiquement à partir de la région</span>
+                        </div>
+                        <div class="email-help-text">Le serveur SMTP AWS SES est automatiquement défini en fonction de votre région</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="email-form-group">
+                        <label class="email-form-label" for="smtp_port">Port *</label>
+                        <input type="number" 
+                               class="email-form-control" 
+                               id="smtp_port" 
+                               name="smtp_port" 
+                               value="{{ email_config.smtp_port if email_config else '587' }}" 
+                               min="1" 
+                               max="65535" 
+                               required
+                               aria-required="true"
+                               aria-describedby="smtp_port_help">
+                        <div class="email-help-text" id="smtp_port_help">Généralement 587 (TLS) ou 465 (SSL)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="email-form-group">
+                        <label class="email-form-label" for="smtp_username">
+                            <span id="smtp_username_label">Nom d'utilisateur</span> *
+                        </label>
+                        <input type="text" 
+                               class="email-form-control" 
+                               id="smtp_username" 
+                               name="smtp_username" 
+                               value="{{ email_config.smtp_username if email_config else '' }}" 
+                               placeholder="your-email@domain.com" 
+                               required
+                               aria-required="true"
+                               aria-describedby="smtp_username_help">
+                        <div class="email-help-text" id="smtp_username_help">Généralement votre adresse e-mail</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="email-form-group">
+                        <label class="email-form-label" for="smtp_password">
+                            <span id="smtp_password_label">Mot de passe</span> {{ '*' if not email_config else '(leave blank to keep current)' }}
+                        </label>
+                        <input type="password" 
+                               class="email-form-control" 
+                               id="smtp_password" 
+                               name="smtp_password" 
+                               placeholder="Enter SMTP password" 
+                               {{ 'required aria-required=true' if not email_config else '' }}
+                               aria-describedby="smtp_password_help">
+                        <div class="email-help-text" id="smtp_password_help">Votre mot de passe e-mail ou un mot de passe d'application spécifique</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="email-form-check">
+                        <input type="checkbox" 
+                               class="email-form-check-input" 
+                               id="use_tls" 
+                               name="use_tls" 
+                               {{ 'checked' if (email_config and email_config.use_tls) or not email_config else '' }}
+                               aria-describedby="use_tls_help">
+                        <label class="email-form-check-label" for="use_tls">
+                            Utiliser TLS (recommandé pour le port 587)
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="email-form-check">
+                        <input type="checkbox" 
+                               class="email-form-check-input" 
+                               id="use_ssl" 
+                               name="use_ssl" 
+                               {{ 'checked' if email_config and email_config.use_ssl else '' }}
+                               aria-describedby="use_ssl_help">
+                        <label class="email-form-check-label" for="use_ssl">
+                            Utiliser SSL (pour le port 465)
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sender Settings -->
+        <div class="email-config-form-section">
+            <h3 class="email-section-title">
+                <i class="fas fa-user" aria-hidden="true"></i>
+                Sender Settings
+            </h3>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="email-form-group">
+                        <label class="email-form-label" for="sender_name">Nom de l'expéditeur *</label>
+                        <input type="text" 
+                               class="email-form-control" 
+                               id="sender_name" 
+                               name="sender_name" 
+                               value="{{ email_config.sender_name if email_config else business_account.name + ' Team' }}" 
+                               placeholder="Your Company Name" 
+                               required
+                               aria-required="true"
+                               aria-describedby="sender_name_help">
+                        <div class="email-help-text" id="sender_name_help">Nom affiché dans le champ « De »</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="email-form-group">
+                        <label class="email-form-label" for="sender_email">Adresse e-mail de l'expéditeur *</label>
+                        <input type="email" 
+                               class="email-form-control" 
+                               id="sender_email" 
+                               name="sender_email" 
+                               value="{{ email_config.sender_email if email_config else '' }}" 
+                               placeholder="noreply@yourcompany.com" 
+                               required
+                               aria-required="true"
+                               aria-describedby="sender_email_help">
+                        <div class="email-help-text" id="sender_email_help">Adresse e-mail affichée dans le champ « De »</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="email-form-group">
+                <label class="email-form-label" for="reply_to_email">Adresse e-mail de réponse (optionnelle)</label>
+                <input type="email" 
+                       class="email-form-control" 
+                       id="reply_to_email" 
+                       name="reply_to_email" 
+                       value="{{ email_config.reply_to_email if email_config and email_config.reply_to_email else '' }}" 
+                       placeholder="support@yourcompany.com"
+                       aria-describedby="reply_to_email_help">
+                <div class="email-help-text" id="reply_to_email_help">Adresse à laquelle les réponses doivent être envoyées (si différente de l'expéditeur)</div>
+            </div>
+        </div>
+
+        <!-- Admin Notifications -->
+        <div class="email-config-form-section">
+            <h3 class="email-section-title">
+                <i class="fas fa-bell" aria-hidden="true"></i>
+                Admin Notifications
+            </h3>
+            
+            <div class="email-form-group">
+                <label class="email-form-label" for="admin_emails">Adresses e-mail administrateur</label>
+                <input type="text" 
+                       class="email-form-control" 
+                       id="admin_emails" 
+                       name="admin_emails" 
+                       value="{{ email_config.get_admin_emails() | join(', ') if email_config and email_config.get_admin_emails() else '' }}" 
+                       placeholder="admin@yourcompany.com, manager@yourcompany.com"
+                       aria-describedby="admin_emails_help">
+                <div class="email-help-text" id="admin_emails_help">Liste d'adresses e-mail séparées par des virgules pour les notifications administrateur</div>
+            </div>
+        </div>
+        
+        <!-- Email Content Customization -->
+        <div class="email-config-form-section">
+            <h3 class="email-section-title">
+                <i class="fas fa-envelope-open-text" aria-hidden="true"></i>
+                Email Content
+            </h3>
+            
+            <div class="email-form-group">
+                <div class="email-form-check">
+                    <input type="checkbox" 
+                           class="email-form-check-input" 
+                           id="use_custom_content" 
+                           name="use_custom_content" 
+                           {{ 'checked' if email_config and email_config.use_custom_content else '' }}
+                           onchange="toggleCustomContent()"
+                           aria-describedby="use_custom_content_help">
+                    <label class="email-form-check-label" for="use_custom_content">
+                        <strong>Use custom email content</strong>
+                    </label>
+                </div>
+                <div class="email-help-text" id="use_custom_content_help">
+                    Personnalisez le contenu de l'e-mail d'invitation. Si décoché, les modèles professionnels par défaut seront utilisés.
+                </div>
+            </div>
+            
+            <!-- Custom Content Fields (hidden by default) -->
+            <div id="custom_content_fields" style="display: none;">
+                <div class="email-form-group">
+                    <label class="email-form-label" for="custom_subject_template">
+                        Objet de l'e-mail
+                        <span style="color: #999; font-weight: normal;">(200 caractères maximum)</span>
+                    </label>
+                    <input type="text" 
+                           class="email-form-control" 
+                           id="custom_subject_template" 
+                           name="custom_subject_template" 
+                           value="{{ email_config.custom_subject_template if email_config else '' }}" 
+                           placeholder="Your feedback is requested: {campaign_name}"
+                           maxlength="200"
+                           oninput="updatePreview()"
+                           aria-describedby="custom_subject_help">
+                    <div class="email-help-text" id="custom_subject_help">
+                        Variables : <code>{participant_name}</code>, <code>{campaign_name}</code>, <code>{business_account_name}</code>
+                    </div>
+                </div>
+                
+                <div class="email-form-group">
+                    <label class="email-form-label" for="custom_intro_message">Message d'introduction</label>
+                    <textarea class="email-form-control" 
+                              id="custom_intro_message" 
+                              name="custom_intro_message" 
+                              rows="3"
+                              placeholder="{business_account_name} is requesting your valuable feedback through our Voice of Client system."
+                              oninput="updatePreview()"
+                              aria-describedby="custom_intro_help">{{ email_config.custom_intro_message if email_config else '' }}</textarea>
+                    <div class="email-help-text" id="custom_intro_help">
+                        Le message d'ouverture dans le corps de l'e-mail
+                    </div>
+                </div>
+                
+                <div class="email-form-group">
+                    <label class="email-form-label" for="custom_cta_text">
+                        Texte du bouton
+                        <span style="color: #999; font-weight: normal;">(50 caractères maximum)</span>
+                    </label>
+                    <input type="text" 
+                           class="email-form-control" 
+                           id="custom_cta_text" 
+                           name="custom_cta_text" 
+                           value="{{ email_config.custom_cta_text if email_config else '' }}" 
+                           placeholder="Complete Your Survey"
+                           maxlength="50"
+                           oninput="updatePreview()"
+                           aria-describedby="custom_cta_help">
+                    <div class="email-help-text" id="custom_cta_help">
+                        Texte affiché sur le bouton du sondage
+                    </div>
+                </div>
+                
+                <div class="email-form-group">
+                    <label class="email-form-label" for="custom_closing_message">Message de clôture</label>
+                    <textarea class="email-form-control" 
+                              id="custom_closing_message" 
+                              name="custom_closing_message" 
+                              rows="3"
+                              placeholder="Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.&#10;&#10;Thank you for your time and valuable insights!"
+                              oninput="updatePreview()"
+                              aria-describedby="custom_closing_help">{{ email_config.custom_closing_message if email_config else '' }}</textarea>
+                    <div class="email-help-text" id="custom_closing_help">
+                        Message avant la signature
+                    </div>
+                </div>
+                
+                <div class="email-form-group">
+                    <label class="email-form-label" for="custom_footer_note">Avertissement en bas de page</label>
+                    <textarea class="email-form-control" 
+                              id="custom_footer_note" 
+                              name="custom_footer_note" 
+                              rows="2"
+                              placeholder="This is an automated message. If you have any questions, please contact the organization that sent this survey."
+                              oninput="updatePreview()"
+                              aria-describedby="custom_footer_help">{{ email_config.custom_footer_note if email_config else '' }}</textarea>
+                    <div class="email-help-text" id="custom_footer_help">
+                        Texte en bas de l'e-mail
+                    </div>
+                </div>
+                
+                <!-- Live Preview Button -->
+                <div class="email-form-group">
+                    <button type="button" 
+                            class="email-btn-test" 
+                            id="previewEmailBtn"
+                            onclick="showPreview()"
+                            aria-label="Aperçu de l'e-mail">
+                        <i class="fas fa-eye" aria-hidden="true"></i>
+                        Preview Email
+                    </button>
+                </div>
+                
+                <!-- Preview Container -->
+                <div id="emailPreviewContainer" 
+                     style="display: none; margin-top: 20px; padding: 20px; background-color: #f8f9fa; border-radius: 8px; border: 1px solid #dee2e6;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h4 style="margin: 0; color: #333;">
+                            <i class="fas fa-eye" aria-hidden="true"></i>
+                            Email Preview
+                        </h4>
+                        <button type="button" 
+                                onclick="document.getElementById('emailPreviewContainer').style.display='none'" 
+                                style="background: none; border: none; font-size: 20px; cursor: pointer; color: #666;"
+                                aria-label="Fermer l'aperçu">
+                            ×
+                        </button>
+                    </div>
+                    <div id="emailPreviewContent" 
+                         style="background-color: white; padding: 20px; border-radius: 5px; min-height: 200px;">
+                        <p style="color: #999; text-align: center;">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Loading preview...
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="email-config-form-section">
+            <div class="email-actions-row">
+                <div class="email-actions-left">
+                    <button type="button" 
+                            class="email-btn-test" 
+                            id="testConnectionBtn"
+                            aria-label="Tester la connexion SMTP">
+                        <i class="fas fa-plug" aria-hidden="true"></i>
+                        Test Connection
+                    </button>
+                    <button type="button" 
+                            class="email-btn-test" 
+                            id="sendTestEmailBtn" 
+                            style="display: none;"
+                            aria-label="Envoyer un e-mail de test">
+                        <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                        Send Test Email
+                    </button>
+                </div>
+                <div class="email-actions-right">
+                    <button type="submit" 
+                            class="email-btn-save"
+                            aria-label="Enregistrer la configuration de l'e-mail">
+                        <i class="fas fa-save" aria-hidden="true"></i>
+                        Save Configuration
+                    </button>
+                </div>
+            </div>
+
+            <!-- Test Results -->
+            <div id="testResult" 
+                 class="email-test-result" 
+                 role="status" 
+                 aria-live="polite"></div>
+            
+            <!-- Test Email Form -->
+            <div id="testEmailForm" 
+                 class="email-test-email-form" 
+                 style="display: none;">
+                <div class="email-input-group">
+                    <div class="email-form-group">
+                        <label class="email-form-label" for="test_email">Adresse e-mail de test</label>
+                        <input type="email" 
+                               class="email-form-control" 
+                               id="test_email" 
+                               placeholder="test@example.com"
+                               aria-label="Saisir l'adresse e-mail de test">
+                    </div>
+                    <button type="button" 
+                            class="email-btn-test" 
+                            id="sendTestBtn"
+                            aria-label="Envoyer un e-mail de test">
+                        <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                        Send
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+// Toggle provider-specific fields
+function toggleProviderFields() {
+    const provider = document.getElementById('email_provider').value;
+    const awsRegionField = document.getElementById('aws_region_field');
+    const awsRegionSelect = document.getElementById('aws_region');
+    const smtpServerField = document.getElementById('smtp_server_field');
+    const smtpServerInput = document.getElementById('smtp_server');
+    const awsSesServerInfo = document.getElementById('aws_ses_server_info');
+    const sesServerDisplay = document.getElementById('ses_server_display');
+    const smtpNom d'utilisateurHelp = document.getElementById('smtp_username_help');
+    const smtpMot de passeHelp = document.getElementById('smtp_password_help');
+    const smtpNom d'utilisateurLabel = document.getElementById('smtp_username_label');
+    const smtpMot de passeLabel = document.getElementById('smtp_password_label');
+    
+    if (provider === 'aws_ses') {
+        // Show AWS SES fields
+        awsRegionField.style.display = 'block';
+        awsRegionSelect.required = true;
+        
+        // Hide standard SMTP server field
+        smtpServerField.style.display = 'none';
+        smtpServerInput.required = false;
+        
+        // Show AWS SES server info
+        awsSesServerInfo.style.display = 'block';
+        
+        // Update help text for AWS SES
+        smtpNom d'utilisateurLabel.textContent = 'AWS SES SMTP Nom d'utilisateur';
+        smtpMot de passeLabel.textContent = 'AWS SES SMTP Mot de passe';
+        smtpNom d'utilisateurHelp.textContent = 'SMTP username from AWS SES Console > SMTP Settings';
+        smtpMot de passeHelp.textContent = 'SMTP password from AWS SES Console (not your AWS password)';
+        
+        // Update SES server display based on region
+        const region = awsRegionSelect.value;
+        if (region) {
+            sesServerDisplay.textContent = `email-smtp.${region}.amazonaws.com`;
+        } else {
+            sesServerDisplay.textContent = 'Select a region above to see SMTP server';
+        }
+    } else {
+        // Show standard SMTP fields
+        awsRegionField.style.display = 'none';
+        awsRegionSelect.required = false;
+        
+        smtpServerField.style.display = 'block';
+        smtpServerInput.required = true;
+        
+        awsSesServerInfo.style.display = 'none';
+        
+        // Reset help text for standard SMTP
+        smtpNom d'utilisateurLabel.textContent = 'Nom d'utilisateur';
+        smtpMot de passeLabel.textContent = 'Mot de passe';
+        smtpNom d'utilisateurHelp.textContent = 'Généralement votre adresse e-mail';
+        smtpMot de passeHelp.textContent = 'Votre mot de passe e-mail ou un mot de passe d'application spécifique';
+    }
+}
+
+// Update SES server display when region changes
+function updateSesServerDisplay() {
+    const provider = document.getElementById('email_provider').value;
+    if (provider === 'aws_ses') {
+        const region = document.getElementById('aws_region').value;
+        const sesServerDisplay = document.getElementById('ses_server_display');
+        if (region) {
+            sesServerDisplay.textContent = `email-smtp.${region}.amazonaws.com`;
+        } else {
+            sesServerDisplay.textContent = 'Select a region above to see SMTP server';
+        }
+    }
+}
+
+// Toggle custom content fields
+function toggleCustomContent() {
+    const useCustom = document.getElementById('use_custom_content').checked;
+    const customFields = document.getElementById('custom_content_fields');
+    customFields.style.display = useCustom ? 'block' : 'none';
+}
+
+// Show email preview
+function showPreview() {
+    const previewContainer = document.getElementById('emailPreviewContainer');
+    const previewContent = document.getElementById('emailPreviewContent');
+    
+    // Show container
+    previewContainer.style.display = 'block';
+    
+    // Show loading
+    previewContent.innerHTML = '<p style="color: #999; text-align: center;"><i class="fas fa-spinner fa-spin"></i> Loading preview...</p>';
+    
+    // Get custom content values
+    const customData = {
+        subject: document.getElementById('custom_subject_template').value,
+        intro: document.getElementById('custom_intro_message').value,
+        cta_text: document.getElementById('custom_cta_text').value,
+        closing: document.getElementById('custom_closing_message').value,
+        footer: document.getElementById('custom_footer_note').value,
+        use_custom: document.getElementById('use_custom_content').checked
+    };
+    
+    // Fetch preview
+    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+    
+    fetch('{{ url_for("business_auth.preview_email_content") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify(customData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            previewContent.innerHTML = data.html;
+        } else {
+            previewContent.innerHTML = '<p style="color: #dc3545;">Preview failed: ' + (data.error || 'Unknown error') + '</p>';
+        }
+    })
+    .catch(error => {
+        previewContent.innerHTML = '<p style="color: #dc3545;">Network error: ' + error.message + '</p>';
+    });
+}
+
+// Debounced preview update (not used currently, but available for real-time updates)
+let updatePreviewTimeout;
+function updatePreview() {
+    clearTimeout(updatePreviewTimeout);
+    updatePreviewTimeout = setTimeout(() => {
+        // Could auto-update preview here if desired
+    }, 500);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const testConnectionBtn = document.getElementById('testConnectionBtn');
+    const sendTestEmailBtn = document.getElementById('sendTestEmailBtn');
+    const sendTestBtn = document.getElementById('sendTestBtn');
+    const testResult = document.getElementById('testResult');
+    const testEmailForm = document.getElementById('testEmailForm');
+    
+    // Initialize provider fields on page load
+    toggleProviderFields();
+    
+    // Initialize custom content fields on page load
+    toggleCustomContent();
+    
+    // Add region change listener
+    document.getElementById('aws_region').addEventListener('change', updateSesServerDisplay);
+
+    // Test connection
+    testConnectionBtn.addEventListener('click', function() {
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Testing...';
+        
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+        
+        fetch('{{ url_for("business_auth.test_email_config") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            testResult.style.display = 'block';
+            
+            if (data.success) {
+                testResult.className = 'email-test-result success';
+                testResult.innerHTML = '<strong><i class="fas fa-check-circle me-2" aria-hidden="true"></i>Connection successful!</strong>' + data.message;
+                sendTestEmailBtn.style.display = 'inline-flex';
+            } else {
+                testResult.className = 'email-test-result error';
+                testResult.innerHTML = '<strong><i class="fas fa-times-circle me-2" aria-hidden="true"></i>Connection failed!</strong>' + (data.error || data.message);
+                sendTestEmailBtn.style.display = 'none';
+            }
+        })
+        .catch(error => {
+            testResult.style.display = 'block';
+            testResult.className = 'email-test-result error';
+            testResult.innerHTML = '<strong><i class="fas fa-times-circle me-2" aria-hidden="true"></i>Test failed!</strong>Network error: ' + error.message;
+            sendTestEmailBtn.style.display = 'none';
+        })
+        .finally(() => {
+            testConnectionBtn.disabled = false;
+            testConnectionBtn.innerHTML = '<i class="fas fa-plug" aria-hidden="true"></i> Test Connection';
+        });
+    });
+
+    // Show test email form
+    sendTestEmailBtn.addEventListener('click', function() {
+        testEmailForm.style.display = testEmailForm.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // Envoyer un e-mail de test
+    sendTestBtn.addEventListener('click', function() {
+        const testEmail = document.getElementById('test_email').value;
+        
+        if (!testEmail || !testEmail.includes('@')) {
+            alert('Please enter a valid email address');
+            return;
+        }
+
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Sending...';
+        
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+        
+        fetch('{{ url_for("business_auth.send_test_email") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({ test_email: testEmail })
+        })
+        .then(response => response.json())
+        .then(data => {
+            testResult.style.display = 'block';
+            
+            if (data.success) {
+                testResult.className = 'email-test-result success';
+                testResult.innerHTML = '<strong><i class="fas fa-check-circle me-2" aria-hidden="true"></i>Test email sent!</strong>Check ' + testEmail + ' for the test message.';
+            } else {
+                testResult.className = 'email-test-result error';
+                testResult.innerHTML = '<strong><i class="fas fa-times-circle me-2" aria-hidden="true"></i>Failed to send test email!</strong>' + (data.error || data.message);
+            }
+        })
+        .catch(error => {
+            testResult.style.display = 'block';
+            testResult.className = 'email-test-result error';
+            testResult.innerHTML = '<strong><i class="fas fa-times-circle me-2" aria-hidden="true"></i>Send failed!</strong>Network error: ' + error.message;
+        })
+        .finally(() => {
+            sendTestBtn.disabled = false;
+            sendTestBtn.innerHTML = '<i class="fas fa-paper-plane" aria-hidden="true"></i> Send';
+        });
+    });
+
+    // Form validation
+    const form = document.getElementById('emailConfigForm');
+    form.addEventListener('submit', function(e) {
+        const useTls = document.getElementById('use_tls').checked;
+        const useSsl = document.getElementById('use_ssl').checked;
+        
+        if (useTls && useSsl) {
+            e.preventDefault();
+            alert('Please select either TLS or SSL, not both.');
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %}

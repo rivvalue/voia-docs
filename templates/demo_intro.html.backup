@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block title %}Bienvenue dans votre VOÏA Demo{% endblock %}
+
+{% block content %}
+<main class="demo-page" aria-labelledby="demo-main-heading">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <!-- Hero Section -->
+            <header class="demo-hero-section" aria-labelledby="demo-main-heading">
+                <div class="row">
+                    <div class="col-lg-10 mx-auto">
+                        <div class="row align-items-center">
+                            <div class="col-lg-12">
+                                <h1 id="demo-main-heading" class="demo-page-header">Bienvenue dans votre VO<span class="voia-red-accent">Ï</span>A Demo</h1>
+                                
+                                <p class="demo-page-subtitle">
+                                    Vous êtes sur le point de découvrir comment VO<span class="voia-red-accent">Ï</span>A turns open-ended feedback into actionable insights — in minutes.
+                                </p>
+                                
+                                <!-- Left content, Right logo layout -->
+                                <div class="row align-items-center">
+                                    <div class="col-12 col-md-8 mb-3 mb-md-0">
+                                        <p class="demo-scenario-text">
+                                            Dans cette simulation, vous incarnerez un client invité par <strong>Archelo Group</strong>, a growing workplace solutions provider, to share feedback on their existing product: <strong>ArcheloFlow</strong>.
+                                        </p>
+                                    </div>
+                                    <div class="col-12 col-md-4 text-center text-md-end">
+                                        <img src="{{ url_for('static', filename='images/archelo-logo.png') }}" alt="Archelo Group Logo" class="demo-logo">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Section -->
+            <section class="demo-content-section" aria-labelledby="demo-content-heading">
+                <h2 id="demo-content-heading" class="visually-hidden">Informations sur la démonstration</h2>
+                <div class="row">
+                    <div class="col-lg-10 mx-auto">
+                        <!-- Top Row -->
+                        <div class="row demo-row-spacing">
+                            <!-- À propos d'Archelo Group -->
+                            <div class="col-md-6">
+                                <article class="demo-info-card">
+                                    <h3 class="demo-section-title">À propos d'Archelo Group</h3>
+                                    <p class="demo-section-subtitle">
+                                        Archelo Group helps mid-sized companies improve remote onboarding, internal communication, and employee engagement through its flagship platform, <strong>ArcheloFlow</strong>.
+                                    </p>
+                                    <p class="demo-feature-text">
+                                        As part of their continuous improvement process, they've launched a feedback initiative using Rivvalue's VoC agent — <strong>VO<span class="voia-red-accent">Ï</span>A</strong> — and you've been invited to participate.
+                                    </p>
+                                </article>
+                            </div>
+                            
+                            <!-- Ce que vous allez faire -->
+                            <div class="col-md-6">
+                                <article class="demo-info-card">
+                                    <h3 class="demo-section-title">Ce que vous allez faire</h3>
+                                    <p class="demo-section-subtitle">
+                                        Étapes simples pour découvrir la puissance de la collecte de retours alimentée par l'IA.
+                                    </p>
+                                    
+                                    <ul class="demo-expectation-list">
+                                        <li class="demo-expectation-item">
+                                            <span class="demo-expectation-dot" aria-hidden="true"></span>
+                                            <span class="demo-feature-text">Choisissez votre méthode de retour préférée : flux conversationnel alimenté par l'IA ou enquête traditionnelle</span>
+                                        </li>
+                                        
+                                        <li class="demo-expectation-item">
+                                            <span class="demo-expectation-dot" aria-hidden="true"></span>
+                                            <span class="demo-feature-text">Répondez à quelques questions rapides, comme le ferait un véritable client</span>
+                                        </li>
+                                        
+                                        <li class="demo-expectation-item">
+                                            <span class="demo-expectation-dot" aria-hidden="true"></span>
+                                            <span class="demo-feature-text">Explorez le tableau de bord en direct, généré instantanément à partir de vos réponses</span>
+                                        </li>
+                                    </ul>
+                                </article>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Row -->
+                        <div class="row">
+                            <!-- Real-time Insights -->
+                            <div class="col-md-6">
+                                <article class="demo-info-card">
+                                    <h3 class="demo-section-title">Ce que vous verrez, en temps réel</h3>
+                                    <p class="demo-section-subtitle">
+                                        Analyses instantanées et informations générées à partir de vos retours.
+                                    </p>
+                                    
+                                    <div class="demo-feature-grid">
+                                        <div class="demo-feature-icon" aria-hidden="true">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <span class="demo-feature-text">Score NPS et répartition</span>
+                                    </div>
+                                    
+                                    <div class="demo-feature-grid">
+                                        <div class="demo-feature-icon" aria-hidden="true">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </div>
+                                        <span class="demo-feature-text">Indicateurs de risque de résiliation</span>
+                                    </div>
+                                    
+                                    <div class="demo-feature-grid">
+                                        <div class="demo-feature-icon" aria-hidden="true">
+                                            <i class="fas fa-rocket"></i>
+                                        </div>
+                                        <span class="demo-feature-text">Opportunités de croissance</span>
+                                    </div>
+                                    
+                                    <div class="demo-feature-grid">
+                                        <div class="demo-feature-icon" aria-hidden="true">
+                                            <i class="fas fa-brain"></i>
+                                        </div>
+                                        <span class="demo-feature-text">Sentiment clé et thématiques</span>
+                                    </div>
+                                    
+                                    <div class="demo-feature-grid">
+                                        <div class="demo-feature-icon" aria-hidden="true">
+                                            <i class="fas fa-building"></i>
+                                        </div>
+                                        <span class="demo-feature-text">Enseignements par compte</span>
+                                    </div>
+                                </article>
+                            </div>
+                            
+                            <!-- À quoi s'attendre -->
+                            <div class="col-md-6">
+                                <article class="demo-info-card">
+                                    <h3 class="demo-section-title">À quoi s'attendre</h3>
+                                    <p class="demo-section-subtitle">
+                                        Une expérience de démonstration rapide, sécurisée et totalement anonyme.
+                                    </p>
+                                    
+                                    <div class="demo-feature-grid">
+                                        <div class="demo-feature-icon" aria-hidden="true">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <span class="demo-feature-text">Durée totale : moins de 2 minutes</span>
+                                    </div>
+                                    
+                                    <div class="demo-feature-grid">
+                                        <div class="demo-feature-icon" aria-hidden="true">
+                                            <i class="fas fa-shield-alt"></i>
+                                        </div>
+                                        <span class="demo-feature-text">Aucune connexion, aucun spam, aucune configuration</span>
+                                    </div>
+                                    
+                                    <div class="demo-feature-grid">
+                                        <div class="demo-feature-icon" aria-hidden="true">
+                                            <i class="fas fa-user-secret"></i>
+                                        </div>
+                                        <span class="demo-feature-text">Toutes les réponses sont anonymisées et utilisées uniquement à des fins de démonstration</span>
+                                    </div>
+                                </article>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Continue Section -->
+            <section class="demo-continue-section" aria-labelledby="demo-cta-heading">
+                <div class="row">
+                    <div class="col-lg-10 mx-auto">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-6 text-center">
+                                <h2 id="demo-cta-heading" class="demo-section-title">Prêt à commencer ?</h2>
+                                <p class="demo-section-subtitle">
+                                    Cliquez ci-dessous pour passer à la configuration sécurisée de la session et commencer l'expérience d'enquête.
+                                </p>
+                                
+                                <a href="{{ url_for('auth') }}" class="demo-btn-continue" aria-label="Continuer vers l'enquête">
+                                    <i class="fas fa-play" aria-hidden="true"></i>Continue
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+{% endblock %}

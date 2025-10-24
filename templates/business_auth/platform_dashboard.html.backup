@@ -1,0 +1,775 @@
+{% extends "base.html" %}
+
+{% block title %}Centre d'analytique d'entreprise - VOÏA{% endblock %}
+
+{% block page_class %}page-business-analytics-hub{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Platform Admin', 'url': url_for('business_auth.admin_panel')},
+    {'label': 'Platform Dashboard', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+<style>
+/* Platform dashboard specific styling */
+.platform-header {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+    padding: 2rem 0;
+    border-radius: var(--radius-2xl);
+    margin-bottom: 2rem;
+}
+
+.platform-welcome {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.platform-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-white);
+    font-size: 1.5rem;
+}
+
+.metric-card {
+    background: var(--primary-white);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+    margin-bottom: var(--spacing-xl);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+}
+
+.metric-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.metric-icon.platform {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+}
+
+.metric-icon.accounts {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: white;
+}
+
+.metric-icon.users {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+    color: white;
+}
+
+.metric-icon.activity {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.metric-number {
+    font-size: var(--font-size-4xl);
+    font-weight: 700;
+    color: var(--primary-black);
+    margin: 0;
+    font-family: var(--font-family-headings);
+}
+
+.metric-label {
+    color: var(--gray-dark);
+    font-size: var(--font-size-sm);
+    margin: 0;
+    font-family: var(--font-family-base);
+}
+
+.metric-sublabel {
+    color: var(--gray-medium);
+    font-size: var(--font-size-xs);
+    margin-top: 0.25rem;
+}
+
+.platform-section {
+    background: var(--primary-white);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 2px solid var(--light-gray);
+}
+
+.section-title {
+    font-size: var(--font-size-2xl);
+    font-weight: 600;
+    color: var(--primary-black);
+    margin: 0;
+}
+
+.account-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--light-gray);
+    transition: all 0.2s ease;
+}
+
+.account-item:hover {
+    background: var(--light-gray);
+    border-color: var(--medium-gray);
+}
+
+.account-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.account-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.account-details h6 {
+    margin: 0;
+    font-weight: 600;
+    color: var(--primary-black);
+    font-size: 0.95rem;
+}
+
+.account-details small {
+    color: var(--gray-dark);
+    font-size: 0.8rem;
+}
+
+.account-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.type-trial {
+    background-color: rgba(234, 179, 8, 0.1);
+    color: #ca8a04;
+    border: 1px solid rgba(234, 179, 8, 0.2);
+}
+
+.type-customer {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: rgb(22, 163, 74);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.type-demo {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.type-platform-owner {
+    background-color: rgba(225, 58, 68, 0.1);
+    color: var(--primary-red);
+    border: 1px solid rgba(225, 58, 68, 0.2);
+}
+
+.usage-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+}
+
+.usage-bar {
+    width: 60px;
+    height: 6px;
+    background: var(--light-gray);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.usage-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.usage-fill.low { background: #10b981; }
+.usage-fill.medium { background: #f59e0b; }
+.usage-fill.high { background: var(--primary-red); }
+
+.quick-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 8px;
+    border: 1.5px solid transparent;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.action-btn-primary {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--primary-white);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.action-btn-primary:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: var(--primary-white);
+    transform: translateY(-1px);
+}
+
+.action-btn-secondary {
+    background: transparent;
+    color: var(--gray-dark);
+    border-color: var(--medium-gray);
+}
+
+.action-btn-secondary:hover {
+    background: var(--light-gray);
+    color: var(--primary-black);
+    border-color: var(--gray-dark);
+}
+
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-3xl);
+    color: var(--gray-dark);
+}
+
+.empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+</style>
+
+<div class="container-fluid">
+    <!-- Platform Header -->
+    <div class="platform-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="platform-welcome">
+                        <div class="platform-avatar">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div>
+                            <h2 class="mb-1" style="color: var(--primary-white);">Centre d'analytique d'entreprise</h2>
+                            <p class="mb-0" style="color: var(--primary-white); opacity: 0.9;">System-wide overview and management for {{ current_user.get_full_name() }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="quick-actions">
+                        <a href="{{ url_for('business_auth.business_account_onboarding') }}" class="action-btn action-btn-primary">
+                            <i class="fas fa-plus"></i>Onboard Business
+                        </a>
+                        <a href="{{ url_for('business_auth.admin_licenses') }}" class="action-btn action-btn-secondary">
+                            <i class="fas fa-list"></i>All Licenses
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- System Metrics Overview -->
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="metric-card">
+                    <div class="metric-icon platform">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <h3 class="metric-number">{{ dashboard_data.overview_metrics.total_accounts }}</h3>
+                    <p class="metric-label">Total Business Accounts</p>
+                    <p class="metric-sublabel">
+                        {{ dashboard_data.overview_metrics.trial_accounts }} trial, 
+                        {{ dashboard_data.overview_metrics.customer_accounts }} customer, 
+                        {{ dashboard_data.overview_metrics.demo_accounts }} demo
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="metric-card">
+                    <div class="metric-icon users">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="metric-number">{{ dashboard_data.overview_metrics.total_active_users }}</h3>
+                    <p class="metric-label">Total Active Users</p>
+                    <p class="metric-sublabel">{{ dashboard_data.overview_metrics.platform_admin_count }} platform admins</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="metric-card">
+                    <div class="metric-icon activity">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="metric-number">{{ dashboard_data.overview_metrics.campaigns_this_month }}</h3>
+                    <p class="metric-label">Campaigns This Month</p>
+                    <p class="metric-sublabel">{{ dashboard_data.overview_metrics.active_campaigns }} currently active</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="metric-card">
+                    <div class="metric-icon accounts">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3 class="metric-number">{{ dashboard_data.overview_metrics.responses_this_month }}</h3>
+                    <p class="metric-label">Responses This Month</p>
+                    <p class="metric-sublabel">Survey submissions</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comprehensive Platform Intelligence -->
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="platform-section">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="fas fa-users me-2"></i>User Engagement Overview
+                        </h3>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h4 class="metric-number text-success">{{ dashboard_data.detailed_metrics.user_engagement.total_users }}</h4>
+                            <p class="metric-label">Total Users</p>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="metric-number text-info">{{ dashboard_data.detailed_metrics.user_engagement.avg_users_per_account }}</h4>
+                            <p class="metric-label">Moyenne/Compte</p>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            {{ dashboard_data.detailed_metrics.user_engagement.total_active_users }} active, 
+                            {{ dashboard_data.detailed_metrics.user_engagement.total_inactive_users }} inactive
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6">
+                <div class="platform-section">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="fas fa-chart-pie me-2"></i>Campaign Statut Distribution
+                        </h3>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <h5 class="metric-number text-primary">{{ dashboard_data.detailed_metrics.campaign_performance.active_campaigns }}</h5>
+                            <small>Active</small>
+                        </div>
+                        <div class="col-4">
+                            <h5 class="metric-number text-success">{{ dashboard_data.detailed_metrics.campaign_performance.completed_campaigns }}</h5>
+                            <small>Completed</small>
+                        </div>
+                        <div class="col-4">
+                            <h5 class="metric-number text-warning">{{ dashboard_data.detailed_metrics.campaign_performance.draft_campaigns }}</h5>
+                            <small>Draft</small>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            Total: {{ dashboard_data.detailed_metrics.campaign_performance.total_campaigns }} campaigns
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Participant & Survey Intelligence -->
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="platform-section">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="fas fa-user-friends me-2"></i>Participant Intelligence
+                        </h3>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="metric-number text-info">{{ dashboard_data.detailed_metrics.participant_intelligence.total_participants }}</h3>
+                        <p class="metric-label">Nombre total de participants</p>
+                        <div class="row mt-3">
+                            <div class="col-6">
+                                <h5 class="metric-number">{{ dashboard_data.detailed_metrics.participant_intelligence.avg_participants_per_account }}</h5>
+                                <small>Moyenne/Compte</small>
+                            </div>
+                            <div class="col-6">
+                                <h5 class="metric-number">{{ dashboard_data.detailed_metrics.participant_intelligence.avg_participants_per_campaign }}</h5>
+                                <small>Avg/Campaign</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="platform-section">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="fas fa-clipboard-list me-2"></i>Survey Analytics
+                        </h3>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="metric-number text-success">{{ dashboard_data.detailed_metrics.survey_analytics.completion_rate }}%</h3>
+                        <p class="metric-label">Taux de complétion</p>
+                        <div class="row mt-3">
+                            <div class="col-6">
+                                <h5 class="metric-number">{{ dashboard_data.detailed_metrics.survey_analytics.total_responses }}</h5>
+                                <small>Total Responses</small>
+                            </div>
+                            <div class="col-6">
+                                <h5 class="metric-number">{{ dashboard_data.detailed_metrics.participant_intelligence.total_assignments }}</h5>
+                                <small>Total Invitations</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="platform-section">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="fas fa-certificate me-2"></i>License Distribution
+                        </h3>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="metric-number text-warning">{{ dashboard_data.detailed_metrics.license_utilization.total_licensed_accounts }}</h3>
+                        <p class="metric-label">Comptes sous licence</p>
+                        <div class="mt-3">
+                            <div class="row">
+                                {% for license_type, count in dashboard_data.detailed_metrics.license_utilization.accounts_by_license_type.items() %}
+                                {% if count > 0 %}
+                                <div class="col-6">
+                                    <small class="text-muted">{{ license_type|title }}: {{ count }}</small>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Most Active Business Accounts -->
+        {% if dashboard_data.detailed_metrics.recent_activity.most_active_accounts %}
+        <div class="platform-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-fire me-2"></i>Most Active Business Accounts
+                </h3>
+                <small class="text-muted">Ranked by campaign volume</small>
+            </div>
+            
+            <div class="row">
+                {% for account in dashboard_data.detailed_metrics.recent_activity.most_active_accounts %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="account-item">
+                        <div class="account-info">
+                            <div class="account-avatar">
+                                {{ account.business_name[:2]|upper }}
+                            </div>
+                            <div class="account-details">
+                                <h6>{{ account.business_name }}</h6>
+                                <small>{{ account.campaign_count }} campaigns</small>
+                            </div>
+                        </div>
+                        <div class="usage-indicator">
+                            <span class="badge bg-primary">Meilleur performeur</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Recent Business Accounts -->
+        <div class="platform-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-clock me-2"></i>Recent Business Accounts
+                </h3>
+                <a href="{{ url_for('business_auth.admin_licenses', filter='all') }}" class="action-btn action-btn-secondary">
+                    <i class="fas fa-external-link-alt"></i>View All
+                </a>
+            </div>
+            
+            {% if dashboard_data.recent_accounts %}
+                {% for account in dashboard_data.recent_accounts %}
+                <div class="account-item">
+                    <div class="account-info">
+                        <div class="account-avatar">
+                            {{ account.name[:2]|upper }}
+                        </div>
+                        <div class="account-details">
+                            <h6>{{ account.name }}</h6>
+                            <small>Created {{ account.created_at }}</small>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="account-type-badge type-{{ account.account_type.replace('_', '-') }}">
+                            <i class="fas fa-{{ 'flask' if account.account_type == 'demo' else ('crown' if account.account_type == 'platform_owner' else ('building' if account.account_type == 'customer' else 'play')) }}"></i>
+                            {{ account.account_type|title }}
+                        </span>
+                        <span class="badge bg-{{ 'success' if account.status == 'active' else ('warning' if account.status == 'trial' else 'secondary') }}">
+                            {{ account.status|title }}
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-building"></i>
+                    <h4>Aucun compte récent</h4>
+                    <p>Les nouvelles inscriptions de comptes entreprise apparaîtront ici.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- High Usage Accounts -->
+        {% if dashboard_data.high_usage_accounts %}
+        <div class="platform-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>High Usage Accounts
+                </h3>
+                <small class="text-muted">Accounts using over 80% of their limits</small>
+            </div>
+            
+            {% for item in dashboard_data.high_usage_accounts %}
+            <div class="account-item">
+                <div class="account-info">
+                    <div class="account-avatar">
+                        {{ item.account.name[:2]|upper }}
+                    </div>
+                    <div class="account-details">
+                        <h6>{{ item.account.name }}</h6>
+                        <small>{{ item.license_type|title }} License</small>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="usage-indicator">
+                        <span>Utilisateurs :</span>
+                        <div class="usage-bar">
+                            <div class="usage-fill {{ 'high' if item.users_usage > 90 else 'medium' if item.users_usage > 80 else 'low' }}" 
+                                 style="width: {{ item.users_usage|min(100) }}%"></div>
+                        </div>
+                        <span class="text-muted">{{ "%.0f"|format(item.users_usage) }}%</span>
+                    </div>
+                    <div class="usage-indicator">
+                        <span>Campagnes :</span>
+                        <div class="usage-bar">
+                            <div class="usage-fill {{ 'high' if item.campaigns_usage > 90 else 'medium' if item.campaigns_usage > 80 else 'low' }}" 
+                                 style="width: {{ item.campaigns_usage|min(100) }}%"></div>
+                        </div>
+                        <span class="text-muted">{{ "%.0f"|format(item.campaigns_usage) }}%</span>
+                    </div>
+                    <a href="{{ url_for('business_auth.license_assignment_form', business_id=item.account.id) }}" 
+                       class="action-btn action-btn-primary">
+                        <i class="fas fa-arrow-up"></i>Upgrade
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- User Directory by Business Account -->
+        {% if dashboard_data.user_directory %}
+        <div class="platform-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-users me-2"></i>Users by Business Account
+                </h3>
+                <small class="text-muted">Most recent 20 business accounts</small>
+            </div>
+            
+            <div class="accordion" id="userDirectoryAccordion">
+                {% for account_data in dashboard_data.user_directory %}
+                <div class="account-item" style="border: 1px solid var(--light-gray); margin-bottom: 0.5rem; border-radius: var(--radius-lg);">
+                    <div style="padding: var(--spacing-md); cursor: pointer;" 
+                         data-bs-toggle="collapse" 
+                         data-bs-target="#account-{{ account_data.account_id }}" 
+                         aria-expanded="false">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="account-info">
+                                <div class="account-avatar">
+                                    {{ account_data.account_name[:2]|upper }}
+                                </div>
+                                <div class="account-details">
+                                    <h6>{{ account_data.account_name }}</h6>
+                                    <small>{{ account_data.user_count }} user{{ 's' if account_data.user_count != 1 else '' }}</small>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="account-type-badge type-{{ account_data.account_type.replace('_', '-') }}">
+                                    <i class="fas fa-{{ 'flask' if account_data.account_type == 'demo' else ('crown' if account_data.account_type == 'platform_owner' else ('building' if account_data.account_type == 'customer' else 'play')) }}" aria-hidden="true"></i>
+                                    {{ account_data.account_type|title }}
+                                </span>
+                                <i class="fas fa-chevron-down" aria-hidden="true"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="account-{{ account_data.account_id }}" class="collapse" data-bs-parent="#userDirectoryAccordion">
+                        <div style="padding: var(--spacing-md); border-top: 1px solid var(--light-gray); background: var(--light-gray);">
+                            {% if account_data.users %}
+                            <div class="table-responsive">
+                                <table class="table table-sm mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Nom</th>
+                                            <th>E-mail</th>
+                                            <th>Rôle</th>
+                                            <th>Statut</th>
+                                            <th>Dernière connexion</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for user in account_data.users %}
+                                        <tr>
+                                            <td>{{ user.full_name }}</td>
+                                            <td>{{ user.email }}</td>
+                                            <td>
+                                                <span class="badge bg-{{ 'danger' if user.role == 'platform_admin' else ('primary' if user.role == 'admin' else 'secondary') }}">
+                                                    {{ user.role|title }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {% if user.is_active %}
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check-circle" aria-hidden="true"></i> Active
+                                                </span>
+                                                {% else %}
+                                                <span class="badge bg-secondary">
+                                                    <i class="fas fa-times-circle" aria-hidden="true"></i> Inactive
+                                                </span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">{{ user.last_login }}</small>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="text-center text-muted py-3">
+                                <i class="fas fa-user-slash" aria-hidden="true"></i>
+                                <p class="mb-0">Aucun utilisateur dans ce compte</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Quick Platform Actions -->
+        <div class="platform-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-tools me-2"></i>Platform Management
+                </h3>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('business_auth.business_account_onboarding') }}" class="action-btn action-btn-primary">
+                            <i class="fas fa-plus-circle"></i>Create Business Account
+                        </a>
+                        <a href="{{ url_for('business_auth.admin_licenses') }}" class="action-btn action-btn-secondary">
+                            <i class="fas fa-certificate"></i>Manage All Licenses
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('business_auth.license_dashboard') }}" class="action-btn action-btn-secondary">
+                            <i class="fas fa-chart-pie"></i>License Dashboard
+                        </a>
+                        <a href="{{ url_for('business_auth.manage_users') }}" class="action-btn action-btn-secondary">
+                            <i class="fas fa-user-cog"></i>Platform Admin Users
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

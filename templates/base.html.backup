@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="{{ session.get('language', 'en') }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}VOÏA - Voice Of Client{% endblock %}</title>
+    
+    <!-- Resource Hints for Faster CDN Loading -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}?v=name-only-navbar-20251010">
+    
+    <!-- CSRF Token for AJAX requests -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+    {% block head %}{% endblock %}
+    {% block extra_head %}{% endblock %}
+    
+</head>
+<body class="{% block page_class %}{% endblock %}" data-ui-version="{{ ui_version }}" data-user-id="{{ business_user_id }}" data-user-email="{{ business_user_email }}">
+    
+    <!-- Sidebar Navigation (v2 UI only) -->
+    {% if ui_version == 'v2' and is_business_authenticated %}
+    <div class="sidebar" id="voiaSidebar">
+        <div class="sidebar-header">
+            <!-- Multi-tenant Business Logo -->
+            {% if branding_context and branding_context.logo_url %}
+            <div class="text-center mb-3">
+                <img src="{{ branding_context.logo_url }}" 
+                     alt="{{ branding_context.company_name }}" 
+                     style="max-height: 80px; max-width: 220px; height: auto; object-fit: contain;">
+            </div>
+            {% endif %}
+            
+            <!-- VOÏA Brand -->
+            <div class="sidebar-brand">
+                <span>VO<span style="color: #E13A44;">Ï</span>A</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="sidebar-nav-item has-submenu" data-page="dashboard" id="biSubmenuToggle">
+                <i class="fas fa-chart-line"></i>
+                <span>{{ _('Business Intelligence') }}</span>
+                <i class="fas fa-chevron-down submenu-toggle"></i>
+            </div>
+            <div class="sidebar-submenu" id="biSubmenu">
+                <a href="{{ url_for('dashboard') }}" class="sidebar-submenu-item" data-page="dashboard-overview">
+                    <span>{{ _('Overview') }}</span>
+                </a>
+                <a href="{{ url_for('executive_summary') }}" class="sidebar-submenu-item" data-page="executive-summary">
+                    <span>{{ _('Executive Summary') }}</span>
+                </a>
+                <a href="{{ url_for('campaign_insights') }}" class="sidebar-submenu-item" data-page="campaign-insights">
+                    <span>{{ _('Campaign Insights') }}</span>
+                </a>
+            </div>
+            <a href="{{ url_for('campaigns.list_campaigns') }}" class="sidebar-nav-item" data-page="campaigns">
+                <i class="fas fa-bullhorn"></i>
+                <span>{{ _('Campaigns') }}</span>
+            </a>
+            <a href="{{ url_for('participants.list_participants') }}" class="sidebar-nav-item" data-page="participants">
+                <i class="fas fa-users"></i>
+                <span>{{ _('Participants') }}</span>
+            </a>
+            <a href="{{ url_for('business_auth.admin_panel') }}" class="sidebar-nav-item" data-page="admin">
+                <i class="fas fa-cog"></i>
+                <span>{{ _('Settings') }}</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="{{ url_for('business_auth.logout') }}" class="sidebar-nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>{{ _('Logout') }}</span>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Mobile Toggle Button (v2 UI only) -->
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="{{ _('Toggle sidebar') }}">
+        <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Mobile Overlay (v2 UI only) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    {% endif %}
+
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container position-relative">
+            <!-- Demo Logo for Trial Users (not authenticated) - Hidden on demo intro page -->
+            {% if not is_business_authenticated and branding_context and branding_context.logo_url and request.endpoint != 'demo_intro' %}
+            <div class="navbar-brand d-flex align-items-center">
+                <img src="{{ branding_context.logo_url }}" alt="{{ branding_context.company_name }}" height="40" class="navbar-logo">
+            </div>
+            {% endif %}
+            
+            <!-- Centered Welcome Text (for unauthenticated users) -->
+            {% if not is_business_authenticated %}
+            <div class="d-flex justify-content-center flex-grow-1" style="max-width: 60%;">
+                <a class="navbar-brand text-nowrap navbar-welcome-text" href="{{ url_for('index') }}">
+                    {{ _('Welcome to VO') }}<span style="color: #E13A44;">Ï</span>{{ _('A Demo') }}
+                </a>
+            </div>
+            {% endif %}
+            
+            <!-- Language Selector - Always Visible (Mobile & Desktop) -->
+            <div class="d-flex align-items-center ms-auto">
+                {% include 'components/language_selector.html' %}
+            </div>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <!-- Business Authentication - UI Version Toggle (inside collapsible menu) -->
+                    {% if is_business_authenticated %}
+                    <li class="nav-item d-flex align-items-center me-3">
+                        {% include 'components/ui_version_toggle.html' %}
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+            
+            <!-- User Name Display (No Dropdown - Actions in Sidebar) -->
+            {% if is_business_authenticated %}
+            <span class="navbar-text ms-3 text-white">
+                <i class="fas fa-user-circle me-2"></i>{{ business_user_name }}
+            </span>
+            {% endif %}
+            
+            <!-- Hamburger Toggle Button (Right Side - Unauthenticated) / User Dropdown (Right Side - Authenticated) -->
+            {% if not is_business_authenticated %}
+            <button class="navbar-toggler ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Breadcrumb Navigation -->
+    {% block breadcrumb %}{% endblock %}
+
+    <main class="container mt-4 {% if ui_version == 'v2' and is_business_authenticated %}main-with-sidebar{% endif %}">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Chart.js (Conditional Loading - Phase 2 Optimization) -->
+    {% if needs_charts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js" defer></script>
+    {% endif %}
+    
+    <!-- Sidebar Toggle Script (v2 UI only) -->
+    {% if ui_version == 'v2' and is_business_authenticated %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('voiaSidebar');
+            const toggleBtn = document.getElementById('sidebarToggle');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            // Intelligence d'affaires Submenu Toggle
+            const biSubmenuToggle = document.getElementById('biSubmenuToggle');
+            const biSubmenu = document.getElementById('biSubmenu');
+            
+            if (biSubmenuToggle && biSubmenu) {
+                // Check if current page is within BI section to auto-expand
+                const currentPage = document.body.getAttribute('data-page') || '';
+                const biPages = ['dashboard', 'executive-summary', 'campaign-insights'];
+                const shouldAutoExpand = biPages.some(page => currentPage.includes(page));
+                
+                if (shouldAutoExpand) {
+                    biSubmenuToggle.classList.add('open');
+                    biSubmenu.classList.add('open');
+                }
+                
+                biSubmenuToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    biSubmenuToggle.classList.toggle('open');
+                    biSubmenu.classList.toggle('open');
+                });
+            }
+            
+            // Highlight active submenu item
+            const currentPath = window.location.pathname;
+            const submenuItems = document.querySelectorAll('.sidebar-submenu-item');
+            submenuItems.forEach(item => {
+                if (item.getAttribute('href') === currentPath) {
+                    item.classList.add('active');
+                }
+            });
+            
+            if (toggleBtn && sidebar && overlay) {
+                // Toggle sidebar on button click
+                toggleBtn.addEventListener('click', function() {
+                    sidebar.classList.toggle('mobile-open');
+                    overlay.classList.toggle('active');
+                });
+                
+                // Close sidebar when overlay is clicked
+                overlay.addEventListener('click', function() {
+                    sidebar.classList.remove('mobile-open');
+                    overlay.classList.remove('active');
+                });
+                
+                // Close sidebar when navigation item is clicked (mobile only)
+                const navItems = sidebar.querySelectorAll('.sidebar-nav-item');
+                navItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        if (window.innerWidth <= 768) {
+                            sidebar.classList.remove('mobile-open');
+                            overlay.classList.remove('active');
+                        }
+                    });
+                });
+                
+                // Highlight active page in sidebar
+                const currentPath = window.location.pathname;
+                navItems.forEach(item => {
+                    const page = item.getAttribute('data-page');
+                    
+                    // Map paths to page identifiers (order matters - check more specific paths first)
+                    if (page === 'dashboard' && (currentPath.includes('/business-analytics-hub') || currentPath.includes('/business/analytics'))) {
+                        item.classList.add('active');
+                    } else if (page === 'campaigns' && currentPath.includes('/business/campaigns')) {
+                        item.classList.add('active');
+                    } else if (page === 'participants' && currentPath.includes('/business/participants')) {
+                        item.classList.add('active');
+                    } else if (page === 'admin' && currentPath.startsWith('/business/admin') && !currentPath.includes('/business-analytics-hub')) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+        });
+    </script>
+    {% endif %}
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

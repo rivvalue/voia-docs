@@ -19,11 +19,11 @@
                 <!-- Token Request Form -->
                 <div id="tokenRequestForm">
                     <div class="mb-3">
-                        <label for="emailInput" class="form-label">Adresse e-mail</label>
+                        <label for="emailInput" class="form-label">{{ _('Email Address') }}</label>
                         <input type="email" class="form-control" id="emailInput" 
                                placeholder="your.email@company.com" required>
                         <div class="form-text">
-                            Vous recevrez un jeton sécurisé valable 24 heures
+                            {{ _('You\'ll receive a secure token valid for 24 hours') }}
                         </div>
                     </div>
                     
@@ -37,9 +37,9 @@
                 <!-- Loading State -->
                 <div class="d-none text-center" id="loadingState">
                     <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Chargement...</span>
+                        <span class="visually-hidden">{{ _('Loading...') }}</span>
                     </div>
-                    <p class="mt-2">Génération de votre jeton d'authentification...</p>
+                    <p class="mt-2">{{ _('Generating your authentication token...') }}</p>
                 </div>
 
                 <!-- Success State -->
@@ -48,9 +48,9 @@
                         <h6 class="alert-heading">
                             <i class="fas fa-check-circle me-2"></i>Token Generated Successfully!
                         </h6>
-                        <p class="mb-2">Votre jeton d'authentification a été créé :</p>
+                        <p class="mb-2">{{ _('Your authentication token has been created:') }}</p>
                         <div class="mb-3">
-                            <label class="form-label">Jeton d'authentification :</label>
+                            <label class="form-label">{{ _('Authentication Token:') }}</label>
                             <div class="input-group">
                                 <input type="text" class="form-control font-monospace" 
                                        id="generatedToken" readonly>
@@ -66,8 +66,8 @@
                         
                         <!-- Survey Type Selection -->
                         <div class="mb-3">
-                            <label class="form-label">Choisissez l'expérience d'enquête :</label>
-                            <div class="btn-group w-100" role="group" aria-label="Sélection du type d'enquête">
+                            <label class="form-label">{{ _('Choose Survey Experience:') }}</label>
+                            <div class="btn-group w-100" role="group" aria-label="{{ _('Survey type selection') }}">
                                 <input type="radio" class="btn-check" name="surveyType" id="conversationalOption" value="conversational" checked>
                                 <label class="btn btn-outline-primary" for="conversationalOption">
                                     <i class="fas fa-comments me-2"></i>Conversational (AI)
@@ -89,7 +89,7 @@
                                 <i class="fas fa-poll-h me-2"></i>Start Survey
                             </button>
                             <button type="button" class="btn btn-outline-primary" onclick="resetForm()">
-                                Générer un autre jeton
+                                {{ _('Generate Another Token') }}
                             </button>
                         </div>
                     </div>
@@ -101,9 +101,9 @@
                         <h6 class="alert-heading">
                             <i class="fas fa-exclamation-triangle me-2"></i>Error
                         </h6>
-                        <p id="errorMessage">Une erreur est survenue. Veuillez réessayer.</p>
+                        <p id="errorMessage">{{ _('Something went wrong. Please try again.') }}</p>
                         <button type="button" class="btn btn-outline-danger" onclick="resetForm()">
-                            Réessayer
+                            {{ _('Try Again') }}
                         </button>
                     </div>
                 </div>
@@ -120,17 +120,18 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-12">
-                        <h6>Pourquoi ai-je besoin d'un jeton ?</h6>
+                        <h6>{{ _('Why do I need a token?') }}</h6>
                         <p class="small text-muted">
-                            Les jetons d'authentification garantissent que seuls les utilisateurs autorisés peuvent soumettre des réponses à l'enquête et empêchent les doublons. Votre jeton est unique à votre adresse e-mail.
+                            {{ _('Authentication tokens ensure that only authorized users can submit survey responses 
+                            and prevent duplicate submissions. Your token is unique to your email address.') }}
                         </p>
 
-                        <h6>Fonctionnalités de sécurité :</h6>
+                        <h6>{{ _('Security Features:') }}</h6>
                         <ul class="small text-muted">
-                            <li>Les jetons sont liés à votre adresse e-mail</li>
-                            <li>Chaque jeton expire après 24 heures</li>
-                            <li>Une réponse par adresse e-mail (sauf remplacement)</li>
-                            <li>La limitation du débit empêche les abus</li>
+                            <li>{{ _('Tokens are tied to your email address') }}</li>
+                            <li>{{ _('Each token expires after 24 hours') }}</li>
+                            <li>{{ _('One response per email address (unless overwriting)') }}</li>
+                            <li>{{ _('Rate limiting prevents abuse') }}</li>
                         </ul>
                     </div>
                 </div>

@@ -1,0 +1,389 @@
+{% extends "base.html" %}
+
+{% block title %}Team Management - {{ business_account.name }}{% endblock %}
+
+{% block page_class %}page-manage-users{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Settings', 'url': url_for('business_auth.admin_panel')},
+    {'label': 'Team Management', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+<div class="users-container">
+    <!-- Header -->
+    <div class="users-header">
+        <div class="users-header-content">
+            <h1>
+                <i class="fas fa-users me-2" aria-hidden="true"></i>
+                Team Management
+            </h1>
+            <p>Manage users and team members for {{ business_account.name }}</p>
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert" aria-live="assertive">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- License Usage Card -->
+    <div class="users-limit-card">
+        <div class="users-limit-icon" aria-hidden="true">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="users-limit-info">
+            <h4>{{ users_count }}/{{ license_info.users_limit }} Users</h4>
+            <p>{{ license_info.license_type|title }} License - {{ license_info.users_remaining }} remaining</p>
+        </div>
+        <div class="users-limit-progress">
+            {% set usage_percent = (users_count / license_info.users_limit * 100) if license_info.users_limit > 0 else 0 %}
+            <div class="users-progress-bar-container" role="progressbar" aria-valuenow="{{ usage_percent }}" aria-valuemin="0" aria-valuemax="100" aria-label="User limit usage">
+                <div class="users-progress-fill {{ 'low' if usage_percent < 60 else 'medium' if usage_percent < 90 else 'high' }}" 
+                     style="width: {{ usage_percent }}%"></div>
+            </div>
+        </div>
+        <div class="ms-3">
+            {% if license_info.users_remaining > 0 %}
+            <button type="button" 
+                    class="users-btn-add" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#addUserModal"
+                    aria-label="Add new user">
+                <i class="fas fa-plus" aria-hidden="true"></i>
+                Add User
+            </button>
+            {% else %}
+            <button type="button" 
+                    class="users-btn-add" 
+                    disabled 
+                    aria-label="Add user button disabled - license limit reached"
+                    title="License limit reached">
+                <i class="fas fa-ban" aria-hidden="true"></i>
+                Limit Reached
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- License Limit Warning -->
+    {% if usage_percent >= 90 %}
+    <div class="users-limit-warning" role="alert" aria-live="polite">
+        <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+        <strong>License limit warning:</strong> 
+        {% if usage_percent >= 100 %}
+        You've reached your {{ license_info.license_type|title }} license limit. Contact support to upgrade your license.
+        {% else %}
+        You're approaching your {{ license_info.license_type|title }} license limit ({{ users_count }}/{{ license_info.users_limit }} users used).
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Users Table -->
+    <div class="users-table-container">
+        {% if users %}
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr>
+                    <th scope="col">User</th>
+                    <th scope="col">Rôle</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Last Login</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>
+                        <div class="users-user-info">
+                            <div class="users-user-avatar" role="img" aria-label="User avatar for {{ user.get_full_name() }}">
+                                {{ user.first_name[:1]|upper }}{{ user.last_name[:1]|upper }}
+                            </div>
+                            <div class="users-user-details">
+                                <h6>{{ user.get_full_name() }}</h6>
+                                <small>{{ user.email }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {% set role_class = 'platform-admin' if user.role == 'platform_admin' else 'admin' if user.role in ['business_account_admin', 'admin'] else 'user' %}
+                        {% set role_icon = 'fa-star' if user.role == 'platform_admin' else 'fa-crown' if user.role in ['business_account_admin', 'admin'] else 'fa-user' %}
+                        <span class="users-role-badge {{ role_class }}" role="status" aria-label="User role">
+                            <i class="fas {{ role_icon }}" aria-hidden="true"></i>
+                            {{ user.role.replace('_', ' ')|title }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="users-status-badge {{ 'active' if user.is_active_user else 'inactive' }}" role="status" aria-label="User status">
+                            <i class="fas {{ 'fa-check-circle' if user.is_active_user else 'fa-times-circle' }}" aria-hidden="true"></i>
+                            {{ 'Active' if user.is_active_user else 'Inactive' }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if user.last_login_at %}
+                            <time datetime="{{ user.last_login_at.isoformat() }}">{{ user.last_login_at.strftime('%b %d, %Y') }}</time>
+                        {% else %}
+                            <span class="text-muted">Never</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="users-action-buttons">
+                            {% if user.id != current_user.id %}
+                            <button type="button" 
+                                    class="users-action-btn primary" 
+                                    title="Edit User" 
+                                    onclick="editUser({{ user.id }}, '{{ user.first_name }}', '{{ user.last_name }}', '{{ user.email }}', '{{ user.role }}')"
+                                    aria-label="Edit {{ user.get_full_name() }}">
+                                <i class="fas fa-edit" aria-hidden="true"></i>
+                            </button>
+                            <form method="POST" 
+                                  action="{{ url_for('business_auth.reset_user_password', user_id=user.id) }}" 
+                                  style="display: inline;" 
+                                  onsubmit="return confirmPasswordReset('{{ user.get_full_name() }}')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                <button type="submit" 
+                                        class="users-action-btn secondary" 
+                                        title="Reset Password"
+                                        aria-label="Reset password for {{ user.get_full_name() }}">
+                                    <i class="fas fa-key" aria-hidden="true"></i>
+                                </button>
+                            </form>
+                            <form method="POST" 
+                                  action="{{ url_for('business_auth.toggle_user_status', user_id=user.id) }}" 
+                                  style="display: inline;" 
+                                  onsubmit="return confirmToggleStatus('{{ user.get_full_name() }}', {{ user.is_active_user|tojson }})">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                {% if user.is_active_user %}
+                                <button type="submit" 
+                                        class="users-action-btn secondary" 
+                                        title="Deactivate User"
+                                        aria-label="Deactivate {{ user.get_full_name() }}">
+                                    <i class="fas fa-user-times" aria-hidden="true"></i>
+                                </button>
+                                {% else %}
+                                <button type="submit" 
+                                        class="users-action-btn primary" 
+                                        title="Activate User"
+                                        aria-label="Activate {{ user.get_full_name() }}">
+                                    <i class="fas fa-user-check" aria-hidden="true"></i>
+                                </button>
+                                {% endif %}
+                            </form>
+                            {% endif %}
+                            {% if user.id == current_user.id %}
+                            <span class="text-muted small">Current User</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="users-empty-state">
+            <i class="fas fa-users" aria-hidden="true"></i>
+            <h4>No users found</h4>
+            <p>Start building your team by adding the first user.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ url_for('business_auth.add_user') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addUserModalLabel">
+                        <i class="fas fa-user-plus me-2" aria-hidden="true"></i>Add New User
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="first_name" class="form-label">First Name <span class="text-danger" aria-label="required">*</span></label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="first_name" 
+                                       name="first_name" 
+                                       required 
+                                       maxlength="100"
+                                       aria-required="true">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="last_name" class="form-label">Last Name <span class="text-danger" aria-label="required">*</span></label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="last_name" 
+                                       name="last_name" 
+                                       required 
+                                       maxlength="100"
+                                       aria-required="true">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Adresse e-mail <span class="text-danger" aria-label="required">*</span></label>
+                        <input type="email" 
+                               class="form-control" 
+                               id="email" 
+                               name="email" 
+                               required 
+                               maxlength="200" 
+                               placeholder="user@company.com"
+                               aria-required="true"
+                               aria-describedby="email_help">
+                        <div class="form-text" id="email_help">The user will receive an invitation email to activate their account.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Rôle</label>
+                        <select class="form-select" id="role" name="role" aria-describedby="role_help">
+                            <option value="manager">Manager - Can manage campaigns and participants</option>
+                            <option value="viewer">Viewer - Can only view data and reports</option>
+                            <option value="admin">Admin - Full access including user management</option>
+                            {% if business_account.account_type == 'platform_owner' and current_user.is_platform_admin() %}
+                            <option value="platform_admin">Platform Admin - Cross-tenant platform management</option>
+                            {% endif %}
+                        </select>
+                        <div class="form-text" id="role_help">Rôle determines what features the user can access.</div>
+                    </div>
+                    
+                    <div class="alert alert-info mb-0" role="status">
+                        <i class="fas fa-info-circle me-2" aria-hidden="true"></i>
+                        <strong>Note:</strong> The new user will receive an invitation email and must activate their account before they can log in.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" aria-label="Confirm add user">
+                        <i class="fas fa-plus me-2" aria-hidden="true"></i>Add User
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="editUserForm" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editUserModalLabel">
+                        <i class="fas fa-edit me-2" aria-hidden="true"></i>Edit User
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_first_name" class="form-label">First Name <span class="text-danger" aria-label="required">*</span></label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="edit_first_name" 
+                                       name="first_name" 
+                                       required 
+                                       maxlength="100"
+                                       aria-required="true">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_last_name" class="form-label">Last Name <span class="text-danger" aria-label="required">*</span></label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="edit_last_name" 
+                                       name="last_name" 
+                                       required 
+                                       maxlength="100"
+                                       aria-required="true">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="edit_email" class="form-label">Adresse e-mail <span class="text-danger" aria-label="required">*</span></label>
+                        <input type="email" 
+                               class="form-control" 
+                               id="edit_email" 
+                               name="email" 
+                               required 
+                               maxlength="200"
+                               aria-required="true">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="edit_role" class="form-label">Rôle</label>
+                        <select class="form-select" id="edit_role" name="role" aria-describedby="edit_role_help">
+                            <option value="manager">Manager - Can manage campaigns and participants</option>
+                            <option value="viewer">Viewer - Can only view data and reports</option>
+                            <option value="admin">Admin - Full access including user management</option>
+                            {% if business_account.account_type == 'platform_owner' and current_user.is_platform_admin() %}
+                            <option value="platform_admin">Platform Admin - Cross-tenant platform management</option>
+                            {% endif %}
+                        </select>
+                        <div class="form-text" id="edit_role_help">Rôle determines what features the user can access.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" aria-label="Save changes">
+                        <i class="fas fa-save me-2" aria-hidden="true"></i>Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function editUser(userId, firstName, lastName, email, role) {
+    document.getElementById('edit_first_name').value = firstName;
+    document.getElementById('edit_last_name').value = lastName;
+    document.getElementById('edit_email').value = email;
+    document.getElementById('edit_role').value = role;
+    
+    document.getElementById('editUserForm').action = `/business/users/${userId}/edit`;
+    
+    var editModal = new bootstrap.Modal(document.getElementById('editUserModal'));
+    editModal.show();
+}
+
+function confirmToggleStatus(userName, isActive) {
+    const action = isActive ? 'deactivate' : 'activate';
+    const message = `Are you sure you want to ${action} ${userName}?`;
+    
+    if (action === 'deactivate') {
+        return confirm(message + '\n\nDeactivated users will not be able to log in.');
+    }
+    
+    return confirm(message);
+}
+
+function confirmPasswordReset(userName) {
+    const message = `Are you sure you want to reset the password for ${userName}?`;
+    return confirm(message + '\n\nThe user will receive a password reset email with instructions to set a new password.');
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,959 @@
+{% extends "base.html" %}
+
+{% block title %}Campaign Participants - {{ campaign.name }} - VOÏA{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Campaigns', 'url': url_for('campaigns.list_campaigns')},
+    {'label': campaign.name, 'url': url_for('campaigns.view_campaign', campaign_id=campaign.id)},
+    {'label': 'Manage Participants', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+
+<div class="page-campaign-participants">
+    <!-- Header -->
+    <div class="campaign-participants-header">
+        <h1>
+            <i class="fas fa-users me-2" aria-hidden="true"></i>
+            {{ campaign.name }}
+        </h1>
+        <p>Gérer les participants pour cette campagne</p>
+    </div>
+    
+    <!-- Quick Stats -->
+    <div class="campaign-participants-stats-grid">
+        <div class="campaign-participants-stat-card">
+            <div class="campaign-participants-stat-number">{{ campaign_stats.total }}</div>
+            <div class="campaign-participants-stat-label">Nombre total de participants</div>
+        </div>
+        <div class="campaign-participants-stat-card">
+            <div class="campaign-participants-stat-number">{{ campaign_stats.invited }}</div>
+            <div class="campaign-participants-stat-label">Invités</div>
+        </div>
+        <div class="campaign-participants-stat-card">
+            <div class="campaign-participants-stat-number">{{ campaign_stats.started }}</div>
+            <div class="campaign-participants-stat-label">Commencé</div>
+        </div>
+        <div class="campaign-participants-stat-card">
+            <div class="campaign-participants-stat-number">{{ campaign_stats.completed }}</div>
+            <div class="campaign-participants-stat-label">Terminé</div>
+        </div>
+    </div>
+
+    <!-- Add Participants Section -->
+    {% if campaign.status in ['draft', 'ready'] %}
+        <div class="campaign-participants-section">
+            <h5 class="campaign-participants-section-header">
+                <i class="fas fa-user-plus" aria-hidden="true"></i>Add Participants to Campaign
+            </h5>
+            
+            <!-- Filter Criteria -->
+            <div class="filter-panel-header" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="true" aria-controls="filterCollapse" role="button">
+                <h6 class="filter-panel-title">
+                    <i class="fas fa-filter me-2" aria-hidden="true"></i>Filter Criteria
+                    <i class="fas fa-chevron-down ms-2 filter-panel-chevron" aria-hidden="true"></i>
+                </h6>
+            </div>
+            <div class="collapse show" id="filterCollapse">
+                <form method="GET" action="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" id="filterForm" aria-label="Filter participants form">
+                    <div class="row g-3 mb-3">
+                        <!-- Entreprise Filter -->
+                        <div class="col-md-4">
+                            <label for="filter_company" class="form-label">Entreprise</label>
+                            <select class="form-select filter-select" id="filter_company" name="filter_company" multiple 
+                                    aria-label="Filtrer par entreprise">
+                                {% for company in filter_options.companies %}
+                                <option value="{{ company }}" {% if company in active_filters.companies %}selected{% endif %}>
+                                    {{ company }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Rôle Filter -->
+                        <div class="col-md-4">
+                            <label for="filter_role" class="form-label">Rôle</label>
+                            <select class="form-select filter-select" id="filter_role" name="filter_role" multiple 
+                                    aria-label="Filtrer par rôle">
+                                {% for role in filter_options.roles %}
+                                <option value="{{ role }}" {% if role in active_filters.roles %}selected{% endif %}>
+                                    {{ role }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Région Filter -->
+                        <div class="col-md-4">
+                            <label for="filter_region" class="form-label">Région</label>
+                            <select class="form-select filter-select" id="filter_region" name="filter_region" multiple 
+                                    aria-label="Filtrer par région">
+                                {% for region in filter_options.regions %}
+                                <option value="{{ region }}" {% if region in active_filters.regions %}selected{% endif %}>
+                                    {{ region }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mb-3">
+                        <!-- Catégorie de client Filter -->
+                        <div class="col-md-4">
+                            <label for="filter_tier" class="form-label">Catégorie de client</label>
+                            <select class="form-select filter-select" id="filter_tier" name="filter_tier" multiple 
+                                    aria-label="Filtrer par catégorie de client">
+                                {% for tier in filter_options.tiers %}
+                                <option value="{{ tier }}" {% if tier in active_filters.tiers %}selected{% endif %}>
+                                    {{ tier }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Language Filter -->
+                        <div class="col-md-4">
+                            <label for="filter_language" class="form-label">Language</label>
+                            <select class="form-select filter-select" id="filter_language" name="filter_language" multiple 
+                                    aria-label="Filtrer par langue">
+                                {% for language in filter_options.languages %}
+                                <option value="{{ language }}" {% if language in active_filters.languages %}selected{% endif %}>
+                                    {{ language }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Tenure Filter -->
+                        <div class="col-md-4">
+                            <label for="filter_tenure" class="form-label">Ancienneté (années)</label>
+                            <select class="form-select filter-select" id="filter_tenure" name="filter_tenure" multiple 
+                                    aria-label="Filtrer par ancienneté">
+                                {% for tenure in filter_options.tenure_ranges %}
+                                <option value="{{ tenure }}" {% if tenure in active_filters.tenure_ranges %}selected{% endif %}>
+                                    {{ tenure }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-actions">
+                        <button type="submit" class="btn btn-voïa-red" aria-label="Apply filters">
+                            <i class="fas fa-check me-2" aria-hidden="true"></i>Apply Filters
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" id="clearFiltersBtn" aria-label="Effacer tous les filtres">
+                            <i class="fas fa-times me-2" aria-hidden="true"></i>Clear Filters
+                        </button>
+                        <small class="text-muted ms-3">
+                            <i class="fas fa-info-circle me-1" aria-hidden="true"></i>
+                            Available: {{ total_available_count }}
+                        </small>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Active Filters Summary Bar -->
+            {% if active_filters.companies or active_filters.roles or active_filters.regions or active_filters.tiers or active_filters.languages or active_filters.tenure_ranges %}
+            <div class="filter-summary-bar mt-3">
+                <div class="filter-summary-header">
+                    <span class="filter-summary-label">
+                        <i class="fas fa-filter me-2" aria-hidden="true"></i>Active Filters:
+                    </span>
+                    <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" class="btn btn-sm btn-outline-secondary" aria-label="Effacer tous les filtres">
+                        <i class="fas fa-times me-1" aria-hidden="true"></i>Clear All
+                    </a>
+                </div>
+                <div class="filter-chips">
+                    {% for company in active_filters.companies %}
+                    <span class="filter-chip">
+                        <strong>Entreprise:</strong> {{ company }}
+                        <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id, 
+                            filter_company=active_filters.companies|reject('equalto', company)|list,
+                            filter_role=active_filters.roles,
+                            filter_region=active_filters.regions,
+                            filter_tier=active_filters.tiers,
+                            filter_language=active_filters.languages,
+                            filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove" aria-label="Supprimer le filtre {{ company }}">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </a>
+                    </span>
+                    {% endfor %}
+                    
+                    {% for role in active_filters.roles %}
+                    <span class="filter-chip">
+                        <strong>Rôle:</strong> {{ role }}
+                        <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id, 
+                            filter_company=active_filters.companies,
+                            filter_role=active_filters.roles|reject('equalto', role)|list,
+                            filter_region=active_filters.regions,
+                            filter_tier=active_filters.tiers,
+                            filter_language=active_filters.languages,
+                            filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove" aria-label="Supprimer le filtre {{ role }}">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </a>
+                    </span>
+                    {% endfor %}
+                    
+                    {% for region in active_filters.regions %}
+                    <span class="filter-chip">
+                        <strong>Région:</strong> {{ region }}
+                        <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id, 
+                            filter_company=active_filters.companies,
+                            filter_role=active_filters.roles,
+                            filter_region=active_filters.regions|reject('equalto', region)|list,
+                            filter_tier=active_filters.tiers,
+                            filter_language=active_filters.languages,
+                            filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove" aria-label="Supprimer le filtre {{ region }}">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </a>
+                    </span>
+                    {% endfor %}
+                    
+                    {% for tier in active_filters.tiers %}
+                    <span class="filter-chip">
+                        <strong>Tier:</strong> {{ tier }}
+                        <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id, 
+                            filter_company=active_filters.companies,
+                            filter_role=active_filters.roles,
+                            filter_region=active_filters.regions,
+                            filter_tier=active_filters.tiers|reject('equalto', tier)|list,
+                            filter_language=active_filters.languages,
+                            filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove" aria-label="Supprimer le filtre {{ tier }}">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </a>
+                    </span>
+                    {% endfor %}
+                    
+                    {% for language in active_filters.languages %}
+                    <span class="filter-chip">
+                        <strong>Language:</strong> {{ language }}
+                        <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id, 
+                            filter_company=active_filters.companies,
+                            filter_role=active_filters.roles,
+                            filter_region=active_filters.regions,
+                            filter_tier=active_filters.tiers,
+                            filter_language=active_filters.languages|reject('equalto', language)|list,
+                            filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove" aria-label="Supprimer le filtre {{ language }}">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </a>
+                    </span>
+                    {% endfor %}
+                    
+                    {% for tenure in active_filters.tenure_ranges %}
+                    <span class="filter-chip">
+                        <strong>Tenure:</strong> {{ tenure }} years
+                        <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id, 
+                            filter_company=active_filters.companies,
+                            filter_role=active_filters.roles,
+                            filter_region=active_filters.regions,
+                            filter_tier=active_filters.tiers,
+                            filter_language=active_filters.languages,
+                            filter_tenure=active_filters.tenure_ranges|reject('equalto', tenure)|list) }}" class="filter-chip-remove" aria-label="Supprimer le filtre {{ tenure }}">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </a>
+                    </span>
+                    {% endfor %}
+                </div>
+                <div class="filter-summary-count">
+                    <i class="fas fa-users me-2" aria-hidden="true"></i>
+                    Showing <strong>{{ available_participants|length }}</strong> of <strong>{{ total_available_count }}</strong> available participant{% if total_available_count != 1 %}s{% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if available_participants %}
+            <!-- Selection Section -->
+            <hr class="my-4">
+            <form method="POST" action="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" id="addParticipantsForm" aria-label="Formulaire d’ajout de participants">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                
+                <!-- Quick Search -->
+                <div class="mb-3">
+                    <div class="participant-search-box">
+                        <i class="fas fa-search" aria-hidden="true"></i>
+                        <input type="text" 
+                               id="participantQuickSearch" 
+                               class="form-control" 
+                               placeholder="Recherche rapide par nom, e-mail ou entreprise..."
+                               aria-label="Rechercher des participants">
+                    </div>
+                </div>
+                
+                <!-- Select All -->
+                <div class="participant-select-all">
+                    <label class="participant-checkbox-label">
+                        <input type="checkbox" id="selectAllParticipants" aria-label="Sélectionner tous les participants">
+                        <span class="participant-checkbox-text">
+                            <strong>Select All</strong> 
+                            (<span id="visibleCount">{{ available_participants|length }}</span> participant{% if available_participants|length != 1 %}s{% endif %})
+                        </span>
+                    </label>
+                </div>
+                
+                <!-- Scrollable Participant List -->
+                <div class="participant-list-container" id="participantListContainer">
+                    {% for participant in available_participants %}
+                    <div class="participant-card" data-participant-id="{{ participant.id }}" 
+                         data-search-text="{{ participant.name|lower }} {{ participant.email|lower }} {{ participant.company_name|lower if participant.company_name else '' }} {{ participant.role|lower if participant.role else '' }}">
+                        <label class="participant-card-label">
+                            <input type="checkbox" 
+                                   name="participant_ids" 
+                                   value="{{ participant.id }}"
+                                   class="participant-checkbox"
+                                   aria-label="Sélectionner {{ participant.name }}">
+                            <div class="participant-card-content">
+                                <div class="participant-card-header">
+                                    <span class="participant-name">{{ participant.name }}</span>
+                                    {% if participant.role %}
+                                    <span class="participant-badge participant-badge-role">{{ participant.role }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="participant-card-details">
+                                    <span class="participant-email">
+                                        <i class="fas fa-envelope me-1" aria-hidden="true"></i>{{ participant.email }}
+                                    </span>
+                                    {% if participant.company_name %}
+                                    <span class="participant-company">
+                                        <i class="fas fa-building me-1" aria-hidden="true"></i>{{ participant.company_name }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                {% if participant.region or participant.customer_tier %}
+                                <div class="participant-card-meta">
+                                    {% if participant.region %}
+                                    <span class="participant-meta-item">
+                                        <i class="fas fa-globe me-1" aria-hidden="true"></i>{{ participant.region }}
+                                    </span>
+                                    {% endif %}
+                                    {% if participant.customer_tier %}
+                                    <span class="participant-meta-item">
+                                        <i class="fas fa-star me-1" aria-hidden="true"></i>{{ participant.customer_tier }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="participant-list-empty" id="noResultsMessage" style="display: none;">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                    <p>Aucun participant ne correspond à votre recherche</p>
+                </div>
+                
+                <!-- Actions -->
+                <div class="participant-actions mt-3">
+                    <button type="submit" class="btn btn-voïa-red" id="addSelectedBtn" disabled aria-label="Ajouter les participants sélectionnés à la campagne">
+                        <i class="fas fa-plus me-2" aria-hidden="true"></i>
+                        Add Selected (<span id="selectedCount">0</span>)
+                    </button>
+                    <small class="text-muted ms-3">
+                        Select participants to add them to this campaign
+                    </small>
+                </div>
+            </form>
+            {% else %}
+            <!-- No Participants Match Filters -->
+            <hr class="my-4">
+            {% if active_filters.companies or active_filters.roles or active_filters.regions or active_filters.tiers or active_filters.languages or active_filters.tenure_ranges %}
+            <div class="campaign-participants-alert campaign-participants-alert-warning" role="alert">
+                <i class="fas fa-filter me-2" aria-hidden="true"></i>
+                <strong>No Participants Match Your Filters:</strong> 
+                No available participants match the selected filters. Try adjusting your filter criteria above.
+            </div>
+            {% else %}
+            <div class="campaign-participants-alert campaign-participants-alert-info" role="alert">
+                <i class="fas fa-info-circle me-2" aria-hidden="true"></i>
+                <strong>All Available Participants Assigned:</strong> 
+                All participants in your account are already assigned to this campaign.
+                <a href="{{ url_for('participants.create_participant') }}" class="btn btn-sm btn-primary ms-2" aria-label="Créer un nouveau participant">
+                    <i class="fas fa-user-plus me-1" aria-hidden="true"></i>Create New Participant
+                </a>
+            </div>
+            {% endif %}
+            {% endif %}
+        </div>
+    {% else %}
+        <!-- Campaign status prevents adding participants -->
+        <div class="campaign-participants-section">
+            <h5 class="campaign-participants-section-header text-muted">
+                <i class="fas fa-user-plus" aria-hidden="true"></i>Add Participants to Campaign
+            </h5>
+            <div class="campaign-participants-alert campaign-participants-alert-warning" role="alert">
+                <i class="fas fa-exclamation-triangle me-2" aria-hidden="true"></i>
+                <strong>Participants Cannot Be Modified:</strong> 
+                This campaign is {{ campaign.status }}. Participants can only be added or removed when the campaign is in draft or ready status.
+                {% if campaign.status == 'active' %}
+                    <br><small class="text-muted">Campaign is currently collecting responses. Wait until completion to modify participants.</small>
+                {% elif campaign.status == 'completed' %}
+                    <br><small class="text-muted">Campaign has finished. Participant list is now locked.</small>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Rechercher des participants de la campagne -->
+    <div class="campaign-participants-section">
+        <form method="GET" action="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" aria-label="Rechercher des participants form">
+            <div class="row align-items-end">
+                <div class="col-md-8">
+                    <label for="search" class="form-label">Rechercher des participants de la campagne</label>
+                    <input type="text" class="form-control" id="search" name="search" 
+                           value="{{ search_query or '' }}" 
+                           placeholder="Rechercher des participants by name, email, or company..."
+                           aria-label="Rechercher des participants by name, email, or company">
+                </div>
+                <div class="col-md-4">
+                    <div class="btn-group w-100" role="group" aria-label="Actions de recherche">
+                        <button type="submit" class="btn btn-primary" aria-label="Rechercher des participants">
+                            <i class="fas fa-search me-1" aria-hidden="true"></i>Search
+                        </button>
+                        {% if search_query %}
+                        <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" class="btn btn-outline-secondary" aria-label="Effacer la recherche">
+                            <i class="fas fa-times me-1" aria-hidden="true"></i>Clear
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Current Participants -->
+    <div class="campaign-participants-section">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="campaign-participants-section-header mb-0">
+                <i class="fas fa-list" aria-hidden="true"></i>Current Participants
+                {% if search_query %}
+                    <small class="text-muted">({{ current_participants|length }} found for "{{ search_query }}")</small>
+                {% else %}
+                    <small class="text-muted">({{ current_participants|length }})</small>
+                {% endif %}
+            </h5>
+            {% if current_participants %}
+            <div class="btn-group" role="group" aria-label="Actions du participant">
+                <!-- Bulk Remove Button (only visible when participants selected and campaign is draft/ready) -->
+                {% if campaign.status in ['draft', 'ready'] %}
+                <button type="button" class="btn btn-outline-danger btn-sm" id="bulkRemoveBtn" style="display: none;" onclick="openBulkRemoveModal()" aria-label="Supprimer en masse les participants sélectionnés">
+                    <i class="fas fa-trash me-2" aria-hidden="true"></i>Remove Selected (<span id="bulkRemoveCount">0</span>)
+                </button>
+                {% endif %}
+                <button type="button" class="btn btn-outline-info btn-sm" onclick="copyAllTokens()" aria-label="Copier tous les liens d’enquête dans le presse-papiers">
+                    <i class="fas fa-copy me-2" aria-hidden="true"></i>Copy All Survey Links
+                </button>
+            </div>
+            {% endif %}
+        </div>
+        
+        {% if current_participants %}
+        <div class="table-responsive">
+            <table class="table table-hover campaign-participants-table" aria-label="Tableau des participants à la campagne">
+                <thead>
+                    <tr>
+                        {% if campaign.status in ['draft', 'ready'] %}
+                        <th scope="col" style="width: 40px;">
+                            <input type="checkbox" id="selectAllCampaignParticipants" onchange="toggleSelectAllCampaign(this)" aria-label="Sélectionner tous les participants">
+                        </th>
+                        {% endif %}
+                        <th scope="col"><i class="fas fa-user me-2" aria-hidden="true"></i>Participant</th>
+                        <th scope="col"><i class="fas fa-envelope me-2" aria-hidden="true"></i>E-mail</th>
+                        <th scope="col"><i class="fas fa-building me-2" aria-hidden="true"></i>Entreprise</th>
+                        <th scope="col"><i class="fas fa-info-circle me-2" aria-hidden="true"></i>Status</th>
+                        <th scope="col"><i class="fas fa-calendar me-2" aria-hidden="true"></i>Progress</th>
+                        <th scope="col"><i class="fas fa-link me-2" aria-hidden="true"></i>Survey Link</th>
+                        <th scope="col"><i class="fas fa-cogs me-2" aria-hidden="true"></i>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for participant in current_participants %}
+                    <tr>
+                        {% if campaign.status in ['draft', 'ready'] %}
+                        <td>
+                            <input type="checkbox" class="campaign-participant-checkbox" value="{{ participant.association_id }}" onchange="updateBulkRemoveSelection()" aria-label="Sélectionner {{ participant.name }}">
+                        </td>
+                        {% endif %}
+                        <td>
+                            <strong>{{ participant.name }}</strong>
+                        </td>
+                        <td>
+                            <a href="mailto:{{ participant.email }}" class="text-decoration-none" aria-label="E-mail {{ participant.name }}">
+                                {{ participant.email }}
+                            </a>
+                        </td>
+                        <td>
+                            {% if participant.company_name %}
+                                {{ participant.company_name }}
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="{% if participant.status == 'completed' %}badge-voiia-success{% elif participant.status == 'started' %}badge-voiia-warning{% else %}badge-voiia-secondary{% endif %}" role="status" aria-label="Statut : {{ participant.status|title }}">
+                                {{ participant.status|title }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="small text-muted">
+                                {% if participant.invited_at %}
+                                    <i class="fas fa-paper-plane me-1" aria-hidden="true"></i>Invités: {{ participant.invited_at[:10] }}<br>
+                                {% endif %}
+                                {% if participant.started_at %}
+                                    <i class="fas fa-play me-1" aria-hidden="true"></i>Commencé: {{ participant.started_at[:10] }}<br>
+                                {% endif %}
+                                {% if participant.completed_at %}
+                                    <i class="fas fa-check me-1" aria-hidden="true"></i>Terminé: {{ participant.completed_at[:10] }}
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td>
+                            {% if participant.token %}
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control token-input" 
+                                       value="{{ url_for('survey', token=participant.token, _external=True) }}" 
+                                       readonly
+                                       aria-label="Lien d’enquête pour {{ participant.name }}">
+                                <button class="btn btn-outline-secondary" type="button" 
+                                        onclick="copyToken(this, '{{ participant.name }}')"
+                                        aria-label="Copier le lien d’enquête pour {{ participant.name }}">
+                                    <i class="fas fa-copy" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            {% else %}
+                            <span class="text-muted">Aucun jeton</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group-vertical btn-group-sm" role="group" aria-label="Actions du participant">
+                                <!-- Remove from Campaign -->
+                                {% if campaign.status in ['draft', 'ready'] %}
+                                <form method="POST" action="{{ url_for('participants.remove_campaign_participant', campaign_id=campaign.id, association_id=participant.association_id) }}" 
+                                      onsubmit="return confirm('Remove {{ participant.name }} from this campaign?')" class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" aria-label="Retirer {{ participant.name }} de la campagne">
+                                        <i class="fas fa-times me-1" aria-hidden="true"></i>Remove
+                                    </button>
+                                </form>
+                                {% else %}
+                                <button type="button" class="btn btn-outline-secondary btn-sm" disabled 
+                                        title="Cannot remove participants from {{ campaign.status }} campaign"
+                                        aria-label="Impossible de retirer le participant - la campagne est {{ campaign.status }}">
+                                    <i class="fas fa-lock me-1" aria-hidden="true"></i>Locked
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="campaign-participants-empty" role="status" aria-live="polite">
+            <i class="fas fa-users" aria-hidden="true"></i>
+            <h6>Aucun participant n'est encore affecté à cette campagne</h6>
+            {% if available_participants %}
+            <p>Utilisez le formulaire ci-dessus pour ajouter des participants à cette campagne.</p>
+            {% else %}
+            <p>Créez d'abord les participants, puis affectez-les aux campagnes.</p>
+            <a href="{{ url_for('participants.create_participant') }}" class="btn btn-primary mt-3" aria-label="Créer le premier participant">
+                <i class="fas fa-user-plus me-2" aria-hidden="true"></i>Create First Participant
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Campaign Status Information -->
+    <div class="campaign-participants-section">
+        <h5 class="campaign-participants-section-header">
+            <i class="fas fa-info-circle" aria-hidden="true"></i>Campaign Status
+        </h5>
+        
+        <div class="campaign-participants-status-info">
+            <div class="mb-3">
+                <span class="{% if campaign.status == 'completed' %}badge-voiia-success{% elif campaign.status == 'active' %}badge-voiia-success{% elif campaign.status == 'ready' %}badge-voiia-warning{% elif campaign.status == 'draft' %}badge-voiia-secondary{% else %}badge-voiia-info{% endif %} me-2" role="status">
+                    {% if campaign.status == 'draft' %}
+                        <i class="fas fa-edit me-1" aria-hidden="true"></i>Draft
+                    {% elif campaign.status == 'ready' %}
+                        <i class="fas fa-check-circle me-1" aria-hidden="true"></i>Ready
+                    {% elif campaign.status == 'active' %}
+                        <i class="fas fa-play-circle me-1" aria-hidden="true"></i>Active
+                    {% elif campaign.status == 'completed' %}
+                        <i class="fas fa-flag-checkered me-1" aria-hidden="true"></i>Terminé
+                    {% endif %}
+                </span>
+                
+                {% if campaign.status == 'draft' %}
+                    <span class="text-success"><i class="fas fa-check" aria-hidden="true"></i> Can add/remove participants</span>
+                {% elif campaign.status == 'ready' %}
+                    <span class="text-success"><i class="fas fa-check" aria-hidden="true"></i> Can add/remove participants</span>
+                {% elif campaign.status == 'active' %}
+                    <span class="text-warning"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Liste de participants verrouillée - collecte en cours</span>
+                {% elif campaign.status == 'completed' %}
+                    <span class="text-muted"><i class="fas fa-lock" aria-hidden="true"></i> Liste de participants définitivement verrouillée</span>
+                {% endif %}
+            </div>
+            
+            <div class="campaign-participants-status-explanation">
+                {% if campaign.status == 'draft' %}
+                    <strong class="text-primary">Draft Campaign:</strong>
+                    <p>La campagne est en préparation. Vous pouvez librement ajouter ou supprimer des participants, modifier les détails de la campagne et la préparer pour le lancement.</p>
+                {% elif campaign.status == 'ready' %}
+                    <strong class="text-warning">Ready for Activation:</strong>
+                    <p>La campagne est prête à être lancée. Vous pouvez encore ajouter ou supprimer des participants jusqu'à son activation.</p>
+                {% elif campaign.status == 'active' %}
+                    <strong class="text-success">Active Campaign:</strong>
+                    <p>La campagne est en cours et collecte les réponses à l'enquête. La liste des participants est verrouillée pour garantir l'intégrité des données. Attendez la fin pour modifier les participants.</p>
+                {% elif campaign.status == 'completed' %}
+                    <strong class="text-info">Terminé Campaign:</strong>
+                    <p>La campagne est terminée. Toutes les données sont conservées et la liste des participants est définitivement verrouillée pour garantir l'exactitude historique.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<!-- Select2 for searchable multi-selects -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+// Initialize Select2 on filter dropdowns only
+$(document).ready(function() {
+    $('.filter-select').select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: 'Select options...',
+        allowClear: false,
+        closeOnSelect: false
+    });
+});
+
+// Participant Selection Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const quickSearch = document.getElementById('participantQuickSearch');
+    const selectAllCheckbox = document.getElementById('selectAllParticipants');
+    const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
+    const addSelectedBtn = document.getElementById('addSelectedBtn');
+    const selectedCountSpan = document.getElementById('selectedCount');
+    const visibleCountSpan = document.getElementById('visibleCount');
+    const participantCards = document.querySelectorAll('.participant-card');
+    const noResultsMessage = document.getElementById('noResultsMessage');
+    const participantContainer = document.getElementById('participantListContainer');
+    
+    // Update selected count and button state
+    function updateSelectionState() {
+        const checkedBoxes = document.querySelectorAll('.participant-checkbox:checked');
+        const count = checkedBoxes.length;
+        
+        selectedCountSpan.textContent = count;
+        addSelectedBtn.disabled = count === 0;
+        
+        // Update select all checkbox state
+        const visibleCheckboxes = Array.from(participantCheckboxes).filter(cb => {
+            return cb.closest('.participant-card').style.display !== 'none';
+        });
+        const visibleChecked = visibleCheckboxes.filter(cb => cb.checked).length;
+        
+        if (visibleCheckboxes.length > 0) {
+            selectAllCheckbox.checked = visibleChecked === visibleCheckboxes.length;
+            selectAllCheckbox.indeterminate = visibleChecked > 0 && visibleChecked < visibleCheckboxes.length;
+        } else {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        }
+    }
+    
+    // Quick search functionality
+    if (quickSearch) {
+        quickSearch.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            let visibleCount = 0;
+            
+            participantCards.forEach(card => {
+                const searchText = card.getAttribute('data-search-text');
+                const matches = searchText.includes(searchTerm);
+                
+                if (matches) {
+                    card.style.display = '';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Update visible count
+            visibleCountSpan.textContent = visibleCount;
+            
+            // Show/hide empty state
+            if (visibleCount === 0) {
+                participantContainer.style.display = 'none';
+                noResultsMessage.style.display = 'block';
+            } else {
+                participantContainer.style.display = 'block';
+                noResultsMessage.style.display = 'none';
+            }
+            
+            updateSelectionState();
+        });
+    }
+    
+    // Select all functionality
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            const visibleCheckboxes = Array.from(participantCheckboxes).filter(cb => {
+                return cb.closest('.participant-card').style.display !== 'none';
+            });
+            
+            visibleCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            
+            updateSelectionState();
+        });
+    }
+    
+    // Individual checkbox change
+    participantCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateSelectionState);
+    });
+    
+    // Initial state
+    updateSelectionState();
+});
+
+// Copy individual token
+function copyToken(button, participantName) {
+    const input = button.previousElementSibling;
+    input.select();
+    document.execCommand('copy');
+    
+    const originalHTML = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i>';
+    button.classList.remove('btn-outline-secondary');
+    button.classList.add('btn-success');
+    
+    setTimeout(() => {
+        button.innerHTML = originalHTML;
+        button.classList.remove('btn-success');
+        button.classList.add('btn-outline-secondary');
+    }, 2000);
+}
+
+// Copy all tokens
+function copyAllTokens() {
+    const tokenInputs = document.querySelectorAll('.token-input');
+    let allTokens = '';
+    
+    tokenInputs.forEach((input, index) => {
+        allTokens += input.value;
+        if (index < tokenInputs.length - 1) {
+            allTokens += '\n';
+        }
+    });
+    
+    const tempTextArea = document.createElement('textarea');
+    tempTextArea.value = allTokens;
+    document.body.appendChild(tempTextArea);
+    tempTextArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempTextArea);
+    
+    alert(`Copied ${tokenInputs.length} survey links to clipboard!`);
+}
+
+// Filter panel functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle collapse icon rotation
+    const filterHeader = document.querySelector('.filter-panel-header');
+    const filterCollapse = document.getElementById('filterCollapse');
+    
+    if (filterHeader && filterCollapse) {
+        filterCollapse.addEventListener('shown.bs.collapse', function() {
+            filterHeader.setAttribute('aria-expanded', 'true');
+        });
+        
+        filterCollapse.addEventListener('hidden.bs.collapse', function() {
+            filterHeader.setAttribute('aria-expanded', 'false');
+        });
+    }
+    
+    // Effacer tous les filtres button
+    const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+    if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', function() {
+            // Clear all multi-select filters
+            const filterSelects = document.querySelectorAll('.filter-select');
+            filterSelects.forEach(select => {
+                select.selectedIndex = -1;
+                Array.from(select.options).forEach(option => {
+                    option.selected = false;
+                });
+            });
+            
+            // Submit the form to refresh the list
+            document.getElementById('filterForm').submit();
+        });
+    }
+    
+    // Initialize Bootstrap popovers if any
+    const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    if (typeof bootstrap !== 'undefined' && bootstrap.Popover) {
+        popoverTriggerList.map(function (popoverTriggerEl) {
+            return new bootstrap.Popover(popoverTriggerEl, {
+                trigger: 'click',
+                html: true
+            });
+        });
+    }
+});
+
+// Bulk Removal Functions
+let selectedCampaignParticipants = new Set();
+
+function toggleSelectAllCampaign(checkbox) {
+    const checkboxes = document.querySelectorAll('.campaign-participant-checkbox');
+    checkboxes.forEach(cb => {
+        cb.checked = checkbox.checked;
+        if (checkbox.checked) {
+            selectedCampaignParticipants.add(cb.value);
+        } else {
+            selectedCampaignParticipants.delete(cb.value);
+        }
+    });
+    updateBulkRemoveSelection();
+}
+
+function updateBulkRemoveSelection() {
+    // Update selected set
+    selectedCampaignParticipants.clear();
+    document.querySelectorAll('.campaign-participant-checkbox:checked').forEach(cb => {
+        selectedCampaignParticipants.add(cb.value);
+    });
+    
+    // Update UI
+    const count = selectedCampaignParticipants.size;
+    const btn = document.getElementById('bulkRemoveBtn');
+    const countSpan = document.getElementById('bulkRemoveCount');
+    
+    if (btn && countSpan) {
+        countSpan.textContent = count;
+        btn.style.display = count > 0 ? 'inline-block' : 'none';
+    }
+    
+    // Update select all checkbox state
+    const selectAllCheckbox = document.getElementById('selectAllCampaignParticipants');
+    const allCheckboxes = document.querySelectorAll('.campaign-participant-checkbox');
+    if (selectAllCheckbox && allCheckboxes.length > 0) {
+        selectAllCheckbox.checked = count === allCheckboxes.length;
+    }
+}
+
+function openBulkRemoveModal() {
+    if (selectedCampaignParticipants.size === 0) {
+        alert('Please select participants to remove.');
+        return;
+    }
+    
+    const modal = new bootstrap.Modal(document.getElementById('bulkRemoveModal'));
+    document.getElementById('bulkRemoveCountModal').textContent = selectedCampaignParticipants.size;
+    modal.show();
+}
+
+function submitBulkRemove() {
+    if (selectedCampaignParticipants.size === 0) {
+        alert('Please select participants to remove.');
+        return;
+    }
+    
+    const btn = document.getElementById('confirmBulkRemoveBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Removing...';
+    
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    
+    // Send bulk remove request
+    fetch('{{ url_for("participants.bulk_remove_campaign_participants", campaign_id=campaign.id) }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            association_ids: Array.from(selectedCampaignParticipants)
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Fermer modal
+            bootstrap.Modal.getInstance(document.getElementById('bulkRemoveModal')).hide();
+            
+            // Show success message
+            alert(`Successfully removed ${data.removed} participant(s) from {{ campaign.name }}.`);
+            
+            // Reload page to show updated data
+            window.location.reload();
+        } else {
+            alert(`Error: ${data.error}\n${data.message || data.details || ''}`);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-trash me-1"></i>Remove Participants';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert(`An error occurred while removing participants.\nDetails: ${error.message}`);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-trash me-1"></i>Remove Participants';
+    });
+}
+</script>
+
+<!-- Bulk Remove Confirmation Modal -->
+<div class="modal fade" id="bulkRemoveModal" tabindex="-1" aria-labelledby="bulkRemoveModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="bulkRemoveModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Bulk Removal
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle me-2"></i>
+                    You are about to remove <strong><span id="bulkRemoveCountModal">0</span> participant(s)</strong> from <strong>{{ campaign.name }}</strong>.
+                </div>
+                <p><strong>This action will:</strong></p>
+                <ul>
+                    <li>Remove the selected participants from this campaign</li>
+                    <li>Not delete the participant records (they can be re-added later)</li>
+                    <li>Not affect their participation in other campaigns</li>
+                </ul>
+                <p class="mb-0"><strong>Are you sure you want to continue?</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-danger" onclick="submitBulkRemove()" id="confirmBulkRemoveBtn">
+                    <i class="fas fa-trash me-1"></i>Remove Participants
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

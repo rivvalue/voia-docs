@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Configuration de l'e-mail - VOÏA Setup{% endblock %}
+{% block title %}{{ _('Email Configuration') }} - VOÏA Setup{% endblock %}
 
 {% block page_class %}page-onboarding-smtp{% endblock %}
 
@@ -9,7 +9,7 @@
 {% set breadcrumb_items = [
     {'label': 'Settings', 'url': url_for('business_auth.admin_panel')},
     {'label': 'Account Setup', 'url': url_for('business_auth.onboarding_welcome')},
-    {'label': 'Configuration de l'e-mail', 'current': true}
+    {'label': '{{ _('Email Configuration') }}', 'current': true}
 ] %}
 {% include 'components/breadcrumb.html' %}
 <style>
@@ -254,7 +254,7 @@
         <div class="step-icon">
             <i class="fas fa-envelope"></i>
         </div>
-        <h1 style="font-size: var(--font-size-3xl); font-weight: 700; margin-bottom: var(--spacing-sm);">Configuration de l'e-mail</h1>
+        <h1 style="font-size: var(--font-size-3xl); font-weight: 700; margin-bottom: var(--spacing-sm);">{{ _('Email Configuration') }}</h1>
         <p style="font-size: var(--font-size-lg); color: var(--gray-dark); margin: 0;">Configure SMTP settings to send survey invitations</p>
     </div>
 
@@ -271,15 +271,15 @@
     <!-- Help Information -->
     <div class="help-box">
         <h5><i class="fas fa-info-circle"></i> SMTP Configuration Guide</h5>
-        <p>Pour envoyer des invitations à l'enquête, VOÏA a besoin d'un accès à votre serveur de messagerie. Vous pouvez utiliser :</p>
+        <p>{{ _('To send survey invitations, VOÏA needs access to your email server. You can use:') }}</p>
         <ul style="margin: var(--spacing-sm) 0 0 var(--spacing-lg);">
             <li><strong>Gmail:</strong> smtp.gmail.com (port 587, use App Password)</li>
             <li><strong>Outlook:</strong> smtp-mail.outlook.com (port 587)</li>
-            <li><strong>Custom SMTP:</strong> Les paramètres du serveur de messagerie de votre organisation</li>
+            <li><strong>Custom SMTP:</strong> {{ _('Your organization\'s email server settings') }}</li>
         </ul>
     </div>
 
-    <!-- Configuration de l'e-mail Form -->
+    <!-- {{ _('Email Configuration') }} Form -->
     <div class="form-container">
         <form id="smtpForm">
             <div class="form-section">
@@ -287,7 +287,7 @@
                     <div class="section-icon">
                         <i class="fas fa-server"></i>
                     </div>
-                    <h3 style="margin: 0; color: var(--primary-black);">Paramètres du serveur</h3>
+                    <h3 style="margin: 0; color: var(--primary-black);">{{ _('Server Settings') }}</h3>
                 </div>
 
                 <div class="form-row">
@@ -296,14 +296,14 @@
                         <input type="text" class="form-control" id="smtp_server" name="smtp_server" 
                                value="{{ email_config.smtp_server if email_config else '' }}" 
                                placeholder="smtp.gmail.com" required>
-                        <div class="form-text">Adresse du serveur SMTP de votre fournisseur de messagerie</div>
+                        <div class="form-text">{{ _('Your email provider\'s SMTP server address') }}</div>
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="smtp_port">Port *</label>
                         <input type="number" class="form-control" id="smtp_port" name="smtp_port" 
                                value="{{ email_config.smtp_port if email_config else 587 }}" 
                                placeholder="587" required>
-                        <div class="form-text">Généralement 587 pour TLS ou 465 pour SSL</div>
+                        <div class="form-text">{{ _('Usually 587 for TLS or 465 for SSL') }}</div>
                     </div>
                 </div>
 
@@ -313,7 +313,7 @@
                         <input type="email" class="form-control" id="smtp_username" name="smtp_username" 
                                value="{{ email_config.smtp_username if email_config else '' }}" 
                                placeholder="your-email@company.com" required>
-                        <div class="form-text">Votre adresse e-mail ou nom d'utilisateur SMTP</div>
+                        <div class="form-text">{{ _('Your email address or SMTP username') }}</div>
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="smtp_password">Password *</label>
@@ -328,7 +328,7 @@
                     <input type="text" class="form-control" id="from_name" name="from_name" 
                            value="{{ email_config.from_name if email_config else business_account.name }}" 
                            placeholder="{{ business_account.name }}" required>
-                    <div class="form-text">Comment votre nom apparaît aux destinataires de l'enquête</div>
+                    <div class="form-text">{{ _('How your name appears to survey recipients') }}</div>
                 </div>
             </div>
 
@@ -338,7 +338,7 @@
                     <i class="fas fa-paper-plane"></i> Test Your Configuration
                 </h4>
                 <p style="color: var(--gray-dark); margin-bottom: var(--spacing-lg);">
-                    Envoyez un e-mail de test pour vérifier que vos paramètres SMTP fonctionnent correctement.
+                    {{ _('Send a test email to verify your SMTP settings are working correctly.') }}
                 </p>
                 <div class="form-group">
                     <label class="form-label" for="test_email">Test Email Address *</label>

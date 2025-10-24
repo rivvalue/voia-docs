@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+
+{% block title %}Customer Survey - VOÏA - Voice Of Client Agent{% endblock %}
+
+{% block page_class %}page-survey{% endblock %}
+
+{% block content %}
+<div data-page="survey"></div>
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header text-center">
+                {% if branding and branding.logo_url %}
+                    <div class="mb-3">
+                        <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}" class="img-fluid" style="max-height: 60px;">
+                    </div>
+                {% endif %}
+                <h4 class="card-title mb-1">Enquête de retour client</h4>
+                <small class="text-muted">Help us improve by sharing your experience</small>
+                {% if branding and branding.company_name %}
+                    <div class="mt-2">
+                        <small class="text-muted">Powered by {{ branding.company_name }}</small>
+                    </div>
+                {% else %}
+                    <div class="mt-2">
+                        <small class="text-muted">Powered by VOÏA - Voice Of Client Agent</small>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <!-- Progress Bar -->
+                <div class="progress mb-4" style="height: 6px;">
+                    <div class="progress-bar" role="progressbar" style="width: 20%;" id="progressBar"></div>
+                </div>
+
+                <form id="surveyForm" method="POST" action="/submit_survey_form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <!-- Step 1: Informations de base -->
+                    <div class="survey-step" id="step1">
+                        <h5 class="mb-3">Informations de base</h5>
+                        <div class="mb-3">
+                            <label for="companyName" class="form-label">Nom de l'entreprise</label>
+                            <input type="text" class="form-control" id="companyName" name="company_name" 
+                                   value="{{ participant_company or '' }}" 
+                                   {% if participant_company %}readonly{% endif %} required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="respondentName" class="form-label">Votre nom</label>
+                            <input type="text" class="form-control" id="respondentName" name="respondent_name" 
+                                   value="{{ participant_name or '' }}" 
+                                   {% if participant_name %}readonly{% endif %} required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="respondentEmail" class="form-label">Adresse e-mail</label>
+                            <input type="email" class="form-control" id="respondentEmail" name="respondent_email" 
+                                   value="{{ email or '' }}" 
+                                   {% if email %}readonly{% endif %} required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tenureWithFc" class="form-label">Depuis combien de temps travaillez-vous avec Archelo Group ?</label>
+                            <select class="form-select" id="tenureWithFc" required>
+                                <option value="">Sélectionnez la durée...</option>
+                                <option value="Moins de 6 mois">Moins de 6 mois</option>
+                                <option value="6 mois - 1 an">6 mois - 1 an</option>
+                                <option value="1 à 2 ans">1 à 2 ans</option>
+                                <option value="2 à 3 ans">2 à 3 ans</option>
+                                <option value="3 à 5 ans">3 à 5 ans</option>
+                                <option value="5 à 10 ans">5 à 10 ans</option>
+                                <option value="Plus de 10 ans">Plus de 10 ans</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="nextStep(2)">Suivant</button>
+                    </div>
+
+                    <!-- Step 2: NPS Score -->
+                    <div class="survey-step d-none" id="step2">
+                        <h5 class="mb-3">Net Promoter Score</h5>
+                        <p class="mb-3">Sur une échelle de 0 à 10, quelle est la probabilité que vous recommandiez nos services à un ami ou un collègue ?</p>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <small class="text-muted">Not likely</small>
+                            <div class="nps-scale">
+                                <div class="btn-group" role="group">
+                                    <input type="radio" class="btn-check" name="npsScore" id="nps0" value="0">
+                                    <label class="btn btn-outline-danger" for="nps0">0</label>
+                                    <input type="radio" class="btn-check" name="npsScore" id="nps1" value="1">
+                                    <label class="btn btn-outline-danger" for="nps1">1</label>
+                                    <input type="radio" class="btn-check" name="npsScore" id="nps2" value="2">
+                                    <label class="btn btn-outline-danger" for="nps2">2</label>
+                                    <input type="radio" class="btn-check" name="npsScore" id="nps3" value="3">
+                                    <label class="btn btn-outline-danger" for="nps3">3</label>
+                                    <input type="radio" class="btn-check" name="npsScore" id="nps4" value="4">
+                                    <label class="btn btn-outline-danger" for="nps4">4</label>
+                                    <input type="radio" class="btn-check" name="npsScore" id="nps5" value="5">
+                                    <label class="btn btn-outline-danger" for="nps5">5</label>
+                                    <input type="radio" class="btn-check" name="npsScore" id="nps6" value="6">
+                                    <label class="btn btn-outline-danger" for="nps6">6</label>
+                                    <input type="radio" class="btn-check" name="npsScore" id="nps7" value="7">
+                                    <label class="btn btn-outline-warning" for="nps7">7</label>
+                                    <input type="radio" class="btn-check" name="npsScore" id="nps8" value="8">
+                                    <label class="btn btn-outline-warning" for="nps8">8</label>
+                                    <input type="radio" class="btn-check" name="npsScore" id="nps9" value="9">
+                                    <label class="btn btn-outline-success" for="nps9">9</label>
+                                    <input type="radio" class="btn-check" name="npsScore" id="nps10" value="10">
+                                    <label class="btn btn-outline-success" for="nps10">10</label>
+                                </div>
+                            </div>
+                            <small class="text-muted">Extremely likely</small>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" onclick="previousStep(1)">Précédent</button>
+                            <button type="button" class="btn btn-primary" onclick="handleNpsSelection()">Suivant</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Follow-up Questions -->
+                    <div class="survey-step d-none" id="step3">
+                        <h5 class="mb-3">Parlez-nous davantage de votre expérience</h5>
+                        
+                        <div class="mb-3">
+                            <label for="recommendationReason" class="form-label" id="reasonLabel">
+                                Quelle est la principale raison de votre note ?
+                            </label>
+                            <textarea class="form-control" id="recommendationReason" rows="3"></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="satisfactionRating" class="form-label">Satisfaction globale (1-5)</label>
+                                    <select class="form-select" id="satisfactionRating">
+                                        <option value="">Sélectionnez la note</option>
+                                        <option value="1">1 - Très faible</option>
+                                        <option value="2">2 - Faible</option>
+                                        <option value="3">3 - Moyen</option>
+                                        <option value="4">4 - Bon</option>
+                                        <option value="5">5 - Excellent</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="productValueRating" class="form-label">Valeur du produit (1-5)</label>
+                                    <select class="form-select" id="productValueRating">
+                                        <option value="">Sélectionnez la note</option>
+                                        <option value="1">1 - Très faible</option>
+                                        <option value="2">2 - Faible</option>
+                                        <option value="3">3 - Moyen</option>
+                                        <option value="4">4 - Bon</option>
+                                        <option value="5">5 - Excellent</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="serviceRating" class="form-label">Prestation de service et support Archelo Group (1-5)</label>
+                                    <select class="form-select" id="serviceRating">
+                                        <option value="">Sélectionnez la note</option>
+                                        <option value="1">1 - Très faible</option>
+                                        <option value="2">2 - Faible</option>
+                                        <option value="3">3 - Moyen</option>
+                                        <option value="4">4 - Bon</option>
+                                        <option value="5">5 - Excellent</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="pricingRating" class="form-label">Tarification (1-5)</label>
+                                    <select class="form-select" id="pricingRating">
+                                        <option value="">Sélectionnez la note</option>
+                                        <option value="1">1 - Très faible</option>
+                                        <option value="2">2 - Faible</option>
+                                        <option value="3">3 - Moyen</option>
+                                        <option value="4">4 - Bon</option>
+                                        <option value="5">5 - Excellent</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" onclick="previousStep(2)">Précédent</button>
+                            <button type="button" class="btn btn-primary" onclick="nextStep(4)">Suivant</button>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Retour d'information supplémentaire -->
+                    <div class="survey-step d-none" id="step4">
+                        <h5 class="mb-3">Retour d'information supplémentaire</h5>
+                        
+                        <div class="mb-3">
+                            <label for="improvementFeedback" class="form-label">Que pourrions-nous améliorer ?</label>
+                            <textarea class="form-control" id="improvementFeedback" rows="3" placeholder="Please share your suggestions for improvement..."></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="additionalComments" class="form-label">Autres commentaires ?</label>
+                            <textarea class="form-control" id="additionalComments" rows="3" placeholder="Feel free to share any other thoughts or feedback..."></textarea>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" onclick="previousStep(3)">Précédent</button>
+                            <button type="button" class="btn btn-success" onclick="submitSurvey()">
+                                <i class="fas fa-paper-plane me-2"></i>Submit Survey
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Loading state -->
+                <div class="d-none" id="loadingState">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Chargement...</span>
+                        </div>
+                        <p class="mt-2">Traitement de votre retour d'information...</p>
+                    </div>
+                </div>
+
+                <!-- Success state -->
+                <div class="d-none" id="successState">
+                    <div class="text-center">
+                        <div class="success-icon mb-4">
+                            <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                        </div>
+                        <h4 class="text-success mb-3">Merci de partager votre retour d'information avec nous.</h4>
+                        <p class="lead mb-2">Votre retour d'information a été analysé avec succès par VOÏA Intelligence.</p>
+                        
+                        <!-- Dashboard Button -->
+                        <div class="mb-4">
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-chart-bar me-2"></i>View Analytics Dashboard
+                            </a>
+                        </div>
+                        
+                        <p class="text-muted mb-4">Cela conclut votre démonstration des capacités de notre agent Voice of Client.</p>
+                        
+                        <!-- Suivant Steps Section -->
+                        <div class="border rounded p-4 mb-4" style="background-color: #f8f9fa;">
+                            <h5 class="mb-3"><i class="fas fa-rocket me-2 text-primary"></i>What's Suivant?</h5>
+                            <p class="text-muted mb-3">Découvrez toute la puissance de l'agent Voice of Client pour votre organisation.</p>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <button onclick="startNewSession()" class="btn btn-outline-primary btn-lg w-100">
+                                        <i class="fas fa-redo me-2"></i>Try Another Session
+                                    </button>
+                                    <small class="text-muted d-block mt-2">Experience VOÏA with different scenarios</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <a href="mailto:info@rivvalue.com?subject=Voice of Client Agent - Full Service Inquiry&body=Hi Rivvalue team,%0A%0AI just completed the VOÏA Intelligence demonstration and I'm interested in learning more about implementing the full Voice of Client Agent service for my organization.%0A%0APlease contact me to discuss how this can benefit our customer feedback strategy.%0A%0AThank you!" 
+                                       class="btn btn-primary btn-lg w-100">
+                                        <i class="fas fa-envelope me-2"></i>Contact Rivvalue
+                                    </a>
+                                    <small class="text-muted d-block mt-2">Implement full VoC Agent for your business</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Additional Options -->
+                        <div class="mt-4">
+                            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-home me-2"></i>Return Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Pass authentication status to JavaScript
+    window.isAuthenticated = {% if authenticated %}true{% else %}false{% endif %};
+    {% if authenticated %}
+    window.userEmail = "{{ email }}";
+    {% endif %}
+    
+    // Authentication status passed to JavaScript (server-side token invalidation now implemented)
+    console.log('Survey page loaded - Server-side token invalidation active');
+</script>
+<script src="{{ url_for('static', filename='js/survey.js') }}"></script>
+{% endblock %}

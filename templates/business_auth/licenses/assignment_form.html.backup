@@ -1,0 +1,668 @@
+{% extends "business_auth/base.html" %}
+
+{% block title %}Assign License - {{ business_account.name }} - VOÏA Platform Admin{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Platform Admin', 'url': url_for('business_auth.admin_panel')},
+    {'label': 'License Dashboard', 'url': url_for('business_auth.license_dashboard')},
+    {'label': 'Assign License', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+
+<div class="admin-panel">
+    <!-- Header -->
+    <div class="admin-header">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="admin-title">
+                    <i class="fas fa-certificate me-3"></i>Assign License
+                </h1>
+                <p class="admin-subtitle">Configurer la licence pour {{ business_account.name }}</p>
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="{{ url_for('business_auth.license_history', business_id=business_account.id) }}" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-history me-2"></i>History
+                </a>
+                <a href="{{ url_for('business_auth.license_dashboard') }}" class="btn btn-primary">
+                    <i class="fas fa-arrow-left me-2"></i>Back
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Actuel License Information -->
+    <div class="admin-section">
+        <div class="section-header">
+            <h3 class="section-title">
+                <i class="fas fa-info-circle"></i>
+                Actuel Account Information
+            </h3>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="mb-3">Détails du compte</h5>
+                        <table class="table table-sm table-borderless">
+                            <tr>
+                                <td class="text-muted" style="width: 40%;">Nom de l'entreprise :</td>
+                                <td><strong>{{ business_account.name }}</strong></td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Email:</td>
+                                <td>{{ business_account.email }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Type de compte :</td>
+                                <td><span class="badge bg-secondary">{{ business_account.account_type|title }}</span></td>
+                            </tr>
+                            {% if current_license %}
+                            <tr>
+                                <td class="text-muted">Licence actuelle :</td>
+                                <td><span class="license-badge license-{{ current_license.type }}">{{ current_license.type|title }}</span></td>
+                            </tr>
+                            {% if current_license.expiration_date %}
+                            <tr>
+                                <td class="text-muted">Expire :</td>
+                                <td>{{ current_license.expiration_date.strftime('%B %d, %Y') }}</td>
+                            </tr>
+                            {% endif %}
+                            {% endif %}
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="mb-3">Utilisation actuelle</h5>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="text-center p-3" style="background: var(--light-gray); border-radius: var(--radius-lg);">
+                                    <div style="font-size: var(--font-size-2xl); font-weight: 600; color: var(--primary-red);">
+                                        {{ usage_stats.users_count }}
+                                    </div>
+                                    <div class="text-muted" style="font-size: var(--font-size-xs); text-transform: uppercase;">
+                                        Utilisateurs
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-center p-3" style="background: var(--light-gray); border-radius: var(--radius-lg);">
+                                    <div style="font-size: var(--font-size-2xl); font-weight: 600; color: var(--primary-red);">
+                                        {{ usage_stats.campaigns_count }}
+                                    </div>
+                                    <div class="text-muted" style="font-size: var(--font-size-xs); text-transform: uppercase;">
+                                        Campagnes
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- License Assignment Form -->
+    <form method="POST" action="{{ url_for('business_auth.process_license_assignment') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <input type="hidden" name="business_id" value="{{ business_account.id }}"/>
+
+        <!-- License Type Selection -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-certificate"></i>
+                    Select License Type
+                </h3>
+                <p class="text-muted">Choisissez le niveau de licence approprié pour ce compte entreprise</p>
+            </div>
+
+            <div class="row g-4">
+                <!-- Licence Core -->
+                <div class="col-12">
+                    <label class="license-card" for="license_core">
+                        <input type="radio" id="license_core" name="license_type" value="core" {{ 'checked' if current_license and current_license.type == 'core' else '' }}>
+                        <div class="license-card-content">
+                            <div class="d-flex align-items-start">
+                                <div class="license-icon-wrapper me-3">
+                                    <div class="license-icon license-icon-core">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <h4 class="mb-1" style="font-weight: 600;">Licence Core</h4>
+                                            <p class="text-muted mb-0" style="font-size: var(--font-size-sm);">Fonctionnalités essentielles pour les petites équipes</p>
+                                        </div>
+                                        <div class="text-end">
+                                            <div style="font-size: var(--font-size-xl); font-weight: 600; color: var(--primary-red);">{{ "${:,}".format(core_template.annual_price|int) if core_template and core_template.annual_price else 'N/A' }}</div>
+                                            <div class="text-muted" style="font-size: var(--font-size-xs);">par an</div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-md-6">
+                                            <ul class="license-features-list">
+                                                <li><i class="fas fa-check"></i> Jusqu’à 5 utilisateurs</li>
+                                                <li><i class="fas fa-check"></i> 4 campaigns par an</li>
+                                                <li><i class="fas fa-check"></i> 200 réponses cibles par campagne</li>
+                                                <li><i class="fas fa-check"></i> 1 000 invitations par campagne</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <ul class="license-features-list">
+                                                <li><i class="fas fa-check"></i> Analytique de base</li>
+                                                <li><i class="fas fa-check"></i> Assistance par e-mail</li>
+                                                <li><i class="fas fa-check"></i> Modèles standard</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Licence Plus -->
+                <div class="col-12">
+                    <label class="license-card" for="license_plus">
+                        <input type="radio" id="license_plus" name="license_type" value="plus" {{ 'checked' if current_license and current_license.type == 'plus' else '' }}>
+                        <div class="license-card-content">
+                            <div class="d-flex align-items-start">
+                                <div class="license-icon-wrapper me-3">
+                                    <div class="license-icon license-icon-plus">
+                                        <i class="fas fa-plus"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <h4 class="mb-1" style="font-weight: 600;">Licence Plus</h4>
+                                            <p class="text-muted mb-0" style="font-size: var(--font-size-sm);">Fonctionnalités avancées pour les équipes en croissance</p>
+                                        </div>
+                                        <div class="text-end">
+                                            <div style="font-size: var(--font-size-xl); font-weight: 600; color: var(--primary-red);">{{ "${:,}".format(plus_template.annual_price|int) if plus_template and plus_template.annual_price else 'N/A' }}</div>
+                                            <div class="text-muted" style="font-size: var(--font-size-xs);">par an</div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-md-6">
+                                            <ul class="license-features-list">
+                                                <li><i class="fas fa-check"></i> Jusqu’à 10 utilisateurs</li>
+                                                <li><i class="fas fa-check"></i> 4 campaigns par an</li>
+                                                <li><i class="fas fa-check"></i> 1 000 réponses cibles par campagne</li>
+                                                <li><i class="fas fa-check"></i> 5 000 invitations par campagne</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <ul class="license-features-list">
+                                                <li><i class="fas fa-check"></i> Analytique avancée</li>
+                                                <li><i class="fas fa-check"></i> Support prioritaire</li>
+                                                <li><i class="fas fa-check"></i> Modèles personnalisés</li>
+                                                <li><i class="fas fa-check"></i> API Access</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Pro License -->
+                <div class="col-12">
+                    <label class="license-card" for="license_pro">
+                        <input type="radio" id="license_pro" name="license_type" value="pro" {{ 'checked' if current_license and current_license.type == 'pro' else '' }}>
+                        <div class="license-card-content">
+                            <div class="d-flex align-items-start">
+                                <div class="license-icon-wrapper me-3">
+                                    <div class="license-icon license-icon-pro">
+                                        <i class="fas fa-crown"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <h4 class="mb-1" style="font-weight: 600;">Pro License</h4>
+                                            <p class="text-muted mb-0" style="font-size: var(--font-size-sm);">Limites personnalisées pour les besoins d'entreprise</p>
+                                        </div>
+                                        <div class="text-end">
+                                            <div style="font-size: var(--font-size-xl); font-weight: 600; color: var(--primary-red);">Custom</div>
+                                            <div class="text-muted" style="font-size: var(--font-size-xs);">pricing</div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-md-6">
+                                            <ul class="license-features-list">
+                                                <li><i class="fas fa-check"></i> Limites d'utilisateurs personnalisées (par défaut : 25)</li>
+                                                <li><i class="fas fa-check"></i> Limites de campagnes personnalisées (par défaut : 12/an)</li>
+                                                <li><i class="fas fa-check"></i> Objectifs de réponses personnalisés (par défaut : 10 000)</li>
+                                                <li><i class="fas fa-check"></i> Capacité d'invitations personnalisée (par défaut : 50 000)</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <ul class="license-features-list">
+                                                <li><i class="fas fa-check"></i> Analytique personnalisée</li>
+                                                <li><i class="fas fa-check"></i> Support dédié</li>
+                                                <li><i class="fas fa-check"></i> Options en marque blanche</li>
+                                                <li><i class="fas fa-check"></i> Intégrations personnalisées</li>
+                                                <li><i class="fas fa-check"></i> Garantie SLA</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Pro Custom Limits (shown when Pro is selected) -->
+            <div class="mt-4" id="proCustomLimits" style="display: none;">
+                <div class="card">
+                    <div class="card-header" style="background: var(--light-gray); border-bottom: 2px solid var(--primary-red);">
+                        <h5 class="mb-0"><i class="fas fa-cog me-2"></i>Configuration des limites personnalisées</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-4">Définissez des limites spécifiques pour ce compte sous licence Pro.</p>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="max_users" class="form-label">Maximum Utilisateurs</label>
+                                <input type="number" class="form-control" id="max_users" name="max_users" 
+                                       min="1" value="{{ current_license.max_users if current_license and current_license.type == 'pro' else 25 }}">
+                                <div class="form-text">Nombre d'utilisateurs pouvant accéder au compte</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="max_campaigns" class="form-label">Maximum Campagnes</label>
+                                <input type="number" class="form-control" id="max_campaigns" name="max_campaigns" 
+                                       min="1" value="{{ current_license.max_campaigns if current_license and current_license.type == 'pro' else 100 }}">
+                                <div class="form-text">Nombre de campagnes par mois</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="max_participants_per_campaign" class="form-label">Réponses cibles par campagne</label>
+                                <input type="number" class="form-control" id="max_participants_per_campaign" name="max_participants_per_campaign" 
+                                       min="1" max="1000000" value="{{ current_license.max_participants_per_campaign if current_license and current_license.type == 'pro' else 10000 }}">
+                                <div class="form-text">Nombre attendu de réponses complètes à l'enquête (à titre informatif)</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="max_invitations_per_campaign" class="form-label">Nombre maximal d'invitations par campagne</label>
+                                <input type="number" class="form-control" id="max_invitations_per_campaign" name="max_invitations_per_campaign" 
+                                       min="1" max="5000000" value="{{ current_license.max_invitations_per_campaign if current_license and current_license.type == 'pro' else 50000 }}">
+                                <div class="form-text">Limite stricte d'invitations (généralement 5× les réponses pour un taux d’environ 20 %)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add-on Fonctionnalités -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-puzzle-piece"></i>
+                    Add-on Fonctionnalités
+                </h3>
+                <p class="text-muted">Fonctionnalités supplémentaires optionnelles avec tarification et durée personnalisées</p>
+            </div>
+            
+            <div class="card">
+                <div class="card-header" style="background: var(--light-gray);">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="transcript_analysis_addon" name="transcript_analysis_addon" value="1" 
+                               {{ 'checked' if current_license and (current_license.transcript_analysis_start_date or current_license.has_transcript_analysis) else '' }}>
+                        <label class="form-check-label" for="transcript_analysis_addon">
+                            <strong><i class="fas fa-microphone me-2"></i>Transcript Analysis Add-on</strong>
+                        </label>
+                    </div>
+                    <small class="text-muted d-block mt-1">AI-powered analysis of meeting transcripts and voice conversations</small>
+                </div>
+                <div class="card-body transcript-addon-config" style="{{ 'display: none;' if not (current_license and (current_license.transcript_analysis_start_date or current_license.has_transcript_analysis)) else '' }}">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="transcript_start_date" class="form-label">Date de début</label>
+                            <input type="date" class="form-control" id="transcript_start_date" name="transcript_start_date" 
+                                   value="{{ current_license.transcript_analysis_start_date.strftime('%Y-%m-%d') if current_license and current_license.transcript_analysis_start_date else '' }}">
+                            <div class="form-text">When transcript analysis access begins</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="transcript_end_date" class="form-label">Date de fin</label>
+                            <input type="date" class="form-control" id="transcript_end_date" name="transcript_end_date" 
+                                   value="{{ current_license.transcript_analysis_end_date.strftime('%Y-%m-%d') if current_license and current_license.transcript_analysis_end_date else '' }}">
+                            <div class="form-text">When transcript analysis access expires</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="transcript_price" class="form-label">Prix du module complémentaire (USD)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="transcript_price" name="transcript_price" 
+                                       min="0" step="0.01" placeholder="0.00"
+                                       value="{{ '%.2f'|format(current_license.transcript_analysis_price|float) if current_license and current_license.transcript_analysis_price else '' }}">
+                            </div>
+                            <div class="form-text">Custom pricing for this add-on period</div>
+                        </div>
+                    </div>
+                    <div class="alert alert-info mt-3 mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Note:</strong> When the add-on expires, UI access to transcript features will be blocked, but existing transcript data will remain in the database for future access if the add-on is renewed.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assignment Notes -->
+        <div class="admin-section">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-sticky-note"></i>
+                    Assignment Notes
+                </h3>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <label for="notes" class="form-label">Notes (Optional)</label>
+                    <textarea class="form-control" id="notes" name="notes" rows="3" 
+                              placeholder="Ajoutez des notes sur cette attribution de licence..."></textarea>
+                    <div class="form-text">Ces notes seront enregistrées dans l'historique des licences à des fins d'audit.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Warning for downgrades -->
+        <div class="alert alert-warning" id="downgradeWarning" style="display: none;">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Warning:</strong> This license change may reduce the account's capabilities. 
+            Please ensure the current usage is within the new license limits before proceeding.
+        </div>
+
+        <!-- License Comparison Preview -->
+        <div class="admin-section" id="licenseComparison" style="display: none;">
+            <div class="section-header">
+                <h3 class="section-title">
+                    <i class="fas fa-exchange-alt"></i>
+                    License Comparison
+                </h3>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead style="background: var(--light-gray);">
+                                <tr>
+                                    <th>Fonctionnalité</th>
+                                    <th>Actuel</th>
+                                    <th style="color: var(--primary-red);">Nouveau</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>License Type</strong></td>
+                                    <td class="text-muted">{{ current_license.type|title if current_license else 'None' }}</td>
+                                    <td style="color: var(--primary-red); font-weight: 600;" id="newLicenseType">-</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Max Utilisateurs</strong></td>
+                                    <td class="text-muted">{{ current_license.max_users if current_license else 'N/A' }}</td>
+                                    <td style="color: var(--primary-red); font-weight: 600;" id="newMaxUtilisateurs">-</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Max Campagnes</strong></td>
+                                    <td class="text-muted">{{ current_license.max_campaigns if current_license else 'N/A' }}</td>
+                                    <td style="color: var(--primary-red); font-weight: 600;" id="newMaxCampagnes">-</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Réponses cibles par campagne</strong></td>
+                                    <td class="text-muted">{{ current_license.max_participants_per_campaign if current_license else 'N/A' }}</td>
+                                    <td style="color: var(--primary-red); font-weight: 600;" id="newMaxParticipants">-</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Max Invitations per Campaign</strong></td>
+                                    <td class="text-muted">{{ current_license.max_invitations_per_campaign if current_license else 'N/A' }}</td>
+                                    <td style="color: var(--primary-red); font-weight: 600;" id="newMaxInvitations">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="admin-section">
+            <div class="d-flex justify-content-end gap-3">
+                <a href="{{ url_for('business_auth.license_dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-check me-2"></i>Assign License
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<style>
+/* License Card Styling */
+.license-card {
+    display: block;
+    background: var(--primary-white);
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.license-card input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.license-card:hover {
+    border-color: var(--primary-red);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.license-card input[type="radio"]:checked + .license-card-content {
+    border-left: 4px solid var(--primary-red);
+    padding-left: calc(var(--spacing-md) - 4px);
+}
+
+.license-card input[type="radio"]:checked ~ * {
+    background: rgba(var(--primary-red-rgb, 220, 53, 69), 0.03);
+}
+
+.license-card-content {
+    border-left: 4px solid transparent;
+    padding-left: var(--spacing-md);
+    transition: all 0.2s ease;
+}
+
+.license-icon-wrapper {
+    flex-shrink: 0;
+}
+
+.license-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: var(--primary-white);
+}
+
+.license-icon-core {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+}
+
+.license-icon-plus {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.license-icon-pro {
+    background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+}
+
+.license-features-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.license-features-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: var(--font-size-sm);
+    color: var(--primary-black);
+}
+
+.license-features-list i {
+    color: var(--primary-red);
+    width: 16px;
+    flex-shrink: 0;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const licenseOptions = document.querySelectorAll('input[name="license_type"]');
+    const proCustomLimits = document.getElementById('proCustomLimits');
+    const licenseComparison = document.getElementById('licenseComparison');
+    const downgradeWarning = document.getElementById('downgradeWarning');
+    
+    // License limits configuration
+    const licenseLimits = {
+        core: { users: 5, campaigns: 4, participants: 200, invitations: 1000 },
+        plus: { users: 10, campaigns: 4, participants: 1000, invitations: 5000 },
+        pro: { users: 'custom', campaigns: 'custom', participants: 'custom', invitations: 'custom' }
+    };
+    
+    // Actuel usage from backend
+    const currentUsage = {
+        users: {{ usage_stats.users_count }},
+        campaigns: {{ usage_stats.campaigns_count }}
+    };
+    
+    // Transcript Analysis Add-on handling
+    const transcriptAddonCheckbox = document.getElementById('transcript_analysis_addon');
+    const transcriptAddonConfig = document.querySelector('.transcript-addon-config');
+    
+    function toggleTranscriptAddon() {
+        if (transcriptAddonCheckbox.checked) {
+            transcriptAddonConfig.style.display = 'block';
+        } else {
+            transcriptAddonConfig.style.display = 'none';
+            document.getElementById('transcript_start_date').value = '';
+            document.getElementById('transcript_end_date').value = '';
+            document.getElementById('transcript_price').value = '';
+        }
+    }
+    
+    transcriptAddonCheckbox.addEventListener('change', toggleTranscriptAddon);
+
+    function updateLicenseSelection() {
+        const selectedLicense = document.querySelector('input[name="license_type"]:checked');
+        if (!selectedLicense) return;
+
+        const licenseType = selectedLicense.value;
+        
+        // Show/hide Pro custom limits
+        if (licenseType === 'pro') {
+            proCustomLimits.style.display = 'block';
+        } else {
+            proCustomLimits.style.display = 'none';
+        }
+        
+        // Update license comparison
+        updateComparison(licenseType);
+        
+        // Check for downgrades
+        checkForDowngrade(licenseType);
+    }
+    
+    function updateComparison(licenseType) {
+        const limits = licenseLimits[licenseType];
+        
+        document.getElementById('newLicenseType').textContent = licenseType.charAt(0).toUpperCase() + licenseType.slice(1);
+        
+        if (licenseType === 'pro') {
+            document.getElementById('newMaxUtilisateurs').textContent = document.getElementById('max_users').value || 'Custom';
+            document.getElementById('newMaxCampagnes').textContent = document.getElementById('max_campaigns').value || 'Custom';
+            document.getElementById('newMaxParticipants').textContent = document.getElementById('max_participants_per_campaign').value || 'Custom';
+            document.getElementById('newMaxInvitations').textContent = document.getElementById('max_invitations_per_campaign').value || 'Custom';
+        } else {
+            document.getElementById('newMaxUtilisateurs').textContent = limits.users.toLocaleString();
+            document.getElementById('newMaxCampagnes').textContent = limits.campaigns.toLocaleString();
+            document.getElementById('newMaxParticipants').textContent = limits.participants.toLocaleString();
+            document.getElementById('newMaxInvitations').textContent = limits.invitations.toLocaleString();
+        }
+        
+        licenseComparison.style.display = 'block';
+    }
+    
+    function checkForDowngrade(licenseType) {
+        let isDowngrade = false;
+        const limits = licenseLimits[licenseType];
+        
+        if (licenseType !== 'pro') {
+            if (currentUsage.users > limits.users ||
+                currentUsage.campaigns > limits.campaigns) {
+                isDowngrade = true;
+            }
+        } else {
+            const maxUtilisateurs = parseInt(document.getElementById('max_users').value) || 0;
+            const maxCampagnes = parseInt(document.getElementById('max_campaigns').value) || 0;
+            
+            if (currentUsage.users > maxUtilisateurs ||
+                currentUsage.campaigns > maxCampagnes) {
+                isDowngrade = true;
+            }
+        }
+        
+        downgradeWarning.style.display = isDowngrade ? 'block' : 'none';
+    }
+    
+    // Event listeners
+    licenseOptions.forEach(option => {
+        option.addEventListener('change', updateLicenseSelection);
+    });
+    
+    // Update Pro limits when changed
+    ['max_users', 'max_campaigns', 'max_participants_per_campaign', 'max_invitations_per_campaign'].forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.addEventListener('input', function() {
+                const selectedLicense = document.querySelector('input[name="license_type"]:checked');
+                if (selectedLicense && selectedLicense.value === 'pro') {
+                    updateLicenseSelection();
+                }
+            });
+        }
+    });
+    
+    // Initialize
+    updateLicenseSelection();
+});
+</script>
+
+{% endblock %}

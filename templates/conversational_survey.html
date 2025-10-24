@@ -15,7 +15,7 @@
                     <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}" class="conv-hero-logo">
                 {% endif %}
                 <h1 id="conv-main-heading" class="conv-hero-title">VO<span class="voia-red-accent">Ï</span>A</h1>
-                <p class="conv-hero-subtitle">Partagez votre expérience</p>
+                <p class="conv-hero-subtitle">{{ _('Share your experience') }}</p>
             </header>
 
             <!-- Authentication Check -->
@@ -27,11 +27,11 @@
                             <i class="fas fa-key me-2" aria-hidden="true"></i>
                             <strong>Authentication Required</strong>
                         </h2>
-                        <p class="mb-3">Vous avez besoin d'un jeton valide pour participer à cette enquête.</p>
+                        <p class="mb-3">{{ _('You need a valid token to participate in this survey.') }}</p>
                         {% if error %}
                         <p class="text-danger">{{ error }}</p>
                         {% endif %}
-                        <a href="/auth" class="conv-auth-btn btn" aria-label="Obtenir un jeton d'authentification pour commencer l'enquête">Obtenir un jeton d'authentification</a>
+                        <a href="/auth" class="conv-auth-btn btn" aria-label="{{ _('Get authentication token to start survey') }}">{{ _('Get Authentication Token') }}</a>
                     </div>
                 </div>
             </section>
@@ -41,7 +41,7 @@
             {% if authenticated %}
             <section id="surveySetup" class="conv-setup-card card" aria-labelledby="setup-heading">
                 <div class="conv-setup-header card-header">
-                    <h2 id="setup-heading" class="h5"><i class="fas fa-user-circle me-2" aria-hidden="true"></i>Commençons</h2>
+                    <h2 id="setup-heading" class="h5"><i class="fas fa-user-circle me-2" aria-hidden="true"></i>{{ _('Let\'s Get Started') }}</h2>
                     <small class="text-muted">Authenticated as: {{ email }}</small>
                 </div>
                 <div class="conv-setup-body card-body">
@@ -49,7 +49,7 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         
                         <div class="mb-3">
-                            <label for="companyName" class="form-label conv-form-label">Nom de l'entreprise</label>
+                            <label for="companyName" class="form-label conv-form-label">{{ _('Company Name') }}</label>
                             <input type="text" 
                                    class="form-control" 
                                    id="companyName" 
@@ -57,11 +57,11 @@
                                    aria-required="true"
                                    value="{{ participant_company or '' }}"
                                    {% if participant_company %}readonly aria-readonly="true"{% endif %}
-                                   placeholder="Entrez le nom de votre entreprise">
+                                   placeholder="{{ _('Enter your company name') }}">
                         </div>
                         
                         <div class="mb-3">
-                            <label for="respondentName" class="form-label conv-form-label">Votre nom</label>
+                            <label for="respondentName" class="form-label conv-form-label">{{ _('Your Name') }}</label>
                             <input type="text" 
                                    class="form-control" 
                                    id="respondentName" 
@@ -69,11 +69,11 @@
                                    aria-required="true"
                                    value="{{ participant_name or '' }}"
                                    {% if participant_name %}readonly aria-readonly="true"{% endif %}
-                                   placeholder="Entrez votre nom complet">
+                                   placeholder="{{ _('Enter your full name') }}">
                         </div>
                         
                         <div class="mb-3">
-                            <label for="respondentEmail" class="form-label conv-form-label">Adresse e-mail</label>
+                            <label for="respondentEmail" class="form-label conv-form-label">{{ _('Email Address') }}</label>
                             <input type="email" 
                                    class="form-control" 
                                    id="respondentEmail" 
@@ -81,24 +81,24 @@
                                    aria-required="true"
                                    value="{{ email or '' }}"
                                    {% if email %}readonly aria-readonly="true"{% endif %}
-                                   placeholder="Entrez votre adresse e-mail">
+                                   placeholder="{{ _('Enter your email address') }}">
                         </div>
                         
                         <div class="mb-3">
-                            <label for="tenureWithFc" class="form-label conv-form-label">Depuis combien de temps travaillez-vous avec FC inc ?</label>
+                            <label for="tenureWithFc" class="form-label conv-form-label">{{ _('How long have you been working with FC inc?') }}</label>
                             <select class="form-select" id="tenureWithFc" required aria-required="true">
-                                <option value="">Sélectionnez la durée...</option>
-                                <option value="Moins de 6 mois">Moins de 6 mois</option>
-                                <option value="6 mois - 1 an">6 mois - 1 an</option>
-                                <option value="1 à 2 ans">1 à 2 ans</option>
-                                <option value="2 à 3 ans">2 à 3 ans</option>
-                                <option value="3 à 5 ans">3 à 5 ans</option>
-                                <option value="5 à 10 ans">5 à 10 ans</option>
-                                <option value="Plus de 10 ans">Plus de 10 ans</option>
+                                <option value="">{{ _('Select duration...') }}</option>
+                                <option value="{{ _('Less than 6 months') }}">{{ _('Less than 6 months') }}</option>
+                                <option value="{{ _('6 months - 1 year') }}">{{ _('6 months - 1 year') }}</option>
+                                <option value="{{ _('1-2 years') }}">{{ _('1-2 years') }}</option>
+                                <option value="{{ _('2-3 years') }}">{{ _('2-3 years') }}</option>
+                                <option value="{{ _('3-5 years') }}">{{ _('3-5 years') }}</option>
+                                <option value="{{ _('5-10 years') }}">{{ _('5-10 years') }}</option>
+                                <option value="{{ _('More than 10 years') }}">{{ _('More than 10 years') }}</option>
                             </select>
                         </div>
                         
-                        <button type="submit" class="conv-start-btn btn" aria-label="Démarrer l'enquête conversationnelle">
+                        <button type="submit" class="conv-start-btn btn" aria-label="{{ _('Start Conversational Survey') }}">
                             <i class="fas fa-comments me-2" aria-hidden="true"></i>Start Conversation
                         </button>
                     </form>
@@ -112,7 +112,7 @@
                      aria-live="polite">
                 <div class="conv-interface-header card-header">
                     <h2 id="conversation-heading" class="h5 voia-wordmark">VO<span class="voia-accent voia-red-accent">Ï</span>A</h2>
-                    <div class="progress conv-progress-container" role="progressbar" aria-label="Progression de l'enquête" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress conv-progress-container" role="progressbar" aria-label="{{ _('Survey progress') }}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
                         <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated conv-progress-bar"></div>
                     </div>
                 </div>
@@ -122,7 +122,7 @@
                     <div id="chatMessages" 
                          class="conv-chat-messages" 
                          role="log" 
-                         aria-label="Messages de la conversation"
+                         aria-label="{{ _('Conversation messages') }}"
                          aria-live="polite"
                          aria-atomic="false">
                         <!-- Messages will be populated here -->
@@ -131,16 +131,16 @@
                     <!-- Input Area -->
                     <div id="inputArea" class="conv-input-area">
                         <div class="input-group">
-                            <label for="userInput" class="visually-hidden">Saisissez votre réponse</label>
+                            <label for="userInput" class="visually-hidden">{{ _('Type your response') }}</label>
                             <textarea id="userInput" 
                                       class="form-control" 
                                       rows="3" 
-                                      placeholder="Saisissez votre réponse here..."
-                                      aria-label="Saisissez votre réponse to VOÏA"></textarea>
+                                      placeholder="{{ _('Type your response') }} here..."
+                                      aria-label="{{ _('Type your response') }} to VOÏA"></textarea>
                             <button id="sendButton" 
                                     class="conv-send-btn btn" 
                                     type="button"
-                                    aria-label="Envoyer le message">
+                                    aria-label="{{ _('Send message') }}">
                                 <i class="fas fa-paper-plane" aria-hidden="true"></i>
                             </button>
                         </div>
@@ -157,13 +157,13 @@
                      class="conv-loading-card card v2-hidden" 
                      role="status"
                      aria-live="polite"
-                     aria-label="Traitement de la réponse">
+                     aria-label="{{ _('Processing response') }}">
                 <div class="conv-loading-body card-body">
                     <div class="spinner-border conv-loading-spinner" role="status">
-                        <span class="visually-hidden">Chargement...</span>
+                        <span class="visually-hidden">{{ _('Loading...') }}</span>
                     </div>
-                    <h2 class="h5">VOÏA traite votre réponse...</h2>
-                    <p class="text-muted">Veuillez patienter pendant que VOÏA analyse votre retour d'information</p>
+                    <h2 class="h5">{{ _('VOÏA is processing your response...') }}</h2>
+                    <p class="text-muted">{{ _('Please wait while VOÏA analyzes your feedback') }}</p>
                 </div>
             </section>
 
@@ -175,30 +175,30 @@
                     <div class="conv-success-icon">
                         <i class="fas fa-check-circle" aria-hidden="true"></i>
                     </div>
-                    <h2 id="complete-heading" class="h4">Merci d'avoir partagé votre retour d'information.</h2>
-                    <p class="lead">Votre retour d'information a été analysé avec succès par VOÏA Intelligence.</p>
+                    <h2 id="complete-heading" class="h4">{{ _('Thank you for sharing your feedback.') }}</h2>
+                    <p class="lead">{{ _('Your feedback has been successfully analyzed by VOÏA Intelligence.') }}</p>
                     
                     <!-- Dashboard Button -->
                     <div class="mb-4">
                         <a href="{{ url_for('dashboard') }}" 
                            class="conv-dashboard-btn btn"
-                           aria-label="Afficher le tableau de bord analytique avec vos résultats de retour">
+                           aria-label="{{ _('View analytics dashboard with your feedback results') }}">
                             <i class="fas fa-chart-bar me-2" aria-hidden="true"></i>View Analytics Dashboard
                         </a>
                     </div>
                     
-                    <p class="text-muted mb-4">Cela conclut votre démonstration des capacités de notre agent Voice of Client.</p>
+                    <p class="text-muted mb-4">{{ _('This completes your demonstration of our Voice of Client Agent capabilities.') }}</p>
                     
                     <!-- Next Steps Section -->
                     <div class="conv-next-steps">
-                        <h3 class="h5"><i class="fas fa-rocket me-2" aria-hidden="true"></i>Quelle est la prochaine étape ?</h3>
-                        <p class="text-muted">Découvrez toute la puissance de l'agent Voice of Client pour votre organisation.</p>
+                        <h3 class="h5"><i class="fas fa-rocket me-2" aria-hidden="true"></i>{{ _('What\'s Next?') }}</h3>
+                        <p class="text-muted">{{ _('Experience the full power of Voice of Client Agent for your organization.') }}</p>
                         
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <button onclick="startNewSession()" 
                                         class="conv-action-btn-outline btn"
-                                        aria-label="Essayer une autre session de démonstration">
+                                        aria-label="{{ _('Try another demo session') }}">
                                     <i class="fas fa-redo me-2" aria-hidden="true"></i>Try Another Session
                                 </button>
                                 <small class="conv-btn-helper-text">Experience VOÏA with different scenarios</small>
@@ -206,7 +206,7 @@
                             <div class="col-md-6">
                                 <a href="mailto:info@rivvalue.com?subject=Voice of Client Agent - Full Service Inquiry&body=Hi Rivvalue team,%0A%0AI just completed the VOÏA Intelligence demonstration and I'm interested in learning more about implementing the full Voice of Client Agent service for my organization.%0A%0APlease contact me to discuss how this can benefit our customer feedback strategy.%0A%0AThank you!" 
                                    class="conv-action-btn-solid btn"
-                                   aria-label="Contactez Rivvalue pour mettre en œuvre VOÏA dans votre entreprise">
+                                   aria-label="{{ _('Contact Rivvalue to implement VOÏA for your business') }}">
                                     <i class="fas fa-envelope me-2" aria-hidden="true"></i>Contact Rivvalue
                                 </a>
                                 <small class="conv-btn-helper-text">Implement full VoC Agent for your business</small>
@@ -218,7 +218,7 @@
                     <div class="mt-4">
                         <a href="{{ url_for('index') }}" 
                            class="conv-home-btn btn btn-outline-secondary"
-                           aria-label="Retour à la page d'accueil">
+                           aria-label="{{ _('Return to home page') }}">
                             <i class="fas fa-home me-2" aria-hidden="true"></i>Return Home
                         </a>
                     </div>

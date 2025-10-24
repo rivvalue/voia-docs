@@ -1,0 +1,376 @@
+{% extends "base.html" %}
+{% set needs_charts = True %}
+
+{% block title %}Résumé exécutif - VOÏA - Voice Of Client Agent{% endblock %}
+
+{% block page_class %}page-executive-summary{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Business Intelligence', 'url': url_for('dashboard')},
+    {'label': 'Résumé exécutif', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+
+<div class="container">
+    <div data-page="executive-summary"></div>
+    
+    <!-- Page Header -->
+    <div class="bg-white border-bottom" style="padding: 2.5rem 0; margin-bottom: 2rem;">
+        <div class="row align-items-center">
+            <div class="col-12 col-md-8 mb-3 mb-md-0">
+                <h1 class="h2 mb-2">Résumé exécutif</h1>
+                <p class="text-muted mb-0">Vue d'ensemble des principaux indicateurs de performance sur l'ensemble des campagnes</p>
+            </div>
+            <div class="col-12 col-md-4 text-center text-md-end">
+                <div class="d-flex align-items-center justify-content-center justify-content-md-end gap-3">
+                    <!-- Link to Campagne Insights -->
+                    <a href="{{ url_for('campaign_insights') }}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-chart-bar me-2"></i>Campagne Insights
+                    </a>
+                    
+                    <!-- Refresh Icon -->
+                    <button class="btn btn-sm btn-link text-muted p-1" 
+                            onclick="refreshData()" 
+                            title="Actualiser les données">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Résumé exécutif Content -->
+    <div class="bg-white border rounded" style="padding: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <!-- Loading state -->
+        <div class="loading-card" id="executiveSummaryLoading">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Chargement du résumé exécutif...</span>
+            </div>
+            <div class="loading-text">Chargement du résumé exécutif...</div>
+        </div>
+
+        <!-- Résumé exécutif Content (toggles during loading) -->
+        <div class="d-none" id="executiveSummaryContent">
+            <!-- KPI Overview Section -->
+            <div class="mb-4">
+                <h5 class="mb-3"><i class="fas fa-trending-up me-2" style="color: #E13A44;"></i>Vue d'ensemble des indicateurs de campagne</h5>
+                <div class="table-responsive">
+                    <table class="table table-borderless table-sm" id="kpiOverviewTable" style="font-size: 0.85rem;">
+                        <thead>
+                            <tr>
+                                <th style="min-width: 120px;">Campagne</th>
+                                <th class="text-center" style="min-width: 100px;">
+                                    Réponses
+                                    <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Cliquez pour voir les tendances complètes">
+                                        <canvas id="sparkline-responses"></canvas>
+                                    </div>
+                                </th>
+                                <th class="text-center" style="min-width: 100px;">
+                                    NPS
+                                    <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Cliquez pour voir les tendances complètes">
+                                        <canvas id="sparkline-nps"></canvas>
+                                    </div>
+                                </th>
+                                <th class="text-center" style="min-width: 100px;">
+                                    Entreprises
+                                    <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Cliquez pour voir les tendances complètes">
+                                        <canvas id="sparkline-companies"></canvas>
+                                    </div>
+                                </th>
+                                <th class="text-center" style="min-width: 110px;">
+                                    Risque critique
+                                    <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Cliquez pour voir les tendances complètes">
+                                        <canvas id="sparkline-critical"></canvas>
+                                    </div>
+                                </th>
+                                <th class="text-center" style="min-width: 110px;">
+                                    Satisfaction
+                                    <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Cliquez pour voir les tendances complètes">
+                                        <canvas id="sparkline-satisfaction"></canvas>
+                                    </div>
+                                </th>
+                                <th class="text-center" style="min-width: 110px;">
+                                    Produit
+                                    <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Cliquez pour voir les tendances complètes">
+                                        <canvas id="sparkline-product"></canvas>
+                                    </div>
+                                </th>
+                                <th class="text-center" style="min-width: 100px;">
+                                    Tarification
+                                    <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Cliquez pour voir les tendances complètes">
+                                        <canvas id="sparkline-pricing"></canvas>
+                                    </div>
+                                </th>
+                                <th class="text-center" style="min-width: 100px;">
+                                    Service
+                                    <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Cliquez pour voir les tendances complètes">
+                                        <canvas id="sparkline-service"></canvas>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="kpiOverviewTableBody">
+                            <tr>
+                                <td colspan="9" class="text-center text-muted">
+                                    <i class="fas fa-spinner fa-spin me-2"></i>Loading KPI overview...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Mobile: View Trends Button (hidden on desktop) -->
+                <div class="text-center mt-3 d-md-none">
+                    <button class="btn btn-outline-secondary btn-sm" onclick="openTrendsModal()" style="border-color: #BDBDBD; color: #000000;">
+                        <i class="fas fa-chart-line me-2"></i>View Trends
+                    </button>
+                </div>
+            </div>
+
+            <!-- Campagne Comparison Section -->
+            <div class="mt-4">
+                <h5 class="mb-3"><i class="fas fa-exchange-alt me-2" style="color: #E13A44;"></i>Campagne Comparison</h5>
+                
+                <!-- Campagne Comparison Selector -->
+                <div class="border rounded p-3 mb-3" style="background-color: #f8f9fa;">
+                    <div class="row align-items-center">
+                        <div class="col-md-5">
+                            <label for="campaign1Select" class="form-label fw-semibold">Campagne 1</label>
+                            <select class="form-select" id="campaign1Select" onchange="updateComparison()">
+                                <option value="">Sélectionner la première campagne</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 text-center">
+                            <i class="fas fa-exchange-alt fa-2x mt-4" style="color: #E13A44;"></i>
+                        </div>
+                        <div class="col-md-5">
+                            <label for="campaign2Select" class="form-label fw-semibold">Campagne 2</label>
+                            <select class="form-select" id="campaign2Select" onchange="updateComparison()">
+                                <option value="">Sélectionner la deuxième campagne</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- No Selection Message -->
+                    <div id="noComparisonMessage" class="text-center py-4 mt-3" style="background-color: #ffffff; border-radius: 8px;">
+                        <i class="fas fa-info-circle fa-2x mb-2" style="color: #E13A44;"></i>
+                        <p class="text-muted mb-0">Veuillez sélectionner deux campagnes ci-dessus pour afficher les résultats de la comparaison</p>
+                    </div>
+                </div>
+                
+                <!-- Comparison Results -->
+                <div id="comparisonResults" style="display: none;">
+                    <!-- Comparaison des indicateurs -->
+                    <div class="border rounded p-3 mb-3" style="background-color: #ffffff;">
+                        <h6 class="mb-3">Comparaison des indicateurs</h6>
+                        <div class="table-responsive">
+                            <table class="table table-borderless table-sm">
+                                <thead>
+                                    <tr style="background-color: #f8f9fa;">
+                                        <th style="width: 30%;">Indicateur</th>
+                                        <th style="width: 25%;" class="text-center" id="campaign1Header">Campagne 1</th>
+                                        <th style="width: 25%;" class="text-center" id="campaign2Header">Campagne 2</th>
+                                        <th style="width: 20%;" class="text-center">Changementment</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="summaryTable">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Analyse compte par compte -->
+                    <div class="border rounded p-3" style="background-color: #ffffff;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h6 class="mb-0">Analyse compte par compte</h6>
+                                <small class="text-muted" id="comparisonRechercherInfo"></small>
+                            </div>
+                        </div>
+                        
+                        <!-- Campagne Identifiers -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <small class="text-muted">C1 = <strong id="c1CampagneName">Campagne 1</strong></small>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <small class="text-muted">C2 = <strong id="c2CampagneName">Campagne 2</strong></small>
+                            </div>
+                        </div>
+                        
+                        <!-- Rechercher and Filter Controls -->
+                        <div class="row align-items-end mb-3">
+                            <div class="col-md-5">
+                                <label for="comparisonRechercher" class="form-label">Rechercher</label>
+                                <input type="text" class="form-control" id="comparisonRechercher" 
+                                       placeholder="Rechercher by company name...">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="comparisonBalanceFilter" class="form-label">État d'équilibre</label>
+                                <select class="form-select" id="comparisonBalanceFilter" onchange="searchComparisonTable()">
+                                    <option value="">All Entreprises</option>
+                                    <option value="opportunity_heavy">Forte opportunité</option>
+                                    <option value="balanced">Équilibré</option>
+                                    <option value="risk_heavy">Risque élevé</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="btn-group w-100">
+                                    <button type="button" class="btn btn-primary" onclick="searchComparisonTable()">
+                                        <i class="fas fa-search me-1"></i>Rechercher
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" onclick="clearComparisonRechercher()">
+                                        <i class="fas fa-times me-1"></i>Clear
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover table-sm">
+                                <thead style="background-color: #f8f9fa;">
+                                    <tr>
+                                        <th style="width: 15%;">Entreprise</th>
+                                        <th style="width: 15%;" class="text-center">C1 Risques</th>
+                                        <th style="width: 15%;" class="text-center">C1 Opportunités</th>
+                                        <th style="width: 15%;" class="text-center">C1 Équilibre</th>
+                                        <th style="width: 15%;" class="text-center">C2 Risques</th>
+                                        <th style="width: 15%;" class="text-center">C2 Opportunités</th>
+                                        <th style="width: 15%;" class="text-center">C2 Équilibre</th>
+                                        <th style="width: 15%;" class="text-center">Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="companyTable">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Pagination Controls for Comparison Table -->
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div class="pagination-info">
+                                <small class="text-muted" id="comparisonPaginationInfo">Loading...</small>
+                            </div>
+                            <nav aria-label="Pagination du tableau comparatif">
+                                <ul class="pagination pagination-sm mb-0" id="comparisonPaginationControls">
+                                    <!-- Will be populated by JavaScript -->
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Résumé exécutif Content -->
+    </div>
+</div>
+
+<!-- Trends Modal (Full Screen View for Sparklines) -->
+<div class="modal fade" id="trendsModal" tabindex="-1" aria-labelledby="trendsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-white border-bottom">
+                <h5 class="modal-title" id="trendsModalLabel">
+                    <i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>Campagne Performance Trends
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Total Réponses</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-responses" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Score NPS</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-nps" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Entreprises Analyzed</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-companies" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Risque critique Count</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-critical" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Satisfaction</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-satisfaction" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Produit Value</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-product" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Tarification</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-pricing" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Service</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-service" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-white border-top">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<!-- JavaScript for Résumé exécutif -->
+<script src="{{ url_for('static', filename='js/executive_summary.js') }}?v={{ range(1000, 9999) | random }}"></script>
+{% endblock %}

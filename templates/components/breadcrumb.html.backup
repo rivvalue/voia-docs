@@ -1,0 +1,34 @@
+{# 
+  Reusable Breadcrumb Component
+  
+  Usage:
+    {% set breadcrumb_items = [
+        {'label': 'Campaigns', 'url': url_for('campaigns.list_campaigns')},
+        {'label': campaign.name, 'url': url_for('campaigns.view_campaign', campaign_id=campaign.id)},
+        {'label': 'Survey Configuration', 'current': true}
+    ] %}
+    {% include 'components/breadcrumb.html' %}
+#}
+
+{% if breadcrumb_items and breadcrumb_items|length > 0 %}
+<nav class="breadcrumb-nav" aria-label="Navigation par fil d'Ariane">
+    <div class="container">
+        <ol class="breadcrumb-list">
+            {% for item in breadcrumb_items %}
+                {% if item.current or loop.last %}
+                    <li class="breadcrumb-item breadcrumb-item-current" aria-current="page">
+                        <span class="breadcrumb-text" title="{{ item.label }}">{{ item.label }}</span>
+                    </li>
+                {% else %}
+                    <li class="breadcrumb-item">
+                        <a href="{{ item.url }}" class="breadcrumb-link" aria-label="Aller à {{ item.label }}">
+                            {{ item.label }}
+                        </a>
+                        <i class="fas fa-chevron-right breadcrumb-separator" aria-hidden="true"></i>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ol>
+    </div>
+</nav>
+{% endif %}

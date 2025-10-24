@@ -1,0 +1,664 @@
+{% extends "base.html" %}
+
+{% block title %}Activate Account - {{ business_account.name }} - VOÏA{% endblock %}
+
+{% block page_class %}page-account-activation{% endblock %}
+
+{% block content %}
+<style>
+/* Account activation specific styling */
+.activation-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 0 var(--spacing-lg);
+}
+
+.activation-header {
+    background: linear-gradient(135deg, rgba(var(--primary-red-rgb, 225, 58, 68), 0.1) 0%, rgba(var(--red-hover-rgb, 197, 45, 54), 0.15) 100%);
+    border: 1px solid var(--red-light);
+    color: var(--primary-black);
+    padding: 3rem 2rem;
+    border-radius: var(--radius-2xl);
+    margin-bottom: 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.activation-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-red), var(--red-hover));
+}
+
+.welcome-icon {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: var(--primary-white);
+    font-size: 2.5rem;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+}
+
+.welcome-icon::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, var(--primary-red), var(--red-hover), var(--primary-red));
+    z-index: -1;
+    opacity: 0.3;
+}
+
+.welcome-title {
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    color: var(--primary-black);
+    margin-bottom: var(--spacing-sm);
+    font-family: var(--font-family-headings);
+}
+
+.welcome-subtitle {
+    font-size: var(--font-size-lg);
+    color: var(--gray-dark);
+    margin-bottom: 0;
+    font-weight: 500;
+}
+
+.business-info {
+    background: var(--primary-white);
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-2xl);
+    box-shadow: var(--shadow-sm);
+    position: relative;
+}
+
+.business-info::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--primary-red), var(--red-hover));
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+.business-info h4 {
+    color: var(--primary-black);
+    font-weight: 600;
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.business-details {
+    display: grid;
+    gap: var(--spacing-sm);
+}
+
+.business-detail {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.business-detail:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-weight: 500;
+    color: var(--gray-dark);
+    font-size: var(--font-size-sm);
+}
+
+.detail-value {
+    font-weight: 600;
+    color: var(--primary-black);
+    font-size: var(--font-size-sm);
+}
+
+.activation-form {
+    background: var(--primary-white);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 2px solid var(--light-gray);
+}
+
+.form-title {
+    font-size: var(--font-size-2xl);
+    font-weight: 600;
+    color: var(--primary-black);
+    margin-bottom: var(--spacing-sm);
+    font-family: var(--font-family-headings);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+}
+
+.form-description {
+    color: var(--gray-dark);
+    font-size: var(--font-size-base);
+    margin: 0;
+}
+
+.form-group {
+    margin-bottom: var(--spacing-xl);
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: var(--primary-black);
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wide);
+}
+
+.form-control {
+    width: 100%;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-base);
+    transition: all 0.3s ease;
+    font-family: var(--font-family-base);
+    background-color: var(--primary-white);
+    color: var(--primary-black);
+    position: relative;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 3px rgba(var(--primary-red-rgb, 225, 58, 68), 0.15);
+    transform: translateY(-1px);
+}
+
+.form-control:hover {
+    border-color: var(--medium-gray);
+}
+
+.form-control.is-invalid {
+    border-color: var(--primary-red);
+    background-color: rgba(var(--primary-red-rgb, 225, 58, 68), 0.02);
+}
+
+.password-strength {
+    margin-top: var(--spacing-sm);
+    font-size: var(--font-size-xs);
+    color: var(--gray-dark);
+}
+
+.password-requirements {
+    background: rgba(var(--primary-red-rgb, 225, 58, 68), 0.03);
+    border: 1px solid var(--red-light);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-top: var(--spacing-sm);
+}
+
+.requirement {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--font-size-xs);
+    color: var(--gray-dark);
+}
+
+.requirement:last-child {
+    margin-bottom: 0;
+}
+
+.requirement.met {
+    color: #15803d;
+}
+
+.requirement.met .requirement-icon {
+    color: #15803d;
+}
+
+.requirement-icon {
+    color: var(--medium-gray);
+    width: 16px;
+    text-align: center;
+}
+
+.btn-activate {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+    border: 2px solid var(--primary-red);
+    padding: var(--spacing-lg) var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    font-family: var(--font-family-base);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wide);
+    width: 100%;
+    min-height: 56px;
+}
+
+.btn-activate:hover {
+    background: linear-gradient(135deg, var(--red-hover) 0%, var(--primary-red) 100%);
+    border-color: var(--red-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-activate:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(var(--primary-red-rgb, 225, 58, 68), 0.25);
+}
+
+.btn-activate:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    background: var(--medium-gray);
+    border-color: var(--medium-gray);
+}
+
+.alert {
+    border-radius: var(--radius-lg);
+    border: none;
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    font-weight: 500;
+}
+
+.alert-success {
+    background: rgba(34, 197, 94, 0.1);
+    color: #15803d;
+    border-left: 4px solid #22c55e;
+}
+
+.alert-danger {
+    background: rgba(var(--primary-red-rgb, 225, 58, 68), 0.1);
+    color: var(--primary-red);
+    border-left: 4px solid var(--primary-red);
+}
+
+.alert-info {
+    background: rgba(59, 130, 246, 0.1);
+    color: #1d4ed8;
+    border-left: 4px solid #3b82f6;
+}
+
+.security-note {
+    background: rgba(var(--primary-red-rgb, 225, 58, 68), 0.05);
+    border-left: 4px solid var(--primary-red);
+    padding: var(--spacing-lg);
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+    margin-bottom: var(--spacing-xl);
+}
+
+.security-note h6 {
+    color: var(--primary-red);
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.footer-links {
+    text-align: center;
+    padding-top: var(--spacing-xl);
+    border-top: 1px solid var(--light-gray);
+    margin-top: var(--spacing-2xl);
+    color: var(--gray-dark);
+    font-size: var(--font-size-sm);
+}
+
+.footer-links a {
+    color: var(--primary-red);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+}
+
+.password-field-wrapper {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: var(--spacing-lg);
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--gray-dark);
+    cursor: pointer;
+    font-size: var(--font-size-base);
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-sm);
+    transition: color 0.2s ease;
+}
+
+.password-toggle:hover {
+    color: var(--primary-red);
+}
+
+@media (max-width: 768px) {
+    .activation-container {
+        margin: 1rem auto;
+        padding: 0 var(--spacing-md);
+    }
+    
+    .activation-header {
+        padding: 2rem var(--spacing-lg);
+    }
+    
+    .welcome-icon {
+        width: 80px;
+        height: 80px;
+        font-size: 2rem;
+    }
+    
+    .welcome-title {
+        font-size: var(--font-size-2xl);
+    }
+}
+</style>
+
+<div class="activation-container">
+    <!-- Welcome Header -->
+    <div class="activation-header">
+        <div class="welcome-icon">
+            <i class="fas fa-user-shield"></i>
+        </div>
+        <h1 class="welcome-title">Bienvenue sur VOÏA !</h1>
+        <p class="welcome-subtitle">Vous êtes invité à rejoindre {{ business_account.name }}</p>
+    </div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'info-circle' if category == 'info' else 'check-circle' }} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Business Account Information -->
+    <div class="business-info">
+        <h4>
+            <i class="fas fa-building"></i>
+            Account Details
+        </h4>
+        <div class="business-details">
+            <div class="business-detail">
+                <span class="detail-label">Nom de l'entreprise</span>
+                <span class="detail-value">{{ business_account.name }}</span>
+            </div>
+            <div class="business-detail">
+                <span class="detail-label">Votre nom</span>
+                <span class="detail-value">{{ user.first_name }} {{ user.last_name }}</span>
+            </div>
+            <div class="business-detail">
+                <span class="detail-label">Adresse e-mail</span>
+                <span class="detail-value">{{ user.email }}</span>
+            </div>
+            <div class="business-detail">
+                <span class="detail-label">Rôle</span>
+                <span class="detail-value">Administrateur du compte entreprise</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Security Notice -->
+    <div class="security-note">
+        <h6>
+            <i class="fas fa-shield-alt"></i>
+            Security First
+        </h6>
+        <p class="mb-0">
+            La sécurité de votre compte est importante pour nous. Veuillez créer un mot de passe robuste afin de protéger vos données d'entreprise et d'assurer un accès sécurisé à la plateforme VOÏA.
+        </p>
+    </div>
+
+    <!-- Activation Form -->
+    <div class="activation-form">
+        <div class="form-header">
+            <h2 class="form-title">
+                <i class="fas fa-key"></i>
+                Set Your Password
+            </h2>
+            <p class="form-description">
+                Finalisez la configuration de votre compte en créant un mot de passe sécurisé
+            </p>
+        </div>
+
+        <form method="POST" action="{{ url_for('business_auth.process_account_activation', token=token) }}" novalidate>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+            <div class="form-group">
+                <label for="password" class="form-label">
+                    <i class="fas fa-lock me-2"></i>New Password
+                </label>
+                <div class="password-field-wrapper">
+                    <input type="password" 
+                           class="form-control" 
+                           id="password" 
+                           name="password" 
+                           placeholder="Saisissez votre nouveau mot de passe"
+                           required 
+                           minlength="8">
+                    <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                        <i class="fas fa-eye" id="password-eye"></i>
+                    </button>
+                </div>
+                
+                <div class="password-requirements">
+                    <div class="requirement" id="req-length">
+                        <span class="requirement-icon"><i class="fas fa-times"></i></span>
+                        At least 8 characters long
+                    </div>
+                    <div class="requirement" id="req-uppercase">
+                        <span class="requirement-icon"><i class="fas fa-times"></i></span>
+                        Contains uppercase letter (A-Z)
+                    </div>
+                    <div class="requirement" id="req-lowercase">
+                        <span class="requirement-icon"><i class="fas fa-times"></i></span>
+                        Contains lowercase letter (a-z)
+                    </div>
+                    <div class="requirement" id="req-number">
+                        <span class="requirement-icon"><i class="fas fa-times"></i></span>
+                        Contains at least one number (0-9)
+                    </div>
+                    <div class="requirement" id="req-special">
+                        <span class="requirement-icon"><i class="fas fa-times"></i></span>
+                        Contains special character (!@#$%^&*)
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password" class="form-label">
+                    <i class="fas fa-lock me-2"></i>Confirm Password
+                </label>
+                <div class="password-field-wrapper">
+                    <input type="password" 
+                           class="form-control" 
+                           id="confirm_password" 
+                           name="confirm_password" 
+                           placeholder="Confirmez votre nouveau mot de passe"
+                           required>
+                    <button type="button" class="password-toggle" onclick="togglePassword('confirm_password')">
+                        <i class="fas fa-eye" id="confirm_password-eye"></i>
+                    </button>
+                </div>
+                <div class="password-strength" id="password-match-feedback"></div>
+            </div>
+
+            <button type="submit" class="btn-activate" id="activate-btn" disabled>
+                <i class="fas fa-user-check me-2"></i>Activate Account
+            </button>
+        </form>
+    </div>
+
+    <!-- Footer Links -->
+    <div class="footer-links">
+        Besoin d'aide ? Contactez le support à 
+        <a href="mailto:support@voia.com">support@voia.com</a>
+        <br>
+        <a href="{{ url_for('index') }}">← Retour à l'accueil VOÏA</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Password validation and form handling
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordField = document.getElementById('password');
+    const confirmPasswordField = document.getElementById('confirm_password');
+    const activateBtn = document.getElementById('activate-btn');
+    const form = document.querySelector('form');
+
+    const requirements = {
+        length: document.getElementById('req-length'),
+        uppercase: document.getElementById('req-uppercase'),
+        lowercase: document.getElementById('req-lowercase'),
+        number: document.getElementById('req-number'),
+        special: document.getElementById('req-special')
+    };
+
+    const passwordMatchFeedback = document.getElementById('password-match-feedback');
+
+    // Password validation rules
+    const validationRules = {
+        length: (password) => password.length >= 8,
+        uppercase: (password) => /[A-Z]/.test(password),
+        lowercase: (password) => /[a-z]/.test(password),
+        number: (password) => /[0-9]/.test(password),
+        special: (password) => /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    };
+
+    function updateRequirement(requirement, isMet) {
+        const icon = requirement.querySelector('.requirement-icon i');
+        if (isMet) {
+            requirement.classList.add('met');
+            icon.className = 'fas fa-check';
+        } else {
+            requirement.classList.remove('met');
+            icon.className = 'fas fa-times';
+        }
+    }
+
+    function validatePassword() {
+        const password = passwordField.value;
+        const confirmPassword = confirmPasswordField.value;
+        let allRequirementsMet = true;
+
+        // Check each requirement
+        for (const [rule, requirement] of Object.entries(requirements)) {
+            const isMet = validationRules[rule](password);
+            updateRequirement(requirement, isMet);
+            if (!isMet) allRequirementsMet = false;
+        }
+
+        // Check password confirmation
+        let passwordsMatch = false;
+        if (confirmPassword) {
+            passwordsMatch = password === confirmPassword;
+            if (passwordsMatch) {
+                passwordMatchFeedback.innerHTML = '<i class="fas fa-check text-success me-2"></i>Passwords match';
+                passwordMatchFeedback.style.color = '#15803d';
+                confirmPasswordField.classList.remove('is-invalid');
+            } else {
+                passwordMatchFeedback.innerHTML = '<i class="fas fa-times text-danger me-2"></i>Passwords do not match';
+                passwordMatchFeedback.style.color = 'var(--primary-red)';
+                confirmPasswordField.classList.add('is-invalid');
+            }
+        } else {
+            passwordMatchFeedback.innerHTML = '';
+            confirmPasswordField.classList.remove('is-invalid');
+        }
+
+        // Enable/disable submit button
+        activateBtn.disabled = !(allRequirementsMet && passwordsMatch && password && confirmPassword);
+        
+        return allRequirementsMet && passwordsMatch;
+    }
+
+    // Event listeners
+    passwordField.addEventListener('input', validatePassword);
+    confirmPasswordField.addEventListener('input', validatePassword);
+
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        if (!validatePassword()) {
+            e.preventDefault();
+            alert('Please ensure all password requirements are met and passwords match.');
+            return;
+        }
+
+        // Show loading state
+        activateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Activating Account...';
+        activateBtn.disabled = true;
+    });
+
+    // Auto-focus on password field
+    passwordField.focus();
+});
+
+// Password visibility toggle
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const eyeIcon = document.getElementById(fieldId + '-eye');
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        eyeIcon.className = 'fas fa-eye-slash';
+    } else {
+        field.type = 'password';
+        eyeIcon.className = 'fas fa-eye';
+    }
+}
+</script>
+{% endblock %}

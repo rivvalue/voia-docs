@@ -1,0 +1,206 @@
+{% extends "base_minimal.html" %}
+<!-- BUSINESS TEMPLATE VERSION 2025 -->
+
+{% block title %}{{ campaign_name }} - VOÏA Survey{% endblock %}
+
+{% block page_class %}page-conversational-business{% endblock %}
+
+{% block content %}
+<div data-page="conversational-business"></div>
+
+<!-- Hero Section -->
+<div class="conv-hero">
+    <div class="conv-hero-content">
+        <div class="text-center mb-4">
+            <span class="conv-campaign-badge">
+                <i class="fas fa-poll"></i>{{ campaign_name }}
+            </span>
+            {% if campaign_start_date and campaign_end_date %}
+            <div class="conv-campaign-dates">
+                <i class="fas fa-calendar-alt me-1"></i>
+                {{ campaign_start_date.strftime('%B %d, %Y') }} - {{ campaign_end_date.strftime('%B %d, %Y') }}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="conv-hero-header">
+            <div class="conv-hero-branding">
+                <h1>VO<span class="accent">Ï</span>A</h1>
+            </div>
+            {% if branding and branding.logo_url %}
+            <div class="conv-hero-logo">
+                <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}">
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="conv-hero-welcome">
+            <h2>Bonjour {{ participant_name }}, merci de votre participation</h2>
+            <p>{{ branding.company_name if branding and branding.company_name else 'We' }} value your feedback</p>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-3 px-lg-5 mt-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <!-- Survey Setup -->
+            <div id="surveySetup" class="conv-card mb-4">
+                <div class="conv-card-header">
+                    <h5>
+                        <i class="fas fa-user-circle"></i>Your Information
+                    </h5>
+                    <small>Participating on behalf of {{ participant_company }}</small>
+                </div>
+                <div class="conv-card-body">
+                    <form id="setupForm" class="conv-form">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        
+                        <div class="mb-3">
+                            <label for="companyName" class="form-label">Nom de l'entreprise</label>
+                            <input type="text" class="form-control" id="companyName" required 
+                                   value="{{ participant_company }}" readonly>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="respondentName" class="form-label">Votre nom</label>
+                            <input type="text" class="form-control" id="respondentName" required 
+                                   value="{{ participant_name }}" readonly>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="respondentEmail" class="form-label">Adresse e-mail</label>
+                            <input type="email" class="form-control" id="respondentEmail" required 
+                                   value="{{ email }}" readonly>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="tenureWithFc" class="form-label">
+                                Depuis combien de temps travaillez-vous avec {{ branding.company_name if branding and branding.company_name else 'nous' }} ?
+                            </label>
+                            <select class="form-select" id="tenureWithFc" required>
+                                <option value="">Sélectionnez la durée...</option>
+                                <option value="Moins de 6 mois">Moins de 6 mois</option>
+                                <option value="6 mois - 1 an">6 mois - 1 an</option>
+                                <option value="1 à 2 ans">1 à 2 ans</option>
+                                <option value="2 à 3 ans">2 à 3 ans</option>
+                                <option value="3 à 5 ans">3 à 5 ans</option>
+                                <option value="5 à 10 ans">5 à 10 ans</option>
+                                <option value="Plus de 10 ans">Plus de 10 ans</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-lg w-100 conv-btn-primary">
+                            <i class="fas fa-comments me-2"></i>Start Conversation
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Conversation Interface -->
+            <div id="conversationInterface" class="conv-card" style="display: none;">
+                <div class="conv-card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">VO<span class="accent" style="color: #E13A44;">Ï</span>A</h5>
+                    <div class="conv-progress">
+                        <div id="progressBar" class="conv-progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" style="width: 0%;"></div>
+                    </div>
+                </div>
+                
+                <div class="conv-card-body">
+                    <!-- Chat Messages -->
+                    <div id="chatMessages" class="conv-chat-container mb-4">
+                        <!-- Messages will be populated here -->
+                    </div>
+                    
+                    <!-- Input Area -->
+                    <div id="inputArea" class="conv-input-area">
+                        <div class="input-group">
+                            <textarea id="userInput" class="form-control" rows="3" 
+                                      placeholder="Saisissez votre réponse ici..."></textarea>
+                            <button id="sendButton" class="btn" type="button">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div class="conv-tip">
+                            <i class="fas fa-lightbulb"></i>
+                            Tip: Speak naturally! VOÏA understands conversational responses.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="conv-card" style="display: none;">
+                <div class="conv-card-body text-center" style="padding: 3rem 2rem;">
+                    <div class="spinner-border mb-3" style="color: #E13A44;">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <h5 style="font-family: 'Montserrat', sans-serif;">VOÏA traite votre réponse...</h5>
+                    <p class="text-muted">Veuillez patienter pendant que VOÏA analyse votre retour d'information</p>
+                </div>
+            </div>
+
+            <!-- Survey Complete -->
+            <div id="surveyComplete" class="conv-card" style="display: none;">
+                <div class="conv-complete">
+                    <div class="conv-complete-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    
+                    <h4>Merci, {{ participant_name }} !</h4>
+                    
+                    <p class="lead mb-2">
+                        Votre retour pour <strong>{{ campaign_name }}</strong> has been successfully submitted.
+                    </p>
+                    
+                    {% if custom_end_message %}
+                    <!-- Custom Completion Message from Campaign Settings -->
+                    <div class="conv-complete-message">
+                        <p class="mb-0">{{ custom_end_message }}</p>
+                    </div>
+                    {% else %}
+                    <!-- Default Completion Message -->
+                    <p class="text-muted mb-4">
+                        Vos analyses nous aident à améliorer continuellement nos services. Merci d'avoir pris le temps de partager votre expérience.
+                    </p>
+                    {% endif %}
+                    
+                    <!-- What Happens Next Section -->
+                    <div class="border rounded p-4 mb-4" style="background-color: #f8f9fa; border-color: #e5e7eb !important;">
+                        <h5 class="mb-3" style="font-family: 'Montserrat', sans-serif; font-weight: 600;">
+                            <i class="fas fa-info-circle me-2" style="color: #E13A44;"></i>What Happens Next?
+                        </h5>
+                        <ul class="text-start" style="list-style: none; padding-left: 0; font-family: 'Karla', sans-serif;">
+                            <li class="mb-2">
+                                <i class="fas fa-robot me-2" style="color: #E13A44;"></i>
+                                Our AI analyzes your feedback to extract key insights
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-chart-bar me-2" style="color: #E13A44;"></i>
+                                Your responses contribute to comprehensive analytics
+                            </li>
+                            <li>
+                                <i class="fas fa-users me-2" style="color: #E13A44;"></i>
+                                We use your input to improve our services and client experience
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <small class="text-muted">You can now close this window.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Pass authentication status to JavaScript
+window.isAuthenticated = {{ 'true' if authenticated else 'false' }};
+window.userEmail = '{{ email or '' }}';
+</script>
+<script src="{{ url_for('static', filename='js/conversational_survey.js') }}"></script>
+{% endblock %}

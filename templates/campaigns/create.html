@@ -60,8 +60,8 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h1 class="mb-1">Créer une nouvelle campagne</h1>
-                    <p class="mb-0 opacity-75">Configurer une nouvelle campagne d’enquête pour {{ business_account.name }}</p>
+                    <h1 class="mb-1">{{ _('Create New Campaign') }}</h1>
+                    <p class="mb-0 opacity-75">{{ _('Set up a new survey campaign for {{ business_account.name }}') }}</p>
                 </div>
             </div>
         </div>
@@ -79,18 +79,18 @@
                 </h3>
                 
                 <div class="mb-3">
-                    <label for="name" class="form-label">Nom de la campagne <span class="text-danger">*</span></label>
+                    <label for="name" class="form-label">{{ _('Campaign Name') }} <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="name" name="name" 
                            placeholder="e.g., Q2 2025 Product Satisfaction Survey" 
                            required maxlength="200">
-                    <div class="form-text">Un nom clair et descriptif pour votre campagne</div>
+                    <div class="form-text">{{ _('A clear, descriptive name for your campaign') }}</div>
                 </div>
                 
                 <div class="mb-3">
                     <label for="description" class="form-label">Description</label>
                     <textarea class="form-control" id="description" name="description" rows="3" 
                               placeholder="Optional description of campaign goals, focus areas, or target audience"></textarea>
-                    <div class="form-text">Détails optionnels sur l’objectif et la portée de cette campagne</div>
+                    <div class="form-text">{{ _('Optional details about this campaign\'s purpose and scope') }}</div>
                 </div>
             </div>
 
@@ -103,16 +103,16 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="start_date" class="form-label">Date de début <span class="text-danger">*</span></label>
+                            <label for="start_date" class="form-label">{{ _('Start Date') }} <span class="text-danger">*</span></label>
                             <input type="date" class="form-control" id="start_date" name="start_date" required>
-                            <div class="form-text">Quand cette campagne doit-elle commencer ?</div>
+                            <div class="form-text">{{ _('When should this campaign begin?') }}</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="end_date" class="form-label">Date de fin <span class="text-danger">*</span></label>
+                            <label for="end_date" class="form-label">{{ _('End Date') }} <span class="text-danger">*</span></label>
                             <input type="date" class="form-control" id="end_date" name="end_date" required>
-                            <div class="form-text">Quand cette campagne doit-elle se terminer ?</div>
+                            <div class="form-text">{{ _('When should this campaign end?') }}</div>
                         </div>
                     </div>
                 </div>
@@ -121,9 +121,9 @@
                     <i class="fas fa-lightbulb me-2"></i>
                     <strong>Next Steps:</strong> After creating your campaign, you'll be able to:
                     <ul class="mb-0 mt-2">
-                        <li>Affecter des participants à la campagne</li>
-                        <li>Générer des jetons d’enquête personnalisés</li>
-                        <li>Planifier l’activation de la campagne et les invitations par e-mail</li>
+                        <li>{{ _('Assign participants to the campaign') }}</li>
+                        <li>{{ _('Generate personalized survey tokens') }}</li>
+                        <li>{{ _('Schedule campaign activation and email invitations') }}</li>
                     </ul>
                 </div>
             </div>
@@ -175,14 +175,14 @@
 
                 <div id="customContentFields" style="display: none;">
                     <div class="mb-3">
-                        <label for="custom_subject_template" class="form-label">Objet de l’e-mail</label>
+                        <label for="custom_subject_template" class="form-label">{{ _('Email Subject') }}</label>
                         <input type="text" class="form-control" id="custom_subject_template" name="custom_subject_template" 
                                maxlength="500" placeholder="Your feedback is requested: {campaign_name}">
                         <div class="form-text">Available variables: {participant_name}, {campaign_name}, {business_account_name}</div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="custom_intro_message" class="form-label">Message d’introduction</label>
+                        <label for="custom_intro_message" class="form-label">{{ _('Introduction Message') }}</label>
                         <textarea class="form-control" id="custom_intro_message" name="custom_intro_message" 
                                   rows="3" maxlength="2000" 
                                   placeholder="{business_account_name} is requesting your valuable feedback through our Voice of Client system."></textarea>
@@ -190,14 +190,14 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="custom_cta_text" class="form-label">Texte du bouton d’appel à l’action</label>
+                        <label for="custom_cta_text" class="form-label">{{ _('Call-to-Action Button Text') }}</label>
                         <input type="text" class="form-control" id="custom_cta_text" name="custom_cta_text" 
                                maxlength="100" placeholder="Complete Your Survey">
-                        <div class="form-text">Texte affiché sur le bouton d’enquête</div>
+                        <div class="form-text">{{ _('Text displayed on the survey button') }}</div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="custom_closing_message" class="form-label">Message de clôture</label>
+                        <label for="custom_closing_message" class="form-label">{{ _('Closing Message') }}</label>
                         <textarea class="form-control" id="custom_closing_message" name="custom_closing_message" 
                                   rows="4" maxlength="2000" 
                                   placeholder="Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.
@@ -207,11 +207,11 @@ Thank you for your time and valuable insights!"></textarea>
                     </div>
 
                     <div class="mb-3">
-                        <label for="custom_footer_note" class="form-label">Note de bas de page</label>
+                        <label for="custom_footer_note" class="form-label">{{ _('Footer Note') }}</label>
                         <textarea class="form-control" id="custom_footer_note" name="custom_footer_note" 
                                   rows="2" maxlength="1000" 
                                   placeholder="This is an automated message. If you have any questions, please contact the organization that sent this survey."></textarea>
-                        <div class="form-text">Texte en bas de l’e-mail</div>
+                        <div class="form-text">{{ _('Small print at the bottom of the email') }}</div>
                     </div>
 
                     <div class="alert alert-info">
@@ -241,7 +241,7 @@ Thank you for your time and valuable insights!"></textarea>
 
                 <div id="reminderDelayFields">
                     <div class="mb-3">
-                        <label for="reminder_delay_days" class="form-label">Nombre de jours avant le rappel</label>
+                        <label for="reminder_delay_days" class="form-label">{{ _('Days to Wait Before Reminder') }}</label>
                         <select class="form-select" id="reminder_delay_days" name="reminder_delay_days">
                             <option value="3">3 days</option>
                             <option value="5">5 days</option>
@@ -249,16 +249,16 @@ Thank you for your time and valuable insights!"></textarea>
                             <option value="10">10 days</option>
                             <option value="14">14 days</option>
                         </select>
-                        <div class="form-text">Combien de jours après l’invitation devons-nous envoyer le rappel ?</div>
+                        <div class="form-text">{{ _('How many days after the invitation should we send the reminder?') }}</div>
                     </div>
 
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle me-2"></i>
                         <strong>How it works:</strong>
                         <ul class="mb-0 mt-2">
-                            <li>Les rappels sont envoyés uniquement aux participants qui n’ont pas encore répondu</li>
-                            <li>Un seul rappel est envoyé par participant</li>
-                            <li>Les rappels sont traités quotidiennement pendant les campagnes actives</li>
+                            <li>{{ _('Reminders are sent only to participants who haven\'t responded yet') }}</li>
+                            <li>{{ _('Only one reminder is sent per participant') }}</li>
+                            <li>{{ _('Reminders are processed daily during active campaigns') }}</li>
                         </ul>
                     </div>
                 </div>

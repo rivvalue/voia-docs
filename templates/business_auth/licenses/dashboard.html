@@ -19,7 +19,7 @@
                 <h1 class="admin-title">
                     <i class="fas fa-certificate me-3"></i>License Management Dashboard
                 </h1>
-                <p class="admin-subtitle">Surveillez et gérez toutes les licences de comptes entreprise sur la plateforme</p>
+                <p class="admin-subtitle">{{ _('Monitor and manage all business account licenses across the platform') }}</p>
             </div>
             <div class="col-md-4 text-end">
                 {% if is_platform_admin %}
@@ -65,7 +65,7 @@
                         <i class="fas fa-users"></i>
                     </div>
                     <div class="stat-value">{{ license_stats.total_accounts or 0 }}</div>
-                    <div class="stat-label">Nombre total de comptes</div>
+                    <div class="stat-label">{{ _('Total Accounts') }}</div>
                     {% if license_stats.account_growth %}
                     <div class="stat-trend {{ 'positive' if license_stats.account_growth > 0 else 'negative' }}">
                         <i class="fas fa-{{ 'arrow-up' if license_stats.account_growth > 0 else 'arrow-down' }}"></i>
@@ -81,7 +81,7 @@
                         <i class="fas fa-star"></i>
                     </div>
                     <div class="stat-value">{{ license_stats.core_licenses or 0 }}</div>
-                    <div class="stat-label">Licences Core</div>
+                    <div class="stat-label">{{ _('Core Licenses') }}</div>
                 </div>
             </div>
 
@@ -91,7 +91,7 @@
                         <i class="fas fa-plus"></i>
                     </div>
                     <div class="stat-value">{{ license_stats.plus_licenses or 0 }}</div>
-                    <div class="stat-label">Licences Plus</div>
+                    <div class="stat-label">{{ _('Plus Licenses') }}</div>
                 </div>
             </div>
 
@@ -101,7 +101,7 @@
                         <i class="fas fa-crown"></i>
                     </div>
                     <div class="stat-value">{{ license_stats.pro_licenses or 0 }}</div>
-                    <div class="stat-label">Licences Pro</div>
+                    <div class="stat-label">{{ _('Pro Licenses') }}</div>
                 </div>
             </div>
 
@@ -111,7 +111,7 @@
                         <i class="fas fa-clock"></i>
                     </div>
                     <div class="stat-value">{{ license_stats.trial_accounts or 0 }}</div>
-                    <div class="stat-label">Comptes d'essai</div>
+                    <div class="stat-label">{{ _('Trial Accounts') }}</div>
                 </div>
             </div>
 
@@ -121,7 +121,7 @@
                         <i class="fas fa-exclamation-triangle"></i>
                     </div>
                     <div class="stat-value">{{ license_stats.expiring_soon or 0 }}</div>
-                    <div class="stat-label">Expire bientôt</div>
+                    <div class="stat-label">{{ _('Expiring Soon') }}</div>
                     {% if license_stats.expiring_soon > 0 %}
                     <div class="stat-trend negative">
                         <i class="fas fa-clock"></i>
@@ -226,7 +226,7 @@
                         {% else %}
                         <div class="text-center py-5 text-muted">
                             <i class="fas fa-history fa-3x mb-3 empty-state-icon"></i>
-                            <p>Aucune activité de licence récente</p>
+                            <p>{{ _('No recent license activity') }}</p>
                         </div>
                         {% endif %}
                     </div>
@@ -248,50 +248,50 @@
             <div class="col-md-6 col-lg-3">
                 <a href="{{ url_for('business_auth.admin_licenses', filter='all') }}" class="quick-action-card">
                     <i class="fas fa-list"></i>
-                    <span>Afficher tous les comptes</span>
+                    <span>{{ _('View All Accounts') }}</span>
                 </a>
             </div>
             <div class="col-md-6 col-lg-3">
                 <a href="{{ url_for('business_auth.admin_licenses', filter='expiring') }}" class="quick-action-card">
                     <i class="fas fa-clock"></i>
-                    <span>Licences en expiration</span>
+                    <span>{{ _('Expiring Licenses') }}</span>
                 </a>
             </div>
             <div class="col-md-6 col-lg-3">
                 <a href="{{ url_for('business_auth.admin_licenses', filter='trial') }}" class="quick-action-card">
                     <i class="fas fa-flask"></i>
-                    <span>Comptes d'essai</span>
+                    <span>{{ _('Trial Accounts') }}</span>
                 </a>
             </div>
             <div class="col-md-6 col-lg-3">
                 <a href="{{ url_for('business_auth.admin_licenses', filter='usage') }}" class="quick-action-card">
                     <i class="fas fa-chart-bar"></i>
-                    <span>Rapports d'utilisation élevée</span>
+                    <span>{{ _('High Usage Reports') }}</span>
                 </a>
             </div>
             {% else %}
             <div class="col-md-6 col-lg-3">
                 <a href="{{ url_for('business_auth.business_license_overview', filter='overview') }}" class="quick-action-card">
                     <i class="fas fa-list"></i>
-                    <span>Aperçu des licences</span>
+                    <span>{{ _('License Overview') }}</span>
                 </a>
             </div>
             <div class="col-md-6 col-lg-3">
                 <a href="{{ url_for('business_auth.business_license_overview', filter='expiring') }}" class="quick-action-card">
                     <i class="fas fa-clock"></i>
-                    <span>Détails de l'expiration</span>
+                    <span>{{ _('Expiration Details') }}</span>
                 </a>
             </div>
             <div class="col-md-6 col-lg-3">
                 <a href="{{ url_for('business_auth.license_info') }}" class="quick-action-card">
                     <i class="fas fa-info-circle"></i>
-                    <span>Informations sur la licence</span>
+                    <span>{{ _('License Information') }}</span>
                 </a>
             </div>
             <div class="col-md-6 col-lg-3">
                 <a href="{{ url_for('business_auth.business_license_overview', filter='usage') }}" class="quick-action-card">
                     <i class="fas fa-chart-bar"></i>
-                    <span>Détails d'utilisation</span>
+                    <span>{{ _('Usage Details') }}</span>
                 </a>
             </div>
             {% endif %}

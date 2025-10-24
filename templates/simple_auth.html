@@ -8,20 +8,20 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h4>Génération de jeton simple</h4>
+                    <h4>{{ _('Simple Token Generation') }}</h4>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
-                        <label for="email" class="form-label">Adresse e-mail</label>
+                        <label for="email" class="form-label">{{ _('Email Address') }}</label>
                         <input type="email" class="form-control" id="email" value="test@example.com" required>
                     </div>
                     
                     <div class="d-grid gap-2">
                         <button type="button" class="btn btn-primary" onclick="generateToken()">
-                            Générer un jeton
+                            {{ _('Generate Token') }}
                         </button>
                         <button type="button" class="btn btn-secondary" onclick="clearResults()">
-                            Effacer les résultats
+                            {{ _('Clear Results') }}
                         </button>
                     </div>
                     

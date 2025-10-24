@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Enquête conversationnelle déjà complétée - VOÏA Voice of Client{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-body text-center p-5">
+                    <!-- Success Icon -->
+                    <div class="mb-4">
+                        <i class="fas fa-comments text-success" style="font-size: 4rem;"></i>
+                    </div>
+                    
+                    <!-- Completion Message -->
+                    <h2 class="card-title text-success mb-3">Enquête conversationnelle déjà complétée</h2>
+                    <p class="text-muted mb-4">
+                        Merci ! Vous avez déjà soumis votre retour conversationnel le <strong>{{ completion_date }}</strong> 
+                        using the email address <strong>{{ email }}</strong>.
+                    </p>
+                    
+                    <!-- Business Value Message -->
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-robot me-2"></i>
+                        Your AI-powered conversation responses have been analyzed to provide valuable insights 
+                        for business improvement and customer satisfaction enhancement.
+                    </div>
+                    
+                    {% if show_alternatives %}
+                    <!-- Alternative Options -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">Que souhaitez-vous faire ensuite ?</h5>
+                        
+                        <div class="d-grid gap-3">
+                            <!-- Try Traditional Survey -->
+                            <a href="/survey" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-list me-2"></i>
+                                Try Our Traditional Survey
+                                <small class="d-block mt-1">Experience structured form-based feedback</small>
+                            </a>
+                            
+                            <!-- Contact for Full Service -->
+                            <button class="btn btn-danger btn-lg" onclick="contactRivvalue()">
+                                <i class="fas fa-envelope me-2"></i>
+                                Contact Rivvalue for Full Service
+                                <small class="d-block mt-1">Implement complete Voice of Client solution</small>
+                            </button>
+                            
+                            <!-- Dashboard Access (if available) -->
+                            <a href="/dashboard" class="btn btn-outline-success btn-lg">
+                                <i class="fas fa-chart-dashboard me-2"></i>
+                                View Analytics Dashboard
+                                <small class="d-block mt-1">See customer feedback insights</small>
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Note About Duplicates -->
+                    <div class="mt-4">
+                        <p class="text-muted small">
+                            <i class="fas fa-shield-alt me-1"></i>
+                            For data integrity, each email address can only submit one response per survey type.
+                        </p>
+                    </div>
+                    
+                    <!-- Home Link -->
+                    <div class="mt-4">
+                        <a href="/" class="btn btn-outline-secondary">
+                            <i class="fas fa-home me-2"></i>Return to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function contactRivvalue() {
+    // Pre-fill email with implementation inquiry
+    const subject = encodeURIComponent("Voice of Client Implementation Inquiry");
+    const body = encodeURIComponent(`Hello Rivvalue Team,
+
+I'm interested in implementing your complete Voice of Client solution for my business. I've experienced your conversational survey demonstration and would like to discuss:
+
+- Full Voice of Client Agent implementation
+- Custom AI-powered conversational surveys
+- Advanced analytics and reporting
+- Integration with our existing systems
+
+Business Details:
+- Company: [Your Company Name]
+- Industry: [Your Industry]
+- Contact Email: {{ email }}
+
+Please contact me to schedule a consultation.
+
+Best regards,
+[Your Name]`);
+    
+    const mailtoUrl = `mailto:contact@rivvalue.com?subject=${subject}&body=${body}`;
+    window.open(mailtoUrl, '_blank');
+}
+</script>
+{% endblock %}

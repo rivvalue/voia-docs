@@ -294,7 +294,7 @@
         <div class="d-flex align-items-center justify-content-between">
             <div>
                 <i class="fas fa-search text-muted me-2"></i>
-                <span class="text-muted">Résultats de recherche mis en surbrillance pour : <strong>"{{ search_query }}"</strong></span>
+                <span class="text-muted">{{ _('Search results highlighted for:') }} <strong>"{{ search_query }}"</strong></span>
             </div>
             <a href="{{ url_for('campaigns.individual_response', campaign_id=campaign.id, participant_id=participant.id) }}" class="btn btn-sm btn-outline-secondary">
                 <i class="fas fa-times me-1"></i>Clear Search
@@ -313,11 +313,11 @@
                     <i class="fas fa-user"></i>Participant Information
                 </h3>
                 <div class="data-item">
-                    <span class="data-label">Nom :</span>
+                    <span class="data-label">{{ _('Name:') }}</span>
                     <span class="data-value">{{ response.respondent_name or 'Unknown' }}</span>
                 </div>
                 <div class="data-item">
-                    <span class="data-label">E-mail :</span>
+                    <span class="data-label">{{ _('Email:') }}</span>
                     <span class="data-value">{{ response.respondent_email or 'No email' }}</span>
                 </div>
                 <div class="data-item">
@@ -325,7 +325,7 @@
                     <span class="data-value">{{ response.company_name or 'Unknown' }}</span>
                 </div>
                 <div class="data-item">
-                    <span class="data-label">Ancienneté :</span>
+                    <span class="data-label">{{ _('Tenure:') }}</span>
                     <span class="data-value">{{ response.tenure_with_fc or 'Not specified' }}</span>
                 </div>
             </div>
@@ -343,7 +343,7 @@
                 </div>
                 {% if response.satisfaction_rating %}
                 <div class="data-item">
-                    <span class="data-label">Satisfaction :</span>
+                    <span class="data-label">{{ _('Satisfaction:') }}</span>
                     <span class="data-value">{{ response.satisfaction_rating }}/5</span>
                 </div>
                 {% endif %}

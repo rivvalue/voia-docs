@@ -147,8 +147,8 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h1 class="page-title mb-1">Gestion des participants</h1>
-                    <p class="page-subtitle mb-0">Gérez les participants à la campagne pour {{ business_account.name }}</p>
+                    <h1 class="page-title mb-1">{{ _('Participant Management') }}</h1>
+                    <p class="page-subtitle mb-0">{{ _('Manage campaign participants for {{ business_account.name }}') }}</p>
                 </div>
                 <div class="col-md-4">
                     <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end">
@@ -213,7 +213,7 @@
                             </div>
                             <div>
                                 <h5 class="mb-0">{{ kpi_stats.participants_per_company }}</h5>
-                                <small>Avg per Entreprise</small>
+                                <small>Avg per {{ _('Company') }}</small>
                             </div>
                         </div>
                     </div>
@@ -237,11 +237,11 @@
                             {% endif %}
                             
                             <div class="row g-3 mb-3">
-                                <!-- Entreprise Filter -->
+                                <!-- {{ _('Company') }} Filter -->
                                 <div class="col-md-4">
-                                    <label for="filter_company" class="form-label">Entreprise</label>
+                                    <label for="filter_company" class="form-label">{{ _('Company') }}</label>
                                     <select class="form-select filter-select" id="filter_company" name="filter_company" multiple 
-                                            aria-label="Filtrer par entreprise">
+                                            aria-label="{{ _('Filter by company') }}">
                                         {% for company in filter_options.companies %}
                                         <option value="{{ company }}">
                                             {{ company }}
@@ -250,11 +250,11 @@
                                     </select>
                                 </div>
                                 
-                                <!-- Rôle Filter -->
+                                <!-- {{ _('Role') }} Filter -->
                                 <div class="col-md-4">
-                                    <label for="filter_role" class="form-label">Rôle</label>
+                                    <label for="filter_role" class="form-label">{{ _('Role') }}</label>
                                     <select class="form-select filter-select" id="filter_role" name="filter_role" multiple 
-                                            aria-label="Filtrer par rôle">
+                                            aria-label="{{ _('Filter by role') }}">
                                         {% for role in filter_options.roles %}
                                         <option value="{{ role }}">
                                             {{ role }}
@@ -263,11 +263,11 @@
                                     </select>
                                 </div>
                                 
-                                <!-- Région Filter -->
+                                <!-- {{ _('Region') }} Filter -->
                                 <div class="col-md-4">
-                                    <label for="filter_region" class="form-label">Région</label>
+                                    <label for="filter_region" class="form-label">{{ _('Region') }}</label>
                                     <select class="form-select filter-select" id="filter_region" name="filter_region" multiple 
-                                            aria-label="Filtrer par région">
+                                            aria-label="{{ _('Filter by region') }}">
                                         {% for region in filter_options.regions %}
                                         <option value="{{ region }}">
                                             {{ region }}
@@ -278,11 +278,11 @@
                             </div>
                             
                             <div class="row g-3 mb-3">
-                                <!-- Catégorie de client Filter -->
+                                <!-- {{ _('Customer Tier') }} Filter -->
                                 <div class="col-md-4">
-                                    <label for="filter_tier" class="form-label">Catégorie de client</label>
+                                    <label for="filter_tier" class="form-label">{{ _('Customer Tier') }}</label>
                                     <select class="form-select filter-select" id="filter_tier" name="filter_tier" multiple 
-                                            aria-label="Filtrer par catégorie de client">
+                                            aria-label="{{ _('Filter by customer tier') }}">
                                         {% for tier in filter_options.tiers %}
                                         <option value="{{ tier }}">
                                             {{ tier }}
@@ -295,7 +295,7 @@
                                 <div class="col-md-4">
                                     <label for="filter_language" class="form-label">Language</label>
                                     <select class="form-select filter-select" id="filter_language" name="filter_language" multiple 
-                                            aria-label="Filtrer par langue">
+                                            aria-label="{{ _('Filter by language') }}">
                                         {% for language in filter_options.languages %}
                                         <option value="{{ language }}">
                                             {{ language }}
@@ -306,9 +306,9 @@
                                 
                                 <!-- Tenure Filter -->
                                 <div class="col-md-4">
-                                    <label for="filter_tenure" class="form-label">Ancienneté (années)</label>
+                                    <label for="filter_tenure" class="form-label">{{ _('Tenure (Years)') }}</label>
                                     <select class="form-select filter-select" id="filter_tenure" name="filter_tenure" multiple 
-                                            aria-label="Filtrer par ancienneté">
+                                            aria-label="{{ _('Filter by tenure') }}">
                                         {% for tenure in filter_options.tenure_ranges %}
                                         <option value="{{ tenure }}">
                                             {{ tenure }}
@@ -341,10 +341,10 @@
                     <form method="GET" action="{{ url_for('participants.list_participants') }}" class="search-form">
                         <div class="row align-items-end">
                             <div class="col-md-8">
-                                <label for="search" class="form-label">Rechercher des participants</label>
+                                <label for="search" class="form-label">{{ _('Search participants') }}</label>
                                 <input type="text" class="form-control" id="search" name="search" 
                                        value="{{ search_query or '' }}" 
-                                       placeholder="Rechercher par nom, e-mail ou entreprise...">
+                                       placeholder="{{ _('Search by name, email, or company...') }}">
                             </div>
                             <div class="col-md-4">
                                 <div class="btn-group w-100">
@@ -365,7 +365,7 @@
             <div class="bulk-selection-toolbar align-items-center justify-content-between" id="bulkToolbar">
                 <div class="d-flex align-items-center">
                     <i class="fas fa-check-circle me-2"></i>
-                    <span class="selection-count" id="selectionCount">0 sélectionné</span>
+                    <span class="selection-count" id="selectionCount">{{ _('0 selected') }}</span>
                     <span class="selection-limit-warning ms-3" id="limitWarning">
                         <i class="fas fa-exclamation-triangle me-1"></i>
                         Limit reached (50 max). Apply this batch before selecting more.
@@ -384,7 +384,7 @@
             <!-- Participants Table -->
             <div class="card participant-table">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Liste des participants</h5>
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>{{ _('Participant List') }}</h5>
                     <small class="text-muted" id="tableHeaderCount">
                         <span id="tableHeaderTotal">{{ pagination.total }}</span> <span id="tableHeaderLabel">{% if search_query %}result{{ 's' if pagination.total != 1 else '' }} for "{{ search_query }}"{% else %}participant{{ 's' if pagination.total != 1 else '' }}{% endif %}</span>
                     </small>
@@ -399,11 +399,11 @@
                                         <input type="checkbox" class="participant-checkbox" id="selectAll" onchange="toggleSelectAll(this)">
                                     </th>
                                     <th>Nom</th>
-                                    <th>E-mail</th>
-                                    <th>Entreprise</th>
-                                    <th class="hide-on-tablet">Originee</th>
+                                    <th>{{ _('Email') }}</th>
+                                    <th>{{ _('Company') }}</th>
+                                    <th class="hide-on-tablet">{{ _('Origin') }}e</th>
                                     <th>Status</th>
-                                    <th class="hide-on-tablet">Créé</th>
+                                    <th class="hide-on-tablet">{{ _('Created') }}</th>
                                     <th class="text-end">Actions</th>
                                 </tr>
                             </thead>
@@ -419,13 +419,13 @@
                                     <td data-label="Nom">
                                         <div class="fw-bold">{{ participant.name }}</div>
                                     </td>
-                                    <td data-label="E-mail">
+                                    <td data-label="{{ _('Email') }}">
                                         <div class="text-muted">{{ participant.email }}</div>
                                     </td>
-                                    <td data-label="Entreprise">
+                                    <td data-label="{{ _('Company') }}">
                                         <div>{{ participant.company_name or '-' }}</div>
                                     </td>
-                                    <td data-label="Originee" class="hide-on-tablet">
+                                    <td data-label="{{ _('Origin') }}e" class="hide-on-tablet">
                                         {% if participant.origin_badge %}
                                             <span class="badge {{ participant.origin_badge.class }}">
                                                 {% if participant.source == 'trial' %}
@@ -438,7 +438,7 @@
                                                 {{ participant.origin_badge.text }}
                                             </span>
                                         {% else %}
-                                            <span class="badge bg-secondary">Inconnu</span>
+                                            <span class="badge bg-secondary">{{ _('Unknown') }}</span>
                                         {% endif %}
                                     </td>
                                     <td data-label="Status">
@@ -456,13 +456,13 @@
                                             </span>
                                         {% elif participant.status == 'created' %}
                                             <span class="badge bg-primary">
-                                                <i class="fas fa-plus me-1"></i>Créé
+                                                <i class="fas fa-plus me-1"></i>{{ _('Created') }}
                                             </span>
                                         {% else %}
                                             <span class="badge bg-secondary">{{ participant.status|title }}</span>
                                         {% endif %}
                                     </td>
-                                    <td data-label="Créé" class="hide-on-tablet">
+                                    <td data-label="{{ _('Created') }}" class="hide-on-tablet">
                                         <small class="text-muted">
                                             {% if participant.created_at %}
                                                 {{ participant.created_at[:10] }}
@@ -499,11 +499,11 @@
                         <div class="empty-state-icon">
                             <i class="fas fa-users"></i>
                         </div>
-                        <h3>Aucun participant {% if search_query %}ne correspond à votre recherche{% else %}pour le moment{% endif %}</h3>
+                        <h3>{{ _('No participants {% if search_query %}match your search{% else %}yet{% endif %}') }}</h3>
                         {% if search_query %}
-                        <p>Essayez d'ajuster vos termes de recherche ou de réinitialiser les filtres pour afficher tous les participants.</p>
+                        <p>{{ _('Try adjusting your search terms or clear filters to view all participants.') }}</p>
                         {% else %}
-                        <p>Ajoutez des participants individuellement ou téléversez un fichier CSV pour constituer votre base de participants. Vous pourrez ensuite les affecter à des campagnes pour la collecte de retours.</p>
+                        <p>{{ _('Add individual participants or upload a CSV file to build your participant database. You can then assign them to campaigns for feedback collection.') }}</p>
                         <div class="d-flex gap-2 justify-content-center">
                             <a href="{{ url_for('participants.create_participant') }}" class="btn btn-primary">
                                 <i class="fas fa-plus me-2"></i>Add First Participant
@@ -535,45 +535,45 @@
                 <h5 class="modal-title" id="bulkEditModalLabel">
                     <i class="fas fa-edit me-2"></i>Bulk Edit Participants
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
             </div>
             <div class="modal-body">
                 <div class="alert alert-info">
                     <i class="fas fa-info-circle me-2"></i>
                     <strong>Select which fields to update.</strong> Only checked fields will be modified.
-                    Entreprise name cannot be changed in bulk for data integrity.
+                    {{ _('Company') }} name cannot be changed in bulk for data integrity.
                 </div>
 
                 <form id="bulkEditForm">
                     <div class="row">
-                        <!-- Rôle -->
+                        <!-- {{ _('Role') }} -->
                         <div class="col-md-6 mb-3">
                             <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="updateRôle" onchange="toggleField('role')">
-                                <label class="form-check-label fw-bold" for="updateRôle">
-                                    Update Rôle
+                                <input class="form-check-input" type="checkbox" id="update{{ _('Role') }}" onchange="toggleField('role')">
+                                <label class="form-check-label fw-bold" for="update{{ _('Role') }}">
+                                    Update {{ _('Role') }}
                                 </label>
                             </div>
                             <input type="text" class="form-control" id="role" disabled placeholder="e.g., Manager, Director">
                         </div>
 
-                        <!-- Région -->
+                        <!-- {{ _('Region') }} -->
                         <div class="col-md-6 mb-3">
                             <div class="form-check mb-2">
-                                <input class="form-check-input" type="checkbox" id="updateRégion" onchange="toggleField('region')">
-                                <label class="form-check-label fw-bold" for="updateRégion">
-                                    Update Région
+                                <input class="form-check-input" type="checkbox" id="update{{ _('Region') }}" onchange="toggleField('region')">
+                                <label class="form-check-label fw-bold" for="update{{ _('Region') }}">
+                                    Update {{ _('Region') }}
                                 </label>
                             </div>
                             <input type="text" class="form-control" id="region" disabled placeholder="e.g., North America, EMEA">
                         </div>
 
-                        <!-- Catégorie de client -->
+                        <!-- {{ _('Customer Tier') }} -->
                         <div class="col-md-6 mb-3">
                             <div class="form-check mb-2">
                                 <input class="form-check-input" type="checkbox" id="updateCustomerTier" onchange="toggleField('customer_tier')">
                                 <label class="form-check-label fw-bold" for="updateCustomerTier">
-                                    Update Catégorie de client
+                                    Update {{ _('Customer Tier') }}
                                 </label>
                             </div>
                             <select class="form-select" id="customer_tier" disabled>
@@ -629,7 +629,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
                 <button type="button" class="btn btn-voia-primary" onclick="submitBulkEdit()" id="applyBtn" disabled>
                     <i class="fas fa-check me-1"></i>Apply Changes
                 </button>
@@ -733,7 +733,7 @@ function applyFilters(page = 1) {
                 // Update selection UI to hide toolbar
                 updateSelection();
             } else {
-                throw new Error(data.error || 'Inconnu error');
+                throw new Error(data.error || '{{ _('Unknown') }} error');
             }
         })
         .catch(error => {
@@ -785,7 +785,7 @@ function updateParticipantTable(participants, pagination) {
         } else if (p.status === 'invited') {
             statusBadge = '<span class="badge bg-warning"><i class="fas fa-clock me-1"></i>Invited</span>';
         } else if (p.status === 'created') {
-            statusBadge = '<span class="badge bg-primary"><i class="fas fa-plus me-1"></i>Créé</span>';
+            statusBadge = '<span class="badge bg-primary"><i class="fas fa-plus me-1"></i>{{ _('Created') }}</span>';
         } else {
             statusBadge = `<span class="badge bg-secondary">${p.status}</span>`;
         }
@@ -801,7 +801,7 @@ function updateParticipantTable(participants, pagination) {
             const icon = iconMap[p.source] || '';
             originBadge = `<span class="badge ${p.origin_badge.class}">${icon}${p.origin_badge.text}</span>`;
         } else {
-            originBadge = '<span class="badge bg-secondary">Inconnu</span>';
+            originBadge = '<span class="badge bg-secondary">{{ _('Unknown') }}</span>';
         }
         
         const createdDate = p.created_at ? p.created_at.substring(0, 10) : '-';
@@ -817,19 +817,19 @@ function updateParticipantTable(participants, pagination) {
                 <td data-label="Nom">
                     <div class="fw-bold">${p.name || 'N/A'}</div>
                 </td>
-                <td data-label="E-mail">
+                <td data-label="{{ _('Email') }}">
                     <div class="text-muted">${p.email || 'N/A'}</div>
                 </td>
-                <td data-label="Entreprise">
+                <td data-label="{{ _('Company') }}">
                     <div>${p.company_name || '-'}</div>
                 </td>
-                <td data-label="Originee" class="hide-on-tablet">
+                <td data-label="{{ _('Origin') }}e" class="hide-on-tablet">
                     ${originBadge}
                 </td>
                 <td data-label="Status">
                     ${statusBadge}
                 </td>
-                <td data-label="Créé" class="hide-on-tablet">
+                <td data-label="{{ _('Created') }}" class="hide-on-tablet">
                     <small class="text-muted">${createdDate}</small>
                 </td>
                 <td data-label="Actions" class="text-end">
@@ -1160,8 +1160,8 @@ function openBulkEditModal() {
 function toggleField(fieldNom) {
     // Map field names to checkbox IDs
     const checkboxMap = {
-        'role': 'updateRôle',
-        'region': 'updateRégion',
+        'role': 'update{{ _('Role') }}',
+        'region': 'update{{ _('Region') }}',
         'customer_tier': 'updateCustomerTier',
         'language': 'updateLanguage',
         'tenure_years': 'updateTenure',
@@ -1189,11 +1189,11 @@ function toggleField(fieldNom) {
 function updateConfirmation() {
     const updates = {};
     
-    if (document.getElementById('updateRôle').checked) {
+    if (document.getElementById('update{{ _('Role') }}').checked) {
         const value = document.getElementById('role').value;
         if (value) updates.role = value;
     }
-    if (document.getElementById('updateRégion').checked) {
+    if (document.getElementById('update{{ _('Region') }}').checked) {
         const value = document.getElementById('region').value;
         if (value) updates.region = value;
     }
@@ -1242,11 +1242,11 @@ document.addEventListener('DOMContentLoaded', function() {
 function submitBulkEdit() {
     const updates = {};
     
-    if (document.getElementById('updateRôle').checked) {
+    if (document.getElementById('update{{ _('Role') }}').checked) {
         const value = document.getElementById('role').value;
         if (value) updates.role = value;
     }
-    if (document.getElementById('updateRégion').checked) {
+    if (document.getElementById('update{{ _('Region') }}').checked) {
         const value = document.getElementById('region').value;
         if (value) updates.region = value;
     }
@@ -1300,7 +1300,7 @@ function submitBulkEdit() {
     })
     .then(data => {
         if (data.success) {
-            // Fermer modal
+            // {{ _('Close') }} modal
             bootstrap.Modal.getInstance(document.getElementById('bulkEditModal')).hide();
             
             // Show success message

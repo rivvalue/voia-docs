@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Gestion des campagnes - {{ business_account.name }}{% endblock %}
+{% block title %}{{ _('Campaign Management') }} - {{ business_account.name }}{% endblock %}
 
 {% block page_class %}page-campaign-management{% endblock %}
 
@@ -16,8 +16,8 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-8">
-                <h1 class="page-title mb-1">Gestion des campagnes</h1>
-                <p class="page-subtitle mb-0">Gérez les campagnes de sondage pour {{ business_account.name }}</p>
+                <h1 class="page-title mb-1">{{ _('Campaign Management') }}</h1>
+                <p class="page-subtitle mb-0">{{ _('Manage survey campaigns for {{ business_account.name }}') }}</p>
             </div>
             <div class="col-md-4">
                 <div class="text-end">
@@ -32,28 +32,28 @@
 
 <div class="container">
 
-    {# Macro des boutons d'action de campagne #}
-    {% macro campaign_actions(campaign, view_type='table') %}
-        {% set action_class = 'table-actions' if view_type == 'table' else 'campaign-card-actions' %}
+    {{ _('{# Campaign Action Buttons Macro #}
+    {% macro campaign_actions(campaign, view_type=\'table\') %}
+        {% set action_class = \'table-actions\' if view_type == \'table\' else \'campaign-card-actions\' %}') }}
         <div class="{{ action_class }}" {% if view_type == 'card' %}onclick="event.stopPropagation();"{% endif %}>
             <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" 
-               class="btn btn-outline-primary btn-sm" title="Voir les détails">
+               class="btn btn-outline-primary btn-sm" title="{{ _('View Details') }}">
                 <i class="fas fa-eye"></i>
             </a>
             {% if campaign.status in ['active', 'completed'] %}
             <a href="{{ url_for('campaign_insights') }}?campaign_id={{ campaign.id }}" 
-               class="btn btn-outline-success btn-sm" title="Insights de la campagne">
+               class="btn btn-outline-success btn-sm" title="{{ _('Campaign Insights') }}">
                 <i class="fas fa-chart-bar"></i>
             </a>
             {% endif %}
             <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" 
-               class="btn btn-outline-secondary btn-sm" title="Gérer les participants">
+               class="btn btn-outline-secondary btn-sm" title="{{ _('Manage Participants') }}">
                 <i class="fas fa-users"></i>
             </a>
             {% if campaign.status in ['active', 'completed'] %}
             <button type="button" class="btn btn-outline-info btn-sm" 
                     onclick="startCampaignExport({{ campaign.id }}, '{{ campaign.name|e }}')"
-                    title="Exporter les données">
+                    title="{{ _('Export Data') }}">
                 <i class="fas fa-download"></i>
             </button>
             {% endif %}
@@ -61,7 +61,7 @@
             <button type="button" id="execReportBtn_{{ campaign.id }}" 
                     class="btn btn-outline-primary btn-sm" 
                     onclick="downloadExecutiveReport({{ campaign.id }}, '{{ campaign.name|e }}')"
-                    title="Rapport exécutif">
+                    title="{{ _('Executive Report') }}">
                 <i class="fas fa-file-pdf"></i>
             </button>
             {% endif %}
@@ -95,7 +95,7 @@
             
             <div class="row text-center mb-3">
                 <div class="col-4">
-                    <div class="small text-muted">Début</div>
+                    <div class="small text-muted">{{ _('Start') }}</div>
                     <div class="fw-bold small">{{ campaign.start_date }}</div>
                 </div>
                 <div class="col-4">
@@ -111,11 +111,11 @@
             <!-- Engagement Metrics -->
             <div class="row text-center py-2 campaign-metrics-box">
                 <div class="col-6">
-                    <div class="small text-muted"><i class="fas fa-envelope"></i> Envoyé</div>
+                    <div class="small text-muted"><i class="fas fa-envelope"></i> {{ _('Sent') }}</div>
                     <div class="fw-bold small">{{ campaign.engagement_metrics.invitations_sent }}</div>
                 </div>
                 <div class="col-6">
-                    <div class="small text-muted"><i class="fas fa-check-circle"></i> Terminé</div>
+                    <div class="small text-muted"><i class="fas fa-check-circle"></i> {{ _('Completed') }}</div>
                     <div class="fw-bold small">{{ campaign.engagement_metrics.surveys_completed }}</div>
                 </div>
             </div>
@@ -143,16 +143,16 @@
                     <div class="filters-section">
                         <div class="status-filters">
                             <a href="#" class="status-filter all active-filter" data-status="all">
-                                Tous <span class="badge">{{ campaigns|length }}</span>
+                                {{ _('All') }} <span class="badge">{{ campaigns|length }}</span>
                             </a>
                             <a href="#" class="status-filter draft" data-status="draft">
-                                Brouillon <span class="badge">{{ campaigns|selectattr('status', 'in', ['draft', 'ready'])|list|length }}</span>
+                                {{ _('Draft') }} <span class="badge">{{ campaigns|selectattr('status', 'in', ['draft', 'ready'])|list|length }}</span>
                             </a>
                             <a href="#" class="status-filter active" data-status="active">
-                                Actif <span class="badge">{{ campaigns|selectattr('status', '==', 'active')|list|length }}</span>
+                                {{ _('Active') }} <span class="badge">{{ campaigns|selectattr('status', '==', 'active')|list|length }}</span>
                             </a>
                             <a href="#" class="status-filter completed" data-status="completed">
-                                Terminé <span class="badge">{{ campaigns|selectattr('status', '==', 'completed')|list|length }}</span>
+                                {{ _('Completed') }} <span class="badge">{{ campaigns|selectattr('status', '==', 'completed')|list|length }}</span>
                             </a>
                         </div>
                     </div>
@@ -165,12 +165,12 @@
             <table class="table table-hover mb-0 responsive-table">
                 <thead>
                     <tr>
-                        <th>Nom de la campagne</th>
-                        <th>Statut</th>
-                        <th class="hide-on-tablet">Début Date</th>
+                        <th>{{ _('Campaign Name') }}</th>
+                        <th>{{ _('Status') }}</th>
+                        <th class="hide-on-tablet">{{ _('Start') }} Date</th>
                         <th class="hide-on-tablet">Fin Date</th>
                         <th class="text-center">Participants</th>
-                        <th class="text-center hide-on-tablet">Envoyé/Terminé</th>
+                        <th class="text-center hide-on-tablet">{{ _('Sent/Completed') }}</th>
                         <th class="text-center">Actions</th>
                     </tr>
                 </thead>
@@ -185,12 +185,12 @@
                                 {% endif %}
                             </div>
                         </td>
-                        <td data-label="Statut">
+                        <td data-label="{{ _('Status') }}">
                             <span class="campaign-status status-{{ campaign.status }}">
                                 {{ campaign.status|title }}
                             </span>
                         </td>
-                        <td data-label="Début Date" class="hide-on-tablet">
+                        <td data-label="{{ _('Start') }} Date" class="hide-on-tablet">
                             <small>{{ campaign.start_date }}</small>
                         </td>
                         <td data-label="Fin Date" class="hide-on-tablet">
@@ -199,7 +199,7 @@
                         <td class="text-center" data-label="Participants">
                             <strong>{{ campaign.participant_count }}</strong>
                         </td>
-                        <td class="text-center hide-on-tablet" data-label="Envoyé/Terminé">
+                        <td class="text-center hide-on-tablet" data-label="{{ _('Sent/Completed') }}">
                             <small class="text-muted">
                                 {{ campaign.engagement_metrics.invitations_sent }} / {{ campaign.engagement_metrics.surveys_completed }}
                                 {% if campaign.engagement_metrics.participation_rate is not none %}
@@ -230,8 +230,8 @@
             <div class="empty-state-icon">
                 <i class="fas fa-bullhorn"></i>
             </div>
-            <h3>Prêt à recueillir des insights ?</h3>
-            <p>Créez votre première campagne pour commencer à recueillir les retours de vos clients et comprendre leur expérience. Les campagnes vous aident à organiser les participants, envoyer les invitations et analyser les résultats.</p>
+            <h3>{{ _('Ready to gather insights?') }}</h3>
+            <p>{{ _('Create your first campaign to start collecting customer feedback and understanding their experience. Campaigns help you organize survey participants, send invitations, and analyze results.') }}</p>
             <a href="{{ url_for('campaigns.create_campaign') }}" class="btn btn-primary">
                 <i class="fas fa-plus me-2"></i>Create First Campaign
             </a>
@@ -250,12 +250,12 @@
                 <h5 class="modal-title" id="exportProgressModalLabel">
                     <i class="fas fa-download me-2"></i>Exporting Campaign Data
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer" id="closeExportModal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}" id="closeExportModal"></button>
             </div>
             <div class="modal-body">
                 <div id="exportProgressContent">
                     <div class="text-center mb-3">
-                        <h6 id="exportCampaignName">Nom de la campagne</h6>
+                        <h6 id="exportCampaignName">{{ _('Campaign Name') }}</h6>
                         <small class="text-muted">Preparing your data export...</small>
                     </div>
                     
@@ -265,16 +265,16 @@
                         </div>
                     </div>
                     
-                    <div id="exportStatut" class="text-center text-muted">
-                        <i class="fas fa-spinner fa-spin me-2"></i>Débuting export...
+                    <div id="export{{ _('Status') }}" class="text-center text-muted">
+                        <i class="fas fa-spinner fa-spin me-2"></i>{{ _('Start') }}ing export...
                     </div>
                 </div>
                 
                 <div id="exportCompleteContent" style="display: none;">
                     <div class="text-center">
                         <i class="fas fa-check-circle text-success mb-3 export-modal-icon"></i>
-                        <h5>Exportation terminée !</h5>
-                        <p class="text-muted mb-4">Les données de votre campagne ont été exportées avec succès.</p>
+                        <h5>{{ _('Export Complete!') }}</h5>
+                        <p class="text-muted mb-4">{{ _('Your campaign data has been successfully exported.') }}</p>
                         <a id="downloadExportLink" href="#" class="btn btn-success btn-lg">
                             <i class="fas fa-download me-2"></i>Download Export File
                         </a>
@@ -284,9 +284,9 @@
                 <div id="exportErrorContent" style="display: none;">
                     <div class="text-center">
                         <i class="fas fa-exclamation-triangle text-danger mb-3 export-modal-icon"></i>
-                        <h5>Échec de l'exportation</h5>
-                        <p class="text-muted mb-4" id="exportErrorMessage">Une erreur s'est produite lors de l'exportation de vos données.</p>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                        <h5>{{ _('Export Failed') }}</h5>
+                        <p class="text-muted mb-4" id="exportErrorMessage">{{ _('An error occurred while exporting your data.') }}</p>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Close') }}</button>
                     </div>
                 </div>
             </div>
@@ -308,14 +308,14 @@ function startCampaignExport(campaignId, campaignName) {
     document.getElementById('closeExportModal').style.display = 'block';
     
     // Reset progress
-    updateExportProgress(0, 'Débuting export...');
+    updateExportProgress(0, '{{ _('Start') }}ing export...');
     
     modal.show();
     
     // Get CSRF token
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
     
-    // Début export
+    // {{ _('Start') }} export
     fetch(`/api/campaigns/${campaignId}/export`, {
         method: 'POST',
         headers: {
@@ -329,9 +329,9 @@ function startCampaignExport(campaignId, campaignName) {
             currentExportJob = data.job_id;
             updateExportProgress(10, 'Export queued. Processing...');
             
-            // Début checking export status
+            // {{ _('Start') }} checking export status
             exportCheckInterval = setInterval(() => {
-                checkExportStatut(data.job_id);
+                checkExport{{ _('Status') }}(data.job_id);
             }, 2000); // Check every 2 seconds
         } else {
             showExportError(data.error || 'Failed to start export');
@@ -343,7 +343,7 @@ function startCampaignExport(campaignId, campaignName) {
     });
 }
 
-function checkExportStatut(jobId) {
+function checkExport{{ _('Status') }}(jobId) {
     fetch(`/api/export-jobs/${jobId}/status`)
     .then(response => response.json())
     .then(data => {
@@ -390,7 +390,7 @@ function checkExportStatut(jobId) {
 
 function updateExportProgress(percentage, message) {
     const progressBar = document.getElementById('exportProgressBar');
-    const statusText = document.getElementById('exportStatut');
+    const statusText = document.getElementById('export{{ _('Status') }}');
     
     progressBar.style.width = percentage + '%';
     progressBar.setAttribute('aria-valuenow', percentage);
@@ -412,7 +412,7 @@ function showExportComplete(downloadUrl) {
     const downloadLink = document.getElementById('downloadExportLink');
     downloadLink.href = downloadUrl;
     downloadLink.onclick = function() {
-        // Fermer modal after download starts
+        // {{ _('Close') }} modal after download starts
         setTimeout(() => {
             bootstrap.Modal.getInstance(document.getElementById('exportProgressModal')).hide();
         }, 500);
@@ -434,11 +434,11 @@ document.getElementById('exportProgressModal').addEventListener('hidden.bs.modal
     currentExportJob = null;
 });
 
-// Rapport exécutif Functions
+// {{ _('Executive Report') }} Functions
 function updateReportButtonText(campaignId, isAvailable) {
     const textElement = document.getElementById(`execReportText_${campaignId}`);
     if (textElement) {
-        textElement.textContent = isAvailable ? 'Rapport exécutif Available' : 'Rapport exécutif';
+        textElement.textContent = isAvailable ? '{{ _('Executive Report') }} Available' : '{{ _('Executive Report') }}';
     }
     
     // Show/hide regenerate link based on availability
@@ -452,7 +452,7 @@ function updateReportButtonText(campaignId, isAvailable) {
     }
 }
 
-function checkReportStatut(campaignId) {
+function checkReport{{ _('Status') }}(campaignId) {
     // Check report status without user interaction
     fetch(`/business/api/campaigns/${campaignId}/executive-reports`, {
         method: 'GET',
@@ -477,12 +477,12 @@ function checkReportStatut(campaignId) {
     })
     .catch(error => {
         // Silently fail for status checks
-        console.log('Statut check failed for campaign', campaignId);
+        console.log('{{ _('Status') }} check failed for campaign', campaignId);
     });
 }
 
 function downloadExecutiveReport(campaignId, campaignName) {
-    console.log('Débuting executive report download for campaign:', campaignId);
+    console.log('{{ _('Start') }}ing executive report download for campaign:', campaignId);
     
     // Get CSRF token
     const csrfToken = document.querySelector('meta[name=csrf-token]');
@@ -539,7 +539,7 @@ function downloadExecutiveReport(campaignId, campaignName) {
 }
 
 function generateExecutiveReport(campaignId, campaignName) {
-    console.log('Débuting executive report generation for campaign:', campaignId);
+    console.log('{{ _('Start') }}ing executive report generation for campaign:', campaignId);
     
     // Get CSRF token
     const csrfToken = document.querySelector('meta[name=csrf-token]');
@@ -577,7 +577,7 @@ function generateExecutiveReport(campaignId, campaignName) {
 }
 
 function regenerateExecutiveReport(campaignId, campaignName) {
-    console.log('Débuting executive report regeneration for campaign:', campaignId);
+    console.log('{{ _('Start') }}ing executive report regeneration for campaign:', campaignId);
     
     if (!confirm(`Regenerate executive report for "${campaignName}"?\n\nThis will replace the existing report with a new version containing the latest data and updated features.`)) {
         return;
@@ -616,11 +616,11 @@ function regenerateExecutiveReport(campaignId, campaignName) {
             alert(`Executive report regeneration started for "${campaignName}". The updated report will be ready in a few minutes.`);
             
             // Keep checking status until regeneration is complete
-            setTimeout(() => checkReportStatut(campaignId), 5000);
+            setTimeout(() => checkReport{{ _('Status') }}(campaignId), 5000);
         } else {
             // Reset button text on error
             if (textElement) {
-                textElement.textContent = 'Rapport exécutif Available';
+                textElement.textContent = '{{ _('Executive Report') }} Available';
             }
             alert('Failed to start executive report regeneration: ' + (result.data.error || 'Unknown error'));
         }
@@ -628,7 +628,7 @@ function regenerateExecutiveReport(campaignId, campaignName) {
     .catch(error => {
         // Reset button text on error
         if (textElement) {
-            textElement.textContent = 'Rapport exécutif Available';
+            textElement.textContent = '{{ _('Executive Report') }} Available';
         }
         console.error('Error regenerating executive report:', error);
         alert('Failed to start executive report regeneration: ' + error.message);
@@ -658,10 +658,10 @@ function switchView(viewType) {
     sessionStorage.setItem('campaignView', viewType);
 }
 
-// Statut Filtering Functions
+// {{ _('Status') }} Filtering Functions
 function filterCampaigns(status) {
-    const listRows = document.querySelectorTous('#listView tbody tr[data-status]');
-    const gridCards = document.querySelectorTous('#gridView [data-status]');
+    const listRows = document.querySelector{{ _('All') }}('#listView tbody tr[data-status]');
+    const gridCards = document.querySelector{{ _('All') }}('#gridView [data-status]');
     
     // Filter list view
     listRows.forEach(row => {
@@ -694,12 +694,12 @@ document.addEventListener('DOMContentLoaded', function() {
     switchView(savedView);
     
     // Add status filter click handlers (needed for interactivity)
-    document.querySelectorTous('.status-filter').forEach(filter => {
+    document.querySelector{{ _('All') }}('.status-filter').forEach(filter => {
         filter.addEventListener('click', function(e) {
             e.preventDefault();
             
             // Remove active class from all filters
-            document.querySelectorTous('.status-filter').forEach(f => {
+            document.querySelector{{ _('All') }}('.status-filter').forEach(f => {
                 f.classList.remove('active-filter');
             });
             
@@ -719,7 +719,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('⏳ Loading executive report statuses (non-blocking)...');
         
         // Find all executive report buttons and check their status
-        const reportButtons = document.querySelectorTous('[id^="execReportBtn_"]');
+        const reportButtons = document.querySelector{{ _('All') }}('[id^="execReportBtn_"]');
         
         // OPTIMIZATION: Defer each status check to prevent blocking
         reportButtons.forEach((button, index) => {
@@ -727,7 +727,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Stagger checks to avoid overwhelming server (50ms intervals)
             setTimeout(() => {
-                checkReportStatut(campaignId);
+                checkReport{{ _('Status') }}(campaignId);
             }, index * 50); // Sequential delays: 0ms, 50ms, 100ms, etc.
         });
         

@@ -335,7 +335,7 @@
             </div>
             <div class="assignment-details">
                 <div class="detail-row">
-                    <span class="detail-label">Compte entreprise :</span>
+                    <span class="detail-label">{{ _('Business Account:') }}</span>
                     <span class="detail-value">{{ business_account.name }}</span>
                 </div>
                 <div class="detail-row">
@@ -343,16 +343,16 @@
                     <span class="detail-value">{{ business_account.email }}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Date d'attribution :</span>
+                    <span class="detail-label">{{ _('Assignment Date:') }}</span>
                     <span class="detail-value">{{ assignment_date.strftime('%B %d, %Y at %I:%M %p') if assignment_date else 'Just now' }}</span>
                 </div>
                 <div class="detail-row">
-                    <span class="detail-label">Attribué par :</span>
+                    <span class="detail-label">{{ _('Assigned By:') }}</span>
                     <span class="detail-value">{{ assigned_by or 'System Administrator' }}</span>
                 </div>
                 {% if assignment_notes %}
                 <div class="detail-row">
-                    <span class="detail-label">Notes :</span>
+                    <span class="detail-label">{{ _('Notes:') }}</span>
                     <span class="detail-value">{{ assignment_notes }}</span>
                 </div>
                 {% endif %}
@@ -371,7 +371,7 @@
             <div class="license-comparison">
                 <div class="comparison-grid">
                     <div class="comparison-side old">
-                        <h5>Licence précédente</h5>
+                        <h5>{{ _('Previous License') }}</h5>
                         <div class="license-badge license-{{ previous_license.type }}">
                             <i class="fas fa-{{ 'star' if previous_license.type == 'core' else 'plus' if previous_license.type == 'plus' else 'crown' }}"></i>
                             {{ previous_license.type|title }}
@@ -388,7 +388,7 @@
                     </div>
                     
                     <div class="comparison-side new">
-                        <h5>Nouvelle licence</h5>
+                        <h5>{{ _('New License') }}</h5>
                         <div class="license-badge license-{{ new_license.type }}">
                             <i class="fas fa-{{ 'star' if new_license.type == 'core' else 'plus' if new_license.type == 'plus' else 'crown' }}"></i>
                             {{ new_license.type|title }}
@@ -406,16 +406,16 @@
 
         <!-- Next Steps -->
         <div class="next-steps">
-            <h5><i class="fas fa-tasks me-2"></i>Prochaines étapes</h5>
+            <h5><i class="fas fa-tasks me-2"></i>{{ _('What Happens Next') }}</h5>
             <ul>
-                <li>La nouvelle licence est active immédiatement</li>
-                <li>Les utilisateurs auront accès aux fonctionnalités selon le type de licence</li>
+                <li>{{ _('The new license is active immediately') }}</li>
+                <li>{{ _('Users will have access to features based on the new license type') }}</li>
                 {% if new_license.expiration_date %}
                 <li>This license will expire on {{ new_license.expiration_date.strftime('%B %d, %Y') }}</li>
                 {% endif %}
-                <li>Vous pouvez suivre l'utilisation et modifier les limites si nécessaire</li>
+                <li>{{ _('You can track usage and modify limits as needed') }}</li>
                 {% if notification_sent %}
-                <li>Un e-mail de notification a été envoyé au compte entreprise</li>
+                <li>{{ _('A notification email has been sent to the business account') }}</li>
                 {% endif %}
             </ul>
         </div>
@@ -437,7 +437,7 @@
                 </h3>
             </div>
             <div class="error-details">
-                <h5>Les problèmes suivants ont empêché l'attribution de la licence :</h5>
+                <h5>{{ _('The following issues prevented the license assignment:') }}</h5>
                 {% if error_details %}
                 <ul class="error-list">
                     {% for error in error_details %}
@@ -458,15 +458,15 @@
             </div>
         </div>
 
-        <!-- Étapes de dépannage -->
+        <!-- {{ _('Troubleshooting Steps') }} -->
         <div class="next-steps">
-            <h5><i class="fas fa-wrench me-2"></i>Étapes de dépannage</h5>
+            <h5><i class="fas fa-wrench me-2"></i>{{ _('Troubleshooting Steps') }}</h5>
             <ul>
-                <li>Vérifiez que le compte entreprise existe et est valide</li>
-                <li>Vérifiez que le type de licence sélectionné est disponible</li>
-                <li>Assurez-vous que les limites personnalisées (pour les licences Pro) sont raisonnables</li>
-                <li>Confirmez que vous disposez des autorisations nécessaires pour attribuer des licences</li>
-                <li>Essayez d'actualiser la page et de refaire l'attribution</li>
+                <li>{{ _('Verify that the business account exists and is valid') }}</li>
+                <li>{{ _('Check that the selected license type is available') }}</li>
+                <li>{{ _('Ensure custom limits (for Pro licenses) are reasonable') }}</li>
+                <li>{{ _('Confirm you have the necessary permissions to assign licenses') }}</li>
+                <li>{{ _('Try refreshing the page and attempting the assignment again') }}</li>
             </ul>
         </div>
         {% endif %}

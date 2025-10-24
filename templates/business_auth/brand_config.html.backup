@@ -1,0 +1,352 @@
+{% extends "base.html" %}
+
+{% block title %}Brand Settings - {{ business_account.name }}{% endblock %}
+
+{% block page_class %}page-brand-config{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Settings', 'url': url_for('business_auth.admin_panel')},
+    {'label': 'Brand Settings', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+<div class="brand-config-container">
+    <!-- Header -->
+    <div class="brand-config-header">
+        <div class="brand-config-header-content">
+            <h1>
+                <i class="fas fa-palette me-2" aria-hidden="true"></i>
+                Brand Settings
+            </h1>
+            <p>Personnalisez votre identité de marque pour {{ business_account.name }}</p>
+        </div>
+    </div>
+
+    <!-- Current Status -->
+    {% if branding_config.logo_filename or branding_config.company_display_name %}
+        <div class="brand-config-status success" role="status" aria-live="polite">
+            <strong><i class="fas fa-check-circle me-2" aria-hidden="true"></i>Branding configuration is active</strong>
+            Your custom branding settings are configured and ready to use.
+        </div>
+    {% else %}
+        <div class="brand-config-status info" role="status" aria-live="polite">
+            <strong><i class="fas fa-info-circle me-2" aria-hidden="true"></i>Default branding in use</strong>
+            Configure your custom branding settings below to personalize your account.
+        </div>
+    {% endif %}
+
+    <!-- Current Preview -->
+    <div class="brand-config-form-section">
+        <h3 class="brand-section-title">
+            <i class="fas fa-eye" aria-hidden="true"></i>
+            Current Brand Preview
+        </h3>
+        
+        <div class="brand-preview-section">
+            <div class="brand-preview-item">
+                {% if branding_config.logo_filename and branding_config.get_logo_url() %}
+                    <img src="{{ branding_config.get_logo_url() }}" 
+                         alt="Logo de l'entreprise" 
+                         class="brand-logo-preview">
+                {% else %}
+                    <div class="brand-logo-placeholder" role="img" aria-label="Aucun logo uploaded">
+                        Aucun logo<br>uploaded
+                    </div>
+                {% endif %}
+                <div class="brand-preview-details">
+                    <div class="brand-preview-label">Logo de l'entreprise</div>
+                    <p class="brand-preview-value {{ 'empty' if not branding_config.logo_filename else '' }}">
+                        {{ branding_config.logo_filename if branding_config.logo_filename else 'Aucun logo uploaded' }}
+                    </p>
+                </div>
+            </div>
+            
+            <div class="brand-preview-item">
+                <div class="brand-preview-details">
+                    <div class="brand-preview-label">Nom d'affichage de l'entreprise</div>
+                    <p class="brand-preview-value {{ 'empty' if not branding_config.company_display_name else '' }}">
+                        {{ branding_config.get_company_display_name() }}
+                        {% if not branding_config.company_display_name %}(default: {{ business_account.name }}){% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration Form -->
+    <form method="POST" action="{{ url_for('business_auth.save_brand_config') }}" enctype="multipart/form-data" id="brandConfigForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        
+        <!-- Company Information -->
+        <div class="brand-config-form-section">
+            <h3 class="brand-section-title">
+                <i class="fas fa-building" aria-hidden="true"></i>
+                Company Information
+            </h3>
+            
+            <div class="brand-form-group">
+                <label class="brand-form-label" for="company_display_name">Nom d'affichage de l'entreprise</label>
+                <input type="text" 
+                       class="brand-form-control" 
+                       id="company_display_name" 
+                       name="company_display_name" 
+                       value="{{ branding_config.company_display_name if branding_config.company_display_name else '' }}" 
+                       placeholder="{{ business_account.name }}"
+                       aria-describedby="company_display_name_help">
+                <div class="brand-help-text" id="company_display_name_help">
+                    Ce nom sera affiché dans les enquêtes et les e-mails. Laissez vide pour utiliser « {{ business_account.name }} ».
+                </div>
+            </div>
+        </div>
+
+        <!-- Color Palette -->
+        <div class="brand-config-form-section">
+            <h3 class="brand-section-title">
+                <i class="fas fa-palette" aria-hidden="true"></i>
+                Color Palette
+            </h3>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="brand-form-group">
+                        <label class="brand-form-label" for="primary_color">Couleur principale</label>
+                        <input type="color" 
+                               class="brand-form-control" 
+                               id="primary_color" 
+                               name="primary_color" 
+                               value="{{ branding_config.primary_color if branding_config.primary_color else '#dc3545' }}"
+                               aria-describedby="primary_color_help">
+                        <div class="brand-help-text" id="primary_color_help">
+                            Couleur principale de la marque utilisée pour les en-têtes, les boutons et les accents.
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="brand-form-group">
+                        <label class="brand-form-label" for="secondary_color">Couleur secondaire</label>
+                        <input type="color" 
+                               class="brand-form-control" 
+                               id="secondary_color" 
+                               name="secondary_color" 
+                               value="{{ branding_config.secondary_color if branding_config.secondary_color else '#6c757d' }}"
+                               aria-describedby="secondary_color_help">
+                        <div class="brand-help-text" id="secondary_color_help">
+                            Couleur complémentaire pour les bordures et les éléments discrets.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="brand-form-group">
+                        <label class="brand-form-label" for="accent_color">Couleur d'accent</label>
+                        <input type="color" 
+                               class="brand-form-control" 
+                               id="accent_color" 
+                               name="accent_color" 
+                               value="{{ branding_config.accent_color if branding_config.accent_color else '#28a745' }}"
+                               aria-describedby="accent_color_help">
+                        <div class="brand-help-text" id="accent_color_help">
+                            Couleur de surbrillance pour les états de succès et les éléments d'appel à l'action.
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="brand-form-group">
+                        <label class="brand-form-label" for="text_color">Couleur du texte</label>
+                        <input type="color" 
+                               class="brand-form-control" 
+                               id="text_color" 
+                               name="text_color" 
+                               value="{{ branding_config.text_color if branding_config.text_color else '#212529' }}"
+                               aria-describedby="text_color_help">
+                        <div class="brand-help-text" id="text_color_help">
+                            Couleur de texte principale pour la lisibilité.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="brand-form-group">
+                        <label class="brand-form-label" for="background_color">Couleur d'arrière-plan</label>
+                        <input type="color" 
+                               class="brand-form-control" 
+                               id="background_color" 
+                               name="background_color" 
+                               value="{{ branding_config.background_color if branding_config.background_color else '#ffffff' }}"
+                               aria-describedby="background_color_help">
+                        <div class="brand-help-text" id="background_color_help">
+                            Couleur d'arrière-plan pour les documents et les rapports.
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="brand-form-group">
+                        <label class="brand-form-label">Aperçu des couleurs</label>
+                        <div class="brand-color-preview" role="img" aria-label="Color palette preview">
+                            <div class="brand-color-preview-item" 
+                                 id="preview-primary" 
+                                 style="background: {{ branding_config.primary_color if branding_config.primary_color else '#dc3545' }};"
+                                 title="Primary color"></div>
+                            <div class="brand-color-preview-item" 
+                                 id="preview-secondary" 
+                                 style="background: {{ branding_config.secondary_color if branding_config.secondary_color else '#6c757d' }};"
+                                 title="Secondary color"></div>
+                            <div class="brand-color-preview-item" 
+                                 id="preview-accent" 
+                                 style="background: {{ branding_config.accent_color if branding_config.accent_color else '#28a745' }};"
+                                 title="Accent color"></div>
+                        </div>
+                        <div class="brand-help-text">
+                            Aperçu en direct de votre palette de couleurs.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logo Upload -->
+        <div class="brand-config-form-section">
+            <h3 class="brand-section-title">
+                <i class="fas fa-image" aria-hidden="true"></i>
+                Logo de l'entreprise
+            </h3>
+            
+            <div class="brand-form-group">
+                <label class="brand-form-label" for="logo_file">Téléverser le logo</label>
+                <input type="file" 
+                       class="brand-form-control" 
+                       id="logo_file" 
+                       name="logo_file" 
+                       accept=".png,.jpg,.jpeg,.gif,.webp" 
+                       aria-describedby="logo_file_help">
+                <div class="brand-help-text" id="logo_file_help">
+                    Téléversez le logo de votre entreprise pour personnaliser les enquêtes et les communications. Formats pris en charge : PNG, JPG, JPEG, GIF, WEBP (max 5 Mo).
+                </div>
+                
+                <div class="brand-upload-constraints" role="region" aria-label="Upload requirements">
+                    <strong>Upload Requirements:</strong>
+                    <ul>
+                        <li>Formats pris en charge : PNG, JPG, JPEG, GIF, WEBP</li>
+                        <li>Taille maximale du fichier : 5 Mo</li>
+                        <li>Dimensions recommandées : 400x200 pixels ou ratio similaire</li>
+                        <li>Arrière-plan transparent recommandé pour les fichiers PNG</li>
+                        <li>Format PNG recommandé pour les logos avec transparence</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Save Button -->
+        <div class="brand-config-form-section">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <button type="submit" 
+                            class="brand-btn-save"
+                            aria-label="Save brand settings">
+                        <i class="fas fa-save" aria-hidden="true"></i>
+                        Save Brand Settings
+                    </button>
+                </div>
+                <div class="brand-help-text mb-0">
+                    Les modifications prendront effet immédiatement après l'enregistrement.
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Preview uploaded logo before form submission
+    const logoInput = document.getElementById('logo_file');
+    if (logoInput) {
+        logoInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Validate file size
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File is too large. Please choose a file smaller than 5MB.');
+                    this.value = '';
+                    return;
+                }
+                
+                // Validate file type
+                const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
+                if (!allowedTypes.includes(file.type)) {
+                    alert('Invalid file type. Please upload PNG, JPG, JPEG, GIF, or WEBP files only.');
+                    this.value = '';
+                    return;
+                }
+                
+                // Show preview for images
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Find the logo preview element and update it
+                    const logoPreview = document.querySelector('.brand-logo-preview');
+                    const logoPlaceholder = document.querySelector('.brand-logo-placeholder');
+                    
+                    if (logoPlaceholder) {
+                        // Replace placeholder with actual image
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.alt = 'Logo Preview';
+                        img.className = 'brand-logo-preview';
+                        logoPlaceholder.parentNode.replaceChild(img, logoPlaceholder);
+                    } else if (logoPreview) {
+                        // Update existing image
+                        logoPreview.src = e.target.result;
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // Live color preview updates
+    function updateColorPreview() {
+        const primaryColor = document.getElementById('primary_color').value;
+        const secondaryColor = document.getElementById('secondary_color').value;
+        const accentColor = document.getElementById('accent_color').value;
+        
+        document.getElementById('preview-primary').style.background = primaryColor;
+        document.getElementById('preview-secondary').style.background = secondaryColor;
+        document.getElementById('preview-accent').style.background = accentColor;
+    }
+
+    // Add event listeners for color inputs
+    ['primary_color', 'secondary_color', 'accent_color'].forEach(function(id) {
+        const input = document.getElementById(id);
+        if (input) {
+            input.addEventListener('input', updateColorPreview);
+        }
+    });
+
+    // Form validation
+    const form = document.getElementById('brandConfigForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const companyName = document.getElementById('company_display_name').value.trim();
+            
+            // Optional validation - company name has reasonable length if provided
+            if (companyName && companyName.length > 200) {
+                e.preventDefault();
+                alert('Company display name is too long. Please keep it under 200 characters.');
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = form.querySelector('.brand-btn-save');
+            if (submitBtn) {
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Saving...';
+                submitBtn.disabled = true;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

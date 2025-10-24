@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Choose Survey Type - VOÏA - Voice Of Client Agent{% endblock %}
+
+{% block page_class %}page-survey-choice{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header text-center">
+                {% if branding and branding.logo_url %}
+                    <div class="mb-3">
+                        <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}" class="img-fluid" style="max-height: 60px;">
+                    </div>
+                {% endif %}
+                <h4 class="card-title mb-1">Bienvenue, {{ participant_name }}</h4>
+                <small class="text-muted">{{ participant_company }} - {{ campaign_name }}</small>
+                {% if branding and branding.company_name %}
+                    <div class="mt-2">
+                        <small class="text-muted">Powered by {{ branding.company_name }}</small>
+                    </div>
+                {% else %}
+                    <div class="mt-2">
+                        <small class="text-muted">Powered by VOÏA - Voice Of Client Agent</small>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <h5 class="text-center mb-4">Choisissez votre expérience d'enquête</h5>
+                
+                <div class="row">
+                    <!-- Conversationnel IA Survey Option -->
+                    <div class="col-md-6">
+                        <div class="card h-100 border-primary">
+                            <div class="card-body text-center">
+                                <i class="fas fa-robot fa-3x text-primary mb-3"></i>
+                                <h5 class="card-title">Conversationnel IA</h5>
+                                <p class="card-text">
+                                    Conversation naturelle avec notre agent IA. Questions dynamiques basées sur vos réponses pour une expérience personnalisée.
+                                </p>
+                                <ul class="list-unstyled text-start mb-4">
+                                    <li><i class="fas fa-check text-success me-2"></i>Flux conversationnel</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Questions dynamiques</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Analyses alimentées par l'IA</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>5 à 7 minutes</li>
+                                </ul>
+                            </div>
+                            <div class="card-footer">
+                                <form method="GET" action="/conversational_survey">
+                                    <input type="hidden" name="token" value="{{ request.args.get('token') }}">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="fas fa-comments me-2"></i>Start AI Conversation
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Traditional Survey Option -->
+                    <div class="col-md-6">
+                        <div class="card h-100 border-secondary">
+                            <div class="card-body text-center">
+                                <i class="fas fa-clipboard-list fa-3x text-secondary mb-3"></i>
+                                <h5 class="card-title">Formulaire traditionnel</h5>
+                                <p class="card-text">
+                                    Formulaire classique étape par étape avec des questions structurées. Interface familière pour une expérience d'enquête rapide.
+                                </p>
+                                <ul class="list-unstyled text-start mb-4">
+                                    <li><i class="fas fa-check text-success me-2"></i>Format structuré</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Processus étape par étape</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Interface traditionnelle</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>3 à 5 minutes</li>
+                                </ul>
+                            </div>
+                            <div class="card-footer">
+                                <form method="GET" action="/survey_form">
+                                    <input type="hidden" name="token" value="{{ request.args.get('token') }}">
+                                    <button type="submit" class="btn btn-secondary w-100">
+                                        <i class="fas fa-list me-2"></i>Start Form Survey
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <small class="text-muted">
+                        Both options provide the same valuable insights. Choose what feels most comfortable for you.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

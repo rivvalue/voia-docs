@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+
+{% block title %}AI Survey - VOÏA - Voice Of Client Agent{% endblock %}
+
+{% block page_class %}page-conversational{% endblock %}
+
+{% block content %}
+<main class="container mt-4" aria-labelledby="conv-main-heading">
+    <div data-page="conversational"></div>
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Hero Section -->
+            <header class="conv-hero-section">
+                {% if branding and branding.logo_url %}
+                    <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}" class="conv-hero-logo">
+                {% endif %}
+                <h1 id="conv-main-heading" class="conv-hero-title">VO<span class="voia-red-accent">Ï</span>A</h1>
+                <p class="conv-hero-subtitle">Partagez votre expérience</p>
+            </header>
+
+            <!-- Authentication Check -->
+            {% if not authenticated %}
+            <section id="authCheck" class="conv-auth-card card" aria-labelledby="auth-heading">
+                <div class="conv-auth-card-body card-body">
+                    <div class="conv-auth-warning alert" role="alert">
+                        <h2 id="auth-heading" class="h5">
+                            <i class="fas fa-key me-2" aria-hidden="true"></i>
+                            <strong>Authentication Required</strong>
+                        </h2>
+                        <p class="mb-3">Vous avez besoin d'un jeton valide pour participer à cette enquête.</p>
+                        {% if error %}
+                        <p class="text-danger">{{ error }}</p>
+                        {% endif %}
+                        <a href="/auth" class="conv-auth-btn btn" aria-label="Obtenir un jeton d'authentification pour commencer l'enquête">Obtenir un jeton d'authentification</a>
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- Survey Setup -->
+            {% if authenticated %}
+            <section id="surveySetup" class="conv-setup-card card" aria-labelledby="setup-heading">
+                <div class="conv-setup-header card-header">
+                    <h2 id="setup-heading" class="h5"><i class="fas fa-user-circle me-2" aria-hidden="true"></i>Commençons</h2>
+                    <small class="text-muted">Authenticated as: {{ email }}</small>
+                </div>
+                <div class="conv-setup-body card-body">
+                    <form id="setupForm" aria-labelledby="setup-heading">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        
+                        <div class="mb-3">
+                            <label for="companyName" class="form-label conv-form-label">Nom de l'entreprise</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="companyName" 
+                                   required 
+                                   aria-required="true"
+                                   value="{{ participant_company or '' }}"
+                                   {% if participant_company %}readonly aria-readonly="true"{% endif %}
+                                   placeholder="Entrez le nom de votre entreprise">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="respondentName" class="form-label conv-form-label">Votre nom</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="respondentName" 
+                                   required 
+                                   aria-required="true"
+                                   value="{{ participant_name or '' }}"
+                                   {% if participant_name %}readonly aria-readonly="true"{% endif %}
+                                   placeholder="Entrez votre nom complet">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="respondentEmail" class="form-label conv-form-label">Adresse e-mail</label>
+                            <input type="email" 
+                                   class="form-control" 
+                                   id="respondentEmail" 
+                                   required 
+                                   aria-required="true"
+                                   value="{{ email or '' }}"
+                                   {% if email %}readonly aria-readonly="true"{% endif %}
+                                   placeholder="Entrez votre adresse e-mail">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="tenureWithFc" class="form-label conv-form-label">Depuis combien de temps travaillez-vous avec FC inc ?</label>
+                            <select class="form-select" id="tenureWithFc" required aria-required="true">
+                                <option value="">Sélectionnez la durée...</option>
+                                <option value="Moins de 6 mois">Moins de 6 mois</option>
+                                <option value="6 mois - 1 an">6 mois - 1 an</option>
+                                <option value="1 à 2 ans">1 à 2 ans</option>
+                                <option value="2 à 3 ans">2 à 3 ans</option>
+                                <option value="3 à 5 ans">3 à 5 ans</option>
+                                <option value="5 à 10 ans">5 à 10 ans</option>
+                                <option value="Plus de 10 ans">Plus de 10 ans</option>
+                            </select>
+                        </div>
+                        
+                        <button type="submit" class="conv-start-btn btn" aria-label="Démarrer l'enquête conversationnelle">
+                            <i class="fas fa-comments me-2" aria-hidden="true"></i>Start Conversation
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Conversation Interface -->
+            <section id="conversationInterface" 
+                     class="conv-interface-card card v2-hidden" 
+                     aria-labelledby="conversation-heading"
+                     aria-live="polite">
+                <div class="conv-interface-header card-header">
+                    <h2 id="conversation-heading" class="h5 voia-wordmark">VO<span class="voia-accent voia-red-accent">Ï</span>A</h2>
+                    <div class="progress conv-progress-container" role="progressbar" aria-label="Progression de l'enquête" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated conv-progress-bar"></div>
+                    </div>
+                </div>
+                
+                <div class="conv-interface-body card-body">
+                    <!-- Chat Messages -->
+                    <div id="chatMessages" 
+                         class="conv-chat-messages" 
+                         role="log" 
+                         aria-label="Messages de la conversation"
+                         aria-live="polite"
+                         aria-atomic="false">
+                        <!-- Messages will be populated here -->
+                    </div>
+                    
+                    <!-- Input Area -->
+                    <div id="inputArea" class="conv-input-area">
+                        <div class="input-group">
+                            <label for="userInput" class="visually-hidden">Saisissez votre réponse</label>
+                            <textarea id="userInput" 
+                                      class="form-control" 
+                                      rows="3" 
+                                      placeholder="Saisissez votre réponse here..."
+                                      aria-label="Saisissez votre réponse to VOÏA"></textarea>
+                            <button id="sendButton" 
+                                    class="conv-send-btn btn" 
+                                    type="button"
+                                    aria-label="Envoyer le message">
+                                <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="form-text conv-input-tip">
+                            <i class="fas fa-lightbulb me-1" aria-hidden="true"></i>
+                            Tip: Speak naturally! VOÏA understands conversational responses.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Loading State -->
+            <section id="loadingState" 
+                     class="conv-loading-card card v2-hidden" 
+                     role="status"
+                     aria-live="polite"
+                     aria-label="Traitement de la réponse">
+                <div class="conv-loading-body card-body">
+                    <div class="spinner-border conv-loading-spinner" role="status">
+                        <span class="visually-hidden">Chargement...</span>
+                    </div>
+                    <h2 class="h5">VOÏA traite votre réponse...</h2>
+                    <p class="text-muted">Veuillez patienter pendant que VOÏA analyse votre retour d'information</p>
+                </div>
+            </section>
+
+            <!-- Survey Complete -->
+            <section id="surveyComplete" 
+                     class="conv-complete-card card v2-hidden" 
+                     aria-labelledby="complete-heading">
+                <div class="conv-complete-body card-body">
+                    <div class="conv-success-icon">
+                        <i class="fas fa-check-circle" aria-hidden="true"></i>
+                    </div>
+                    <h2 id="complete-heading" class="h4">Merci d'avoir partagé votre retour d'information.</h2>
+                    <p class="lead">Votre retour d'information a été analysé avec succès par VOÏA Intelligence.</p>
+                    
+                    <!-- Dashboard Button -->
+                    <div class="mb-4">
+                        <a href="{{ url_for('dashboard') }}" 
+                           class="conv-dashboard-btn btn"
+                           aria-label="Afficher le tableau de bord analytique avec vos résultats de retour">
+                            <i class="fas fa-chart-bar me-2" aria-hidden="true"></i>View Analytics Dashboard
+                        </a>
+                    </div>
+                    
+                    <p class="text-muted mb-4">Cela conclut votre démonstration des capacités de notre agent Voice of Client.</p>
+                    
+                    <!-- Next Steps Section -->
+                    <div class="conv-next-steps">
+                        <h3 class="h5"><i class="fas fa-rocket me-2" aria-hidden="true"></i>Quelle est la prochaine étape ?</h3>
+                        <p class="text-muted">Découvrez toute la puissance de l'agent Voice of Client pour votre organisation.</p>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <button onclick="startNewSession()" 
+                                        class="conv-action-btn-outline btn"
+                                        aria-label="Essayer une autre session de démonstration">
+                                    <i class="fas fa-redo me-2" aria-hidden="true"></i>Try Another Session
+                                </button>
+                                <small class="conv-btn-helper-text">Experience VOÏA with different scenarios</small>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="mailto:info@rivvalue.com?subject=Voice of Client Agent - Full Service Inquiry&body=Hi Rivvalue team,%0A%0AI just completed the VOÏA Intelligence demonstration and I'm interested in learning more about implementing the full Voice of Client Agent service for my organization.%0A%0APlease contact me to discuss how this can benefit our customer feedback strategy.%0A%0AThank you!" 
+                                   class="conv-action-btn-solid btn"
+                                   aria-label="Contactez Rivvalue pour mettre en œuvre VOÏA dans votre entreprise">
+                                    <i class="fas fa-envelope me-2" aria-hidden="true"></i>Contact Rivvalue
+                                </a>
+                                <small class="conv-btn-helper-text">Implement full VoC Agent for your business</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Additional Options -->
+                    <div class="mt-4">
+                        <a href="{{ url_for('index') }}" 
+                           class="conv-home-btn btn btn-outline-secondary"
+                           aria-label="Retour à la page d'accueil">
+                            <i class="fas fa-home me-2" aria-hidden="true"></i>Return Home
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+{% endif %}
+
+<script>
+// Pass authentication status to JavaScript
+window.isAuthenticated = {{ 'true' if authenticated else 'false' }};
+window.userEmail = '{{ email or '' }}';
+
+// Authentication status passed to JavaScript (server-side token invalidation now implemented)  
+console.log('Conversational survey loaded - Server-side token invalidation active');
+</script>
+<script src="{{ url_for('static', filename='js/conversational_survey.js') }}"></script>
+{% endblock %}

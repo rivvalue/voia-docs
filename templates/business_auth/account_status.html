@@ -10,32 +10,32 @@
                 <div class="card-body p-5 text-center">
                     <div class="mb-4">
                         <h2 class="fw-bold text-primary">Vocsa</h2>
-                        <p class="text-muted mb-0">Intelligence Voice Of Client</p>
+                        <p class="text-muted mb-0">{{ _('Voice Of Client Intelligence') }}</p>
                     </div>
 
                     {% if account_status == 'suspended' %}
                         <div class="alert alert-danger">
                             <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
-                            <h5>Compte suspendu</h5>
-                            <p class="mb-0">Votre compte a été suspendu. Veuillez contacter le support pour obtenir de l'aide.</p>
+                            <h5>{{ _('Account Suspended') }}</h5>
+                            <p class="mb-0">{{ _('Your account has been suspended. Please contact support for assistance.') }}</p>
                         </div>
                     {% elif account_status == 'inactive' %}
                         <div class="alert alert-warning">
                             <i class="fas fa-pause-circle fa-2x mb-3"></i>
-                            <h5>Compte inactif</h5>
-                            <p class="mb-0">Votre compte est actuellement inactif. Veuillez contacter le support pour le réactiver.</p>
+                            <h5>{{ _('Account Inactive') }}</h5>
+                            <p class="mb-0">{{ _('Your account is currently inactive. Please contact support to reactivate.') }}</p>
                         </div>
                     {% elif account_status == 'closed' %}
                         <div class="alert alert-secondary">
                             <i class="fas fa-times-circle fa-2x mb-3"></i>
-                            <h5>Compte fermé</h5>
-                            <p class="mb-0">Ce compte a été fermé. Contactez le support si vous pensez qu'il s'agit d'une erreur.</p>
+                            <h5>{{ _('Account Closed') }}</h5>
+                            <p class="mb-0">{{ _('This account has been closed. Contact support if you believe this is an error.') }}</p>
                         </div>
                     {% else %}
                         <div class="alert alert-info">
                             <i class="fas fa-info-circle fa-2x mb-3"></i>
-                            <h5>Statut du compte : {{ account_status|title }}</h5>
-                            <p class="mb-0">Veuillez contacter le support pour obtenir de l'aide concernant votre compte.</p>
+                            <h5>{{ _('Account Status: {{ account_status|title }}') }}</h5>
+                            <p class="mb-0">{{ _('Please contact support for assistance with your account.') }}</p>
                         </div>
                     {% endif %}
 

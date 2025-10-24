@@ -1,0 +1,738 @@
+{% extends "base.html" %}
+
+{% block title %}Gestion des campagnes - {{ business_account.name }}{% endblock %}
+
+{% block page_class %}page-campaign-management{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Campaigns', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+
+<!-- Campaign Header -->
+<div class="header-gradient-primary campaign-page-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="page-title mb-1">Gestion des campagnes</h1>
+                <p class="page-subtitle mb-0">Gérez les campagnes de sondage pour {{ business_account.name }}</p>
+            </div>
+            <div class="col-md-4">
+                <div class="text-end">
+                    <a href="{{ url_for('campaigns.create_campaign') }}" class="create-campaign-btn">
+                        <i class="fas fa-plus me-2"></i>Create Campaign
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+
+    {# Macro des boutons d'action de campagne #}
+    {% macro campaign_actions(campaign, view_type='table') %}
+        {% set action_class = 'table-actions' if view_type == 'table' else 'campaign-card-actions' %}
+        <div class="{{ action_class }}" {% if view_type == 'card' %}onclick="event.stopPropagation();"{% endif %}>
+            <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" 
+               class="btn btn-outline-primary btn-sm" title="Voir les détails">
+                <i class="fas fa-eye"></i>
+            </a>
+            {% if campaign.status in ['active', 'completed'] %}
+            <a href="{{ url_for('campaign_insights') }}?campaign_id={{ campaign.id }}" 
+               class="btn btn-outline-success btn-sm" title="Insights de la campagne">
+                <i class="fas fa-chart-bar"></i>
+            </a>
+            {% endif %}
+            <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" 
+               class="btn btn-outline-secondary btn-sm" title="Gérer les participants">
+                <i class="fas fa-users"></i>
+            </a>
+            {% if campaign.status in ['active', 'completed'] %}
+            <button type="button" class="btn btn-outline-info btn-sm" 
+                    onclick="startCampaignExport({{ campaign.id }}, '{{ campaign.name|e }}')"
+                    title="Exporter les données">
+                <i class="fas fa-download"></i>
+            </button>
+            {% endif %}
+            {% if campaign.status == 'completed' %}
+            <button type="button" id="execReportBtn_{{ campaign.id }}" 
+                    class="btn btn-outline-primary btn-sm" 
+                    onclick="downloadExecutiveReport({{ campaign.id }}, '{{ campaign.name|e }}')"
+                    title="Rapport exécutif">
+                <i class="fas fa-file-pdf"></i>
+            </button>
+            {% endif %}
+        </div>
+        {% if campaign.status == 'completed' %}
+        <div id="regenerateLink_{{ campaign.id }}" class="d-none mt-1">
+            <a href="#" onclick="regenerateExecutiveReport({{ campaign.id }}, '{{ campaign.name|e }}'); return false;" 
+               class="text-muted text-decoration-none small">
+                <i class="fas fa-sync-alt"></i>
+            </a>
+        </div>
+        {% endif %}
+    {% endmacro %}
+
+    {# Campaign Card for Grid View #}
+    {% macro campaign_card(campaign) %}
+    <div class="campaign-card" onclick="location.href='{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}'">
+        <div class="campaign-card-header">
+            <div class="d-flex justify-content-between align-items-start">
+                <h5 class="mb-0 campaign-card-title">{{ campaign.name }}</h5>
+                <span class="campaign-status status-{{ campaign.status }}">
+                    {{ campaign.status|title }}
+                </span>
+            </div>
+        </div>
+        
+        <div class="campaign-card-body">
+            {% if campaign.description %}
+            <p class="text-muted small mb-3">{{ campaign.description[:80] }}{% if campaign.description|length > 80 %}...{% endif %}</p>
+            {% endif %}
+            
+            <div class="row text-center mb-3">
+                <div class="col-4">
+                    <div class="small text-muted">Début</div>
+                    <div class="fw-bold small">{{ campaign.start_date }}</div>
+                </div>
+                <div class="col-4">
+                    <div class="small text-muted">Fin</div>
+                    <div class="fw-bold small">{{ campaign.end_date }}</div>
+                </div>
+                <div class="col-4">
+                    <div class="small text-muted">Participants</div>
+                    <div class="fw-bold small">{{ campaign.participant_count }}</div>
+                </div>
+            </div>
+            
+            <!-- Engagement Metrics -->
+            <div class="row text-center py-2 campaign-metrics-box">
+                <div class="col-6">
+                    <div class="small text-muted"><i class="fas fa-envelope"></i> Envoyé</div>
+                    <div class="fw-bold small">{{ campaign.engagement_metrics.invitations_sent }}</div>
+                </div>
+                <div class="col-6">
+                    <div class="small text-muted"><i class="fas fa-check-circle"></i> Terminé</div>
+                    <div class="fw-bold small">{{ campaign.engagement_metrics.surveys_completed }}</div>
+                </div>
+            </div>
+        </div>
+        
+        {{ campaign_actions(campaign, 'card') }}
+    </div>
+    {% endmacro %}
+
+    {% if campaigns %}
+        <!-- Campaign Controls -->
+        <div class="campaign-controls">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <div class="view-toggle">
+                        <button type="button" id="listViewBtn" class="active" onclick="switchView('list')">
+                            <i class="fas fa-list me-2"></i>List
+                        </button>
+                        <button type="button" id="gridViewBtn" onclick="switchView('grid')">
+                            <i class="fas fa-th me-2"></i>Grid
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="filters-section">
+                        <div class="status-filters">
+                            <a href="#" class="status-filter all active-filter" data-status="all">
+                                Tous <span class="badge">{{ campaigns|length }}</span>
+                            </a>
+                            <a href="#" class="status-filter draft" data-status="draft">
+                                Brouillon <span class="badge">{{ campaigns|selectattr('status', 'in', ['draft', 'ready'])|list|length }}</span>
+                            </a>
+                            <a href="#" class="status-filter active" data-status="active">
+                                Actif <span class="badge">{{ campaigns|selectattr('status', '==', 'active')|list|length }}</span>
+                            </a>
+                            <a href="#" class="status-filter completed" data-status="completed">
+                                Terminé <span class="badge">{{ campaigns|selectattr('status', '==', 'completed')|list|length }}</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- List View (Default) -->
+        <div id="listView" class="campaigns-table">
+            <table class="table table-hover mb-0 responsive-table">
+                <thead>
+                    <tr>
+                        <th>Nom de la campagne</th>
+                        <th>Statut</th>
+                        <th class="hide-on-tablet">Début Date</th>
+                        <th class="hide-on-tablet">Fin Date</th>
+                        <th class="text-center">Participants</th>
+                        <th class="text-center hide-on-tablet">Envoyé/Terminé</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for campaign in campaigns %}
+                    <tr data-status="{{ campaign.status }}">
+                        <td class="campaign-name-cell" data-label="Campaign">
+                            <div>
+                                <strong>{{ campaign.name }}</strong>
+                                {% if campaign.description %}
+                                <br><small class="text-muted">{{ campaign.description[:60] }}{% if campaign.description|length > 60 %}...{% endif %}</small>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td data-label="Statut">
+                            <span class="campaign-status status-{{ campaign.status }}">
+                                {{ campaign.status|title }}
+                            </span>
+                        </td>
+                        <td data-label="Début Date" class="hide-on-tablet">
+                            <small>{{ campaign.start_date }}</small>
+                        </td>
+                        <td data-label="Fin Date" class="hide-on-tablet">
+                            <small>{{ campaign.end_date }}</small>
+                        </td>
+                        <td class="text-center" data-label="Participants">
+                            <strong>{{ campaign.participant_count }}</strong>
+                        </td>
+                        <td class="text-center hide-on-tablet" data-label="Envoyé/Terminé">
+                            <small class="text-muted">
+                                {{ campaign.engagement_metrics.invitations_sent }} / {{ campaign.engagement_metrics.surveys_completed }}
+                                {% if campaign.engagement_metrics.participation_rate is not none %}
+                                <br>({{ campaign.engagement_metrics.participation_rate }}%)
+                                {% endif %}
+                            </small>
+                        </td>
+                        <td class="text-center actions-cell">
+                            {{ campaign_actions(campaign, 'table') }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Grid View -->
+        <div id="gridView" class="campaigns-grid d-none">
+            {% for campaign in campaigns %}
+            <div data-status="{{ campaign.status }}">
+                {{ campaign_card(campaign) }}
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Empty State - No Campaigns -->
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-bullhorn"></i>
+            </div>
+            <h3>Prêt à recueillir des insights ?</h3>
+            <p>Créez votre première campagne pour commencer à recueillir les retours de vos clients et comprendre leur expérience. Les campagnes vous aident à organiser les participants, envoyer les invitations et analyser les résultats.</p>
+            <a href="{{ url_for('campaigns.create_campaign') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Create First Campaign
+            </a>
+            <a href="/demo" class="empty-state-secondary-action">
+                <i class="fas fa-play-circle me-1"></i>View Demo First
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Export Progress Modal -->
+<div class="modal fade" id="exportProgressModal" tabindex="-1" aria-labelledby="exportProgressModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exportProgressModalLabel">
+                    <i class="fas fa-download me-2"></i>Exporting Campaign Data
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer" id="closeExportModal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="exportProgressContent">
+                    <div class="text-center mb-3">
+                        <h6 id="exportCampaignName">Nom de la campagne</h6>
+                        <small class="text-muted">Preparing your data export...</small>
+                    </div>
+                    
+                    <div class="progress mb-3">
+                        <div id="exportProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                    </div>
+                    
+                    <div id="exportStatut" class="text-center text-muted">
+                        <i class="fas fa-spinner fa-spin me-2"></i>Débuting export...
+                    </div>
+                </div>
+                
+                <div id="exportCompleteContent" style="display: none;">
+                    <div class="text-center">
+                        <i class="fas fa-check-circle text-success mb-3 export-modal-icon"></i>
+                        <h5>Exportation terminée !</h5>
+                        <p class="text-muted mb-4">Les données de votre campagne ont été exportées avec succès.</p>
+                        <a id="downloadExportLink" href="#" class="btn btn-success btn-lg">
+                            <i class="fas fa-download me-2"></i>Download Export File
+                        </a>
+                    </div>
+                </div>
+                
+                <div id="exportErrorContent" style="display: none;">
+                    <div class="text-center">
+                        <i class="fas fa-exclamation-triangle text-danger mb-3 export-modal-icon"></i>
+                        <h5>Échec de l'exportation</h5>
+                        <p class="text-muted mb-4" id="exportErrorMessage">Une erreur s'est produite lors de l'exportation de vos données.</p>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentExportJob = null;
+let exportCheckInterval = null;
+
+function startCampaignExport(campaignId, campaignName) {
+    // Show modal and reset state
+    const modal = new bootstrap.Modal(document.getElementById('exportProgressModal'));
+    document.getElementById('exportCampaignName').textContent = campaignName;
+    document.getElementById('exportProgressContent').style.display = 'block';
+    document.getElementById('exportCompleteContent').style.display = 'none';
+    document.getElementById('exportErrorContent').style.display = 'none';
+    document.getElementById('closeExportModal').style.display = 'block';
+    
+    // Reset progress
+    updateExportProgress(0, 'Débuting export...');
+    
+    modal.show();
+    
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+    
+    // Début export
+    fetch(`/api/campaigns/${campaignId}/export`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            currentExportJob = data.job_id;
+            updateExportProgress(10, 'Export queued. Processing...');
+            
+            // Début checking export status
+            exportCheckInterval = setInterval(() => {
+                checkExportStatut(data.job_id);
+            }, 2000); // Check every 2 seconds
+        } else {
+            showExportError(data.error || 'Failed to start export');
+        }
+    })
+    .catch(error => {
+        console.error('Export start error:', error);
+        showExportError('Failed to start export: ' + error.message);
+    });
+}
+
+function checkExportStatut(jobId) {
+    fetch(`/api/export-jobs/${jobId}/status`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            clearInterval(exportCheckInterval);
+            showExportError(data.error);
+            return;
+        }
+        
+        switch (data.status) {
+            case 'queued':
+                updateExportProgress(15, 'Export queued...');
+                break;
+            case 'processing':
+                let progress = 30;
+                if (data.progress) {
+                    if (data.progress.includes('responses')) {
+                        progress = 50;
+                    } else if (data.progress.includes('participants')) {
+                        progress = 80;
+                    }
+                }
+                updateExportProgress(progress, data.progress || 'Processing data...');
+                break;
+            case 'completed':
+                clearInterval(exportCheckInterval);
+                updateExportProgress(100, 'Export completed!');
+                setTimeout(() => {
+                    showExportComplete(data.download_url);
+                }, 1000);
+                break;
+            case 'failed':
+                clearInterval(exportCheckInterval);
+                showExportError(data.error || 'Export failed');
+                break;
+        }
+    })
+    .catch(error => {
+        console.error('Export status check error:', error);
+        clearInterval(exportCheckInterval);
+        showExportError('Failed to check export status: ' + error.message);
+    });
+}
+
+function updateExportProgress(percentage, message) {
+    const progressBar = document.getElementById('exportProgressBar');
+    const statusText = document.getElementById('exportStatut');
+    
+    progressBar.style.width = percentage + '%';
+    progressBar.setAttribute('aria-valuenow', percentage);
+    
+    if (percentage >= 100) {
+        progressBar.classList.remove('progress-bar-striped', 'progress-bar-animated');
+        progressBar.classList.add('bg-success');
+        statusText.innerHTML = '<i class="fas fa-check me-2"></i>' + message;
+    } else {
+        statusText.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>' + message;
+    }
+}
+
+function showExportComplete(downloadUrl) {
+    document.getElementById('exportProgressContent').style.display = 'none';
+    document.getElementById('exportCompleteContent').style.display = 'block';
+    document.getElementById('closeExportModal').style.display = 'none';
+    
+    const downloadLink = document.getElementById('downloadExportLink');
+    downloadLink.href = downloadUrl;
+    downloadLink.onclick = function() {
+        // Fermer modal after download starts
+        setTimeout(() => {
+            bootstrap.Modal.getInstance(document.getElementById('exportProgressModal')).hide();
+        }, 500);
+    };
+}
+
+function showExportError(errorMessage) {
+    document.getElementById('exportProgressContent').style.display = 'none';
+    document.getElementById('exportErrorContent').style.display = 'block';
+    document.getElementById('exportErrorMessage').textContent = errorMessage;
+}
+
+// Clean up intervals when modal is hidden
+document.getElementById('exportProgressModal').addEventListener('hidden.bs.modal', function () {
+    if (exportCheckInterval) {
+        clearInterval(exportCheckInterval);
+        exportCheckInterval = null;
+    }
+    currentExportJob = null;
+});
+
+// Rapport exécutif Functions
+function updateReportButtonText(campaignId, isAvailable) {
+    const textElement = document.getElementById(`execReportText_${campaignId}`);
+    if (textElement) {
+        textElement.textContent = isAvailable ? 'Rapport exécutif Available' : 'Rapport exécutif';
+    }
+    
+    // Show/hide regenerate link based on availability
+    const regenerateLink = document.getElementById(`regenerateLink_${campaignId}`);
+    if (regenerateLink) {
+        if (isAvailable) {
+            regenerateLink.classList.remove('d-none');
+        } else {
+            regenerateLink.classList.add('d-none');
+        }
+    }
+}
+
+function checkReportStatut(campaignId) {
+    // Check report status without user interaction
+    fetch(`/business/api/campaigns/${campaignId}/executive-reports`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        }
+        return null;
+    })
+    .then(data => {
+        if (data && data.executive_reports && data.executive_reports.length > 0) {
+            const report = data.executive_reports[0];
+            if (report.status === 'completed') {
+                updateReportButtonText(campaignId, true);
+            }
+        }
+    })
+    .catch(error => {
+        // Silently fail for status checks
+        console.log('Statut check failed for campaign', campaignId);
+    });
+}
+
+function downloadExecutiveReport(campaignId, campaignName) {
+    console.log('Débuting executive report download for campaign:', campaignId);
+    
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name=csrf-token]');
+    if (!csrfToken) {
+        alert('Security token not found. Please refresh the page and try again.');
+        return;
+    }
+    
+    console.log('CSRF token found:', csrfToken.getAttribute('content').substring(0, 10) + '...');
+    
+    // Check if executive report is available
+    fetch(`/business/api/campaigns/${campaignId}/executive-reports`, {
+        method: 'GET',
+        headers: {
+            'X-CSRFToken': csrfToken.getAttribute('content'),
+            'Content-Type': 'application/json'
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        console.log('Executive reports API response status:', response.status);
+        if (!response.ok) {
+            return response.text().then(text => {
+                console.error('API error response:', text);
+                throw new Error(`HTTP ${response.status}: ${text}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Executive reports data:', data);
+        if (data.executive_reports && data.executive_reports.length > 0) {
+            const report = data.executive_reports[0]; // Get the latest report
+            if (report.status === 'completed') {
+                // Update button text and download
+                updateReportButtonText(campaignId, true);
+                window.location.href = `/business/api/campaigns/${campaignId}/executive-reports/download`;
+            } else if (report.status === 'processing') {
+                alert('Executive report is currently being generated. Please check back in a few minutes.');
+            } else {
+                alert('Executive report generation failed. Please try regenerating it.');
+            }
+        } else {
+            // No report exists, offer to generate one
+            if (confirm(`No executive report exists for "${campaignName}". Would you like to generate one now?`)) {
+                generateExecutiveReport(campaignId, campaignName);
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error checking executive report:', error);
+        alert('Failed to check executive report status: ' + error.message);
+    });
+}
+
+function generateExecutiveReport(campaignId, campaignName) {
+    console.log('Débuting executive report generation for campaign:', campaignId);
+    
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name=csrf-token]');
+    if (!csrfToken) {
+        alert('Security token not found. Please refresh the page and try again.');
+        return;
+    }
+    
+    fetch(`/business/api/campaigns/${campaignId}/executive-reports/generate`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken.getAttribute('content'),
+            'Content-Type': 'application/json'
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json().then(data => ({ success: true, data }));
+        } else {
+            return response.json().then(data => ({ success: false, data }));
+        }
+    })
+    .then(result => {
+        if (result.success) {
+            alert(`Executive report generation started for "${campaignName}". You will be able to download it in a few minutes.`);
+        } else {
+            alert('Failed to start executive report generation: ' + (result.data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        console.error('Error generating executive report:', error);
+        alert('Failed to start executive report generation: ' + error.message);
+    });
+}
+
+function regenerateExecutiveReport(campaignId, campaignName) {
+    console.log('Débuting executive report regeneration for campaign:', campaignId);
+    
+    if (!confirm(`Regenerate executive report for "${campaignName}"?\n\nThis will replace the existing report with a new version containing the latest data and updated features.`)) {
+        return;
+    }
+    
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name=csrf-token]');
+    if (!csrfToken) {
+        alert('Security token not found. Please refresh the page and try again.');
+        return;
+    }
+    
+    // Update button to show regenerating status
+    const textElement = document.getElementById(`execReportText_${campaignId}`);
+    if (textElement) {
+        textElement.textContent = 'Regenerating...';
+    }
+    
+    fetch(`/business/api/campaigns/${campaignId}/executive-reports/regenerate`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken.getAttribute('content'),
+            'Content-Type': 'application/json'
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json().then(data => ({ success: true, data }));
+        } else {
+            return response.json().then(data => ({ success: false, data }));
+        }
+    })
+    .then(result => {
+        if (result.success) {
+            alert(`Executive report regeneration started for "${campaignName}". The updated report will be ready in a few minutes.`);
+            
+            // Keep checking status until regeneration is complete
+            setTimeout(() => checkReportStatut(campaignId), 5000);
+        } else {
+            // Reset button text on error
+            if (textElement) {
+                textElement.textContent = 'Rapport exécutif Available';
+            }
+            alert('Failed to start executive report regeneration: ' + (result.data.error || 'Unknown error'));
+        }
+    })
+    .catch(error => {
+        // Reset button text on error
+        if (textElement) {
+            textElement.textContent = 'Rapport exécutif Available';
+        }
+        console.error('Error regenerating executive report:', error);
+        alert('Failed to start executive report regeneration: ' + error.message);
+    });
+}
+
+// View Management Functions
+function switchView(viewType) {
+    const listView = document.getElementById('listView');
+    const gridView = document.getElementById('gridView');
+    const listBtn = document.getElementById('listViewBtn');
+    const gridBtn = document.getElementById('gridViewBtn');
+
+    if (viewType === 'list') {
+        listView.classList.remove('d-none');
+        gridView.classList.add('d-none');
+        listBtn.classList.add('active');
+        gridBtn.classList.remove('active');
+    } else if (viewType === 'grid') {
+        listView.classList.add('d-none');
+        gridView.classList.remove('d-none');
+        listBtn.classList.remove('active');
+        gridBtn.classList.add('active');
+    }
+
+    // Save preference in sessionStorage
+    sessionStorage.setItem('campaignView', viewType);
+}
+
+// Statut Filtering Functions
+function filterCampaigns(status) {
+    const listRows = document.querySelectorTous('#listView tbody tr[data-status]');
+    const gridCards = document.querySelectorTous('#gridView [data-status]');
+    
+    // Filter list view
+    listRows.forEach(row => {
+        if (status === 'all' || row.dataset.status === status || 
+            (status === 'draft' && ['draft', 'ready'].includes(row.dataset.status))) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    // Filter grid view
+    gridCards.forEach(card => {
+        if (status === 'all' || card.dataset.status === status || 
+            (status === 'draft' && ['draft', 'ready'].includes(card.dataset.status))) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+// ========== OPTIMIZED: Single DOMContentLoaded handler - Progressive Loading ==========
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('⚡ Campaigns page - OPTIMIZED PROGRESSIVE LOADING');
+    
+    // ========== CRITICAL PATH: Immediate rendering (unblock browser) ==========
+    // Restore view preference (needed for layout)
+    const savedView = sessionStorage.getItem('campaignView') || 'list';
+    switchView(savedView);
+    
+    // Add status filter click handlers (needed for interactivity)
+    document.querySelectorTous('.status-filter').forEach(filter => {
+        filter.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Remove active class from all filters
+            document.querySelectorTous('.status-filter').forEach(f => {
+                f.classList.remove('active-filter');
+            });
+            
+            // Add active class to clicked filter
+            this.classList.add('active-filter');
+            
+            // Filter campaigns
+            filterCampaigns(this.dataset.status);
+        });
+    });
+    
+    console.log('✅ Critical path complete - page interactive');
+    
+    // ========== DEFERRED PATH: Load executive reports asynchronously (unblock UI) ==========
+    // Use requestAnimationFrame to defer heavy operations to next frame
+    requestAnimationFrame(() => {
+        console.log('⏳ Loading executive report statuses (non-blocking)...');
+        
+        // Find all executive report buttons and check their status
+        const reportButtons = document.querySelectorTous('[id^="execReportBtn_"]');
+        
+        // OPTIMIZATION: Defer each status check to prevent blocking
+        reportButtons.forEach((button, index) => {
+            const campaignId = button.id.replace('execReportBtn_', '');
+            
+            // Stagger checks to avoid overwhelming server (50ms intervals)
+            setTimeout(() => {
+                checkReportStatut(campaignId);
+            }, index * 50); // Sequential delays: 0ms, 50ms, 100ms, etc.
+        });
+        
+        console.log(`✅ Scheduled ${reportButtons.length} executive report checks`);
+    });
+});
+</script>
+{% endblock %}

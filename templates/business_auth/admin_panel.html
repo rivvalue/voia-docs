@@ -395,8 +395,8 @@
                             <i class="fas fa-user-shield"></i>
                         </div>
                         <div>
-                            <h2 class="page-title mb-1">Bienvenue {{ current_user.get_full_name() }}</h2>
-                            <p class="page-subtitle mb-0">{{ business_account.name }}, {% if current_user.role == 'platform_admin' %}Platform Administrator{% elif current_user.role == 'business_account_admin' %}Administrator{% elif current_user.role == 'manager' %}Gérerr{% elif current_user.role == 'viewer' %}Viewer{% else %}{{ current_user.role|title }}{% endif %}</p>
+                            <h2 class="page-title mb-1">{{ _('Welcome {{ current_user.get_full_name() }}') }}</h2>
+                            <p class="page-subtitle mb-0">{{ business_account.name }}, {% if current_user.role == 'platform_admin' %}Platform Administrator{% elif current_user.role == 'business_account_admin' %}Administrator{% elif current_user.role == 'manager' %}{{ _('Manage') }}r{% elif current_user.role == 'viewer' %}Viewer{% else %}{{ current_user.role|title }}{% endif %}</p>
                         </div>
                     </div>
                 </div>
@@ -404,91 +404,91 @@
                     <div class="admin-actions">
                         <!-- Platform Admin Section - Always Visible -->
                         {% if current_user.role == 'platform_admin' or current_user.is_platform_admin() %}
-                        <a href="{{ url_for('business_auth.business_analytics_hub') }}" class="btn btn-admin me-2" title="Centre d'analytique d'entreprise avec une intelligence complète de la plateforme" style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%); border-color: var(--primary-red); color: white;">
-                            <i class="fas fa-chart-line me-2"></i><span class="d-none d-sm-inline">Centre d'analytique d'entreprise</span><span class="d-sm-none">Analytique</span>
+                        <a href="{{ url_for('business_auth.business_analytics_hub') }}" class="btn btn-admin me-2" title="{{ _('Business analytics hub with comprehensive platform intelligence') }}" style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%); border-color: var(--primary-red); color: white;">
+                            <i class="fas fa-chart-line me-2"></i><span class="d-none d-sm-inline">{{ _('Business Analytics Hub') }}</span><span class="d-sm-none">{{ _('Analytics') }}</span>
                         </a>
-                        <a href="{{ url_for('business_auth.business_account_onboarding') }}" class="btn btn-success btn-admin me-2" title="Créer de nouveaux comptes d'entreprise avec attribution de licence">
-                            <i class="fas fa-plus-circle me-2"></i><span class="d-none d-sm-inline">Intégrer une entreprise</span><span class="d-sm-none">Intégrer</span>
+                        <a href="{{ url_for('business_auth.business_account_onboarding') }}" class="btn btn-success btn-admin me-2" title="{{ _('Create new business accounts with license assignment') }}">
+                            <i class="fas fa-plus-circle me-2"></i><span class="d-none d-sm-inline">{{ _('Onboard Business') }}</span><span class="d-sm-none">{{ _('Onboard') }}</span>
                         </a>
-                        <a href="{{ url_for('business_auth.license_dashboard') }}" class="btn btn-primary btn-admin me-2" title="Tableau de bord et aperçu de la gestion des licences">
+                        <a href="{{ url_for('business_auth.license_dashboard') }}" class="btn btn-primary btn-admin me-2" title="{{ _('License management dashboard and overview') }}">
                             <i class="fas fa-tachometer-alt me-2"></i>License Dashboard
                         </a>
                         {% endif %}
                         
                         <!-- Primary Actions - Always Visible -->
-                        <a href="{{ url_for('campaigns.list_campaigns') }}" class="btn btn-primary btn-admin me-2" title="Gérer survey campaigns">
-                            <i class="fas fa-bullhorn me-2"></i><span class="d-none d-sm-inline">Gérer </span>Campaigns
+                        <a href="{{ url_for('campaigns.list_campaigns') }}" class="btn btn-primary btn-admin me-2" title="{{ _('Manage') }} survey campaigns">
+                            <i class="fas fa-bullhorn me-2"></i><span class="d-none d-sm-inline">{{ _('Manage') }} </span>Campaigns
                         </a>
-                        <a href="{{ url_for('participants.list_participants') }}" class="btn btn-primary btn-admin me-2" title="Gérer survey participants">
-                            <i class="fas fa-users me-2"></i><span class="d-none d-sm-inline">Gérer </span>Participants
+                        <a href="{{ url_for('participants.list_participants') }}" class="btn btn-primary btn-admin me-2" title="{{ _('Manage') }} survey participants">
+                            <i class="fas fa-users me-2"></i><span class="d-none d-sm-inline">{{ _('Manage') }} </span>Participants
                         </a>
                         
                         <!-- Quick Actions Dropdown -->
                         <div class="btn-group">
-                            <button type="button" class="btn btn-outline-primary btn-admin dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="Actions rapides et paramètres">
+                            <button type="button" class="btn btn-outline-primary btn-admin dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" title="{{ _('Quick actions and settings') }}">
                                 <i class="fas fa-cog me-2"></i>Quick Actions
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                <!-- Analytique -->
+                                <!-- {{ _('Analytics') }} -->
                                 <li>
-                                    <a class="dropdown-item" href="{{ url_for('business_auth.business_analytics') }}" title="Afficher les analyses et les informations">
-                                        <i class="fas fa-chart-bar me-2 text-primary"></i>View Analytique
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.business_analytics') }}" title="{{ _('View analytics and insights') }}">
+                                        <i class="fas fa-chart-bar me-2 text-primary"></i>View {{ _('Analytics') }}
                                     </a>
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
                                 
                                 <!-- Configuration Actions -->
                                 <li>
-                                    <a class="dropdown-item" href="{{ url_for('business_auth.email_config') }}" title="Configurer les paramètres d'e-mail">
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.email_config') }}" title="{{ _('Configure email settings') }}">
                                         <i class="fas fa-envelope-open-text me-2 text-primary"></i>Email Config
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="{{ url_for('business_auth.brand_config') }}" title="Configurer les paramètres de marque">
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.brand_config') }}" title="{{ _('Configure brand settings') }}">
                                         <i class="fas fa-paint-brush me-2 text-primary"></i>Brand Settings
                                     </a>
                                 </li>
                                 {% if business_account.account_type in ['customer', 'demo'] %}
                                 <li>
-                                    <a class="dropdown-item" href="{{ url_for('business_auth.survey_config') }}" title="Personnaliser l'expérience d'enquête et les paramètres de conversation">
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.survey_config') }}" title="{{ _('Customize survey experience and conversation settings') }}">
                                         <i class="fas fa-cog me-2 text-primary"></i>Survey Customization
                                     </a>
                                 </li>
                                 {% endif %}
                                 <li><hr class="dropdown-divider"></li>
                                 
-                                <!-- Gérerment Actions -->
+                                <!-- {{ _('Manage') }}ment Actions -->
                                 {% if current_user.has_permission('manage_users') %}
                                 <li>
-                                    <a class="dropdown-item" href="{{ url_for('business_auth.manage_users') }}" title="Gérer team members and users">
-                                        <i class="fas fa-users me-2 text-success"></i>Gérer Users
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.manage_users') }}" title="{{ _('Manage') }} team members and users">
+                                        <i class="fas fa-users me-2 text-success"></i>{{ _('Manage') }} Users
                                     </a>
                                 </li>
                                 {% endif %}
                                 <li>
-                                    <a class="dropdown-item" href="{{ url_for('business_auth.license_info') }}" title="Afficher les informations de licence et les statistiques d'utilisation">
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.license_info') }}" title="{{ _('View license information and usage statistics') }}">
                                         <i class="fas fa-certificate me-2 text-info"></i>License Info
                                     </a>
                                 </li>
                                 {% if current_user.role == 'platform_admin' %}
                                 <li>
-                                    <a class="dropdown-item" href="{{ url_for('business_auth.license_info') }}" title="Afficher tous les comptes d'entreprise et les attributions de licence">
-                                        <i class="fas fa-building me-2 text-warning"></i>Gérer Licenses
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.license_info') }}" title="{{ _('View all business accounts and license assignments') }}">
+                                        <i class="fas fa-building me-2 text-warning"></i>{{ _('Manage') }} Licenses
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item d-lg-none" href="{{ url_for('business_auth.business_account_onboarding') }}" title="Créer de nouveaux comptes d'entreprise avec attribution de licence">
-                                        <i class="fas fa-plus-circle me-2 text-success"></i>Intégrer une entreprise
+                                    <a class="dropdown-item d-lg-none" href="{{ url_for('business_auth.business_account_onboarding') }}" title="{{ _('Create new business accounts with license assignment') }}">
+                                        <i class="fas fa-plus-circle me-2 text-success"></i>{{ _('Onboard Business') }}
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item d-lg-none" href="{{ url_for('business_auth.license_dashboard') }}" title="Tableau de bord et aperçu de la gestion des licences">
+                                    <a class="dropdown-item d-lg-none" href="{{ url_for('business_auth.license_dashboard') }}" title="{{ _('License management dashboard and overview') }}">
                                         <i class="fas fa-tachometer-alt me-2 text-primary"></i>License Dashboard
                                     </a>
                                 </li>
                                 {% endif %}
                                 <li>
-                                    <a class="dropdown-item" href="{{ url_for('business_auth.audit_logs') }}" title="Afficher l'historique des activités du compte">
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.audit_logs') }}" title="{{ _('View account activity trail') }}">
                                         <i class="fas fa-clipboard-list me-2 text-secondary"></i>Audit Trail
                                     </a>
                                 </li>
@@ -515,34 +515,34 @@
             {{ 'Demo Environment' if business_account.account_type == 'demo' else 'Customer Account' }}
         </div>
 
-        <!-- Team Gérerment Section (Admin Only) -->
+        <!-- Team {{ _('Manage') }}ment Section (Admin Only) -->
         {% if current_user.has_permission('manage_users') %}
         <div class="admin-section">
             <div class="section-header">
                 <h3 class="section-title">
                     <i class="fas fa-users"></i>
-                    Team Gérerment
+                    Team {{ _('Manage') }}ment
                 </h3>
                 <a href="{{ url_for('business_auth.manage_users') }}" class="btn btn-primary btn-admin">
-                    <i class="fas fa-user-plus me-2"></i>Gérer Users
+                    <i class="fas fa-user-plus me-2"></i>{{ _('Manage') }} Users
                 </a>
             </div>
-            <p class="text-muted mb-0">Ajoutez et gérez les membres de votre équipe pour votre compte entreprise. Utilisation actuelle : {{ admin_data.license_info.users_used if admin_data.license_info else 1 }}/{{ admin_data.license_info.users_limit if admin_data.license_info else 5 }} utilisateurs.</p>
+            <p class="text-muted mb-0">{{ _('Add and manage team members for your business account. Current usage: {{ admin_data.license_info.users_used if admin_data.license_info else 1 }}/{{ admin_data.license_info.users_limit if admin_data.license_info else 5 }} users.') }}</p>
         </div>
         {% endif %}
 
-        <!-- Campaign Gérerment Section -->
+        <!-- Campaign {{ _('Manage') }}ment Section -->
         <div class="admin-section">
             <div class="section-header">
                 <h3 class="section-title">
                     <i class="fas fa-bullhorn"></i>
-                    Campaign Gérerment
+                    Campaign {{ _('Manage') }}ment
                 </h3>
                 <a href="{{ url_for('campaigns.list_campaigns') }}" class="btn btn-primary btn-admin">
-                    <i class="fas fa-cogs me-2"></i>Gérer Campaigns
+                    <i class="fas fa-cogs me-2"></i>{{ _('Manage') }} Campaigns
                 </a>
             </div>
-            <p class="text-muted mb-0">Créez et gérez des campagnes d'enquête pour votre compte entreprise.</p>
+            <p class="text-muted mb-0">{{ _('Create and manage survey campaigns for your business account.') }}</p>
         </div>
 
         <!-- Statistics Overview -->
@@ -553,7 +553,7 @@
                         <i class="fas fa-chart-line"></i>
                     </div>
                     <h3 class="stat-number">{{ admin_data.stats.total_responses }}</h3>
-                    <p class="stat-label">Nombre total de réponses</p>
+                    <p class="stat-label">{{ _('Total Responses') }}</p>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
@@ -562,7 +562,7 @@
                         <i class="fas fa-bullhorn"></i>
                     </div>
                     <h3 class="stat-number">{{ admin_data.stats.total_campaigns }}</h3>
-                    <p class="stat-label">Nombre total de campagnes</p>
+                    <p class="stat-label">{{ _('Total Campaigns') }}</p>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
@@ -571,7 +571,7 @@
                         <i class="fas fa-play-circle"></i>
                     </div>
                     <h3 class="stat-number">{{ admin_data.stats.get('active_campaigns', 0) }}</h3>
-                    <p class="stat-label">Campagnes actives</p>
+                    <p class="stat-label">{{ _('Active Campaigns') }}</p>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
@@ -580,7 +580,7 @@
                         <i class="fas fa-users"></i>
                     </div>
                     <h3 class="stat-number">{{ admin_data.stats.get('total_participants', 0) }}</h3>
-                    <p class="stat-label">Nombre total de participants</p>
+                    <p class="stat-label">{{ _('Total Participants') }}</p>
                 </div>
             </div>
         </div>
@@ -594,7 +594,7 @@
                         <i class="fas fa-envelope-open"></i>
                     </div>
                     <h3 class="stat-number">{{ admin_data.stats.email_stats.sent_invitations }}</h3>
-                    <p class="stat-label">Invitations envoyées</p>
+                    <p class="stat-label">{{ _('Sent Invitations') }}</p>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
@@ -603,7 +603,7 @@
                         <i class="fas fa-clock"></i>
                     </div>
                     <h3 class="stat-number">{{ admin_data.stats.email_stats.pending_invitations }}</h3>
-                    <p class="stat-label">Invitations en attente</p>
+                    <p class="stat-label">{{ _('Pending Invitations') }}</p>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
@@ -612,7 +612,7 @@
                         <i class="fas fa-exclamation-triangle"></i>
                     </div>
                     <h3 class="stat-number">{{ admin_data.stats.email_stats.failed_invitations }}</h3>
-                    <p class="stat-label">Invitations échouées</p>
+                    <p class="stat-label">{{ _('Failed Invitations') }}</p>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
@@ -621,7 +621,7 @@
                         <i class="fas fa-envelope"></i>
                     </div>
                     <h3 class="stat-number">{{ admin_data.stats.email_stats.total_invitations }}</h3>
-                    <p class="stat-label">Nombre total d'invitations</p>
+                    <p class="stat-label">{{ _('Total Invitations') }}</p>
                 </div>
             </div>
         </div>
@@ -650,7 +650,7 @@
                     </div>
                     
                     <div class="row">
-                        <!-- Type de licence & Status -->
+                        <!-- {{ _('License Type') }} & Status -->
                         <div class="col-lg-3 col-md-6">
                             <div class="stat-card">
                                 <div class="stat-icon 
@@ -665,7 +665,7 @@
                                         {% endif %}"></i>
                                 </div>
                                 <h3 class="stat-number">{{ admin_data.license_info.license_type|title }}</h3>
-                                <p class="stat-label">Type de licence</p>
+                                <p class="stat-label">{{ _('License Type') }}</p>
                                 {% if admin_data.license_info.license_status == 'trial' %}
                                 <small class="text-muted">Trial Mode</small>
                                 {% elif admin_data.license_info.license_end %}
@@ -692,7 +692,7 @@
                                     <i class="fas fa-bullhorn"></i>
                                 </div>
                                 <h3 class="stat-number">{{ admin_data.license_info.campaigns_used }}/{{ admin_data.license_info.campaigns_limit }}</h3>
-                                <p class="stat-label">Campagnes utilisées</p>
+                                <p class="stat-label">{{ _('Campaigns Used') }}</p>
                                 <small class="text-muted">{{ admin_data.license_info.campaigns_remaining }} remaining</small>
                             </div>
                         </div>
@@ -707,7 +707,7 @@
                                     <i class="fas fa-user-friends"></i>
                                 </div>
                                 <h3 class="stat-number">{{ admin_data.license_info.users_used }}/{{ admin_data.license_info.users_limit }}</h3>
-                                <p class="stat-label">Membres de l'équipe</p>
+                                <p class="stat-label">{{ _('Team Members') }}</p>
                                 <small class="text-muted">{{ admin_data.license_info.users_remaining }} remaining</small>
                             </div>
                         </div>
@@ -719,7 +719,7 @@
                                     <i class="fas fa-users"></i>
                                 </div>
                                 <h3 class="stat-number">{{ admin_data.license_info.participants_limit }}</h3>
-                                <p class="stat-label">Nombre maximum de participants</p>
+                                <p class="stat-label">{{ _('Max Participants') }}</p>
                                 <small class="text-muted">Per campaign limit</small>
                             </div>
                         </div>
@@ -742,7 +742,7 @@
                             </div>
                             {% if current_user.role == 'platform_admin' %}
                             <a href="{{ url_for('business_auth.admin_licenses') }}" class="btn btn-primary btn-sm ms-2">
-                                <i class="fas fa-arrow-up me-1"></i>Gérer Licenses
+                                <i class="fas fa-arrow-up me-1"></i>{{ _('Manage') }} Licenses
                             </a>
                             {% endif %}
                         </div>
@@ -753,7 +753,7 @@
         </div>
         {% endif %}
 
-        <!-- Campaign Gérerment for All Account Types -->
+        <!-- Campaign {{ _('Manage') }}ment for All Account Types -->
         <div class="row">
             <div class="col-lg-8">
                 <!-- Recent Campaigns -->
@@ -769,7 +769,7 @@
                         {% for campaign in admin_data.campaigns %}
                         <div class="campaign-item" onclick="toggleCampaignDetails('campaign-{{ campaign.id }}')">
                             <!-- Details toggle button -->
-                            <button class="campaign-details-toggle" onclick="event.stopPropagation(); toggleCampaignDetails('campaign-{{ campaign.id }}')" title="Afficher plus de détails">
+                            <button class="campaign-details-toggle" onclick="event.stopPropagation(); toggleCampaignDetails('campaign-{{ campaign.id }}')" title="{{ _('Show more details') }}">
                                 <i class="fas fa-chevron-down"></i>
                             </button>
                             
@@ -817,10 +817,10 @@
                             <div class="campaign-actions" onclick="event.stopPropagation();">
                                 {% if campaign.status == 'active' %}
                                     <a href="{{ url_for('business_auth.business_analytics') }}?campaign_id={{ campaign.id }}" class="btn campaign-primary-btn">
-                                        <i class="fas fa-chart-bar me-1"></i>View Analytique
+                                        <i class="fas fa-chart-bar me-1"></i>View {{ _('Analytics') }}
                                     </a>
                                     <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" class="btn campaign-secondary-btn">
-                                        <i class="fas fa-users me-1"></i>Gérer Participants
+                                        <i class="fas fa-users me-1"></i>{{ _('Manage') }} Participants
                                     </a>
                                 {% elif campaign.status == 'completed' %}
                                     <a href="{{ url_for('business_auth.business_analytics') }}?campaign_id={{ campaign.id }}" class="btn campaign-primary-btn">
@@ -849,30 +849,30 @@
                             <!-- Expanded Details (hidden by default) -->
                             <div class="campaign-expanded-details" id="campaign-{{ campaign.id }}-details">
                                 <div class="detail-row">
-                                    <span class="detail-label">Description :</span>
+                                    <span class="detail-label">{{ _('Description:') }}</span>
                                     <span class="detail-value">{{ campaign.description or 'No description provided' }}</span>
                                 </div>
                                 <div class="detail-row">
-                                    <span class="detail-label">Durée :</span>
+                                    <span class="detail-label">{{ _('Duration:') }}</span>
                                     <span class="detail-value">{{ campaign.start_date }} to {{ campaign.end_date }}</span>
                                 </div>
                                 <div class="detail-row">
-                                    <span class="detail-label">Réponses :</span>
+                                    <span class="detail-label">{{ _('Responses:') }}</span>
                                     <span class="detail-value">{{ campaign.response_count }} collected</span>
                                 </div>
                                 {% if campaign.status == 'active' and campaign.days_remaining > 0 %}
                                 <div class="detail-row">
-                                    <span class="detail-label">Temps restant :</span>
+                                    <span class="detail-label">{{ _('Time Remaining:') }}</span>
                                     <span class="detail-value">{{ campaign.days_remaining }} days</span>
                                 </div>
                                 {% elif campaign.status == 'draft' and campaign.days_until_start > 0 %}
                                 <div class="detail-row">
-                                    <span class="detail-label">Commence dans :</span>
+                                    <span class="detail-label">{{ _('Starts In:') }}</span>
                                     <span class="detail-value">{{ campaign.days_until_start }} days</span>
                                 </div>
                                 {% elif campaign.status == 'completed' and campaign.days_since_ended > 0 %}
                                 <div class="detail-row">
-                                    <span class="detail-label">Terminées :</span>
+                                    <span class="detail-label">{{ _('Completed:') }}</span>
                                     <span class="detail-value">{{ campaign.days_since_ended }} days ago</span>
                                 </div>
                                 {% endif %}
@@ -882,8 +882,8 @@
                     {% else %}
                         <div class="empty-state">
                             <i class="fas fa-bullhorn"></i>
-                            <h5>Aucune campagne trouvée</h5>
-                            <p>Les campagnes de démonstration apparaîtront ici une fois créées.</p>
+                            <h5>{{ _('No Campaigns Found') }}</h5>
+                            <p>{{ _('Demo campaigns will appear here once created.') }}</p>
                         </div>
                     {% endif %}
                 </div>
@@ -917,8 +917,8 @@
                     {% else %}
                         <div class="empty-state">
                             <i class="fas fa-comments"></i>
-                            <h6>Aucune réponse récente</h6>
-                            <p class="small">Les réponses apparaîtront ici au fur et à mesure de leur réception.</p>
+                            <h6>{{ _('No Recent Responses') }}</h6>
+                            <p class="small">{{ _('Responses will appear here as they come in.') }}</p>
                         </div>
                     {% endif %}
                 </div>
@@ -937,7 +937,7 @@
                 <a href="{{ url_for('business_auth.business_analytics') }}" class="quick-action-btn">
                     <i class="fas fa-chart-bar d-block mb-2"></i>
                     <strong>View Dashboard</strong><br>
-                    <small>Analytique & Insights</small>
+                    <small>{{ _('Analytics') }} & Insights</small>
                 </a>
                 <a href="{{ url_for('conversational_survey') }}" class="quick-action-btn">
                     <i class="fas fa-robot d-block mb-2"></i>
@@ -958,12 +958,12 @@
         </div>
 
 
-        <!-- Data Gérerment -->
+        <!-- Data {{ _('Manage') }}ment -->
         <div class="admin-section">
             <div class="section-header">
                 <h3 class="section-title">
                     <i class="fas fa-database"></i>
-                    Data Gérerment
+                    Data {{ _('Manage') }}ment
                 </h3>
             </div>
             <div class="row">
@@ -971,8 +971,8 @@
                     <div class="card border-0" style="background: var(--light-gray);">
                         <div class="card-body text-center">
                             <i class="fas fa-download fa-3x text-primary mb-3"></i>
-                            <h5>Exporter toutes les données</h5>
-                            <p class="text-muted small">Exportez toutes les réponses aux enquêtes de l'ensemble des campagnes pour l'analyse et les rapports.</p>
+                            <h5>{{ _('Export All Data') }}</h5>
+                            <p class="text-muted small">{{ _('Export all survey responses across all campaigns for analysis and reporting.') }}</p>
                             <button class="btn btn-primary" onclick="exportAllData()" id="exportAllBtn">
                                 <i class="fas fa-download me-2"></i>Export Full Dataset
                             </button>
@@ -982,12 +982,12 @@
                 <div class="col-md-6">
                     <div class="card border-0" style="background: var(--light-gray);">
                         <div class="card-body">
-                            <h6 class="mb-3"><i class="fas fa-info-circle me-2 text-primary"></i>Informations sur l'exportation</h6>
+                            <h6 class="mb-3"><i class="fas fa-info-circle me-2 text-primary"></i>{{ _('Export Information') }}</h6>
                             <ul class="small mb-0" style="list-style: none; padding-left: 0;">
-                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Inclut toutes les campagnes</li>
-                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Format JSON pour une analyse facilitée</li>
-                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Données de réponse complètes</li>
-                                <li class="mb-0"><i class="fas fa-check text-success me-2"></i>Accès administrateur requis</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>{{ _('Includes all campaigns') }}</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>{{ _('JSON format for easy analysis') }}</li>
+                                <li class="mb-2"><i class="fas fa-check text-success me-2"></i>{{ _('Complete response data') }}</li>
+                                <li class="mb-0"><i class="fas fa-check text-success me-2"></i>{{ _('Admin access required') }}</li>
                             </ul>
                         </div>
                     </div>

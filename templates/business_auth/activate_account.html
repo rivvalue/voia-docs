@@ -407,8 +407,8 @@
         <div class="welcome-icon">
             <i class="fas fa-user-shield"></i>
         </div>
-        <h1 class="welcome-title">Bienvenue sur VOÏA !</h1>
-        <p class="welcome-subtitle">Vous êtes invité à rejoindre {{ business_account.name }}</p>
+        <h1 class="welcome-title">{{ _('Welcome to VOÏA!') }}</h1>
+        <p class="welcome-subtitle">{{ _('You\'re invited to join {{ business_account.name }}') }}</p>
     </div>
 
     <!-- Flash Messages -->
@@ -432,20 +432,20 @@
         </h4>
         <div class="business-details">
             <div class="business-detail">
-                <span class="detail-label">Nom de l'entreprise</span>
+                <span class="detail-label">{{ _('Company Name') }}</span>
                 <span class="detail-value">{{ business_account.name }}</span>
             </div>
             <div class="business-detail">
-                <span class="detail-label">Votre nom</span>
+                <span class="detail-label">{{ _('Your Name') }}</span>
                 <span class="detail-value">{{ user.first_name }} {{ user.last_name }}</span>
             </div>
             <div class="business-detail">
-                <span class="detail-label">Adresse e-mail</span>
+                <span class="detail-label">{{ _('Email Address') }}</span>
                 <span class="detail-value">{{ user.email }}</span>
             </div>
             <div class="business-detail">
-                <span class="detail-label">Rôle</span>
-                <span class="detail-value">Administrateur du compte entreprise</span>
+                <span class="detail-label">{{ _('Role') }}</span>
+                <span class="detail-value">{{ _('Business Account Administrator') }}</span>
             </div>
         </div>
     </div>
@@ -457,7 +457,7 @@
             Security First
         </h6>
         <p class="mb-0">
-            La sécurité de votre compte est importante pour nous. Veuillez créer un mot de passe robuste afin de protéger vos données d'entreprise et d'assurer un accès sécurisé à la plateforme VOÏA.
+            {{ _('Your account security is important to us. Please create a strong password to protect your business data and ensure secure access to the VOÏA platform.') }}
         </p>
     </div>
 
@@ -469,7 +469,7 @@
                 Set Your Password
             </h2>
             <p class="form-description">
-                Finalisez la configuration de votre compte en créant un mot de passe sécurisé
+                {{ _('Complete your account setup by creating a secure password') }}
             </p>
         </div>
 
@@ -485,7 +485,7 @@
                            class="form-control" 
                            id="password" 
                            name="password" 
-                           placeholder="Saisissez votre nouveau mot de passe"
+                           placeholder="{{ _('Enter your new password') }}"
                            required 
                            minlength="8">
                     <button type="button" class="password-toggle" onclick="togglePassword('password')">
@@ -526,7 +526,7 @@
                            class="form-control" 
                            id="confirm_password" 
                            name="confirm_password" 
-                           placeholder="Confirmez votre nouveau mot de passe"
+                           placeholder="{{ _('Confirm your new password') }}"
                            required>
                     <button type="button" class="password-toggle" onclick="togglePassword('confirm_password')">
                         <i class="fas fa-eye" id="confirm_password-eye"></i>
@@ -543,10 +543,10 @@
 
     <!-- Footer Links -->
     <div class="footer-links">
-        Besoin d'aide ? Contactez le support à 
+        {{ _('Need help? Contact support at') }} 
         <a href="mailto:support@voia.com">support@voia.com</a>
         <br>
-        <a href="{{ url_for('index') }}">← Retour à l'accueil VOÏA</a>
+        <a href="{{ url_for('index') }}">{{ _('← Return to VOÏA Home') }}</a>
     </div>
 </div>
 {% endblock %}

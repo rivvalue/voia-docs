@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% set needs_charts = True %}
 
-{% block title %}Analyses de campagne - VOÏA - Voice Of Client Agent{% endblock %}
+{% block title %}{{ _('Campaign Insights') }} - VOÏA - Voice Of Client Agent{% endblock %}
 
 {% block page_class %}page-dashboard{% endblock %}
 
@@ -9,7 +9,7 @@
 {# Breadcrumb Navigation #}
 {% set breadcrumb_items = [
     {'label': 'Business Intelligence', 'url': url_for('dashboard')},
-    {'label': 'Analyses de campagne', 'current': true}
+    {'label': '{{ _('Campaign Insights') }}', 'current': true}
 ] %}
 {% include 'components/breadcrumb.html' %}
 <div class="container">
@@ -18,8 +18,8 @@
     <div class="bg-white border-bottom" style="padding: 2.5rem 0; margin-bottom: 2rem;">
         <div class="row align-items-center">
             <div class="col-12 col-md-8 mb-3 mb-md-0">
-                <h1 class="h2 mb-2">Analyses de campagne</h1>
-                <p class="text-muted mb-0">Analyses de performance spécifiques à la campagne et informations issues de l'enquête</p>
+                <h1 class="h2 mb-2">{{ _('Campaign Insights') }}</h1>
+                <p class="text-muted mb-0">{{ _('Campaign-specific performance analytics and survey insights') }}</p>
             </div>
             <div class="col-12 col-md-4 text-center text-md-end">
                 <div class="d-flex align-items-center justify-content-center justify-content-md-end gap-3">
@@ -31,7 +31,7 @@
                     <!-- Refresh Icon -->
                     <button class="btn btn-sm btn-link text-muted p-1" 
                             onclick="refreshData()" 
-                            title="Actualiser les données">
+                            title="{{ _('Refresh data') }}">
                         <i class="fas fa-sync-alt"></i>
                     </button>
                 </div>
@@ -39,17 +39,17 @@
         </div>
     </div>
 
-<!-- Analyses de campagne Section -->
+<!-- {{ _('Campaign Insights') }} Section -->
 <div class="bg-white border rounded mb-4" style="padding: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
 <div class="dashboard-navigation mb-4">
-        <!-- Filtre d'analyse de campagne (Only for Insights) -->
+        <!-- {{ _('Campaign Analytics Filter') }} (Only for Insights) -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="border rounded" style="padding: 1.5rem; background-color: #f8f9fa;">
                     <!-- Header -->
                     <div class="row mb-3">
                         <div class="col-12">
-                            <h6 class="mb-1"><i class="fas fa-filter me-2" style="color: #E13A44;"></i>Filtre d'analyse de campagne</h6>
+                            <h6 class="mb-1"><i class="fas fa-filter me-2" style="color: #E13A44;"></i>{{ _('Campaign Analytics Filter') }}</h6>
                             <small class="text-muted">Compare KPIs across different campaigns</small>
                         </div>
                     </div>
@@ -57,15 +57,15 @@
                     <!-- Filter Controls -->
                     <div class="row align-items-center mb-2">
                         <div class="col-12 col-md-auto mb-2 mb-md-0">
-                            <label for="campaignFilter" class="form-label mb-0">Campagne :</label>
+                            <label for="campaignFilter" class="form-label mb-0">{{ _('Campaign:') }}</label>
                         </div>
                         <div class="col-12 col-md">
                             <div class="d-flex gap-2 align-items-center">
                                 <select class="form-select" id="campaignFilter" onchange="applyCampaignFilter()" style="max-width: 400px;">
-                                    <option value="">Sélectionner la campagne</option>
+                                    <option value="">{{ _('Select Campaign') }}</option>
                                     <!-- Will be populated by JavaScript -->
                                 </select>
-                                <button class="btn btn-outline-secondary btn-sm" onclick="clearCampaignFilter()" title="Effacer le filtre">
+                                <button class="btn btn-outline-secondary btn-sm" onclick="clearCampaignFilter()" title="{{ _('Clear Filter') }}">
                                     <i class="fas fa-times"></i>
                                 </button>
                             </div>
@@ -75,7 +75,7 @@
                     <!-- Campaign Metadata (appears when campaign selected) -->
                     <div id="selectedCampaignInfo" class="mt-3 pt-3 border-top" style="display: none; background-color: #f8f9fa; margin: 0 -1.5rem -1.5rem; padding: 1rem 1.5rem !important; border-radius: 0 0 0.375rem 0.375rem;">
                         <div class="d-flex gap-2 align-items-center flex-wrap">
-                            <small class="text-muted me-2">Campaign Détails:</small>
+                            <small class="text-muted me-2">Campaign {{ _('Details') }}:</small>
                             <span class="badge bg-light text-dark border" id="selectedCampaignDates">
                                 <i class="fas fa-calendar-alt me-1"></i><span class="campaign-dates-text"></span>
                             </span>
@@ -100,7 +100,7 @@
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="intelligence-tab" data-bs-toggle="tab" data-bs-target="#intelligence" type="button" role="tab" aria-controls="intelligence" aria-selected="false">
-                <i class="fas fa-brain me-2" style="color: #E13A44;"></i>Intelligence de compte
+                <i class="fas fa-brain me-2" style="color: #E13A44;"></i>{{ _('Account Intelligence') }}
             </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -124,9 +124,9 @@
     <!-- Loading state (positioned below campaign filter) -->
     <div class="loading-card" id="loadingIndicator">
         <div class="spinner-border" role="status">
-            <span class="visually-hidden">Chargement des données du tableau de bord...</span>
+            <span class="visually-hidden">{{ _('Loading dashboard data...') }}</span>
         </div>
-        <div class="loading-text">Chargement des données du tableau de bord...</div>
+        <div class="loading-text">{{ _('Loading dashboard data...') }}</div>
     </div>
 
     <!-- Dashboard Content (toggles during loading) -->
@@ -142,7 +142,7 @@
                         <i class="fas fa-bullhorn me-3" style="color: #E13A44;"></i>
                         <div>
                             <strong>Survey Insights</strong> - Currently showing data from active campaign: 
-                            <span id="activeCampaignName" class="fw-bold">Nom de la campagne</span>
+                            <span id="activeCampaignName" class="fw-bold">{{ _('Campaign Name') }}</span>
                             <span class="ms-2 text-muted" id="activeCampaignDates">Jan 1 - Dec 31, 2024</span>
                         </div>
                     </div>
@@ -154,52 +154,52 @@
                 <div class="col">
                     <div class="kpi-card kpi-success">
                         <div class="kpi-value text-primary" id="npsScore">0</div>
-                        <div class="kpi-label">Score NPS</div>
-                        <div class="kpi-trend" id="npsScoreTrend">Indicateur de satisfaction globale</div>
+                        <div class="kpi-label">{{ _('NPS Score') }}</div>
+                        <div class="kpi-trend" id="npsScoreTrend">{{ _('Overall satisfaction metric') }}</div>
                     </div>
                 </div>
                 <div class="col">
                     <div class="kpi-card kpi-primary">
-                        <div class="kpi-value text-success" id="totalRéponses">0</div>
-                        <div class="kpi-label">Nombre total de réponses</div>
-                        <div class="kpi-trend" id="totalRéponsesTrend">Retours d'information collectés depuis le début</div>
+                        <div class="kpi-value text-success" id="total{{ _('Responses') }}">0</div>
+                        <div class="kpi-label">{{ _('Total Responses') }}</div>
+                        <div class="kpi-trend" id="total{{ _('Responses') }}Trend">{{ _('All time feedback collected') }}</div>
                     </div>
                 </div>
                 <div class="col">
                     <div class="kpi-card kpi-info">
-                        <div class="kpi-value text-info" id="recentRéponses">0</div>
-                        <div class="kpi-label">Récent (30 jours)</div>
-                        <div class="kpi-trend" id="recentRéponsesTrend">Derniers retours clients</div>
+                        <div class="kpi-value text-info" id="recent{{ _('Responses') }}">0</div>
+                        <div class="kpi-label">{{ _('Recent (30 days)') }}</div>
+                        <div class="kpi-trend" id="recent{{ _('Responses') }}Trend">{{ _('Latest customer feedback') }}</div>
                     </div>
                 </div>
                 <div class="col">
                     <div class="kpi-card kpi-danger">
                         <div class="kpi-value text-danger" id="highRiskCount">0</div>
                         <div class="kpi-label">
-                            Comptes à risque élevé de résiliation
+                            {{ _('High Churn Risk Accounts') }}
                             <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top" 
-                               title="Companies with Élevé or Critique churn risk level based on AI assessment" style="font-size: 0.8em; opacity: 0.7;"></i>
+                               title="Companies with {{ _('High') }} or {{ _('Critical') }} churn risk level based on AI assessment" style="font-size: 0.8em; opacity: 0.7;"></i>
                         </div>
-                        <div class="kpi-trend" id="highRiskTrend">Risque imminent de résiliation (élevé/critique)</div>
+                        <div class="kpi-trend" id="highRiskTrend">{{ _('Imminent churn risk (High/Critical)') }}</div>
                     </div>
                 </div>
                 <div class="col">
                     <div class="kpi-card kpi-success">
                         <div class="kpi-value text-success" id="growthPotential">0%</div>
-                        <div class="kpi-label">Potentiel de croissance</div>
-                        <div class="kpi-trend" id="growthPotentialTrend">Opportunité d'expansion du chiffre d'affaires</div>
+                        <div class="kpi-label">{{ _('Growth Potential') }}</div>
+                        <div class="kpi-trend" id="growthPotentialTrend">{{ _('Revenue expansion opportunity') }}</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Comptes à risque élevé de résiliation & Thèmes clés Summary -->
+            <!-- {{ _('High Churn Risk Accounts') }} & {{ _('Key Themes') }} Summary -->
             <div class="row mb-4">
                 <div class="col-md-6">
                     <div class="chart-card">
                         <div class="card-header">
-                            <h5>Comptes à risque élevé de résiliation
+                            <h5>{{ _('High Churn Risk Accounts') }}
                                 <i class="fas fa-info-circle ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
-                                   title="Companies with Élevé or Critique churn risk level" style="font-size: 0.8em; opacity: 0.7;"></i>
+                                   title="Companies with {{ _('High') }} or {{ _('Critical') }} churn risk level" style="font-size: 0.8em; opacity: 0.7;"></i>
                             </h5>
                         </div>
                         <div class="card-body" style="height: 550px; overflow-y: auto; padding: 1.5rem;">
@@ -212,7 +212,7 @@
                 <div class="col-md-6">
                     <div class="chart-card">
                         <div class="card-header">
-                            <h5>Thèmes clés</h5>
+                            <h5>{{ _('Key Themes') }}</h5>
                         </div>
                         <div class="card-body" style="height: 550px;">
                             <div class="chart-container">
@@ -224,77 +224,77 @@
             </div>
         </div>
 
-        <!-- Intelligence de compte Tab -->
+        <!-- {{ _('Account Intelligence') }} Tab -->
         <div class="tab-pane fade" id="intelligence" role="tabpanel" aria-labelledby="intelligence-tab">
-            <!-- Intelligence de compte - Unified View -->
+            <!-- {{ _('Account Intelligence') }} - Unified View -->
             <div class="chart-card mb-4">
                 <div class="card-header">
                     <h5 class="mb-0">
-                        Intelligence de compte
+                        {{ _('Account Intelligence') }}
                         <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top" 
-                           title="Shows account health balance: Risk-Heavy (risks outweigh opportunities), Élevé Potential (opportunities with minimal risks), or Équilibred" 
+                           title="Shows account health balance: Risk-Heavy (risks outweigh opportunities), {{ _('High') }} Potential (opportunities with minimal risks), or {{ _('Balance') }}d" 
                            style="font-size: 0.8em; opacity: 0.7;"></i>
                     </h5>
-                    <small class="text-muted">Risk vs Opportunity Équilibre by Entreprise</small>
+                    <small class="text-muted">Risk vs Opportunity {{ _('Balance') }} by {{ _('Company') }}</small>
                 </div>
                 <div class="card-body">
-                            <!-- Rechercher and Filters -->
+                            <!-- {{ _('Search') }} and Filters -->
                             <div class="row g-3 mb-4">
                                 <div class="col-md-4">
-                                    <label for="accountIntelRechercher" class="form-label">Rechercher</label>
+                                    <label for="accountIntel{{ _('Search') }}" class="form-label">{{ _('Search') }}</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-search"></i></span>
-                                        <input type="text" class="form-control" id="accountIntelRechercher" 
-                                               placeholder="Rechercher company, opportunities, risks..." 
+                                        <input type="text" class="form-control" id="accountIntel{{ _('Search') }}" 
+                                               placeholder="{{ _('Search') }} company, opportunities, risks..." 
                                                onkeyup="searchAccountIntelligence()">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
-                                    <label for="accountÉquilibreFilter" class="form-label">Équilibre</label>
-                                    <select class="form-select" id="accountÉquilibreFilter" onchange="searchAccountIntelligence()">
-                                        <option value="">Tous</option>
+                                    <label for="account{{ _('Balance') }}Filter" class="form-label">{{ _('Balance') }}</label>
+                                    <select class="form-select" id="account{{ _('Balance') }}Filter" onchange="searchAccountIntelligence()">
+                                        <option value="">{{ _('All') }}</option>
                                         <option value="risk_heavy">Risk-Heavy</option>
-                                        <option value="balanced">Équilibred</option>
-                                        <option value="opportunity_heavy">Élevé Potential</option>
+                                        <option value="balanced">{{ _('Balance') }}d</option>
+                                        <option value="opportunity_heavy">{{ _('High') }} Potential</option>
                                     </select>
                                 </div>
                                 <div class="col-md-2">
-                                    <label for="accountRiskFilter" class="form-label">Niveau de risque</label>
+                                    <label for="accountRiskFilter" class="form-label">{{ _('Risk Level') }}</label>
                                     <select class="form-select" id="accountRiskFilter" onchange="searchAccountIntelligence()">
-                                        <option value="">Tous</option>
-                                        <option value="critical">Critique</option>
-                                        <option value="high">Élevé</option>
-                                        <option value="medium">Moyen</option>
-                                        <option value="low">Faible</option>
+                                        <option value="">{{ _('All') }}</option>
+                                        <option value="critical">{{ _('Critical') }}</option>
+                                        <option value="high">{{ _('High') }}</option>
+                                        <option value="medium">{{ _('Medium') }}</option>
+                                        <option value="low">{{ _('Low') }}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-2">
-                                    <label for="accountOppFilter" class="form-label">Opportunités</label>
+                                    <label for="accountOppFilter" class="form-label">{{ _('Opportunities') }}</label>
                                     <select class="form-select" id="accountOppFilter" onchange="searchAccountIntelligence()">
-                                        <option value="">Tous</option>
-                                        <option value="yes">Has Opportunités</option>
-                                        <option value="no">No Opportunités</option>
+                                        <option value="">{{ _('All') }}</option>
+                                        <option value="yes">Has {{ _('Opportunities') }}</option>
+                                        <option value="no">No {{ _('Opportunities') }}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-2">
-                                    <label for="accountRisksFilter" class="form-label">Avec risques</label>
+                                    <label for="accountRisksFilter" class="form-label">{{ _('Has Risks') }}</label>
                                     <select class="form-select" id="accountRisksFilter" onchange="searchAccountIntelligence()">
-                                        <option value="">Tous</option>
-                                        <option value="yes">Avec risques</option>
-                                        <option value="no">Sans risques</option>
+                                        <option value="">{{ _('All') }}</option>
+                                        <option value="yes">{{ _('Has Risks') }}</option>
+                                        <option value="no">{{ _('No Risks') }}</option>
                                     </select>
                                 </div>
                             </div>
                             
-                            <!-- Results Count and Effacer le filtres -->
+                            <!-- Results Count and {{ _('Clear Filter') }}s -->
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div>
-                                    <span id="accountIntelCount" class="text-muted">Chargement...</span>
+                                    <span id="accountIntelCount" class="text-muted">{{ _('Loading...') }}</span>
                                     <span id="accountIntelFiltersActive" class="badge ms-2" style="display: none; background: rgba(225, 58, 68, 0.1); color: #E13A44;"></span>
                                 </div>
                                 <button class="btn btn-sm btn-outline-secondary" id="accountIntelClearFilters" 
                                         onclick="clearAccountIntelFilters()" style="display: none;">
-                                    <i class="fas fa-times me-1"></i>Effacer le filtres
+                                    <i class="fas fa-times me-1"></i>{{ _('Clear Filter') }}s
                                 </button>
                             </div>
                             
@@ -303,7 +303,7 @@
                             </div>
                             
                             <!-- Pagination Controls -->
-                            <nav aria-label="Intelligence de compte pagination" id="accountIntelPaginationContainer" style="display: none;">
+                            <nav aria-label="{{ _('Account Intelligence') }} pagination" id="accountIntelPaginationContainer" style="display: none;">
                                 <ul class="pagination justify-content-center" id="accountIntelPagination"></ul>
                             </nav>
                         </div>
@@ -317,7 +317,7 @@
         <div class="col-md-6">
             <div class="chart-card">
                 <div class="card-header">
-                    <h5>Répartition du NPS</h5>
+                    <h5>{{ _('NPS Distribution') }}</h5>
                 </div>
                 <div class="card-body">
                     <div class="chart-container">
@@ -329,7 +329,7 @@
         <div class="col-md-6">
             <div class="chart-card">
                 <div class="card-header">
-                    <h5>Analyse de sentiment</h5>
+                    <h5>{{ _('Sentiment Analysis') }}</h5>
                 </div>
                 <div class="card-body">
                     <div class="chart-container">
@@ -345,7 +345,7 @@
         <div class="col-md-6">
             <div class="chart-card">
                 <div class="card-header">
-                    <h5>Répartition de l'ancienneté client</h5>
+                    <h5>{{ _('Customer Tenure Distribution') }}</h5>
                 </div>
                 <div class="card-body">
                     <div class="chart-container">
@@ -357,7 +357,7 @@
         <div class="col-md-6">
             <div class="chart-card">
                 <div class="card-header">
-                    <h5>Analyse du facteur de croissance basé sur le NPS</h5>
+                    <h5>{{ _('NPS-Based Growth Factor Analysis') }}</h5>
                 </div>
                 <div class="card-body">
                     <div class="chart-container">
@@ -368,12 +368,12 @@
         </div>
     </div>
 
-            <!-- Notes moyennes -->
+            <!-- {{ _('Average Ratings') }} -->
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="chart-card">
                         <div class="card-header">
-                            <h5>Notes moyennes</h5>
+                            <h5>{{ _('Average Ratings') }}</h5>
                         </div>
                         <div class="card-body">
                             <div class="chart-container">
@@ -387,44 +387,44 @@
 
         <!-- Survey Insights Tab -->
         <div class="tab-pane fade" id="survey-insights" role="tabpanel" aria-labelledby="survey-insights-tab">
-            <!-- Entreprise NPS Segregation Section -->
+            <!-- {{ _('Company') }} NPS Segregation Section -->
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="data-table">
                         <div class="table-header">
-                            <h5>NPS par entreprise cliente</h5>
+                            <h5>{{ _('NPS by Client Company') }}</h5>
                             <small class="text-muted">Strategic account management - NPS scores segregated by company evaluating Archelo Group</small>
                         </div>
                         <div class="p-3">
-                            <!-- Rechercher and Filter Controls -->
+                            <!-- {{ _('Search') }} and Filter Controls -->
                             <div class="row align-items-end mb-3">
                                 <div class="col-md-5">
-                                    <label for="companyRechercher" class="form-label">Rechercher</label>
-                                    <input type="text" class="form-control" id="companyRechercher" 
-                                           placeholder="Rechercher by company name...">
+                                    <label for="company{{ _('Search') }}" class="form-label">{{ _('Search') }}</label>
+                                    <input type="text" class="form-control" id="company{{ _('Search') }}" 
+                                           placeholder="{{ _('Search') }} by company name...">
                                 </div>
                                 <div class="col-md-3">
-                                    <label for="companyNpsFilter" class="form-label">Catégorie NPS</label>
-                                    <select class="form-select" id="companyNpsFilter" onchange="searchEntrepriseNPS()">
-                                        <option value="">Tous Companies</option>
-                                        <option value="promoters">Promoteurs (9-10)</option>
-                                        <option value="passives">Neutres (7-8)</option>
-                                        <option value="detractors">Détracteurs (0-6)</option>
+                                    <label for="companyNpsFilter" class="form-label">{{ _('NPS Category') }}</label>
+                                    <select class="form-select" id="companyNpsFilter" onchange="search{{ _('Company') }}NPS()">
+                                        <option value="">{{ _('All') }} Companies</option>
+                                        <option value="promoters">{{ _('Promoters (9-10)') }}</option>
+                                        <option value="passives">{{ _('Passives (7-8)') }}</option>
+                                        <option value="detractors">{{ _('Detractors (0-6)') }}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="btn-group w-100">
-                                        <button type="button" class="btn btn-primary" onclick="searchEntrepriseNPS()">
-                                            <i class="fas fa-search me-1"></i>Rechercher
+                                        <button type="button" class="btn btn-primary" onclick="search{{ _('Company') }}NPS()">
+                                            <i class="fas fa-search me-1"></i>{{ _('Search') }}
                                         </button>
-                                        <button type="button" class="btn btn-outline-secondary" onclick="clearEntrepriseRechercher()">
+                                        <button type="button" class="btn btn-outline-secondary" onclick="clear{{ _('Company') }}{{ _('Search') }}()">
                                             <i class="fas fa-times me-1"></i>Clear
                                         </button>
                                     </div>
                                 </div>
                             </div>
                             <div class="mb-2">
-                                <small class="text-muted" id="companyRechercherInfo"></small>
+                                <small class="text-muted" id="company{{ _('Search') }}Info"></small>
                             </div>
                         </div>
                         <div class="p-0">
@@ -432,14 +432,14 @@
                                 <table class="table table-striped table-hover">
                                     <thead>
                                         <tr>
-                                            <th>Entreprise Name</th>
-                                            <th>Répondants</th>
+                                            <th>{{ _('Company') }} Name</th>
+                                            <th>{{ _('Respondent') }}s</th>
                                             <th>Avg Individual NPS</th>
-                                            <th>Entreprise NPS</th>
+                                            <th>{{ _('Company') }} NPS</th>
                                             <th>Distribution</th>
-                                            <th>Niveau de risque</th>
+                                            <th>{{ _('Risk Level') }}</th>
                                             <th>Latest Response</th>
-                                            <th>Latest Risque de résiliation</th>
+                                            <th>Latest {{ _('Churn Risk') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="companyNpsTableServerSide" style="display: table-row-group !important; visibility: visible !important;">
@@ -457,7 +457,7 @@
                                                 </td>
                                                 <td><small>{{ company.promoters }}P / {{ company.passives }}Pa / {{ company.detractors }}D</small></td>
                                                 <td>
-                                                    <span class="badge {% if company.risk_level == 'Faible' %}bg-success{% elif company.risk_level == 'Moyen' %}bg-secondary{% elif company.risk_level == 'Élevé' %}bg-danger{% elif company.risk_level == 'Critique' %}bg-dark{% else %}bg-secondary{% endif %}">
+                                                    <span class="badge {% if company.risk_level == '{{ _('Low') }}' %}bg-success{% elif company.risk_level == '{{ _('Medium') }}' %}bg-secondary{% elif company.risk_level == '{{ _('High') }}' %}bg-danger{% elif company.risk_level == '{{ _('Critical') }}' %}bg-dark{% else %}bg-secondary{% endif %}">
                                                         {{ company.risk_level }}
                                                     </span>
                                                 </td>
@@ -473,12 +473,12 @@
                                 </table>
                             </div>
                             
-                            <!-- Pagination Controls for Entreprise NPS Table -->
+                            <!-- Pagination Controls for {{ _('Company') }} NPS Table -->
                             <div class="d-flex justify-content-between align-items-center mt-3">
                                 <div class="pagination-info">
-                                    <small class="text-muted" id="companyPaginationInfo">Chargement...</small>
+                                    <small class="text-muted" id="companyPaginationInfo">{{ _('Loading...') }}</small>
                                 </div>
-                                <nav aria-label="Entreprise NPS pagination">
+                                <nav aria-label="{{ _('Company') }} NPS pagination">
                                     <ul class="pagination pagination-sm mb-0" id="companyPaginationControls">
                                         <!-- Will be populated by JavaScript -->
                                     </ul>
@@ -487,12 +487,12 @@
                             
                             <div class="mt-3">
                                 <small class="text-muted">
-                                    <strong>Entreprise NPS</strong> = (% Promoters - % Detractors) within each company |
-                                    <strong>Niveau de risques:</strong> 
-                                    <span class="badge bg-success">Faible (>20)</span>
-                                    <span class="badge bg-secondary">Moyen (-20 to 20)</span>
-                                    <span class="badge bg-danger">Élevé (≤-20)</span>
-                                    <span class="badge bg-dark">Critique (≤-50)</span>
+                                    <strong>{{ _('Company') }} NPS</strong> = (% Promoters - % Detractors) within each company |
+                                    <strong>{{ _('Risk Level') }}s:</strong> 
+                                    <span class="badge bg-success">{{ _('Low') }} (>20)</span>
+                                    <span class="badge bg-secondary">{{ _('Medium') }} (-20 to 20)</span>
+                                    <span class="badge bg-danger">{{ _('High') }} (≤-20)</span>
+                                    <span class="badge bg-dark">{{ _('Critical') }} (≤-50)</span>
                                 </small>
                             </div>
                         </div>
@@ -500,12 +500,12 @@
                 </div>
             </div>
 
-            <!-- NPS par ancienneté Segregation Section -->
+            <!-- {{ _('Tenure NPS') }} Segregation Section -->
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="data-table">
                         <div class="table-header">
-                            <h5>NPS par ancienneté client</h5>
+                            <h5>{{ _('NPS by Customer Tenure') }}</h5>
                             <small class="text-muted">Customer lifecycle insights - NPS scores segregated by length of business relationship</small>
                         </div>
                         <div class="p-0">
@@ -513,14 +513,14 @@
                                 <table class="table table-striped table-hover">
                                     <thead>
                                         <tr>
-                                            <th>Groupe d'ancienneté</th>
-                                            <th>Répondants</th>
+                                            <th>{{ _('Tenure Group') }}</th>
+                                            <th>{{ _('Respondent') }}s</th>
                                             <th>Avg Individual NPS</th>
-                                            <th>NPS par ancienneté</th>
+                                            <th>{{ _('Tenure NPS') }}</th>
                                             <th>Distribution</th>
-                                            <th>Niveau de risque</th>
+                                            <th>{{ _('Risk Level') }}</th>
                                             <th>Latest Response</th>
-                                            <th>Latest Risque de résiliation</th>
+                                            <th>Latest {{ _('Churn Risk') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tenureNpsTable">
@@ -529,12 +529,12 @@
                                 </table>
                             </div>
                             
-                            <!-- Pagination Controls for NPS par ancienneté Table -->
+                            <!-- Pagination Controls for {{ _('Tenure NPS') }} Table -->
                             <div class="d-flex justify-content-between align-items-center mt-3">
                                 <div class="pagination-info">
-                                    <small class="text-muted" id="tenurePaginationInfo">Chargement...</small>
+                                    <small class="text-muted" id="tenurePaginationInfo">{{ _('Loading...') }}</small>
                                 </div>
-                                <nav aria-label="NPS par ancienneté pagination">
+                                <nav aria-label="{{ _('Tenure NPS') }} pagination">
                                     <ul class="pagination pagination-sm mb-0" id="tenurePaginationControls">
                                         <!-- Will be populated by JavaScript -->
                                     </ul>
@@ -543,12 +543,12 @@
                             
                             <div class="mt-3">
                                 <small class="text-muted">
-                                    <strong>NPS par ancienneté</strong> = (% Promoters - % Detractors) within each tenure group |
-                                    <strong>Niveau de risques:</strong> 
-                                    <span class="badge bg-success">Faible (>20)</span>
-                                    <span class="badge bg-secondary">Moyen (-20 to 20)</span>
-                                    <span class="badge bg-danger">Élevé (≤-20)</span>
-                                    <span class="badge bg-dark">Critique (≤-50)</span>
+                                    <strong>{{ _('Tenure NPS') }}</strong> = (% Promoters - % Detractors) within each tenure group |
+                                    <strong>{{ _('Risk Level') }}s:</strong> 
+                                    <span class="badge bg-success">{{ _('Low') }} (>20)</span>
+                                    <span class="badge bg-secondary">{{ _('Medium') }} (-20 to 20)</span>
+                                    <span class="badge bg-danger">{{ _('High') }} (≤-20)</span>
+                                    <span class="badge bg-dark">{{ _('Critical') }} (≤-50)</span>
                                     <span class="badge bg-secondary">Insufficient Data (&lt;2 responses)</span>
                                 </small>
                             </div>
@@ -557,39 +557,39 @@
                 </div>
             </div>
 
-            <!-- Recent Réponses Table -->
+            <!-- Recent {{ _('Responses') }} Table -->
             <div class="chart-card mb-4">
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h5 class="mb-0">Réponses récentes aux enquêtes</h5>
-                            <small class="text-muted" id="responsesRechercherInfo"></small>
+                            <h5 class="mb-0">{{ _('Recent Survey Responses') }}</h5>
+                            <small class="text-muted" id="responses{{ _('Search') }}Info"></small>
                         </div>
                     </div>
                 </div>
                 <div class="card-body">
-                            <!-- Rechercher and Filter Controls -->
+                            <!-- {{ _('Search') }} and Filter Controls -->
                             <div class="row align-items-end mb-3">
                                 <div class="col-md-5">
-                                    <label for="responsesRechercher" class="form-label">Rechercher</label>
-                                    <input type="text" class="form-control" id="responsesRechercher" 
-                                           placeholder="Rechercher by company name, participant name, or email...">
+                                    <label for="responses{{ _('Search') }}" class="form-label">{{ _('Search') }}</label>
+                                    <input type="text" class="form-control" id="responses{{ _('Search') }}" 
+                                           placeholder="{{ _('Search') }} by company name, participant name, or email...">
                                 </div>
                                 <div class="col-md-3">
-                                    <label for="npsFilter" class="form-label">Catégorie NPS</label>
-                                    <select class="form-select" id="npsFilter" onchange="searchSurveyRéponses()">
-                                        <option value="">Tous Réponses</option>
-                                        <option value="promoters">Promoteurs (9-10)</option>
-                                        <option value="passives">Neutres (7-8)</option>
-                                        <option value="detractors">Détracteurs (0-6)</option>
+                                    <label for="npsFilter" class="form-label">{{ _('NPS Category') }}</label>
+                                    <select class="form-select" id="npsFilter" onchange="searchSurvey{{ _('Responses') }}()">
+                                        <option value="">{{ _('All') }} {{ _('Responses') }}</option>
+                                        <option value="promoters">{{ _('Promoters (9-10)') }}</option>
+                                        <option value="passives">{{ _('Passives (7-8)') }}</option>
+                                        <option value="detractors">{{ _('Detractors (0-6)') }}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="btn-group w-100">
-                                        <button type="button" class="btn btn-primary" onclick="searchSurveyRéponses()">
-                                            <i class="fas fa-search me-1"></i>Rechercher
+                                        <button type="button" class="btn btn-primary" onclick="searchSurvey{{ _('Responses') }}()">
+                                            <i class="fas fa-search me-1"></i>{{ _('Search') }}
                                         </button>
-                                        <button type="button" class="btn btn-outline-secondary" onclick="clearRéponsesRechercher()">
+                                        <button type="button" class="btn btn-outline-secondary" onclick="clear{{ _('Responses') }}{{ _('Search') }}()">
                                             <i class="fas fa-times me-1"></i>Clear
                                         </button>
                                     </div>
@@ -599,14 +599,14 @@
                                 <table class="table table-striped">
                                     <thead>
                                         <tr>
-                                            <th>Entreprise</th>
+                                            <th>{{ _('Company') }}</th>
                                             <th>Tenure with FC inc</th>
-                                            <th>Score NPS</th>
-                                            <th>Catégorie</th>
+                                            <th>{{ _('NPS Score') }}</th>
+                                            <th>{{ _('Category') }}</th>
                                             <th>Sentiment</th>
-                                            <th>Risque de résiliation</th>
+                                            <th>{{ _('Churn Risk') }}</th>
                                             <th>Date</th>
-                                            <th>Détails</th>
+                                            <th>{{ _('Details') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="responsesTable">
@@ -618,9 +618,9 @@
                             <!-- Pagination Controls -->
                             <div class="d-flex justify-content-between align-items-center mt-3">
                                 <div class="pagination-info">
-                                    <small class="text-muted" id="paginationInfo">Chargement...</small>
+                                    <small class="text-muted" id="paginationInfo">{{ _('Loading...') }}</small>
                                 </div>
-                                <nav aria-label="Pagination des réponses à l'enquête">
+                                <nav aria-label="{{ _('Survey responses pagination') }}">
                                     <ul class="pagination pagination-sm mb-0" id="paginationControls">
                                         <!-- Will be populated by JavaScript -->
                                     </ul>
@@ -639,12 +639,12 @@
             </div>
             
             <div id="segmentationContent">
-                <!-- NPS par rôle Section -->
+                <!-- {{ _('NPS by Role') }} Section -->
                 <div class="row mb-4">
                     <div class="col-12">
                         <div class="chart-card">
                             <div class="card-header">
-                                <h5><i class="fas fa-user-tie me-2" style="color: #E13A44;"></i>NPS par rôle</h5>
+                                <h5><i class="fas fa-user-tie me-2" style="color: #E13A44;"></i>{{ _('NPS by Role') }}</h5>
                                 <small class="text-muted">Net Promoter Score distribution across different participant roles</small>
                             </div>
                             <div class="card-body">
@@ -654,12 +654,12 @@
                     </div>
                 </div>
                 
-                <!-- NPS par région Section -->
+                <!-- {{ _('NPS by Region') }} Section -->
                 <div class="row mb-4">
                     <div class="col-12">
                         <div class="chart-card">
                             <div class="card-header">
-                                <h5><i class="fas fa-globe me-2" style="color: #E13A44;"></i>NPS par région</h5>
+                                <h5><i class="fas fa-globe me-2" style="color: #E13A44;"></i>{{ _('NPS by Region') }}</h5>
                                 <small class="text-muted">Geographic distribution of customer satisfaction</small>
                             </div>
                             <div class="card-body">
@@ -669,12 +669,12 @@
                     </div>
                 </div>
                 
-                <!-- NPS par catégorie de clients Section -->
+                <!-- {{ _('NPS by Customer Tier') }} Section -->
                 <div class="row mb-4">
                     <div class="col-12">
                         <div class="chart-card">
                             <div class="card-header">
-                                <h5><i class="fas fa-layer-group me-2" style="color: #E13A44;"></i>NPS par catégorie de clients</h5>
+                                <h5><i class="fas fa-layer-group me-2" style="color: #E13A44;"></i>{{ _('NPS by Customer Tier') }}</h5>
                                 <small class="text-muted">Customer satisfaction across different tier levels</small>
                             </div>
                             <div class="card-body">
@@ -689,7 +689,7 @@
                     <div class="col-12">
                         <div class="data-table">
                             <div class="table-header">
-                                <h5>Évaluations de satisfaction par segment</h5>
+                                <h5>{{ _('Satisfaction Ratings by Segment') }}</h5>
                                 <small class="text-muted">Average satisfaction scores across all segmentation dimensions</small>
                             </div>
                             <div class="p-0">
@@ -697,11 +697,11 @@
                                     <table class="table table-striped table-hover">
                                         <thead>
                                             <tr>
-                                                <th>Type de segment</th>
-                                                <th>Nom du segment</th>
-                                                <th>Réponses</th>
-                                                <th>Satisfaction moyenne</th>
-                                                <th>Score NPS</th>
+                                                <th>{{ _('Segment Type') }}</th>
+                                                <th>{{ _('Segment Name') }}</th>
+                                                <th>{{ _('Responses') }}</th>
+                                                <th>{{ _('Avg Satisfaction') }}</th>
+                                                <th>{{ _('NPS Score') }}</th>
                                             </tr>
                                         </thead>
                                         <tbody id="segmentationTable">
@@ -720,78 +720,78 @@
 
     </div>
 </div>
-<!-- End Analyses de campagne Section -->
+<!-- End {{ _('Campaign Insights') }} Section -->
 
     <!-- End Dashboard Content -->
 </div>
 <!-- End Dashboard Column -->
 
-<!-- Entreprise Réponses Modal -->
-<div class="modal fade" id="companyRéponsesModal" tabindex="-1" aria-labelledby="companyRéponsesModalLabel" aria-hidden="true">
+<!-- {{ _('Company') }} {{ _('Responses') }} Modal -->
+<div class="modal fade" id="company{{ _('Responses') }}Modal" tabindex="-1" aria-labelledby="company{{ _('Responses') }}ModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content" style="background-color: #ffffff; border: 2px solid #2E5090;">
             <div class="modal-header" style="background: linear-gradient(135deg, #2E5090 0%, #1a3560 100%); border-bottom: 2px solid #E13A44;">
                 <div class="w-100">
-                    <h5 class="modal-title text-white mb-2" id="companyRéponsesModalLabel">
-                        <i class="fas fa-building me-2"></i><span id="modalEntrepriseName"></span>
+                    <h5 class="modal-title text-white mb-2" id="company{{ _('Responses') }}ModalLabel">
+                        <i class="fas fa-building me-2"></i><span id="modal{{ _('Company') }}Name"></span>
                     </h5>
                     <div class="d-flex align-items-center gap-2 flex-wrap">
                         <span class="badge bg-light text-dark">
                             <i class="fas fa-flag me-1"></i><span id="modalCampaignName"></span>
                         </span>
                         <span class="badge" style="background-color: #2E5090; color: white;">
-                            <i class="fas fa-poll me-1"></i><span id="modalResponseCount">0</span> Réponses
+                            <i class="fas fa-poll me-1"></i><span id="modalResponseCount">0</span> {{ _('Responses') }}
                         </span>
                     </div>
                 </div>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
             </div>
             <div class="modal-body" style="background-color: #f8f9fa;">
-                <!-- Rechercher and Filters -->
+                <!-- {{ _('Search') }} and Filters -->
                 <div class="row mb-3">
                     <div class="col-md-8">
                         <div class="input-group">
                             <span class="input-group-text" style="background-color: #ffffff; border-color: #dee2e6;">
                                 <i class="fas fa-search" style="color: #8A8A8A;"></i>
                             </span>
-                            <input type="text" class="form-control" id="companyResponseRechercher" 
-                                   placeholder="Rechercher by respondent name or email..."
+                            <input type="text" class="form-control" id="companyResponse{{ _('Search') }}" 
+                                   placeholder="{{ _('Search') }} by respondent name or email..."
                                    style="background-color: #ffffff; border-color: #dee2e6; color: #212529;">
                         </div>
                     </div>
                     <div class="col-md-4">
                         <select class="form-select" id="companyResponseSort" 
                                 style="background-color: #ffffff; border-color: #dee2e6; color: #212529;">
-                            <option value="created_at_desc">Les plus récents</option>
-                            <option value="created_at_asc">Les plus anciens</option>
-                            <option value="nps_score_desc">Élevéest NPS</option>
-                            <option value="nps_score_asc">Faibleest NPS</option>
+                            <option value="created_at_desc">{{ _('Newest First') }}</option>
+                            <option value="created_at_asc">{{ _('Oldest First') }}</option>
+                            <option value="nps_score_desc">{{ _('High') }}est NPS</option>
+                            <option value="nps_score_asc">{{ _('Low') }}est NPS</option>
                         </select>
                     </div>
                 </div>
                 
                 <!-- Loading State -->
-                <div id="companyRéponsesLoading" class="text-center py-5">
+                <div id="company{{ _('Responses') }}Loading" class="text-center py-5">
                     <div class="spinner-border" style="color: #2E5090;" role="status">
-                        <span class="visually-hidden">Chargement...</span>
+                        <span class="visually-hidden">{{ _('Loading...') }}</span>
                     </div>
-                    <p class="mt-2" style="color: #8A8A8A;">Chargement des réponses...</p>
+                    <p class="mt-2" style="color: #8A8A8A;">{{ _('Loading responses...') }}</p>
                 </div>
                 
-                <!-- Réponses Table -->
-                <div id="companyRéponsesContent" style="display: none;">
+                <!-- {{ _('Responses') }} Table -->
+                <div id="company{{ _('Responses') }}Content" style="display: none;">
                     <div class="table-responsive">
                         <table class="table table-hover" style="background-color: #ffffff;">
                             <thead style="background-color: #2E5090; color: white; position: sticky; top: 0; z-index: 10;">
                                 <tr>
-                                    <th style="width: 20%;">Répondant</th>
+                                    <th style="width: 20%;">{{ _('Respondent') }}</th>
                                     <th style="width: 10%; text-align: center;">NPS</th>
-                                    <th style="width: 50%;" class="text-center">Évaluations</th>
+                                    <th style="width: 50%;" class="text-center">{{ _('Ratings') }}</th>
                                     <th style="width: 15%;">Date</th>
                                     <th style="width: 5%; text-align: center;">Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="companyRéponsesTableBody">
+                            <tbody id="company{{ _('Responses') }}TableBody">
                                 <!-- Will be populated by JavaScript -->
                             </tbody>
                         </table>
@@ -800,10 +800,10 @@
                     <!-- Pagination -->
                     <div class="d-flex justify-content-between align-items-center mt-3">
                         <div style="color: #8A8A8A;">
-                            <span id="companyRéponsesPaginationInfo"></span>
+                            <span id="company{{ _('Responses') }}PaginationInfo"></span>
                         </div>
                         <nav>
-                            <ul class="pagination pagination-sm mb-0" id="companyRéponsesPagination">
+                            <ul class="pagination pagination-sm mb-0" id="company{{ _('Responses') }}Pagination">
                                 <!-- Will be populated by JavaScript -->
                             </ul>
                         </nav>
@@ -811,10 +811,10 @@
                 </div>
                 
                 <!-- No Data State -->
-                <div id="companyRéponsesNoData" class="text-center py-5" style="display: none;">
+                <div id="company{{ _('Responses') }}NoData" class="text-center py-5" style="display: none;">
                     <i class="fas fa-inbox fa-4x mb-3" style="color: #BDBDBD;"></i>
-                    <h5 style="color: #8A8A8A;">No Réponses Found</h5>
-                    <p style="color: #8A8A8A;">Aucune réponse d'enquête ne correspond à vos critères de recherche.</p>
+                    <h5 style="color: #8A8A8A;">No {{ _('Responses') }} Found</h5>
+                    <p style="color: #8A8A8A;">{{ _('No survey responses match your search criteria.') }}</p>
                 </div>
             </div>
         </div>
@@ -829,14 +829,14 @@
                 <h5 class="modal-title" id="kpiTrendsModalLabel">
                     <i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>Campaign KPI Trends
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
             </div>
             <div class="modal-body" style="background-color: #FFFFFF;">
                 <div class="row">
                     <div class="col-lg-6 mb-4">
                         <div class="card border">
                             <div class="card-header bg-white border-bottom">
-                                <h6 class="mb-0">Réponses</h6>
+                                <h6 class="mb-0">{{ _('Responses') }}</h6>
                             </div>
                             <div class="card-body">
                                 <canvas id="modal-chart-responses" height="250"></canvas>
@@ -846,7 +846,7 @@
                     <div class="col-lg-6 mb-4">
                         <div class="card border">
                             <div class="card-header bg-white border-bottom">
-                                <h6 class="mb-0">Score NPS</h6>
+                                <h6 class="mb-0">{{ _('NPS Score') }}</h6>
                             </div>
                             <div class="card-body">
                                 <canvas id="modal-chart-nps" height="250"></canvas>
@@ -856,7 +856,7 @@
                     <div class="col-lg-6 mb-4">
                         <div class="card border">
                             <div class="card-header bg-white border-bottom">
-                                <h6 class="mb-0">Entreprises analysées</h6>
+                                <h6 class="mb-0">{{ _('Companies Analyzed') }}</h6>
                             </div>
                             <div class="card-body">
                                 <canvas id="modal-chart-companies" height="250"></canvas>
@@ -866,7 +866,7 @@
                     <div class="col-lg-6 mb-4">
                         <div class="card border">
                             <div class="card-header bg-white border-bottom">
-                                <h6 class="mb-0">Critique Risk</h6>
+                                <h6 class="mb-0">{{ _('Critical') }} Risk</h6>
                             </div>
                             <div class="card-body">
                                 <canvas id="modal-chart-critical" height="250"></canvas>
@@ -886,7 +886,7 @@
                     <div class="col-lg-6 mb-4">
                         <div class="card border">
                             <div class="card-header bg-white border-bottom">
-                                <h6 class="mb-0">Valeur du produit</h6>
+                                <h6 class="mb-0">{{ _('Product Value') }}</h6>
                             </div>
                             <div class="card-body">
                                 <canvas id="modal-chart-product" height="250"></canvas>
@@ -896,7 +896,7 @@
                     <div class="col-lg-6 mb-4">
                         <div class="card border">
                             <div class="card-header bg-white border-bottom">
-                                <h6 class="mb-0">Tarification</h6>
+                                <h6 class="mb-0">{{ _('Pricing') }}</h6>
                             </div>
                             <div class="card-body">
                                 <canvas id="modal-chart-pricing" height="250"></canvas>
@@ -916,7 +916,7 @@
                 </div>
             </div>
             <div class="modal-footer bg-white border-top">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Close') }}</button>
             </div>
         </div>
     </div>
@@ -971,10 +971,10 @@ function renderSegmentationInsights(data) {
     document.getElementById('segmentationEmptyState').style.display = 'none';
     document.getElementById('segmentationContent').style.display = 'block';
     
-    // Render NPS par rôle Chart
+    // Render {{ _('NPS by Role') }} Chart
     renderSegmentationChart('npsByRoleChart', 'role', segmentationData.nps_by_role || {},  'Role');
     
-    // Render NPS par région Chart
+    // Render {{ _('NPS by Region') }} Chart
     renderSegmentationChart('npsByRegionChart', 'region', segmentationData.nps_by_region || {}, 'Region');
     
     // Render NPS by Tier Chart
@@ -1002,7 +1002,7 @@ function renderSegmentationChart(canvasId, chartKey, npsData, label) {
         data: {
             labels: labels,
             datasets: [{
-                label: 'Score NPS',
+                label: '{{ _('NPS Score') }}',
                 data: npsScores,
                 backgroundColor: labels.map(label => {
                     const score = npsData[label].nps_score || 0;
@@ -1028,7 +1028,7 @@ function renderSegmentationChart(canvasId, chartKey, npsData, label) {
                 },
                 title: {
                     display: true,
-                    text: `Score NPS by ${label}`
+                    text: `{{ _('NPS Score') }} by ${label}`
                 },
                 tooltip: {
                     callbacks: {
@@ -1037,7 +1037,7 @@ function renderSegmentationChart(canvasId, chartKey, npsData, label) {
                             const key = labels[idx];
                             const metrics = npsData[key];
                             return [
-                                `Réponses: ${metrics.total_responses}`,
+                                `{{ _('Responses') }}: ${metrics.total_responses}`,
                                 `Promoters: ${metrics.promoters}`,
                                 `Passives: ${metrics.passives}`,
                                 `Detractors: ${metrics.detractors}`
@@ -1058,7 +1058,7 @@ function renderSegmentationChart(canvasId, chartKey, npsData, label) {
                     },
                     title: {
                         display: true,
-                        text: 'Score NPS'
+                        text: '{{ _('NPS Score') }}'
                     }
                 },
                 x: {

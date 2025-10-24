@@ -1,0 +1,476 @@
+{% extends "base.html" %}
+
+{% block title %}Configuration de l'e-mail - VOÏA Setup{% endblock %}
+
+{% block page_class %}page-onboarding-smtp{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Settings', 'url': url_for('business_auth.admin_panel')},
+    {'label': 'Account Setup', 'url': url_for('business_auth.onboarding_welcome')},
+    {'label': 'Configuration de l'e-mail', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+<style>
+/* Onboarding SMTP specific styling */
+.onboarding-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 var(--spacing-lg);
+}
+
+.onboarding-header {
+    background: linear-gradient(135deg, rgba(var(--primary-red-rgb, 225, 58, 68), 0.1) 0%, rgba(var(--red-hover-rgb, 197, 45, 54), 0.15) 100%);
+    border: 1px solid var(--red-light);
+    color: var(--primary-black);
+    padding: 2rem;
+    border-radius: var(--radius-2xl);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.step-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: var(--primary-white);
+    font-size: 2rem;
+    box-shadow: var(--shadow-lg);
+}
+
+.progress-container {
+    background: var(--primary-white);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: var(--light-gray);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: var(--spacing-md);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-red), var(--red-hover));
+    transition: width 0.3s ease;
+}
+
+.form-container {
+    background: var(--primary-white);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.form-section {
+    margin-bottom: var(--spacing-2xl);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 2px solid var(--light-gray);
+}
+
+.section-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(var(--primary-red-rgb, 225, 58, 68), 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-red);
+    font-size: 1.2rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.form-group {
+    margin-bottom: var(--spacing-lg);
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    color: var(--primary-black);
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-sm);
+}
+
+.form-control {
+    width: 100%;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-base);
+    transition: all 0.3s ease;
+    font-family: var(--font-family-base);
+    background-color: var(--primary-white);
+    color: var(--primary-black);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 3px rgba(var(--primary-red-rgb, 225, 58, 68), 0.15);
+    transform: translateY(-1px);
+}
+
+.form-text {
+    color: var(--gray-dark);
+    font-size: var(--font-size-xs);
+    margin-top: var(--spacing-xs);
+}
+
+.help-box {
+    background: rgba(59, 130, 246, 0.05);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.help-box h5 {
+    color: rgb(37, 99, 235);
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.test-section {
+    background: rgba(34, 197, 94, 0.05);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    margin-top: var(--spacing-xl);
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-xl) 0;
+}
+
+.btn-test {
+    background: linear-gradient(135deg, rgb(34, 197, 94) 0%, rgb(22, 163, 74) 100%);
+    color: white;
+    border: none;
+    padding: var(--spacing-md) var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-test:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-continue {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+    border: none;
+    padding: var(--spacing-lg) var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-continue:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+}
+
+.btn-continue:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.alert {
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.alert-success {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: rgb(22, 163, 74);
+}
+
+.alert-error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: rgb(185, 28, 28);
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+</style>
+
+<div class="onboarding-container">
+    <!-- Header -->
+    <div class="onboarding-header">
+        <div class="step-icon">
+            <i class="fas fa-envelope"></i>
+        </div>
+        <h1 style="font-size: var(--font-size-3xl); font-weight: 700; margin-bottom: var(--spacing-sm);">Configuration de l'e-mail</h1>
+        <p style="font-size: var(--font-size-lg); color: var(--gray-dark); margin: 0;">Configure SMTP settings to send survey invitations</p>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ progress_percentage }}%"></div>
+        </div>
+        <div style="text-align: center; color: var(--gray-dark); font-size: var(--font-size-sm); font-weight: 500;">
+            Step {{ current_step_index + 1 }} of {{ all_steps|length }}: {{ step.name }}
+        </div>
+    </div>
+
+    <!-- Help Information -->
+    <div class="help-box">
+        <h5><i class="fas fa-info-circle"></i> SMTP Configuration Guide</h5>
+        <p>Pour envoyer des invitations à l'enquête, VOÏA a besoin d'un accès à votre serveur de messagerie. Vous pouvez utiliser :</p>
+        <ul style="margin: var(--spacing-sm) 0 0 var(--spacing-lg);">
+            <li><strong>Gmail:</strong> smtp.gmail.com (port 587, use App Password)</li>
+            <li><strong>Outlook:</strong> smtp-mail.outlook.com (port 587)</li>
+            <li><strong>Custom SMTP:</strong> Les paramètres du serveur de messagerie de votre organisation</li>
+        </ul>
+    </div>
+
+    <!-- Configuration de l'e-mail Form -->
+    <div class="form-container">
+        <form id="smtpForm">
+            <div class="form-section">
+                <div class="section-header">
+                    <div class="section-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <h3 style="margin: 0; color: var(--primary-black);">Paramètres du serveur</h3>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="smtp_server">SMTP Server *</label>
+                        <input type="text" class="form-control" id="smtp_server" name="smtp_server" 
+                               value="{{ email_config.smtp_server if email_config else '' }}" 
+                               placeholder="smtp.gmail.com" required>
+                        <div class="form-text">Adresse du serveur SMTP de votre fournisseur de messagerie</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="smtp_port">Port *</label>
+                        <input type="number" class="form-control" id="smtp_port" name="smtp_port" 
+                               value="{{ email_config.smtp_port if email_config else 587 }}" 
+                               placeholder="587" required>
+                        <div class="form-text">Généralement 587 pour TLS ou 465 pour SSL</div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="smtp_username">Username *</label>
+                        <input type="email" class="form-control" id="smtp_username" name="smtp_username" 
+                               value="{{ email_config.smtp_username if email_config else '' }}" 
+                               placeholder="your-email@company.com" required>
+                        <div class="form-text">Votre adresse e-mail ou nom d'utilisateur SMTP</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="smtp_password">Password *</label>
+                        <input type="password" class="form-control" id="smtp_password" name="smtp_password" 
+                               placeholder="{% if email_config %}••••••••{% else %}Enter password{% endif %}" required>
+                        <div class="form-text">{% if email_config %}Leave blank to keep existing password{% else %}Use App Password for Gmail{% endif %}</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="from_name">Sender Name *</label>
+                    <input type="text" class="form-control" id="from_name" name="from_name" 
+                           value="{{ email_config.from_name if email_config else business_account.name }}" 
+                           placeholder="{{ business_account.name }}" required>
+                    <div class="form-text">Comment votre nom apparaît aux destinataires de l'enquête</div>
+                </div>
+            </div>
+
+            <!-- Test Email Section -->
+            <div class="test-section">
+                <h4 style="color: rgb(22, 163, 74); margin-bottom: var(--spacing-lg); display: flex; align-items: center; gap: var(--spacing-sm);">
+                    <i class="fas fa-paper-plane"></i> Test Your Configuration
+                </h4>
+                <p style="color: var(--gray-dark); margin-bottom: var(--spacing-lg);">
+                    Envoyez un e-mail de test pour vérifier que vos paramètres SMTP fonctionnent correctement.
+                </p>
+                <div class="form-group">
+                    <label class="form-label" for="test_email">Test Email Address *</label>
+                    <input type="email" class="form-control" id="test_email" name="test_email" 
+                           value="{{ current_user.email }}" placeholder="test@example.com" required>
+                </div>
+                <button type="button" class="btn-test" id="testEmailBtn">
+                    <i class="fas fa-paper-plane me-2"></i>Send Test Email
+                </button>
+                <div id="testResult" style="margin-top: var(--spacing-lg);"></div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <div></div> <!-- Spacer -->
+                <button type="submit" class="btn-continue" id="continueBtn" disabled>
+                    <i class="fas fa-arrow-right me-2"></i>Continue to Team Setup
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+let configValid = false;
+
+// Test email functionality
+document.getElementById('testEmailBtn').addEventListener('click', function() {
+    const btn = this;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Testing...';
+    btn.disabled = true;
+    
+    const formData = new FormData(document.getElementById('smtpForm'));
+    
+    fetch('{{ url_for("business_auth.test_email_config") }}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        const resultDiv = document.getElementById('testResult');
+        if (data.success) {
+            resultDiv.innerHTML = `
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Test email sent successfully! Check your inbox.
+                </div>
+            `;
+            configValid = true;
+            document.getElementById('continueBtn').disabled = false;
+        } else {
+            resultDiv.innerHTML = `
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    ${data.error || 'Failed to send test email'}
+                </div>
+            `;
+            configValid = false;
+            document.getElementById('continueBtn').disabled = true;
+        }
+    })
+    .catch(error => {
+        document.getElementById('testResult').innerHTML = `
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                Error testing email: ${error.message}
+            </div>
+        `;
+        configValid = false;
+        document.getElementById('continueBtn').disabled = true;
+    })
+    .finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+});
+
+// Form submission
+document.getElementById('smtpForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    if (!configValid) {
+        alert('Please test your email configuration first.');
+        return;
+    }
+    
+    const btn = document.getElementById('continueBtn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+    btn.disabled = true;
+    
+    const formData = new FormData(this);
+    
+    // First save the configuration
+    fetch('{{ url_for("business_auth.save_email_config") }}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Then complete the onboarding step
+            return fetch('{{ url_for("business_auth.complete_onboarding_step", step="smtp") }}', {
+                method: 'POST',
+                body: formData
+            });
+        } else {
+            throw new Error(data.error || 'Failed to save configuration');
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (data.redirect) {
+                window.location.href = data.redirect;
+            }
+        } else {
+            throw new Error(data.error || 'Failed to complete step');
+        }
+    })
+    .catch(error => {
+        alert(error.message || 'An error occurred. Please try again.');
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+});
+
+// Enable continue button if config already exists and tested
+{% if email_config %}
+configValid = false; // Still require testing even if config exists
+{% endif %}
+</script>
+
+{% endblock %}

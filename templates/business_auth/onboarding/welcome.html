@@ -240,8 +240,8 @@
         <div class="welcome-icon">
             <i class="fas fa-rocket"></i>
         </div>
-        <h1 class="welcome-title">Bienvenue sur VOÏA !</h1>
-        <p class="welcome-subtitle">Configurons votre plateforme pour la réussite</p>
+        <h1 class="welcome-title">{{ _('Welcome to VOÏA!') }}</h1>
+        <p class="welcome-subtitle">{{ _('Let\'s set up your platform for success') }}</p>
     </div>
 
     <!-- Progress Bar -->
@@ -257,7 +257,7 @@
     <!-- Business Account Info -->
     <div class="business-info">
         <h4><i class="fas fa-building"></i> {{ business_account.name }}</h4>
-        <p>Bienvenue, {{ current_user.get_full_name() }} ! Vous configurez VOÏA pour votre équipe.</p>
+        <p>{{ _('Welcome, {{ current_user.get_full_name() }}! You\'re setting up VOÏA for your team.') }}</p>
     </div>
 
     <!-- Mandatory Notice -->
@@ -265,7 +265,7 @@
         <div class="icon">
             <i class="fas fa-exclamation-triangle"></i>
         </div>
-        <p><strong>Essential Setup Required:</strong> Complétez ces étapes pour accéder à votre plateforme VOÏA et commencer à collecter de précieux retours clients.</p>
+        <p><strong>Essential Setup Required:</strong> {{ _('Complete these steps to access your VOÏA platform and start collecting valuable customer feedback.') }}</p>
     </div>
 
     <!-- Setup Information -->
@@ -278,22 +278,22 @@
             <li class="setup-step">
                 <div class="step-number">1</div>
                 <div class="step-content">
-                    <div class="step-title">Configuration de l'e-mail</div>
-                    <div class="step-description">Configurez vos paramètres SMTP pour envoyer des invitations à l'enquête aux participants</div>
+                    <div class="step-title">{{ _('Email Configuration') }}</div>
+                    <div class="step-description">{{ _('Configure your SMTP settings to send survey invitations to participants') }}</div>
                 </div>
             </li>
             <li class="setup-step">
                 <div class="step-number">2</div>
                 <div class="step-content">
-                    <div class="step-title">Ajouter des membres à l'équipe</div>
-                    <div class="step-description">Invitez des responsables de campagne à vous aider à créer et gérer les enquêtes de retour client</div>
+                    <div class="step-title">{{ _('Add Team Members') }}</div>
+                    <div class="step-description">{{ _('Invite campaign managers to help you create and manage customer feedback surveys') }}</div>
                 </div>
             </li>
             <li class="setup-step">
                 <div class="step-number">3</div>
                 <div class="step-content">
                     <div class="step-title">Start Collecting Feedback</div>
-                    <div class="step-description">Lancez votre première campagne et commencez à recueillir des informations clients précieuses</div>
+                    <div class="step-description">{{ _('Launch your first campaign and begin gathering valuable customer insights') }}</div>
                 </div>
             </li>
         </ol>

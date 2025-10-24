@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}Survey Response Details - VOÏA{% endblock %}
+
+{% block page_class %}page-public-response{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% if campaign_name == 'Trial Survey' %}
+    {# Simplified breadcrumb for trial responses - skip campaign level #}
+    {% set breadcrumb_items = [
+        {'label': bi_label, 'url': bi_url},
+        {'label': response.respondent_name, 'current': true}
+    ] %}
+{% else %}
+    {# Full breadcrumb for business campaign responses #}
+    {% set breadcrumb_items = [
+        {'label': bi_label, 'url': bi_url},
+        {'label': campaign_name, 'url': bi_url},
+        {'label': response.respondent_name, 'current': true}
+    ] %}
+{% endif %}
+{% include 'components/breadcrumb.html' %}
+
+<div class="container py-4" role="main" aria-label="Détails de la réponse à l'enquête">
+    <!-- Simple Page Header -->
+    <div class="mb-4">
+        <div class="mb-2">
+            <span class="badge bg-secondary">{{ campaign_name }}</span>
+        </div>
+        <h3 class="mb-2">{{ response.respondent_name }} - {{ response.company_name }}</h3>
+        <div class="d-flex align-items-center gap-3">
+            <span class="public-nps-score public-nps-{{ response.nps_category.lower() }}" role="status" aria-label="Net Promoter Score: {{ response.nps_score }} out of 10, {{ response.nps_category }}">
+                NPS: {{ response.nps_score }}/10
+            </span>
+            <span class="text-muted">
+                {% if response.updated_at %}
+                    {{ response.updated_at[:10] }} <small>(updated)</small>
+                {% elif response.created_at %}
+                    {{ response.created_at[:10] }}
+                {% else %}
+                    Unknown
+                {% endif %}
+            </span>
+        </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="public-container">
+        <!-- Analysis Data Panel -->
+        <aside class="public-data-panel" role="complementary" aria-label="Données d'analyse des réponses à l'enquête">
+            <!-- Basic Information -->
+            <section class="public-section" aria-labelledby="response-info-heading">
+                <h5 class="public-section-title" id="response-info-heading">
+                    <i class="fas fa-info-circle" aria-hidden="true"></i>
+                    Response Information
+                </h5>
+                <div class="public-data-item">
+                    <span class="public-data-label">Répondant :</span>
+                    <span class="public-data-value">{{ response.respondent_name }}</span>
+                </div>
+                <div class="public-data-item">
+                    <span class="public-data-label">Entreprise :</span>
+                    <span class="public-data-value">{{ response.company_name }}</span>
+                </div>
+                <div class="public-data-item">
+                    <span class="public-data-label">E-mail :</span>
+                    <span class="public-data-value">{{ response.respondent_email }}</span>
+                </div>
+                {% if response.tenure_with_fc %}
+                <div class="public-data-item">
+                    <span class="public-data-label">Ancienneté :</span>
+                    <span class="public-data-value">{{ response.tenure_with_fc }}</span>
+                </div>
+                {% endif %}
+            </section>
+
+            <!-- NPS and Ratings -->
+            <section class="public-section" aria-labelledby="ratings-heading">
+                <h5 class="public-section-title" id="ratings-heading">
+                    <i class="fas fa-star" aria-hidden="true"></i>
+                    Ratings & Scores
+                </h5>
+                <div class="public-data-item">
+                    <span class="public-data-label">Score NPS :</span>
+                    <span class="public-data-value">
+                        <span class="public-nps-score public-nps-{{ response.nps_category.lower() }}">
+                            {{ response.nps_score }}/10 ({{ response.nps_category }})
+                        </span>
+                    </span>
+                </div>
+                {% if response.satisfaction_rating %}
+                <div class="public-data-item">
+                    <span class="public-data-label">Satisfaction :</span>
+                    <span class="public-data-value">{{ response.satisfaction_rating }}/5</span>
+                </div>
+                {% endif %}
+                {% if response.product_value_rating %}
+                <div class="public-data-item">
+                    <span class="public-data-label">Valeur du produit :</span>
+                    <span class="public-data-value">{{ response.product_value_rating }}/5</span>
+                </div>
+                {% endif %}
+                {% if response.service_rating %}
+                <div class="public-data-item">
+                    <span class="public-data-label">Qualité du service :</span>
+                    <span class="public-data-value">{{ response.service_rating }}/5</span>
+                </div>
+                {% endif %}
+                {% if response.pricing_rating %}
+                <div class="public-data-item">
+                    <span class="public-data-label">Pricing:</span>
+                    <span class="public-data-value">{{ response.pricing_rating }}/5</span>
+                </div>
+                {% endif %}
+            </section>
+
+            <!-- Sentiment Analysis -->
+            {% if response.sentiment_label %}
+            <section class="public-section" aria-labelledby="ai-analysis-heading">
+                <h5 class="public-section-title" id="ai-analysis-heading">
+                    <i class="fas fa-brain" aria-hidden="true"></i>
+                    AI Analysis
+                </h5>
+                <div class="public-data-item">
+                    <span class="public-data-label">Sentiment :</span>
+                    <span class="public-data-value">
+                        <span class="public-sentiment-indicator public-sentiment-{{ response.sentiment_label.lower() }}" role="status" aria-label="Sentiment : {{ response.sentiment_label }}">
+                            {% if response.sentiment_label.lower() == 'positive' %}
+                                <i class="fas fa-smile" aria-hidden="true"></i>
+                            {% elif response.sentiment_label.lower() == 'negative' %}
+                                <i class="fas fa-frown" aria-hidden="true"></i>
+                            {% else %}
+                                <i class="fas fa-meh" aria-hidden="true"></i>
+                            {% endif %}
+                            {{ response.sentiment_label }}
+                        </span>
+                    </span>
+                </div>
+                {% if response.sentiment_score %}
+                <div class="public-data-item">
+                    <span class="public-data-label">Score de sentiment :</span>
+                    <span class="public-data-value">{{ "%.2f"|format(response.sentiment_score) }}</span>
+                </div>
+                {% endif %}
+            </section>
+            {% endif %}
+
+            <!-- Key Themes -->
+            {% if response.key_themes and response.key_themes|length > 0 %}
+            <section class="public-section" aria-labelledby="themes-heading">
+                <h5 class="public-section-title" id="themes-heading">
+                    <i class="fas fa-tags" aria-hidden="true"></i>
+                    Key Themes
+                </h5>
+                <div class="public-themes-list" role="list" aria-label="Thèmes clés identifiés">
+                    {% for theme in response.key_themes %}
+                        <span class="public-theme-tag" role="listitem">{{ theme }}</span>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- Growth Opportunities -->
+            {% if response.growth_opportunities and response.growth_opportunities|length > 0 %}
+            <section class="public-section" aria-labelledby="opportunities-heading">
+                <h5 class="public-section-title" id="opportunities-heading">
+                    <i class="fas fa-chart-line" aria-hidden="true"></i>
+                    Growth Opportunities
+                </h5>
+                <div class="public-opportunities-list" role="list" aria-label="Opportunités de croissance identifiées">
+                    {% for opportunity in response.growth_opportunities %}
+                        <span class="public-opportunity-tag" role="listitem">{{ opportunity }}</span>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+        </aside>
+
+        <!-- Conversation Panel -->
+        <article class="public-conversation-panel" role="article" aria-labelledby="conversation-heading">
+            <h5 class="public-section-title" id="conversation-heading">
+                <i class="fas fa-comments" aria-hidden="true"></i>
+                Conversation Transcript
+            </h5>
+            
+            {% if response.conversation_history and response.conversation_history|length > 0 %}
+            <div class="public-conversation" role="log" aria-label="Historique de la conversation">
+                {% for message in response.conversation_history %}
+                <div class="public-message public-message-{{ message.role }}" role="article" aria-label="{{ 'AI message' if message.role == 'ai' else 'User message' }}">
+                    <div class="public-message-avatar public-avatar-{{ message.role }}" aria-hidden="true">
+                        {% if message.role == 'ai' %}
+                            AI
+                        {% else %}
+                            {{ response.respondent_name[0]|upper if response.respondent_name else 'U' }}
+                        {% endif %}
+                    </div>
+                    <div class="public-message-content">
+                        <div class="message-text">{{ message.content }}</div>
+                        {% if message.timestamp %}
+                        <time class="public-message-timestamp" datetime="{{ message.timestamp }}">
+                            {{ message.timestamp }}
+                        </time>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-info" role="alert">
+                <i class="fas fa-info-circle me-2" aria-hidden="true"></i>
+                No conversation transcript available for this response.
+            </div>
+            {% endif %}
+        </article>
+    </div>
+
+    <!-- Additional Comments -->
+    {% if response.improvement_feedback or response.recommendation_reason or response.additional_comments %}
+    <section class="mt-4" aria-labelledby="additional-feedback-heading">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0" id="additional-feedback-heading">
+                    <i class="fas fa-comment-alt me-2" aria-hidden="true"></i>
+                    Additional Feedback
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if response.improvement_feedback %}
+                <div class="mb-3">
+                    <strong>Improvement Suggestions:</strong>
+                    <p class="mb-0 mt-1">{{ response.improvement_feedback }}</p>
+                </div>
+                {% endif %}
+                
+                {% if response.recommendation_reason %}
+                <div class="mb-3">
+                    <strong>Recommendation Reason:</strong>
+                    <p class="mb-0 mt-1">{{ response.recommendation_reason }}</p>
+                </div>
+                {% endif %}
+                
+                {% if response.additional_comments %}
+                <div class="mb-0">
+                    <strong>Additional Comments:</strong>
+                    <p class="mb-0 mt-1">{{ response.additional_comments }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+</div>
+
+<!-- Footer note -->
+{% if not is_business_authenticated %}
+<footer class="container mt-4" role="contentinfo">
+    <div class="alert alert-light text-center" role="note">
+        <small class="text-muted">
+            <i class="fas fa-shield-alt me-1" aria-hidden="true"></i>
+            This is a public view of a trial survey response. 
+            Business survey responses require authentication to access.
+        </small>
+    </div>
+</footer>
+{% endif %}
+{% endblock %}

@@ -265,7 +265,7 @@
                         <div class="stat-content">
                             <div class="stat-value">{{ participant_stats.pending }}</div>
                             <div class="stat-label">
-                                En attente
+                                {{ _('Pending') }}
                                 <i class="fas fa-info-circle info-icon" 
                                    data-bs-toggle="popover" 
                                    data-bs-trigger="click" 
@@ -306,9 +306,9 @@
             </div>
         {% endif %}
 
-                    <!-- Actions de la campagne Card -->
+                    <!-- {{ _('Campaign Actions') }} Card -->
                     <div class="campaign-actions-card">
-                        <h4 class="campaign-actions-title">Actions de la campagne</h4>
+                        <h4 class="campaign-actions-title">{{ _('Campaign Actions') }}</h4>
                         
                         {% if campaign.status == 'draft' %}
                             <!-- Draft State Actions -->
@@ -338,10 +338,10 @@
                                 <div class="campaign-actions-helper">
                                     {% if not campaign.description or participant_stats.total == 0 %}
                                         <i class="fas fa-exclamation-circle me-1"></i>
-                                        <span>La campagne doit contenir une description et au moins un participant pour être marquée comme prête.</span>
+                                        <span>{{ _('Campaign needs description and at least one participant to be marked ready.') }}</span>
                                     {% else %}
                                         <i class="fas fa-info-circle me-1"></i>
-                                        <span>Les campagnes brouillon peuvent être librement modifiées ou supprimées. Une fois marquées comme prêtes, les détails deviennent verrouillés.</span>
+                                        <span>{{ _('Draft campaigns can be freely edited or deleted. Once marked ready, campaign details become locked.') }}</span>
                                     {% endif %}
                                 </div>
                             </div>
@@ -361,7 +361,7 @@
                                 
                                 <div class="campaign-actions-helper campaign-actions-helper-info">
                                     <i class="fas fa-check-circle me-1"></i>
-                                    <span>La campagne est prête pour activation</span>
+                                    <span>{{ _('Campaign is ready for activation') }}</span>
                                 </div>
                             </div>
                             
@@ -374,7 +374,7 @@
                                         <button type="submit" class="btn btn-primary btn-lg"
                                                 data-bs-toggle="tooltip" 
                                                 data-bs-placement="top" 
-                                                title="Cela n'enverra des invitations qu'aux participants qui n'ont pas encore été invités."
+                                                title="{{ _('This will only send invitations to participants who haven\'t been invited yet.') }}"
                                                 onclick="return confirm('Send email invitations to all participants who have not been invited yet?');">
                                             <i class="fas fa-envelope me-2"></i>Send Invitations
                                         </button>
@@ -398,7 +398,7 @@
                                 
                                 <div class="campaign-actions-status campaign-actions-status-success">
                                     <i class="fas fa-chart-line me-1"></i>
-                                    <span>La campagne est actuellement active et recueille des réponses</span>
+                                    <span>{{ _('Campaign is currently active and collecting responses') }}</span>
                                 </div>
                             </div>
                             
@@ -409,7 +409,7 @@
                                     <i class="fas fa-flag-checkered me-2"></i>
                                     <div>
                                         <strong>Campaign Completed</strong>
-                                        <p class="mb-0">Cette campagne s'est terminée le {{ campaign.completed_at[:10] if campaign.completed_at else campaign.end_date }}</p>
+                                        <p class="mb-0">{{ _('This campaign finished on {{ campaign.completed_at[:10] if campaign.completed_at else campaign.end_date }}') }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -422,8 +422,8 @@
             <div class="tab-pane fade" id="responses-pane" role="tabpanel" aria-labelledby="responses-tab">
                 <div class="text-center py-4">
                     <i class="fas fa-comments fa-3x text-muted mb-3"></i>
-                    <h4 class="text-muted">Visualisation des réponses individuelles</h4>
-                    <p class="text-muted mb-4">Consultez et analysez les réponses individuelles des participants ainsi que les transcriptions de conversation.</p>
+                    <h4 class="text-muted">{{ _('Individual Response Viewer') }}</h4>
+                    <p class="text-muted mb-4">{{ _('View and analyze individual participant responses and conversation transcripts.') }}</p>
                     <div class="row justify-content-center">
                         <div class="col-md-8">
                             <div class="card bg-light">
@@ -472,24 +472,24 @@
                             <div class="card-body">
                                 <form id="transcript-upload-form" enctype="multipart/form-data">
                                     <div class="mb-3">
-                                        <label for="transcript-file" class="form-label">Sélectionner une transcription (fichiers .txt uniquement)</label>
+                                        <label for="transcript-file" class="form-label">{{ _('Select Transcript (.txt files only)') }}</label>
                                         <input type="file" class="form-control" id="transcript-file" name="transcript_file" accept=".txt" required>
-                                        <div class="form-text">Téléversez les transcriptions de réunions pour extraire automatiquement les insights du sondage.</div>
+                                        <div class="form-text">{{ _('Upload meeting transcripts to extract survey insights automatically.') }}</div>
                                     </div>
                                     
                                     <div class="mb-3">
-                                        <label for="participant-name" class="form-label">Nom du participant <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="participant-name" name="participant_name" required placeholder="Saisir le nom complet du participant">
+                                        <label for="participant-name" class="form-label">{{ _('Participant Name') }} <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="participant-name" name="participant_name" required placeholder="{{ _('Enter participant\'s full name') }}">
                                     </div>
                                     
                                     <div class="mb-3">
-                                        <label for="participant-email" class="form-label">Courriel du participant <span class="text-danger">*</span></label>
-                                        <input type="email" class="form-control" id="participant-email" name="participant_email" required placeholder="participant@entreprise.com">
+                                        <label for="participant-email" class="form-label">{{ _('Participant Email') }} <span class="text-danger">*</span></label>
+                                        <input type="email" class="form-control" id="participant-email" name="participant_email" required placeholder="{{ _('participant@company.com') }}">
                                     </div>
                                     
                                     <div class="mb-3">
-                                        <label for="participant-company" class="form-label">Nom de l'entreprise <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" id="participant-company" name="participant_company" required placeholder="Saisir le nom de l'entreprise">
+                                        <label for="participant-company" class="form-label">{{ _('Company Name') }} <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="participant-company" name="participant_company" required placeholder="{{ _('Enter company name') }}">
                                     </div>
                                     
                                     <div class="d-grid">
@@ -525,7 +525,7 @@
                                 <div id="transcripts-list">
                                     <div class="text-center py-3">
                                         <i class="fas fa-file-alt fa-2x text-muted mb-2"></i>
-                                        <p class="text-muted mb-0">Aucune transcription traitée pour le moment</p>
+                                        <p class="text-muted mb-0">{{ _('No transcripts processed yet') }}</p>
                                         <small class="text-muted">Upload a transcript to get started</small>
                                     </div>
                                 </div>
@@ -543,8 +543,8 @@
                                     <i class="fas fa-info-circle fa-2x"></i>
                                 </div>
                                 <div class="col-md-11">
-                                    <h6 class="alert-heading mb-1">À propos de l'analyse des transcriptions</h6>
-                                    <p class="mb-0">VOÏA analyse les transcriptions de réunions pour en extraire les scores NPS, le sentiment, les thèmes et les insights exploitables. Téléversez des fichiers .txt provenant d'appels téléphoniques, de réunions vidéo ou de discussions en personne pour générer automatiquement des réponses de sondage et les intégrer à vos analyses de campagne.</p>
+                                    <h6 class="alert-heading mb-1">{{ _('About Transcript Analysis') }}</h6>
+                                    <p class="mb-0">{{ _('VOÏA analyzes meeting transcripts to extract NPS scores, sentiment, themes, and actionable insights. Upload .txt files from phone calls, video meetings, or face-to-face discussions to automatically generate survey responses and integrate them with your campaign analytics.') }}</p>
                                 </div>
                             </div>
                         </div>
@@ -685,7 +685,7 @@ document.addEventListener('DOMContentLoaded', function() {
             transcriptsList.innerHTML = `
                 <div class="text-center py-3">
                     <i class="fas fa-file-alt fa-2x text-muted mb-2"></i>
-                    <p class="text-muted mb-0">Aucune transcription traitée pour le moment</p>
+                    <p class="text-muted mb-0">{{ _('No transcripts processed yet') }}</p>
                     <small class="text-muted">Upload a transcript to get started</small>
                 </div>
             `;

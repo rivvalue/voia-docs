@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+
+{% block title %}Add Participant - {{ business_account.name }} - VOÏA{% endblock %}
+
+{% block page_class %}page-participant-create{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Participants', 'url': url_for('participants.list_participants')},
+    {'label': 'Add Participant', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+
+<div class="participant-config-container">
+    <!-- Header -->
+    <div class="participant-config-header">
+        <div class="participant-config-header-content">
+            <h1>
+                <i class="fas fa-user-plus me-2" aria-hidden="true"></i>
+                Add New Participant
+            </h1>
+            <p>Ajouter un nouveau participant à {{ business_account.name }}</p>
+        </div>
+    </div>
+
+    <!-- Configuration Form -->
+    <form method="POST" action="{{ url_for('participants.create_participant') }}" id="participantCreateForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        
+        <!-- Participant Information -->
+        <div class="participant-config-form-section">
+            <h3 class="participant-section-title">
+                <i class="fas fa-user" aria-hidden="true"></i>
+                Participant Information
+            </h3>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="participant-form-group">
+                        <label class="participant-form-label" for="email">Adresse e-mail *</label>
+                        <input type="email" 
+                               class="participant-form-control" 
+                               id="email" 
+                               name="email" 
+                               placeholder="participant@example.com" 
+                               required
+                               aria-required="true"
+                               aria-describedby="email_help">
+                        <div class="participant-help-text" id="email_help">Adresse e-mail du participant pour l'invitation à l'enquête</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="participant-form-group">
+                        <label class="participant-form-label" for="name">Nom complet *</label>
+                        <input type="text" 
+                               class="participant-form-control" 
+                               id="name" 
+                               name="name" 
+                               placeholder="John Doe" 
+                               required
+                               aria-required="true"
+                               aria-describedby="name_help">
+                        <div class="participant-help-text" id="name_help">Nom complet du participant</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="participant-form-group">
+                        <label class="participant-form-label" for="company_name">Nom de l'entreprise *</label>
+                        <input type="text" 
+                               class="participant-form-control" 
+                               id="company_name" 
+                               name="company_name" 
+                               placeholder="Acme Corporation" 
+                               required
+                               aria-required="true"
+                               aria-describedby="company_name_help">
+                        <div class="participant-help-text" id="company_name_help">Entreprise ou organisation du participant</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Segmentation Attributes (Optionnel) -->
+        <div class="participant-config-form-section">
+            <h3 class="participant-section-title">
+                <i class="fas fa-tags" aria-hidden="true"></i>
+                Segmentation Attributes
+                <span class="badge bg-secondary ms-2">Optionnel</span>
+            </h3>
+            <p class="participant-help-text mb-3">Ajoutez des données de segmentation pour des enquêtes personnalisées et une analytique avancée</p>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="participant-form-group">
+                        <label class="participant-form-label" for="role">Rôle</label>
+                        <select class="participant-form-control" 
+                                id="role" 
+                                name="role"
+                                aria-describedby="role_help">
+                            <option value="">Sélectionnez un rôle (optionnel)</option>
+                            <option value="C-Level">Cadre dirigeant (C-Level)</option>
+                            <option value="VP">VP / Directeur</option>
+                            <option value="Gestionnaire">Gestionnaire</option>
+                            <option value="Chef d'équipe">Chef d'équipe</option>
+                            <option value="Utilisateur final">Utilisateur final</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                        <div class="participant-help-text" id="role_help">Rôle du participant pour la personnalisation de l'enquête selon le rôle</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="participant-form-group">
+                        <label class="participant-form-label" for="region">Région</label>
+                        <select class="participant-form-control" 
+                                id="region" 
+                                name="region"
+                                aria-describedby="region_help">
+                            <option value="">Sélectionnez une région (optionnel)</option>
+                            <option value="Amérique du Nord">Amérique du Nord</option>
+                            <option value="LATAM">Amérique latine (LATAM)</option>
+                            <option value="EMEA">Europe, Moyen-Orient et Afrique (EMEA)</option>
+                            <option value="APAC">Asie-Pacifique (APAC)</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                        <div class="participant-help-text" id="region_help">Région géographique pour des analyses régionales</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="participant-form-group">
+                        <label class="participant-form-label" for="customer_tier">Catégorie de client</label>
+                        <select class="participant-form-control" 
+                                id="customer_tier" 
+                                name="customer_tier"
+                                aria-describedby="customer_tier_help">
+                            <option value="">Sélectionnez une catégorie (optionnel)</option>
+                            <option value="T1 : Stratégique (5–10 % des meilleurs clients)">T1 : Stratégique (5–10 % des meilleurs clients)</option>
+                            <option value="T2 : Gérés (majorité des clients payants)">T2 : Gérés (majorité des clients payants)</option>
+                            <option value="T3 : Libre-service ou petit client">T3 : Libre-service ou petit client</option>
+                        </select>
+                        <div class="participant-help-text" id="customer_tier_help">Segment client pour l'analyse par catégorie</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="participant-form-group">
+                        <label class="participant-form-label" for="language">Langue préférée</label>
+                        <select class="participant-form-control" 
+                                id="language" 
+                                name="language"
+                                aria-describedby="language_help">
+                            <option value="en">English</option>
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                            <option value="pt">Portuguese</option>
+                            <option value="zh">Chinese</option>
+                            <option value="ja">Japanese</option>
+                            <option value="other">Autre</option>
+                        </select>
+                        <div class="participant-help-text" id="language_help">Langue principale pour la prise en charge multilingue future</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="participant-form-group">
+                        <label class="participant-form-label" for="tenure_years">
+                            Ancienneté (années)
+                        </label>
+                        <input type="number" 
+                               class="participant-form-control" 
+                               id="tenure_years" 
+                               name="tenure_years"
+                               step="0.1"
+                               min="0"
+                               max="99.9"
+                               placeholder="e.g., 2.5"
+                               aria-describedby="tenure_years_help">
+                        <div class="participant-help-text" id="tenure_years_help">
+                            Nombre d'années d'utilisation de votre produit/service par le participant (optionnel)
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="participant-form-group">
+                        <label class="participant-form-label" for="company_commercial_value">
+                            Valeur commerciale de l'entreprise
+                            <i class="fas fa-info-circle ms-1" aria-hidden="true" title="Cette valeur s'applique à tous les participants de cette entreprise"></i>
+                        </label>
+                        <input type="number" 
+                               class="participant-form-control" 
+                               id="company_commercial_value" 
+                               name="company_commercial_value"
+                               step="0.01"
+                               min="0"
+                               placeholder="e.g., 250000"
+                               aria-describedby="company_commercial_value_help">
+                        <div class="participant-help-text" id="company_commercial_value_help">
+                            Valeur estimée du compte en USD. Cette valeur sera synchronisée pour tous les participants de la même entreprise dans votre compte.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="participant-config-form-section">
+            <div class="participant-actions-row">
+                <div class="participant-actions-left">
+                    <a href="{{ url_for('participants.list_participants') }}" 
+                       class="participant-btn-cancel"
+                       aria-label="Annuler et revenir à la liste des participants">
+                        <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                        Cancel
+                    </a>
+                </div>
+                <div class="participant-actions-right">
+                    <button type="submit" 
+                            class="participant-btn-save"
+                            aria-label="Créer un participant">
+                        <i class="fas fa-plus" aria-hidden="true"></i>
+                        Create Participant
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Information Card -->
+    <div class="participant-config-form-section">
+        <h3 class="participant-section-title">
+            <i class="fas fa-info-circle" aria-hidden="true"></i>
+            How It Works
+        </h3>
+        
+        <div class="participant-info-steps">
+            <div class="participant-info-step">
+                <div class="participant-step-icon">
+                    <i class="fas fa-user-plus" aria-hidden="true"></i>
+                </div>
+                <h4 class="participant-step-title">1. Créer</h4>
+                <p class="participant-step-description">Ajoutez les informations du participant à votre compte</p>
+            </div>
+            
+            <div class="participant-info-step">
+                <div class="participant-step-icon">
+                    <i class="fas fa-link" aria-hidden="true"></i>
+                </div>
+                <h4 class="participant-step-title">2. Générer un jeton</h4>
+                <p class="participant-step-description">Jeton unique pour l'accès à l'enquête et l'anonymisation</p>
+            </div>
+            
+            <div class="participant-info-step">
+                <div class="participant-step-icon">
+                    <i class="fas fa-users" aria-hidden="true"></i>
+                </div>
+                <h4 class="participant-step-title">3. Assigner à une campagne</h4>
+                <p class="participant-step-description">Ajoutez le participant aux campagnes actives</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form validation and enhancement
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('participantCreateForm');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    form.addEventListener('submit', function(e) {
+        // Add loading state
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2" aria-hidden="true"></i>Creating...';
+        submitBtn.disabled = true;
+    });
+    
+    // Auto-format email field
+    const emailField = document.getElementById('email');
+    emailField.addEventListener('blur', function() {
+        this.value = this.value.toLowerCase().trim();
+    });
+    
+    // Auto-format name field
+    const nameField = document.getElementById('name');
+    nameField.addEventListener('blur', function() {
+        // Capitalize first letter of each word
+        this.value = this.value.replace(/\w\S*/g, function(txt) {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        });
+    });
+});
+</script>
+{% endblock %}

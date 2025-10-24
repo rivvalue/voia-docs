@@ -1,0 +1,1336 @@
+{% extends "base.html" %}
+
+{% block title %}Participants - {{ business_account.name }} - Vocsa{% endblock %}
+
+{% block page_class %}page-participant-management{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Participants', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+<style>
+/* Participant management styling */
+
+.add-participant-btn {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    border: 2px solid var(--primary-red);
+    color: var(--primary-white) !important;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-xl);
+    font-weight: 600;
+    font-size: var(--font-size-lg);
+    box-shadow: var(--shadow-lg);
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.add-participant-btn:hover {
+    background: linear-gradient(135deg, var(--red-hover) 0%, var(--primary-red) 100%);
+    border-color: var(--red-hover);
+    color: var(--primary-white) !important;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+}
+
+.add-participant-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-md);
+}
+
+/* Table styling improvements */
+.participant-table {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.participant-table .table {
+    margin-bottom: 0;
+}
+
+.participant-table .table th {
+    background-color: var(--table-header-bg);
+    border-bottom: 2px solid var(--border-color);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    padding: 1rem 0.75rem;
+}
+
+.participant-table .table td {
+    padding: 1rem 0.75rem;
+    vertical-align: middle;
+    border-top: 1px solid var(--border-light);
+}
+
+.participant-table .table-responsive {
+    border-radius: var(--radius-lg);
+}
+
+/* Fix any overflow issues */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.btn-group {
+    white-space: nowrap;
+}
+
+/* Custom background for muted card */
+.bg-muted {
+    background-color: #6c757d !important;
+}
+
+/* Search form styling */
+.search-form .form-control {
+    height: 48px;
+}
+
+.search-form .btn {
+    height: 48px;
+    padding: 0.75rem 1.5rem;
+}
+
+/* Bulk selection toolbar */
+.bulk-selection-toolbar {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: white;
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-md);
+    display: none;
+}
+
+.bulk-selection-toolbar.active {
+    display: flex;
+}
+
+.bulk-selection-toolbar .selection-count {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.bulk-selection-toolbar .btn {
+    margin-left: 0.5rem;
+}
+
+/* Checkbox styling */
+.participant-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+/* Selection limit warning */
+.selection-limit-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffc107;
+    border-radius: var(--radius-md);
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    display: none;
+}
+
+.selection-limit-warning.active {
+    display: block;
+}
+</style>
+
+<div class="container">
+    <!-- Participant Header -->
+    <div class="header-gradient-primary" style="padding: var(--spacing-xl); margin-bottom: var(--spacing-xl);">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="page-title mb-1">Gestion des participants</h1>
+                    <p class="page-subtitle mb-0">Gérez les participants à la campagne pour {{ business_account.name }}</p>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end">
+                        <a href="{{ url_for('participants.create_participant') }}" class="add-participant-btn">
+                            <i class="fas fa-plus me-2"></i>Add Participant
+                        </a>
+                        <a href="{{ url_for('participants.upload_participants') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-upload me-2"></i>Bulk Upload CSV
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+            <div class="row mb-4">
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card bg-primary text-white h-100">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fas fa-users fa-2x"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-0" id="kpiTotal">{{ kpi_stats.total }}</h5>
+                                <small>Total Participants</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card bg-warning text-white h-100">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fas fa-clock fa-2x"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-0" id="kpiActive">{{ kpi_stats.active }}</h5>
+                                <small>Active</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card bg-secondary text-white h-100">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fas fa-building fa-2x"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-0" id="kpiCompanies">{{ kpi_stats.companies }}</h5>
+                                <small>Companies</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card bg-muted text-white h-100">
+                        <div class="card-body d-flex align-items-center">
+                            <div class="me-3">
+                                <i class="fas fa-chart-pie fa-2x"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-0">{{ kpi_stats.participants_per_company }}</h5>
+                                <small>Avg per Entreprise</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Panel -->
+            <div class="card mb-4">
+                <div class="card-header" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="true" aria-controls="filterCollapse" role="button" style="cursor: pointer;">
+                    <h5 class="mb-0">
+                        <i class="fas fa-filter me-2"></i>Filter Participants
+                        <i class="fas fa-chevron-down ms-2" id="filterChevron"></i>
+                    </h5>
+                </div>
+                <div class="collapse show" id="filterCollapse">
+                    <div class="card-body">
+                        <form method="GET" action="{{ url_for('participants.list_participants') }}" id="filterForm">
+                            <!-- Preserve search query when filtering -->
+                            {% if search_query %}
+                            <input type="hidden" name="search" value="{{ search_query }}">
+                            {% endif %}
+                            
+                            <div class="row g-3 mb-3">
+                                <!-- Entreprise Filter -->
+                                <div class="col-md-4">
+                                    <label for="filter_company" class="form-label">Entreprise</label>
+                                    <select class="form-select filter-select" id="filter_company" name="filter_company" multiple 
+                                            aria-label="Filtrer par entreprise">
+                                        {% for company in filter_options.companies %}
+                                        <option value="{{ company }}">
+                                            {{ company }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <!-- Rôle Filter -->
+                                <div class="col-md-4">
+                                    <label for="filter_role" class="form-label">Rôle</label>
+                                    <select class="form-select filter-select" id="filter_role" name="filter_role" multiple 
+                                            aria-label="Filtrer par rôle">
+                                        {% for role in filter_options.roles %}
+                                        <option value="{{ role }}">
+                                            {{ role }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <!-- Région Filter -->
+                                <div class="col-md-4">
+                                    <label for="filter_region" class="form-label">Région</label>
+                                    <select class="form-select filter-select" id="filter_region" name="filter_region" multiple 
+                                            aria-label="Filtrer par région">
+                                        {% for region in filter_options.regions %}
+                                        <option value="{{ region }}">
+                                            {{ region }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="row g-3 mb-3">
+                                <!-- Catégorie de client Filter -->
+                                <div class="col-md-4">
+                                    <label for="filter_tier" class="form-label">Catégorie de client</label>
+                                    <select class="form-select filter-select" id="filter_tier" name="filter_tier" multiple 
+                                            aria-label="Filtrer par catégorie de client">
+                                        {% for tier in filter_options.tiers %}
+                                        <option value="{{ tier }}">
+                                            {{ tier }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <!-- Language Filter -->
+                                <div class="col-md-4">
+                                    <label for="filter_language" class="form-label">Language</label>
+                                    <select class="form-select filter-select" id="filter_language" name="filter_language" multiple 
+                                            aria-label="Filtrer par langue">
+                                        {% for language in filter_options.languages %}
+                                        <option value="{{ language }}">
+                                            {{ language }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <!-- Tenure Filter -->
+                                <div class="col-md-4">
+                                    <label for="filter_tenure" class="form-label">Ancienneté (années)</label>
+                                    <select class="form-select filter-select" id="filter_tenure" name="filter_tenure" multiple 
+                                            aria-label="Filtrer par ancienneté">
+                                        {% for tenure in filter_options.tenure_ranges %}
+                                        <option value="{{ tenure }}">
+                                            {{ tenure }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex align-items-center gap-2">
+                                <button type="submit" class="btn btn-voïa-red">
+                                    <i class="fas fa-check me-2"></i>Apply Filters
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" id="clearFiltersBtn">
+                                    <i class="fas fa-times me-2"></i>Clear Filters
+                                </button>
+                                <small class="text-muted ms-3" id="filterResultCount">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Showing <span id="filterTotalCount">{{ pagination.total }}</span> participant<span id="filterPluralSuffix">{{ 's' if pagination.total != 1 else '' }}</span>
+                                </small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="GET" action="{{ url_for('participants.list_participants') }}" class="search-form">
+                        <div class="row align-items-end">
+                            <div class="col-md-8">
+                                <label for="search" class="form-label">Rechercher des participants</label>
+                                <input type="text" class="form-control" id="search" name="search" 
+                                       value="{{ search_query or '' }}" 
+                                       placeholder="Rechercher par nom, e-mail ou entreprise...">
+                            </div>
+                            <div class="col-md-4">
+                                <div class="btn-group w-100">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search me-1"></i>Search
+                                    </button>
+                                    <button type="button" id="clearSearchBtn" class="btn btn-outline-secondary" style="display: none;">
+                                        <i class="fas fa-times me-1"></i>Clear
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Bulk Selection Toolbar -->
+            <div class="bulk-selection-toolbar align-items-center justify-content-between" id="bulkToolbar">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span class="selection-count" id="selectionCount">0 sélectionné</span>
+                    <span class="selection-limit-warning ms-3" id="limitWarning">
+                        <i class="fas fa-exclamation-triangle me-1"></i>
+                        Limit reached (50 max). Apply this batch before selecting more.
+                    </span>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-outline-light btn-sm" onclick="clearSelection()">
+                        <i class="fas fa-times me-1"></i>Clear Selection
+                    </button>
+                    <button type="button" class="btn btn-bulk-edit btn-sm" onclick="openBulkEditModal()">
+                        <i class="fas fa-edit me-1"></i>Bulk Edit
+                    </button>
+                </div>
+            </div>
+
+            <!-- Participants Table -->
+            <div class="card participant-table">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Liste des participants</h5>
+                    <small class="text-muted" id="tableHeaderCount">
+                        <span id="tableHeaderTotal">{{ pagination.total }}</span> <span id="tableHeaderLabel">{% if search_query %}result{{ 's' if pagination.total != 1 else '' }} for "{{ search_query }}"{% else %}participant{{ 's' if pagination.total != 1 else '' }}{% endif %}</span>
+                    </small>
+                </div>
+                <div class="card-body p-0">
+                    {% if participants %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 responsive-table">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th style="width: 40px;">
+                                        <input type="checkbox" class="participant-checkbox" id="selectAll" onchange="toggleSelectAll(this)">
+                                    </th>
+                                    <th>Nom</th>
+                                    <th>E-mail</th>
+                                    <th>Entreprise</th>
+                                    <th class="hide-on-tablet">Originee</th>
+                                    <th>Status</th>
+                                    <th class="hide-on-tablet">Créé</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="participantTableBody">
+                                {% for participant in participants %}
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" 
+                                               class="participant-checkbox row-checkbox" 
+                                               data-participant-id="{{ participant.id }}"
+                                               onchange="updateSelection()">
+                                    </td>
+                                    <td data-label="Nom">
+                                        <div class="fw-bold">{{ participant.name }}</div>
+                                    </td>
+                                    <td data-label="E-mail">
+                                        <div class="text-muted">{{ participant.email }}</div>
+                                    </td>
+                                    <td data-label="Entreprise">
+                                        <div>{{ participant.company_name or '-' }}</div>
+                                    </td>
+                                    <td data-label="Originee" class="hide-on-tablet">
+                                        {% if participant.origin_badge %}
+                                            <span class="badge {{ participant.origin_badge.class }}">
+                                                {% if participant.source == 'trial' %}
+                                                    <i class="fas fa-flask me-1"></i>
+                                                {% elif participant.source == 'admin_single' %}
+                                                    <i class="fas fa-user-plus me-1"></i>
+                                                {% elif participant.source == 'admin_bulk' %}
+                                                    <i class="fas fa-upload me-1"></i>
+                                                {% endif %}
+                                                {{ participant.origin_badge.text }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Inconnu</span>
+                                        {% endif %}
+                                    </td>
+                                    <td data-label="Status">
+                                        {% if participant.status == 'completed' %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check me-1"></i>Completed
+                                            </span>
+                                        {% elif participant.status == 'started' %}
+                                            <span class="badge bg-info">
+                                                <i class="fas fa-play me-1"></i>Started
+                                            </span>
+                                        {% elif participant.status == 'invited' %}
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-clock me-1"></i>Invited
+                                            </span>
+                                        {% elif participant.status == 'created' %}
+                                            <span class="badge bg-primary">
+                                                <i class="fas fa-plus me-1"></i>Créé
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ participant.status|title }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td data-label="Créé" class="hide-on-tablet">
+                                        <small class="text-muted">
+                                            {% if participant.created_at %}
+                                                {{ participant.created_at[:10] }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </small>
+                                    </td>
+                                    <td data-label="Actions" class="text-end">
+                                        <div class="btn-group btn-group-sm" role="group" aria-label="Participant actions">
+                                            <a href="{{ url_for('participants.edit_participant', participant_id=participant.id) }}" 
+                                               class="btn btn-outline-primary"
+                                               title="Edit participant"
+                                               aria-label="Edit {{ participant.name }}">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" 
+                                                    class="btn btn-outline-danger delete-participant-btn"
+                                                    data-participant-id="{{ participant.id }}"
+                                                    data-participant-name="{{ participant.name }}"
+                                                    title="Delete participant"
+                                                    aria-label="Delete {{ participant.name }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="empty-state empty-state-compact">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3>Aucun participant {% if search_query %}ne correspond à votre recherche{% else %}pour le moment{% endif %}</h3>
+                        {% if search_query %}
+                        <p>Essayez d'ajuster vos termes de recherche ou de réinitialiser les filtres pour afficher tous les participants.</p>
+                        {% else %}
+                        <p>Ajoutez des participants individuellement ou téléversez un fichier CSV pour constituer votre base de participants. Vous pourrez ensuite les affecter à des campagnes pour la collecte de retours.</p>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <a href="{{ url_for('participants.create_participant') }}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Add First Participant
+                            </a>
+                            <a href="{{ url_for('participants.upload_participants') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-upload me-2"></i>Upload CSV
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Pagination (populated dynamically by JavaScript) -->
+                <div id="paginationContainer">
+                    <!-- JavaScript updatePagination() function populates this -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Edit Modal -->
+<div class="modal fade" id="bulkEditModal" tabindex="-1" aria-labelledby="bulkEditModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="bulkEditModalLabel">
+                    <i class="fas fa-edit me-2"></i>Bulk Edit Participants
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Select which fields to update.</strong> Only checked fields will be modified.
+                    Entreprise name cannot be changed in bulk for data integrity.
+                </div>
+
+                <form id="bulkEditForm">
+                    <div class="row">
+                        <!-- Rôle -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="updateRôle" onchange="toggleField('role')">
+                                <label class="form-check-label fw-bold" for="updateRôle">
+                                    Update Rôle
+                                </label>
+                            </div>
+                            <input type="text" class="form-control" id="role" disabled placeholder="e.g., Manager, Director">
+                        </div>
+
+                        <!-- Région -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="updateRégion" onchange="toggleField('region')">
+                                <label class="form-check-label fw-bold" for="updateRégion">
+                                    Update Région
+                                </label>
+                            </div>
+                            <input type="text" class="form-control" id="region" disabled placeholder="e.g., North America, EMEA">
+                        </div>
+
+                        <!-- Catégorie de client -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="updateCustomerTier" onchange="toggleField('customer_tier')">
+                                <label class="form-check-label fw-bold" for="updateCustomerTier">
+                                    Update Catégorie de client
+                                </label>
+                            </div>
+                            <select class="form-select" id="customer_tier" disabled>
+                                <option value="">Select tier...</option>
+                                <option value="Enterprise">Enterprise</option>
+                                <option value="Premium">Premium</option>
+                                <option value="Standard">Standard</option>
+                                <option value="Basic">Basic</option>
+                            </select>
+                            <small class="text-muted">⚠️ Locked for participants with survey history</small>
+                        </div>
+
+                        <!-- Language -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="updateLanguage" onchange="toggleField('language')">
+                                <label class="form-check-label fw-bold" for="updateLanguage">
+                                    Update Language
+                                </label>
+                            </div>
+                            <input type="text" class="form-control" id="language" disabled placeholder="e.g., English, Spanish">
+                        </div>
+
+                        <!-- Tenure -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="updateTenure" onchange="toggleField('tenure_years')">
+                                <label class="form-check-label fw-bold" for="updateTenure">
+                                    Update Tenure (years)
+                                </label>
+                            </div>
+                            <input type="number" class="form-control" id="tenure_years" disabled placeholder="e.g., 2.5" step="0.1" min="0">
+                        </div>
+
+                        <!-- Commercial Value -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="updateCommercialValue" onchange="toggleField('company_commercial_value')">
+                                <label class="form-check-label fw-bold" for="updateCommercialValue">
+                                    Update Commercial Value ($)
+                                </label>
+                            </div>
+                            <input type="number" class="form-control" id="company_commercial_value" disabled placeholder="e.g., 50000" min="0">
+                            <small class="text-muted">Syncs across all participants from same company</small>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning mt-3" id="confirmationAlert" style="display: none;">
+                        <p class="mb-2"><strong><i class="fas fa-exclamation-triangle me-2"></i>Review Changes:</strong></p>
+                        <ul id="changesList" class="mb-0"></ul>
+                        <p class="mt-2 mb-0" id="skipCount"></p>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-voia-primary" onclick="submitBulkEdit()" id="applyBtn" disabled>
+                    <i class="fas fa-check me-1"></i>Apply Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<!-- jQuery and Select2 for filter dropdowns -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+// Initialize Select2 on filter dropdowns
+$(document).ready(function() {
+    $('.filter-select').select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: 'Select options...',
+        allowClear: false,
+        closeOnSelect: false
+    });
+});
+
+// AJAX filter functionality
+let isFilterLoading = false;
+
+function applyFilters(page = 1) {
+    if (isFilterLoading) return;
+    
+    const filterForm = document.getElementById('filterForm');
+    if (!filterForm) return;
+    
+    isFilterLoading = true;
+    
+    // Show loading state
+    const participantTableBody = document.getElementById('participantTableBody');
+    const originalContent = participantTableBody.innerHTML;
+    participantTableBody.innerHTML = `
+        <tr>
+            <td colspan="8" class="text-center py-5">
+                <div class="spinner-border text-voia-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 text-muted">Filtering participants...</p>
+            </td>
+        </tr>
+    `;
+    
+    // Build query parameters from form
+    const formData = new FormData(filterForm);
+    const params = new URLSearchParams();
+    
+    // IMPORTANT: Get search value from the visible search input (in separate form)
+    const searchInput = document.getElementById('search');
+    if (searchInput && searchInput.value.trim()) {
+        params.append('search', searchInput.value.trim());
+    }
+    
+    // Add all filter parameters (skip the hidden search input if present)
+    for (const [key, value] of formData.entries()) {
+        if (value && key !== 'search') {  // Skip hidden search input from filter form
+            params.append(key, value);
+        }
+    }
+    
+    // Add page parameter
+    params.append('page', page);
+    
+    // Call API
+    fetch('/business/participants/api/filter?' + params.toString())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Update participant table
+                updateParticipantTable(data.participants, data.pagination);
+                
+                // Update KPI cards
+                updateKPICards(data.kpi_stats);
+                
+                // Update URL without reload
+                const newUrl = window.location.pathname + '?' + params.toString();
+                window.history.pushState({}, '', newUrl);
+                
+                // Clear bulk selection and update UI
+                selectedParticipants.clear();
+                const selectAllCheckbox = document.getElementById('selectAll');
+                if (selectAllCheckbox) {
+                    selectAllCheckbox.checked = false;
+                }
+                // Update selection UI to hide toolbar
+                updateSelection();
+            } else {
+                throw new Error(data.error || 'Inconnu error');
+            }
+        })
+        .catch(error => {
+            console.error('Error filtering participants:', error);
+            participantTableBody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center py-5">
+                        <i class="fas fa-exclamation-triangle text-danger fa-2x mb-2"></i>
+                        <p class="text-danger">Error loading participants. Please try again.</p>
+                    </td>
+                </tr>
+            `;
+        })
+        .finally(() => {
+            isFilterLoading = false;
+        });
+}
+
+function updateParticipantTable(participants, pagination) {
+    const tbody = document.getElementById('participantTableBody');
+    
+    if (participants.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center py-5">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-filter"></i>
+                    </div>
+                    <h3>No participants match your filters</h3>
+                    <p class="text-muted">Try adjusting your filter criteria.</p>
+                </td>
+            </tr>
+        `;
+        
+        // Update pagination
+        document.getElementById('paginationContainer').innerHTML = '';
+        return;
+    }
+    
+    // Build table rows
+    let html = '';
+    participants.forEach(p => {
+        // Determine status badge
+        let statusBadge = '';
+        if (p.status === 'completed') {
+            statusBadge = '<span class="badge bg-success"><i class="fas fa-check me-1"></i>Completed</span>';
+        } else if (p.status === 'started') {
+            statusBadge = '<span class="badge bg-info"><i class="fas fa-play me-1"></i>Started</span>';
+        } else if (p.status === 'invited') {
+            statusBadge = '<span class="badge bg-warning"><i class="fas fa-clock me-1"></i>Invited</span>';
+        } else if (p.status === 'created') {
+            statusBadge = '<span class="badge bg-primary"><i class="fas fa-plus me-1"></i>Créé</span>';
+        } else {
+            statusBadge = `<span class="badge bg-secondary">${p.status}</span>`;
+        }
+        
+        // Determine origin badge
+        let originBadge = '';
+        if (p.origin_badge) {
+            const iconMap = {
+                'trial': '<i class="fas fa-flask me-1"></i>',
+                'admin_single': '<i class="fas fa-user-plus me-1"></i>',
+                'admin_bulk': '<i class="fas fa-upload me-1"></i>'
+            };
+            const icon = iconMap[p.source] || '';
+            originBadge = `<span class="badge ${p.origin_badge.class}">${icon}${p.origin_badge.text}</span>`;
+        } else {
+            originBadge = '<span class="badge bg-secondary">Inconnu</span>';
+        }
+        
+        const createdDate = p.created_at ? p.created_at.substring(0, 10) : '-';
+        
+        html += `
+            <tr>
+                <td>
+                    <input type="checkbox" 
+                           class="participant-checkbox row-checkbox" 
+                           data-participant-id="${p.id}"
+                           onchange="updateSelection()">
+                </td>
+                <td data-label="Nom">
+                    <div class="fw-bold">${p.name || 'N/A'}</div>
+                </td>
+                <td data-label="E-mail">
+                    <div class="text-muted">${p.email || 'N/A'}</div>
+                </td>
+                <td data-label="Entreprise">
+                    <div>${p.company_name || '-'}</div>
+                </td>
+                <td data-label="Originee" class="hide-on-tablet">
+                    ${originBadge}
+                </td>
+                <td data-label="Status">
+                    ${statusBadge}
+                </td>
+                <td data-label="Créé" class="hide-on-tablet">
+                    <small class="text-muted">${createdDate}</small>
+                </td>
+                <td data-label="Actions" class="text-end">
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Participant actions">
+                        <a href="/business/participants/${p.id}/edit" 
+                           class="btn btn-outline-primary"
+                           title="Edit participant"
+                           aria-label="Edit ${p.name}">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <button type="button" 
+                                class="btn btn-outline-danger delete-participant-btn"
+                                data-participant-id="${p.id}"
+                                data-participant-name="${p.name}"
+                                title="Delete participant"
+                                aria-label="Delete ${p.name}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    });
+    
+    tbody.innerHTML = html;
+    
+    // Re-attach delete event listeners
+    attachDeleteListeners();
+    
+    // Update pagination
+    updatePagination(pagination);
+}
+
+function updateKPICards(stats) {
+    // Update KPI card values
+    document.getElementById('kpiTotal').textContent = stats.total || 0;
+    document.getElementById('kpiActive').textContent = stats.active || 0;
+    document.getElementById('kpiCompanies').textContent = stats.companies || 0;
+    
+    // Update filter result count (in filter panel)
+    const filterTotalCount = document.getElementById('filterTotalCount');
+    const filterPluralSuffix = document.getElementById('filterPluralSuffix');
+    if (filterTotalCount) {
+        filterTotalCount.textContent = stats.total || 0;
+    }
+    if (filterPluralSuffix) {
+        filterPluralSuffix.textContent = (stats.total === 1) ? '' : 's';
+    }
+    
+    // Update table header count
+    const tableHeaderTotal = document.getElementById('tableHeaderTotal');
+    const tableHeaderLabel = document.getElementById('tableHeaderLabel');
+    if (tableHeaderTotal) {
+        tableHeaderTotal.textContent = stats.total || 0;
+    }
+    if (tableHeaderLabel) {
+        const searchInput = document.getElementById('search');
+        const searchQuery = searchInput ? searchInput.value.trim() : '';
+        if (searchQuery) {
+            tableHeaderLabel.textContent = `result${(stats.total === 1) ? '' : 's'} for "${searchQuery}"`;
+        } else {
+            tableHeaderLabel.textContent = `participant${(stats.total === 1) ? '' : 's'}`;
+        }
+    }
+}
+
+function updatePagination(pagination) {
+    const container = document.getElementById('paginationContainer');
+    
+    if (pagination.total_pages <= 1) {
+        container.innerHTML = '';
+        return;
+    }
+    
+    let html = '<nav aria-label="Participant pagination"><ul class="pagination justify-content-center mb-0">';
+    
+    // Previous button
+    html += `<li class="page-item ${!pagination.has_prev ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="if(${pagination.has_prev}) { applyFilters(${pagination.prev_page}); return false; }" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+             </li>`;
+    
+    // Page numbers (show max 5 pages)
+    const startPage = Math.max(1, pagination.page - 2);
+    const endPage = Math.min(pagination.total_pages, pagination.page + 2);
+    
+    for (let i = startPage; i <= endPage; i++) {
+        html += `<li class="page-item ${i === pagination.page ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="applyFilters(${i}); return false;">${i}</a>
+                 </li>`;
+    }
+    
+    // Next button
+    html += `<li class="page-item ${!pagination.has_next ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="if(${pagination.has_next}) { applyFilters(${pagination.next_page}); return false; }" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+             </li>`;
+    
+    html += '</ul></nav>';
+    container.innerHTML = html;
+}
+
+function attachDeleteListeners() {
+    const deleteButtons = document.querySelectorAll('.delete-participant-btn');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const participantId = this.getAttribute('data-participant-id');
+            const participantNom = this.getAttribute('data-participant-name');
+            
+            if (confirm(`Are you sure you want to delete participant "${participantNom}"?\n\nThis action cannot be undone. The participant can only be deleted if they have no survey history.`)) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/business/participants/${participantId}/delete`;
+                
+                const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                if (csrfToken) {
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = 'csrf_token';
+                    csrfInput.value = csrfToken.getAttribute('content');
+                    form.appendChild(csrfInput);
+                }
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    });
+}
+
+// Intercept filter form submission
+document.addEventListener('DOMContentLoaded', function() {
+    // Define search elements and helper function FIRST
+    const searchInput = document.getElementById('search');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    
+    function updateClearButtonVisibility() {
+        if (searchInput && clearSearchBtn) {
+            if (searchInput.value.trim()) {
+                clearSearchBtn.style.display = 'inline-block';
+            } else {
+                clearSearchBtn.style.display = 'none';
+            }
+        }
+    }
+    
+    // Initialize pagination on page load with server-provided data
+    const initialPagination = {
+        page: {{ pagination.page }},
+        per_page: {{ pagination.per_page }},
+        total: {{ pagination.total }},
+        total_pages: {{ pagination.total_pages }},
+        has_prev: {{ 'true' if pagination.has_prev else 'false' }},
+        has_next: {{ 'true' if pagination.has_next else 'false' }},
+        prev_page: {{ pagination.prev_page if pagination.prev_page else 'null' }},
+        next_page: {{ pagination.next_page if pagination.next_page else 'null' }}
+    };
+    updatePagination(initialPagination);
+    
+    const filterForm = document.getElementById('filterForm');
+    if (filterForm) {
+        filterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            applyFilters(1); // Reset to page 1 on new filter
+        });
+    }
+    
+    // Clear filters button - clears BOTH filters and search
+    const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+    if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Reset all filter selects
+            $('.filter-select').val(null).trigger('change');
+            // ALSO clear search input
+            if (searchInput) {
+                searchInput.value = '';
+                updateClearButtonVisibility();
+            }
+            // Apply filters (everything will be empty)
+            applyFilters(1);
+        });
+    }
+    
+    // Intercept search form submission to use AJAX instead
+    const searchForm = document.querySelector('.search-form');
+    if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            applyFilters(1); // Apply current filters with new search
+        });
+    }
+    
+    if (searchInput) {
+        // Update button visibility on input change
+        searchInput.addEventListener('input', updateClearButtonVisibility);
+        
+        // Initial check on page load
+        updateClearButtonVisibility();
+    }
+    
+    if (clearSearchBtn) {
+        clearSearchBtn.addEventListener('click', function() {
+            if (searchInput) {
+                searchInput.value = '';
+                updateClearButtonVisibility();
+                applyFilters(1); // Trigger filter refresh with empty search
+            }
+        });
+    }
+    
+    // Chevron rotation on collapse
+    const filterCollapse = document.getElementById('filterCollapse');
+    const filterChevron = document.getElementById('filterChevron');
+    if (filterCollapse && filterChevron) {
+        filterCollapse.addEventListener('show.bs.collapse', function () {
+            filterChevron.style.transform = 'rotate(0deg)';
+        });
+        filterCollapse.addEventListener('hide.bs.collapse', function () {
+            filterChevron.style.transform = 'rotate(-90deg)';
+        });
+    }
+});
+
+const MAX_SELECTION = 50;
+let selectedParticipants = new Set();
+
+// Initialize delete listeners on page load
+document.addEventListener('DOMContentLoaded', function() {
+    attachDeleteListeners();
+});
+
+// Bulk edit functions
+function toggleSelectAll(checkbox) {
+    const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+    const isChecked = checkbox.checked;
+    
+    rowCheckboxes.forEach(cb => {
+        // Check if we're at max and trying to check more
+        if (isChecked && selectedParticipants.size >= MAX_SELECTION) {
+            checkbox.checked = false;
+            alert(`Selection limit reached. You can select up to ${MAX_SELECTION} participants at a time.`);
+            return;
+        }
+        cb.checked = isChecked;
+    });
+    
+    updateSelection();
+}
+
+function updateSelection() {
+    selectedParticipants.clear();
+    const rowCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+    
+    rowCheckboxes.forEach(cb => {
+        selectedParticipants.add(cb.getAttribute('data-participant-id'));
+    });
+    
+    const count = selectedParticipants.size;
+    const toolbar = document.getElementById('bulkToolbar');
+    const countEl = document.getElementById('selectionCount');
+    const limitWarning = document.getElementById('limitWarning');
+    const selectAllCheckbox = document.getElementById('selectAll');
+    
+    if (count > 0) {
+        toolbar.classList.add('active');
+        countEl.textContent = `${count} selected`;
+        
+        // Show warning if at limit
+        if (count >= MAX_SELECTION) {
+            limitWarning.classList.add('active');
+            // Disable unchecked checkboxes
+            document.querySelectorAll('.row-checkbox:not(:checked)').forEach(cb => {
+                cb.disabled = true;
+            });
+        } else {
+            limitWarning.classList.remove('active');
+            // Re-enable all checkboxes
+            document.querySelectorAll('.row-checkbox').forEach(cb => {
+                cb.disabled = false;
+            });
+        }
+    } else {
+        toolbar.classList.remove('active');
+        limitWarning.classList.remove('active');
+        selectAllCheckbox.checked = false;
+        // Re-enable all checkboxes
+        document.querySelectorAll('.row-checkbox').forEach(cb => {
+            cb.disabled = false;
+        });
+    }
+}
+
+function clearSelection() {
+    document.querySelectorAll('.row-checkbox').forEach(cb => {
+        cb.checked = false;
+        cb.disabled = false;
+    });
+    document.getElementById('selectAll').checked = false;
+    updateSelection();
+}
+
+function openBulkEditModal() {
+    if (selectedParticipants.size === 0) {
+        alert('Please select participants first.');
+        return;
+    }
+    
+    // Reset form
+    document.getElementById('bulkEditForm').reset();
+    document.querySelectorAll('.form-control, .form-select').forEach(input => {
+        input.disabled = true;
+    });
+    document.querySelectorAll('.form-check-input').forEach(cb => {
+        cb.checked = false;
+    });
+    document.getElementById('confirmationAlert').style.display = 'none';
+    document.getElementById('applyBtn').disabled = true;
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('bulkEditModal'));
+    modal.show();
+}
+
+function toggleField(fieldNom) {
+    // Map field names to checkbox IDs
+    const checkboxMap = {
+        'role': 'updateRôle',
+        'region': 'updateRégion',
+        'customer_tier': 'updateCustomerTier',
+        'language': 'updateLanguage',
+        'tenure_years': 'updateTenure',
+        'company_commercial_value': 'updateCommercialValue'
+    };
+    
+    const checkbox = document.getElementById(checkboxMap[fieldNom]);
+    const input = document.getElementById(fieldNom);
+    input.disabled = !checkbox.checked;
+    
+    // Check if any field is selected
+    const anySelected = Array.from(document.querySelectorAll('.form-check-input'))
+        .some(cb => cb.checked && cb.id !== 'selectAll');
+    
+    document.getElementById('applyBtn').disabled = !anySelected;
+    
+    // Show confirmation if fields selected
+    if (anySelected) {
+        updateConfirmation();
+    } else {
+        document.getElementById('confirmationAlert').style.display = 'none';
+    }
+}
+
+function updateConfirmation() {
+    const updates = {};
+    
+    if (document.getElementById('updateRôle').checked) {
+        const value = document.getElementById('role').value;
+        if (value) updates.role = value;
+    }
+    if (document.getElementById('updateRégion').checked) {
+        const value = document.getElementById('region').value;
+        if (value) updates.region = value;
+    }
+    if (document.getElementById('updateCustomerTier').checked) {
+        const value = document.getElementById('customer_tier').value;
+        if (value) updates.customer_tier = value;
+    }
+    if (document.getElementById('updateLanguage').checked) {
+        const value = document.getElementById('language').value;
+        if (value) updates.language = value;
+    }
+    if (document.getElementById('updateTenure').checked) {
+        const value = document.getElementById('tenure_years').value;
+        if (value) updates.tenure_years = parseFloat(value);
+    }
+    if (document.getElementById('updateCommercialValue').checked) {
+        const value = document.getElementById('company_commercial_value').value;
+        if (value) updates.company_commercial_value = parseFloat(value);
+    }
+    
+    if (Object.keys(updates).length > 0) {
+        const changesList = document.getElementById('changesList');
+        changesList.innerHTML = '';
+        
+        for (const [field, value] of Object.entries(updates)) {
+            const li = document.createElement('li');
+            li.textContent = `${field.replace('_', ' ')}: ${value}`;
+            changesList.appendChild(li);
+        }
+        
+        document.getElementById('skipCount').textContent = 
+            `These changes will apply to ${selectedParticipants.size} participant(s). Some may be skipped if they have restrictions.`;
+        document.getElementById('confirmationAlert').style.display = 'block';
+    }
+}
+
+// Listen for input changes to update confirmation
+document.addEventListener('DOMContentLoaded', function() {
+    const inputs = document.querySelectorAll('#bulkEditForm input, #bulkEditForm select');
+    inputs.forEach(input => {
+        input.addEventListener('input', updateConfirmation);
+        input.addEventListener('change', updateConfirmation);
+    });
+});
+
+function submitBulkEdit() {
+    const updates = {};
+    
+    if (document.getElementById('updateRôle').checked) {
+        const value = document.getElementById('role').value;
+        if (value) updates.role = value;
+    }
+    if (document.getElementById('updateRégion').checked) {
+        const value = document.getElementById('region').value;
+        if (value) updates.region = value;
+    }
+    if (document.getElementById('updateCustomerTier').checked) {
+        const value = document.getElementById('customer_tier').value;
+        if (value) updates.customer_tier = value;
+    }
+    if (document.getElementById('updateLanguage').checked) {
+        const value = document.getElementById('language').value;
+        if (value) updates.language = value;
+    }
+    if (document.getElementById('updateTenure').checked) {
+        const value = document.getElementById('tenure_years').value;
+        if (value) updates.tenure_years = parseFloat(value);
+    }
+    if (document.getElementById('updateCommercialValue').checked) {
+        const value = document.getElementById('company_commercial_value').value;
+        if (value) updates.company_commercial_value = parseFloat(value);
+    }
+    
+    if (Object.keys(updates).length === 0) {
+        alert('Please select at least one field to update.');
+        return;
+    }
+    
+    // Disable submit button and show loading
+    const applyBtn = document.getElementById('applyBtn');
+    applyBtn.disabled = true;
+    applyBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Applying...';
+    
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    
+    // Send bulk edit request
+    fetch('/business/participants/bulk-edit', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            participant_ids: Array.from(selectedParticipants),
+            updates: updates
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Fermer modal
+            bootstrap.Modal.getInstance(document.getElementById('bulkEditModal')).hide();
+            
+            // Show success message
+            let message = `Successfully updated ${data.updated} participant(s).`;
+            if (data.skipped > 0) {
+                message += `\n${data.skipped} participant(s) were skipped due to restrictions.`;
+                
+                if (data.skipped_participants && data.skipped_participants.length > 0) {
+                    message += '\n\nSkipped:';
+                    data.skipped_participants.forEach(p => {
+                        message += `\n• ${p.name}: ${p.reason}`;
+                    });
+                }
+            }
+            alert(message);
+            
+            // Reload page to show updated data
+            window.location.reload();
+        } else {
+            alert(`Error: ${data.error}\n${data.message || data.details || ''}`);
+            applyBtn.disabled = false;
+            applyBtn.innerHTML = '<i class="fas fa-check me-1"></i>Apply Changes';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert(`An error occurred while updating participants.\nDetails: ${error.message}`);
+        applyBtn.disabled = false;
+        applyBtn.innerHTML = '<i class="fas fa-check me-1"></i>Apply Changes';
+    });
+}
+</script>
+{% endblock %}

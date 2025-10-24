@@ -20,7 +20,7 @@
                 <i class="fas fa-user-plus me-2" aria-hidden="true"></i>
                 Add New Participant
             </h1>
-            <p>Ajouter un nouveau participant à {{ business_account.name }}</p>
+            <p>{{ _('Add a new participant to {{ business_account.name }}') }}</p>
         </div>
     </div>
 
@@ -38,7 +38,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="participant-form-group">
-                        <label class="participant-form-label" for="email">Adresse e-mail *</label>
+                        <label class="participant-form-label" for="email">{{ _('Email Address *') }}</label>
                         <input type="email" 
                                class="participant-form-control" 
                                id="email" 
@@ -47,7 +47,7 @@
                                required
                                aria-required="true"
                                aria-describedby="email_help">
-                        <div class="participant-help-text" id="email_help">Adresse e-mail du participant pour l'invitation à l'enquête</div>
+                        <div class="participant-help-text" id="email_help">{{ _('Participant\'s email address for survey invitation') }}</div>
                     </div>
                 </div>
             </div>
@@ -55,7 +55,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="participant-form-group">
-                        <label class="participant-form-label" for="name">Nom complet *</label>
+                        <label class="participant-form-label" for="name">{{ _('Full Name *') }}</label>
                         <input type="text" 
                                class="participant-form-control" 
                                id="name" 
@@ -64,13 +64,13 @@
                                required
                                aria-required="true"
                                aria-describedby="name_help">
-                        <div class="participant-help-text" id="name_help">Nom complet du participant</div>
+                        <div class="participant-help-text" id="name_help">{{ _('Participant\'s full name') }}</div>
                     </div>
                 </div>
                 
                 <div class="col-md-6">
                     <div class="participant-form-group">
-                        <label class="participant-form-label" for="company_name">Nom de l'entreprise *</label>
+                        <label class="participant-form-label" for="company_name">{{ _('Company Name *') }}</label>
                         <input type="text" 
                                class="participant-form-control" 
                                id="company_name" 
@@ -79,56 +79,56 @@
                                required
                                aria-required="true"
                                aria-describedby="company_name_help">
-                        <div class="participant-help-text" id="company_name_help">Entreprise ou organisation du participant</div>
+                        <div class="participant-help-text" id="company_name_help">{{ _('Participant\'s company or organization') }}</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Segmentation Attributes (Optionnel) -->
+        <!-- Segmentation Attributes ({{ _('Optional') }}) -->
         <div class="participant-config-form-section">
             <h3 class="participant-section-title">
                 <i class="fas fa-tags" aria-hidden="true"></i>
                 Segmentation Attributes
-                <span class="badge bg-secondary ms-2">Optionnel</span>
+                <span class="badge bg-secondary ms-2">{{ _('Optional') }}</span>
             </h3>
-            <p class="participant-help-text mb-3">Ajoutez des données de segmentation pour des enquêtes personnalisées et une analytique avancée</p>
+            <p class="participant-help-text mb-3">{{ _('Add segmentation data for personalized surveys and advanced analytics') }}</p>
             
             <div class="row">
                 <div class="col-md-6">
                     <div class="participant-form-group">
-                        <label class="participant-form-label" for="role">Rôle</label>
+                        <label class="participant-form-label" for="role">{{ _('Role') }}</label>
                         <select class="participant-form-control" 
                                 id="role" 
                                 name="role"
                                 aria-describedby="role_help">
-                            <option value="">Sélectionnez un rôle (optionnel)</option>
-                            <option value="C-Level">Cadre dirigeant (C-Level)</option>
-                            <option value="VP">VP / Directeur</option>
-                            <option value="Gestionnaire">Gestionnaire</option>
-                            <option value="Chef d'équipe">Chef d'équipe</option>
-                            <option value="Utilisateur final">Utilisateur final</option>
-                            <option value="Autre">Autre</option>
+                            <option value="">{{ _('Select role (optional)') }}</option>
+                            <option value="C-Level">{{ _('C-Level Executive') }}</option>
+                            <option value="VP">{{ _('VP / Director') }}</option>
+                            <option value="{{ _('Manager') }}">{{ _('Manager') }}</option>
+                            <option value="{{ _('Team Lead') }}">{{ _('Team Lead') }}</option>
+                            <option value="{{ _('End User') }}">{{ _('End User') }}</option>
+                            <option value="{{ _('Other') }}">{{ _('Other') }}</option>
                         </select>
-                        <div class="participant-help-text" id="role_help">Rôle du participant pour la personnalisation de l'enquête selon le rôle</div>
+                        <div class="participant-help-text" id="role_help">{{ _('Participant\'s role for role-based survey personalization') }}</div>
                     </div>
                 </div>
                 
                 <div class="col-md-6">
                     <div class="participant-form-group">
-                        <label class="participant-form-label" for="region">Région</label>
+                        <label class="participant-form-label" for="region">{{ _('Region') }}</label>
                         <select class="participant-form-control" 
                                 id="region" 
                                 name="region"
                                 aria-describedby="region_help">
-                            <option value="">Sélectionnez une région (optionnel)</option>
-                            <option value="Amérique du Nord">Amérique du Nord</option>
-                            <option value="LATAM">Amérique latine (LATAM)</option>
-                            <option value="EMEA">Europe, Moyen-Orient et Afrique (EMEA)</option>
-                            <option value="APAC">Asie-Pacifique (APAC)</option>
-                            <option value="Autre">Autre</option>
+                            <option value="">{{ _('Select region (optional)') }}</option>
+                            <option value="{{ _('North America') }}">{{ _('North America') }}</option>
+                            <option value="LATAM">{{ _('Latin America (LATAM)') }}</option>
+                            <option value="EMEA">{{ _('Europe, Middle East & Africa (EMEA)') }}</option>
+                            <option value="APAC">{{ _('Asia Pacific (APAC)') }}</option>
+                            <option value="{{ _('Other') }}">{{ _('Other') }}</option>
                         </select>
-                        <div class="participant-help-text" id="region_help">Région géographique pour des analyses régionales</div>
+                        <div class="participant-help-text" id="region_help">{{ _('Geographic region for regional insights') }}</div>
                     </div>
                 </div>
             </div>
@@ -136,23 +136,23 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="participant-form-group">
-                        <label class="participant-form-label" for="customer_tier">Catégorie de client</label>
+                        <label class="participant-form-label" for="customer_tier">{{ _('Customer Tier') }}</label>
                         <select class="participant-form-control" 
                                 id="customer_tier" 
                                 name="customer_tier"
                                 aria-describedby="customer_tier_help">
-                            <option value="">Sélectionnez une catégorie (optionnel)</option>
-                            <option value="T1 : Stratégique (5–10 % des meilleurs clients)">T1 : Stratégique (5–10 % des meilleurs clients)</option>
-                            <option value="T2 : Gérés (majorité des clients payants)">T2 : Gérés (majorité des clients payants)</option>
-                            <option value="T3 : Libre-service ou petit client">T3 : Libre-service ou petit client</option>
+                            <option value="">{{ _('Select tier (optional)') }}</option>
+                            <option value="{{ _('T1: Strategic (Top 5–10% clients)') }}">{{ _('T1: Strategic (Top 5–10% clients)') }}</option>
+                            <option value="{{ _('T2: Managed (bulk of paying clients)') }}">{{ _('T2: Managed (bulk of paying clients)') }}</option>
+                            <option value="{{ _('T3: Self-serve or small') }}">{{ _('T3: Self-serve or small') }}</option>
                         </select>
-                        <div class="participant-help-text" id="customer_tier_help">Segment client pour l'analyse par catégorie</div>
+                        <div class="participant-help-text" id="customer_tier_help">{{ _('Customer segment for tier-based analysis') }}</div>
                     </div>
                 </div>
                 
                 <div class="col-md-6">
                     <div class="participant-form-group">
-                        <label class="participant-form-label" for="language">Langue préférée</label>
+                        <label class="participant-form-label" for="language">{{ _('Preferred Language') }}</label>
                         <select class="participant-form-control" 
                                 id="language" 
                                 name="language"
@@ -164,9 +164,9 @@
                             <option value="pt">Portuguese</option>
                             <option value="zh">Chinese</option>
                             <option value="ja">Japanese</option>
-                            <option value="other">Autre</option>
+                            <option value="other">{{ _('Other') }}</option>
                         </select>
-                        <div class="participant-help-text" id="language_help">Langue principale pour la prise en charge multilingue future</div>
+                        <div class="participant-help-text" id="language_help">{{ _('Primary language for future multilingual support') }}</div>
                     </div>
                 </div>
             </div>
@@ -175,7 +175,7 @@
                 <div class="col-md-6">
                     <div class="participant-form-group">
                         <label class="participant-form-label" for="tenure_years">
-                            Ancienneté (années)
+                            {{ _('Tenure (Years)') }}
                         </label>
                         <input type="number" 
                                class="participant-form-control" 
@@ -187,7 +187,7 @@
                                placeholder="e.g., 2.5"
                                aria-describedby="tenure_years_help">
                         <div class="participant-help-text" id="tenure_years_help">
-                            Nombre d'années d'utilisation de votre produit/service par le participant (optionnel)
+                            {{ _('Years the participant has been using your product/service (optional)') }}
                         </div>
                     </div>
                 </div>
@@ -195,8 +195,8 @@
                 <div class="col-md-6">
                     <div class="participant-form-group">
                         <label class="participant-form-label" for="company_commercial_value">
-                            Valeur commerciale de l'entreprise
-                            <i class="fas fa-info-circle ms-1" aria-hidden="true" title="Cette valeur s'applique à tous les participants de cette entreprise"></i>
+                            {{ _('Company Commercial Value') }}
+                            <i class="fas fa-info-circle ms-1" aria-hidden="true" title="{{ _('This value applies to all participants from this company') }}"></i>
                         </label>
                         <input type="number" 
                                class="participant-form-control" 
@@ -207,7 +207,7 @@
                                placeholder="e.g., 250000"
                                aria-describedby="company_commercial_value_help">
                         <div class="participant-help-text" id="company_commercial_value_help">
-                            Valeur estimée du compte en USD. Cette valeur sera synchronisée pour tous les participants de la même entreprise dans votre compte.
+                            {{ _('Estimated account value in USD. This will be synced across all participants from the same company in your account.') }}
                         </div>
                     </div>
                 </div>
@@ -220,7 +220,7 @@
                 <div class="participant-actions-left">
                     <a href="{{ url_for('participants.list_participants') }}" 
                        class="participant-btn-cancel"
-                       aria-label="Annuler et revenir à la liste des participants">
+                       aria-label="{{ _('Cancel and return to participants list') }}">
                         <i class="fas fa-arrow-left" aria-hidden="true"></i>
                         Cancel
                     </a>
@@ -228,7 +228,7 @@
                 <div class="participant-actions-right">
                     <button type="submit" 
                             class="participant-btn-save"
-                            aria-label="Créer un participant">
+                            aria-label="{{ _('Create participant') }}">
                         <i class="fas fa-plus" aria-hidden="true"></i>
                         Create Participant
                     </button>
@@ -249,24 +249,24 @@
                 <div class="participant-step-icon">
                     <i class="fas fa-user-plus" aria-hidden="true"></i>
                 </div>
-                <h4 class="participant-step-title">1. Créer</h4>
-                <p class="participant-step-description">Ajoutez les informations du participant à votre compte</p>
+                <h4 class="participant-step-title">{{ _('1. Create') }}</h4>
+                <p class="participant-step-description">{{ _('Add participant details to your account') }}</p>
             </div>
             
             <div class="participant-info-step">
                 <div class="participant-step-icon">
                     <i class="fas fa-link" aria-hidden="true"></i>
                 </div>
-                <h4 class="participant-step-title">2. Générer un jeton</h4>
-                <p class="participant-step-description">Jeton unique pour l'accès à l'enquête et l'anonymisation</p>
+                <h4 class="participant-step-title">{{ _('2. Generate Token') }}</h4>
+                <p class="participant-step-description">{{ _('Unique token for survey access and anonymization') }}</p>
             </div>
             
             <div class="participant-info-step">
                 <div class="participant-step-icon">
                     <i class="fas fa-users" aria-hidden="true"></i>
                 </div>
-                <h4 class="participant-step-title">3. Assigner à une campagne</h4>
-                <p class="participant-step-description">Ajoutez le participant aux campagnes actives</p>
+                <h4 class="participant-step-title">{{ _('3. Assign to Campaign') }}</h4>
+                <p class="participant-step-description">{{ _('Add participant to active campaigns') }}</p>
             </div>
         </div>
     </div>

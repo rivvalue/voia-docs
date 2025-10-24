@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Centre d'analytique d'entreprise - VOÏA{% endblock %}
+{% block title %}{{ _('Business Analytics Hub') }} - VOÏA{% endblock %}
 
 {% block page_class %}page-business-analytics-hub{% endblock %}
 
@@ -306,7 +306,7 @@
                             <i class="fas fa-crown"></i>
                         </div>
                         <div>
-                            <h2 class="mb-1" style="color: var(--primary-white);">Centre d'analytique d'entreprise</h2>
+                            <h2 class="mb-1" style="color: var(--primary-white);">{{ _('Business Analytics Hub') }}</h2>
                             <p class="mb-0" style="color: var(--primary-white); opacity: 0.9;">System-wide overview and management for {{ current_user.get_full_name() }}</p>
                         </div>
                     </div>
@@ -402,7 +402,7 @@
                         </div>
                         <div class="col-6">
                             <h4 class="metric-number text-info">{{ dashboard_data.detailed_metrics.user_engagement.avg_users_per_account }}</h4>
-                            <p class="metric-label">Moyenne/Compte</p>
+                            <p class="metric-label">{{ _('Avg/Account') }}</p>
                         </div>
                     </div>
                     <div class="mt-3">
@@ -418,7 +418,7 @@
                 <div class="platform-section">
                     <div class="section-header">
                         <h3 class="section-title">
-                            <i class="fas fa-chart-pie me-2"></i>Campaign Statut Distribution
+                            <i class="fas fa-chart-pie me-2"></i>Campaign {{ _('Status') }} Distribution
                         </h3>
                     </div>
                     <div class="row text-center">
@@ -455,11 +455,11 @@
                     </div>
                     <div class="text-center">
                         <h3 class="metric-number text-info">{{ dashboard_data.detailed_metrics.participant_intelligence.total_participants }}</h3>
-                        <p class="metric-label">Nombre total de participants</p>
+                        <p class="metric-label">{{ _('Total Participants') }}</p>
                         <div class="row mt-3">
                             <div class="col-6">
                                 <h5 class="metric-number">{{ dashboard_data.detailed_metrics.participant_intelligence.avg_participants_per_account }}</h5>
-                                <small>Moyenne/Compte</small>
+                                <small>{{ _('Avg/Account') }}</small>
                             </div>
                             <div class="col-6">
                                 <h5 class="metric-number">{{ dashboard_data.detailed_metrics.participant_intelligence.avg_participants_per_campaign }}</h5>
@@ -479,7 +479,7 @@
                     </div>
                     <div class="text-center">
                         <h3 class="metric-number text-success">{{ dashboard_data.detailed_metrics.survey_analytics.completion_rate }}%</h3>
-                        <p class="metric-label">Taux de complétion</p>
+                        <p class="metric-label">{{ _('Completion Rate') }}</p>
                         <div class="row mt-3">
                             <div class="col-6">
                                 <h5 class="metric-number">{{ dashboard_data.detailed_metrics.survey_analytics.total_responses }}</h5>
@@ -503,7 +503,7 @@
                     </div>
                     <div class="text-center">
                         <h3 class="metric-number text-warning">{{ dashboard_data.detailed_metrics.license_utilization.total_licensed_accounts }}</h3>
-                        <p class="metric-label">Comptes sous licence</p>
+                        <p class="metric-label">{{ _('Licensed Accounts') }}</p>
                         <div class="mt-3">
                             <div class="row">
                                 {% for license_type, count in dashboard_data.detailed_metrics.license_utilization.accounts_by_license_type.items() %}
@@ -544,7 +544,7 @@
                             </div>
                         </div>
                         <div class="usage-indicator">
-                            <span class="badge bg-primary">Meilleur performeur</span>
+                            <span class="badge bg-primary">{{ _('Top Performer') }}</span>
                         </div>
                     </div>
                 </div>
@@ -590,8 +590,8 @@
             {% else %}
                 <div class="empty-state">
                     <i class="fas fa-building"></i>
-                    <h4>Aucun compte récent</h4>
-                    <p>Les nouvelles inscriptions de comptes entreprise apparaîtront ici.</p>
+                    <h4>{{ _('No recent accounts') }}</h4>
+                    <p>{{ _('New business account registrations will appear here.') }}</p>
                 </div>
             {% endif %}
         </div>
@@ -619,7 +619,7 @@
                 </div>
                 <div class="d-flex align-items-center gap-3">
                     <div class="usage-indicator">
-                        <span>Utilisateurs :</span>
+                        <span>{{ _('Users:') }}</span>
                         <div class="usage-bar">
                             <div class="usage-fill {{ 'high' if item.users_usage > 90 else 'medium' if item.users_usage > 80 else 'low' }}" 
                                  style="width: {{ item.users_usage|min(100) }}%"></div>
@@ -627,7 +627,7 @@
                         <span class="text-muted">{{ "%.0f"|format(item.users_usage) }}%</span>
                     </div>
                     <div class="usage-indicator">
-                        <span>Campagnes :</span>
+                        <span>{{ _('Campaigns:') }}</span>
                         <div class="usage-bar">
                             <div class="usage-fill {{ 'high' if item.campaigns_usage > 90 else 'medium' if item.campaigns_usage > 80 else 'low' }}" 
                                  style="width: {{ item.campaigns_usage|min(100) }}%"></div>
@@ -689,10 +689,10 @@
                                     <thead>
                                         <tr>
                                             <th>Nom</th>
-                                            <th>E-mail</th>
-                                            <th>Rôle</th>
-                                            <th>Statut</th>
-                                            <th>Dernière connexion</th>
+                                            <th>{{ _('Email') }}</th>
+                                            <th>{{ _('Role') }}</th>
+                                            <th>{{ _('Status') }}</th>
+                                            <th>{{ _('Last Login') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -727,7 +727,7 @@
                             {% else %}
                             <div class="text-center text-muted py-3">
                                 <i class="fas fa-user-slash" aria-hidden="true"></i>
-                                <p class="mb-0">Aucun utilisateur dans ce compte</p>
+                                <p class="mb-0">{{ _('No users in this account') }}</p>
                             </div>
                             {% endif %}
                         </div>
