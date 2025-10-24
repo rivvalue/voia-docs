@@ -50,43 +50,43 @@
         <nav class="sidebar-nav">
             <div class="sidebar-nav-item has-submenu" data-page="dashboard" id="biSubmenuToggle">
                 <i class="fas fa-chart-line"></i>
-                <span>Intelligence d'affaires</span>
+                <span>{{ _('Business Intelligence') }}</span>
                 <i class="fas fa-chevron-down submenu-toggle"></i>
             </div>
             <div class="sidebar-submenu" id="biSubmenu">
                 <a href="{{ url_for('dashboard') }}" class="sidebar-submenu-item" data-page="dashboard-overview">
-                    <span>Vue d'ensemble</span>
+                    <span>{{ _('Overview') }}</span>
                 </a>
                 <a href="{{ url_for('executive_summary') }}" class="sidebar-submenu-item" data-page="executive-summary">
-                    <span>Résumé exécutif</span>
+                    <span>{{ _('Executive Summary') }}</span>
                 </a>
                 <a href="{{ url_for('campaign_insights') }}" class="sidebar-submenu-item" data-page="campaign-insights">
-                    <span>Analyses de campagne</span>
+                    <span>{{ _('Campaign Insights') }}</span>
                 </a>
             </div>
             <a href="{{ url_for('campaigns.list_campaigns') }}" class="sidebar-nav-item" data-page="campaigns">
                 <i class="fas fa-bullhorn"></i>
-                <span>Campagnes</span>
+                <span>{{ _('Campaigns') }}</span>
             </a>
             <a href="{{ url_for('participants.list_participants') }}" class="sidebar-nav-item" data-page="participants">
                 <i class="fas fa-users"></i>
-                <span>Participants</span>
+                <span>{{ _('Participants') }}</span>
             </a>
             <a href="{{ url_for('business_auth.admin_panel') }}" class="sidebar-nav-item" data-page="admin">
                 <i class="fas fa-cog"></i>
-                <span>Paramètres</span>
+                <span>{{ _('Settings') }}</span>
             </a>
         </nav>
         <div class="sidebar-footer">
             <a href="{{ url_for('business_auth.logout') }}" class="sidebar-nav-item">
                 <i class="fas fa-sign-out-alt"></i>
-                <span>Déconnexion</span>
+                <span>{{ _('Logout') }}</span>
             </a>
         </div>
     </div>
     
     <!-- Mobile Toggle Button (v2 UI only) -->
-    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Basculer la barre latérale">
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="{{ _('Toggle sidebar') }}">
         <i class="fas fa-bars"></i>
     </button>
     
@@ -108,7 +108,7 @@
             {% if not is_business_authenticated %}
             <div class="d-flex justify-content-center flex-grow-1" style="max-width: 60%;">
                 <a class="navbar-brand text-nowrap navbar-welcome-text" href="{{ url_for('index') }}">
-                    Bienvenue sur VO<span style="color: #E13A44;">Ï</span>A Demo
+                    {{ _('Welcome to VO') }}<span style="color: #E13A44;">Ï</span>{{ _('A Demo') }}
                 </a>
             </div>
             {% endif %}

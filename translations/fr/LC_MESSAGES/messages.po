@@ -2906,3 +2906,58 @@ msgstr "{business_account_name} sollicite votre précieux retour d'expérience v
 
 msgid "← Return to VOÏA Home"
 msgstr "← Retour à l'accueil VOÏA"
+
+msgid "Get Started Today"
+msgstr "Commencez aujourd'hui"
+
+msgid "VOÏA - Experience Demo"
+msgstr "VOÏA - Démonstration"
+
+msgid "VOÏA demo home page"
+msgstr "Page d'accueil de la démonstration VOÏA"
+
+msgid "Demo features"
+msgstr "Fonctionnalités de la démonstration"
+
+msgid "Start demo - Join a live campaign"
+msgstr "Commencer la démonstration - Rejoindre une campagne en direct"
+
+msgid "See AI Insights"
+msgstr "Voir les analyses IA"
+
+msgid "View pricing plans"
+msgstr "Voir les plans tarifaires"
+
+
+msgid "Welcome to VO"
+msgstr "Bienvenue sur VO"
+
+msgid "A Demo"
+msgstr "A Demo"
+
+msgid "Business Intelligence"
+msgstr "Intelligence d'affaires"
+
+msgid "Overview"
+msgstr "Vue d'ensemble"
+
+msgid "Executive Summary"
+msgstr "Résumé exécutif"
+
+msgid "Campaign Insights"
+msgstr "Analyses de campagne"
+
+msgid "Campaigns"
+msgstr "Campagnes"
+
+msgid "Participants"
+msgstr "Participants"
+
+msgid "Settings"
+msgstr "Paramètres"
+
+msgid "Logout"
+msgstr "Déconnexion"
+
+msgid "Toggle sidebar"
+msgstr "Basculer la barre latérale"
