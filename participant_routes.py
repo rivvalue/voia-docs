@@ -486,6 +486,9 @@ def edit_participant(participant_id):
                                  business_account=current_account.to_dict() if current_account else {})
         
         # Handle form submission (POST)
+        # DEBUG: Log form data
+        logger.info(f"Edit participant form data: {dict(request.form)}")
+        
         # Extract form data
         email = request.form.get('email', '').strip().lower()
         name = request.form.get('name', '').strip()
