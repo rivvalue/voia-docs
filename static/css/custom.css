@@ -462,6 +462,64 @@ p, .text-body {
     box-shadow: none;
 }
 
+/* VOÏA V2 Branded Buttons - Red Gradient */
+.btn-voia-primary {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    border: 2px solid var(--primary-red);
+    color: var(--primary-white) !important;
+    font-weight: 600;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+}
+
+.btn-voia-primary:hover:not(:disabled), 
+.btn-voia-primary:focus:not(:disabled) {
+    background: linear-gradient(135deg, var(--red-hover) 0%, var(--primary-red) 100%);
+    border-color: var(--red-hover);
+    color: var(--primary-white) !important;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-voia-primary:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-voia-primary:disabled {
+    background: linear-gradient(135deg, var(--medium-gray) 0%, var(--gray-dark) 100%);
+    border-color: var(--medium-gray);
+    color: var(--primary-white) !important;
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Bulk Edit Button - Prominent Red Gradient */
+.btn-bulk-edit {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    border: 2px solid var(--primary-red);
+    color: var(--primary-white) !important;
+    font-weight: 700;
+    box-shadow: var(--shadow-lg);
+    transition: all 0.3s ease;
+}
+
+.btn-bulk-edit:hover, 
+.btn-bulk-edit:focus {
+    background: linear-gradient(135deg, var(--red-hover) 0%, var(--primary-red) 100%);
+    border-color: var(--red-hover);
+    color: var(--primary-white) !important;
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: var(--shadow-xl);
+}
+
+.btn-bulk-edit:active {
+    transform: translateY(0) scale(1);
+    box-shadow: var(--shadow-md);
+}
+
 /* Card styling - Standardized Pattern */
 .card {
     background-color: var(--primary-white);
