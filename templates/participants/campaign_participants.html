@@ -41,232 +41,231 @@
         </div>
     </div>
 
-    <!-- Filter Available Participants -->
-    {% if campaign.status in ['draft', 'ready'] and available_participants %}
-    <div class="campaign-participants-section">
-        <div class="filter-panel-header" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="true" aria-controls="filterCollapse" role="button">
-            <h5 class="filter-panel-title">
-                <i class="fas fa-filter me-2" aria-hidden="true"></i>Filter Available Participants
-                <i class="fas fa-chevron-down ms-2 filter-panel-chevron" aria-hidden="true"></i>
-            </h5>
-        </div>
-        <div class="collapse show" id="filterCollapse">
-            <form method="GET" action="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" id="filterForm" aria-label="Filter participants form">
-                <div class="row g-3 mb-3">
-                    <!-- Company Filter -->
-                    <div class="col-md-4">
-                        <label for="filter_company" class="form-label">Company</label>
-                        <select class="form-select filter-select" id="filter_company" name="filter_company" multiple 
-                                aria-label="Filter by company">
-                            {% for company in filter_options.companies %}
-                            <option value="{{ company }}" {% if company in active_filters.companies %}selected{% endif %}>
-                                {{ company }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    
-                    <!-- Role Filter -->
-                    <div class="col-md-4">
-                        <label for="filter_role" class="form-label">Role</label>
-                        <select class="form-select filter-select" id="filter_role" name="filter_role" multiple 
-                                aria-label="Filter by role">
-                            {% for role in filter_options.roles %}
-                            <option value="{{ role }}" {% if role in active_filters.roles %}selected{% endif %}>
-                                {{ role }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    
-                    <!-- Region Filter -->
-                    <div class="col-md-4">
-                        <label for="filter_region" class="form-label">Region</label>
-                        <select class="form-select filter-select" id="filter_region" name="filter_region" multiple 
-                                aria-label="Filter by region">
-                            {% for region in filter_options.regions %}
-                            <option value="{{ region }}" {% if region in active_filters.regions %}selected{% endif %}>
-                                {{ region }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="row g-3 mb-3">
-                    <!-- Customer Tier Filter -->
-                    <div class="col-md-4">
-                        <label for="filter_tier" class="form-label">Customer Tier</label>
-                        <select class="form-select filter-select" id="filter_tier" name="filter_tier" multiple 
-                                aria-label="Filter by customer tier">
-                            {% for tier in filter_options.tiers %}
-                            <option value="{{ tier }}" {% if tier in active_filters.tiers %}selected{% endif %}>
-                                {{ tier }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    
-                    <!-- Language Filter -->
-                    <div class="col-md-4">
-                        <label for="filter_language" class="form-label">Language</label>
-                        <select class="form-select filter-select" id="filter_language" name="filter_language" multiple 
-                                aria-label="Filter by language">
-                            {% for language in filter_options.languages %}
-                            <option value="{{ language }}" {% if language in active_filters.languages %}selected{% endif %}>
-                                {{ language }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    
-                    <!-- Tenure Filter -->
-                    <div class="col-md-4">
-                        <label for="filter_tenure" class="form-label">Tenure (Years)</label>
-                        <select class="form-select filter-select" id="filter_tenure" name="filter_tenure" multiple 
-                                aria-label="Filter by tenure">
-                            {% for tenure in filter_options.tenure_ranges %}
-                            <option value="{{ tenure }}" {% if tenure in active_filters.tenure_ranges %}selected{% endif %}>
-                                {{ tenure }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="filter-actions">
-                    <button type="submit" class="btn btn-voïa-red" aria-label="Apply filters">
-                        <i class="fas fa-check me-2" aria-hidden="true"></i>Apply Filters
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary" id="clearFiltersBtn" aria-label="Clear all filters">
-                        <i class="fas fa-times me-2" aria-hidden="true"></i>Clear Filters
-                    </button>
-                    <small class="text-muted ms-3">
-                        <i class="fas fa-info-circle me-1" aria-hidden="true"></i>
-                        Showing {{ available_participants|length }} available participants
-                    </small>
-                </div>
-            </form>
-        </div>
-    </div>
-    
-    <!-- Active Filters Summary Bar -->
-    {% if active_filters.companies or active_filters.roles or active_filters.regions or active_filters.tiers or active_filters.languages or active_filters.tenure_ranges %}
-    <div class="filter-summary-bar">
-        <div class="filter-summary-header">
-            <span class="filter-summary-label">
-                <i class="fas fa-filter me-2" aria-hidden="true"></i>Active Filters:
-            </span>
-            <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" class="btn btn-sm btn-outline-secondary" aria-label="Clear all filters">
-                <i class="fas fa-times me-1" aria-hidden="true"></i>Clear All
-            </a>
-        </div>
-        <div class="filter-chips">
-            {% for company in active_filters.companies %}
-            <span class="filter-chip">
-                <strong>Company:</strong> {{ company }}
-                <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id, 
-                    filter_company=active_filters.companies|reject('equalto', company)|list,
-                    filter_role=active_filters.roles,
-                    filter_region=active_filters.regions,
-                    filter_tier=active_filters.tiers,
-                    filter_language=active_filters.languages,
-                    filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove" aria-label="Remove {{ company }} filter">
-                    <i class="fas fa-times" aria-hidden="true"></i>
-                </a>
-            </span>
-            {% endfor %}
-            
-            {% for role in active_filters.roles %}
-            <span class="filter-chip">
-                <strong>Role:</strong> {{ role }}
-                <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id, 
-                    filter_company=active_filters.companies,
-                    filter_role=active_filters.roles|reject('equalto', role)|list,
-                    filter_region=active_filters.regions,
-                    filter_tier=active_filters.tiers,
-                    filter_language=active_filters.languages,
-                    filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove" aria-label="Remove {{ role }} filter">
-                    <i class="fas fa-times" aria-hidden="true"></i>
-                </a>
-            </span>
-            {% endfor %}
-            
-            {% for region in active_filters.regions %}
-            <span class="filter-chip">
-                <strong>Region:</strong> {{ region }}
-                <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id, 
-                    filter_company=active_filters.companies,
-                    filter_role=active_filters.roles,
-                    filter_region=active_filters.regions|reject('equalto', region)|list,
-                    filter_tier=active_filters.tiers,
-                    filter_language=active_filters.languages,
-                    filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove" aria-label="Remove {{ region }} filter">
-                    <i class="fas fa-times" aria-hidden="true"></i>
-                </a>
-            </span>
-            {% endfor %}
-            
-            {% for tier in active_filters.tiers %}
-            <span class="filter-chip">
-                <strong>Tier:</strong> {{ tier }}
-                <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id, 
-                    filter_company=active_filters.companies,
-                    filter_role=active_filters.roles,
-                    filter_region=active_filters.regions,
-                    filter_tier=active_filters.tiers|reject('equalto', tier)|list,
-                    filter_language=active_filters.languages,
-                    filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove" aria-label="Remove {{ tier }} filter">
-                    <i class="fas fa-times" aria-hidden="true"></i>
-                </a>
-            </span>
-            {% endfor %}
-            
-            {% for language in active_filters.languages %}
-            <span class="filter-chip">
-                <strong>Language:</strong> {{ language }}
-                <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id, 
-                    filter_company=active_filters.companies,
-                    filter_role=active_filters.roles,
-                    filter_region=active_filters.regions,
-                    filter_tier=active_filters.tiers,
-                    filter_language=active_filters.languages|reject('equalto', language)|list,
-                    filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove" aria-label="Remove {{ language }} filter">
-                    <i class="fas fa-times" aria-hidden="true"></i>
-                </a>
-            </span>
-            {% endfor %}
-            
-            {% for tenure in active_filters.tenure_ranges %}
-            <span class="filter-chip">
-                <strong>Tenure:</strong> {{ tenure }} years
-                <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id, 
-                    filter_company=active_filters.companies,
-                    filter_role=active_filters.roles,
-                    filter_region=active_filters.regions,
-                    filter_tier=active_filters.tiers,
-                    filter_language=active_filters.languages,
-                    filter_tenure=active_filters.tenure_ranges|reject('equalto', tenure)|list) }}" class="filter-chip-remove" aria-label="Remove {{ tenure }} filter">
-                    <i class="fas fa-times" aria-hidden="true"></i>
-                </a>
-            </span>
-            {% endfor %}
-        </div>
-        <div class="filter-summary-count">
-            <i class="fas fa-users me-2" aria-hidden="true"></i>
-            Showing <strong>{{ available_participants|length }}</strong> of <strong>{{ total_available_count }}</strong> available participant{% if total_available_count != 1 %}s{% endif %}
-        </div>
-    </div>
-    {% endif %}
-    {% endif %}
-
     <!-- Add Participants Section -->
     {% if campaign.status in ['draft', 'ready'] %}
-        {% if available_participants %}
         <div class="campaign-participants-section">
             <h5 class="campaign-participants-section-header">
                 <i class="fas fa-user-plus" aria-hidden="true"></i>Add Participants to Campaign
             </h5>
+            
+            <!-- Filter Criteria -->
+            <div class="filter-panel-header" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="true" aria-controls="filterCollapse" role="button">
+                <h6 class="filter-panel-title">
+                    <i class="fas fa-filter me-2" aria-hidden="true"></i>Filter Criteria
+                    <i class="fas fa-chevron-down ms-2 filter-panel-chevron" aria-hidden="true"></i>
+                </h6>
+            </div>
+            <div class="collapse show" id="filterCollapse">
+                <form method="GET" action="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" id="filterForm" aria-label="Filter participants form">
+                    <div class="row g-3 mb-3">
+                        <!-- Company Filter -->
+                        <div class="col-md-4">
+                            <label for="filter_company" class="form-label">Company</label>
+                            <select class="form-select filter-select" id="filter_company" name="filter_company" multiple 
+                                    aria-label="Filter by company">
+                                {% for company in filter_options.companies %}
+                                <option value="{{ company }}" {% if company in active_filters.companies %}selected{% endif %}>
+                                    {{ company }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Role Filter -->
+                        <div class="col-md-4">
+                            <label for="filter_role" class="form-label">Role</label>
+                            <select class="form-select filter-select" id="filter_role" name="filter_role" multiple 
+                                    aria-label="Filter by role">
+                                {% for role in filter_options.roles %}
+                                <option value="{{ role }}" {% if role in active_filters.roles %}selected{% endif %}>
+                                    {{ role }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Region Filter -->
+                        <div class="col-md-4">
+                            <label for="filter_region" class="form-label">Region</label>
+                            <select class="form-select filter-select" id="filter_region" name="filter_region" multiple 
+                                    aria-label="Filter by region">
+                                {% for region in filter_options.regions %}
+                                <option value="{{ region }}" {% if region in active_filters.regions %}selected{% endif %}>
+                                    {{ region }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mb-3">
+                        <!-- Customer Tier Filter -->
+                        <div class="col-md-4">
+                            <label for="filter_tier" class="form-label">Customer Tier</label>
+                            <select class="form-select filter-select" id="filter_tier" name="filter_tier" multiple 
+                                    aria-label="Filter by customer tier">
+                                {% for tier in filter_options.tiers %}
+                                <option value="{{ tier }}" {% if tier in active_filters.tiers %}selected{% endif %}>
+                                    {{ tier }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Language Filter -->
+                        <div class="col-md-4">
+                            <label for="filter_language" class="form-label">Language</label>
+                            <select class="form-select filter-select" id="filter_language" name="filter_language" multiple 
+                                    aria-label="Filter by language">
+                                {% for language in filter_options.languages %}
+                                <option value="{{ language }}" {% if language in active_filters.languages %}selected{% endif %}>
+                                    {{ language }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <!-- Tenure Filter -->
+                        <div class="col-md-4">
+                            <label for="filter_tenure" class="form-label">Tenure (Years)</label>
+                            <select class="form-select filter-select" id="filter_tenure" name="filter_tenure" multiple 
+                                    aria-label="Filter by tenure">
+                                {% for tenure in filter_options.tenure_ranges %}
+                                <option value="{{ tenure }}" {% if tenure in active_filters.tenure_ranges %}selected{% endif %}>
+                                    {{ tenure }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-actions">
+                        <button type="submit" class="btn btn-voïa-red" aria-label="Apply filters">
+                            <i class="fas fa-check me-2" aria-hidden="true"></i>Apply Filters
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" id="clearFiltersBtn" aria-label="Clear all filters">
+                            <i class="fas fa-times me-2" aria-hidden="true"></i>Clear Filters
+                        </button>
+                        <small class="text-muted ms-3">
+                            <i class="fas fa-info-circle me-1" aria-hidden="true"></i>
+                            Available: {{ total_available_count }}
+                        </small>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Active Filters Summary Bar -->
+            {% if active_filters.companies or active_filters.roles or active_filters.regions or active_filters.tiers or active_filters.languages or active_filters.tenure_ranges %}
+            <div class="filter-summary-bar mt-3">
+                <div class="filter-summary-header">
+                    <span class="filter-summary-label">
+                        <i class="fas fa-filter me-2" aria-hidden="true"></i>Active Filters:
+                    </span>
+                    <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" class="btn btn-sm btn-outline-secondary" aria-label="Clear all filters">
+                        <i class="fas fa-times me-1" aria-hidden="true"></i>Clear All
+                    </a>
+                </div>
+                <div class="filter-chips">
+                    {% for company in active_filters.companies %}
+                    <span class="filter-chip">
+                        <strong>Company:</strong> {{ company }}
+                        <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id, 
+                            filter_company=active_filters.companies|reject('equalto', company)|list,
+                            filter_role=active_filters.roles,
+                            filter_region=active_filters.regions,
+                            filter_tier=active_filters.tiers,
+                            filter_language=active_filters.languages,
+                            filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove" aria-label="Remove {{ company }} filter">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </a>
+                    </span>
+                    {% endfor %}
+                    
+                    {% for role in active_filters.roles %}
+                    <span class="filter-chip">
+                        <strong>Role:</strong> {{ role }}
+                        <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id, 
+                            filter_company=active_filters.companies,
+                            filter_role=active_filters.roles|reject('equalto', role)|list,
+                            filter_region=active_filters.regions,
+                            filter_tier=active_filters.tiers,
+                            filter_language=active_filters.languages,
+                            filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove" aria-label="Remove {{ role }} filter">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </a>
+                    </span>
+                    {% endfor %}
+                    
+                    {% for region in active_filters.regions %}
+                    <span class="filter-chip">
+                        <strong>Region:</strong> {{ region }}
+                        <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id, 
+                            filter_company=active_filters.companies,
+                            filter_role=active_filters.roles,
+                            filter_region=active_filters.regions|reject('equalto', region)|list,
+                            filter_tier=active_filters.tiers,
+                            filter_language=active_filters.languages,
+                            filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove" aria-label="Remove {{ region }} filter">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </a>
+                    </span>
+                    {% endfor %}
+                    
+                    {% for tier in active_filters.tiers %}
+                    <span class="filter-chip">
+                        <strong>Tier:</strong> {{ tier }}
+                        <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id, 
+                            filter_company=active_filters.companies,
+                            filter_role=active_filters.roles,
+                            filter_region=active_filters.regions,
+                            filter_tier=active_filters.tiers|reject('equalto', tier)|list,
+                            filter_language=active_filters.languages,
+                            filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove" aria-label="Remove {{ tier }} filter">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </a>
+                    </span>
+                    {% endfor %}
+                    
+                    {% for language in active_filters.languages %}
+                    <span class="filter-chip">
+                        <strong>Language:</strong> {{ language }}
+                        <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id, 
+                            filter_company=active_filters.companies,
+                            filter_role=active_filters.roles,
+                            filter_region=active_filters.regions,
+                            filter_tier=active_filters.tiers,
+                            filter_language=active_filters.languages|reject('equalto', language)|list,
+                            filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove" aria-label="Remove {{ language }} filter">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </a>
+                    </span>
+                    {% endfor %}
+                    
+                    {% for tenure in active_filters.tenure_ranges %}
+                    <span class="filter-chip">
+                        <strong>Tenure:</strong> {{ tenure }} years
+                        <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id, 
+                            filter_company=active_filters.companies,
+                            filter_role=active_filters.roles,
+                            filter_region=active_filters.regions,
+                            filter_tier=active_filters.tiers,
+                            filter_language=active_filters.languages,
+                            filter_tenure=active_filters.tenure_ranges|reject('equalto', tenure)|list) }}" class="filter-chip-remove" aria-label="Remove {{ tenure }} filter">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </a>
+                    </span>
+                    {% endfor %}
+                </div>
+                <div class="filter-summary-count">
+                    <i class="fas fa-users me-2" aria-hidden="true"></i>
+                    Showing <strong>{{ available_participants|length }}</strong> of <strong>{{ total_available_count }}</strong> available participant{% if total_available_count != 1 %}s{% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if available_participants %}
+            <!-- Selection Section -->
+            <hr class="my-4">
             <form method="POST" action="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" id="addParticipantsForm" aria-label="Add participants form">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 
@@ -357,20 +356,14 @@
                     </small>
                 </div>
             </form>
-        </div>
-        {% else %}
-        <div class="campaign-participants-section">
-            <h5 class="campaign-participants-section-header">
-                <i class="fas fa-user-plus" aria-hidden="true"></i>Add Participants to Campaign
-            </h5>
+            {% else %}
+            <!-- No Participants Match Filters -->
+            <hr class="my-4">
             {% if active_filters.companies or active_filters.roles or active_filters.regions or active_filters.tiers or active_filters.languages or active_filters.tenure_ranges %}
             <div class="campaign-participants-alert campaign-participants-alert-warning" role="alert">
                 <i class="fas fa-filter me-2" aria-hidden="true"></i>
                 <strong>No Participants Match Your Filters:</strong> 
-                No available participants match the selected filters. Try adjusting your filter criteria.
-                <button type="button" class="btn btn-sm btn-outline-secondary ms-2" onclick="document.getElementById('clearFiltersBtn').click();" aria-label="Clear all filters">
-                    <i class="fas fa-times me-1" aria-hidden="true"></i>Clear Filters
-                </button>
+                No available participants match the selected filters. Try adjusting your filter criteria above.
             </div>
             {% else %}
             <div class="campaign-participants-alert campaign-participants-alert-info" role="alert">
@@ -382,8 +375,8 @@
                 </a>
             </div>
             {% endif %}
+            {% endif %}
         </div>
-        {% endif %}
     {% else %}
         <!-- Campaign status prevents adding participants -->
         <div class="campaign-participants-section">
