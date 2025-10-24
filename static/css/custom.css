@@ -2857,6 +2857,8 @@ body[data-ui-version="v2"] .navbar .container {
     margin: 0 !important;
     padding-left: 1rem !important;
     padding-right: 1rem !important;
+    display: flex !important;
+    justify-content: flex-end !important;
 }
 
 /* Mobile: Reset offset when sidebar collapses */
