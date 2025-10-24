@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+/* Current approach */
+.test1 .container {
+    margin-left: 260px;
+    max-width: calc(100% - 260px);
+    background: red;
+}
+.test1 .ms-auto {
+    margin-left: auto;
+    background: yellow;
+}
+</style>
+</head>
+<body>
+<div class="test1" style="width:100%; border: 2px solid blue;">
+    <div class="container" style="display: flex;">
+        <div class="ms-auto">LANGUAGE + USER</div>
+    </div>
+</div>
+</body>
+</html>

@@ -2846,19 +2846,23 @@ a:hover {
     transform: translateX(0) !important;
 }
 
-/* V2 UI: Offset navbar content for sidebar, keep navbar full-width */
+/* V2 UI: Offset navbar for sidebar */
+body[data-ui-version="v2"] .navbar {
+    padding-left: 260px;
+}
+
 body[data-ui-version="v2"] .navbar .container {
-    margin-left: 260px;
-    max-width: calc(100% - 260px);
-    padding-left: 1rem;
-    padding-right: 1rem;
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
 }
 
 /* Mobile: Reset offset when sidebar collapses */
 @media (max-width: 992px) {
-    body[data-ui-version="v2"] .navbar .container {
-        margin-left: 0;
-        max-width: 100%;
+    body[data-ui-version="v2"] .navbar {
+        padding-left: 0;
     }
 }
 
