@@ -1220,6 +1220,13 @@ class Participant(db.Model):
         db.UniqueConstraint('business_account_id', 'email', name='uq_participant_business_email'),
         db.Index('idx_participant_business_email', 'business_account_id', 'email'),
         db.Index('idx_participant_source', 'source'),
+        # Indexes for filtering in campaign participant assignment
+        db.Index('idx_participant_company_name', 'company_name'),
+        db.Index('idx_participant_role', 'role'),
+        db.Index('idx_participant_region', 'region'),
+        db.Index('idx_participant_customer_tier', 'customer_tier'),
+        db.Index('idx_participant_language', 'language'),
+        db.Index('idx_participant_tenure_years', 'tenure_years'),
     )
     
     id = db.Column(db.Integer, primary_key=True)

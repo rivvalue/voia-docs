@@ -913,9 +913,38 @@ def bulk_edit_participants():
                         Participant.business_account_id == current_account.id
                     ).all()
                     
+                    new_commercial_value = changes['company_commercial_value']['new']
+                    
                     for other_participant in same_company_participants:
                         if other_participant.id != participant.id:
-                            other_participant.company_commercial_value = new_value
+                            old_commercial_value = other_participant.company_commercial_value
+                            other_participant.company_commercial_value = new_commercial_value
+                            
+                            # Audit log for automatic commercial value sync
+                            try:
+                                queue_audit_log(
+                                    business_account_id=current_account.id,
+                                    action_type='participant_updated',
+                                    resource_type='participant',
+                                    resource_id=other_participant.id,
+                                    resource_name=other_participant.name,
+                                    details={
+                                        'email': other_participant.email,
+                                        'changes': {
+                                            'company_commercial_value': {
+                                                'old': old_commercial_value,
+                                                'new': new_commercial_value
+                                            }
+                                        },
+                                        'bulk_operation_id': bulk_operation_id,
+                                        'auto_synced_from_participant_id': participant.id,
+                                        'auto_synced_from_participant_name': participant.name,
+                                        'sync_reason': 'Company commercial value automatic synchronization',
+                                        'company_name': participant.company_name
+                                    }
+                                )
+                            except Exception as audit_error:
+                                logger.error(f"Failed to log commercial value auto-sync audit: {audit_error}")
                 
                 updated_count += 1
                 
