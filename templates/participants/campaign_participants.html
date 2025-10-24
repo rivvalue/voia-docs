@@ -267,37 +267,94 @@
             <h5 class="campaign-participants-section-header">
                 <i class="fas fa-user-plus" aria-hidden="true"></i>Add Participants to Campaign
             </h5>
-            <form method="POST" action="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" aria-label="Add participants form">
+            <form method="POST" action="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" id="addParticipantsForm" aria-label="Add participants form">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="mb-3">
-                            <label for="participant_ids" class="form-label">
-                                <i class="fas fa-users me-2" aria-hidden="true"></i>Select Participants
-                            </label>
-                            <select class="form-select" id="participant_ids" name="participant_ids" multiple required 
-                                    aria-label="Select participants to add to campaign" 
-                                    aria-describedby="participant-select-help">
-                                {% for participant in available_participants %}
-                                <option value="{{ participant.id }}">
-                                    {{ participant.name }} ({{ participant.email }})
-                                    {% if participant.company_name %} - {{ participant.company_name }}{% endif %}
-                                </option>
-                                {% endfor %}
-                            </select>
-                            <div class="form-text" id="participant-select-help">
-                                Search and click to select multiple participants
+                
+                <!-- Quick Search -->
+                <div class="mb-3">
+                    <div class="participant-search-box">
+                        <i class="fas fa-search" aria-hidden="true"></i>
+                        <input type="text" 
+                               id="participantQuickSearch" 
+                               class="form-control" 
+                               placeholder="Quick search by name, email, or company..."
+                               aria-label="Search participants">
+                    </div>
+                </div>
+                
+                <!-- Select All -->
+                <div class="participant-select-all">
+                    <label class="participant-checkbox-label">
+                        <input type="checkbox" id="selectAllParticipants" aria-label="Select all participants">
+                        <span class="participant-checkbox-text">
+                            <strong>Select All</strong> 
+                            (<span id="visibleCount">{{ available_participants|length }}</span> participant{% if available_participants|length != 1 %}s{% endif %})
+                        </span>
+                    </label>
+                </div>
+                
+                <!-- Scrollable Participant List -->
+                <div class="participant-list-container" id="participantListContainer">
+                    {% for participant in available_participants %}
+                    <div class="participant-card" data-participant-id="{{ participant.id }}" 
+                         data-search-text="{{ participant.name|lower }} {{ participant.email|lower }} {{ participant.company_name|lower if participant.company_name else '' }} {{ participant.role|lower if participant.role else '' }}">
+                        <label class="participant-card-label">
+                            <input type="checkbox" 
+                                   name="participant_ids" 
+                                   value="{{ participant.id }}"
+                                   class="participant-checkbox"
+                                   aria-label="Select {{ participant.name }}">
+                            <div class="participant-card-content">
+                                <div class="participant-card-header">
+                                    <span class="participant-name">{{ participant.name }}</span>
+                                    {% if participant.role %}
+                                    <span class="participant-badge participant-badge-role">{{ participant.role }}</span>
+                                    {% endif %}
+                                </div>
+                                <div class="participant-card-details">
+                                    <span class="participant-email">
+                                        <i class="fas fa-envelope me-1" aria-hidden="true"></i>{{ participant.email }}
+                                    </span>
+                                    {% if participant.company_name %}
+                                    <span class="participant-company">
+                                        <i class="fas fa-building me-1" aria-hidden="true"></i>{{ participant.company_name }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                {% if participant.region or participant.customer_tier %}
+                                <div class="participant-card-meta">
+                                    {% if participant.region %}
+                                    <span class="participant-meta-item">
+                                        <i class="fas fa-globe me-1" aria-hidden="true"></i>{{ participant.region }}
+                                    </span>
+                                    {% endif %}
+                                    {% if participant.customer_tier %}
+                                    <span class="participant-meta-item">
+                                        <i class="fas fa-star me-1" aria-hidden="true"></i>{{ participant.customer_tier }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
                             </div>
-                        </div>
+                        </label>
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label">&nbsp;</label>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-success" aria-label="Add selected participants to campaign">
-                                <i class="fas fa-plus me-2" aria-hidden="true"></i>Add Selected Participants
-                            </button>
-                        </div>
-                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="participant-list-empty" id="noResultsMessage" style="display: none;">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                    <p>No participants match your search</p>
+                </div>
+                
+                <!-- Actions -->
+                <div class="participant-actions mt-3">
+                    <button type="submit" class="btn btn-voïa-red" id="addSelectedBtn" disabled aria-label="Add selected participants to campaign">
+                        <i class="fas fa-plus me-2" aria-hidden="true"></i>
+                        Add Selected (<span id="selectedCount">0</span>)
+                    </button>
+                    <small class="text-muted ms-3">
+                        Select participants to add them to this campaign
+                    </small>
                 </div>
             </form>
         </div>
@@ -561,7 +618,7 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-// Initialize Select2 on all filter dropdowns
+// Initialize Select2 on filter dropdowns only
 $(document).ready(function() {
     $('.filter-select').select2({
         theme: 'bootstrap-5',
@@ -570,15 +627,99 @@ $(document).ready(function() {
         allowClear: false,
         closeOnSelect: false
     });
+});
+
+// Participant Selection Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const quickSearch = document.getElementById('participantQuickSearch');
+    const selectAllCheckbox = document.getElementById('selectAllParticipants');
+    const participantCheckboxes = document.querySelectorAll('.participant-checkbox');
+    const addSelectedBtn = document.getElementById('addSelectedBtn');
+    const selectedCountSpan = document.getElementById('selectedCount');
+    const visibleCountSpan = document.getElementById('visibleCount');
+    const participantCards = document.querySelectorAll('.participant-card');
+    const noResultsMessage = document.getElementById('noResultsMessage');
+    const participantContainer = document.getElementById('participantListContainer');
     
-    // Initialize Select2 on participant selection dropdown
-    $('#participant_ids').select2({
-        theme: 'bootstrap-5',
-        width: '100%',
-        placeholder: 'Search and select participants...',
-        allowClear: false,
-        closeOnSelect: false
+    // Update selected count and button state
+    function updateSelectionState() {
+        const checkedBoxes = document.querySelectorAll('.participant-checkbox:checked');
+        const count = checkedBoxes.length;
+        
+        selectedCountSpan.textContent = count;
+        addSelectedBtn.disabled = count === 0;
+        
+        // Update select all checkbox state
+        const visibleCheckboxes = Array.from(participantCheckboxes).filter(cb => {
+            return cb.closest('.participant-card').style.display !== 'none';
+        });
+        const visibleChecked = visibleCheckboxes.filter(cb => cb.checked).length;
+        
+        if (visibleCheckboxes.length > 0) {
+            selectAllCheckbox.checked = visibleChecked === visibleCheckboxes.length;
+            selectAllCheckbox.indeterminate = visibleChecked > 0 && visibleChecked < visibleCheckboxes.length;
+        } else {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        }
+    }
+    
+    // Quick search functionality
+    if (quickSearch) {
+        quickSearch.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            let visibleCount = 0;
+            
+            participantCards.forEach(card => {
+                const searchText = card.getAttribute('data-search-text');
+                const matches = searchText.includes(searchTerm);
+                
+                if (matches) {
+                    card.style.display = '';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Update visible count
+            visibleCountSpan.textContent = visibleCount;
+            
+            // Show/hide empty state
+            if (visibleCount === 0) {
+                participantContainer.style.display = 'none';
+                noResultsMessage.style.display = 'block';
+            } else {
+                participantContainer.style.display = 'block';
+                noResultsMessage.style.display = 'none';
+            }
+            
+            updateSelectionState();
+        });
+    }
+    
+    // Select all functionality
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            const visibleCheckboxes = Array.from(participantCheckboxes).filter(cb => {
+                return cb.closest('.participant-card').style.display !== 'none';
+            });
+            
+            visibleCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            
+            updateSelectionState();
+        });
+    }
+    
+    // Individual checkbox change
+    participantCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateSelectionState);
     });
+    
+    // Initial state
+    updateSelectionState();
 });
 
 // Copy individual token
