@@ -1,0 +1,1449 @@
+{
+  "metadata": {
+    "project": "VOÏA - Voice Of Client",
+    "source_language": "English",
+    "target_language": "French",
+    "extraction_date": "2025-10-24",
+    "total_files": 10,
+    "total_strings": 2161,
+    "file_number": 3,
+    "part_description": "Templates Part 3/8"
+  },
+  "instructions": {
+    "overview": "Translate all 'text' field values from English to French (France market, professional SaaS tone)",
+    "rules": [
+      "Translate ONLY the 'text' field values",
+      "Keep all other fields (id, file, type, element, etc.) UNCHANGED",
+      "Preserve {variables}, {{variables}}, and {%...%} syntax exactly as-is",
+      "Use professional business French suitable for SaaS platform",
+      "Maintain consistent terminology throughout",
+      "Keep technical terms like 'NPS', 'API', 'VOÏA' unchanged unless noted"
+    ]
+  },
+  "templates": [
+    {
+      "id": "campaign_insights_128",
+      "file": "templates/campaign_insights.html",
+      "element": "h6",
+      "text": "Service"
+    },
+    {
+      "id": "campaign_insights_129",
+      "file": "templates/campaign_insights.html",
+      "element": "button",
+      "text": "Close"
+    },
+    {
+      "id": "campaign_insights_placeholder_130",
+      "file": "templates/campaign_insights.html",
+      "element": "input[placeholder]",
+      "text": "Search company, opportunities, risks..."
+    },
+    {
+      "id": "campaign_insights_placeholder_131",
+      "file": "templates/campaign_insights.html",
+      "element": "input[placeholder]",
+      "text": "Search by company name..."
+    },
+    {
+      "id": "campaign_insights_placeholder_132",
+      "file": "templates/campaign_insights.html",
+      "element": "input[placeholder]",
+      "text": "Search by company name, participant name, or email..."
+    },
+    {
+      "id": "campaign_insights_placeholder_133",
+      "file": "templates/campaign_insights.html",
+      "element": "input[placeholder]",
+      "text": "Search by respondent name or email..."
+    },
+    {
+      "id": "campaign_insights_title_134",
+      "file": "templates/campaign_insights.html",
+      "element": "button[title]",
+      "text": "Refresh data"
+    },
+    {
+      "id": "campaign_insights_title_135",
+      "file": "templates/campaign_insights.html",
+      "element": "button[title]",
+      "text": "Clear Filter"
+    },
+    {
+      "id": "campaign_insights_title_136",
+      "file": "templates/campaign_insights.html",
+      "element": "i[title]",
+      "text": "Companies with High or Critical churn risk level based on AI assessment"
+    },
+    {
+      "id": "campaign_insights_title_137",
+      "file": "templates/campaign_insights.html",
+      "element": "i[title]",
+      "text": "Companies with High or Critical churn risk level"
+    },
+    {
+      "id": "campaign_insights_title_138",
+      "file": "templates/campaign_insights.html",
+      "element": "i[title]",
+      "text": "Shows account health balance: Risk-Heavy (risks outweigh opportunities), High Potential (opportunities with minimal risks), or Balanced"
+    },
+    {
+      "id": "campaign_insights_aria_139",
+      "file": "templates/campaign_insights.html",
+      "element": "nav[aria-label]",
+      "text": "Account Intelligence pagination"
+    },
+    {
+      "id": "campaign_insights_aria_140",
+      "file": "templates/campaign_insights.html",
+      "element": "nav[aria-label]",
+      "text": "Company NPS pagination"
+    },
+    {
+      "id": "campaign_insights_aria_141",
+      "file": "templates/campaign_insights.html",
+      "element": "nav[aria-label]",
+      "text": "Tenure NPS pagination"
+    },
+    {
+      "id": "campaign_insights_aria_142",
+      "file": "templates/campaign_insights.html",
+      "element": "nav[aria-label]",
+      "text": "Survey responses pagination"
+    },
+    {
+      "id": "campaign_insights_aria_143",
+      "file": "templates/campaign_insights.html",
+      "element": "button[aria-label]",
+      "text": "Close"
+    },
+    {
+      "id": "campaign_insights_aria_144",
+      "file": "templates/campaign_insights.html",
+      "element": "button[aria-label]",
+      "text": "Close"
+    },
+    {
+      "id": "conversational_survey_business_1",
+      "file": "templates/conversational_survey_business.html",
+      "element": "h1",
+      "text": "VO"
+    },
+    {
+      "id": "conversational_survey_business_2",
+      "file": "templates/conversational_survey_business.html",
+      "element": "h2",
+      "text": "Hi {{ participant_name }}, thank you for participating"
+    },
+    {
+      "id": "conversational_survey_business_3",
+      "file": "templates/conversational_survey_business.html",
+      "element": "label",
+      "text": "Company Name"
+    },
+    {
+      "id": "conversational_survey_business_4",
+      "file": "templates/conversational_survey_business.html",
+      "element": "label",
+      "text": "Your Name"
+    },
+    {
+      "id": "conversational_survey_business_5",
+      "file": "templates/conversational_survey_business.html",
+      "element": "label",
+      "text": "Email Address"
+    },
+    {
+      "id": "conversational_survey_business_6",
+      "file": "templates/conversational_survey_business.html",
+      "element": "label",
+      "text": "How long have you been working with {{ branding.company_name if branding and branding.company_name else 'us' }}?"
+    },
+    {
+      "id": "conversational_survey_business_7",
+      "file": "templates/conversational_survey_business.html",
+      "element": "option",
+      "text": "Select duration..."
+    },
+    {
+      "id": "conversational_survey_business_8",
+      "file": "templates/conversational_survey_business.html",
+      "element": "option",
+      "text": "Less than 6 months"
+    },
+    {
+      "id": "conversational_survey_business_9",
+      "file": "templates/conversational_survey_business.html",
+      "element": "option",
+      "text": "6 months - 1 year"
+    },
+    {
+      "id": "conversational_survey_business_10",
+      "file": "templates/conversational_survey_business.html",
+      "element": "option",
+      "text": "1-2 years"
+    },
+    {
+      "id": "conversational_survey_business_11",
+      "file": "templates/conversational_survey_business.html",
+      "element": "option",
+      "text": "2-3 years"
+    },
+    {
+      "id": "conversational_survey_business_12",
+      "file": "templates/conversational_survey_business.html",
+      "element": "option",
+      "text": "3-5 years"
+    },
+    {
+      "id": "conversational_survey_business_13",
+      "file": "templates/conversational_survey_business.html",
+      "element": "option",
+      "text": "5-10 years"
+    },
+    {
+      "id": "conversational_survey_business_14",
+      "file": "templates/conversational_survey_business.html",
+      "element": "option",
+      "text": "More than 10 years"
+    },
+    {
+      "id": "conversational_survey_business_15",
+      "file": "templates/conversational_survey_business.html",
+      "element": "h5",
+      "text": "VO"
+    },
+    {
+      "id": "conversational_survey_business_16",
+      "file": "templates/conversational_survey_business.html",
+      "element": "span",
+      "text": "Loading..."
+    },
+    {
+      "id": "conversational_survey_business_17",
+      "file": "templates/conversational_survey_business.html",
+      "element": "h5",
+      "text": "VOÏA is processing your response..."
+    },
+    {
+      "id": "conversational_survey_business_18",
+      "file": "templates/conversational_survey_business.html",
+      "element": "p",
+      "text": "Please wait while VOÏA analyzes your feedback"
+    },
+    {
+      "id": "conversational_survey_business_19",
+      "file": "templates/conversational_survey_business.html",
+      "element": "h4",
+      "text": "Thank you, {{ participant_name }}!"
+    },
+    {
+      "id": "conversational_survey_business_20",
+      "file": "templates/conversational_survey_business.html",
+      "element": "p",
+      "text": "Your feedback for"
+    },
+    {
+      "id": "conversational_survey_business_21",
+      "file": "templates/conversational_survey_business.html",
+      "element": "p",
+      "text": "Your insights help us continuously improve our services. Thank you for taking the time to share your experience."
+    },
+    {
+      "id": "conversational_survey_business_placeholder_22",
+      "file": "templates/conversational_survey_business.html",
+      "element": "textarea[placeholder]",
+      "text": "Type your response here..."
+    },
+    {
+      "id": "base_1",
+      "file": "templates/base.html",
+      "element": "span",
+      "text": "VO"
+    },
+    {
+      "id": "base_2",
+      "file": "templates/base.html",
+      "element": "span",
+      "text": "Business Intelligence"
+    },
+    {
+      "id": "base_3",
+      "file": "templates/base.html",
+      "element": "span",
+      "text": "Overview"
+    },
+    {
+      "id": "base_4",
+      "file": "templates/base.html",
+      "element": "span",
+      "text": "Executive Summary"
+    },
+    {
+      "id": "base_5",
+      "file": "templates/base.html",
+      "element": "span",
+      "text": "Campaign Insights"
+    },
+    {
+      "id": "base_6",
+      "file": "templates/base.html",
+      "element": "span",
+      "text": "Campaigns"
+    },
+    {
+      "id": "base_7",
+      "file": "templates/base.html",
+      "element": "span",
+      "text": "Participants"
+    },
+    {
+      "id": "base_8",
+      "file": "templates/base.html",
+      "element": "span",
+      "text": "Settings"
+    },
+    {
+      "id": "base_9",
+      "file": "templates/base.html",
+      "element": "span",
+      "text": "Logout"
+    },
+    {
+      "id": "base_10",
+      "file": "templates/base.html",
+      "element": "a",
+      "text": "Welcome to VO"
+    },
+    {
+      "id": "base_aria_11",
+      "file": "templates/base.html",
+      "element": "button[aria-label]",
+      "text": "Toggle Sidebar"
+    },
+    {
+      "id": "conversational_survey_1",
+      "file": "templates/conversational_survey.html",
+      "element": "h1",
+      "text": "VO"
+    },
+    {
+      "id": "conversational_survey_2",
+      "file": "templates/conversational_survey.html",
+      "element": "p",
+      "text": "Partagez votre expérience"
+    },
+    {
+      "id": "conversational_survey_3",
+      "file": "templates/conversational_survey.html",
+      "element": "p",
+      "text": "Vous avez besoin d'un jeton valide pour participer à cette enquête."
+    },
+    {
+      "id": "conversational_survey_4",
+      "file": "templates/conversational_survey.html",
+      "element": "a",
+      "text": "Obtenir un jeton d'authentification"
+    },
+    {
+      "id": "conversational_survey_5",
+      "file": "templates/conversational_survey.html",
+      "element": "h2",
+      "text": "Commencer"
+    },
+    {
+      "id": "conversational_survey_6",
+      "file": "templates/conversational_survey.html",
+      "element": "label",
+      "text": "Nom de l'entreprise"
+    },
+    {
+      "id": "conversational_survey_7",
+      "file": "templates/conversational_survey.html",
+      "element": "label",
+      "text": "Votre nom"
+    },
+    {
+      "id": "conversational_survey_8",
+      "file": "templates/conversational_survey.html",
+      "element": "label",
+      "text": "Adresse e-mail"
+    },
+    {
+      "id": "conversational_survey_9",
+      "file": "templates/conversational_survey.html",
+      "element": "label",
+      "text": "Depuis combien de temps travaillez-vous avec FC inc ?"
+    },
+    {
+      "id": "conversational_survey_10",
+      "file": "templates/conversational_survey.html",
+      "element": "option",
+      "text": "Sélectionnez une durée..."
+    },
+    {
+      "id": "conversational_survey_11",
+      "file": "templates/conversational_survey.html",
+      "element": "option",
+      "text": "Moins de 6 mois"
+    },
+    {
+      "id": "conversational_survey_12",
+      "file": "templates/conversational_survey.html",
+      "element": "option",
+      "text": "6 mois - 1 an"
+    },
+    {
+      "id": "conversational_survey_13",
+      "file": "templates/conversational_survey.html",
+      "element": "option",
+      "text": "1-2 ans"
+    },
+    {
+      "id": "conversational_survey_14",
+      "file": "templates/conversational_survey.html",
+      "element": "option",
+      "text": "2-3 ans"
+    },
+    {
+      "id": "conversational_survey_15",
+      "file": "templates/conversational_survey.html",
+      "element": "option",
+      "text": "3-5 ans"
+    },
+    {
+      "id": "conversational_survey_16",
+      "file": "templates/conversational_survey.html",
+      "element": "option",
+      "text": "5-10 ans"
+    },
+    {
+      "id": "conversational_survey_17",
+      "file": "templates/conversational_survey.html",
+      "element": "option",
+      "text": "Plus de 10 ans"
+    },
+    {
+      "id": "conversational_survey_18",
+      "file": "templates/conversational_survey.html",
+      "element": "h2",
+      "text": "VO"
+    },
+    {
+      "id": "conversational_survey_19",
+      "file": "templates/conversational_survey.html",
+      "element": "label",
+      "text": "Saisissez votre réponse"
+    },
+    {
+      "id": "conversational_survey_20",
+      "file": "templates/conversational_survey.html",
+      "element": "span",
+      "text": "Chargement..."
+    },
+    {
+      "id": "conversational_survey_21",
+      "file": "templates/conversational_survey.html",
+      "element": "h2",
+      "text": "VOÏA traite votre réponse..."
+    },
+    {
+      "id": "conversational_survey_22",
+      "file": "templates/conversational_survey.html",
+      "element": "p",
+      "text": "Veuillez patienter pendant que VOÏA analyse votre retour d'information"
+    },
+    {
+      "id": "conversational_survey_23",
+      "file": "templates/conversational_survey.html",
+      "element": "h2",
+      "text": "Merci d'avoir partagé votre retour d'information."
+    },
+    {
+      "id": "conversational_survey_24",
+      "file": "templates/conversational_survey.html",
+      "element": "p",
+      "text": "Votre retour d'information a été analysé avec succès par VOÏA Intelligence."
+    },
+    {
+      "id": "conversational_survey_25",
+      "file": "templates/conversational_survey.html",
+      "element": "p",
+      "text": "Cela conclut votre démonstration des capacités de notre agent Voix du Client."
+    },
+    {
+      "id": "conversational_survey_26",
+      "file": "templates/conversational_survey.html",
+      "element": "h3",
+      "text": "Quelle est la suite ?"
+    },
+    {
+      "id": "conversational_survey_27",
+      "file": "templates/conversational_survey.html",
+      "element": "p",
+      "text": "Découvrez toute la puissance de l'agent Voix du Client pour votre organisation."
+    },
+    {
+      "id": "conversational_survey_placeholder_28",
+      "file": "templates/conversational_survey.html",
+      "element": "input[placeholder]",
+      "text": "Saisissez le nom de votre entreprise"
+    },
+    {
+      "id": "conversational_survey_placeholder_29",
+      "file": "templates/conversational_survey.html",
+      "element": "input[placeholder]",
+      "text": "Saisissez votre nom complet"
+    },
+    {
+      "id": "conversational_survey_placeholder_30",
+      "file": "templates/conversational_survey.html",
+      "element": "input[placeholder]",
+      "text": "Saisissez votre adresse e-mail"
+    },
+    {
+      "id": "conversational_survey_placeholder_31",
+      "file": "templates/conversational_survey.html",
+      "element": "textarea[placeholder]",
+      "text": "Saisissez votre réponse ici..."
+    },
+    {
+      "id": "conversational_survey_aria_32",
+      "file": "templates/conversational_survey.html",
+      "element": "a[aria-label]",
+      "text": "Obtenir un jeton d'authentification pour démarrer l'enquête"
+    },
+    {
+      "id": "conversational_survey_aria_33",
+      "file": "templates/conversational_survey.html",
+      "element": "button[aria-label]",
+      "text": "Démarrer l'enquête conversationnelle"
+    },
+    {
+      "id": "conversational_survey_aria_34",
+      "file": "templates/conversational_survey.html",
+      "element": "div[aria-label]",
+      "text": "Progression de l'enquête"
+    },
+    {
+      "id": "conversational_survey_aria_35",
+      "file": "templates/conversational_survey.html",
+      "element": "div[aria-label]",
+      "text": "Messages de la conversation"
+    },
+    {
+      "id": "conversational_survey_aria_36",
+      "file": "templates/conversational_survey.html",
+      "element": "textarea[aria-label]",
+      "text": "Saisissez votre réponse à VOÏA"
+    },
+    {
+      "id": "conversational_survey_aria_37",
+      "file": "templates/conversational_survey.html",
+      "element": "button[aria-label]",
+      "text": "Envoyer le message"
+    },
+    {
+      "id": "conversational_survey_aria_38",
+      "file": "templates/conversational_survey.html",
+      "element": "section[aria-label]",
+      "text": "Traitement de la réponse"
+    },
+    {
+      "id": "conversational_survey_aria_39",
+      "file": "templates/conversational_survey.html",
+      "element": "a[aria-label]",
+      "text": "Afficher le Tableau de bord Analytique avec les résultats de vos retours d'information"
+    },
+    {
+      "id": "conversational_survey_aria_40",
+      "file": "templates/conversational_survey.html",
+      "element": "button[aria-label]",
+      "text": "Essayer une autre session de démonstration"
+    },
+    {
+      "id": "conversational_survey_aria_41",
+      "file": "templates/conversational_survey.html",
+      "element": "a[aria-label]",
+      "text": "Contacter Rivvalue pour mettre en œuvre VOÏA pour votre entreprise"
+    },
+    {
+      "id": "conversational_survey_aria_42",
+      "file": "templates/conversational_survey.html",
+      "element": "a[aria-label]",
+      "text": "Revenir à la page d'accueil"
+    },
+    {
+      "id": "demo_intro_1",
+      "file": "templates/demo_intro.html",
+      "element": "h1",
+      "text": "Bienvenue dans votre VO"
+    },
+    {
+      "id": "demo_intro_2",
+      "file": "templates/demo_intro.html",
+      "element": "p",
+      "text": "Vous êtes sur le point de découvrir comment VO"
+    },
+    {
+      "id": "demo_intro_3",
+      "file": "templates/demo_intro.html",
+      "element": "p",
+      "text": "Dans cette simulation, vous endosserez le rôle d'un client invité par"
+    },
+    {
+      "id": "demo_intro_4",
+      "file": "templates/demo_intro.html",
+      "element": "h2",
+      "text": "Informations de démonstration"
+    },
+    {
+      "id": "demo_intro_5",
+      "file": "templates/demo_intro.html",
+      "element": "h3",
+      "text": "À propos d'Archelo Group"
+    },
+    {
+      "id": "demo_intro_6",
+      "file": "templates/demo_intro.html",
+      "element": "p",
+      "text": "Archelo Group aide les entreprises de taille moyenne à améliorer l'intégration à distance, la communication interne et l'engagement des employés grâce à sa plateforme phare,"
+    },
+    {
+      "id": "demo_intro_7",
+      "file": "templates/demo_intro.html",
+      "element": "p",
+      "text": "Dans le cadre de leur démarche d'amélioration continue, ils ont lancé une initiative de retour d'information en utilisant l'agent Voix du Client de Rivvalue —"
+    },
+    {
+      "id": "demo_intro_8",
+      "file": "templates/demo_intro.html",
+      "element": "h3",
+      "text": "Ce que vous allez faire"
+    },
+    {
+      "id": "demo_intro_9",
+      "file": "templates/demo_intro.html",
+      "element": "p",
+      "text": "Des étapes simples pour découvrir la puissance de la collecte de retour d'information pilotée par l'IA."
+    },
+    {
+      "id": "demo_intro_10",
+      "file": "templates/demo_intro.html",
+      "element": "span",
+      "text": "Choisissez votre méthode de retour d'information préférée : parcours conversationnel piloté par l'IA ou enquête traditionnelle"
+    },
+    {
+      "id": "demo_intro_11",
+      "file": "templates/demo_intro.html",
+      "element": "span",
+      "text": "Répondez à quelques questions rapides, comme le ferait un véritable client"
+    },
+    {
+      "id": "demo_intro_12",
+      "file": "templates/demo_intro.html",
+      "element": "span",
+      "text": "Explorez le tableau de bord d'analyses en direct, généré instantanément à partir de vos réponses"
+    },
+    {
+      "id": "demo_intro_13",
+      "file": "templates/demo_intro.html",
+      "element": "h3",
+      "text": "Ce que vous verrez, en temps réel"
+    },
+    {
+      "id": "demo_intro_14",
+      "file": "templates/demo_intro.html",
+      "element": "p",
+      "text": "Analytique et analyses instantanées générées à partir de votre retour d'information."
+    },
+    {
+      "id": "demo_intro_15",
+      "file": "templates/demo_intro.html",
+      "element": "span",
+      "text": "Score NPS et répartition"
+    },
+    {
+      "id": "demo_intro_16",
+      "file": "templates/demo_intro.html",
+      "element": "span",
+      "text": "Indicateurs de risque d'attrition"
+    },
+    {
+      "id": "demo_intro_17",
+      "file": "templates/demo_intro.html",
+      "element": "span",
+      "text": "Opportunités de croissance"
+    },
+    {
+      "id": "demo_intro_18",
+      "file": "templates/demo_intro.html",
+      "element": "span",
+      "text": "Principaux sentiments et thèmes"
+    },
+    {
+      "id": "demo_intro_19",
+      "file": "templates/demo_intro.html",
+      "element": "span",
+      "text": "Enseignements au niveau du compte"
+    },
+    {
+      "id": "demo_intro_20",
+      "file": "templates/demo_intro.html",
+      "element": "h3",
+      "text": "À quoi s'attendre"
+    },
+    {
+      "id": "demo_intro_21",
+      "file": "templates/demo_intro.html",
+      "element": "p",
+      "text": "Une expérience de démonstration rapide, sécurisée et entièrement anonyme."
+    },
+    {
+      "id": "demo_intro_22",
+      "file": "templates/demo_intro.html",
+      "element": "span",
+      "text": "Durée totale: moins de 2 minutes"
+    },
+    {
+      "id": "demo_intro_23",
+      "file": "templates/demo_intro.html",
+      "element": "span",
+      "text": "Aucune connexion, aucun spam, aucune configuration"
+    },
+    {
+      "id": "demo_intro_24",
+      "file": "templates/demo_intro.html",
+      "element": "span",
+      "text": "Toutes les réponses sont anonymisées et utilisées uniquement à des fins de démonstration"
+    },
+    {
+      "id": "demo_intro_25",
+      "file": "templates/demo_intro.html",
+      "element": "h2",
+      "text": "Êtes-vous prêt à commencer ?"
+    },
+    {
+      "id": "demo_intro_26",
+      "file": "templates/demo_intro.html",
+      "element": "p",
+      "text": "Cliquez ci-dessous pour poursuivre la configuration de la session sécurisée et lancer l'expérience d'enquête."
+    },
+    {
+      "id": "demo_intro_aria_27",
+      "file": "templates/demo_intro.html",
+      "element": "a[aria-label]",
+      "text": "Passer à l'enquête"
+    },
+    {
+      "id": "company_responses_1",
+      "file": "templates/company_responses.html",
+      "element": "span",
+      "text": "Chargement..."
+    },
+    {
+      "id": "company_responses_2",
+      "file": "templates/company_responses.html",
+      "element": "span",
+      "text": "Chargement..."
+    },
+    {
+      "id": "company_responses_3",
+      "file": "templates/company_responses.html",
+      "element": "p",
+      "text": "Chargement des réponses..."
+    },
+    {
+      "id": "company_responses_4",
+      "file": "templates/company_responses.html",
+      "element": "th",
+      "text": "Répondant"
+    },
+    {
+      "id": "company_responses_5",
+      "file": "templates/company_responses.html",
+      "element": "th",
+      "text": "NPS"
+    },
+    {
+      "id": "company_responses_6",
+      "file": "templates/company_responses.html",
+      "element": "th",
+      "text": "Satisfaction"
+    },
+    {
+      "id": "company_responses_7",
+      "file": "templates/company_responses.html",
+      "element": "th",
+      "text": "Valeur du produit"
+    },
+    {
+      "id": "company_responses_8",
+      "file": "templates/company_responses.html",
+      "element": "th",
+      "text": "Service"
+    },
+    {
+      "id": "company_responses_9",
+      "file": "templates/company_responses.html",
+      "element": "th",
+      "text": "Tarification"
+    },
+    {
+      "id": "company_responses_10",
+      "file": "templates/company_responses.html",
+      "element": "th",
+      "text": "Date"
+    },
+    {
+      "id": "company_responses_11",
+      "file": "templates/company_responses.html",
+      "element": "th",
+      "text": "Action"
+    },
+    {
+      "id": "company_responses_12",
+      "file": "templates/company_responses.html",
+      "element": "p",
+      "text": "Aucune réponse trouvée pour cette entreprise"
+    },
+    {
+      "id": "company_responses_13",
+      "file": "templates/company_responses.html",
+      "element": "p",
+      "text": "Erreur lors du chargement des réponses"
+    },
+    {
+      "id": "company_responses_14",
+      "file": "templates/company_responses.html",
+      "element": "div",
+      "text": "Affichage"
+    },
+    {
+      "id": "public_survey_response_1",
+      "file": "templates/public_survey_response.html",
+      "element": "span",
+      "text": "NPS: {{ response.nps_score }}/10"
+    },
+    {
+      "id": "public_survey_response_2",
+      "file": "templates/public_survey_response.html",
+      "element": "span",
+      "text": "Répondant:"
+    },
+    {
+      "id": "public_survey_response_3",
+      "file": "templates/public_survey_response.html",
+      "element": "span",
+      "text": "Entreprise:"
+    },
+    {
+      "id": "public_survey_response_4",
+      "file": "templates/public_survey_response.html",
+      "element": "span",
+      "text": "E-mail:"
+    },
+    {
+      "id": "public_survey_response_5",
+      "file": "templates/public_survey_response.html",
+      "element": "span",
+      "text": "Ancienneté:"
+    },
+    {
+      "id": "public_survey_response_6",
+      "file": "templates/public_survey_response.html",
+      "element": "span",
+      "text": "Score NPS:"
+    },
+    {
+      "id": "public_survey_response_7",
+      "file": "templates/public_survey_response.html",
+      "element": "span",
+      "text": "Satisfaction:"
+    },
+    {
+      "id": "public_survey_response_8",
+      "file": "templates/public_survey_response.html",
+      "element": "span",
+      "text": "Valeur du produit:"
+    },
+    {
+      "id": "public_survey_response_9",
+      "file": "templates/public_survey_response.html",
+      "element": "span",
+      "text": "Qualité du service:"
+    },
+    {
+      "id": "public_survey_response_10",
+      "file": "templates/public_survey_response.html",
+      "element": "span",
+      "text": "Tarification:"
+    },
+    {
+      "id": "public_survey_response_11",
+      "file": "templates/public_survey_response.html",
+      "element": "span",
+      "text": "Sentiment:"
+    },
+    {
+      "id": "public_survey_response_12",
+      "file": "templates/public_survey_response.html",
+      "element": "span",
+      "text": "Score de sentiment:"
+    },
+    {
+      "id": "public_survey_response_aria_13",
+      "file": "templates/public_survey_response.html",
+      "element": "div[aria-label]",
+      "text": "Détails de la réponse à l'enquête"
+    },
+    {
+      "id": "public_survey_response_aria_14",
+      "file": "templates/public_survey_response.html",
+      "element": "span[aria-label]",
+      "text": "Net Promoter Score: {{ response.nps_score }} sur 10, {{ response.nps_category }}"
+    },
+    {
+      "id": "public_survey_response_aria_15",
+      "file": "templates/public_survey_response.html",
+      "element": "aside[aria-label]",
+      "text": "Données d'analyse de la réponse à l'enquête"
+    },
+    {
+      "id": "public_survey_response_aria_16",
+      "file": "templates/public_survey_response.html",
+      "element": "span[aria-label]",
+      "text": "Sentiment: {{ response.sentiment_label }}"
+    },
+    {
+      "id": "public_survey_response_aria_17",
+      "file": "templates/public_survey_response.html",
+      "element": "div[aria-label]",
+      "text": "Principaux thèmes identifiés"
+    },
+    {
+      "id": "public_survey_response_aria_18",
+      "file": "templates/public_survey_response.html",
+      "element": "div[aria-label]",
+      "text": "Growth opportunities identified"
+    },
+    {
+      "id": "public_survey_response_aria_19",
+      "file": "templates/public_survey_response.html",
+      "element": "div[aria-label]",
+      "text": "Conversation history"
+    },
+    {
+      "id": "index_1",
+      "file": "templates/index.html",
+      "element": "h1",
+      "text": "VO"
+    },
+    {
+      "id": "index_2",
+      "file": "templates/index.html",
+      "element": "p",
+      "text": "Turning voices into value"
+    },
+    {
+      "id": "index_3",
+      "file": "templates/index.html",
+      "element": "h2",
+      "text": "What You'll Experience"
+    },
+    {
+      "id": "index_4",
+      "file": "templates/index.html",
+      "element": "p",
+      "text": "Run a real customer feedback scenario."
+    },
+    {
+      "id": "index_5",
+      "file": "templates/index.html",
+      "element": "h2",
+      "text": "Demo Features"
+    },
+    {
+      "id": "index_6",
+      "file": "templates/index.html",
+      "element": "h3",
+      "text": "Join a Live Campaign"
+    },
+    {
+      "id": "index_7",
+      "file": "templates/index.html",
+      "element": "p",
+      "text": "You'll take part in a live simulated campaign, where VO"
+    },
+    {
+      "id": "index_8",
+      "file": "templates/index.html",
+      "element": "a",
+      "text": "Start Demo"
+    },
+    {
+      "id": "index_9",
+      "file": "templates/index.html",
+      "element": "h3",
+      "text": "AI Insights"
+    },
+    {
+      "id": "index_10",
+      "file": "templates/index.html",
+      "element": "p",
+      "text": "Once the dialogue is complete, VO"
+    },
+    {
+      "id": "index_11",
+      "file": "templates/index.html",
+      "element": "a",
+      "text": "See AI Insights"
+    },
+    {
+      "id": "index_12",
+      "file": "templates/index.html",
+      "element": "h2",
+      "text": "Proven Results from Campaign-Based Intelligence"
+    },
+    {
+      "id": "index_13",
+      "file": "templates/index.html",
+      "element": "div",
+      "text": "10x"
+    },
+    {
+      "id": "index_14",
+      "file": "templates/index.html",
+      "element": "p",
+      "text": "Speed-to-Insight"
+    },
+    {
+      "id": "index_15",
+      "file": "templates/index.html",
+      "element": "div",
+      "text": "4x"
+    },
+    {
+      "id": "index_16",
+      "file": "templates/index.html",
+      "element": "p",
+      "text": "More actionable insights"
+    },
+    {
+      "id": "index_17",
+      "file": "templates/index.html",
+      "element": "div",
+      "text": "98%"
+    },
+    {
+      "id": "index_18",
+      "file": "templates/index.html",
+      "element": "p",
+      "text": "Accuracy"
+    },
+    {
+      "id": "index_19",
+      "file": "templates/index.html",
+      "element": "h2",
+      "text": "Complete Intelligence Platform"
+    },
+    {
+      "id": "index_20",
+      "file": "templates/index.html",
+      "element": "p",
+      "text": "AI-powered survey intelligence"
+    },
+    {
+      "id": "index_21",
+      "file": "templates/index.html",
+      "element": "p",
+      "text": "Transcript analysis for key accounts"
+    },
+    {
+      "id": "index_22",
+      "file": "templates/index.html",
+      "element": "p",
+      "text": "Exec-level insights"
+    },
+    {
+      "id": "index_23",
+      "file": "templates/index.html",
+      "element": "p",
+      "text": "White-label brand configuration"
+    },
+    {
+      "id": "index_24",
+      "file": "templates/index.html",
+      "element": "p",
+      "text": "Analytics & business intelligence"
+    },
+    {
+      "id": "index_25",
+      "file": "templates/index.html",
+      "element": "p",
+      "text": "Participant management"
+    },
+    {
+      "id": "index_26",
+      "file": "templates/index.html",
+      "element": "p",
+      "text": "Campaign management"
+    },
+    {
+      "id": "index_27",
+      "file": "templates/index.html",
+      "element": "p",
+      "text": "User management"
+    },
+    {
+      "id": "index_28",
+      "file": "templates/index.html",
+      "element": "p",
+      "text": "Engagement management"
+    },
+    {
+      "id": "index_29",
+      "file": "templates/index.html",
+      "element": "p",
+      "text": "Security & authentication"
+    },
+    {
+      "id": "index_30",
+      "file": "templates/index.html",
+      "element": "p",
+      "text": "Email automation"
+    },
+    {
+      "id": "index_31",
+      "file": "templates/index.html",
+      "element": "p",
+      "text": "Real-time reporting"
+    },
+    {
+      "id": "index_32",
+      "file": "templates/index.html",
+      "element": "h2",
+      "text": "Get Started with VOÏA"
+    },
+    {
+      "id": "index_aria_33",
+      "file": "templates/index.html",
+      "element": "main[aria-label]",
+      "text": "VOÏA Demo Homepage"
+    },
+    {
+      "id": "index_aria_34",
+      "file": "templates/index.html",
+      "element": "a[aria-label]",
+      "text": "Start Demo - Join a Live Campaign"
+    },
+    {
+      "id": "index_aria_35",
+      "file": "templates/index.html",
+      "element": "a[aria-label]",
+      "text": "See AI Insights"
+    },
+    {
+      "id": "index_aria_36",
+      "file": "templates/index.html",
+      "element": "div[aria-label]",
+      "text": "10 times speed improvement"
+    },
+    {
+      "id": "index_aria_37",
+      "file": "templates/index.html",
+      "element": "div[aria-label]",
+      "text": "4 times more insights"
+    },
+    {
+      "id": "index_aria_38",
+      "file": "templates/index.html",
+      "element": "div[aria-label]",
+      "text": "98 percent accuracy"
+    },
+    {
+      "id": "index_aria_39",
+      "file": "templates/index.html",
+      "element": "a[aria-label]",
+      "text": "View Pricing Plans"
+    },
+    {
+      "id": "server_auth_1",
+      "file": "templates/server_auth.html",
+      "element": "h1",
+      "text": "VO"
+    },
+    {
+      "id": "server_auth_2",
+      "file": "templates/server_auth.html",
+      "element": "p",
+      "text": "A lightweight, AI-powered Voice of Client experience designed for small and medium businesses."
+    },
+    {
+      "id": "server_auth_3",
+      "file": "templates/server_auth.html",
+      "element": "div",
+      "text": "Takes under 2 minutes"
+    },
+    {
+      "id": "server_auth_4",
+      "file": "templates/server_auth.html",
+      "element": "div",
+      "text": "Includes live insight dashboard right after completion"
+    },
+    {
+      "id": "server_auth_5",
+      "file": "templates/server_auth.html",
+      "element": "h2",
+      "text": "Enter an email to generate a secure session token."
+    },
+    {
+      "id": "server_auth_6",
+      "file": "templates/server_auth.html",
+      "element": "label",
+      "text": "Email Address"
+    },
+    {
+      "id": "server_auth_7",
+      "file": "templates/server_auth.html",
+      "element": "div",
+      "text": "Enter your email to generate a secure session token"
+    },
+    {
+      "id": "server_auth_8",
+      "file": "templates/server_auth.html",
+      "element": "label",
+      "text": "Choose Your Survey Experience"
+    },
+    {
+      "id": "server_auth_9",
+      "file": "templates/server_auth.html",
+      "element": "h3",
+      "text": "Survey Type Options"
+    },
+    {
+      "id": "server_auth_10",
+      "file": "templates/server_auth.html",
+      "element": "h4",
+      "text": "Conversational Interface"
+    },
+    {
+      "id": "server_auth_11",
+      "file": "templates/server_auth.html",
+      "element": "p",
+      "text": "Engage with our natural language processing system to demonstrate advanced dialogue-based data collection."
+    },
+    {
+      "id": "server_auth_12",
+      "file": "templates/server_auth.html",
+      "element": "h4",
+      "text": "Structured Questionnaire"
+    },
+    {
+      "id": "server_auth_13",
+      "file": "templates/server_auth.html",
+      "element": "p",
+      "text": "Traditional form-based methodology for comparative analysis against conversational approaches."
+    },
+    {
+      "id": "server_auth_14",
+      "file": "templates/server_auth.html",
+      "element": "h5",
+      "text": "Token Generated Successfully!"
+    },
+    {
+      "id": "server_auth_15",
+      "file": "templates/server_auth.html",
+      "element": "span",
+      "text": "Start Conversational Survey"
+    },
+    {
+      "id": "server_auth_16",
+      "file": "templates/server_auth.html",
+      "element": "h5",
+      "text": "Token Generation Failed"
+    },
+    {
+      "id": "server_auth_placeholder_17",
+      "file": "templates/server_auth.html",
+      "element": "input[placeholder]",
+      "text": "Enter your email address"
+    },
+    {
+      "id": "server_auth_aria_18",
+      "file": "templates/server_auth.html",
+      "element": "button[aria-label]",
+      "text": "Generate secure authentication token"
+    },
+    {
+      "id": "server_auth_aria_19",
+      "file": "templates/server_auth.html",
+      "element": "a[aria-label]",
+      "text": "Start selected survey type"
+    },
+    {
+      "id": "auth_1",
+      "file": "templates/auth.html",
+      "element": "label",
+      "text": "Email Address"
+    },
+    {
+      "id": "auth_2",
+      "file": "templates/auth.html",
+      "element": "div",
+      "text": "You'll receive a secure token valid for 24 hours"
+    },
+    {
+      "id": "auth_3",
+      "file": "templates/auth.html",
+      "element": "span",
+      "text": "Loading..."
+    },
+    {
+      "id": "auth_4",
+      "file": "templates/auth.html",
+      "element": "p",
+      "text": "Generating your authentication token..."
+    },
+    {
+      "id": "auth_5",
+      "file": "templates/auth.html",
+      "element": "p",
+      "text": "Your authentication token has been created:"
+    },
+    {
+      "id": "auth_6",
+      "file": "templates/auth.html",
+      "element": "label",
+      "text": "Authentication Token:"
+    },
+    {
+      "id": "auth_7",
+      "file": "templates/auth.html",
+      "element": "label",
+      "text": "Choose Survey Experience:"
+    },
+    {
+      "id": "auth_8",
+      "file": "templates/auth.html",
+      "element": "button",
+      "text": "Generate Another Token"
+    },
+    {
+      "id": "auth_9",
+      "file": "templates/auth.html",
+      "element": "p",
+      "text": "Something went wrong. Please try again."
+    },
+    {
+      "id": "auth_10",
+      "file": "templates/auth.html",
+      "element": "button",
+      "text": "Try Again"
+    },
+    {
+      "id": "auth_11",
+      "file": "templates/auth.html",
+      "element": "h6",
+      "text": "Why do I need a token?"
+    },
+    {
+      "id": "auth_12",
+      "file": "templates/auth.html",
+      "element": "p",
+      "text": "Authentication tokens ensure that only authorized users can submit survey responses \n                            and prevent duplicate submissions. Your token is unique to your email address."
+    },
+    {
+      "id": "auth_13",
+      "file": "templates/auth.html",
+      "element": "h6",
+      "text": "Security Features:"
+    },
+    {
+      "id": "auth_14",
+      "file": "templates/auth.html",
+      "element": "li",
+      "text": "Tokens are tied to your email address"
+    },
+    {
+      "id": "auth_15",
+      "file": "templates/auth.html",
+      "element": "li",
+      "text": "Each token expires after 24 hours"
+    },
+    {
+      "id": "auth_16",
+      "file": "templates/auth.html",
+      "element": "li",
+      "text": "One response per email address (unless overwriting)"
+    },
+    {
+      "id": "auth_17",
+      "file": "templates/auth.html",
+      "element": "li",
+      "text": "Rate limiting prevents abuse"
+    },
+    {
+      "id": "auth_placeholder_18",
+      "file": "templates/auth.html",
+      "element": "input[placeholder]",
+      "text": "your.email@company.com"
+    },
+    {
+      "id": "auth_aria_19",
+      "file": "templates/auth.html",
+      "element": "div[aria-label]",
+      "text": "Survey type selection"
+    },
+    {
+      "id": "account_status_1",
+      "file": "templates/business_auth/account_status.html",
+      "element": "h2",
+      "text": "Vocsa"
+    },
+    {
+      "id": "account_status_2",
+      "file": "templates/business_auth/account_status.html",
+      "element": "p",
+      "text": "Voice Of Client Intelligence"
+    },
+    {
+      "id": "account_status_3",
+      "file": "templates/business_auth/account_status.html",
+      "element": "h5",
+      "text": "Account Suspended"
+    },
+    {
+      "id": "account_status_4",
+      "file": "templates/business_auth/account_status.html",
+      "element": "p",
+      "text": "Your account has been suspended. Please contact support for assistance."
+    },
+    {
+      "id": "account_status_5",
+      "file": "templates/business_auth/account_status.html",
+      "element": "h5",
+      "text": "Account Inactive"
+    },
+    {
+      "id": "account_status_6",
+      "file": "templates/business_auth/account_status.html",
+      "element": "p",
+      "text": "Your account is currently inactive. Please contact support to reactivate."
+    },
+    {
+      "id": "account_status_7",
+      "file": "templates/business_auth/account_status.html",
+      "element": "h5",
+      "text": "Account Closed"
+    },
+    {
+      "id": "account_status_8",
+      "file": "templates/business_auth/account_status.html",
+      "element": "p",
+      "text": "This account has been closed. Contact support if you believe this is an error."
+    }
+  ],
+  "flash_messages": [],
+  "email_templates": []
+}
