@@ -1,0 +1,4 @@
+Markers: 71
+Unique: 34
+Total UI strings: 211
+Coverage: 33.6%

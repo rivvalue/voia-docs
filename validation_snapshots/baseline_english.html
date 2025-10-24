@@ -1,0 +1,3127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Intelligence Hub - VOÏA - Voice Of Client Agent</title>
+    
+    <!-- Resource Hints for Faster CDN Loading -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/custom.css?v=name-only-navbar-20251010">
+    
+    <!-- CSRF Token for AJAX requests -->
+    <meta name="csrf-token" content="Ijg3NWQ2ODFjNDA1ZTQ5NzU4MmYwZmI1YTBlZGZmODkxMmU3ZGQ5NzAi.aPvLMg.9n12K135CQrswxQFTe2tGyZdjlU">
+    
+    
+    
+    
+</head>
+<body class="page-dashboard" data-ui-version="v1" data-user-id="None" data-user-email="">
+    
+    <!-- Sidebar Navigation (v2 UI only) -->
+    
+
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container position-relative">
+            <!-- Demo Logo for Trial Users (not authenticated) - Hidden on demo intro page -->
+            
+            <div class="navbar-brand d-flex align-items-center">
+                <img src="/static/uploads/logos/1/20251010_041248_archelo-logo.png" alt="Archelo Group inc" height="40" class="navbar-logo">
+            </div>
+            
+            
+            <!-- Centered Welcome Text (for unauthenticated users) -->
+            
+            <div class="d-flex justify-content-center flex-grow-1" style="max-width: 60%;">
+                <a class="navbar-brand text-nowrap navbar-welcome-text" href="/">
+                    Welcome to VO<span style="color: #E13A44;">Ï</span>A Demo
+                </a>
+            </div>
+            
+            
+            <!-- Language Selector - Always Visible (Mobile & Desktop) -->
+            <div class="d-flex align-items-center ms-auto">
+                <!-- Language Selector Component -->
+<div class="dropdown">
+    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+            type="button" 
+            id="languageDropdown" 
+            data-bs-toggle="dropdown" 
+            aria-expanded="false"
+            aria-label="Select language">
+        
+            <i class="fas fa-globe me-1"></i> English
+        
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+        <li>
+            <a class="dropdown-item active" 
+               href="/language/set/en">
+                <i class="fas fa-check me-2 "></i>
+                English
+            </a>
+        </li>
+        <li>
+            <a class="dropdown-item " 
+               href="/language/set/fr">
+                <i class="fas fa-check me-2 invisible"></i>
+                Français
+            </a>
+        </li>
+    </ul>
+</div>
+            </div>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <!-- Business Authentication - UI Version Toggle (inside collapsible menu) -->
+                    
+                </ul>
+            </div>
+            
+            <!-- User Name Display (No Dropdown - Actions in Sidebar) -->
+            
+            
+            <!-- Hamburger Toggle Button (Right Side - Unauthenticated) / User Dropdown (Right Side - Authenticated) -->
+            
+            <button class="navbar-toggler ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+        </div>
+    </nav>
+
+    <!-- Breadcrumb Navigation -->
+    
+
+    <main class="container mt-4 ">
+        
+
+
+
+
+
+<nav class="breadcrumb-nav" aria-label="Breadcrumb navigation">
+    <div class="container">
+        <ol class="breadcrumb-list">
+            
+                
+                    <li class="breadcrumb-item breadcrumb-item-current" aria-current="page">
+                        <span class="breadcrumb-text" title="Business Intelligence">Business Intelligence</span>
+                    </li>
+                
+            
+        </ol>
+    </div>
+</nav>
+
+<div class="container">
+    <div data-page="dashboard"></div>
+    <!-- Dashboard Header -->
+    <div class="bg-white border-bottom" style="padding: 2.5rem 0; margin-bottom: 2rem;">
+        <div class="row align-items-center">
+            <div class="col-12 col-md-8 mb-3 mb-md-0">
+                <h1 class="h2 mb-2">Business Intelligence</h1>
+                <p class="text-muted mb-0">Comprehensive customer feedback insights and analysis</p>
+            </div>
+            <div class="col-12 col-md-4 text-center text-md-end">
+                <div class="d-flex align-items-center justify-content-center justify-content-md-end gap-3">
+                    <!-- Export Response Data - Only for trial/public users -->
+                    
+                    <button class="btn btn-outline-secondary btn-sm" onclick="exportUserData()">
+                        <i class="fas fa-user-circle me-2"></i>Export Response Data
+                    </button>
+                    
+                    
+                    <!-- Refresh Icon -->
+                    <button class="btn btn-sm btn-link text-muted p-1" 
+                            onclick="refreshData()" 
+                            title="Refresh data">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Executive Summary - All Campaigns Overview -->
+<div class="mb-5">
+    <div class="bg-white border rounded" style="padding: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+        <!-- Section Header -->
+        <div class="mb-4">
+            <h3 class="mb-2"><i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>Executive Summary</h3>
+            <p class="text-muted mb-0">High-level overview of key performance indicators across all campaigns</p>
+        </div>
+
+        <!-- Loading state -->
+        <div class="loading-card" id="executiveSummaryLoading">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading executive summary...</span>
+            </div>
+            <div class="loading-text">Loading executive summary...</div>
+        </div>
+
+        <!-- Executive Summary Content (toggles during loading) -->
+        <div class="d-none" id="executiveSummaryContent">
+        <!-- KPI Overview Section -->
+        <div class="mb-4">
+            <h5 class="mb-3"><i class="fas fa-trending-up me-2" style="color: #E13A44;"></i>Campaign KPI Overview</h5>
+            <div class="table-responsive">
+                <table class="table table-borderless table-sm" id="kpiOverviewTable" style="font-size: 0.85rem;">
+                    <thead>
+                        <tr>
+                            <th style="min-width: 120px;">Campaign</th>
+                            <th class="text-center" style="min-width: 100px;">
+                                Responses
+                                <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Click to view full trends">
+                                    <canvas id="sparkline-responses"></canvas>
+                                </div>
+                            </th>
+                            <th class="text-center" style="min-width: 100px;">
+                                NPS
+                                <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Click to view full trends">
+                                    <canvas id="sparkline-nps"></canvas>
+                                </div>
+                            </th>
+                            <th class="text-center" style="min-width: 100px;">
+                                Companies
+                                <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Click to view full trends">
+                                    <canvas id="sparkline-companies"></canvas>
+                                </div>
+                            </th>
+                            <th class="text-center" style="min-width: 110px;">
+                                Critical Risk
+                                <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Click to view full trends">
+                                    <canvas id="sparkline-critical"></canvas>
+                                </div>
+                            </th>
+                            <th class="text-center" style="min-width: 110px;">
+                                Satisfaction
+                                <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Click to view full trends">
+                                    <canvas id="sparkline-satisfaction"></canvas>
+                                </div>
+                            </th>
+                            <th class="text-center" style="min-width: 110px;">
+                                Product
+                                <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Click to view full trends">
+                                    <canvas id="sparkline-product"></canvas>
+                                </div>
+                            </th>
+                            <th class="text-center" style="min-width: 100px;">
+                                Pricing
+                                <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Click to view full trends">
+                                    <canvas id="sparkline-pricing"></canvas>
+                                </div>
+                            </th>
+                            <th class="text-center" style="min-width: 100px;">
+                                Service
+                                <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="Click to view full trends">
+                                    <canvas id="sparkline-service"></canvas>
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="kpiOverviewTableBody">
+                        <tr>
+                            <td colspan="9" class="text-center text-muted">
+                                <i class="fas fa-spinner fa-spin me-2"></i>Loading KPI overview...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Mobile: View Trends Button (hidden on desktop) -->
+            <div class="text-center mt-3 d-md-none">
+                <button class="btn btn-outline-secondary btn-sm" onclick="openTrendsModal()" style="border-color: #BDBDBD; color: #000000;">
+                    <i class="fas fa-chart-line me-2"></i>View Trends
+                </button>
+            </div>
+        </div>
+
+        <!-- Campaign Comparison Section -->
+        <div class="mt-4">
+            <h5 class="mb-3"><i class="fas fa-exchange-alt me-2" style="color: #E13A44;"></i>Campaign Comparison</h5>
+            
+            <!-- Campaign Comparison Selector -->
+            <div class="border rounded p-3 mb-3" style="background-color: #f8f9fa;">
+                <div class="row align-items-center">
+                    <div class="col-md-5">
+                        <label for="campaign1Select" class="form-label fw-semibold">Campaign 1</label>
+                        <select class="form-select" id="campaign1Select" onchange="updateComparison()">
+                            <option value="">Select first campaign</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 text-center">
+                        <i class="fas fa-exchange-alt fa-2x mt-4" style="color: #E13A44;"></i>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="campaign2Select" class="form-label fw-semibold">Campaign 2</label>
+                        <select class="form-select" id="campaign2Select" onchange="updateComparison()">
+                            <option value="">Select second campaign</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- No Selection Message -->
+                <div id="noComparisonMessage" class="text-center py-4 mt-3" style="background-color: #ffffff; border-radius: 8px;">
+                    <i class="fas fa-info-circle fa-2x mb-2" style="color: #E13A44;"></i>
+                    <p class="text-muted mb-0">Please select two campaigns above to view comparison results</p>
+                </div>
+            </div>
+            
+            <!-- Comparison Results -->
+            <div id="comparisonResults" style="display: none;">
+                <!-- Metrics Comparison -->
+                <div class="border rounded p-3 mb-3" style="background-color: #ffffff;">
+                    <h6 class="mb-3">Metrics Comparison</h6>
+                    <div class="table-responsive">
+                        <table class="table table-borderless table-sm">
+                            <thead>
+                                <tr style="background-color: #f8f9fa;">
+                                    <th style="width: 30%;">Metric</th>
+                                    <th style="width: 25%;" class="text-center" id="campaign1Header">Campaign 1</th>
+                                    <th style="width: 25%;" class="text-center" id="campaign2Header">Campaign 2</th>
+                                    <th style="width: 20%;" class="text-center">Change</th>
+                                </tr>
+                            </thead>
+                            <tbody id="summaryTable">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Account-by-Account Analysis -->
+                <div class="border rounded p-3" style="background-color: #ffffff;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h6 class="mb-0">Account-by-Account Analysis</h6>
+                            <small class="text-muted" id="comparisonSearchInfo"></small>
+                        </div>
+                    </div>
+                    
+                    <!-- Campaign Identifiers -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <small class="text-muted">C1 = <strong id="c1CampaignName">Campaign 1</strong></small>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <small class="text-muted">C2 = <strong id="c2CampaignName">Campaign 2</strong></small>
+                        </div>
+                    </div>
+                    
+                    <!-- Search and Filter Controls -->
+                    <div class="row align-items-end mb-3">
+                        <div class="col-md-5">
+                            <label for="comparisonSearch" class="form-label">Search</label>
+                            <input type="text" class="form-control" id="comparisonSearch" 
+                                   placeholder="Search by company name...">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="comparisonBalanceFilter" class="form-label">Balance Status</label>
+                            <select class="form-select" id="comparisonBalanceFilter" onchange="searchComparisonTable()">
+                                <option value="">All Companies</option>
+                                <option value="opportunity_heavy">Opportunity Heavy</option>
+                                <option value="balanced">Balanced</option>
+                                <option value="risk_heavy">Risk Heavy</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="btn-group w-100">
+                                <button type="button" class="btn btn-primary" onclick="searchComparisonTable()">
+                                    <i class="fas fa-search me-1"></i>Search
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="clearComparisonSearch()">
+                                    <i class="fas fa-times me-1"></i>Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-sm">
+                            <thead style="background-color: #f8f9fa;">
+                                <tr>
+                                    <th style="width: 15%;">Company</th>
+                                    <th style="width: 15%;" class="text-center">C1 Risks</th>
+                                    <th style="width: 15%;" class="text-center">C1 Opps</th>
+                                    <th style="width: 15%;" class="text-center">C1 Balance</th>
+                                    <th style="width: 15%;" class="text-center">C2 Risks</th>
+                                    <th style="width: 15%;" class="text-center">C2 Opps</th>
+                                    <th style="width: 15%;" class="text-center">C2 Balance</th>
+                                    <th style="width: 15%;" class="text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="companyTable">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination Controls for Comparison Table -->
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div class="pagination-info">
+                            <small class="text-muted" id="comparisonPaginationInfo">Loading...</small>
+                        </div>
+                        <nav aria-label="Comparison table pagination">
+                            <ul class="pagination pagination-sm mb-0" id="comparisonPaginationControls">
+                                <!-- Will be populated by JavaScript -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        <!-- End Executive Summary Content -->
+    </div>
+</div>
+
+<!-- Campaign Insights Section -->
+<div class="bg-white border rounded mb-4" style="padding: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+    <!-- Section Header -->
+    <div class="mb-4">
+        <h3 class="mb-2"><i class="fas fa-chart-bar me-2" style="color: #E13A44;"></i>Campaign Insights</h3>
+        <p class="text-muted mb-0">Analyze and compare campaign-specific performance metrics</p>
+    </div>
+
+<div class="dashboard-navigation mb-4">
+        <!-- Campaign Analytics Filter (Only for Insights) -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="border rounded" style="padding: 1.5rem; background-color: #f8f9fa;">
+                    <!-- Header -->
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="mb-1"><i class="fas fa-filter me-2" style="color: #E13A44;"></i>Campaign Analytics Filter</h6>
+                            <small class="text-muted">Compare KPIs across different campaigns</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Filter Controls -->
+                    <div class="row align-items-center mb-2">
+                        <div class="col-12 col-md-auto mb-2 mb-md-0">
+                            <label for="campaignFilter" class="form-label mb-0">Campaign:</label>
+                        </div>
+                        <div class="col-12 col-md">
+                            <div class="d-flex gap-2 align-items-center">
+                                <select class="form-select" id="campaignFilter" onchange="applyCampaignFilter()" style="max-width: 400px;">
+                                    <option value="">Select Campaign</option>
+                                    <!-- Will be populated by JavaScript -->
+                                </select>
+                                <button class="btn btn-outline-secondary btn-sm" onclick="clearCampaignFilter()" title="Clear Filter">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Campaign Metadata (appears when campaign selected) -->
+                    <div id="selectedCampaignInfo" class="mt-3 pt-3 border-top" style="display: none; background-color: #f8f9fa; margin: 0 -1.5rem -1.5rem; padding: 1rem 1.5rem !important; border-radius: 0 0 0.375rem 0.375rem;">
+                        <div class="d-flex gap-2 align-items-center flex-wrap">
+                            <small class="text-muted me-2">Campaign Details:</small>
+                            <span class="badge bg-light text-dark border" id="selectedCampaignDates">
+                                <i class="fas fa-calendar-alt me-1"></i><span class="campaign-dates-text"></span>
+                            </span>
+                            <span class="badge" id="selectedCampaignStatus">
+                                <span class="campaign-status-text"></span>
+                            </span>
+                            <span class="badge text-dark border" id="selectedCampaignDaysLeft" style="display: none; background: #f5f5f5;">
+                                <i class="fas fa-clock me-1" style="color: #E13A44;"></i><span class="campaign-days-text"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    <!-- Main Navigation Tabs -->
+    <ul class="nav nav-tabs mb-4" id="dashboardNav" role="tablist" style="border-bottom: 1px solid #e5e5e5;">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
+                <i class="fas fa-tachometer-alt me-2" style="color: #E13A44;"></i>Overview
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="intelligence-tab" data-bs-toggle="tab" data-bs-target="#intelligence" type="button" role="tab" aria-controls="intelligence" aria-selected="false">
+                <i class="fas fa-brain me-2" style="color: #E13A44;"></i>Account Intelligence
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="analytics" aria-selected="false">
+                <i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>Analytics
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="survey-insights-tab" data-bs-toggle="tab" data-bs-target="#survey-insights" type="button" role="tab" aria-controls="survey-insights" aria-selected="false">
+                <i class="fas fa-comments me-2" style="color: #E13A44;"></i>Survey Insights
+            </button>
+        </li>
+    </ul>
+</div>
+
+    <!-- Loading state (positioned below campaign filter) -->
+    <div class="loading-card" id="loadingIndicator">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading dashboard data...</span>
+        </div>
+        <div class="loading-text">Loading dashboard data...</div>
+    </div>
+
+    <!-- Dashboard Content (toggles during loading) -->
+    <div class="d-none" id="dashboardContent">
+        <!-- Tab Content -->
+        <div class="tab-content" id="dashboardTabContent">
+        <!-- Overview Tab -->
+        <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+            <!-- Active Campaign Banner -->
+            <div class="row mb-4" id="activeCampaignBanner" style="display: none;">
+                <div class="col-12">
+                    <div class="alert d-flex align-items-center border rounded" style="background: #fff; border-color: #E13A44 !important; padding: 1rem;">
+                        <i class="fas fa-bullhorn me-3" style="color: #E13A44;"></i>
+                        <div>
+                            <strong>Survey Insights</strong> - Currently showing data from active campaign: 
+                            <span id="activeCampaignName" class="fw-bold">Campaign Name</span>
+                            <span class="ms-2 text-muted" id="activeCampaignDates">Jan 1 - Dec 31, 2024</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="row mb-4 g-3">
+                <div class="col">
+                    <div class="kpi-card kpi-success">
+                        <div class="kpi-value text-primary" id="npsScore">0</div>
+                        <div class="kpi-label">NPS Score</div>
+                        <div class="kpi-trend" id="npsScoreTrend">Overall satisfaction metric</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="kpi-card kpi-primary">
+                        <div class="kpi-value text-success" id="totalResponses">0</div>
+                        <div class="kpi-label">Total Responses</div>
+                        <div class="kpi-trend" id="totalResponsesTrend">All time feedback collected</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="kpi-card kpi-info">
+                        <div class="kpi-value text-info" id="recentResponses">0</div>
+                        <div class="kpi-label">Recent (30 days)</div>
+                        <div class="kpi-trend" id="recentResponsesTrend">Latest customer feedback</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="kpi-card kpi-danger">
+                        <div class="kpi-value text-danger" id="highRiskCount">0</div>
+                        <div class="kpi-label">
+                            High Churn Risk Accounts
+                            <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top" 
+                               title="Companies with High or Critical churn risk level based on AI assessment" style="font-size: 0.8em; opacity: 0.7;"></i>
+                        </div>
+                        <div class="kpi-trend" id="highRiskTrend">Imminent churn risk (High/Critical)</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="kpi-card kpi-success">
+                        <div class="kpi-value text-success" id="growthPotential">0%</div>
+                        <div class="kpi-label">Growth Potential</div>
+                        <div class="kpi-trend" id="growthPotentialTrend">Revenue expansion opportunity</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- High Churn Risk Accounts & Key Themes Summary -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <h5>High Churn Risk Accounts
+                                <i class="fas fa-info-circle ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
+                                   title="Companies with High or Critical churn risk level" style="font-size: 0.8em; opacity: 0.7;"></i>
+                            </h5>
+                        </div>
+                        <div class="card-body" style="height: 550px; overflow-y: auto; padding: 1.5rem;">
+                            <div id="highRiskAccounts">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <h5>Key Themes</h5>
+                        </div>
+                        <div class="card-body" style="height: 550px;">
+                            <div class="chart-container">
+                                <canvas id="themesChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Intelligence Tab -->
+        <div class="tab-pane fade" id="intelligence" role="tabpanel" aria-labelledby="intelligence-tab">
+            <!-- Account Intelligence - Unified View -->
+            <div class="chart-card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        Account Intelligence
+                        <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top" 
+                           title="Shows account health balance: Risk-Heavy (risks outweigh opportunities), High Potential (opportunities with minimal risks), or Balanced" 
+                           style="font-size: 0.8em; opacity: 0.7;"></i>
+                    </h5>
+                    <small class="text-muted">Risk vs Opportunity Balance by Company</small>
+                </div>
+                <div class="card-body">
+                            <!-- Search and Filters -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <label for="accountIntelSearch" class="form-label">Search</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                        <input type="text" class="form-control" id="accountIntelSearch" 
+                                               placeholder="Search company, opportunities, risks..." 
+                                               onkeyup="searchAccountIntelligence()">
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="accountBalanceFilter" class="form-label">Balance</label>
+                                    <select class="form-select" id="accountBalanceFilter" onchange="searchAccountIntelligence()">
+                                        <option value="">All</option>
+                                        <option value="risk_heavy">Risk-Heavy</option>
+                                        <option value="balanced">Balanced</option>
+                                        <option value="opportunity_heavy">High Potential</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="accountRiskFilter" class="form-label">Risk Level</label>
+                                    <select class="form-select" id="accountRiskFilter" onchange="searchAccountIntelligence()">
+                                        <option value="">All</option>
+                                        <option value="critical">Critical</option>
+                                        <option value="high">High</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="low">Low</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="accountOppFilter" class="form-label">Opportunities</label>
+                                    <select class="form-select" id="accountOppFilter" onchange="searchAccountIntelligence()">
+                                        <option value="">All</option>
+                                        <option value="yes">Has Opportunities</option>
+                                        <option value="no">No Opportunities</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="accountRisksFilter" class="form-label">Has Risks</label>
+                                    <select class="form-select" id="accountRisksFilter" onchange="searchAccountIntelligence()">
+                                        <option value="">All</option>
+                                        <option value="yes">Has Risks</option>
+                                        <option value="no">No Risks</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <!-- Results Count and Clear Filters -->
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <span id="accountIntelCount" class="text-muted">Loading...</span>
+                                    <span id="accountIntelFiltersActive" class="badge ms-2" style="display: none; background: rgba(225, 58, 68, 0.1); color: #E13A44;"></span>
+                                </div>
+                                <button class="btn btn-sm btn-outline-secondary" id="accountIntelClearFilters" 
+                                        onclick="clearAccountIntelFilters()" style="display: none;">
+                                    <i class="fas fa-times me-1"></i>Clear Filters
+                                </button>
+                            </div>
+                            
+                            <div id="accountIntelligence">
+                                <!-- Will be populated by JavaScript -->
+                            </div>
+                            
+                            <!-- Pagination Controls -->
+                            <nav aria-label="Account Intelligence pagination" id="accountIntelPaginationContainer" style="display: none;">
+                                <ul class="pagination justify-content-center" id="accountIntelPagination"></ul>
+                            </nav>
+                        </div>
+                    </div>
+        </div>
+
+        <!-- Analytics Tab -->
+        <div class="tab-pane fade" id="analytics" role="tabpanel" aria-labelledby="analytics-tab">
+            <!-- Charts Row -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-6">
+            <div class="chart-card">
+                <div class="card-header">
+                    <h5>NPS Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="npsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-card">
+                <div class="card-header">
+                    <h5>Sentiment Analysis</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="sentimentChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tenure Distribution -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-6">
+            <div class="chart-card">
+                <div class="card-header">
+                    <h5>Customer Tenure Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="tenureChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="chart-card">
+                <div class="card-header">
+                    <h5>NPS-Based Growth Factor Analysis</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="growthFactorChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+            <!-- Average Ratings -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <h5>Average Ratings</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="ratingsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Survey Insights Tab -->
+        <div class="tab-pane fade" id="survey-insights" role="tabpanel" aria-labelledby="survey-insights-tab">
+            <!-- Company NPS Segregation Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="data-table">
+                        <div class="table-header">
+                            <h5>NPS by Client Company</h5>
+                            <small class="text-muted">Strategic account management - NPS scores segregated by company evaluating Archelo Group</small>
+                        </div>
+                        <div class="p-3">
+                            <!-- Search and Filter Controls -->
+                            <div class="row align-items-end mb-3">
+                                <div class="col-md-5">
+                                    <label for="companySearch" class="form-label">Search</label>
+                                    <input type="text" class="form-control" id="companySearch" 
+                                           placeholder="Search by company name...">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="companyNpsFilter" class="form-label">NPS Category</label>
+                                    <select class="form-select" id="companyNpsFilter" onchange="searchCompanyNPS()">
+                                        <option value="">All Companies</option>
+                                        <option value="promoters">Promoters (9-10)</option>
+                                        <option value="passives">Passives (7-8)</option>
+                                        <option value="detractors">Detractors (0-6)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="btn-group w-100">
+                                        <button type="button" class="btn btn-primary" onclick="searchCompanyNPS()">
+                                            <i class="fas fa-search me-1"></i>Search
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="clearCompanySearch()">
+                                            <i class="fas fa-times me-1"></i>Clear
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted" id="companySearchInfo"></small>
+                            </div>
+                        </div>
+                        <div class="p-0">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Company Name</th>
+                                            <th>Respondents</th>
+                                            <th>Avg Individual NPS</th>
+                                            <th>Company NPS</th>
+                                            <th>Distribution</th>
+                                            <th>Risk Level</th>
+                                            <th>Latest Response</th>
+                                            <th>Latest Churn Risk</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="companyNpsTableServerSide" style="display: table-row-group !important; visibility: visible !important;">
+                                        
+                                            <!-- Server-side data: 101 companies -->
+                                            
+                                            <tr>
+                                                <td><strong>Pfizer</strong></td>
+                                                <td>6</td>
+                                                <td>6.0</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -50
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 3Pa / 3D</small></td>
+                                                <td>
+                                                    <span class="badge bg-dark">
+                                                        Critical
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-20</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>RealEstateFlow Inc</strong></td>
+                                                <td>2</td>
+                                                <td>7.0</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -50
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 1Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-dark">
+                                                        Critical
+                                                    </span>
+                                                </td>
+                                                <td>2025-03-03</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Archelo</strong></td>
+                                                <td>6</td>
+                                                <td>5.7</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -50
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 3Pa / 3D</small></td>
+                                                <td>
+                                                    <span class="badge bg-dark">
+                                                        Critical
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-16</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>FleetManager Pro</strong></td>
+                                                <td>6</td>
+                                                <td>6.2</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -50
+                                                    </span>
+                                                </td>
+                                                <td><small>1P / 1Pa / 4D</small></td>
+                                                <td>
+                                                    <span class="badge bg-dark">
+                                                        Critical
+                                                    </span>
+                                                </td>
+                                                <td>2025-06-05</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>KnowledgeHub Inc</strong></td>
+                                                <td>8</td>
+                                                <td>5.6</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -50
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 4Pa / 4D</small></td>
+                                                <td>
+                                                    <span class="badge bg-dark">
+                                                        Critical
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-23</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>PaymentHub Systems</strong></td>
+                                                <td>2</td>
+                                                <td>6.0</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -50
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 1Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-dark">
+                                                        Critical
+                                                    </span>
+                                                </td>
+                                                <td>2025-03-26</td>
+                                                <td>High</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>InvestPro Group</strong></td>
+                                                <td>9</td>
+                                                <td>5.6</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -56
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 4Pa / 5D</small></td>
+                                                <td>
+                                                    <span class="badge bg-dark">
+                                                        Critical
+                                                    </span>
+                                                </td>
+                                                <td>2025-06-22</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Psg</strong></td>
+                                                <td>10</td>
+                                                <td>5.5</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -60
+                                                    </span>
+                                                </td>
+                                                <td><small>1P / 2Pa / 7D</small></td>
+                                                <td>
+                                                    <span class="badge bg-dark">
+                                                        Critical
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-15</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>LearnPath Systems</strong></td>
+                                                <td>4</td>
+                                                <td>5.2</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -75
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 1Pa / 3D</small></td>
+                                                <td>
+                                                    <span class="badge bg-dark">
+                                                        Critical
+                                                    </span>
+                                                </td>
+                                                <td>2025-03-28</td>
+                                                <td>Low</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Freightflow Inc</strong></td>
+                                                <td>4</td>
+                                                <td>4.2</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -75
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 1Pa / 3D</small></td>
+                                                <td>
+                                                    <span class="badge bg-dark">
+                                                        Critical
+                                                    </span>
+                                                </td>
+                                                <td>2025-10-21</td>
+                                                <td>Low</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Dms Inc</strong></td>
+                                                <td>1</td>
+                                                <td>6.0</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -100
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 0Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-dark">
+                                                        Critical
+                                                    </span>
+                                                </td>
+                                                <td>2025-10-20</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>HealthTech Partners</strong></td>
+                                                <td>1</td>
+                                                <td>5.0</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -100
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 0Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-dark">
+                                                        Critical
+                                                    </span>
+                                                </td>
+                                                <td>2025-01-14</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>EcoPower Systems</strong></td>
+                                                <td>1</td>
+                                                <td>3.0</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -100
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 0Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-dark">
+                                                        Critical
+                                                    </span>
+                                                </td>
+                                                <td>2025-01-05</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Stan</strong></td>
+                                                <td>2</td>
+                                                <td>3.5</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -100
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 0Pa / 2D</small></td>
+                                                <td>
+                                                    <span class="badge bg-dark">
+                                                        Critical
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-10</td>
+                                                <td>High</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Min</strong></td>
+                                                <td>1</td>
+                                                <td>4.0</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -100
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 0Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-dark">
+                                                        Critical
+                                                    </span>
+                                                </td>
+                                                <td>2025-10-23</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Icloud</strong></td>
+                                                <td>3</td>
+                                                <td>4.3</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -100
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 0Pa / 3D</small></td>
+                                                <td>
+                                                    <span class="badge bg-dark">
+                                                        Critical
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-14</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>ShopFlow Systems</strong></td>
+                                                <td>2</td>
+                                                <td>3.0</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -100
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 0Pa / 2D</small></td>
+                                                <td>
+                                                    <span class="badge bg-dark">
+                                                        Critical
+                                                    </span>
+                                                </td>
+                                                <td>2025-03-21</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>MediCare Plus</strong></td>
+                                                <td>10</td>
+                                                <td>6.5</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        -20
+                                                    </span>
+                                                </td>
+                                                <td><small>2P / 4Pa / 4D</small></td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        High
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-27</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>TourismPro Inc</strong></td>
+                                                <td>10</td>
+                                                <td>6.9</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        -20
+                                                    </span>
+                                                </td>
+                                                <td><small>2P / 4Pa / 4D</small></td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        High
+                                                    </span>
+                                                </td>
+                                                <td>2025-06-16</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Ic</strong></td>
+                                                <td>5</td>
+                                                <td>7.0</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        -20
+                                                    </span>
+                                                </td>
+                                                <td><small>1P / 2Pa / 2D</small></td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        High
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-05</td>
+                                                <td>Low</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>StrategyFlow Systems</strong></td>
+                                                <td>9</td>
+                                                <td>6.1</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -22
+                                                    </span>
+                                                </td>
+                                                <td><small>2P / 3Pa / 4D</small></td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        High
+                                                    </span>
+                                                </td>
+                                                <td>2025-06-25</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>IMP</strong></td>
+                                                <td>4</td>
+                                                <td>6.5</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -25
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 3Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        High
+                                                    </span>
+                                                </td>
+                                                <td>2025-07-28</td>
+                                                <td>High</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Ati</strong></td>
+                                                <td>4</td>
+                                                <td>6.5</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -25
+                                                    </span>
+                                                </td>
+                                                <td><small>1P / 1Pa / 2D</small></td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        High
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-17</td>
+                                                <td>High</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Miel</strong></td>
+                                                <td>4</td>
+                                                <td>7.0</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -25
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 3Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        High
+                                                    </span>
+                                                </td>
+                                                <td>2025-07-08</td>
+                                                <td>Low</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>FactorySync Industries</strong></td>
+                                                <td>7</td>
+                                                <td>6.4</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -29
+                                                    </span>
+                                                </td>
+                                                <td><small>1P / 3Pa / 3D</small></td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        High
+                                                    </span>
+                                                </td>
+                                                <td>2025-06-22</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>333</strong></td>
+                                                <td>10</td>
+                                                <td>6.9</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -30
+                                                    </span>
+                                                </td>
+                                                <td><small>2P / 3Pa / 5D</small></td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        High
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-12</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Rivvalue</strong></td>
+                                                <td>3</td>
+                                                <td>5.3</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -33
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 2Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        High
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-10</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>StreamFlow Media</strong></td>
+                                                <td>3</td>
+                                                <td>7.0</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -33
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 2Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        High
+                                                    </span>
+                                                </td>
+                                                <td>2025-03-19</td>
+                                                <td>Low</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>EcomGrow Solutions</strong></td>
+                                                <td>3</td>
+                                                <td>6.0</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -33
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 2Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        High
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-18</td>
+                                                <td>Low</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>SecureBank Financial</strong></td>
+                                                <td>3</td>
+                                                <td>7.0</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -33
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 2Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        High
+                                                    </span>
+                                                </td>
+                                                <td>2025-03-29</td>
+                                                <td>Low</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>ComplianceSync Inc</strong></td>
+                                                <td>3</td>
+                                                <td>5.3</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -33
+                                                    </span>
+                                                </td>
+                                                <td><small>1P / 0Pa / 2D</small></td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        High
+                                                    </span>
+                                                </td>
+                                                <td>2025-03-28</td>
+                                                <td>High</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>FinanceFirst Ltd</strong></td>
+                                                <td>12</td>
+                                                <td>5.6</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -33
+                                                    </span>
+                                                </td>
+                                                <td><small>2P / 4Pa / 6D</small></td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        High
+                                                    </span>
+                                                </td>
+                                                <td>2025-06-27</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Justiceflow Systems</strong></td>
+                                                <td>11</td>
+                                                <td>6.5</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -36
+                                                    </span>
+                                                </td>
+                                                <td><small>2P / 3Pa / 6D</small></td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        High
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-17</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Video</strong></td>
+                                                <td>7</td>
+                                                <td>6.3</td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        -43
+                                                    </span>
+                                                </td>
+                                                <td><small>1P / 2Pa / 4D</small></td>
+                                                <td>
+                                                    <span class="badge bg-danger">
+                                                        High
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-19</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>PolicyFlow Systems</strong></td>
+                                                <td>10</td>
+                                                <td>7.5</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        +20
+                                                    </span>
+                                                </td>
+                                                <td><small>4P / 4Pa / 2D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-24</td>
+                                                <td>High</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>ClaimSync Solutions</strong></td>
+                                                <td>5</td>
+                                                <td>8.0</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        +20
+                                                    </span>
+                                                </td>
+                                                <td><small>2P / 2Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-22</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Klean</strong></td>
+                                                <td>5</td>
+                                                <td>6.8</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        +20
+                                                    </span>
+                                                </td>
+                                                <td><small>2P / 2Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-25</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>BuildingSync Pro</strong></td>
+                                                <td>5</td>
+                                                <td>8.0</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        +20
+                                                    </span>
+                                                </td>
+                                                <td><small>1P / 4Pa / 0D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-03-21</td>
+                                                <td>Low</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>RestaurantTech Inc</strong></td>
+                                                <td>6</td>
+                                                <td>7.5</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        +17
+                                                    </span>
+                                                </td>
+                                                <td><small>3P / 1Pa / 2D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-08-29</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Bim</strong></td>
+                                                <td>6</td>
+                                                <td>7.7</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        +17
+                                                    </span>
+                                                </td>
+                                                <td><small>2P / 3Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-17</td>
+                                                <td>Low</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>RenewCorp Energy</strong></td>
+                                                <td>12</td>
+                                                <td>7.8</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        +17
+                                                    </span>
+                                                </td>
+                                                <td><small>5P / 4Pa / 3D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-06-28</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>MediaStream Corp</strong></td>
+                                                <td>6</td>
+                                                <td>7.5</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        +17
+                                                    </span>
+                                                </td>
+                                                <td><small>2P / 3Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-05</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>CargoSync Logistics</strong></td>
+                                                <td>13</td>
+                                                <td>7.4</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        +15
+                                                    </span>
+                                                </td>
+                                                <td><small>5P / 5Pa / 3D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-15</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>MenuMaster Systems</strong></td>
+                                                <td>7</td>
+                                                <td>7.6</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        +14
+                                                    </span>
+                                                </td>
+                                                <td><small>2P / 4Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-06-29</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Cn</strong></td>
+                                                <td>17</td>
+                                                <td>7.4</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        +12
+                                                    </span>
+                                                </td>
+                                                <td><small>7P / 5Pa / 5D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-24</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>BroadcastPro Inc</strong></td>
+                                                <td>8</td>
+                                                <td>7.6</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        +12
+                                                    </span>
+                                                </td>
+                                                <td><small>2P / 5Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-21</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>API Masters Inc</strong></td>
+                                                <td>8</td>
+                                                <td>7.2</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        +12
+                                                    </span>
+                                                </td>
+                                                <td><small>4P / 1Pa / 3D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-16</td>
+                                                <td>High</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Mistral</strong></td>
+                                                <td>1</td>
+                                                <td>8.0</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 1Pa / 0D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-03</td>
+                                                <td>Low</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>TechVision Corp</strong></td>
+                                                <td>2</td>
+                                                <td>6.5</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>1P / 0Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-03-11</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>SupplyChain Pro</strong></td>
+                                                <td>1</td>
+                                                <td>7.0</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 1Pa / 0D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-01-05</td>
+                                                <td>Low</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>ManufacturePro Inc</strong></td>
+                                                <td>2</td>
+                                                <td>6.0</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>1P / 0Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-02-08</td>
+                                                <td>High</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>PropertyTech Solutions</strong></td>
+                                                <td>19</td>
+                                                <td>7.4</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>5P / 9Pa / 5D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-14</td>
+                                                <td>Low</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Riv</strong></td>
+                                                <td>6</td>
+                                                <td>7.2</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>3P / 0Pa / 3D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-17</td>
+                                                <td>High</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>TrainingPro Solutions</strong></td>
+                                                <td>12</td>
+                                                <td>7.0</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>3P / 6Pa / 3D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-20</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>DriveSync Automotive</strong></td>
+                                                <td>4</td>
+                                                <td>6.8</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>2P / 0Pa / 2D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-02-06</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>MarketReach Analytics</strong></td>
+                                                <td>9</td>
+                                                <td>7.4</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>2P / 5Pa / 2D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-06-22</td>
+                                                <td>High</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>RetailPro International</strong></td>
+                                                <td>9</td>
+                                                <td>7.4</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>1P / 7Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-06-30</td>
+                                                <td>Low</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>WellBeing Systems</strong></td>
+                                                <td>13</td>
+                                                <td>7.3</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>4P / 5Pa / 4D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-30</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Donut</strong></td>
+                                                <td>1</td>
+                                                <td>8.0</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 1Pa / 0D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-17</td>
+                                                <td>Low</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Midas</strong></td>
+                                                <td>1</td>
+                                                <td>7.0</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 1Pa / 0D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-07-08</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Mint</strong></td>
+                                                <td>6</td>
+                                                <td>7.2</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>1P / 4Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-27</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Rivx</strong></td>
+                                                <td>1</td>
+                                                <td>8.0</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 1Pa / 0D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-07-23</td>
+                                                <td>Low</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>LogiTrack Express</strong></td>
+                                                <td>18</td>
+                                                <td>7.7</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>5P / 8Pa / 5D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-21</td>
+                                                <td>Low</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>ContentHub Technologies</strong></td>
+                                                <td>3</td>
+                                                <td>7.3</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>1P / 1Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-03-03</td>
+                                                <td>Low</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Hotmail</strong></td>
+                                                <td>1</td>
+                                                <td>8.0</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 1Pa / 0D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-12</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>EMC</strong></td>
+                                                <td>12</td>
+                                                <td>6.9</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>5P / 2Pa / 5D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-08-29</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>VehicleTech Systems</strong></td>
+                                                <td>3</td>
+                                                <td>7.3</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 3Pa / 0D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-03-02</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Anderson Group</strong></td>
+                                                <td>9</td>
+                                                <td>7.2</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>2P / 5Pa / 2D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-17</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>LegalTech Partners</strong></td>
+                                                <td>8</td>
+                                                <td>7.1</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>2P / 4Pa / 2D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-19</td>
+                                                <td>Low</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Ocp</strong></td>
+                                                <td>1</td>
+                                                <td>7.0</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>0P / 1Pa / 0D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-11</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>ConsultPro Partners</strong></td>
+                                                <td>2</td>
+                                                <td>7.0</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        0
+                                                    </span>
+                                                </td>
+                                                <td><small>1P / 0Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-03-03</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>chams</strong></td>
+                                                <td>15</td>
+                                                <td>7.4</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        -7
+                                                    </span>
+                                                </td>
+                                                <td><small>4P / 6Pa / 5D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-08-29</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Me</strong></td>
+                                                <td>13</td>
+                                                <td>7.4</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        -8
+                                                    </span>
+                                                </td>
+                                                <td><small>3P / 6Pa / 4D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-14</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>SolarTech Industries</strong></td>
+                                                <td>12</td>
+                                                <td>6.6</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        -8
+                                                    </span>
+                                                </td>
+                                                <td><small>3P / 5Pa / 4D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-30</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Poly</strong></td>
+                                                <td>10</td>
+                                                <td>7.3</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        -10
+                                                    </span>
+                                                </td>
+                                                <td><small>3P / 3Pa / 4D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-08-29</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Lawyerhub Legal</strong></td>
+                                                <td>8</td>
+                                                <td>7.0</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        -12
+                                                    </span>
+                                                </td>
+                                                <td><small>1P / 5Pa / 2D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-10</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>IndustryTech Solutions</strong></td>
+                                                <td>7</td>
+                                                <td>7.4</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        -14
+                                                    </span>
+                                                </td>
+                                                <td><small>1P / 4Pa / 2D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-30</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>AdvisoryTech Inc</strong></td>
+                                                <td>7</td>
+                                                <td>6.4</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        -14
+                                                    </span>
+                                                </td>
+                                                <td><small>2P / 2Pa / 3D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-07-17</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>GreenEnergy Solutions</strong></td>
+                                                <td>6</td>
+                                                <td>7.0</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        -17
+                                                    </span>
+                                                </td>
+                                                <td><small>2P / 1Pa / 3D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-17</td>
+                                                <td>High</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>DataFlow Solutions</strong></td>
+                                                <td>12</td>
+                                                <td>6.3</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        -17
+                                                    </span>
+                                                </td>
+                                                <td><small>4P / 2Pa / 6D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-08-22</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>TravelBook Solutions</strong></td>
+                                                <td>11</td>
+                                                <td>6.6</td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        -18
+                                                    </span>
+                                                </td>
+                                                <td><small>3P / 3Pa / 5D</small></td>
+                                                <td>
+                                                    <span class="badge bg-secondary">
+                                                        Medium
+                                                    </span>
+                                                </td>
+                                                <td>2025-06-23</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Ortega, Mason And Hernandez</strong></td>
+                                                <td>4</td>
+                                                <td>9.0</td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        +100
+                                                    </span>
+                                                </td>
+                                                <td><small>4P / 0Pa / 0D</small></td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        Low
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-26</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Coka</strong></td>
+                                                <td>1</td>
+                                                <td>9.0</td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        +100
+                                                    </span>
+                                                </td>
+                                                <td><small>1P / 0Pa / 0D</small></td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        Low
+                                                    </span>
+                                                </td>
+                                                <td>2025-07-07</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Smith</strong></td>
+                                                <td>1</td>
+                                                <td>10.0</td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        +100
+                                                    </span>
+                                                </td>
+                                                <td><small>1P / 0Pa / 0D</small></td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        Low
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-03</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>White And Sons</strong></td>
+                                                <td>1</td>
+                                                <td>10.0</td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        +100
+                                                    </span>
+                                                </td>
+                                                <td><small>1P / 0Pa / 0D</small></td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        Low
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-15</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>BookingFlow Tech</strong></td>
+                                                <td>4</td>
+                                                <td>9.0</td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        +75
+                                                    </span>
+                                                </td>
+                                                <td><small>3P / 1Pa / 0D</small></td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        Low
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-22</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>CareConnect Health</strong></td>
+                                                <td>3</td>
+                                                <td>9.0</td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        +67
+                                                    </span>
+                                                </td>
+                                                <td><small>2P / 1Pa / 0D</small></td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        Low
+                                                    </span>
+                                                </td>
+                                                <td>2025-03-21</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>HotelSync Technologies</strong></td>
+                                                <td>4</td>
+                                                <td>8.5</td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        +50
+                                                    </span>
+                                                </td>
+                                                <td><small>2P / 2Pa / 0D</small></td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        Low
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-01</td>
+                                                <td>Low</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>EduTech Academy</strong></td>
+                                                <td>2</td>
+                                                <td>8.0</td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        +50
+                                                    </span>
+                                                </td>
+                                                <td><small>1P / 1Pa / 0D</small></td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        Low
+                                                    </span>
+                                                </td>
+                                                <td>2025-03-14</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>ProductionFlow Systems</strong></td>
+                                                <td>4</td>
+                                                <td>8.2</td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        +50
+                                                    </span>
+                                                </td>
+                                                <td><small>2P / 2Pa / 0D</small></td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        Low
+                                                    </span>
+                                                </td>
+                                                <td>2025-05-20</td>
+                                                <td>Medium</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>AutoParts Wholesale</strong></td>
+                                                <td>2</td>
+                                                <td>8.0</td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        +50
+                                                    </span>
+                                                </td>
+                                                <td><small>1P / 1Pa / 0D</small></td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        Low
+                                                    </span>
+                                                </td>
+                                                <td>2025-03-10</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>CloudSync Technologies</strong></td>
+                                                <td>13</td>
+                                                <td>8.2</td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        +46
+                                                    </span>
+                                                </td>
+                                                <td><small>7P / 5Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        Low
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-26</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>FoodService Partners</strong></td>
+                                                <td>8</td>
+                                                <td>8.2</td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        +38
+                                                    </span>
+                                                </td>
+                                                <td><small>4P / 3Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        Low
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-30</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Riskhub Insurance</strong></td>
+                                                <td>6</td>
+                                                <td>8.0</td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        +33
+                                                    </span>
+                                                </td>
+                                                <td><small>2P / 4Pa / 0D</small></td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        Low
+                                                    </span>
+                                                </td>
+                                                <td>2025-10-21</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>HomeHub RealEstate</strong></td>
+                                                <td>3</td>
+                                                <td>8.0</td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        +33
+                                                    </span>
+                                                </td>
+                                                <td><small>1P / 2Pa / 0D</small></td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        Low
+                                                    </span>
+                                                </td>
+                                                <td>2025-03-28</td>
+                                                <td>Low</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>ChefConnect Platform</strong></td>
+                                                <td>9</td>
+                                                <td>8.1</td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        +33
+                                                    </span>
+                                                </td>
+                                                <td><small>5P / 2Pa / 2D</small></td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        Low
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-24</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Indigo Inc</strong></td>
+                                                <td>13</td>
+                                                <td>7.8</td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        +31
+                                                    </span>
+                                                </td>
+                                                <td><small>6P / 5Pa / 2D</small></td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        Low
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-09</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Gmail</strong></td>
+                                                <td>7</td>
+                                                <td>8.1</td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        +29
+                                                    </span>
+                                                </td>
+                                                <td><small>3P / 3Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        Low
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-24</td>
+                                                <td>Low</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>InsureTech Corp</strong></td>
+                                                <td>7</td>
+                                                <td>8.0</td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        +29
+                                                    </span>
+                                                </td>
+                                                <td><small>3P / 3Pa / 1D</small></td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        Low
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-21</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>ExpertHub International</strong></td>
+                                                <td>13</td>
+                                                <td>7.8</td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        +23
+                                                    </span>
+                                                </td>
+                                                <td><small>7P / 2Pa / 4D</small></td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        Low
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-23</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                            <tr>
+                                                <td><strong>Sprint</strong></td>
+                                                <td>14</td>
+                                                <td>7.7</td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        +21
+                                                    </span>
+                                                </td>
+                                                <td><small>6P / 5Pa / 3D</small></td>
+                                                <td>
+                                                    <span class="badge bg-success">
+                                                        Low
+                                                    </span>
+                                                </td>
+                                                <td>2025-09-27</td>
+                                                <td>Minimal</td>
+                                            </tr>
+                                            
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Pagination Controls for Company NPS Table -->
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div class="pagination-info">
+                                    <small class="text-muted" id="companyPaginationInfo">Loading...</small>
+                                </div>
+                                <nav aria-label="Company NPS pagination">
+                                    <ul class="pagination pagination-sm mb-0" id="companyPaginationControls">
+                                        <!-- Will be populated by JavaScript -->
+                                    </ul>
+                                </nav>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    <strong>Company NPS</strong> = (% Promoters - % Detractors) within each company |
+                                    <strong>Risk Levels:</strong> 
+                                    <span class="badge bg-success">Low (>20)</span>
+                                    <span class="badge bg-secondary">Medium (-20 to 20)</span>
+                                    <span class="badge bg-danger">High (≤-20)</span>
+                                    <span class="badge bg-dark">Critical (≤-50)</span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tenure NPS Segregation Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="data-table">
+                        <div class="table-header">
+                            <h5>NPS by Customer Tenure</h5>
+                            <small class="text-muted">Customer lifecycle insights - NPS scores segregated by length of business relationship</small>
+                        </div>
+                        <div class="p-0">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Tenure Group</th>
+                                            <th>Respondents</th>
+                                            <th>Avg Individual NPS</th>
+                                            <th>Tenure NPS</th>
+                                            <th>Distribution</th>
+                                            <th>Risk Level</th>
+                                            <th>Latest Response</th>
+                                            <th>Latest Churn Risk</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tenureNpsTable">
+                                        <!-- Will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Pagination Controls for Tenure NPS Table -->
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div class="pagination-info">
+                                    <small class="text-muted" id="tenurePaginationInfo">Loading...</small>
+                                </div>
+                                <nav aria-label="Tenure NPS pagination">
+                                    <ul class="pagination pagination-sm mb-0" id="tenurePaginationControls">
+                                        <!-- Will be populated by JavaScript -->
+                                    </ul>
+                                </nav>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <small class="text-muted">
+                                    <strong>Tenure NPS</strong> = (% Promoters - % Detractors) within each tenure group |
+                                    <strong>Risk Levels:</strong> 
+                                    <span class="badge bg-success">Low (>20)</span>
+                                    <span class="badge bg-secondary">Medium (-20 to 20)</span>
+                                    <span class="badge bg-danger">High (≤-20)</span>
+                                    <span class="badge bg-dark">Critical (≤-50)</span>
+                                    <span class="badge bg-secondary">Insufficient Data (&lt;2 responses)</span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Responses Table -->
+            <div class="chart-card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0">Recent Survey Responses</h5>
+                            <small class="text-muted" id="responsesSearchInfo"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                            <!-- Search and Filter Controls -->
+                            <div class="row align-items-end mb-3">
+                                <div class="col-md-5">
+                                    <label for="responsesSearch" class="form-label">Search</label>
+                                    <input type="text" class="form-control" id="responsesSearch" 
+                                           placeholder="Search by company name, participant name, or email...">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="npsFilter" class="form-label">NPS Category</label>
+                                    <select class="form-select" id="npsFilter" onchange="searchSurveyResponses()">
+                                        <option value="">All Responses</option>
+                                        <option value="promoters">Promoters (9-10)</option>
+                                        <option value="passives">Passives (7-8)</option>
+                                        <option value="detractors">Detractors (0-6)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="btn-group w-100">
+                                        <button type="button" class="btn btn-primary" onclick="searchSurveyResponses()">
+                                            <i class="fas fa-search me-1"></i>Search
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="clearResponsesSearch()">
+                                            <i class="fas fa-times me-1"></i>Clear
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Company</th>
+                                            <th>Tenure with FC inc</th>
+                                            <th>NPS Score</th>
+                                            <th>Category</th>
+                                            <th>Sentiment</th>
+                                            <th>Churn Risk</th>
+                                            <th>Date</th>
+                                            <th>Details</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="responsesTable">
+                                        <!-- Will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Pagination Controls -->
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div class="pagination-info">
+                                    <small class="text-muted" id="paginationInfo">Loading...</small>
+                                </div>
+                                <nav aria-label="Survey responses pagination">
+                                    <ul class="pagination pagination-sm mb-0" id="paginationControls">
+                                        <!-- Will be populated by JavaScript -->
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+        </div>
+    </div>
+        <!-- End Tab Content -->
+
+    </div>
+</div>
+<!-- End Campaign Insights Section -->
+
+    <!-- End Dashboard Content -->
+</div>
+<!-- End Dashboard Column -->
+
+<!-- Company Responses Modal -->
+<div class="modal fade" id="companyResponsesModal" tabindex="-1" aria-labelledby="companyResponsesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" style="background-color: #ffffff; border: 2px solid #2E5090;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #2E5090 0%, #1a3560 100%); border-bottom: 2px solid #E13A44;">
+                <div class="w-100">
+                    <h5 class="modal-title text-white mb-2" id="companyResponsesModalLabel">
+                        <i class="fas fa-building me-2"></i><span id="modalCompanyName"></span>
+                    </h5>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <span class="badge bg-light text-dark">
+                            <i class="fas fa-flag me-1"></i><span id="modalCampaignName"></span>
+                        </span>
+                        <span class="badge" style="background-color: #2E5090; color: white;">
+                            <i class="fas fa-poll me-1"></i><span id="modalResponseCount">0</span> Responses
+                        </span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="background-color: #f8f9fa;">
+                <!-- Search and Filters -->
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            <span class="input-group-text" style="background-color: #ffffff; border-color: #dee2e6;">
+                                <i class="fas fa-search" style="color: #8A8A8A;"></i>
+                            </span>
+                            <input type="text" class="form-control" id="companyResponseSearch" 
+                                   placeholder="Search by respondent name or email..."
+                                   style="background-color: #ffffff; border-color: #dee2e6; color: #212529;">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" id="companyResponseSort" 
+                                style="background-color: #ffffff; border-color: #dee2e6; color: #212529;">
+                            <option value="created_at_desc">Newest First</option>
+                            <option value="created_at_asc">Oldest First</option>
+                            <option value="nps_score_desc">Highest NPS</option>
+                            <option value="nps_score_asc">Lowest NPS</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Loading State -->
+                <div id="companyResponsesLoading" class="text-center py-5">
+                    <div class="spinner-border" style="color: #2E5090;" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2" style="color: #8A8A8A;">Loading responses...</p>
+                </div>
+                
+                <!-- Responses Table -->
+                <div id="companyResponsesContent" style="display: none;">
+                    <div class="table-responsive">
+                        <table class="table table-hover" style="background-color: #ffffff;">
+                            <thead style="background-color: #2E5090; color: white; position: sticky; top: 0; z-index: 10;">
+                                <tr>
+                                    <th style="width: 20%;">Respondent</th>
+                                    <th style="width: 10%; text-align: center;">NPS</th>
+                                    <th style="width: 50%;" class="text-center">Ratings</th>
+                                    <th style="width: 15%;">Date</th>
+                                    <th style="width: 5%; text-align: center;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="companyResponsesTableBody">
+                                <!-- Will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div style="color: #8A8A8A;">
+                            <span id="companyResponsesPaginationInfo"></span>
+                        </div>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0" id="companyResponsesPagination">
+                                <!-- Will be populated by JavaScript -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                
+                <!-- No Data State -->
+                <div id="companyResponsesNoData" class="text-center py-5" style="display: none;">
+                    <i class="fas fa-inbox fa-4x mb-3" style="color: #BDBDBD;"></i>
+                    <h5 style="color: #8A8A8A;">No Responses Found</h5>
+                    <p style="color: #8A8A8A;">No survey responses match your search criteria.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- KPI Trends Modal -->
+<div class="modal fade" id="kpiTrendsModal" tabindex="-1" aria-labelledby="kpiTrendsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-white border-bottom">
+                <h5 class="modal-title" id="kpiTrendsModalLabel">
+                    <i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>Campaign KPI Trends
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="background-color: #FFFFFF;">
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Responses</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-responses" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">NPS Score</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-nps" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Companies Analyzed</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-companies" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Critical Risk</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-critical" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Satisfaction</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-satisfaction" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Product Value</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-product" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Pricing</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-pricing" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border">
+                            <div class="card-header bg-white border-bottom">
+                                <h6 class="mb-0">Service</h6>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="modal-chart-service" height="250"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-white border-top">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    </main>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Chart.js (Conditional Loading - Phase 2 Optimization) -->
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js" defer></script>
+    
+    
+    <!-- Sidebar Toggle Script (v2 UI only) -->
+    
+    
+    
+<!-- Pass business authentication status to JavaScript -->
+<script>
+    window.isBusinessAuthenticated = false;
+</script>
+
+<!-- Hash redirect handler for old bookmarks -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const hash = window.location.hash;
+    
+    // Handle old bookmark hashes
+    if (hash) {
+        // Redirect #admin-tools to Settings page
+        if (hash === '#admin-tools') {
+            window.location.href = "/business/admin";
+            return;
+        }
+    }
+});
+</script>
+
+<!-- JavaScript disabled for company NPS table - using server-side rendering only -->
+<script src="/static/js/dashboard.js?v=5257"></script>
+
+</body>
+</html>
