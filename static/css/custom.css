@@ -8877,6 +8877,99 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     transform: translateY(0);
 }
 
+/* Filter Summary Bar */
+.filter-summary-bar {
+    background: var(--light-gray);
+    border-left: 4px solid var(--primary-red);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.filter-summary-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-sm);
+}
+
+.filter-summary-label {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--neutral-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    background: var(--primary-white);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-sm);
+    color: var(--neutral-dark);
+    transition: all 0.2s ease;
+}
+
+.filter-chip:hover {
+    background: rgba(225, 58, 68, 0.05);
+    border-color: var(--primary-red);
+}
+
+.filter-chip strong {
+    font-family: var(--font-family-headings);
+    color: var(--primary-red);
+}
+
+.filter-chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--gray-medium);
+    color: var(--primary-white);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    margin-left: var(--spacing-xs);
+}
+
+.filter-chip-remove:hover {
+    background: var(--primary-red);
+    color: var(--primary-white);
+    transform: scale(1.1);
+}
+
+.filter-chip-remove i {
+    font-size: 10px;
+}
+
+.filter-summary-count {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-sm);
+    color: var(--gray-dark);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--border-color);
+}
+
+.filter-summary-count strong {
+    color: var(--primary-red);
+    font-weight: 600;
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
     .page-campaign-participants {
