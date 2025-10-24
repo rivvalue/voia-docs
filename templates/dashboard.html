@@ -143,18 +143,18 @@
             <div class="border rounded p-3 mb-3" style="background-color: #f8f9fa;">
                 <div class="row align-items-center">
                     <div class="col-md-5">
-                        <label for="campaign1Select" class="form-label fw-semibold">Campaign 1</label>
+                        <label for="campaign1Select" class="form-label fw-semibold">{{ _('Campaign 1') }}</label>
                         <select class="form-select" id="campaign1Select" onchange="updateComparison()">
-                            <option value="">Select first campaign</option>
+                            <option value="">{{ _('Select first campaign') }}</option>
                         </select>
                     </div>
                     <div class="col-md-2 text-center">
                         <i class="fas fa-exchange-alt fa-2x mt-4" style="color: #E13A44;"></i>
                     </div>
                     <div class="col-md-5">
-                        <label for="campaign2Select" class="form-label fw-semibold">Campaign 2</label>
+                        <label for="campaign2Select" class="form-label fw-semibold">{{ _('Campaign 2') }}</label>
                         <select class="form-select" id="campaign2Select" onchange="updateComparison()">
-                            <option value="">Select second campaign</option>
+                            <option value="">{{ _('Select second campaign') }}</option>
                         </select>
                     </div>
                 </div>
@@ -162,7 +162,7 @@
                 <!-- No Selection Message -->
                 <div id="noComparisonMessage" class="text-center py-4 mt-3" style="background-color: #ffffff; border-radius: 8px;">
                     <i class="fas fa-info-circle fa-2x mb-2" style="color: #E13A44;"></i>
-                    <p class="text-muted mb-0">Please select two campaigns above to view comparison results</p>
+                    <p class="text-muted mb-0">{{ _('Please select two campaigns above to view comparison results') }}</p>
                 </div>
             </div>
             
@@ -170,15 +170,15 @@
             <div id="comparisonResults" style="display: none;">
                 <!-- Metrics Comparison -->
                 <div class="border rounded p-3 mb-3" style="background-color: #ffffff;">
-                    <h6 class="mb-3">Metrics Comparison</h6>
+                    <h6 class="mb-3">{{ _('Metrics Comparison') }}</h6>
                     <div class="table-responsive">
                         <table class="table table-borderless table-sm">
                             <thead>
                                 <tr style="background-color: #f8f9fa;">
-                                    <th style="width: 30%;">Metric</th>
-                                    <th style="width: 25%;" class="text-center" id="campaign1Header">Campaign 1</th>
-                                    <th style="width: 25%;" class="text-center" id="campaign2Header">Campaign 2</th>
-                                    <th style="width: 20%;" class="text-center">Change</th>
+                                    <th style="width: 30%;">{{ _('Metric') }}</th>
+                                    <th style="width: 25%;" class="text-center" id="campaign1Header">{{ _('Campaign 1') }}</th>
+                                    <th style="width: 25%;" class="text-center" id="campaign2Header">{{ _('Campaign 2') }}</th>
+                                    <th style="width: 20%;" class="text-center">{{ _('Change') }}</th>
                                 </tr>
                             </thead>
                             <tbody id="summaryTable">
@@ -192,7 +192,7 @@
                 <div class="border rounded p-3" style="background-color: #ffffff;">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
-                            <h6 class="mb-0">Account-by-Account Analysis</h6>
+                            <h6 class="mb-0">{{ _('Account-by-Account Analysis') }}</h6>
                             <small class="text-muted" id="comparisonSearchInfo"></small>
                         </div>
                     </div>
@@ -210,26 +210,26 @@
                     <!-- Search and Filter Controls -->
                     <div class="row align-items-end mb-3">
                         <div class="col-md-5">
-                            <label for="comparisonSearch" class="form-label">Search</label>
+                            <label for="comparisonSearch" class="form-label">{{ _('Search') }}</label>
                             <input type="text" class="form-control" id="comparisonSearch" 
                                    placeholder="{{ _('Search by company name...') }}">
                         </div>
                         <div class="col-md-3">
-                            <label for="comparisonBalanceFilter" class="form-label">Balance Status</label>
+                            <label for="comparisonBalanceFilter" class="form-label">{{ _('Balance Status') }}</label>
                             <select class="form-select" id="comparisonBalanceFilter" onchange="searchComparisonTable()">
-                                <option value="">All Companies</option>
-                                <option value="opportunity_heavy">Opportunity Heavy</option>
-                                <option value="balanced">Balanced</option>
-                                <option value="risk_heavy">Risk Heavy</option>
+                                <option value="">{{ _('All Companies') }}</option>
+                                <option value="opportunity_heavy">{{ _('Opportunity Heavy') }}</option>
+                                <option value="balanced">{{ _('Balanced') }}</option>
+                                <option value="risk_heavy">{{ _('Risk Heavy') }}</option>
                             </select>
                         </div>
                         <div class="col-md-4">
                             <div class="btn-group w-100">
                                 <button type="button" class="btn btn-primary" onclick="searchComparisonTable()">
-                                    <i class="fas fa-search me-1"></i>Search
+                                    <i class="fas fa-search me-1"></i>{{ _('Search') }}
                                 </button>
                                 <button type="button" class="btn btn-outline-secondary" onclick="clearComparisonSearch()">
-                                    <i class="fas fa-times me-1"></i>Clear
+                                    <i class="fas fa-times me-1"></i>{{ _('Clear') }}
                                 </button>
                             </div>
                         </div>
@@ -238,14 +238,14 @@
                         <table class="table table-striped table-hover table-sm">
                             <thead style="background-color: #f8f9fa;">
                                 <tr>
-                                    <th style="width: 15%;">Company</th>
-                                    <th style="width: 15%;" class="text-center">C1 Risks</th>
-                                    <th style="width: 15%;" class="text-center">C1 Opps</th>
-                                    <th style="width: 15%;" class="text-center">C1 Balance</th>
-                                    <th style="width: 15%;" class="text-center">C2 Risks</th>
-                                    <th style="width: 15%;" class="text-center">C2 Opps</th>
-                                    <th style="width: 15%;" class="text-center">C2 Balance</th>
-                                    <th style="width: 15%;" class="text-center">Status</th>
+                                    <th style="width: 15%;">{{ _('Company') }}</th>
+                                    <th style="width: 15%;" class="text-center">{{ _('C1 Risks') }}</th>
+                                    <th style="width: 15%;" class="text-center">{{ _('C1 Opps') }}</th>
+                                    <th style="width: 15%;" class="text-center">{{ _('C1 Balance') }}</th>
+                                    <th style="width: 15%;" class="text-center">{{ _('C2 Risks') }}</th>
+                                    <th style="width: 15%;" class="text-center">{{ _('C2 Opps') }}</th>
+                                    <th style="width: 15%;" class="text-center">{{ _('C2 Balance') }}</th>
+                                    <th style="width: 15%;" class="text-center">{{ _('Status') }}</th>
                                 </tr>
                             </thead>
                             <tbody id="companyTable">
@@ -289,8 +289,8 @@
                     <!-- Header -->
                     <div class="row mb-3">
                         <div class="col-12">
-                            <h6 class="mb-1"><i class="fas fa-filter me-2" style="color: #E13A44;"></i>Campaign Analytics Filter</h6>
-                            <small class="text-muted">Compare KPIs across different campaigns</small>
+                            <h6 class="mb-1"><i class="fas fa-filter me-2" style="color: #E13A44;"></i>{{ _('Campaign Analytics Filter') }}</h6>
+                            <small class="text-muted">{{ _('Compare KPIs across different campaigns') }}</small>
                         </div>
                     </div>
                     
@@ -302,7 +302,7 @@
                         <div class="col-12 col-md">
                             <div class="d-flex gap-2 align-items-center">
                                 <select class="form-select" id="campaignFilter" onchange="applyCampaignFilter()" style="max-width: 400px;">
-                                    <option value="">Select Campaign</option>
+                                    <option value="">{{ _('Select Campaign') }}</option>
                                     <!-- Will be populated by JavaScript -->
                                 </select>
                                 <button class="btn btn-outline-secondary btn-sm" onclick="clearCampaignFilter()" title="{{ _('Clear Filter') }}">
@@ -335,22 +335,22 @@
     <ul class="nav nav-tabs mb-4" id="dashboardNav" role="tablist" style="border-bottom: 1px solid #e5e5e5;">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
-                <i class="fas fa-tachometer-alt me-2" style="color: #E13A44;"></i>Overview
+                <i class="fas fa-tachometer-alt me-2" style="color: #E13A44;"></i>{{ _('Overview') }}
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="intelligence-tab" data-bs-toggle="tab" data-bs-target="#intelligence" type="button" role="tab" aria-controls="intelligence" aria-selected="false">
-                <i class="fas fa-brain me-2" style="color: #E13A44;"></i>Account Intelligence
+                <i class="fas fa-brain me-2" style="color: #E13A44;"></i>{{ _('Account Intelligence') }}
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="analytics" aria-selected="false">
-                <i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>Analytics
+                <i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>{{ _('Analytics') }}
             </button>
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="survey-insights-tab" data-bs-toggle="tab" data-bs-target="#survey-insights" type="button" role="tab" aria-controls="survey-insights" aria-selected="false">
-                <i class="fas fa-comments me-2" style="color: #E13A44;"></i>Survey Insights
+                <i class="fas fa-comments me-2" style="color: #E13A44;"></i>{{ _('Survey Insights') }}
             </button>
         </li>
     </ul>
@@ -359,9 +359,9 @@
     <!-- Loading state (positioned below campaign filter) -->
     <div class="loading-card" id="loadingIndicator">
         <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading dashboard data...</span>
+            <span class="visually-hidden">{{ _('Loading dashboard data...') }}</span>
         </div>
-        <div class="loading-text">Loading dashboard data...</div>
+        <div class="loading-text">{{ _('Loading dashboard data...') }}</div>
     </div>
 
     <!-- Dashboard Content (toggles during loading) -->
@@ -376,7 +376,7 @@
                     <div class="alert d-flex align-items-center border rounded" style="background: #fff; border-color: #E13A44 !important; padding: 1rem;">
                         <i class="fas fa-bullhorn me-3" style="color: #E13A44;"></i>
                         <div>
-                            <strong>Survey Insights</strong> - Currently showing data from active campaign: 
+                            <strong>{{ _('Survey Insights') }}</strong> - {{ _('Currently showing data from active campaign') }}: 
                             <span id="activeCampaignName" class="fw-bold">Campaign Name</span>
                             <span class="ms-2 text-muted" id="activeCampaignDates">Jan 1 - Dec 31, 2024</span>
                         </div>
@@ -465,18 +465,18 @@
             <div class="chart-card mb-4">
                 <div class="card-header">
                     <h5 class="mb-0">
-                        Account Intelligence
+                        {{ _('Account Intelligence') }}
                         <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top" 
                            title="{{ _('Shows account health balance: Risk-Heavy (risks outweigh opportunities), High Potential (opportunities with minimal risks), or Balanced') }}" 
                            style="font-size: 0.8em; opacity: 0.7;"></i>
                     </h5>
-                    <small class="text-muted">Risk vs Opportunity Balance by Company</small>
+                    <small class="text-muted">{{ _('Risk vs Opportunity Balance by Company') }}</small>
                 </div>
                 <div class="card-body">
                             <!-- Search and Filters -->
                             <div class="row g-3 mb-4">
                                 <div class="col-md-4">
-                                    <label for="accountIntelSearch" class="form-label">Search</label>
+                                    <label for="accountIntelSearch" class="form-label">{{ _('Search') }}</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-search"></i></span>
                                         <input type="text" class="form-control" id="accountIntelSearch" 
@@ -485,38 +485,38 @@
                                     </div>
                                 </div>
                                 <div class="col-md-2">
-                                    <label for="accountBalanceFilter" class="form-label">Balance</label>
+                                    <label for="accountBalanceFilter" class="form-label">{{ _('Balance') }}</label>
                                     <select class="form-select" id="accountBalanceFilter" onchange="searchAccountIntelligence()">
-                                        <option value="">All</option>
-                                        <option value="risk_heavy">Risk-Heavy</option>
-                                        <option value="balanced">Balanced</option>
-                                        <option value="opportunity_heavy">High Potential</option>
+                                        <option value="">{{ _('All') }}</option>
+                                        <option value="risk_heavy">{{ _('Risk-Heavy') }}</option>
+                                        <option value="balanced">{{ _('Balanced') }}</option>
+                                        <option value="opportunity_heavy">{{ _('High Potential') }}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-2">
-                                    <label for="accountRiskFilter" class="form-label">Risk Level</label>
+                                    <label for="accountRiskFilter" class="form-label">{{ _('Risk Level') }}</label>
                                     <select class="form-select" id="accountRiskFilter" onchange="searchAccountIntelligence()">
-                                        <option value="">All</option>
-                                        <option value="critical">Critical</option>
-                                        <option value="high">High</option>
-                                        <option value="medium">Medium</option>
-                                        <option value="low">Low</option>
+                                        <option value="">{{ _('All') }}</option>
+                                        <option value="critical">{{ _('Critical') }}</option>
+                                        <option value="high">{{ _('High') }}</option>
+                                        <option value="medium">{{ _('Medium') }}</option>
+                                        <option value="low">{{ _('Low') }}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-2">
-                                    <label for="accountOppFilter" class="form-label">Opportunities</label>
+                                    <label for="accountOppFilter" class="form-label">{{ _('Opportunities') }}</label>
                                     <select class="form-select" id="accountOppFilter" onchange="searchAccountIntelligence()">
-                                        <option value="">All</option>
-                                        <option value="yes">Has Opportunities</option>
-                                        <option value="no">No Opportunities</option>
+                                        <option value="">{{ _('All') }}</option>
+                                        <option value="yes">{{ _('Has Opportunities') }}</option>
+                                        <option value="no">{{ _('No Opportunities') }}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-2">
-                                    <label for="accountRisksFilter" class="form-label">Has Risks</label>
+                                    <label for="accountRisksFilter" class="form-label">{{ _('Has Risks') }}</label>
                                     <select class="form-select" id="accountRisksFilter" onchange="searchAccountIntelligence()">
-                                        <option value="">All</option>
-                                        <option value="yes">Has Risks</option>
-                                        <option value="no">No Risks</option>
+                                        <option value="">{{ _('All') }}</option>
+                                        <option value="yes">{{ _('Has Risks') }}</option>
+                                        <option value="no">{{ _('No Risks') }}</option>
                                     </select>
                                 </div>
                             </div>
@@ -628,32 +628,32 @@
                     <div class="data-table">
                         <div class="table-header">
                             <h5>{{ _('NPS by Client Company') }}</h5>
-                            <small class="text-muted">Strategic account management - NPS scores segregated by company evaluating Archelo Group</small>
+                            <small class="text-muted">{{ _('Strategic account management - NPS scores segregated by company evaluating Archelo Group') }}</small>
                         </div>
                         <div class="p-3">
                             <!-- Search and Filter Controls -->
                             <div class="row align-items-end mb-3">
                                 <div class="col-md-5">
-                                    <label for="companySearch" class="form-label">Search</label>
+                                    <label for="companySearch" class="form-label">{{ _('Search') }}</label>
                                     <input type="text" class="form-control" id="companySearch" 
                                            placeholder="{{ _('Search by company name...') }}">
                                 </div>
                                 <div class="col-md-3">
-                                    <label for="companyNpsFilter" class="form-label">NPS Category</label>
+                                    <label for="companyNpsFilter" class="form-label">{{ _('NPS Category') }}</label>
                                     <select class="form-select" id="companyNpsFilter" onchange="searchCompanyNPS()">
-                                        <option value="">All Companies</option>
-                                        <option value="promoters">Promoters (9-10)</option>
-                                        <option value="passives">Passives (7-8)</option>
-                                        <option value="detractors">Detractors (0-6)</option>
+                                        <option value="">{{ _('All Companies') }}</option>
+                                        <option value="promoters">{{ _('Promoters (9-10)') }}</option>
+                                        <option value="passives">{{ _('Passives (7-8)') }}</option>
+                                        <option value="detractors">{{ _('Detractors (0-6)') }}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="btn-group w-100">
                                         <button type="button" class="btn btn-primary" onclick="searchCompanyNPS()">
-                                            <i class="fas fa-search me-1"></i>Search
+                                            <i class="fas fa-search me-1"></i>{{ _('Search') }}
                                         </button>
                                         <button type="button" class="btn btn-outline-secondary" onclick="clearCompanySearch()">
-                                            <i class="fas fa-times me-1"></i>Clear
+                                            <i class="fas fa-times me-1"></i>{{ _('Clear') }}
                                         </button>
                                     </div>
                                 </div>
@@ -669,12 +669,12 @@
                                         <tr>
                                             <th>{{ _('Company Name') }}</th>
                                             <th>{{ _('Respondent') }}s</th>
-                                            <th>Avg Individual NPS</th>
-                                            <th>Company NPS</th>
-                                            <th>Distribution</th>
-                                            <th>Risk Level</th>
-                                            <th>Latest Response</th>
-                                            <th>Latest Churn Risk</th>
+                                            <th>{{ _('Avg Individual NPS') }}</th>
+                                            <th>{{ _('Company NPS') }}</th>
+                                            <th>{{ _('Distribution') }}</th>
+                                            <th>{{ _('Risk Level') }}</th>
+                                            <th>{{ _('Latest Response') }}</th>
+                                            <th>{{ _('Latest Churn Risk') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="companyNpsTableServerSide" style="display: table-row-group !important; visibility: visible !important;">
@@ -702,7 +702,7 @@
                                             {% endfor %}
                                         {% else %}
                                             <!-- No server-side data found -->
-                                            <tr><td colspan="8" class="text-center text-muted">No company data available yet</td></tr>
+                                            <tr><td colspan="8" class="text-center text-muted">{{ _('No company data available yet') }}</td></tr>
                                         {% endif %}
                                     </tbody>
                                 </table>

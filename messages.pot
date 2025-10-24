@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-24 19:08+0000\n"
+"POT-Creation-Date: 2025-10-24 19:33+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -109,7 +109,7 @@ msgstr ""
 msgid "Business Intelligence"
 msgstr ""
 
-#: templates/base.html:58
+#: templates/base.html:58 templates/dashboard.html:338
 msgid "Overview"
 msgstr ""
 
@@ -438,8 +438,119 @@ msgstr ""
 msgid "Campaign Comparison"
 msgstr ""
 
+#: templates/dashboard.html:146 templates/dashboard.html:179
+msgid "Campaign 1"
+msgstr ""
+
+#: templates/dashboard.html:148
+msgid "Select first campaign"
+msgstr ""
+
+#: templates/dashboard.html:155 templates/dashboard.html:180
+msgid "Campaign 2"
+msgstr ""
+
+#: templates/dashboard.html:157
+msgid "Select second campaign"
+msgstr ""
+
+#: templates/dashboard.html:165
+msgid "Please select two campaigns above to view comparison results"
+msgstr ""
+
+#: templates/dashboard.html:173
+msgid "Metrics Comparison"
+msgstr ""
+
+#: templates/dashboard.html:178
+msgid "Metric"
+msgstr ""
+
+#: templates/dashboard.html:181
+msgid "Change"
+msgstr ""
+
+#: templates/dashboard.html:195
+msgid "Account-by-Account Analysis"
+msgstr ""
+
+#: templates/dashboard.html:213 templates/dashboard.html:229
+#: templates/dashboard.html:479 templates/dashboard.html:637
+#: templates/dashboard.html:653
+msgid "Search"
+msgstr ""
+
 #: templates/dashboard.html:215 templates/dashboard.html:639
 msgid "Search by company name..."
+msgstr ""
+
+#: templates/dashboard.html:218
+msgid "Balance Status"
+msgstr ""
+
+#: templates/dashboard.html:220 templates/dashboard.html:644
+msgid "All Companies"
+msgstr ""
+
+#: templates/dashboard.html:221
+msgid "Opportunity Heavy"
+msgstr ""
+
+#: templates/dashboard.html:222 templates/dashboard.html:492
+msgid "Balanced"
+msgstr ""
+
+#: templates/dashboard.html:223
+msgid "Risk Heavy"
+msgstr ""
+
+#: templates/dashboard.html:232 templates/dashboard.html:656
+msgid "Clear"
+msgstr ""
+
+#: templates/campaigns/responses_list.html:177 templates/dashboard.html:241
+#: templates/participants/campaign_participants.html:61
+#: templates/participants/campaign_participants.html:63
+#: templates/participants/campaign_participants.html:171
+#: templates/participants/campaign_participants.html:464
+#: templates/participants/list.html:216 templates/participants/list.html:240
+#: templates/participants/list.html:242 templates/participants/list.html:403
+#: templates/participants/list.html:425 templates/participants/list.html:544
+#: templates/participants/list.html:823
+msgid "Company"
+msgstr ""
+
+#: templates/dashboard.html:242
+msgid "C1 Risks"
+msgstr ""
+
+#: templates/dashboard.html:243
+msgid "C1 Opps"
+msgstr ""
+
+#: templates/dashboard.html:244
+msgid "C1 Balance"
+msgstr ""
+
+#: templates/dashboard.html:245
+msgid "C2 Risks"
+msgstr ""
+
+#: templates/dashboard.html:246
+msgid "C2 Opps"
+msgstr ""
+
+#: templates/dashboard.html:247
+msgid "C2 Balance"
+msgstr ""
+
+#: templates/business_auth/licenses/overview.html:301
+#: templates/business_auth/licenses/overview.html:303
+#: templates/business_auth/licenses/overview.html:325
+#: templates/business_auth/platform_dashboard.html:421
+#: templates/business_auth/platform_dashboard.html:694
+#: templates/campaigns/responses_list.html:179 templates/dashboard.html:248
+msgid "Status"
 msgstr ""
 
 #: templates/dashboard.html:262
@@ -450,6 +561,18 @@ msgstr ""
 msgid "Analyze and compare campaign-specific performance metrics"
 msgstr ""
 
+#: templates/dashboard.html:292
+msgid "Campaign Analytics Filter"
+msgstr ""
+
+#: templates/dashboard.html:293
+msgid "Compare KPIs across different campaigns"
+msgstr ""
+
+#: templates/dashboard.html:305
+msgid "Select Campaign"
+msgstr ""
+
 #: templates/dashboard.html:308 templates/dashboard.html:524
 #: templates/dashboard.html:532
 msgid "Clear Filter"
@@ -457,6 +580,30 @@ msgstr ""
 
 #: templates/dashboard.html:318 templates/dashboard.html:844
 msgid "Details"
+msgstr ""
+
+#: templates/dashboard.html:343 templates/dashboard.html:468
+msgid "Account Intelligence"
+msgstr ""
+
+#: templates/business_auth/admin_panel.html:408
+#: templates/business_auth/admin_panel.html:432
+#: templates/business_auth/admin_panel.html:435
+#: templates/business_auth/admin_panel.html:820
+#: templates/business_auth/admin_panel.html:940 templates/dashboard.html:348
+msgid "Analytics"
+msgstr ""
+
+#: templates/dashboard.html:353 templates/dashboard.html:379
+msgid "Survey Insights"
+msgstr ""
+
+#: templates/dashboard.html:362 templates/dashboard.html:364
+msgid "Loading dashboard data..."
+msgstr ""
+
+#: templates/dashboard.html:379
+msgid "Currently showing data from active campaign"
 msgstr ""
 
 #: templates/campaigns/responses_list.html:178 templates/dashboard.html:392
@@ -486,8 +633,69 @@ msgid ""
 "High Potential (opportunities with minimal risks), or Balanced"
 msgstr ""
 
+#: templates/dashboard.html:473
+msgid "Risk vs Opportunity Balance by Company"
+msgstr ""
+
 #: templates/dashboard.html:483
 msgid "Search company, opportunities, risks..."
+msgstr ""
+
+#: templates/dashboard.html:488
+msgid "Balance"
+msgstr ""
+
+#: templates/dashboard.html:490 templates/dashboard.html:499
+#: templates/dashboard.html:509 templates/dashboard.html:517
+msgid "All"
+msgstr ""
+
+#: templates/dashboard.html:491
+msgid "Risk-Heavy"
+msgstr ""
+
+#: templates/dashboard.html:493
+msgid "High Potential"
+msgstr ""
+
+#: templates/dashboard.html:497 templates/dashboard.html:675
+msgid "Risk Level"
+msgstr ""
+
+#: templates/dashboard.html:500
+msgid "Critical"
+msgstr ""
+
+#: templates/dashboard.html:501
+msgid "High"
+msgstr ""
+
+#: templates/dashboard.html:502
+msgid "Medium"
+msgstr ""
+
+#: templates/dashboard.html:503
+msgid "Low"
+msgstr ""
+
+#: templates/dashboard.html:507
+msgid "Opportunities"
+msgstr ""
+
+#: templates/dashboard.html:510
+msgid "Has Opportunities"
+msgstr ""
+
+#: templates/dashboard.html:511
+msgid "No Opportunities"
+msgstr ""
+
+#: templates/dashboard.html:515 templates/dashboard.html:518
+msgid "Has Risks"
+msgstr ""
+
+#: templates/dashboard.html:519
+msgid "No Risks"
 msgstr ""
 
 #: templates/dashboard.html:541
@@ -517,6 +725,52 @@ msgstr ""
 
 #: templates/dashboard.html:630
 msgid "NPS by Client Company"
+msgstr ""
+
+#: templates/dashboard.html:631
+msgid ""
+"Strategic account management - NPS scores segregated by company "
+"evaluating Archelo Group"
+msgstr ""
+
+#: templates/dashboard.html:642
+msgid "NPS Category"
+msgstr ""
+
+#: templates/dashboard.html:645
+msgid "Promoters (9-10)"
+msgstr ""
+
+#: templates/dashboard.html:646
+msgid "Passives (7-8)"
+msgstr ""
+
+#: templates/dashboard.html:647
+msgid "Detractors (0-6)"
+msgstr ""
+
+#: templates/dashboard.html:672
+msgid "Avg Individual NPS"
+msgstr ""
+
+#: templates/dashboard.html:673
+msgid "Company NPS"
+msgstr ""
+
+#: templates/dashboard.html:674
+msgid "Distribution"
+msgstr ""
+
+#: templates/dashboard.html:676
+msgid "Latest Response"
+msgstr ""
+
+#: templates/dashboard.html:677
+msgid "Latest Churn Risk"
+msgstr ""
+
+#: templates/dashboard.html:705
+msgid "No company data available yet"
 msgstr ""
 
 #: templates/dashboard.html:716
@@ -1301,14 +1555,6 @@ msgstr ""
 msgid "Business Analytics Hub"
 msgstr ""
 
-#: templates/business_auth/admin_panel.html:408
-#: templates/business_auth/admin_panel.html:432
-#: templates/business_auth/admin_panel.html:435
-#: templates/business_auth/admin_panel.html:820
-#: templates/business_auth/admin_panel.html:940
-msgid "Analytics"
-msgstr ""
-
 #: templates/business_auth/admin_panel.html:410
 #: templates/business_auth/admin_panel.html:480
 msgid "Create new business accounts with license assignment"
@@ -1964,15 +2210,6 @@ msgstr ""
 #: templates/business_auth/platform_dashboard.html:405
 #: templates/business_auth/platform_dashboard.html:462
 msgid "Avg/Account"
-msgstr ""
-
-#: templates/business_auth/licenses/overview.html:301
-#: templates/business_auth/licenses/overview.html:303
-#: templates/business_auth/licenses/overview.html:325
-#: templates/business_auth/platform_dashboard.html:421
-#: templates/business_auth/platform_dashboard.html:694
-#: templates/campaigns/responses_list.html:179
-msgid "Status"
 msgstr ""
 
 #: templates/business_auth/platform_dashboard.html:482
@@ -2693,18 +2930,6 @@ msgstr ""
 
 #: templates/campaigns/responses_list.html:138
 msgid "Search participants, companies, or conversation content..."
-msgstr ""
-
-#: templates/campaigns/responses_list.html:177
-#: templates/participants/campaign_participants.html:61
-#: templates/participants/campaign_participants.html:63
-#: templates/participants/campaign_participants.html:171
-#: templates/participants/campaign_participants.html:464
-#: templates/participants/list.html:216 templates/participants/list.html:240
-#: templates/participants/list.html:242 templates/participants/list.html:403
-#: templates/participants/list.html:425 templates/participants/list.html:544
-#: templates/participants/list.html:823
-msgid "Company"
 msgstr ""
 
 #: templates/campaigns/responses_list.html:180

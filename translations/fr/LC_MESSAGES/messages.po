@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-24 19:08+0000\n"
+"POT-Creation-Date: 2025-10-24 19:33+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -112,7 +112,7 @@ msgstr "La limitation du débit empêche les abus"
 msgid "Business Intelligence"
 msgstr "Intelligence d'affaires"
 
-#: templates/base.html:58
+#: templates/base.html:58 templates/dashboard.html:338
 msgid "Overview"
 msgstr "Vue d'ensemble"
 
@@ -420,9 +420,10 @@ msgstr "Actualiser les données"
 
 #: templates/dashboard.html:49
 msgid "High-level overview of key performance indicators across all campaigns"
-msgstr "Vue d'ensemble de haut niveau des indicateurs clés de performance de toutes les campagnes"
-"Vue d'ensemble des principaux indicateurs de performance sur l'ensemble "
-"des campagnes"
+msgstr ""
+"Vue d'ensemble de haut niveau des indicateurs clés de performance de "
+"toutes les campagnesVue d'ensemble des principaux indicateurs de "
+"performance sur l'ensemble des campagnes"
 
 #: templates/dashboard.html:64
 msgid "Campaign KPI Overview"
@@ -453,9 +454,133 @@ msgstr "Risque critique"
 msgid "Campaign Comparison"
 msgstr "Comparaison des campagnes"
 
+#: templates/dashboard.html:146 templates/dashboard.html:179
+#, fuzzy
+msgid "Campaign 1"
+msgstr "Campagnes"
+
+#: templates/dashboard.html:148
+#, fuzzy
+msgid "Select first campaign"
+msgstr "Créez votre première campagne"
+
+#: templates/dashboard.html:155 templates/dashboard.html:180
+#, fuzzy
+msgid "Campaign 2"
+msgstr "Campagnes"
+
+#: templates/dashboard.html:157
+#, fuzzy
+msgid "Select second campaign"
+msgstr "Campagnes actives"
+
+#: templates/dashboard.html:165
+msgid "Please select two campaigns above to view comparison results"
+msgstr "Veuillez sélectionner deux campagnes ci-dessus pour voir les résultats de la comparaison"
+
+#: templates/dashboard.html:173
+#, fuzzy
+msgid "Metrics Comparison"
+msgstr "Comparaison des campagnes"
+
+#: templates/dashboard.html:178
+msgid "Metric"
+msgstr "Métrique"
+
+#: templates/dashboard.html:181
+#, fuzzy
+msgid "Change"
+msgstr "Gérer"
+
+#: templates/dashboard.html:195
+#, fuzzy
+msgid "Account-by-Account Analysis"
+msgstr "À propos de l'analyse des transcriptions"
+
+#: templates/dashboard.html:213 templates/dashboard.html:229
+#: templates/dashboard.html:479 templates/dashboard.html:637
+#: templates/dashboard.html:653
+#, fuzzy
+msgid "Search"
+msgstr "Effacer la recherche"
+
 #: templates/dashboard.html:215 templates/dashboard.html:639
 msgid "Search by company name..."
 msgstr "Rechercher par nom d'entreprise..."
+
+#: templates/dashboard.html:218
+#, fuzzy
+msgid "Balance Status"
+msgstr "Statut"
+
+#: templates/dashboard.html:220 templates/dashboard.html:644
+#, fuzzy
+msgid "All Companies"
+msgstr "Nombre total de campagnes"
+
+#: templates/dashboard.html:221
+msgid "Opportunity Heavy"
+msgstr "Opportunité Élevée"
+
+#: templates/dashboard.html:222 templates/dashboard.html:492
+msgid "Balanced"
+msgstr "Équilibré"
+
+#: templates/dashboard.html:223
+msgid "Risk Heavy"
+msgstr "Risque Élevé"
+
+#: templates/dashboard.html:232 templates/dashboard.html:656
+#, fuzzy
+msgid "Clear"
+msgstr "Fermer"
+
+#: templates/campaigns/responses_list.html:177 templates/dashboard.html:241
+#: templates/participants/campaign_participants.html:61
+#: templates/participants/campaign_participants.html:63
+#: templates/participants/campaign_participants.html:171
+#: templates/participants/campaign_participants.html:464
+#: templates/participants/list.html:216 templates/participants/list.html:240
+#: templates/participants/list.html:242 templates/participants/list.html:403
+#: templates/participants/list.html:425 templates/participants/list.html:544
+#: templates/participants/list.html:823
+msgid "Company"
+msgstr "Entreprise"
+
+#: templates/dashboard.html:242
+msgid "C1 Risks"
+msgstr "Risques C1"
+
+#: templates/dashboard.html:243
+msgid "C1 Opps"
+msgstr "Opps C1"
+
+#: templates/dashboard.html:244
+#, fuzzy
+msgid "C1 Balance"
+msgstr "Annuler"
+
+#: templates/dashboard.html:245
+msgid "C2 Risks"
+msgstr "Risques C2"
+
+#: templates/dashboard.html:246
+msgid "C2 Opps"
+msgstr "Opps C2"
+
+#: templates/dashboard.html:247
+#, fuzzy
+msgid "C2 Balance"
+msgstr "Annuler"
+
+#: templates/business_auth/licenses/overview.html:301
+#: templates/business_auth/licenses/overview.html:303
+#: templates/business_auth/licenses/overview.html:325
+#: templates/business_auth/platform_dashboard.html:421
+#: templates/business_auth/platform_dashboard.html:694
+#: templates/campaigns/responses_list.html:179 templates/dashboard.html:248
+msgid "Status"
+msgstr "Statut"
 
 #: templates/dashboard.html:262
 msgid "Comparison table pagination"
@@ -463,7 +588,23 @@ msgstr "Pagination du tableau comparatif"
 
 #: templates/dashboard.html:281
 msgid "Analyze and compare campaign-specific performance metrics"
-msgstr "Analyser et comparer les métriques de performance spécifiques aux campagnes"
+msgstr ""
+"Analyser et comparer les métriques de performance spécifiques aux "
+"campagnes"
+
+#: templates/dashboard.html:292
+#, fuzzy
+msgid "Campaign Analytics Filter"
+msgstr "Tableau des participants à la campagne"
+
+#: templates/dashboard.html:293
+msgid "Compare KPIs across different campaigns"
+msgstr "Comparer les KPI entre différentes campagnes"
+
+#: templates/dashboard.html:305
+#, fuzzy
+msgid "Select Campaign"
+msgstr "Modifier la campagne"
 
 #: templates/dashboard.html:308 templates/dashboard.html:524
 #: templates/dashboard.html:532
@@ -473,6 +614,32 @@ msgstr "Effacer le filtre"
 #: templates/dashboard.html:318 templates/dashboard.html:844
 msgid "Details"
 msgstr "Détails"
+
+#: templates/dashboard.html:343 templates/dashboard.html:468
+#, fuzzy
+msgid "Account Intelligence"
+msgstr "Pagination de l'intelligence de compte"
+
+#: templates/business_auth/admin_panel.html:408
+#: templates/business_auth/admin_panel.html:432
+#: templates/business_auth/admin_panel.html:435
+#: templates/business_auth/admin_panel.html:820
+#: templates/business_auth/admin_panel.html:940 templates/dashboard.html:348
+msgid "Analytics"
+msgstr "Analytique"
+
+#: templates/dashboard.html:353 templates/dashboard.html:379
+#, fuzzy
+msgid "Survey Insights"
+msgstr "Voir les analyses IA"
+
+#: templates/dashboard.html:362 templates/dashboard.html:364
+msgid "Loading dashboard data..."
+msgstr "Chargement des données du tableau de bord..."
+
+#: templates/dashboard.html:379
+msgid "Currently showing data from active campaign"
+msgstr "Affichage des données de la campagne active"
 
 #: templates/campaigns/responses_list.html:178 templates/dashboard.html:392
 #: templates/dashboard.html:839 templates/dashboard.html:998
@@ -506,9 +673,75 @@ msgstr ""
 "dépassent les opportunités), Fort potentiel (opportunités avec peu de "
 "risques) ou Équilibré"
 
+#: templates/dashboard.html:473
+msgid "Risk vs Opportunity Balance by Company"
+msgstr "Équilibre Risque vs Opportunité par Entreprise"
+
 #: templates/dashboard.html:483
 msgid "Search company, opportunities, risks..."
 msgstr "Rechercher une entreprise, des opportunités ou des risques..."
+
+#: templates/dashboard.html:488
+#, fuzzy
+msgid "Balance"
+msgstr "Annuler"
+
+#: templates/dashboard.html:490 templates/dashboard.html:499
+#: templates/dashboard.html:509 templates/dashboard.html:517
+msgid "All"
+msgstr "Tous"
+
+#: templates/dashboard.html:491
+msgid "Risk-Heavy"
+msgstr "Risque Élevé"
+
+#: templates/dashboard.html:493
+msgid "High Potential"
+msgstr ""
+
+#: templates/dashboard.html:497 templates/dashboard.html:675
+msgid "Risk Level"
+msgstr "Niveau de Risque"
+
+#: templates/dashboard.html:500
+#, fuzzy
+msgid "Critical"
+msgstr "Risque critique"
+
+#: templates/dashboard.html:501
+msgid "High"
+msgstr "Élevé"
+
+#: templates/dashboard.html:502
+msgid "Medium"
+msgstr "Moyen"
+
+#: templates/dashboard.html:503
+msgid "Low"
+msgstr "Faible"
+
+#: templates/dashboard.html:507
+#, fuzzy
+msgid "Opportunities"
+msgstr "Opportunités de croissance"
+
+#: templates/dashboard.html:510
+#, fuzzy
+msgid "Has Opportunities"
+msgstr "Opportunités de croissance"
+
+#: templates/dashboard.html:511
+#, fuzzy
+msgid "No Opportunities"
+msgstr "Opportunités de croissance"
+
+#: templates/dashboard.html:515 templates/dashboard.html:518
+msgid "Has Risks"
+msgstr "A des Risques"
+
+#: templates/dashboard.html:519
+msgid "No Risks"
+msgstr "Aucun Risque"
 
 #: templates/dashboard.html:541
 msgid "Account Intelligence pagination"
@@ -538,6 +771,57 @@ msgstr "Évaluations"
 #: templates/dashboard.html:630
 msgid "NPS by Client Company"
 msgstr "NPS par entreprise cliente"
+
+#: templates/dashboard.html:631
+msgid ""
+"Strategic account management - NPS scores segregated by company "
+"evaluating Archelo Group"
+msgstr ""
+
+#: templates/dashboard.html:642
+#, fuzzy
+msgid "NPS Category"
+msgstr "Score NPS"
+
+#: templates/dashboard.html:645
+msgid "Promoters (9-10)"
+msgstr "Promoteurs (9-10)"
+
+#: templates/dashboard.html:646
+msgid "Passives (7-8)"
+msgstr "Passifs (7-8)"
+
+#: templates/dashboard.html:647
+msgid "Detractors (0-6)"
+msgstr "Détracteurs (0-6)"
+
+#: templates/dashboard.html:672
+msgid "Avg Individual NPS"
+msgstr "NPS Individuel Moyen"
+
+#: templates/dashboard.html:673
+#, fuzzy
+msgid "Company NPS"
+msgstr "Nom de l'entreprise"
+
+#: templates/dashboard.html:674
+#, fuzzy
+msgid "Distribution"
+msgstr "Répartition du NPS"
+
+#: templates/dashboard.html:676
+#, fuzzy
+msgid "Latest Response"
+msgstr "Nombre total de réponses"
+
+#: templates/dashboard.html:677
+#, fuzzy
+msgid "Latest Churn Risk"
+msgstr "Indicateurs de risque de résiliation"
+
+#: templates/dashboard.html:705
+msgid "No company data available yet"
+msgstr "Aucune donnée d'entreprise disponible pour le moment"
 
 #: templates/dashboard.html:716
 msgid "Company NPS pagination"
@@ -1361,14 +1645,6 @@ msgstr ""
 msgid "Business Analytics Hub"
 msgstr "Centre d'analytique d'entreprise"
 
-#: templates/business_auth/admin_panel.html:408
-#: templates/business_auth/admin_panel.html:432
-#: templates/business_auth/admin_panel.html:435
-#: templates/business_auth/admin_panel.html:820
-#: templates/business_auth/admin_panel.html:940
-msgid "Analytics"
-msgstr "Analytique"
-
 #: templates/business_auth/admin_panel.html:410
 #: templates/business_auth/admin_panel.html:480
 msgid "Create new business accounts with license assignment"
@@ -2048,15 +2324,6 @@ msgstr "Informations détaillées sur la licence"
 #: templates/business_auth/platform_dashboard.html:462
 msgid "Avg/Account"
 msgstr "Moyenne/Compte"
-
-#: templates/business_auth/licenses/overview.html:301
-#: templates/business_auth/licenses/overview.html:303
-#: templates/business_auth/licenses/overview.html:325
-#: templates/business_auth/platform_dashboard.html:421
-#: templates/business_auth/platform_dashboard.html:694
-#: templates/campaigns/responses_list.html:179
-msgid "Status"
-msgstr "Statut"
 
 #: templates/business_auth/platform_dashboard.html:482
 msgid "Completion Rate"
@@ -2826,18 +3093,6 @@ msgid "Search participants, companies, or conversation content..."
 msgstr ""
 "Rechercher des participants, des entreprises ou du contenu de "
 "conversation..."
-
-#: templates/campaigns/responses_list.html:177
-#: templates/participants/campaign_participants.html:61
-#: templates/participants/campaign_participants.html:63
-#: templates/participants/campaign_participants.html:171
-#: templates/participants/campaign_participants.html:464
-#: templates/participants/list.html:216 templates/participants/list.html:240
-#: templates/participants/list.html:242 templates/participants/list.html:403
-#: templates/participants/list.html:425 templates/participants/list.html:544
-#: templates/participants/list.html:823
-msgid "Company"
-msgstr "Entreprise"
 
 #: templates/campaigns/responses_list.html:180
 msgid "Response Date"
