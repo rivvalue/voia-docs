@@ -32,4 +32,5 @@ dependencies = [
     "sentry-sdk>=2.41.0",
     "redis>=6.4.0",
     "beautifulsoup4>=4.14.2",
+    "flask-babel>=4.0.0",
 ]

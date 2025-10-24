@@ -1,0 +1,19 @@
+# English translations for VOÏA.
+# Copyright (C) 2025 Rivvalue Inc
+# This file is distributed under the same license as the VOÏA project.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: VOÏA 1.0\n"
+"Report-Msgid-Bugs-To: support@rivvalue.com\n"
+"POT-Creation-Date: 2025-10-24 07:35\n"
+"PO-Revision-Date: 2025-10-24 07:35\n"
+"Last-Translator: Rivvalue Team\n"
+"Language: en\n"
+"Language-Team: English\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: convert_json_to_po.py\n"
+

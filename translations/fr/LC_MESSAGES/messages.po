@@ -1,0 +1,2908 @@
+# French translations for VOÏA.
+# Copyright (C) 2025 Rivvalue Inc
+# This file is distributed under the same license as the VOÏA project.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: VOÏA 1.0\n"
+"Report-Msgid-Bugs-To: support@rivvalue.com\n"
+"POT-Creation-Date: 2025-10-24 07:35\n"
+"PO-Revision-Date: 2025-10-24 07:35\n"
+"Last-Translator: Rivvalue Team\n"
+"Language: fr\n"
+"Language-Team: French\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: convert_json_to_po.py\n"
+
+
+msgid "(Max 200 characters)"
+msgstr "(200 caractères maximum)"
+
+msgid "(Max 50 characters)"
+msgstr "(50 caractères maximum)"
+
+msgid "0 selected"
+msgstr "0 sélectionné"
+
+msgid "1 - Very Poor"
+msgstr "1 - Très faible"
+
+msgid "1,000 survey invitations per campaign"
+msgstr "1 000 invitations par campagne"
+
+msgid "1,000 target responses per campaign"
+msgstr "1 000 réponses cibles par campagne"
+
+msgid "1-2 years"
+msgstr "1 à 2 ans"
+
+msgid "1. Create"
+msgstr "1. Créer"
+
+msgid "1. File Validation"
+msgstr "1. Validation du fichier"
+
+msgid "10 times speed improvement"
+msgstr "Amélioration de la vitesse par 10"
+
+msgid "2 - Poor"
+msgstr "2 - Faible"
+
+msgid "2-3 years"
+msgstr "2 à 3 ans"
+
+msgid "2. Duplicate Detection"
+msgstr "2. Détection des doublons"
+
+msgid "2. Generate Token"
+msgstr "2. Générer un jeton"
+
+msgid "200 target responses per campaign"
+msgstr "200 réponses cibles par campagne"
+
+msgid "3 - Average"
+msgstr "3 - Moyen"
+
+msgid "3-5 minutes"
+msgstr "3 à 5 minutes"
+
+msgid "3-5 years"
+msgstr "3 à 5 ans"
+
+msgid "3. Assign to Campaign"
+msgstr "3. Assigner à une campagne"
+
+msgid "3. Token Generation"
+msgstr "3. Génération de jetons"
+
+msgid "4 - Good"
+msgstr "4 - Bon"
+
+msgid "4 campaigns per year"
+msgstr "4 campagnes par an"
+
+msgid "4 times more insights"
+msgstr "4 fois plus d'analyses"
+
+msgid "4. Status Report"
+msgstr "4. Rapport d'état"
+
+msgid "5,000 survey invitations per campaign"
+msgstr "5 000 invitations par campagne"
+
+msgid "5-10 years"
+msgstr "5 à 10 ans"
+
+msgid "5-7 minutes"
+msgstr "5 à 7 minutes"
+
+msgid "6 months - 1 year"
+msgstr "6 mois - 1 an"
+
+msgid "98 percent accuracy"
+msgstr "98 % de précision"
+
+msgid "A clear, descriptive name for your campaign"
+msgstr "Un nom clair et descriptif pour votre campagne"
+
+msgid "A lightweight, AI-powered Voice of Client experience designed for small and medium businesses."
+msgstr "Une expérience légère de Voice of Client alimentée par l'IA, conçue pour les petites et moyennes entreprises."
+
+msgid "A notification email has been sent to the business account"
+msgstr "Un e-mail de notification a été envoyé au compte entreprise"
+
+msgid "AI Conversational"
+msgstr "Conversationnel IA"
+
+msgid "AI Insights"
+msgstr "Analyses IA"
+
+msgid "AI-powered insights"
+msgstr "Analyses alimentées par l'IA"
+
+msgid "AI-powered survey intelligence"
+msgstr "Intelligence d'enquête alimentée par l'IA"
+
+msgid "AWS SES SMTP server is automatically set based on your region"
+msgstr "Le serveur SMTP AWS SES est automatiquement défini en fonction de votre région"
+
+msgid "About Archelo Group"
+msgstr "À propos d'Archelo Group"
+
+msgid "About Transcript Analysis"
+msgstr "À propos de l'analyse des transcriptions"
+
+msgid "Absolute limit to keep surveys concise and engaging"
+msgstr "Limite absolue pour garder les enquêtes concises et engageantes"
+
+msgid "Accent Color"
+msgstr "Couleur d'accent"
+
+msgid "Account Closed"
+msgstr "Compte fermé"
+
+msgid "Account Details"
+msgstr "Détails du compte"
+
+msgid "Account Inactive"
+msgstr "Compte inactif"
+
+msgid "Account Intelligence"
+msgstr "Intelligence de compte"
+
+msgid "Account Intelligence pagination"
+msgstr "Pagination de l'intelligence de compte"
+
+msgid "Account Settings"
+msgstr "Paramètres du compte"
+
+msgid "Account Status: {{ account_status|title }}"
+msgstr "Statut du compte : {{ account_status|title }}"
+
+msgid "Account Suspended"
+msgstr "Compte suspendu"
+
+msgid "Account Type:"
+msgstr "Type de compte :"
+
+msgid "Account-by-Account Analysis"
+msgstr "Analyse compte par compte"
+
+msgid "Account-level takeaways"
+msgstr "Enseignements par compte"
+
+msgid "Accuracy"
+msgstr "Précision"
+
+msgid "Active"
+msgstr "Actif"
+
+msgid "Active Campaigns"
+msgstr "Campagnes actives"
+
+msgid "Add Campaign Manager"
+msgstr "Ajouter un responsable de campagne"
+
+msgid "Add Participants"
+msgstr "Ajouter des participants"
+
+msgid "Add Team Members"
+msgstr "Ajouter des membres à l'équipe"
+
+msgid "Add a new participant to {{ business_account.name }}"
+msgstr "Ajouter un nouveau participant à {{ business_account.name }}"
+
+msgid "Add and manage team members for your business account"
+msgstr "Ajoutez et gérez les membres de votre équipe pour votre compte entreprise"
+
+msgid "Add and manage team members for your business account. Current usage: {{ admin_data.license_info.users_used if admin_data.license_info else 1 }}/{{ admin_data.license_info.users_limit if admin_data.license_info else 5 }} users."
+msgstr "Ajoutez et gérez les membres de votre équipe pour votre compte entreprise. Utilisation actuelle : {{ admin_data.license_info.users_used if admin_data.license_info else 1 }}/{{ admin_data.license_info.users_limit if admin_data.license_info else 5 }} utilisateurs."
+
+msgid "Add any notes about this license assignment..."
+msgstr "Ajoutez des notes sur cette attribution de licence..."
+
+msgid "Add individual participants or upload a CSV file to build your participant database. You can then assign them to campaigns for feedback collection."
+msgstr "Ajoutez des participants individuellement ou téléversez un fichier CSV pour constituer votre base de participants. Vous pourrez ensuite les affecter à des campagnes pour la collecte de retours."
+
+msgid "Add participant details to your account"
+msgstr "Ajoutez les informations du participant à votre compte"
+
+msgid "Add participant to active campaigns"
+msgstr "Ajoutez le participant aux campagnes actives"
+
+msgid "Add participants form"
+msgstr "Formulaire d’ajout de participants"
+
+msgid "Add segmentation data for personalized surveys and advanced analytics"
+msgstr "Ajoutez des données de segmentation pour des enquêtes personnalisées et une analytique avancée"
+
+msgid "Add selected participants to campaign"
+msgstr "Ajouter les participants sélectionnés à la campagne"
+
+msgid "Add-on Price (USD)"
+msgstr "Prix du module complémentaire (USD)"
+
+msgid "Additional Feedback"
+msgstr "Retour d'information supplémentaire"
+
+msgid "Admin Email Addresses"
+msgstr "Adresses e-mail administrateur"
+
+msgid "Admin access required"
+msgstr "Accès administrateur requis"
+
+msgid "Advanced Analytics"
+msgstr "Analytique avancée"
+
+msgid "Advanced features for growing teams"
+msgstr "Fonctionnalités avancées pour les équipes en croissance"
+
+msgid "All"
+msgstr "Tous"
+
+msgid "All Companies"
+msgstr "Toutes les entreprises"
+
+msgid "All License Types"
+msgstr "Tous les types de licence"
+
+msgid "All Responses"
+msgstr "Toutes les réponses"
+
+msgid "All Statuses"
+msgstr "Tous les statuts"
+
+msgid "All participants have already been invited successfully."
+msgstr "Tous les participants ont déjà été invités avec succès."
+
+msgid "All responses are anonymized and used only for demonstration"
+msgstr "Toutes les réponses sont anonymisées et utilisées uniquement à des fins de démonstration"
+
+msgid "All time feedback collected"
+msgstr "Retours d'information collectés depuis le début"
+
+msgid "An error occurred while exporting your data."
+msgstr "Une erreur s'est produite lors de l'exportation de vos données."
+
+msgid "An invitation will be sent to this email address"
+msgstr "Une invitation sera envoyée à cette adresse e-mail"
+
+msgid "Analytics"
+msgstr "Analytique"
+
+msgid "Analytics & business intelligence"
+msgstr "Analytique et intelligence d'affaires"
+
+msgid "Answer a few quick questions, just like a real customer would"
+msgstr "Répondez à quelques questions rapides, comme le ferait un véritable client"
+
+msgid "Any additional comments?"
+msgstr "Autres commentaires ?"
+
+msgid "Archelo Group Service Delivery & Support (1-5)"
+msgstr "Prestation de service et support Archelo Group (1-5)"
+
+msgid "Asia Pacific (APAC)"
+msgstr "Asie-Pacifique (APAC)"
+
+msgid "Asia Pacific (Mumbai)"
+msgstr "Asie-Pacifique (Mumbai)"
+
+msgid "Asia Pacific (Seoul)"
+msgstr "Asie-Pacifique (Séoul)"
+
+msgid "Asia Pacific (Singapore)"
+msgstr "Asie-Pacifique (Singapour)"
+
+msgid "Asia Pacific (Sydney)"
+msgstr "Asie-Pacifique (Sydney)"
+
+msgid "Asia Pacific (Tokyo)"
+msgstr "Asie-Pacifique (Tokyo)"
+
+msgid "Assign License"
+msgstr "Attribuer une licence"
+
+msgid "Assign participants to the campaign"
+msgstr "Affecter des participants à la campagne"
+
+msgid "Assigned By:"
+msgstr "Attribué par :"
+
+msgid "Assignment Date:"
+msgstr "Date d'attribution :"
+
+msgid "Audit Logs"
+msgstr "Journaux d'audit"
+
+msgid "Authentication Token:"
+msgstr "Jeton d'authentification :"
+
+msgid "Authentication tokens ensure that only authorized users can submit survey responses \n                            and prevent duplicate submissions. Your token is unique to your email address."
+msgstr "Les jetons d'authentification garantissent que seuls les utilisateurs autorisés peuvent soumettre des réponses à l'enquête et empêchent les doublons. Votre jeton est unique à votre adresse e-mail."
+
+msgid "Auto-generated from region"
+msgstr "Généré automatiquement à partir de la région"
+
+msgid "Automatically skips participants already in your account"
+msgstr "Ignore automatiquement les participants déjà présents dans votre compte"
+
+msgid "Average Ratings"
+msgstr "Notes moyennes"
+
+msgid "Avg Satisfaction"
+msgstr "Satisfaction moyenne"
+
+msgid "Avg/Account"
+msgstr "Moyenne/Compte"
+
+msgid "Background Color"
+msgstr "Couleur d'arrière-plan"
+
+msgid "Background color for documents and reports."
+msgstr "Couleur d'arrière-plan pour les documents et les rapports."
+
+msgid "Balance"
+msgstr "Équilibre"
+
+msgid "Balance Status"
+msgstr "État d'équilibre"
+
+msgid "Balanced"
+msgstr "Équilibré"
+
+msgid "Basic Analytics"
+msgstr "Analytique de base"
+
+msgid "Basic Information"
+msgstr "Informations de base"
+
+msgid "Brand Configuration"
+msgstr "Configuration de la marque"
+
+msgid "Breadcrumb navigation"
+msgstr "Navigation par fil d'Ariane"
+
+msgid "Bulk remove selected participants"
+msgstr "Supprimer en masse les participants sélectionnés"
+
+msgid "Business Account"
+msgstr "Compte entreprise"
+
+msgid "Business Account Administrator"
+msgstr "Administrateur du compte entreprise"
+
+msgid "Business Account:"
+msgstr "Compte entreprise :"
+
+msgid "Business Accounts Overview"
+msgstr "Aperçu des comptes entreprise"
+
+msgid "Business Analytics Hub"
+msgstr "Centre d'analytique d'entreprise"
+
+msgid "Business Intelligence"
+msgstr "Intelligence d'affaires"
+
+msgid "Business Name"
+msgstr "Nom de l'entreprise"
+
+msgid "Business Name:"
+msgstr "Nom de l'entreprise :"
+
+msgid "Business account context not found."
+msgstr "Contexte du compte entreprise introuvable."
+
+msgid "Business analytics hub with comprehensive platform intelligence"
+msgstr "Centre d'analytique d'entreprise avec une intelligence complète de la plateforme"
+
+msgid "Button Text"
+msgstr "Texte du bouton"
+
+msgid "C-Level Executive"
+msgstr "Cadre dirigeant (C-Level)"
+
+msgid "C1 Balance"
+msgstr "C1 Équilibre"
+
+msgid "C1 Opps"
+msgstr "C1 Opportunités"
+
+msgid "C1 Risks"
+msgstr "C1 Risques"
+
+msgid "C2 Balance"
+msgstr "C2 Équilibre"
+
+msgid "C2 Opps"
+msgstr "C2 Opportunités"
+
+msgid "C2 Risks"
+msgstr "C2 Risques"
+
+msgid "CSV File *"
+msgstr "Fichier CSV *"
+
+msgid "Call-to-Action Button Text"
+msgstr "Texte du bouton d’appel à l’action"
+
+msgid "Campaign"
+msgstr "Campagne"
+
+msgid "Campaign 1"
+msgstr "Campagne 1"
+
+msgid "Campaign 2"
+msgstr "Campagne 2"
+
+msgid "Campaign Actions"
+msgstr "Actions de la campagne"
+
+msgid "Campaign Analytics Filter"
+msgstr "Filtre d'analyse de campagne"
+
+msgid "Campaign Comparison"
+msgstr "Comparaison des campagnes"
+
+msgid "Campaign Counts"
+msgstr "Nombre de campagnes"
+
+msgid "Campaign ID is required"
+msgstr "L’identifiant de la campagne est requis."
+
+msgid "Campaign Insights"
+msgstr "Insights de la campagne"
+
+msgid "Campaign KPI Overview"
+msgstr "Vue d'ensemble des indicateurs de campagne"
+
+msgid "Campaign Management"
+msgstr "Gestion des campagnes"
+
+msgid "Campaign Manager is recommended for most team members"
+msgstr "Le rôle de responsable de campagne est recommandé pour la plupart des membres de l'équipe"
+
+msgid "Campaign Name"
+msgstr "Nom de la campagne"
+
+msgid "Campaign Scheduler"
+msgstr "Planificateur de campagnes"
+
+msgid "Campaign Scheduler Status"
+msgstr "Statut du planificateur de campagnes"
+
+msgid "Campaign Usage Insights"
+msgstr "Analyses d'utilisation des campagnes"
+
+msgid "Campaign has finished. All data is preserved and participant list is permanently locked to maintain historical accuracy."
+msgstr "La campagne est terminée. Toutes les données sont conservées et la liste des participants est définitivement verrouillée pour garantir l'exactitude historique."
+
+msgid "Campaign is currently active and collecting responses"
+msgstr "La campagne est actuellement active et recueille des réponses"
+
+msgid "Campaign is live and collecting survey responses. Participant list is locked to maintain data integrity. Wait for completion to modify participants."
+msgstr "La campagne est en cours et collecte les réponses à l'enquête. La liste des participants est verrouillée pour garantir l'intégrité des données. Attendez la fin pour modifier les participants."
+
+msgid "Campaign is prepared and ready to go live. You can still add or remove participants until the campaign is activated."
+msgstr "La campagne est prête à être lancée. Vous pouvez encore ajouter ou supprimer des participants jusqu'à son activation."
+
+msgid "Campaign is ready for activation"
+msgstr "La campagne est prête pour activation"
+
+msgid "Campaign management"
+msgstr "Gestion des campagnes"
+
+msgid "Campaign must have at least one participant to be marked ready."
+msgstr "La campagne doit comporter au moins un participant pour être marquée comme prête."
+
+msgid "Campaign must have name and description to be marked ready."
+msgstr "La campagne doit comporter un nom et une description pour être marquée comme prête."
+
+msgid "Campaign name, start date, and end date are required."
+msgstr "Le nom de la campagne, la date de début et la date de fin sont requis."
+
+msgid "Campaign needs description and at least one participant to be marked ready."
+msgstr "La campagne doit contenir une description et au moins un participant pour être marquée comme prête."
+
+msgid "Campaign not found or not accessible"
+msgstr "Campagne introuvable ou inaccessible."
+
+msgid "Campaign not found."
+msgstr "Campagne introuvable."
+
+msgid "Campaign participants table"
+msgstr "Tableau des participants à la campagne"
+
+msgid "Campaign-specific performance analytics and survey insights"
+msgstr "Analyses de performance spécifiques à la campagne et informations issues de l'enquête"
+
+msgid "Campaign:"
+msgstr "Campagne :"
+
+msgid "Campaigns"
+msgstr "Campagnes"
+
+msgid "Campaigns Used"
+msgstr "Campagnes utilisées"
+
+msgid "Campaigns:"
+msgstr "Campagnes :"
+
+msgid "Can create surveys, manage participants, and view analytics"
+msgstr "Peut créer des enquêtes, gérer les participants et consulter les analyses"
+
+msgid "Can view survey results and analytics but cannot create campaigns"
+msgstr "Peut consulter les résultats et analyses mais ne peut pas créer de campagnes"
+
+msgid "Canada (Central)"
+msgstr "Canada (Centre)"
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Cancel and return to participants list"
+msgstr "Annuler et revenir à la liste des participants"
+
+msgid "Cancel and return to settings"
+msgstr "Annuler et revenir aux paramètres"
+
+msgid "Cannot remove participant - campaign is {{ campaign.status }}"
+msgstr "Impossible de retirer le participant - la campagne est {{ campaign.status }}"
+
+msgid "Category"
+msgstr "Catégorie"
+
+msgid "Change"
+msgstr "Changement"
+
+msgid "Changes will take effect immediately after saving."
+msgstr "Les modifications prendront effet immédiatement après l'enregistrement."
+
+msgid "Check that the selected license type is available"
+msgstr "Vérifiez que le type de licence sélectionné est disponible"
+
+msgid "Choose Survey Experience:"
+msgstr "Choisissez l'expérience d'enquête :"
+
+msgid "Choose Your Survey Experience"
+msgstr "Choisissez votre expérience d'enquête"
+
+msgid "Choose how the AI should communicate with your survey participants"
+msgstr "Choisissez comment l'IA doit communiquer avec vos participants à l'enquête"
+
+msgid "Choose the appropriate license tier for this business account"
+msgstr "Choisissez le niveau de licence approprié pour ce compte entreprise"
+
+msgid "Choose your preferred feedback method: AI-powered conversational flow or traditional survey"
+msgstr "Choisissez votre méthode de retour préférée : flux conversationnel alimenté par l'IA ou enquête traditionnelle"
+
+msgid "Churn Risk"
+msgstr "Risque de résiliation"
+
+msgid "Churn risk flags"
+msgstr "Indicateurs de risque de résiliation"
+
+msgid "Classic step-by-step form with structured questions. Familiar interface for a quick survey experience."
+msgstr "Formulaire classique étape par étape avec des questions structurées. Interface familière pour une expérience d'enquête rapide."
+
+msgid "Clear Filter"
+msgstr "Effacer le filtre"
+
+msgid "Clear Results"
+msgstr "Effacer les résultats"
+
+msgid "Clear all filters"
+msgstr "Effacer tous les filtres"
+
+msgid "Clear search"
+msgstr "Effacer la recherche"
+
+msgid "Click below to continue to the secure session setup and begin the survey experience."
+msgstr "Cliquez ci-dessous pour passer à la configuration sécurisée de la session et commencer l'expérience d'enquête."
+
+msgid "Click to view full trends"
+msgstr "Cliquez pour voir les tendances complètes"
+
+msgid "Close"
+msgstr "Fermer"
+
+msgid "Close preview"
+msgstr "Fermer l'aperçu"
+
+msgid "Closing Message"
+msgstr "Message de clôture"
+
+msgid "Collapse All"
+msgstr "Tout réduire"
+
+msgid "Collapse all sections"
+msgstr "Réduire toutes les sections"
+
+msgid "Color Preview"
+msgstr "Aperçu des couleurs"
+
+msgid "Comma-separated list of email addresses for admin notifications"
+msgstr "Liste d'adresses e-mail séparées par des virgules pour les notifications administrateur"
+
+msgid "Companies"
+msgstr "Entreprises"
+
+msgid "Companies Analyzed"
+msgstr "Entreprises analysées"
+
+msgid "Companies with High or Critical churn risk level"
+msgstr "Entreprises présentant un risque de résiliation élevé ou critique"
+
+msgid "Companies with High or Critical churn risk level based on AI assessment"
+msgstr "Entreprises présentant un risque de résiliation élevé ou critique selon l'évaluation de l'IA"
+
+msgid "Company"
+msgstr "Entreprise"
+
+msgid "Company Commercial Value"
+msgstr "Valeur commerciale de l'entreprise"
+
+msgid "Company Description"
+msgstr "Description de l'entreprise"
+
+msgid "Company Display Name"
+msgstr "Nom d'affichage de l'entreprise"
+
+msgid "Company Logo"
+msgstr "Logo de l'entreprise"
+
+msgid "Company NPS pagination"
+msgstr "Pagination du NPS par entreprise"
+
+msgid "Company Name"
+msgstr "Nom de l'entreprise"
+
+msgid "Company Name *"
+msgstr "Nom de l'entreprise *"
+
+msgid "Company:"
+msgstr "Entreprise :"
+
+msgid "Comparison table pagination"
+msgstr "Pagination du tableau comparatif"
+
+msgid "Complete Intelligence Platform"
+msgstr "Plateforme d'intelligence complète"
+
+msgid "Complete Your Survey"
+msgstr "Complétez votre enquête"
+
+msgid "Complete response data"
+msgstr "Données de réponse complètes"
+
+msgid "Complete these steps to access your VOÏA platform and start collecting valuable customer feedback."
+msgstr "Complétez ces étapes pour accéder à votre plateforme VOÏA et commencer à collecter de précieux retours clients."
+
+msgid "Complete your account setup by creating a secure password"
+msgstr "Finalisez la configuration de votre compte en créant un mot de passe sécurisé"
+
+msgid "Completed"
+msgstr "Terminé"
+
+msgid "Completed:"
+msgstr "Terminées :"
+
+msgid "Completion Rate"
+msgstr "Taux de complétion"
+
+msgid "Configure SMTP settings for sending survey invitations"
+msgstr "Configurez les paramètres SMTP pour l'envoi des invitations à l'enquête"
+
+msgid "Configure brand settings"
+msgstr "Configurer les paramètres de marque"
+
+msgid "Configure email settings"
+msgstr "Configurer les paramètres d'e-mail"
+
+msgid "Configure license for {{ business_account.name }}"
+msgstr "Configurer la licence pour {{ business_account.name }}"
+
+msgid "Configure your SMTP settings to send survey invitations to participants"
+msgstr "Configurez vos paramètres SMTP pour envoyer des invitations à l'enquête aux participants"
+
+msgid "Configure your personalized survey experience for {{ business_account.name }}"
+msgstr "Configurez votre expérience d'enquête personnalisée pour {{ business_account.name }}"
+
+msgid "Confirm you have the necessary permissions to assign licenses"
+msgstr "Confirmez que vous disposez des autorisations nécessaires pour attribuer des licences"
+
+msgid "Confirm your new password"
+msgstr "Confirmez votre nouveau mot de passe"
+
+msgid "Congratulations, {{ current_user.get_full_name() }}! Your team is ready to start collecting valuable customer feedback."
+msgstr "Félicitations, {{ current_user.get_full_name() }} ! Votre équipe est prête à commencer à collecter des retours clients précieux."
+
+msgid "Contact Rivvalue to implement VOÏA for your business"
+msgstr "Contactez Rivvalue pour mettre en œuvre VOÏA dans votre entreprise"
+
+msgid "Continue to Survey"
+msgstr "Continuer vers l'enquête"
+
+msgid "Control which topics the survey covers first and which are optional if time runs out"
+msgstr "Contrôlez les sujets que l'enquête couvre en premier et ceux qui sont facultatifs si le temps est écoulé"
+
+msgid "Conversation Tone"
+msgstr "Tonalité de la conversation"
+
+msgid "Conversation history"
+msgstr "Historique de la conversation"
+
+msgid "Conversation messages"
+msgstr "Messages de la conversation"
+
+msgid "Conversational Interface"
+msgstr "Interface conversationnelle"
+
+msgid "Conversational Survey Already Completed"
+msgstr "Enquête conversationnelle déjà complétée"
+
+msgid "Conversational flow"
+msgstr "Flux conversationnel"
+
+msgid "Copy all survey links to clipboard"
+msgstr "Copier tous les liens d’enquête dans le presse-papiers"
+
+msgid "Copy survey link for {{ participant.name }}"
+msgstr "Copier le lien d’enquête pour {{ participant.name }}"
+
+msgid "Core License"
+msgstr "Licence Core"
+
+msgid "Core Licenses"
+msgstr "Licences Core"
+
+msgid "Create New Campaign"
+msgstr "Créer une nouvelle campagne"
+
+msgid "Create Your First Campaign"
+msgstr "Créez votre première campagne"
+
+msgid "Create and configure new business accounts with license assignment"
+msgstr "Créez et configurez de nouveaux comptes d'entreprise avec attribution de licence"
+
+msgid "Create and manage survey campaigns for your business account."
+msgstr "Créez et gérez des campagnes d'enquête pour votre compte entreprise."
+
+msgid "Create first participant"
+msgstr "Créer le premier participant"
+
+msgid "Create new business accounts with license assignment"
+msgstr "Créer de nouveaux comptes d'entreprise avec attribution de licence"
+
+msgid "Create new participant"
+msgstr "Créer un nouveau participant"
+
+msgid "Create participant"
+msgstr "Créer un participant"
+
+msgid "Create participants first, then assign them to campaigns."
+msgstr "Créez d'abord les participants, puis affectez-les aux campagnes."
+
+msgid "Create your first campaign to start collecting customer feedback and understanding their experience. Campaigns help you organize survey participants, send invitations, and analyze results."
+msgstr "Créez votre première campagne pour commencer à recueillir les retours de vos clients et comprendre leur expérience. Les campagnes vous aident à organiser les participants, envoyer les invitations et analyser les résultats."
+
+msgid "Created"
+msgstr "Créé"
+
+msgid "Critical"
+msgstr "Critique"
+
+msgid "Critical Risk"
+msgstr "Risque critique"
+
+msgid "Critical Risk Count"
+msgstr "Nombre de risques critiques"
+
+msgid "Cross-tenant license usage, trends, and compliance monitoring"
+msgstr "Utilisation des licences inter-locataires, tendances et suivi de conformité"
+
+msgid "Current"
+msgstr "Actuel"
+
+msgid "Current License:"
+msgstr "Licence actuelle :"
+
+msgid "Current License: {{ current_license.type|title }}"
+msgstr "Licence actuelle : {{ current_license.type|title }}"
+
+msgid "Current Team Members"
+msgstr "Membres actuels de l'équipe"
+
+msgid "Current Usage"
+msgstr "Utilisation actuelle"
+
+msgid "Custom Analytics"
+msgstr "Analytique personnalisée"
+
+msgid "Custom Completion Message"
+msgstr "Message de fin personnalisé"
+
+msgid "Custom Integrations"
+msgstr "Intégrations personnalisées"
+
+msgid "Custom Limits Configuration"
+msgstr "Configuration des limites personnalisées"
+
+msgid "Custom Research"
+msgstr "Recherche personnalisée"
+
+msgid "Custom Templates"
+msgstr "Modèles personnalisés"
+
+msgid "Custom campaign limits (default: 12/year)"
+msgstr "Limites de campagnes personnalisées (par défaut : 12/an)"
+
+msgid "Custom invitation capacity (default: 50,000)"
+msgstr "Capacité d'invitations personnalisée (par défaut : 50 000)"
+
+msgid "Custom limits for enterprise needs"
+msgstr "Limites personnalisées pour les besoins d'entreprise"
+
+msgid "Custom response targets (default: 10,000)"
+msgstr "Objectifs de réponses personnalisés (par défaut : 10 000)"
+
+msgid "Custom user limits (default: 25)"
+msgstr "Limites d'utilisateurs personnalisées (par défaut : 25)"
+
+msgid "Customer Feedback Survey"
+msgstr "Enquête de retour client"
+
+msgid "Customer Tenure Distribution"
+msgstr "Répartition de l'ancienneté client"
+
+msgid "Customer Tier"
+msgstr "Catégorie de client"
+
+msgid "Customer segment for tier-based analysis"
+msgstr "Segment client pour l'analyse par catégorie"
+
+msgid "Customize survey experience and conversation settings"
+msgstr "Personnaliser l'expérience d'enquête et les paramètres de conversation"
+
+msgid "Customize the invitation email content. If unchecked, default professional templates will be used."
+msgstr "Personnalisez le contenu de l'e-mail d'invitation. Si décoché, les modèles professionnels par défaut seront utilisés."
+
+msgid "Customize your brand colors, logo, and visual identity"
+msgstr "Personnalisez les couleurs, le logo et l'identité visuelle de votre marque"
+
+msgid "Customize your brand identity for {{ business_account.name }}"
+msgstr "Personnalisez votre identité de marque pour {{ business_account.name }}"
+
+msgid "Data Management"
+msgstr "Gestion des données"
+
+msgid "Database Health"
+msgstr "Santé de la base de données"
+
+msgid "Days Since First License"
+msgstr "Jours depuis la première licence"
+
+msgid "Days to Wait Before Reminder"
+msgstr "Nombre de jours avant le rappel"
+
+msgid "Dedicated Support"
+msgstr "Support dédié"
+
+msgid "Demo Features"
+msgstr "Fonctionnalités de la démonstration"
+
+msgid "Demo Information"
+msgstr "Informations sur la démonstration"
+
+msgid "Demo account not available"
+msgstr "Compte de démonstration non disponible."
+
+msgid "Demo campaigns will appear here once created."
+msgstr "Les campagnes de démonstration apparaîtront ici une fois créées."
+
+msgid "Description:"
+msgstr "Description :"
+
+msgid "Detailed License Info"
+msgstr "Informations détaillées sur la licence"
+
+msgid "Details"
+msgstr "Détails"
+
+msgid "Detractors (0-6)"
+msgstr "Détracteurs (0-6)"
+
+msgid "Done"
+msgstr "Terminé"
+
+msgid "Download CSV template file"
+msgstr "Télécharger le modèle de fichier CSV"
+
+msgid "Download a sample CSV file with all columns and example data to get started quickly"
+msgstr "Téléchargez un fichier CSV d'exemple contenant toutes les colonnes et des données exemples pour commencer rapidement"
+
+msgid "Download license history data for record keeping or analysis."
+msgstr "Téléchargez les données d'historique des licences pour archivage ou analyse."
+
+msgid "Draft"
+msgstr "Brouillon"
+
+msgid "Draft campaigns can be freely edited or deleted. Once marked ready, campaign details become locked."
+msgstr "Les campagnes brouillon peuvent être librement modifiées ou supprimées. Une fois marquées comme prêtes, les détails deviennent verrouillés."
+
+msgid "Duration:"
+msgstr "Durée :"
+
+msgid "Dynamic questions"
+msgstr "Questions dynamiques"
+
+msgid "Each token expires after 24 hours"
+msgstr "Chaque jeton expire après 24 heures"
+
+msgid "Edit Campaign"
+msgstr "Modifier la campagne"
+
+msgid "Email"
+msgstr "E-mail"
+
+msgid "Email Address"
+msgstr "Adresse e-mail"
+
+msgid "Email Address *"
+msgstr "Adresse e-mail *"
+
+msgid "Email Configuration"
+msgstr "Configuration de l'e-mail"
+
+msgid "Email Subject"
+msgstr "Objet de l’e-mail"
+
+msgid "Email Support"
+msgstr "Assistance par e-mail"
+
+msgid "Email address that appears in the \"From\" field"
+msgstr "Adresse e-mail affichée dans le champ « De »"
+
+msgid "Email automation"
+msgstr "Automatisation des e-mails"
+
+msgid "Email locked - survey history exists"
+msgstr "E-mail verrouillé - historique d'enquête existant"
+
+msgid "Email service is not configured. Please configure SMTP settings first."
+msgstr "Le service de messagerie n’est pas configuré. Veuillez d’abord configurer les paramètres SMTP."
+
+msgid "Email {{ participant.name }}"
+msgstr "Envoyer un e-mail à {{ participant.name }}"
+
+msgid "Email:"
+msgstr "E-mail :"
+
+msgid "End"
+msgstr "Fin"
+
+msgid "End Date"
+msgstr "Date de fin"
+
+msgid "End User"
+msgstr "Utilisateur final"
+
+msgid "End date must be after start date."
+msgstr "La date de fin doit être postérieure à la date de début."
+
+msgid "Engage with our natural language processing system to demonstrate advanced dialogue-based data collection."
+msgstr "Interagissez avec notre système de traitement du langage naturel pour démontrer une collecte de données avancée basée sur le dialogue."
+
+msgid "Engagement management"
+msgstr "Gestion de l'engagement"
+
+msgid "Ensure custom limits (for Pro licenses) are reasonable"
+msgstr "Assurez-vous que les limites personnalisées (pour les licences Pro) sont raisonnables"
+
+msgid "Enter an email to generate a secure session token."
+msgstr "Entrez une adresse e-mail pour générer un jeton de session sécurisé."
+
+msgid "Enter company name"
+msgstr "Saisir le nom de l'entreprise"
+
+msgid "Enter email address"
+msgstr "Saisissez l'adresse e-mail"
+
+msgid "Enter participant's full name"
+msgstr "Saisir le nom complet du participant"
+
+msgid "Enter test email address"
+msgstr "Saisir l'adresse e-mail de test"
+
+msgid "Enter your company name"
+msgstr "Entrez le nom de votre entreprise"
+
+msgid "Enter your email address"
+msgstr "Entrez votre adresse e-mail"
+
+msgid "Enter your email to generate a secure session token"
+msgstr "Saisissez votre e-mail pour générer un jeton de session sécurisé"
+
+msgid "Enter your full name"
+msgstr "Entrez votre nom complet"
+
+msgid "Enter your new password"
+msgstr "Saisissez votre nouveau mot de passe"
+
+msgid "Error loading campaign details."
+msgstr "Erreur lors du chargement des détails de la campagne."
+
+msgid "Error loading campaign responses."
+msgstr "Erreur lors du chargement des réponses de la campagne."
+
+msgid "Error loading campaigns."
+msgstr "Erreur lors du chargement des campagnes."
+
+msgid "Error loading company responses"
+msgstr "Erreur lors du chargement des réponses de l’entreprise."
+
+msgid "Error loading individual response."
+msgstr "Erreur lors du chargement de la réponse individuelle."
+
+msgid "Error loading responses"
+msgstr "Erreur lors du chargement des réponses"
+
+msgid "Error loading survey configuration."
+msgstr "Erreur lors du chargement de la configuration de l’enquête."
+
+msgid "Essential features for small teams"
+msgstr "Fonctionnalités essentielles pour les petites équipes"
+
+msgid "Estimated account value in USD. This will be synced across all participants from the same company in your account."
+msgstr "Valeur estimée du compte en USD. Cette valeur sera synchronisée pour tous les participants de la même entreprise dans votre compte."
+
+msgid "Europe (Frankfurt)"
+msgstr "Europe (Francfort)"
+
+msgid "Europe (Ireland)"
+msgstr "Europe (Irlande)"
+
+msgid "Europe (London)"
+msgstr "Europe (Londres)"
+
+msgid "Europe, Middle East & Africa (EMEA)"
+msgstr "Europe, Moyen-Orient et Afrique (EMEA)"
+
+msgid "Exec-level insights"
+msgstr "Analyses de niveau direction"
+
+msgid "Executive Report"
+msgstr "Rapport exécutif"
+
+msgid "Executive Summary"
+msgstr "Résumé exécutif"
+
+msgid "Expand All"
+msgstr "Tout développer"
+
+msgid "Expand all sections"
+msgstr "Développer toutes les sections"
+
+msgid "Expected number of completed survey responses (informational)"
+msgstr "Nombre attendu de réponses complètes à l'enquête (à titre informatif)"
+
+msgid "Experience the full power of Voice of Client Agent for your organization."
+msgstr "Découvrez toute la puissance de l'agent Voice of Client pour votre organisation."
+
+msgid "Expiration Details"
+msgstr "Détails de l'expiration"
+
+msgid "Expired"
+msgstr "Expiré"
+
+msgid "Expires:"
+msgstr "Expire :"
+
+msgid "Expiring Licenses"
+msgstr "Licences en expiration"
+
+msgid "Expiring Soon"
+msgstr "Expire bientôt"
+
+msgid "Explore the live insights dashboard, instantly generated from your input"
+msgstr "Explorez le tableau de bord en direct, généré instantanément à partir de vos réponses"
+
+msgid "Export All Data"
+msgstr "Exporter toutes les données"
+
+msgid "Export Complete!"
+msgstr "Exportation terminée !"
+
+msgid "Export Data"
+msgstr "Exporter les données"
+
+msgid "Export Failed"
+msgstr "Échec de l'exportation"
+
+msgid "Export Information"
+msgstr "Informations sur l'exportation"
+
+msgid "Export all survey responses across all campaigns for analysis and reporting."
+msgstr "Exportez toutes les réponses aux enquêtes de l'ensemble des campagnes pour l'analyse et les rapports."
+
+msgid "Export all survey responses for analysis and reporting"
+msgstr "Exportez toutes les réponses aux enquêtes pour l'analyse et les rapports"
+
+msgid "Export campaign responses"
+msgstr "Exporter les réponses de la campagne"
+
+msgid "Export feature coming soon"
+msgstr "Fonction d'exportation à venir"
+
+msgid "Failed Invitations"
+msgstr "Invitations échouées"
+
+msgid "Failed to activate campaign. Please try again."
+msgstr "Échec de l’activation de la campagne. Veuillez réessayer."
+
+msgid "Failed to complete campaign. Please try again."
+msgstr "Échec de la finalisation de la campagne. Veuillez réessayer."
+
+msgid "Failed to create campaign. Please try again."
+msgstr "Échec de la création de la campagne. Veuillez réessayer."
+
+msgid "Failed to delete campaign. Please try again."
+msgstr "Échec de la suppression de la campagne. Veuillez réessayer."
+
+msgid "Failed to mark campaign as ready. Please try again."
+msgstr "Échec du marquage de la campagne comme prête. Veuillez réessayer."
+
+msgid "Failed to resend invitations. Please try again."
+msgstr "Échec du renvoi des invitations. Veuillez réessayer."
+
+msgid "Failed to save survey configuration. Please try again."
+msgstr "Échec de l’enregistrement de la configuration de l’enquête. Veuillez réessayer."
+
+msgid "Failed to send invitations. Please try again."
+msgstr "Échec de l’envoi des invitations. Veuillez réessayer."
+
+msgid "Failed to update campaign. Please try again."
+msgstr "Échec de la mise à jour de la campagne. Veuillez réessayer."
+
+msgid "Feature"
+msgstr "Fonctionnalité"
+
+msgid "Filter by company"
+msgstr "Filtrer par entreprise"
+
+msgid "Filter by customer tier"
+msgstr "Filtrer par catégorie de client"
+
+msgid "Filter by language"
+msgstr "Filtrer par langue"
+
+msgid "Filter by region"
+msgstr "Filtrer par région"
+
+msgid "Filter by role"
+msgstr "Filtrer par rôle"
+
+msgid "Filter by tenure"
+msgstr "Filtrer par ancienneté"
+
+msgid "Fine-tune the survey experience and conversation pacing"
+msgstr "Ajustez l'expérience de l'enquête et le rythme de la conversation"
+
+msgid "Follow-ups per Topic"
+msgstr "Relances par sujet"
+
+msgid "Footer Disclaimer"
+msgstr "Avertissement en bas de page"
+
+msgid "Footer Note"
+msgstr "Note de bas de page"
+
+msgid "Full Name *"
+msgstr "Nom complet *"
+
+msgid "Full access to all features and settings"
+msgstr "Accès complet à toutes les fonctionnalités et paramètres"
+
+msgid "Generate Another Token"
+msgstr "Générer un autre jeton"
+
+msgid "Generate Token"
+msgstr "Générer un jeton"
+
+msgid "Generate personalized survey tokens"
+msgstr "Générer des jetons d’enquête personnalisés"
+
+msgid "Generate secure authentication token"
+msgstr "Générer un jeton d'authentification sécurisé"
+
+msgid "Generate unique tokens for secure survey access"
+msgstr "Générez des jetons uniques pour un accès sécurisé à l'enquête"
+
+msgid "Generating your authentication token..."
+msgstr "Génération de votre jeton d'authentification..."
+
+msgid "Geographic region for regional insights"
+msgstr "Région géographique pour des analyses régionales"
+
+msgid "Get Authentication Token"
+msgstr "Obtenir un jeton d'authentification"
+
+msgid "Get Started with VOÏA"
+msgstr "Commencez avec VOÏA"
+
+msgid "Get authentication token to start survey"
+msgstr "Obtenir un jeton d'authentification pour commencer l'enquête"
+
+msgid "Growth Potential"
+msgstr "Potentiel de croissance"
+
+msgid "Growth opportunities"
+msgstr "Opportunités de croissance"
+
+msgid "Growth opportunities identified"
+msgstr "Opportunités de croissance identifiées"
+
+msgid "Hard limit on survey invitations (typically 5x responses for ~20%% response rate)"
+msgstr "Limite stricte d'invitations (généralement 5× les réponses pour un taux d’environ 20 %)"
+
+msgid "Has Opportunities"
+msgstr "Avec opportunités"
+
+msgid "Has Risks"
+msgstr "Avec risques"
+
+msgid "Help"
+msgstr "Aide"
+
+msgid "Here's what you've successfully set up:"
+msgstr "Voici ce que vous avez configuré avec succès :"
+
+msgid "Hi {{ participant_name }}, thank you for participating"
+msgstr "Bonjour {{ participant_name }}, merci de votre participation"
+
+msgid "High"
+msgstr "Élevé"
+
+msgid "High Churn Risk Accounts"
+msgstr "Comptes à risque élevé de résiliation"
+
+msgid "High Usage Reports"
+msgstr "Rapports d'utilisation élevée"
+
+msgid "High-level overview of key performance indicators across all campaigns"
+msgstr "Vue d'ensemble des principaux indicateurs de performance sur l'ensemble des campagnes"
+
+msgid "Highest NPS"
+msgstr "NPS le plus élevé"
+
+msgid "Highlight color for success states and call-to-action elements."
+msgstr "Couleur de surbrillance pour les états de succès et les éléments d'appel à l'action."
+
+msgid "How deep to explore each topic with follow-up questions"
+msgstr "Profondeur d'exploration de chaque sujet avec des questions de relance"
+
+msgid "How long have you been working with Archelo Group?"
+msgstr "Depuis combien de temps travaillez-vous avec Archelo Group ?"
+
+msgid "How long have you been working with FC inc?"
+msgstr "Depuis combien de temps travaillez-vous avec FC inc ?"
+
+msgid "How long have you been working with {{ branding.company_name if branding and branding.company_name else 'us' }}?"
+msgstr "Depuis combien de temps travaillez-vous avec {{ branding.company_name if branding and branding.company_name else 'nous' }} ?"
+
+msgid "How many days after the invitation should we send the reminder?"
+msgstr "Combien de jours après l’invitation devons-nous envoyer le rappel ?"
+
+msgid "How your name appears to survey recipients"
+msgstr "Comment votre nom apparaît aux destinataires de l'enquête"
+
+msgid "Imminent churn risk (High/Critical)"
+msgstr "Risque imminent de résiliation (élevé/critique)"
+
+msgid "In this simulation, you'll step into the role of a customer invited by"
+msgstr "Dans cette simulation, vous incarnerez un client invité par"
+
+msgid "Includes all campaigns"
+msgstr "Inclut toutes les campagnes"
+
+msgid "Includes live insight dashboard right after completion"
+msgstr "Inclut un tableau de bord d'analyse en direct juste après la fin"
+
+msgid "Individual Response Viewer"
+msgstr "Visualisation des réponses individuelles"
+
+msgid "Industry"
+msgstr "Secteur d'activité"
+
+msgid "Instant analytics and insights generated from your feedback."
+msgstr "Analyses instantanées et informations générées à partir de vos retours."
+
+msgid "Insufficient Data (<2 responses)"
+msgstr "Données insuffisantes (<2 réponses)"
+
+msgid "Introduction Message"
+msgstr "Message d’introduction"
+
+msgid "Invalid date format."
+msgstr "Format de date invalide."
+
+msgid "Invalid numeric values in survey controls."
+msgstr "Valeurs numériques invalides dans les contrôles de l’enquête."
+
+msgid "Invite campaign managers to help create and manage surveys"
+msgstr "Invitez des responsables de campagne pour aider à créer et gérer les enquêtes"
+
+msgid "Invite campaign managers to help you create and manage customer feedback surveys"
+msgstr "Invitez des responsables de campagne à vous aider à créer et gérer les enquêtes de retour client"
+
+msgid "Invited"
+msgstr "Invités"
+
+msgid "JSON format for easy analysis"
+msgstr "Format JSON pour une analyse facilitée"
+
+msgid "Join a Live Campaign"
+msgstr "Rejoindre une campagne en direct"
+
+msgid "Key Themes"
+msgstr "Thèmes clés"
+
+msgid "Key sentiment & themes"
+msgstr "Sentiment clé et thématiques"
+
+msgid "Key themes identified"
+msgstr "Thèmes clés identifiés"
+
+msgid "Last Login"
+msgstr "Dernière connexion"
+
+msgid "Latest customer feedback"
+msgstr "Derniers retours clients"
+
+msgid "Latin America (LATAM)"
+msgstr "Amérique latine (LATAM)"
+
+msgid "Launch and Analyze"
+msgstr "Lancer et analyser"
+
+msgid "Launch your first campaign and begin gathering valuable customer insights"
+msgstr "Lancez votre première campagne et commencez à recueillir des informations clients précieuses"
+
+msgid "Less than 6 months"
+msgstr "Moins de 6 mois"
+
+msgid "Let's Get Started"
+msgstr "Commençons"
+
+msgid "Let's set up your platform for success"
+msgstr "Configurons votre plateforme pour la réussite"
+
+msgid "License History"
+msgstr "Historique des licences"
+
+msgid "License Information"
+msgstr "Informations sur la licence"
+
+msgid "License Management"
+msgstr "Gestion des licences"
+
+msgid "License Overview"
+msgstr "Aperçu des licences"
+
+msgid "License Period:"
+msgstr "Période de licence :"
+
+msgid "License Type"
+msgstr "Type de licence"
+
+msgid "License Type:"
+msgstr "Type de licence :"
+
+msgid "License Types Used"
+msgstr "Types de licences utilisés"
+
+msgid "License details and usage information for {{ account_data.name }}"
+msgstr "Détails et informations d'utilisation de la licence pour {{ account_data.name }}"
+
+msgid "License management dashboard and overview"
+msgstr "Tableau de bord et aperçu de la gestion des licences"
+
+msgid "Licensed Accounts"
+msgstr "Comptes sous licence"
+
+msgid "Live preview of your color palette."
+msgstr "Aperçu en direct de votre palette de couleurs."
+
+msgid "Loading dashboard data..."
+msgstr "Chargement des données du tableau de bord..."
+
+msgid "Loading executive summary..."
+msgstr "Chargement du résumé exécutif..."
+
+msgid "Loading responses..."
+msgstr "Chargement des réponses..."
+
+msgid "Loading..."
+msgstr "Chargement..."
+
+msgid "Logout"
+msgstr "Déconnexion"
+
+msgid "Low"
+msgstr "Faible"
+
+msgid "Lowest NPS"
+msgstr "NPS le plus faible"
+
+msgid "Main brand color used for headers, buttons, and accents."
+msgstr "Couleur principale de la marque utilisée pour les en-têtes, les boutons et les accents."
+
+msgid "Manage"
+msgstr "Gérer"
+
+msgid "Manage Campaigns"
+msgstr "Gérer les campagnes"
+
+msgid "Manage Participants"
+msgstr "Gérer les participants"
+
+msgid "Manage Users"
+msgstr "Gérer les utilisateurs"
+
+msgid "Manage campaign participants for {{ business_account.name }}"
+msgstr "Gérez les participants à la campagne pour {{ business_account.name }}"
+
+msgid "Manage cross-tenant administrator accounts and permissions"
+msgstr "Gérez les comptes et autorisations des administrateurs inter-locataires"
+
+msgid "Manage licenses and monitor usage across all business accounts"
+msgstr "Gérez les licences et suivez l'utilisation sur tous les comptes entreprise"
+
+msgid "Manage participants for this campaign"
+msgstr "Gérer les participants pour cette campagne"
+
+msgid "Manage survey campaigns"
+msgstr "Gérer les campagnes d'enquête"
+
+msgid "Manage survey campaigns for {{ business_account.name }}"
+msgstr "Gérez les campagnes de sondage pour {{ business_account.name }}"
+
+msgid "Manage survey participants"
+msgstr "Gérer les participants aux enquêtes"
+
+msgid "Manage team members and users"
+msgstr "Gérer les membres de l'équipe et les utilisateurs"
+
+msgid "Manage your account, team, data, and system settings"
+msgstr "Gérez votre compte, votre équipe, vos données et vos paramètres système"
+
+msgid "Manager"
+msgstr "Gestionnaire"
+
+msgid "Max Campaigns"
+msgstr "Nombre maximal de campagnes"
+
+msgid "Max Participants"
+msgstr "Nombre maximum de participants"
+
+msgid "Max Responses"
+msgstr "Nombre maximal de réponses"
+
+msgid "Max Users"
+msgstr "Nombre maximal d'utilisateurs"
+
+msgid "Max duration must be between 60 and 300 seconds."
+msgstr "La durée maximale doit être comprise entre 60 et 300 secondes."
+
+msgid "Max follow-ups per topic must be between 1 and 3."
+msgstr "Le nombre maximal de relances par sujet doit être compris entre 1 et 3."
+
+msgid "Max questions must be between 3 and 15."
+msgstr "Le nombre maximal de questions doit être compris entre 3 et 15."
+
+msgid "Maximum Campaigns"
+msgstr "Nombre maximal de campagnes"
+
+msgid "Maximum Invitations per Campaign"
+msgstr "Nombre maximal d'invitations par campagne"
+
+msgid "Maximum Questions"
+msgstr "Nombre maximum de questions"
+
+msgid "Maximum Users"
+msgstr "Nombre maximal d'utilisateurs"
+
+msgid "Maximum file size: 5MB"
+msgstr "Taille maximale du fichier : 5 Mo"
+
+msgid "Maximum time participants can spend on the survey"
+msgstr "Durée maximale que les participants peuvent consacrer à l'enquête"
+
+msgid "Medium"
+msgstr "Moyen"
+
+msgid "Message before the signature"
+msgstr "Message avant la signature"
+
+msgid "Metric"
+msgstr "Indicateur"
+
+msgid "Metrics Comparison"
+msgstr "Comparaison des indicateurs"
+
+msgid "Monitor and manage all business account licenses across the platform"
+msgstr "Surveillez et gérez toutes les licences de comptes entreprise sur la plateforme"
+
+msgid "Monitor database connection and performance status"
+msgstr "Surveillez l'état de la connexion et les performances de la base de données"
+
+msgid "Monitor system performance and cache status"
+msgstr "Surveillez les performances du système et l'état du cache"
+
+msgid "More actionable insights"
+msgstr "Analyses plus exploitables"
+
+msgid "More than 10 years"
+msgstr "Plus de 10 ans"
+
+msgid "NPS Category"
+msgstr "Catégorie NPS"
+
+msgid "NPS Distribution"
+msgstr "Répartition du NPS"
+
+msgid "NPS Score"
+msgstr "Score NPS"
+
+msgid "NPS Score:"
+msgstr "Score NPS :"
+
+msgid "NPS by Client Company"
+msgstr "NPS par entreprise cliente"
+
+msgid "NPS by Customer Tenure"
+msgstr "NPS par ancienneté client"
+
+msgid "NPS by Customer Tier"
+msgstr "NPS par catégorie de clients"
+
+msgid "NPS by Region"
+msgstr "NPS par région"
+
+msgid "NPS by Role"
+msgstr "NPS par rôle"
+
+msgid "NPS score & distribution"
+msgstr "Score NPS et répartition"
+
+msgid "NPS-Based Growth Factor Analysis"
+msgstr "Analyse du facteur de croissance basé sur le NPS"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "Name that appears in the \"From\" field"
+msgstr "Nom affiché dans le champ « De »"
+
+msgid "Name:"
+msgstr "Nom :"
+
+msgid "Natural conversation with our AI agent. Dynamic questions based on your responses for a personalized experience."
+msgstr "Conversation naturelle avec notre agent IA. Questions dynamiques basées sur vos réponses pour une expérience personnalisée."
+
+msgid "Navigate to {{ item.label }}"
+msgstr "Aller à {{ item.label }}"
+
+msgid "Need help? Contact support at"
+msgstr "Besoin d'aide ? Contactez le support à"
+
+msgid "New"
+msgstr "Nouveau"
+
+msgid "New License"
+msgstr "Nouvelle licence"
+
+msgid "New business account registrations will appear here."
+msgstr "Les nouvelles inscriptions de comptes entreprise apparaîtront ici."
+
+msgid "Newest First"
+msgstr "Les plus récents"
+
+msgid "Next"
+msgstr "Suivant"
+
+msgid "No Campaigns Found"
+msgstr "Aucune campagne trouvée"
+
+msgid "No License History"
+msgstr "Aucun historique de licence"
+
+msgid "No Opportunities"
+msgstr "Sans opportunités"
+
+msgid "No Recent Responses"
+msgstr "Aucune réponse récente"
+
+msgid "No Responses Found"
+msgstr "Aucune réponse trouvée"
+
+msgid "No Risks"
+msgstr "Sans risques"
+
+msgid "No accounts found"
+msgstr "Aucun compte trouvé"
+
+msgid "No expiration"
+msgstr "Pas d'expiration"
+
+msgid "No failed invitations found that can be retried."
+msgstr "Aucune invitation échouée ne peut être renvoyée."
+
+msgid "No invitations were queued for retry."
+msgstr "Aucune invitation n’a été mise en file d’attente pour un nouvel envoi."
+
+msgid "No login, no spam, no setup"
+msgstr "Aucune connexion, aucun spam, aucune configuration"
+
+msgid "No logo"
+msgstr "Aucun logo"
+
+msgid "No participants assigned to this campaign yet"
+msgstr "Aucun participant n'est encore affecté à cette campagne"
+
+msgid "No participants found for this campaign."
+msgstr "Aucun participant trouvé pour cette campagne."
+
+msgid "No participants match your search"
+msgstr "Aucun participant ne correspond à votre recherche"
+
+msgid "No participants {% if search_query %}match your search{% else %}yet{% endif %}"
+msgstr "Aucun participant {% if search_query %}ne correspond à votre recherche{% else %}pour le moment{% endif %}"
+
+msgid "No recent accounts"
+msgstr "Aucun compte récent"
+
+msgid "No recent license activity"
+msgstr "Aucune activité de licence récente"
+
+msgid "No responses found for this company"
+msgstr "Aucune réponse trouvée pour cette entreprise"
+
+msgid "No survey responses match your search criteria."
+msgstr "Aucune réponse d'enquête ne correspond à vos critères de recherche."
+
+msgid "No token"
+msgstr "Aucun jeton"
+
+msgid "No transcripts processed yet"
+msgstr "Aucune transcription traitée pour le moment"
+
+msgid "No users in this account"
+msgstr "Aucun utilisateur dans ce compte"
+
+msgid "North America"
+msgstr "Amérique du Nord"
+
+msgid "Notes:"
+msgstr "Notes :"
+
+msgid "Number of campaigns per month"
+msgstr "Nombre de campagnes par mois"
+
+msgid "Number of users that can access the account"
+msgstr "Nombre d'utilisateurs pouvant accéder au compte"
+
+msgid "Oldest First"
+msgstr "Les plus anciens"
+
+msgid "On a scale of 0-10, how likely are you to recommend our services to a friend or colleague?"
+msgstr "Sur une échelle de 0 à 10, quelle est la probabilité que vous recommandiez nos services à un ami ou un collègue ?"
+
+msgid "Onboard"
+msgstr "Intégrer"
+
+msgid "Onboard Business"
+msgstr "Intégrer une entreprise"
+
+msgid "Onboard Business Account"
+msgstr "Intégrer un compte entreprise"
+
+msgid "One response per email address (unless overwriting)"
+msgstr "Une réponse par adresse e-mail (sauf remplacement)"
+
+msgid "Only one reminder is sent per participant"
+msgstr "Un seul rappel est envoyé par participant"
+
+msgid "Opportunities"
+msgstr "Opportunités"
+
+msgid "Opportunity Heavy"
+msgstr "Forte opportunité"
+
+msgid "Optional"
+msgstr "Optionnel"
+
+msgid "Optional Topics (if time allows)"
+msgstr "Sujets optionnels (si le temps le permet)"
+
+msgid "Optional add-on features with custom pricing and duration"
+msgstr "Fonctionnalités supplémentaires optionnelles avec tarification et durée personnalisées"
+
+msgid "Optional details about this campaign's purpose and scope"
+msgstr "Détails optionnels sur l’objectif et la portée de cette campagne"
+
+msgid "Origin"
+msgstr "Origine"
+
+msgid "Other"
+msgstr "Autre"
+
+msgid "Overall Satisfaction"
+msgstr "Satisfaction globale"
+
+msgid "Overall Satisfaction (1-5)"
+msgstr "Satisfaction globale (1-5)"
+
+msgid "Overall satisfaction metric"
+msgstr "Indicateur de satisfaction globale"
+
+msgid "Overview"
+msgstr "Vue d'ensemble"
+
+msgid "PNG format recommended for logos with transparency"
+msgstr "Format PNG recommandé pour les logos avec transparence"
+
+msgid "Participant Email"
+msgstr "Courriel du participant"
+
+msgid "Participant List"
+msgstr "Liste des participants"
+
+msgid "Participant Management"
+msgstr "Gestion des participants"
+
+msgid "Participant Name"
+msgstr "Nom du participant"
+
+msgid "Participant actions"
+msgstr "Actions du participant"
+
+msgid "Participant list locked - collecting responses"
+msgstr "Liste de participants verrouillée - collecte en cours"
+
+msgid "Participant list permanently locked"
+msgstr "Liste de participants définitivement verrouillée"
+
+msgid "Participant management"
+msgstr "Gestion des participants"
+
+msgid "Participant not found in this campaign."
+msgstr "Participant introuvable dans cette campagne."
+
+msgid "Participant's company or organization"
+msgstr "Entreprise ou organisation du participant"
+
+msgid "Participant's email address for survey invitation"
+msgstr "Adresse e-mail du participant pour l'invitation à l'enquête"
+
+msgid "Participant's full name"
+msgstr "Nom complet du participant"
+
+msgid "Participant's role for role-based survey personalization"
+msgstr "Rôle du participant pour la personnalisation de l'enquête selon le rôle"
+
+msgid "Passives (7-8)"
+msgstr "Neutres (7-8)"
+
+msgid "Password"
+msgstr "Mot de passe"
+
+msgid "Pending"
+msgstr "En attente"
+
+msgid "Pending Invitations"
+msgstr "Invitations en attente"
+
+msgid "Performance Metrics"
+msgstr "Indicateurs de performance"
+
+msgid "Permission Required"
+msgstr "Autorisation requise"
+
+msgid "Personalize the survey experience with custom messages"
+msgstr "Personnalisez l'expérience d'enquête avec des messages personnalisés"
+
+msgid "Platform Admin Users"
+msgstr "Administrateurs de la plateforme"
+
+msgid "Platform Administration"
+msgstr "Administration de la plateforme"
+
+msgid "Platform-wide metrics, license usage, and business intelligence"
+msgstr "Indicateurs globaux, utilisation des licences et intelligence d'affaires"
+
+msgid "Please contact support for assistance with your account."
+msgstr "Veuillez contacter le support pour obtenir de l'aide concernant votre compte."
+
+msgid "Please select two campaigns above to view comparison results"
+msgstr "Veuillez sélectionner deux campagnes ci-dessus pour afficher les résultats de la comparaison"
+
+msgid "Please wait while VOÏA analyzes your feedback"
+msgstr "Veuillez patienter pendant que VOÏA analyse votre retour d'information"
+
+msgid "Plus License"
+msgstr "Licence Plus"
+
+msgid "Plus Licenses"
+msgstr "Licences Plus"
+
+msgid "Preferred Language"
+msgstr "Langue préférée"
+
+msgid "Preview email"
+msgstr "Aperçu de l'e-mail"
+
+msgid "Previous"
+msgstr "Précédent"
+
+msgid "Previous License"
+msgstr "Licence précédente"
+
+msgid "Pricing"
+msgstr "Tarification"
+
+msgid "Pricing (1-5)"
+msgstr "Tarification (1-5)"
+
+msgid "Pricing Perception"
+msgstr "Perception de la tarification"
+
+msgid "Primary Color"
+msgstr "Couleur principale"
+
+msgid "Primary Survey Goals (select all that apply)"
+msgstr "Objectifs principaux de l'enquête (sélectionnez tout ce qui s'applique)"
+
+msgid "Primary language for future multilingual support"
+msgstr "Langue principale pour la prise en charge multilingue future"
+
+msgid "Primary text color for readability."
+msgstr "Couleur de texte principale pour la lisibilité."
+
+msgid "Prioritized Topics (covered first)"
+msgstr "Sujets prioritaires (couverts en premier)"
+
+msgid "Priority Support"
+msgstr "Support prioritaire"
+
+msgid "Pro Licenses"
+msgstr "Licences Pro"
+
+msgid "Processing response"
+msgstr "Traitement de la réponse"
+
+msgid "Processing your feedback..."
+msgstr "Traitement de votre retour d'information..."
+
+msgid "Product"
+msgstr "Produit"
+
+msgid "Product Feedback"
+msgstr "Retour sur le produit"
+
+msgid "Product Value"
+msgstr "Valeur du produit"
+
+msgid "Product Value (1-5)"
+msgstr "Valeur du produit (1-5)"
+
+msgid "Product Value:"
+msgstr "Valeur du produit :"
+
+msgid "Product/Service Description"
+msgstr "Description du produit/service"
+
+msgid "Promoters (9-10)"
+msgstr "Promoteurs (9-10)"
+
+msgid "Proven Results from Campaign-Based Intelligence"
+msgstr "Résultats prouvés issus de l'intelligence basée sur les campagnes"
+
+msgid "Quick Start Guide"
+msgstr "Guide de démarrage rapide"
+
+msgid "Quick actions and settings"
+msgstr "Actions rapides et paramètres"
+
+msgid "Quick search by name, email, or company..."
+msgstr "Recherche rapide par nom, e-mail ou entreprise..."
+
+msgid "Quick, secure, and completely anonymous demo experience."
+msgstr "Une expérience de démonstration rapide, sécurisée et totalement anonyme."
+
+msgid "Rate limiting prevents abuse"
+msgstr "La limitation du débit empêche les abus"
+
+msgid "Ratings"
+msgstr "Évaluations"
+
+msgid "Ready to Begin?"
+msgstr "Prêt à commencer ?"
+
+msgid "Ready to gather insights?"
+msgstr "Prêt à recueillir des insights ?"
+
+msgid "Real-time reporting"
+msgstr "Rapports en temps réel"
+
+msgid "Recent (30 days)"
+msgstr "Récent (30 jours)"
+
+msgid "Recent Survey Responses"
+msgstr "Réponses récentes aux enquêtes"
+
+msgid "Recommended dimensions: 400x200 pixels or similar ratio"
+msgstr "Dimensions recommandées : 400x200 pixels ou ratio similaire"
+
+msgid "Refresh data"
+msgstr "Actualiser les données"
+
+msgid "Region"
+msgstr "Région"
+
+msgid "Reminder: Your feedback is still needed - {campaign_name}"
+msgstr "Rappel : votre avis est toujours attendu - {campaign_name}"
+
+msgid "Reminders are processed daily during active campaigns"
+msgstr "Les rappels sont traités quotidiennement pendant les campagnes actives"
+
+msgid "Reminders are sent only to participants who haven't responded yet"
+msgstr "Les rappels sont envoyés uniquement aux participants qui n’ont pas encore répondu"
+
+msgid "Remove {{ company }} filter"
+msgstr "Supprimer le filtre {{ company }}"
+
+msgid "Remove {{ language }} filter"
+msgstr "Supprimer le filtre {{ language }}"
+
+msgid "Remove {{ participant.name }} from campaign"
+msgstr "Retirer {{ participant.name }} de la campagne"
+
+msgid "Remove {{ region }} filter"
+msgstr "Supprimer le filtre {{ region }}"
+
+msgid "Remove {{ role }} filter"
+msgstr "Supprimer le filtre {{ role }}"
+
+msgid "Remove {{ tenure }} filter"
+msgstr "Supprimer le filtre {{ tenure }}"
+
+msgid "Remove {{ tier }} filter"
+msgstr "Supprimer le filtre {{ tier }}"
+
+msgid "Reply-To Email (optional)"
+msgstr "Adresse e-mail de réponse (optionnelle)"
+
+msgid "Respondent"
+msgstr "Répondant"
+
+msgid "Respondent:"
+msgstr "Répondant :"
+
+msgid "Response Date"
+msgstr "Date de réponse"
+
+msgid "Response pagination"
+msgstr "Pagination des réponses"
+
+msgid "Responses"
+msgstr "Réponses"
+
+msgid "Responses will appear here as they come in."
+msgstr "Les réponses apparaîtront ici au fur et à mesure de leur réception."
+
+msgid "Responses:"
+msgstr "Réponses :"
+
+msgid "Return to home page"
+msgstr "Retour à la page d'accueil"
+
+msgid "Revenue expansion opportunity"
+msgstr "Opportunité d'expansion du chiffre d'affaires"
+
+msgid "Review and analyze individual participant responses"
+msgstr "Examiner et analyser les réponses individuelles des participants"
+
+msgid "Risk Heavy"
+msgstr "Risque élevé"
+
+msgid "Risk Level"
+msgstr "Niveau de risque"
+
+msgid "Role"
+msgstr "Rôle"
+
+msgid "Run a real customer feedback scenario."
+msgstr "Exécutez un scénario réel de retour client."
+
+msgid "SLA Guarantee"
+msgstr "Garantie SLA"
+
+msgid "SMTP Server"
+msgstr "Serveur SMTP"
+
+msgid "SMTP Server *"
+msgstr "Serveur SMTP *"
+
+msgid "Satisfaction Ratings by Segment"
+msgstr "Évaluations de satisfaction par segment"
+
+msgid "Satisfaction:"
+msgstr "Satisfaction :"
+
+msgid "Save email configuration"
+msgstr "Enregistrer la configuration de l'e-mail"
+
+msgid "Save survey configuration"
+msgstr "Enregistrer la configuration de l'enquête"
+
+msgid "Schedule campaign activation and email invitations"
+msgstr "Planifier l’activation de la campagne et les invitations par e-mail"
+
+msgid "Scheduler Status"
+msgstr "Statut du planificateur"
+
+msgid "Search"
+msgstr "Rechercher"
+
+msgid "Search Accounts"
+msgstr "Rechercher des comptes"
+
+msgid "Search Campaign Participants"
+msgstr "Rechercher des participants de la campagne"
+
+msgid "Search Participants"
+msgstr "Rechercher des participants"
+
+msgid "Search actions"
+msgstr "Actions de recherche"
+
+msgid "Search by company name, participant name, or email..."
+msgstr "Rechercher par nom d'entreprise, nom de participant ou e-mail..."
+
+msgid "Search by company name..."
+msgstr "Rechercher par nom d'entreprise..."
+
+msgid "Search by name, email, or company..."
+msgstr "Rechercher par nom, e-mail ou entreprise..."
+
+msgid "Search by respondent name or email..."
+msgstr "Rechercher par nom ou e-mail du répondant..."
+
+msgid "Search company, opportunities, risks..."
+msgstr "Rechercher une entreprise, des opportunités ou des risques..."
+
+msgid "Search participants"
+msgstr "Rechercher des participants"
+
+msgid "Search participants by name, email, or company"
+msgstr "Rechercher des participants par nom, e-mail ou entreprise"
+
+msgid "Search participants form"
+msgstr "Formulaire de recherche de participants"
+
+msgid "Search participants, companies, or conversation content..."
+msgstr "Rechercher des participants, des entreprises ou du contenu de conversation..."
+
+msgid "Search results highlighted for:"
+msgstr "Résultats de recherche mis en surbrillance pour :"
+
+msgid "Secondary Color"
+msgstr "Couleur secondaire"
+
+msgid "Security & authentication"
+msgstr "Sécurité et authentification"
+
+msgid "Security Features:"
+msgstr "Fonctionnalités de sécurité :"
+
+msgid "See AI Insights"
+msgstr "Voir les analyses IA"
+
+msgid "Segment Name"
+msgstr "Nom du segment"
+
+msgid "Segment Type"
+msgstr "Type de segment"
+
+msgid "Select Campaign"
+msgstr "Sélectionner la campagne"
+
+msgid "Select Transcript (.txt files only)"
+msgstr "Sélectionner une transcription (fichiers .txt uniquement)"
+
+msgid "Select all participants"
+msgstr "Sélectionner tous les participants"
+
+msgid "Select duration..."
+msgstr "Sélectionnez la durée..."
+
+msgid "Select first campaign"
+msgstr "Sélectionner la première campagne"
+
+msgid "Select rating"
+msgstr "Sélectionnez la note"
+
+msgid "Select region (optional)"
+msgstr "Sélectionnez une région (optionnel)"
+
+msgid "Select role (optional)"
+msgstr "Sélectionnez un rôle (optionnel)"
+
+msgid "Select second campaign"
+msgstr "Sélectionner la deuxième campagne"
+
+msgid "Select the AWS region where you configured SES"
+msgstr "Sélectionnez la région AWS où vous avez configuré SES"
+
+msgid "Select tier (optional)"
+msgstr "Sélectionnez une catégorie (optionnel)"
+
+msgid "Select your industry"
+msgstr "Sélectionnez votre secteur d'activité"
+
+msgid "Select {{ participant.name }}"
+msgstr "Sélectionner {{ participant.name }}"
+
+msgid "Send a test email to verify your SMTP settings are working correctly."
+msgstr "Envoyez un e-mail de test pour vérifier que vos paramètres SMTP fonctionnent correctement."
+
+msgid "Send invitations to participants and watch real-time responses come in. Use our AI-powered analytics to gain deeper insights."
+msgstr "Envoyez des invitations aux participants et suivez les réponses en temps réel. Utilisez notre analytique alimentée par l'IA pour obtenir des analyses approfondies."
+
+msgid "Send message"
+msgstr "Envoyer le message"
+
+msgid "Send test email"
+msgstr "Envoyer un e-mail de test"
+
+msgid "Sender Email *"
+msgstr "Adresse e-mail de l'expéditeur *"
+
+msgid "Sender Name *"
+msgstr "Nom de l'expéditeur *"
+
+msgid "Sent"
+msgstr "Envoyé"
+
+msgid "Sent Invitations"
+msgstr "Invitations envoyées"
+
+msgid "Sent/Completed"
+msgstr "Envoyé/Terminé"
+
+msgid "Sentiment Analysis"
+msgstr "Analyse de sentiment"
+
+msgid "Sentiment Score:"
+msgstr "Score de sentiment :"
+
+msgid "Sentiment:"
+msgstr "Sentiment :"
+
+msgid "Server Settings"
+msgstr "Paramètres du serveur"
+
+msgid "Service Quality:"
+msgstr "Qualité du service :"
+
+msgid "Set default AI conversation settings for surveys"
+msgstr "Définissez les paramètres de conversation IA par défaut pour les enquêtes"
+
+msgid "Set specific limits for this Pro license account."
+msgstr "Définissez des limites spécifiques pour ce compte sous licence Pro."
+
+msgid "Set up a new survey campaign for {{ business_account.name }}"
+msgstr "Configurer une nouvelle campagne d’enquête pour {{ business_account.name }}"
+
+msgid "Settings"
+msgstr "Paramètres"
+
+msgid "Setup Complete!"
+msgstr "Configuration terminée !"
+
+msgid "Share your experience"
+msgstr "Partagez votre expérience"
+
+msgid "Show more details"
+msgstr "Afficher plus de détails"
+
+msgid "Showing"
+msgstr "Affichage"
+
+msgid "Shows account health balance: Risk-Heavy (risks outweigh opportunities), High Potential (opportunities with minimal risks), or Balanced"
+msgstr "Affiche l'équilibre de la santé du compte : Risque élevé (les risques dépassent les opportunités), Fort potentiel (opportunités avec peu de risques) ou Équilibré"
+
+msgid "Simple Token Generation"
+msgstr "Génération de jeton simple"
+
+msgid "Simple steps to experience the power of AI-driven feedback collection."
+msgstr "Étapes simples pour découvrir la puissance de la collecte de retours alimentée par l'IA."
+
+msgid "Small print at the bottom of the email"
+msgstr "Texte en bas de l’e-mail"
+
+msgid "Something went wrong. Please try again."
+msgstr "Une erreur est survenue. Veuillez réessayer."
+
+msgid "South America (São Paulo)"
+msgstr "Amérique du Sud (São Paulo)"
+
+msgid "Specific product details enable more targeted feedback collection"
+msgstr "Les détails spécifiques des produits permettent une collecte de retours plus ciblée"
+
+msgid "Speed-to-Insight"
+msgstr "Délai d'accès aux informations"
+
+msgid "Standard Templates"
+msgstr "Modèles standard"
+
+msgid "Start"
+msgstr "Début"
+
+msgid "Start Conversational Survey"
+msgstr "Démarrer l'enquête conversationnelle"
+
+msgid "Start Date"
+msgstr "Date de début"
+
+msgid "Start Demo"
+msgstr "Commencer la démonstration"
+
+msgid "Start Demo - Join a Live Campaign"
+msgstr "Commencer la démo - Rejoindre une campagne en direct"
+
+msgid "Start by creating a customer feedback campaign. Define your goals, target audience, and survey questions to begin collecting valuable insights."
+msgstr "Commencez par créer une campagne de retour client. Définissez vos objectifs, votre audience cible et vos questions d'enquête pour recueillir des informations précieuses."
+
+msgid "Start conversational survey"
+msgstr "Démarrer l'enquête conversationnelle"
+
+msgid "Start selected survey type"
+msgstr "Démarrer le type d'enquête sélectionné"
+
+msgid "Started"
+msgstr "Commencé"
+
+msgid "Starts In:"
+msgstr "Commence dans :"
+
+msgid "Status"
+msgstr "Statut"
+
+msgid "Status:"
+msgstr "Statut :"
+
+msgid "Status: {{ participant.status|title }}"
+msgstr "Statut : {{ participant.status|title }}"
+
+msgid "Step-by-step flow"
+msgstr "Processus étape par étape"
+
+msgid "Structured Questionnaire"
+msgstr "Questionnaire structuré"
+
+msgid "Structured format"
+msgstr "Format structuré"
+
+msgid "Support Quality"
+msgstr "Qualité du support"
+
+msgid "Supported formats: PNG, JPG, JPEG, GIF, WEBP"
+msgstr "Formats pris en charge : PNG, JPG, JPEG, GIF, WEBP"
+
+msgid "Supporting color for borders and subtle elements."
+msgstr "Couleur complémentaire pour les bordures et les éléments discrets."
+
+msgid "Survey Already Completed"
+msgstr "Enquête déjà complétée"
+
+msgid "Survey Defaults"
+msgstr "Paramètres par défaut de l'enquête"
+
+msgid "Survey Type Options"
+msgstr "Options de type d'enquête"
+
+msgid "Survey configuration saved successfully!"
+msgstr "Configuration de l’enquête enregistrée avec succès !"
+
+msgid "Survey link for {{ participant.name }}"
+msgstr "Lien d’enquête pour {{ participant.name }}"
+
+msgid "Survey progress"
+msgstr "Progression de l'enquête"
+
+msgid "Survey response analysis data"
+msgstr "Données d'analyse des réponses à l'enquête"
+
+msgid "Survey response details"
+msgstr "Détails de la réponse à l'enquête"
+
+msgid "Survey response not found for this participant."
+msgstr "Réponse à l’enquête introuvable pour ce participant."
+
+msgid "Survey response not found or unavailable."
+msgstr "Réponse à l’enquête introuvable ou indisponible."
+
+msgid "Survey responses pagination"
+msgstr "Pagination des réponses à l'enquête"
+
+msgid "Survey type selection"
+msgstr "Sélection du type d'enquête"
+
+msgid "Switch"
+msgstr "Basculer"
+
+msgid "Switch to {% if ui_version == 'v1' %}v2 (New Sidebar){% else %}v1 (Current){% endif %}"
+msgstr "Basculer vers {% if ui_version == 'v1' %}v2 (Nouvelle barre latérale){% else %}v1 (Actuelle){% endif %}"
+
+msgid "System Settings"
+msgstr "Paramètres du système"
+
+msgid "System checks CSV format and validates all required columns are present"
+msgstr "Le système vérifie le format CSV et valide la présence de toutes les colonnes requises"
+
+msgid "T1: Strategic (Top 5–10%% clients)"
+msgstr "T1 : Stratégique (5–10 % des meilleurs clients)"
+
+msgid "T2: Managed (bulk of paying clients)"
+msgstr "T2 : Gérés (majorité des clients payants)"
+
+msgid "T3: Self-serve or small"
+msgstr "T3 : Libre-service ou petit client"
+
+msgid "Takes under 2 minutes"
+msgstr "Prend moins de 2 minutes"
+
+msgid "Target Customers"
+msgstr "Clients cibles"
+
+msgid "Target Responses per Campaign"
+msgstr "Réponses cibles par campagne"
+
+msgid "Team Lead"
+msgstr "Chef d'équipe"
+
+msgid "Team Members"
+msgstr "Membres de l'équipe"
+
+msgid "Tell us about your business to personalize the survey conversation"
+msgstr "Parlez-nous de votre entreprise pour personnaliser la conversation de l'enquête"
+
+msgid "Tell us more about your experience"
+msgstr "Parlez-nous davantage de votre expérience"
+
+msgid "Tenure (Years)"
+msgstr "Ancienneté (années)"
+
+msgid "Tenure Group"
+msgstr "Groupe d'ancienneté"
+
+msgid "Tenure NPS"
+msgstr "NPS par ancienneté"
+
+msgid "Tenure NPS pagination"
+msgstr "Pagination du NPS par ancienneté"
+
+msgid "Tenure:"
+msgstr "Ancienneté :"
+
+msgid "Test Email Address"
+msgstr "Adresse e-mail de test"
+
+msgid "Test SMTP connection"
+msgstr "Tester la connexion SMTP"
+
+msgid "Text Color"
+msgstr "Couleur du texte"
+
+msgid "Text displayed on the survey button"
+msgstr "Texte affiché sur le bouton d’enquête"
+
+msgid "Thank you for sharing with us your feedback."
+msgstr "Merci de partager votre retour d'information avec nous."
+
+msgid "Thank you for sharing your feedback."
+msgstr "Merci d'avoir partagé votre retour d'information."
+
+msgid "Thank you! You have already submitted your conversational feedback on"
+msgstr "Merci ! Vous avez déjà soumis votre retour conversationnel le"
+
+msgid "Thank you! You have already submitted your feedback on"
+msgstr "Merci ! Vous avez déjà soumis votre retour d'information le"
+
+msgid "Thank you, {{ participant_name }}!"
+msgstr "Merci, {{ participant_name }} !"
+
+msgid "The campaign is being prepared. You can freely add or remove participants, modify campaign details, and prepare for launch."
+msgstr "La campagne est en préparation. Vous pouvez librement ajouter ou supprimer des participants, modifier les détails de la campagne et la préparer pour le lancement."
+
+msgid "The following issues prevented the license assignment:"
+msgstr "Les problèmes suivants ont empêché l'attribution de la licence :"
+
+msgid "The new license is active immediately"
+msgstr "La nouvelle licence est active immédiatement"
+
+msgid "The opening message in the email body"
+msgstr "Le message d'ouverture dans le corps de l'e-mail"
+
+msgid "These notes will be recorded in the license history for audit purposes."
+msgstr "Ces notes seront enregistrées dans l'historique des licences à des fins d'audit."
+
+msgid "These topics can be skipped if the time/question limit is reached"
+msgstr "Ces sujets peuvent être ignorés si la limite de temps ou de questions est atteinte"
+
+msgid "These topics will always be covered, in order of importance"
+msgstr "Ces sujets seront toujours abordés, selon leur importance"
+
+msgid "This account has been closed. Contact support if you believe this is an error."
+msgstr "Ce compte a été fermé. Contactez le support si vous pensez qu'il s'agit d'une erreur."
+
+msgid "This business account has no license assignment history."
+msgstr "Ce compte entreprise n'a aucun historique d'attribution de licence."
+
+msgid "This campaign finished on {{ campaign.completed_at[:10] if campaign.completed_at else campaign.end_date }}"
+msgstr "Cette campagne s'est terminée le {{ campaign.completed_at[:10] if campaign.completed_at else campaign.end_date }}"
+
+msgid "This completes your demonstration of our Voice of Client Agent capabilities."
+msgstr "Cela conclut votre démonstration des capacités de notre agent Voice of Client."
+
+msgid "This context helps the AI understand your business and ask relevant questions"
+msgstr "Ce contexte aide l'IA à comprendre votre entreprise et à poser des questions pertinentes"
+
+msgid "This helps tailor survey questions to your industry context"
+msgstr "Cela aide à adapter les questions de l'enquête à votre contexte sectoriel"
+
+msgid "This is a friendly reminder that {business_account_name} is still looking forward to your feedback."
+msgstr "Ceci est un rappel amical indiquant que {business_account_name} attend toujours votre retour d'expérience."
+
+msgid "This is an automated message. If you have any questions, please contact the organization that sent this survey."
+msgstr "Ceci est un message automatique. Si vous avez des questions, veuillez contacter l'organisation qui vous a envoyé cette enquête."
+
+msgid "This message will be shown to participants when they complete the survey. Leave blank to use the default message"
+msgstr "Ce message sera affiché aux participants lorsqu'ils termineront l'enquête. Laissez vide pour utiliser le message par défaut"
+
+msgid "This name will be displayed in surveys and emails. Leave blank to use \"{{ business_account.name }}\"."
+msgstr "Ce nom sera affiché dans les enquêtes et les e-mails. Laissez vide pour utiliser « {{ business_account.name }} »."
+
+msgid "This survey response requires authentication. Please log in to view."
+msgstr "Cette réponse à l’enquête nécessite une authentification. Veuillez vous connecter pour la consulter."
+
+msgid "This value applies to all participants from this company"
+msgstr "Cette valeur s'applique à tous les participants de cette entreprise"
+
+msgid "This will only send invitations to participants who haven't been invited yet."
+msgstr "Cela n'enverra des invitations qu'aux participants qui n'ont pas encore été invités."
+
+msgid "Time Limit (seconds)"
+msgstr "Limite de temps (secondes)"
+
+msgid "Time Remaining:"
+msgstr "Temps restant :"
+
+msgid "To send survey invitations, VOÏA needs access to your email server. You can use:"
+msgstr "Pour envoyer des invitations à l'enquête, VOÏA a besoin d'un accès à votre serveur de messagerie. Vous pouvez utiliser :"
+
+msgid "Toggle Sidebar"
+msgstr "Basculer la barre latérale"
+
+msgid "Token Generated Successfully!"
+msgstr "Jeton généré avec succès !"
+
+msgid "Token Generation Failed"
+msgstr "Échec de la génération du jeton"
+
+msgid "Token Generation Test"
+msgstr "Test de génération de jeton"
+
+msgid "Tokens are tied to your email address"
+msgstr "Les jetons sont liés à votre adresse e-mail"
+
+msgid "Top Performer"
+msgstr "Meilleur performeur"
+
+msgid "Total Accounts"
+msgstr "Nombre total de comptes"
+
+msgid "Total Campaigns"
+msgstr "Nombre total de campagnes"
+
+msgid "Total Changes"
+msgstr "Nombre total de modifications"
+
+msgid "Total Invitations"
+msgstr "Nombre total d'invitations"
+
+msgid "Total Participants"
+msgstr "Nombre total de participants"
+
+msgid "Total Responses"
+msgstr "Nombre total de réponses"
+
+msgid "Total time: Less than 2 minutes"
+msgstr "Durée totale : moins de 2 minutes"
+
+msgid "Traditional Form"
+msgstr "Formulaire traditionnel"
+
+msgid "Traditional form-based methodology for comparative analysis against conversational approaches."
+msgstr "Méthodologie traditionnelle basée sur un formulaire pour une analyse comparative avec les approches conversationnelles."
+
+msgid "Traditional interface"
+msgstr "Interface traditionnelle"
+
+msgid "Transcript analysis for key accounts"
+msgstr "Analyse de transcription pour les comptes clés"
+
+msgid "Transparent background recommended for PNG files"
+msgstr "Arrière-plan transparent recommandé pour les fichiers PNG"
+
+msgid "Trial Accounts"
+msgstr "Comptes d'essai"
+
+msgid "Troubleshooting Steps"
+msgstr "Étapes de dépannage"
+
+msgid "Try Again"
+msgstr "Réessayer"
+
+msgid "Try adjusting your search criteria or filters."
+msgstr "Essayez d'ajuster vos critères de recherche ou vos filtres."
+
+msgid "Try adjusting your search terms or clear filters to view all participants."
+msgstr "Essayez d'ajuster vos termes de recherche ou de réinitialiser les filtres pour afficher tous les participants."
+
+msgid "Try another demo session"
+msgstr "Essayer une autre session de démonstration"
+
+msgid "Try refreshing the page and attempting the assignment again"
+msgstr "Essayez d'actualiser la page et de refaire l'attribution"
+
+msgid "Turning voices into value"
+msgstr "Transformer les voix en valeur"
+
+msgid "Type your response"
+msgstr "Saisissez votre réponse"
+
+msgid "Type your response here..."
+msgstr "Saisissez votre réponse ici..."
+
+msgid "Type your response to VOÏA"
+msgstr "Saisissez votre réponse à VOÏA"
+
+msgid "UI: {{ ui_version|upper }}"
+msgstr "UI : {{ ui_version|upper }}"
+
+msgid "US East (Ohio)"
+msgstr "États-Unis Est (Ohio)"
+
+msgid "US West (N. California)"
+msgstr "États-Unis Ouest (N. Californie)"
+
+msgid "US West (Oregon)"
+msgstr "États-Unis Ouest (Oregon)"
+
+msgid "Understanding your audience helps frame questions appropriately"
+msgstr "Comprendre votre audience aide à formuler les questions de manière appropriée"
+
+msgid "Unique token for survey access and anonymization"
+msgstr "Jeton unique pour l'accès à l'enquête et l'anonymisation"
+
+msgid "Unknown"
+msgstr "Inconnu"
+
+msgid "Up to 10 users"
+msgstr "Jusqu’à 10 utilisateurs"
+
+msgid "Up to 5 users"
+msgstr "Jusqu’à 5 utilisateurs"
+
+msgid "Update campaign details for {{ business_account.name }}"
+msgstr "Mettre à jour les détails de la campagne pour {{ business_account.name }}"
+
+msgid "Update participant"
+msgstr "Mettre à jour le participant"
+
+msgid "Upload Logo"
+msgstr "Téléverser le logo"
+
+msgid "Upload meeting transcripts to extract survey insights automatically."
+msgstr "Téléversez les transcriptions de réunions pour extraire automatiquement les insights du sondage."
+
+msgid "Upload multiple participants to {{ business_account.name }} via CSV file"
+msgstr "Téléversez plusieurs participants vers {{ business_account.name }} via un fichier CSV"
+
+msgid "Upload participants from CSV file"
+msgstr "Téléverser des participants à partir d'un fichier CSV"
+
+msgid "Upload your company logo to personalize surveys and communications. Supported formats: PNG, JPG, JPEG, GIF, WEBP (max 5MB)."
+msgstr "Téléversez le logo de votre entreprise pour personnaliser les enquêtes et les communications. Formats pris en charge : PNG, JPG, JPEG, GIF, WEBP (max 5 Mo)."
+
+msgid "Upload your customer list or add participants individually. VOÏA will help you manage and track responses efficiently."
+msgstr "Téléversez votre liste de clients ou ajoutez des participants individuellement. VOÏA vous aidera à gérer et suivre les réponses efficacement."
+
+msgid "Usage"
+msgstr "Utilisation"
+
+msgid "Usage Details"
+msgstr "Détails d'utilisation"
+
+msgid "Use SSL (for port 465)"
+msgstr "Utiliser SSL (pour le port 465)"
+
+msgid "Use TLS (recommended for port 587)"
+msgstr "Utiliser TLS (recommandé pour le port 587)"
+
+msgid "Use the form above to add participants to this campaign."
+msgstr "Utilisez le formulaire ci-dessus pour ajouter des participants à cette campagne."
+
+msgid "User Account Insights"
+msgstr "Analyses des comptes utilisateurs"
+
+msgid "User Limit"
+msgstr "Limite d'utilisateurs"
+
+msgid "User Management"
+msgstr "Gestion des utilisateurs"
+
+msgid "User management"
+msgstr "Gestion des utilisateurs"
+
+msgid "Username"
+msgstr "Nom d'utilisateur"
+
+msgid "Users"
+msgstr "Utilisateurs"
+
+msgid "Users Active"
+msgstr "Utilisateurs actifs"
+
+msgid "Users will have access to features based on the new license type"
+msgstr "Les utilisateurs auront accès aux fonctionnalités selon le type de licence"
+
+msgid "Users:"
+msgstr "Utilisateurs :"
+
+msgid "Usually 587 (TLS) or 465 (SSL)"
+msgstr "Généralement 587 (TLS) ou 465 (SSL)"
+
+msgid "Usually 587 for TLS or 465 for SSL"
+msgstr "Généralement 587 pour TLS ou 465 pour SSL"
+
+msgid "Usually your email address"
+msgstr "Généralement votre adresse e-mail"
+
+msgid "VOÏA Demo Homepage"
+msgstr "Page d'accueil de la démonstration VOÏA"
+
+msgid "VOÏA analyzes meeting transcripts to extract NPS scores, sentiment, themes, and actionable insights. Upload .txt files from phone calls, video meetings, or face-to-face discussions to automatically generate survey responses and integrate them with your campaign analytics."
+msgstr "VOÏA analyse les transcriptions de réunions pour en extraire les scores NPS, le sentiment, les thèmes et les insights exploitables. Téléversez des fichiers .txt provenant d'appels téléphoniques, de réunions vidéo ou de discussions en personne pour générer automatiquement des réponses de sondage et les intégrer à vos analyses de campagne."
+
+msgid "VOÏA is processing your response..."
+msgstr "VOÏA traite votre réponse..."
+
+msgid "VP / Director"
+msgstr "VP / Directeur"
+
+msgid "Variables:"
+msgstr "Variables :"
+
+msgid "Verify that the business account exists and is valid"
+msgstr "Vérifiez que le compte entreprise existe et est valide"
+
+msgid "View All Accounts"
+msgstr "Afficher tous les comptes"
+
+msgid "View Details"
+msgstr "Voir les détails"
+
+msgid "View History"
+msgstr "Voir l'historique"
+
+msgid "View Pricing Plans"
+msgstr "Voir les plans tarifaires"
+
+msgid "View account activity trail"
+msgstr "Afficher l'historique des activités du compte"
+
+msgid "View all business accounts and license assignments"
+msgstr "Afficher tous les comptes d'entreprise et les attributions de licence"
+
+msgid "View analytics and insights"
+msgstr "Afficher les analyses et les informations"
+
+msgid "View analytics dashboard with your feedback results"
+msgstr "Afficher le tableau de bord analytique avec vos résultats de retour"
+
+msgid "View and analyze individual participant responses and conversation transcripts."
+msgstr "Consultez et analysez les réponses individuelles des participants ainsi que les transcriptions de conversation."
+
+msgid "View and manage automated campaign lifecycle"
+msgstr "Afficher et gérer le cycle de vie automatisé des campagnes"
+
+msgid "View detailed results including successes and any errors"
+msgstr "Consultez les résultats détaillés, y compris les réussites et les erreurs"
+
+msgid "View license information and usage statistics"
+msgstr "Afficher les informations de licence et les statistiques d'utilisation"
+
+msgid "View system activity and user action history"
+msgstr "Consultez l'activité du système et l'historique des actions utilisateur"
+
+msgid "Voice Of Client Intelligence"
+msgstr "Intelligence Voice Of Client"
+
+msgid "Welcome to VO"
+msgstr "Bienvenue sur VO"
+
+msgid "Welcome to VOÏA!"
+msgstr "Bienvenue sur VOÏA !"
+
+msgid "Welcome to Your VO"
+msgstr "Bienvenue dans votre VO"
+
+msgid "Welcome {{ current_user.get_full_name() }}"
+msgstr "Bienvenue {{ current_user.get_full_name() }}"
+
+msgid "Welcome, {{ current_user.get_full_name() }}! You're setting up VOÏA for your team."
+msgstr "Bienvenue, {{ current_user.get_full_name() }} ! Vous configurez VOÏA pour votre équipe."
+
+msgid "Welcome, {{ participant_name }}"
+msgstr "Bienvenue, {{ participant_name }}"
+
+msgid "What Happens Next"
+msgstr "Prochaines étapes"
+
+msgid "What You'll Do"
+msgstr "Ce que vous allez faire"
+
+msgid "What You'll Experience"
+msgstr "Ce que vous allez vivre"
+
+msgid "What You'll See, in Real-time"
+msgstr "Ce que vous verrez, en temps réel"
+
+msgid "What could we improve?"
+msgstr "Que pourrions-nous améliorer ?"
+
+msgid "What do you want to learn from your survey participants?"
+msgstr "Que souhaitez-vous apprendre de vos participants à l'enquête ?"
+
+msgid "What is the main reason for your score?"
+msgstr "Quelle est la principale raison de votre note ?"
+
+msgid "What to Expect"
+msgstr "À quoi s'attendre"
+
+msgid "What would you like to do next?"
+msgstr "Que souhaitez-vous faire ensuite ?"
+
+msgid "What's Next?"
+msgstr "Quelle est la prochaine étape ?"
+
+msgid "When should this campaign begin?"
+msgstr "Quand cette campagne doit-elle commencer ?"
+
+msgid "When should this campaign end?"
+msgstr "Quand cette campagne doit-elle se terminer ?"
+
+msgid "Where replies should be sent (if different from sender)"
+msgstr "Adresse à laquelle les réponses doivent être envoyées (si différente de l'expéditeur)"
+
+msgid "White Label Options"
+msgstr "Options en marque blanche"
+
+msgid "White-label brand configuration"
+msgstr "Configuration de marque en marque blanche"
+
+msgid "Why do I need a token?"
+msgstr "Pourquoi ai-je besoin d'un jeton ?"
+
+msgid "Years the participant has been using your product/service (optional)"
+msgstr "Nombre d'années d'utilisation de votre produit/service par le participant (optionnel)"
+
+msgid "You can track usage and modify limits as needed"
+msgstr "Vous pouvez suivre l'utilisation et modifier les limites si nécessaire"
+
+msgid "You do not have permission to view this survey response."
+msgstr "Vous n’avez pas l’autorisation d’afficher cette réponse à l’enquête."
+
+msgid "You need a valid token to participate in this survey."
+msgstr "Vous avez besoin d'un jeton valide pour participer à cette enquête."
+
+msgid "You'll receive a secure token valid for 24 hours"
+msgstr "Vous recevrez un jeton sécurisé valable 24 heures"
+
+msgid "You're about to experience how VO"
+msgstr "Vous êtes sur le point de découvrir comment VO"
+
+msgid "You're invited to join {{ business_account.name }}"
+msgstr "Vous êtes invité à rejoindre {{ business_account.name }}"
+
+msgid "You've successfully configured your platform and can now create powerful customer feedback campaigns."
+msgstr "Vous avez configuré votre plateforme avec succès et pouvez désormais créer des campagnes de retour client performantes."
+
+msgid "Your Name"
+msgstr "Votre nom"
+
+msgid "Your SMTP settings are configured and tested. You can now send survey invitations to participants."
+msgstr "Vos paramètres SMTP sont configurés et testés. Vous pouvez maintenant envoyer des invitations à l'enquête."
+
+msgid "Your VOÏA platform is ready for action"
+msgstr "Votre plateforme VOÏA est prête à fonctionner"
+
+msgid "Your account has been suspended. Please contact support for assistance."
+msgstr "Votre compte a été suspendu. Veuillez contacter le support pour obtenir de l'aide."
+
+msgid "Your account is currently inactive. Please contact support to reactivate."
+msgstr "Votre compte est actuellement inactif. Veuillez contacter le support pour le réactiver."
+
+msgid "Your account is secured with proper authentication and role-based access controls."
+msgstr "Votre compte est sécurisé grâce à une authentification et des contrôles d'accès basés sur les rôles."
+
+msgid "Your account security is important to us. Please create a strong password to protect your business data and ensure secure access to the VOÏA platform."
+msgstr "La sécurité de votre compte est importante pour nous. Veuillez créer un mot de passe robuste afin de protéger vos données d'entreprise et d'assurer un accès sécurisé à la plateforme VOÏA."
+
+msgid "Your authentication token has been created:"
+msgstr "Votre jeton d'authentification a été créé :"
+
+msgid "Your campaign data has been successfully exported."
+msgstr "Les données de votre campagne ont été exportées avec succès."
+
+msgid "Your campaign managers have been invited and can help create and manage customer feedback surveys."
+msgstr "Vos responsables de campagne ont été invités et peuvent aider à créer et gérer les enquêtes de retour client."
+
+msgid "Your email address or SMTP username"
+msgstr "Votre adresse e-mail ou nom d'utilisateur SMTP"
+
+msgid "Your email password or app-specific password"
+msgstr "Votre mot de passe e-mail ou un mot de passe d'application spécifique"
+
+msgid "Your email provider's SMTP server address"
+msgstr "Adresse du serveur SMTP de votre fournisseur de messagerie"
+
+msgid "Your feedback for"
+msgstr "Votre retour pour"
+
+msgid "Your feedback has been successfully analyzed by VOÏA Intelligence."
+msgstr "Votre retour d'information a été analysé avec succès par VOÏA Intelligence."
+
+msgid "Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.\n\nThank you for your time and valuable insights!"
+msgstr "Votre retour d'information contribue à améliorer les services et les expériences. L'enquête ne vous prendra que quelques minutes.\n\nMerci pour votre temps et vos précieuses informations !"
+
+msgid "Your feedback is requested: {campaign_name}"
+msgstr "Votre avis est sollicité : {campaign_name}"
+
+msgid "Your insights help us continuously improve our services. Thank you for taking the time to share your experience."
+msgstr "Vos analyses nous aident à améliorer continuellement nos services. Merci d'avoir pris le temps de partager votre expérience."
+
+msgid "Your organization's email server settings"
+msgstr "Les paramètres du serveur de messagerie de votre organisation"
+
+msgid "participant@company.com"
+msgstr "participant@entreprise.com"
+
+msgid "per year"
+msgstr "par an"
+
+msgid "{# Campaign Action Buttons Macro #}\n    {% macro campaign_actions(campaign, view_type='table') %}\n        {% set action_class = 'table-actions' if view_type == 'table' else 'campaign-card-actions' %}"
+msgstr "{# Macro des boutons d'action de campagne #}\n    {% macro campaign_actions(campaign, view_type='table') %}\n        {% set action_class = 'table-actions' if view_type == 'table' else 'campaign-card-actions' %}"
+
+msgid "{business_account_name} is requesting your valuable feedback through our Voice of Client system."
+msgstr "{business_account_name} sollicite votre précieux retour d'expérience via notre système Voice of Client."
+
+msgid "← Return to VOÏA Home"
+msgstr "← Retour à l'accueil VOÏA"

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ session.get('language', 'en') }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -115,6 +115,11 @@
             
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
+                    <!-- Language Selector -->
+                    <li class="nav-item d-flex align-items-center me-3">
+                        {% include 'components/language_selector.html' %}
+                    </li>
+                    
                     <!-- Business Authentication - UI Version Toggle (inside collapsible menu) -->
                     {% if is_business_authenticated %}
                     <li class="nav-item d-flex align-items-center me-3">

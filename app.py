@@ -1,6 +1,6 @@
 import os
 import logging
-from flask import Flask
+from flask import Flask, request, session
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -8,6 +8,7 @@ load_dotenv()
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from flask_wtf.csrf import CSRFProtect, generate_csrf
+from flask_babel import Babel
 from sqlalchemy.orm import DeclarativeBase
 from werkzeug.middleware.proxy_fix import ProxyFix
 from database_config import db_config
@@ -85,6 +86,24 @@ if ENABLE_SQL_PROFILING:
 
 # Initialize the app with the extension
 db.init_app(app)
+
+# Configure Flask-Babel for i18n (English/French support)
+app.config['BABEL_DEFAULT_LOCALE'] = 'en'
+app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'fr']
+app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
+
+def get_locale():
+    """Determine the best locale to use for this request"""
+    # 1. Check if user explicitly selected a language (stored in session)
+    if 'language' in session:
+        return session['language']
+    
+    # 2. Try to guess the language from the user accept header
+    # For French market, we could default to 'fr' if preferred
+    return request.accept_languages.best_match(['en', 'fr']) or 'en'
+
+# Initialize Babel
+babel = Babel(app, locale_selector=get_locale)
 
 # Add query profiling event listeners (Phase 2: Query Optimization)
 if ENABLE_SQL_PROFILING:
@@ -420,6 +439,10 @@ with app.app_context():
     # Register campaign management blueprint (Phase 3 completion)
     from campaign_routes import campaign_bp
     app.register_blueprint(campaign_bp)
+    
+    # Register language switching routes (i18n support)
+    from language_routes import language_bp
+    app.register_blueprint(language_bp)
     
     # Initialize Rivvalue admin user (Phase 2)
     try:
