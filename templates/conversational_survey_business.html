@@ -8,6 +8,11 @@
 {% block content %}
 <div data-page="conversational-business"></div>
 
+<!-- Language Selector (Fixed Position) -->
+<div style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
+    {% include 'components/language_selector.html' %}
+</div>
+
 <!-- Hero Section -->
 <div class="conv-hero">
     <div class="conv-hero-content">
