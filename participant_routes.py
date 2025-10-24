@@ -1176,6 +1176,14 @@ def manage_campaign_participants(campaign_id: int):
             # Execute query with ordering
             available_participants = available_query.order_by(Participant.name).all()
             
+            # Calculate total available participants (excluding already assigned)
+            total_available_query = Participant.query.filter(
+                Participant.business_account_id == current_account.id
+            )
+            if assigned_participant_ids:
+                total_available_query = total_available_query.filter(~Participant.id.in_(assigned_participant_ids))
+            total_available_count = total_available_query.count()
+            
             # Get unique filter options from all participants in this business account
             all_participants_for_filters = Participant.query.filter(
                 Participant.business_account_id == current_account.id
@@ -1222,7 +1230,8 @@ def manage_campaign_participants(campaign_id: int):
                                  search_query=search_query,
                                  campaign_stats=campaign_stats,
                                  filter_options=filter_options,
-                                 active_filters=active_filters)
+                                 active_filters=active_filters,
+                                 total_available_count=total_available_count)
         
         # Handle POST - Add participants to campaign
         if request.method == 'POST':

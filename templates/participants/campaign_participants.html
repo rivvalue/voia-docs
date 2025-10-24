@@ -254,7 +254,7 @@
         </div>
         <div class="filter-summary-count">
             <i class="fas fa-users me-2" aria-hidden="true"></i>
-            Showing <strong>{{ available_participants|length }}</strong> available participant{% if available_participants|length != 1 %}s{% endif %}
+            Showing <strong>{{ available_participants|length }}</strong> of <strong>{{ total_available_count }}</strong> available participant{% if total_available_count != 1 %}s{% endif %}
         </div>
     </div>
     {% endif %}
