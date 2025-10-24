@@ -1158,7 +1158,17 @@ function openBulkEditModal() {
 }
 
 function toggleField(fieldName) {
-    const checkbox = document.getElementById(`update${fieldName.charAt(0).toUpperCase() + fieldName.slice(1).replace('_', '')}`);
+    // Map field names to checkbox IDs
+    const checkboxMap = {
+        'role': 'updateRole',
+        'region': 'updateRegion',
+        'customer_tier': 'updateCustomerTier',
+        'language': 'updateLanguage',
+        'tenure_years': 'updateTenure',
+        'company_commercial_value': 'updateCommercialValue'
+    };
+    
+    const checkbox = document.getElementById(checkboxMap[fieldName]);
     const input = document.getElementById(fieldName);
     input.disabled = !checkbox.checked;
     

@@ -79,9 +79,15 @@ def apply_participant_filters(query, filter_companies=None, filter_roles=None,
     if filter_languages:
         query = query.filter(Participant.language.in_(filter_languages))
     if filter_tenure_ranges:
-        tenure_years_int = [int(t) for t in filter_tenure_ranges if t.isdigit()]
-        if tenure_years_int:
-            query = query.filter(Participant.tenure_years.in_(tenure_years_int))
+        # Convert tenure values to float (handles both "3" and "3.0" formats)
+        tenure_values = []
+        for t in filter_tenure_ranges:
+            try:
+                tenure_values.append(float(t))
+            except (ValueError, TypeError):
+                logger.warning(f"Invalid tenure value in filter: {t}")
+        if tenure_values:
+            query = query.filter(Participant.tenure_years.in_(tenure_values))
     
     # Apply search filter if provided
     if search_query:
