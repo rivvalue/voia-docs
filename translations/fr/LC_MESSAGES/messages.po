@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-24 20:01+0000\n"
+"POT-Creation-Date: 2025-10-24 21:33+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -21,7 +21,7 @@ msgstr ""
 #: templates/business_auth/manage_users.html:242
 #: templates/business_auth/manage_users.html:325
 #: templates/conversational_survey.html:76
-#: templates/conversational_survey_business.html:72
+#: templates/conversational_survey_business.html:77
 #: templates/server_auth.html:38 templates/simple_auth.html:15
 #: templates/survey.html:54
 msgid "Email Address"
@@ -33,7 +33,7 @@ msgstr "Vous recevrez un jeton sécurisé valable 24 heures"
 
 #: templates/auth.html:40 templates/company_responses.html:55
 #: templates/company_responses.html:62 templates/conversational_survey.html:163
-#: templates/conversational_survey_business.html:137
+#: templates/conversational_survey_business.html:142
 #: templates/dashboard.html:260 templates/dashboard.html:527
 #: templates/dashboard.html:714 templates/dashboard.html:770
 #: templates/dashboard.html:856 templates/dashboard.html:925
@@ -108,7 +108,7 @@ msgstr "Une réponse par adresse e-mail (sauf remplacement)"
 msgid "Rate limiting prevents abuse"
 msgstr "La limitation du débit empêche les abus"
 
-#: templates/base.html:53 templates/base.html:171 templates/dashboard.html:20
+#: templates/base.html:53 templates/base.html:170 templates/dashboard.html:20
 msgid "Business Intelligence"
 msgstr "Intelligence d'affaires"
 
@@ -213,7 +213,7 @@ msgstr "Commençons"
 #: templates/business_auth/activate_account.html:435
 #: templates/business_auth/licenses/overview.html:323
 #: templates/campaigns/view.html:491 templates/conversational_survey.html:52
-#: templates/conversational_survey_business.html:60
+#: templates/conversational_survey_business.html:65
 #: templates/dashboard.html:670 templates/survey.html:42
 msgid "Company Name"
 msgstr "Nom de l'entreprise"
@@ -224,7 +224,7 @@ msgstr "Entrez le nom de votre entreprise"
 
 #: templates/business_auth/activate_account.html:439
 #: templates/conversational_survey.html:64
-#: templates/conversational_survey_business.html:66 templates/survey.html:48
+#: templates/conversational_survey_business.html:71 templates/survey.html:48
 msgid "Your Name"
 msgstr "Votre nom"
 
@@ -237,48 +237,48 @@ msgid "Enter your email address"
 msgstr "Entrez votre adresse e-mail"
 
 #: templates/conversational_survey.html:88
-#: templates/conversational_survey_business.html:79
+#: templates/conversational_survey_business.html:84
 #, fuzzy
 msgid "How long have you been working with"
 msgstr "Depuis combien de temps travaillez-vous avec FC inc ?"
 
 #: templates/conversational_survey.html:90
-#: templates/conversational_survey_business.html:82 templates/survey.html:62
+#: templates/conversational_survey_business.html:87 templates/survey.html:62
 msgid "Select duration..."
 msgstr "Sélectionnez la durée..."
 
 #: templates/conversational_survey.html:91
-#: templates/conversational_survey_business.html:83 templates/survey.html:63
+#: templates/conversational_survey_business.html:88 templates/survey.html:63
 msgid "Less than 6 months"
 msgstr "Moins de 6 mois"
 
 #: templates/conversational_survey.html:92
-#: templates/conversational_survey_business.html:84 templates/survey.html:64
+#: templates/conversational_survey_business.html:89 templates/survey.html:64
 msgid "6 months - 1 year"
 msgstr "6 mois - 1 an"
 
 #: templates/conversational_survey.html:93
-#: templates/conversational_survey_business.html:85 templates/survey.html:65
+#: templates/conversational_survey_business.html:90 templates/survey.html:65
 msgid "1-2 years"
 msgstr "1 à 2 ans"
 
 #: templates/conversational_survey.html:94
-#: templates/conversational_survey_business.html:86 templates/survey.html:66
+#: templates/conversational_survey_business.html:91 templates/survey.html:66
 msgid "2-3 years"
 msgstr "2 à 3 ans"
 
 #: templates/conversational_survey.html:95
-#: templates/conversational_survey_business.html:87 templates/survey.html:67
+#: templates/conversational_survey_business.html:92 templates/survey.html:67
 msgid "3-5 years"
 msgstr "3 à 5 ans"
 
 #: templates/conversational_survey.html:96
-#: templates/conversational_survey_business.html:88 templates/survey.html:68
+#: templates/conversational_survey_business.html:93 templates/survey.html:68
 msgid "5-10 years"
 msgstr "5 à 10 ans"
 
 #: templates/conversational_survey.html:97
-#: templates/conversational_survey_business.html:89 templates/survey.html:69
+#: templates/conversational_survey_business.html:94 templates/survey.html:69
 msgid "More than 10 years"
 msgstr "Plus de 10 ans"
 
@@ -310,12 +310,12 @@ msgid "Processing response"
 msgstr "Traitement de la réponse"
 
 #: templates/conversational_survey.html:165
-#: templates/conversational_survey_business.html:139
+#: templates/conversational_survey_business.html:144
 msgid "VOÏA is processing your response..."
 msgstr "VOÏA traite votre réponse..."
 
 #: templates/conversational_survey.html:166
-#: templates/conversational_survey_business.html:140
+#: templates/conversational_survey_business.html:145
 msgid "Please wait while VOÏA analyzes your feedback"
 msgstr "Veuillez patienter pendant que VOÏA analyse votre retour d'information"
 
@@ -366,40 +366,81 @@ msgstr "Contactez Rivvalue pour mettre en œuvre VOÏA dans votre entreprise"
 msgid "Return to home page"
 msgstr "Retour à la page d'accueil"
 
-#: templates/conversational_survey_business.html:38
+#: templates/conversational_survey_business.html:43
 #, fuzzy
 msgid "Hi"
 msgstr "Bonjour"
 
-#: templates/conversational_survey_business.html:38
+#: templates/conversational_survey_business.html:43
 #, fuzzy
 msgid "thank you for participating"
 msgstr "merci de votre participation"
 
-#: templates/conversational_survey_business.html:39
+#: templates/conversational_survey_business.html:44
 #, fuzzy
 msgid "value your feedback"
 msgstr "valorisons vos retours"
 
-#: templates/conversational_survey_business.html:120
+#: templates/conversational_survey_business.html:56
+msgid "Your Information"
+msgstr "Vos informations"
+
+#: templates/conversational_survey_business.html:58
+msgid "Participating on behalf of"
+msgstr "Participation au nom de"
+
+#: templates/conversational_survey_business.html:99
+msgid "Start Conversation"
+msgstr "Démarrer la conversation"
+
+#: templates/conversational_survey_business.html:125
 msgid "Type your response here..."
 msgstr "Saisissez votre réponse ici..."
 
-#: templates/conversational_survey_business.html:151
-msgid "Thank you, {{ participant_name }}!"
-msgstr "Merci, {{ participant_name }} !"
+#: templates/conversational_survey_business.html:132
+msgid "Tip: Speak naturally! VOÏA understands conversational responses."
+msgstr ""
+"Conseil : Parlez naturellement ! VOÏA comprend les réponses "
+"conversationnelles."
 
-#: templates/conversational_survey_business.html:154
+#: templates/conversational_survey_business.html:156
+#, python-format
+msgid "Thank you, %s!"
+msgstr "Merci, %s !"
+
+#: templates/conversational_survey_business.html:159
 msgid "Your feedback for"
 msgstr "Votre retour pour"
 
-#: templates/conversational_survey_business.html:165
+#: templates/conversational_survey_business.html:170
 msgid ""
 "Your insights help us continuously improve our services. Thank you for "
 "taking the time to share your experience."
 msgstr ""
 "Vos analyses nous aident à améliorer continuellement nos services. Merci "
 "d'avoir pris le temps de partager votre expérience."
+
+#: templates/conversational_survey_business.html:177
+msgid "What Happens Next?"
+msgstr "Quelle est la prochaine étape ?"
+
+#: templates/conversational_survey_business.html:182
+msgid "Our AI analyzes your feedback to extract key insights"
+msgstr "Notre IA analyse vos commentaires pour extraire des informations clés"
+
+#: templates/conversational_survey_business.html:186
+msgid "Your responses contribute to comprehensive analytics"
+msgstr "Vos réponses contribuent à des analyses complètes"
+
+#: templates/conversational_survey_business.html:190
+msgid "We use your input to improve our services and client experience"
+msgstr ""
+"Nous utilisons vos commentaires pour améliorer nos services et "
+"l'expérience client"
+
+#: templates/conversational_survey_business.html:195
+msgid "You can now close this window."
+msgstr "Vous pouvez maintenant fermer cette fenêtre."
 
 #: templates/conversational_survey_completed.html:3
 #: templates/conversational_survey_completed.html:17
@@ -2576,7 +2617,7 @@ msgstr "Nombre maximal d'invitations par campagne"
 #: templates/business_auth/licenses/assignment_form.html:304
 #, fuzzy, python-format
 msgid ""
-"Hard limit on survey invitations (typically 5x responses for ~20% "
+"Hard limit on survey invitations (typically 5x responses for ~20%% "
 "response rate)"
 msgstr ""
 "Limite stricte d'invitations (généralement 5× les réponses pour un taux "
@@ -3610,7 +3651,7 @@ msgstr "Sélectionnez une catégorie (optionnel)"
 
 #: templates/participants/create.html:145 templates/participants/edit.html:193
 #, fuzzy, python-format
-msgid "T1: Strategic (Top 5–10% clients)"
+msgid "T1: Strategic (Top 5.10%% clients)"
 msgstr "T1 : Stratégique (5–10 % des meilleurs clients)"
 
 #: templates/participants/create.html:146 templates/participants/edit.html:194
@@ -3818,894 +3859,4 @@ msgstr "Télécharger le modèle de fichier CSV"
 
 #~ msgid "4 times more insights"
 #~ msgstr "4 fois plus d'analyses"
-
-#~ msgid "98 percent accuracy"
-#~ msgstr "98 % de précision"
-
-#~ msgid "Absolute limit to keep surveys concise and engaging"
-#~ msgstr "Limite absolue pour garder les enquêtes concises et engageantes"
-
-#~ msgid "Accent Color"
-#~ msgstr "Couleur d'accent"
-
-#~ msgid "Account Intelligence"
-#~ msgstr "Intelligence de compte"
-
-#~ msgid "Account-by-Account Analysis"
-#~ msgstr "Analyse compte par compte"
-
-#~ msgid "Add Campaign Manager"
-#~ msgstr "Ajouter un responsable de campagne"
-
-#~ msgid "All"
-#~ msgstr "Tous"
-
-#~ msgid "All Companies"
-#~ msgstr "Toutes les entreprises"
-
-#~ msgid "All License Types"
-#~ msgstr "Tous les types de licence"
-
-#~ msgid "All Responses"
-#~ msgstr "Toutes les réponses"
-
-#~ msgid "All Statuses"
-#~ msgstr "Tous les statuts"
-
-#~ msgid "All participants have already been invited successfully."
-#~ msgstr "Tous les participants ont déjà été invités avec succès."
-
-#~ msgid "All time feedback collected"
-#~ msgstr "Retours d'information collectés depuis le début"
-
-#~ msgid "An error occurred while exporting your data."
-#~ msgstr "Une erreur s'est produite lors de l'exportation de vos données."
-
-#~ msgid "An invitation will be sent to this email address"
-#~ msgstr "Une invitation sera envoyée à cette adresse e-mail"
-
-#~ msgid "Average Ratings"
-#~ msgstr "Notes moyennes"
-
-#~ msgid "Avg Satisfaction"
-#~ msgstr "Satisfaction moyenne"
-
-#~ msgid "Background Color"
-#~ msgstr "Couleur d'arrière-plan"
-
-#~ msgid "Background color for documents and reports."
-#~ msgstr "Couleur d'arrière-plan pour les documents et les rapports."
-
-#~ msgid "Balance"
-#~ msgstr "Équilibre"
-
-#~ msgid "Balance Status"
-#~ msgstr "État d'équilibre"
-
-#~ msgid "Balanced"
-#~ msgstr "Équilibré"
-
-#~ msgid "Business Name"
-#~ msgstr "Nom de l'entreprise"
-
-#~ msgid "Business account context not found."
-#~ msgstr "Contexte du compte entreprise introuvable."
-
-#~ msgid "C1 Balance"
-#~ msgstr "C1 Équilibre"
-
-#~ msgid "C1 Opps"
-#~ msgstr "C1 Opportunités"
-
-#~ msgid "C1 Risks"
-#~ msgstr "C1 Risques"
-
-#~ msgid "C2 Balance"
-#~ msgstr "C2 Équilibre"
-
-#~ msgid "C2 Opps"
-#~ msgstr "C2 Opportunités"
-
-#~ msgid "C2 Risks"
-#~ msgstr "C2 Risques"
-
-#~ msgid "Campaign"
-#~ msgstr "Campagne"
-
-#~ msgid "Campaign 1"
-#~ msgstr "Campagne 1"
-
-#~ msgid "Campaign 2"
-#~ msgstr "Campagne 2"
-
-#~ msgid "Campaign Analytics Filter"
-#~ msgstr "Filtre d'analyse de campagne"
-
-#~ msgid "Campaign ID is required"
-#~ msgstr "L’identifiant de la campagne est requis."
-
-#~ msgid "Campaign Manager is recommended for most team members"
-#~ msgstr ""
-#~ "Le rôle de responsable de campagne "
-#~ "est recommandé pour la plupart des "
-#~ "membres de l'équipe"
-
-#~ msgid "Campaign management"
-#~ msgstr "Gestion des campagnes"
-
-#~ msgid "Campaign must have at least one participant to be marked ready."
-#~ msgstr ""
-#~ "La campagne doit comporter au moins "
-#~ "un participant pour être marquée comme"
-#~ " prête."
-
-#~ msgid "Campaign must have name and description to be marked ready."
-#~ msgstr ""
-#~ "La campagne doit comporter un nom "
-#~ "et une description pour être marquée "
-#~ "comme prête."
-
-#~ msgid "Campaign name, start date, and end date are required."
-#~ msgstr "Le nom de la campagne, la date de début et la date de fin sont requis."
-
-#~ msgid "Campaign not found or not accessible"
-#~ msgstr "Campagne introuvable ou inaccessible."
-
-#~ msgid "Campaign not found."
-#~ msgstr "Campagne introuvable."
-
-#~ msgid "Campaign-specific performance analytics and survey insights"
-#~ msgstr ""
-#~ "Analyses de performance spécifiques à la"
-#~ " campagne et informations issues de "
-#~ "l'enquête"
-
-#~ msgid "Campaign:"
-#~ msgstr "Campagne :"
-
-#~ msgid "Can create surveys, manage participants, and view analytics"
-#~ msgstr ""
-#~ "Peut créer des enquêtes, gérer les "
-#~ "participants et consulter les analyses"
-
-#~ msgid "Can view survey results and analytics but cannot create campaigns"
-#~ msgstr ""
-#~ "Peut consulter les résultats et analyses"
-#~ " mais ne peut pas créer de "
-#~ "campagnes"
-
-#~ msgid "Cancel and return to settings"
-#~ msgstr "Annuler et revenir aux paramètres"
-
-#~ msgid "Category"
-#~ msgstr "Catégorie"
-
-#~ msgid "Change"
-#~ msgstr "Changement"
-
-#~ msgid "Changes will take effect immediately after saving."
-#~ msgstr "Les modifications prendront effet immédiatement après l'enregistrement."
-
-#~ msgid "Choose how the AI should communicate with your survey participants"
-#~ msgstr ""
-#~ "Choisissez comment l'IA doit communiquer "
-#~ "avec vos participants à l'enquête"
-
-#~ msgid "Churn Risk"
-#~ msgstr "Risque de résiliation"
-
-#~ msgid "Color Preview"
-#~ msgstr "Aperçu des couleurs"
-
-#~ msgid "Companies"
-#~ msgstr "Entreprises"
-
-#~ msgid "Company Description"
-#~ msgstr "Description de l'entreprise"
-
-#~ msgid "Company Display Name"
-#~ msgstr "Nom d'affichage de l'entreprise"
-
-#~ msgid "Company Logo"
-#~ msgstr "Logo de l'entreprise"
-
-#~ msgid "Complete Your Survey"
-#~ msgstr "Complétez votre enquête"
-
-#~ msgid ""
-#~ "Configure your personalized survey experience"
-#~ " for {{ business_account.name }}"
-#~ msgstr ""
-#~ "Configurez votre expérience d'enquête "
-#~ "personnalisée pour {{ business_account.name }}"
-
-#~ msgid ""
-#~ "Control which topics the survey covers"
-#~ " first and which are optional if "
-#~ "time runs out"
-#~ msgstr ""
-#~ "Contrôlez les sujets que l'enquête "
-#~ "couvre en premier et ceux qui sont"
-#~ " facultatifs si le temps est écoulé"
-
-#~ msgid "Conversation Tone"
-#~ msgstr "Tonalité de la conversation"
-
-#~ msgid ""
-#~ "Create your first campaign to start "
-#~ "collecting customer feedback and understanding"
-#~ " their experience. Campaigns help you "
-#~ "organize survey participants, send "
-#~ "invitations, and analyze results."
-#~ msgstr ""
-#~ "Créez votre première campagne pour "
-#~ "commencer à recueillir les retours de"
-#~ " vos clients et comprendre leur "
-#~ "expérience. Les campagnes vous aident à"
-#~ " organiser les participants, envoyer les"
-#~ " invitations et analyser les résultats."
-
-#~ msgid "Critical"
-#~ msgstr "Critique"
-
-#~ msgid "Critical Risk Count"
-#~ msgstr "Nombre de risques critiques"
-
-#~ msgid "Current Team Members"
-#~ msgstr "Membres actuels de l'équipe"
-
-#~ msgid "Custom Completion Message"
-#~ msgstr "Message de fin personnalisé"
-
-#~ msgid "Custom Research"
-#~ msgstr "Recherche personnalisée"
-
-#~ msgid "Customize your brand identity for {{ business_account.name }}"
-#~ msgstr "Personnalisez votre identité de marque pour {{ business_account.name }}"
-
-#~ msgid "Demo Features"
-#~ msgstr "Fonctionnalités de la démonstration"
-
-#~ msgid "Demo account not available"
-#~ msgstr "Compte de démonstration non disponible."
-
-#~ msgid "Detractors (0-6)"
-#~ msgstr "Détracteurs (0-6)"
-
-#~ msgid "Done"
-#~ msgstr "Terminé"
-
-#~ msgid "Draft"
-#~ msgstr "Brouillon"
-
-#~ msgid "Email service is not configured. Please configure SMTP settings first."
-#~ msgstr ""
-#~ "Le service de messagerie n’est pas "
-#~ "configuré. Veuillez d’abord configurer les "
-#~ "paramètres SMTP."
-
-#~ msgid "Email {{ participant.name }}"
-#~ msgstr "Envoyer un e-mail à {{ participant.name }}"
-
-#~ msgid "End"
-#~ msgstr "Fin"
-
-#~ msgid "End date must be after start date."
-#~ msgstr "La date de fin doit être postérieure à la date de début."
-
-#~ msgid "Error loading campaign details."
-#~ msgstr "Erreur lors du chargement des détails de la campagne."
-
-#~ msgid "Error loading campaign responses."
-#~ msgstr "Erreur lors du chargement des réponses de la campagne."
-
-#~ msgid "Error loading campaigns."
-#~ msgstr "Erreur lors du chargement des campagnes."
-
-#~ msgid "Error loading company responses"
-#~ msgstr "Erreur lors du chargement des réponses de l’entreprise."
-
-#~ msgid "Error loading individual response."
-#~ msgstr "Erreur lors du chargement de la réponse individuelle."
-
-#~ msgid "Error loading survey configuration."
-#~ msgstr "Erreur lors du chargement de la configuration de l’enquête."
-
-#~ msgid "Executive Report"
-#~ msgstr "Rapport exécutif"
-
-#~ msgid "Export Complete!"
-#~ msgstr "Exportation terminée !"
-
-#~ msgid "Export Failed"
-#~ msgstr "Échec de l'exportation"
-
-#~ msgid "Failed to activate campaign. Please try again."
-#~ msgstr "Échec de l’activation de la campagne. Veuillez réessayer."
-
-#~ msgid "Failed to complete campaign. Please try again."
-#~ msgstr "Échec de la finalisation de la campagne. Veuillez réessayer."
-
-#~ msgid "Failed to create campaign. Please try again."
-#~ msgstr "Échec de la création de la campagne. Veuillez réessayer."
-
-#~ msgid "Failed to delete campaign. Please try again."
-#~ msgstr "Échec de la suppression de la campagne. Veuillez réessayer."
-
-#~ msgid "Failed to mark campaign as ready. Please try again."
-#~ msgstr "Échec du marquage de la campagne comme prête. Veuillez réessayer."
-
-#~ msgid "Failed to resend invitations. Please try again."
-#~ msgstr "Échec du renvoi des invitations. Veuillez réessayer."
-
-#~ msgid "Failed to save survey configuration. Please try again."
-#~ msgstr ""
-#~ "Échec de l’enregistrement de la "
-#~ "configuration de l’enquête. Veuillez "
-#~ "réessayer."
-
-#~ msgid "Failed to send invitations. Please try again."
-#~ msgstr "Échec de l’envoi des invitations. Veuillez réessayer."
-
-#~ msgid "Failed to update campaign. Please try again."
-#~ msgstr "Échec de la mise à jour de la campagne. Veuillez réessayer."
-
-#~ msgid "Fine-tune the survey experience and conversation pacing"
-#~ msgstr "Ajustez l'expérience de l'enquête et le rythme de la conversation"
-
-#~ msgid "Follow-ups per Topic"
-#~ msgstr "Relances par sujet"
-
-#~ msgid "Full access to all features and settings"
-#~ msgstr "Accès complet à toutes les fonctionnalités et paramètres"
-
-#~ msgid "Growth Potential"
-#~ msgstr "Potentiel de croissance"
-
-#~ msgid "Has Opportunities"
-#~ msgstr "Avec opportunités"
-
-#~ msgid "Has Risks"
-#~ msgstr "Avec risques"
-
-#~ msgid "High"
-#~ msgstr "Élevé"
-
-#~ msgid "Highlight color for success states and call-to-action elements."
-#~ msgstr ""
-#~ "Couleur de surbrillance pour les états"
-#~ " de succès et les éléments d'appel"
-#~ " à l'action."
-
-#~ msgid "How deep to explore each topic with follow-up questions"
-#~ msgstr "Profondeur d'exploration de chaque sujet avec des questions de relance"
-
-#~ msgid "How your name appears to survey recipients"
-#~ msgstr "Comment votre nom apparaît aux destinataires de l'enquête"
-
-#~ msgid "Imminent churn risk (High/Critical)"
-#~ msgstr "Risque imminent de résiliation (élevé/critique)"
-
-#~ msgid "Industry"
-#~ msgstr "Secteur d'activité"
-
-#~ msgid "Insufficient Data (<2 responses)"
-#~ msgstr "Données insuffisantes (<2 réponses)"
-
-#~ msgid "Invalid date format."
-#~ msgstr "Format de date invalide."
-
-#~ msgid "Invalid numeric values in survey controls."
-#~ msgstr "Valeurs numériques invalides dans les contrôles de l’enquête."
-
-#~ msgid "Invite campaign managers to help create and manage surveys"
-#~ msgstr ""
-#~ "Invitez des responsables de campagne "
-#~ "pour aider à créer et gérer les"
-#~ " enquêtes"
-
-#~ msgid "Latest customer feedback"
-#~ msgstr "Derniers retours clients"
-
-#~ msgid "Live preview of your color palette."
-#~ msgstr "Aperçu en direct de votre palette de couleurs."
-
-#~ msgid "Loading dashboard data..."
-#~ msgstr "Chargement des données du tableau de bord..."
-
-#~ msgid "Loading executive summary..."
-#~ msgstr "Chargement du résumé exécutif..."
-
-#~ msgid "Low"
-#~ msgstr "Faible"
-
-#~ msgid "Main brand color used for headers, buttons, and accents."
-#~ msgstr ""
-#~ "Couleur principale de la marque utilisée"
-#~ " pour les en-têtes, les boutons "
-#~ "et les accents."
-
-#~ msgid "Manage Campaigns"
-#~ msgstr "Gérer les campagnes"
-
-#~ msgid "Manage Participants"
-#~ msgstr "Gérer les participants"
-
-#~ msgid "Manage Users"
-#~ msgstr "Gérer les utilisateurs"
-
-#~ msgid "Manage survey campaigns"
-#~ msgstr "Gérer les campagnes d'enquête"
-
-#~ msgid "Manage survey campaigns for {{ business_account.name }}"
-#~ msgstr "Gérez les campagnes de sondage pour {{ business_account.name }}"
-
-#~ msgid "Manage survey participants"
-#~ msgstr "Gérer les participants aux enquêtes"
-
-#~ msgid "Manage team members and users"
-#~ msgstr "Gérer les membres de l'équipe et les utilisateurs"
-
-#~ msgid "Max Campaigns"
-#~ msgstr "Nombre maximal de campagnes"
-
-#~ msgid "Max Users"
-#~ msgstr "Nombre maximal d'utilisateurs"
-
-#~ msgid "Max duration must be between 60 and 300 seconds."
-#~ msgstr "La durée maximale doit être comprise entre 60 et 300 secondes."
-
-#~ msgid "Max follow-ups per topic must be between 1 and 3."
-#~ msgstr "Le nombre maximal de relances par sujet doit être compris entre 1 et 3."
-
-#~ msgid "Max questions must be between 3 and 15."
-#~ msgstr "Le nombre maximal de questions doit être compris entre 3 et 15."
-
-#~ msgid "Maximum Questions"
-#~ msgstr "Nombre maximum de questions"
-
-#~ msgid "Maximum file size: 5MB"
-#~ msgstr "Taille maximale du fichier : 5 Mo"
-
-#~ msgid "Maximum time participants can spend on the survey"
-#~ msgstr "Durée maximale que les participants peuvent consacrer à l'enquête"
-
-#~ msgid "Medium"
-#~ msgstr "Moyen"
-
-#~ msgid "Metric"
-#~ msgstr "Indicateur"
-
-#~ msgid "Metrics Comparison"
-#~ msgstr "Comparaison des indicateurs"
-
-#~ msgid "NPS Category"
-#~ msgstr "Catégorie NPS"
-
-#~ msgid "NPS by Customer Tier"
-#~ msgstr "NPS par catégorie de clients"
-
-#~ msgid "NPS by Region"
-#~ msgstr "NPS par région"
-
-#~ msgid "NPS by Role"
-#~ msgstr "NPS par rôle"
-
-#~ msgid "Name"
-#~ msgstr "Nom"
-
-#~ msgid "No License History"
-#~ msgstr "Aucun historique de licence"
-
-#~ msgid "No Opportunities"
-#~ msgstr "Sans opportunités"
-
-#~ msgid "No Risks"
-#~ msgstr "Sans risques"
-
-#~ msgid "No failed invitations found that can be retried."
-#~ msgstr "Aucune invitation échouée ne peut être renvoyée."
-
-#~ msgid "No invitations were queued for retry."
-#~ msgstr "Aucune invitation n’a été mise en file d’attente pour un nouvel envoi."
-
-#~ msgid "No logo"
-#~ msgstr "Aucun logo"
-
-#~ msgid "No participants found for this campaign."
-#~ msgstr "Aucun participant trouvé pour cette campagne."
-
-#~ msgid "Opportunities"
-#~ msgstr "Opportunités"
-
-#~ msgid "Opportunity Heavy"
-#~ msgstr "Forte opportunité"
-
-#~ msgid "Optional Topics (if time allows)"
-#~ msgstr "Sujets optionnels (si le temps le permet)"
-
-#~ msgid "Overall Satisfaction"
-#~ msgstr "Satisfaction globale"
-
-#~ msgid "Overall satisfaction metric"
-#~ msgstr "Indicateur de satisfaction globale"
-
-#~ msgid "PNG format recommended for logos with transparency"
-#~ msgstr "Format PNG recommandé pour les logos avec transparence"
-
-#~ msgid "Participant management"
-#~ msgstr "Gestion des participants"
-
-#~ msgid "Participant not found in this campaign."
-#~ msgstr "Participant introuvable dans cette campagne."
-
-#~ msgid "Passives (7-8)"
-#~ msgstr "Neutres (7-8)"
-
-#~ msgid "Personalize the survey experience with custom messages"
-#~ msgstr "Personnalisez l'expérience d'enquête avec des messages personnalisés"
-
-#~ msgid "Please select two campaigns above to view comparison results"
-#~ msgstr ""
-#~ "Veuillez sélectionner deux campagnes ci-"
-#~ "dessus pour afficher les résultats de"
-#~ " la comparaison"
-
-#~ msgid "Pricing Perception"
-#~ msgstr "Perception de la tarification"
-
-#~ msgid "Primary Color"
-#~ msgstr "Couleur principale"
-
-#~ msgid "Primary Survey Goals (select all that apply)"
-#~ msgstr "Objectifs principaux de l'enquête (sélectionnez tout ce qui s'applique)"
-
-#~ msgid "Primary text color for readability."
-#~ msgstr "Couleur de texte principale pour la lisibilité."
-
-#~ msgid "Prioritized Topics (covered first)"
-#~ msgstr "Sujets prioritaires (couverts en premier)"
-
-#~ msgid "Product"
-#~ msgstr "Produit"
-
-#~ msgid "Product Feedback"
-#~ msgstr "Retour sur le produit"
-
-#~ msgid "Product/Service Description"
-#~ msgstr "Description du produit/service"
-
-#~ msgid "Promoters (9-10)"
-#~ msgstr "Promoteurs (9-10)"
-
-#~ msgid "Ready to gather insights?"
-#~ msgstr "Prêt à recueillir des insights ?"
-
-#~ msgid "Recent (30 days)"
-#~ msgstr "Récent (30 jours)"
-
-#~ msgid "Recent Survey Responses"
-#~ msgstr "Réponses récentes aux enquêtes"
-
-#~ msgid "Recommended dimensions: 400x200 pixels or similar ratio"
-#~ msgstr "Dimensions recommandées : 400x200 pixels ou ratio similaire"
-
-#~ msgid "Reminder: Your feedback is still needed - {campaign_name}"
-#~ msgstr "Rappel : votre avis est toujours attendu - {campaign_name}"
-
-#~ msgid "Revenue expansion opportunity"
-#~ msgstr "Opportunité d'expansion du chiffre d'affaires"
-
-#~ msgid "Risk Heavy"
-#~ msgstr "Risque élevé"
-
-#~ msgid "Risk Level"
-#~ msgstr "Niveau de risque"
-
-#~ msgid "Satisfaction Ratings by Segment"
-#~ msgstr "Évaluations de satisfaction par segment"
-
-#~ msgid "Save survey configuration"
-#~ msgstr "Enregistrer la configuration de l'enquête"
-
-#~ msgid "Search"
-#~ msgstr "Rechercher"
-
-#~ msgid "Search Participants"
-#~ msgstr "Rechercher des participants"
-
-#~ msgid "Search participants by name, email, or company"
-#~ msgstr "Rechercher des participants par nom, e-mail ou entreprise"
-
-#~ msgid "Search participants form"
-#~ msgstr "Formulaire de recherche de participants"
-
-#~ msgid "Secondary Color"
-#~ msgstr "Couleur secondaire"
-
-#~ msgid "Segment Name"
-#~ msgstr "Nom du segment"
-
-#~ msgid "Segment Type"
-#~ msgstr "Type de segment"
-
-#~ msgid "Select Campaign"
-#~ msgstr "Sélectionner la campagne"
-
-#~ msgid "Select first campaign"
-#~ msgstr "Sélectionner la première campagne"
-
-#~ msgid "Select second campaign"
-#~ msgstr "Sélectionner la deuxième campagne"
-
-#~ msgid "Select your industry"
-#~ msgstr "Sélectionnez votre secteur d'activité"
-
-#~ msgid "Send a test email to verify your SMTP settings are working correctly."
-#~ msgstr ""
-#~ "Envoyez un e-mail de test pour "
-#~ "vérifier que vos paramètres SMTP "
-#~ "fonctionnent correctement."
-
-#~ msgid "Sent"
-#~ msgstr "Envoyé"
-
-#~ msgid "Sent/Completed"
-#~ msgstr "Envoyé/Terminé"
-
-#~ msgid "Server Settings"
-#~ msgstr "Paramètres du serveur"
-
-#~ msgid "Specific product details enable more targeted feedback collection"
-#~ msgstr ""
-#~ "Les détails spécifiques des produits "
-#~ "permettent une collecte de retours plus"
-#~ " ciblée"
-
-#~ msgid "Start"
-#~ msgstr "Début"
-
-#~ msgid "Start Demo - Join a Live Campaign"
-#~ msgstr "Commencer la démo - Rejoindre une campagne en direct"
-
-#~ msgid "Start conversational survey"
-#~ msgstr "Démarrer l'enquête conversationnelle"
-
-#~ msgid "Support Quality"
-#~ msgstr "Qualité du support"
-
-#~ msgid "Supported formats: PNG, JPG, JPEG, GIF, WEBP"
-#~ msgstr "Formats pris en charge : PNG, JPG, JPEG, GIF, WEBP"
-
-#~ msgid "Supporting color for borders and subtle elements."
-#~ msgstr "Couleur complémentaire pour les bordures et les éléments discrets."
-
-#~ msgid "Survey configuration saved successfully!"
-#~ msgstr "Configuration de l’enquête enregistrée avec succès !"
-
-#~ msgid "Survey response not found for this participant."
-#~ msgstr "Réponse à l’enquête introuvable pour ce participant."
-
-#~ msgid "Survey response not found or unavailable."
-#~ msgstr "Réponse à l’enquête introuvable ou indisponible."
-
-#~ msgid ""
-#~ "Switch to {% if ui_version == 'v1'"
-#~ " %}v2 (New Sidebar){% else %}v1 "
-#~ "(Current){% endif %}"
-#~ msgstr ""
-#~ "Basculer vers {% if ui_version == "
-#~ "'v1' %}v2 (Nouvelle barre latérale){% "
-#~ "else %}v1 (Actuelle){% endif %}"
-
-#~ msgid "Target Customers"
-#~ msgstr "Clients cibles"
-
-#~ msgid "Tell us about your business to personalize the survey conversation"
-#~ msgstr ""
-#~ "Parlez-nous de votre entreprise pour "
-#~ "personnaliser la conversation de l'enquête"
-
-#~ msgid "Tenure Group"
-#~ msgstr "Groupe d'ancienneté"
-
-#~ msgid "Tenure NPS"
-#~ msgstr "NPS par ancienneté"
-
-#~ msgid "Text Color"
-#~ msgstr "Couleur du texte"
-
-#~ msgid "These topics can be skipped if the time/question limit is reached"
-#~ msgstr ""
-#~ "Ces sujets peuvent être ignorés si "
-#~ "la limite de temps ou de questions"
-#~ " est atteinte"
-
-#~ msgid "These topics will always be covered, in order of importance"
-#~ msgstr "Ces sujets seront toujours abordés, selon leur importance"
-
-#~ msgid ""
-#~ "This context helps the AI understand "
-#~ "your business and ask relevant questions"
-#~ msgstr ""
-#~ "Ce contexte aide l'IA à comprendre "
-#~ "votre entreprise et à poser des "
-#~ "questions pertinentes"
-
-#~ msgid "This helps tailor survey questions to your industry context"
-#~ msgstr ""
-#~ "Cela aide à adapter les questions "
-#~ "de l'enquête à votre contexte sectoriel"
-
-#~ msgid ""
-#~ "This is a friendly reminder that "
-#~ "{business_account_name} is still looking "
-#~ "forward to your feedback."
-#~ msgstr ""
-#~ "Ceci est un rappel amical indiquant "
-#~ "que {business_account_name} attend toujours "
-#~ "votre retour d'expérience."
-
-#~ msgid ""
-#~ "This is an automated message. If "
-#~ "you have any questions, please contact"
-#~ " the organization that sent this "
-#~ "survey."
-#~ msgstr ""
-#~ "Ceci est un message automatique. Si "
-#~ "vous avez des questions, veuillez "
-#~ "contacter l'organisation qui vous a "
-#~ "envoyé cette enquête."
-
-#~ msgid ""
-#~ "This message will be shown to "
-#~ "participants when they complete the "
-#~ "survey. Leave blank to use the "
-#~ "default message"
-#~ msgstr ""
-#~ "Ce message sera affiché aux participants"
-#~ " lorsqu'ils termineront l'enquête. Laissez "
-#~ "vide pour utiliser le message par "
-#~ "défaut"
-
-#~ msgid ""
-#~ "This name will be displayed in "
-#~ "surveys and emails. Leave blank to "
-#~ "use \"{{ business_account.name }}\"."
-#~ msgstr ""
-#~ "Ce nom sera affiché dans les "
-#~ "enquêtes et les e-mails. Laissez vide"
-#~ " pour utiliser « {{ business_account.name"
-#~ " }} »."
-
-#~ msgid "This survey response requires authentication. Please log in to view."
-#~ msgstr ""
-#~ "Cette réponse à l’enquête nécessite une"
-#~ " authentification. Veuillez vous connecter "
-#~ "pour la consulter."
-
-#~ msgid "Time Limit (seconds)"
-#~ msgstr "Limite de temps (secondes)"
-
-#~ msgid ""
-#~ "To send survey invitations, VOÏA needs"
-#~ " access to your email server. You "
-#~ "can use:"
-#~ msgstr ""
-#~ "Pour envoyer des invitations à "
-#~ "l'enquête, VOÏA a besoin d'un accès "
-#~ "à votre serveur de messagerie. Vous "
-#~ "pouvez utiliser :"
-
-#~ msgid "Toggle Sidebar"
-#~ msgstr "Basculer la barre latérale"
-
-#~ msgid "Transparent background recommended for PNG files"
-#~ msgstr "Arrière-plan transparent recommandé pour les fichiers PNG"
-
-#~ msgid "Type your response to VOÏA"
-#~ msgstr "Saisissez votre réponse à VOÏA"
-
-#~ msgid "Understanding your audience helps frame questions appropriately"
-#~ msgstr ""
-#~ "Comprendre votre audience aide à "
-#~ "formuler les questions de manière "
-#~ "appropriée"
-
-#~ msgid "Upload Logo"
-#~ msgstr "Téléverser le logo"
-
-#~ msgid ""
-#~ "Upload your company logo to personalize"
-#~ " surveys and communications. Supported "
-#~ "formats: PNG, JPG, JPEG, GIF, WEBP "
-#~ "(max 5MB)."
-#~ msgstr ""
-#~ "Téléversez le logo de votre entreprise"
-#~ " pour personnaliser les enquêtes et "
-#~ "les communications. Formats pris en "
-#~ "charge : PNG, JPG, JPEG, GIF, WEBP"
-#~ " (max 5 Mo)."
-
-#~ msgid "User management"
-#~ msgstr "Gestion des utilisateurs"
-
-#~ msgid "Usually 587 for TLS or 465 for SSL"
-#~ msgstr "Généralement 587 pour TLS ou 465 pour SSL"
-
-#~ msgid "VOÏA Demo Homepage"
-#~ msgstr "Page d'accueil de la démonstration VOÏA"
-
-#~ msgid "View Details"
-#~ msgstr "Voir les détails"
-
-#~ msgid "View Pricing Plans"
-#~ msgstr "Voir les plans tarifaires"
-
-#~ msgid "What do you want to learn from your survey participants?"
-#~ msgstr "Que souhaitez-vous apprendre de vos participants à l'enquête ?"
-
-#~ msgid "You do not have permission to view this survey response."
-#~ msgstr "Vous n’avez pas l’autorisation d’afficher cette réponse à l’enquête."
-
-#~ msgid "Your campaign data has been successfully exported."
-#~ msgstr "Les données de votre campagne ont été exportées avec succès."
-
-#~ msgid "Your email address or SMTP username"
-#~ msgstr "Votre adresse e-mail ou nom d'utilisateur SMTP"
-
-#~ msgid ""
-#~ "Your feedback helps improve services and"
-#~ " experiences. The survey should take "
-#~ "just a few minutes to complete.\n"
-#~ "\n"
-#~ "Thank you for your time and valuable insights!"
-#~ msgstr ""
-#~ "Votre retour d'information contribue à "
-#~ "améliorer les services et les "
-#~ "expériences. L'enquête ne vous prendra "
-#~ "que quelques minutes.\n"
-#~ "\n"
-#~ "Merci pour votre temps et vos précieuses informations !"
-
-#~ msgid "Your feedback is requested: {campaign_name}"
-#~ msgstr "Votre avis est sollicité : {campaign_name}"
-
-#~ msgid "Your organization's email server settings"
-#~ msgstr "Les paramètres du serveur de messagerie de votre organisation"
-
-#~ msgid ""
-#~ "{# Campaign Action Buttons Macro #}\n"
-#~ "    {% macro campaign_actions(campaign, view_type='table') %}\n"
-#~ "        {% set action_class = 'table-"
-#~ "actions' if view_type == 'table' else"
-#~ " 'campaign-card-actions' %}"
-#~ msgstr ""
-#~ "{# Macro des boutons d'action de campagne #}\n"
-#~ "    {% macro campaign_actions(campaign, view_type='table') %}\n"
-#~ "        {% set action_class = 'table-"
-#~ "actions' if view_type == 'table' else"
-#~ " 'campaign-card-actions' %}"
-
-#~ msgid ""
-#~ "{business_account_name} is requesting your "
-#~ "valuable feedback through our Voice of"
-#~ " Client system."
-#~ msgstr ""
-#~ "{business_account_name} sollicite votre précieux "
-#~ "retour d'expérience via notre système "
-#~ "Voice of Client."
-
-#~ msgid "Hi {{ participant_name }}, thank you for participating"
-#~ msgstr "Bonjour {{ participant_name }}, merci de votre participation"
-
-#~ msgid ""
-#~ "How long have you been working "
-#~ "with {{ branding.company_name if branding "
-#~ "and branding.company_name else 'us' }}?"
-#~ msgstr ""
-#~ "Depuis combien de temps travaillez-vous"
-#~ " avec {{ branding.company_name if branding"
-#~ " and branding.company_name else 'nous' }}"
-#~ " ?"
 
