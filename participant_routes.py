@@ -1047,98 +1047,97 @@ def bulk_edit_participants():
         skipped_count = 0
         skipped_participants = []
         
-        # Process updates in transaction
-        with db.session.begin_nested():
-            for participant in participants:
-                # Check if customer_tier is being changed and participant has survey history
-                if 'customer_tier' in updates and participant.has_survey_history():
-                    skipped_count += 1
-                    skipped_participants.append({
-                        'id': participant.id,
-                        'name': participant.name,
-                        'reason': 'Customer tier locked (has survey history)'
-                    })
-                    continue
+        # Process updates
+        for participant in participants:
+            # Check if customer_tier is being changed and participant has survey history
+            if 'customer_tier' in updates and participant.has_survey_history():
+                skipped_count += 1
+                skipped_participants.append({
+                    'id': participant.id,
+                    'name': participant.name,
+                    'reason': 'Customer tier locked (has survey history)'
+                })
+                continue
+            
+            # Track changes for audit
+            changes = {}
+            
+            # Apply updates
+            for field, new_value in updates.items():
+                old_value = getattr(participant, field, None)
                 
-                # Track changes for audit
-                changes = {}
+                # Only update if value actually changed
+                if old_value != new_value:
+                    changes[field] = {
+                        'old': old_value,
+                        'new': new_value
+                    }
+                    setattr(participant, field, new_value)
+            
+            # If no changes, skip audit logging
+            if not changes:
+                continue
+            
+            # Sync commercial value across same company if changed
+            if 'company_commercial_value' in changes and participant.company_name:
+                normalized_company = participant.company_name.strip().lower()
+                same_company_participants = Participant.query.filter(
+                    db.func.lower(db.func.trim(Participant.company_name)) == normalized_company,
+                    Participant.business_account_id == current_account.id
+                ).all()
                 
-                # Apply updates
-                for field, new_value in updates.items():
-                    old_value = getattr(participant, field, None)
-                    
-                    # Only update if value actually changed
-                    if old_value != new_value:
-                        changes[field] = {
-                            'old': old_value,
-                            'new': new_value
-                        }
-                        setattr(participant, field, new_value)
+                new_commercial_value = changes['company_commercial_value']['new']
                 
-                # If no changes, skip audit logging
-                if not changes:
-                    continue
-                
-                # Sync commercial value across same company if changed
-                if 'company_commercial_value' in changes and participant.company_name:
-                    normalized_company = participant.company_name.strip().lower()
-                    same_company_participants = Participant.query.filter(
-                        db.func.lower(db.func.trim(Participant.company_name)) == normalized_company,
-                        Participant.business_account_id == current_account.id
-                    ).all()
-                    
-                    new_commercial_value = changes['company_commercial_value']['new']
-                    
-                    for other_participant in same_company_participants:
-                        if other_participant.id != participant.id:
-                            old_commercial_value = other_participant.company_commercial_value
-                            other_participant.company_commercial_value = new_commercial_value
-                            
-                            # Audit log for automatic commercial value sync
-                            try:
-                                queue_audit_log(
-                                    business_account_id=current_account.id,
-                                    action_type='participant_updated',
-                                    resource_type='participant',
-                                    resource_id=other_participant.id,
-                                    resource_name=other_participant.name,
-                                    details={
-                                        'email': other_participant.email,
-                                        'changes': {
-                                            'company_commercial_value': {
-                                                'old': old_commercial_value,
-                                                'new': new_commercial_value
-                                            }
-                                        },
-                                        'bulk_operation_id': bulk_operation_id,
-                                        'auto_synced_from_participant_id': participant.id,
-                                        'auto_synced_from_participant_name': participant.name,
-                                        'sync_reason': 'Company commercial value automatic synchronization',
-                                        'company_name': participant.company_name
-                                    }
-                                )
-                            except Exception as audit_error:
-                                logger.error(f"Failed to log commercial value auto-sync audit: {audit_error}")
-                
-                updated_count += 1
-                
-                # Audit logging for each participant update
-                try:
-                    queue_audit_log(
-                        business_account_id=current_account.id,
-                        action_type='participant_updated',
-                        resource_type='participant',
-                        resource_id=participant.id,
-                        resource_name=participant.name,
-                        details={
-                            'email': participant.email,
-                            'changes': changes,
-                            'bulk_operation_id': bulk_operation_id,
-                            'has_survey_history': participant.has_survey_history()
-                        }
-                    )
-                except Exception as audit_error:
-                    logger.error(f"Failed to log bulk participant update audit: {audit_error}")
+                for other_participant in same_company_participants:
+                    if other_participant.id != participant.id:
+                        old_commercial_value = other_participant.company_commercial_value
+                        other_participant.company_commercial_value = new_commercial_value
+                        
+                        # Audit log for automatic commercial value sync
+                        try:
+                            queue_audit_log(
+                                business_account_id=current_account.id,
+                                action_type='participant_updated',
+                                resource_type='participant',
+                                resource_id=other_participant.id,
+                                resource_name=other_participant.name,
+                                details={
+                                    'email': other_participant.email,
+                                    'changes': {
+                                        'company_commercial_value': {
+                                            'old': old_commercial_value,
+                                            'new': new_commercial_value
+                                        }
+                                    },
+                                    'bulk_operation_id': bulk_operation_id,
+                                    'auto_synced_from_participant_id': participant.id,
+                                    'auto_synced_from_participant_name': participant.name,
+                                    'sync_reason': 'Company commercial value automatic synchronization',
+                                    'company_name': participant.company_name
+                                }
+                            )
+                        except Exception as audit_error:
+                            logger.error(f"Failed to log commercial value auto-sync audit: {audit_error}")
+            
+            updated_count += 1
+            
+            # Audit logging for each participant update
+            try:
+                queue_audit_log(
+                    business_account_id=current_account.id,
+                    action_type='participant_updated',
+                    resource_type='participant',
+                    resource_id=participant.id,
+                    resource_name=participant.name,
+                    details={
+                        'email': participant.email,
+                        'changes': changes,
+                        'bulk_operation_id': bulk_operation_id,
+                        'has_survey_history': participant.has_survey_history()
+                    }
+                )
+            except Exception as audit_error:
+                logger.error(f"Failed to log bulk participant update audit: {audit_error}")
         
         db.session.commit()
         
