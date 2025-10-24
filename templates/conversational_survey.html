@@ -85,16 +85,16 @@
                         </div>
                         
                         <div class="mb-3">
-                            <label for="tenureWithFc" class="form-label conv-form-label">{{ _('How long have you been working with FC inc?') }}</label>
+                            <label for="tenureWithFc" class="form-label conv-form-label">{{ _('How long have you been working with') }} {{ branding.company_name if branding and branding.company_name else 'us' }}?</label>
                             <select class="form-select" id="tenureWithFc" required aria-required="true">
                                 <option value="">{{ _('Select duration...') }}</option>
-                                <option value="{{ _('Less than 6 months') }}">{{ _('Less than 6 months') }}</option>
-                                <option value="{{ _('6 months - 1 year') }}">{{ _('6 months - 1 year') }}</option>
-                                <option value="{{ _('1-2 years') }}">{{ _('1-2 years') }}</option>
-                                <option value="{{ _('2-3 years') }}">{{ _('2-3 years') }}</option>
-                                <option value="{{ _('3-5 years') }}">{{ _('3-5 years') }}</option>
-                                <option value="{{ _('5-10 years') }}">{{ _('5-10 years') }}</option>
-                                <option value="{{ _('More than 10 years') }}">{{ _('More than 10 years') }}</option>
+                                <option value="Less than 6 months">{{ _('Less than 6 months') }}</option>
+                                <option value="6 months - 1 year">{{ _('6 months - 1 year') }}</option>
+                                <option value="1-2 years">{{ _('1-2 years') }}</option>
+                                <option value="2-3 years">{{ _('2-3 years') }}</option>
+                                <option value="3-5 years">{{ _('3-5 years') }}</option>
+                                <option value="5-10 years">{{ _('5-10 years') }}</option>
+                                <option value="More than 10 years">{{ _('More than 10 years') }}</option>
                             </select>
                         </div>
                         

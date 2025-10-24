@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-24 19:33+0000\n"
+"POT-Creation-Date: 2025-10-24 19:56+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: en\n"
@@ -234,7 +234,7 @@ msgid "Enter your email address"
 msgstr ""
 
 #: templates/conversational_survey.html:88
-msgid "How long have you been working with FC inc?"
+msgid "How long have you been working with"
 msgstr ""
 
 #: templates/conversational_survey.html:90
@@ -3592,4 +3592,7 @@ msgstr ""
 #: templates/participants/upload.html:226
 msgid "Download CSV template file"
 msgstr ""
+
+#~ msgid "How long have you been working with FC inc?"
+#~ msgstr ""
 
