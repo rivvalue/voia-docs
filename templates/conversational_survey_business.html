@@ -35,8 +35,8 @@
         </div>
         
         <div class="conv-hero-welcome">
-            <h2>{{ _('Hi {{ participant_name }}, thank you for participating') }}</h2>
-            <p>{{ branding.company_name if branding and branding.company_name else 'We' }} value your feedback</p>
+            <h2>{{ _('Hi') }} {{ participant_name }}, {{ _('thank you for participating') }}</h2>
+            <p>{{ branding.company_name if branding and branding.company_name else 'We' }} {{ _('value your feedback') }}</p>
         </div>
     </div>
 </div>
@@ -76,17 +76,17 @@
                         
                         <div class="mb-4">
                             <label for="tenureWithFc" class="form-label">
-                                {{ _('How long have you been working with {{ branding.company_name if branding and branding.company_name else \'us\' }}?') }}
+                                {{ _('How long have you been working with') }} {{ branding.company_name if branding and branding.company_name else 'us' }}?
                             </label>
                             <select class="form-select" id="tenureWithFc" required>
                                 <option value="">{{ _('Select duration...') }}</option>
-                                <option value="{{ _('Less than 6 months') }}">{{ _('Less than 6 months') }}</option>
-                                <option value="{{ _('6 months - 1 year') }}">{{ _('6 months - 1 year') }}</option>
-                                <option value="{{ _('1-2 years') }}">{{ _('1-2 years') }}</option>
-                                <option value="{{ _('2-3 years') }}">{{ _('2-3 years') }}</option>
-                                <option value="{{ _('3-5 years') }}">{{ _('3-5 years') }}</option>
-                                <option value="{{ _('5-10 years') }}">{{ _('5-10 years') }}</option>
-                                <option value="{{ _('More than 10 years') }}">{{ _('More than 10 years') }}</option>
+                                <option value="Less than 6 months">{{ _('Less than 6 months') }}</option>
+                                <option value="6 months - 1 year">{{ _('6 months - 1 year') }}</option>
+                                <option value="1-2 years">{{ _('1-2 years') }}</option>
+                                <option value="2-3 years">{{ _('2-3 years') }}</option>
+                                <option value="3-5 years">{{ _('3-5 years') }}</option>
+                                <option value="5-10 years">{{ _('5-10 years') }}</option>
+                                <option value="More than 10 years">{{ _('More than 10 years') }}</option>
                             </select>
                         </div>
                         

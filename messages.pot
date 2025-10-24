@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-24 19:56+0000\n"
+"POT-Creation-Date: 2025-10-24 20:01+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -234,6 +234,7 @@ msgid "Enter your email address"
 msgstr ""
 
 #: templates/conversational_survey.html:88
+#: templates/conversational_survey_business.html:79
 msgid "How long have you been working with"
 msgstr ""
 
@@ -356,13 +357,15 @@ msgid "Return to home page"
 msgstr ""
 
 #: templates/conversational_survey_business.html:38
-msgid "Hi {{ participant_name }}, thank you for participating"
+msgid "Hi"
 msgstr ""
 
-#: templates/conversational_survey_business.html:79
-msgid ""
-"How long have you been working with {{ branding.company_name if branding "
-"and branding.company_name else 'us' }}?"
+#: templates/conversational_survey_business.html:38
+msgid "thank you for participating"
+msgstr ""
+
+#: templates/conversational_survey_business.html:39
+msgid "value your feedback"
 msgstr ""
 
 #: templates/conversational_survey_business.html:120

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-24 19:56+0000\n"
+"POT-Creation-Date: 2025-10-24 20:01+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -237,6 +237,7 @@ msgid "Enter your email address"
 msgstr "Entrez votre adresse e-mail"
 
 #: templates/conversational_survey.html:88
+#: templates/conversational_survey_business.html:79
 #, fuzzy
 msgid "How long have you been working with"
 msgstr "Depuis combien de temps travaillez-vous avec FC inc ?"
@@ -366,16 +367,19 @@ msgid "Return to home page"
 msgstr "Retour à la page d'accueil"
 
 #: templates/conversational_survey_business.html:38
-msgid "Hi {{ participant_name }}, thank you for participating"
-msgstr "Bonjour {{ participant_name }}, merci de votre participation"
+#, fuzzy
+msgid "Hi"
+msgstr "Bonjour"
 
-#: templates/conversational_survey_business.html:79
-msgid ""
-"How long have you been working with {{ branding.company_name if branding "
-"and branding.company_name else 'us' }}?"
-msgstr ""
-"Depuis combien de temps travaillez-vous avec {{ branding.company_name if "
-"branding and branding.company_name else 'nous' }} ?"
+#: templates/conversational_survey_business.html:38
+#, fuzzy
+msgid "thank you for participating"
+msgstr "merci de votre participation"
+
+#: templates/conversational_survey_business.html:39
+#, fuzzy
+msgid "value your feedback"
+msgstr "valorisons vos retours"
 
 #: templates/conversational_survey_business.html:120
 msgid "Type your response here..."
@@ -4691,4 +4695,17 @@ msgstr "Télécharger le modèle de fichier CSV"
 #~ "{business_account_name} sollicite votre précieux "
 #~ "retour d'expérience via notre système "
 #~ "Voice of Client."
+
+#~ msgid "Hi {{ participant_name }}, thank you for participating"
+#~ msgstr "Bonjour {{ participant_name }}, merci de votre participation"
+
+#~ msgid ""
+#~ "How long have you been working "
+#~ "with {{ branding.company_name if branding "
+#~ "and branding.company_name else 'us' }}?"
+#~ msgstr ""
+#~ "Depuis combien de temps travaillez-vous"
+#~ " avec {{ branding.company_name if branding"
+#~ " and branding.company_name else 'nous' }}"
+#~ " ?"
 
