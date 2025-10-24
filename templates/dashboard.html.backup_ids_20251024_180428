@@ -395,16 +395,16 @@
                 </div>
                 <div class="col">
                     <div class="kpi-card kpi-primary">
-                        <div class="kpi-value text-success" id="totalResponses">0</div>
+                        <div class="kpi-value text-success" id="total{{ _('Responses') }}">0</div>
                         <div class="kpi-label">Total {{ _('Responses') }}</div>
-                        <div class="kpi-trend" id="totalResponsesTrend">All time feedback collected</div>
+                        <div class="kpi-trend" id="total{{ _('Responses') }}Trend">All time feedback collected</div>
                     </div>
                 </div>
                 <div class="col">
                     <div class="kpi-card kpi-info">
-                        <div class="kpi-value text-info" id="recentResponses">0</div>
+                        <div class="kpi-value text-info" id="recent{{ _('Responses') }}">0</div>
                         <div class="kpi-label">Recent (30 days)</div>
-                        <div class="kpi-trend" id="recentResponsesTrend">Latest customer feedback</div>
+                        <div class="kpi-trend" id="recent{{ _('Responses') }}Trend">Latest customer feedback</div>
                     </div>
                 </div>
                 <div class="col">
@@ -876,12 +876,12 @@
 <!-- End Dashboard Column -->
 
 <!-- Company {{ _('Responses') }} Modal -->
-<div class="modal fade" id="companyResponsesModal" tabindex="-1" aria-labelledby="company{{ _('Responses') }}ModalLabel" aria-hidden="true">
+<div class="modal fade" id="company{{ _('Responses') }}Modal" tabindex="-1" aria-labelledby="company{{ _('Responses') }}ModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content" style="background-color: #ffffff; border: 2px solid #2E5090;">
             <div class="modal-header" style="background: linear-gradient(135deg, #2E5090 0%, #1a3560 100%); border-bottom: 2px solid #E13A44;">
                 <div class="w-100">
-                    <h5 class="modal-title text-white mb-2" id="companyResponsesModalLabel">
+                    <h5 class="modal-title text-white mb-2" id="company{{ _('Responses') }}ModalLabel">
                         <i class="fas fa-building me-2"></i><span id="modalCompanyName"></span>
                     </h5>
                     <div class="d-flex align-items-center gap-2 flex-wrap">
@@ -920,7 +920,7 @@
                 </div>
                 
                 <!-- Loading State -->
-                <div id="companyResponsesLoading" class="text-center py-5">
+                <div id="company{{ _('Responses') }}Loading" class="text-center py-5">
                     <div class="spinner-border" style="color: #2E5090;" role="status">
                         <span class="visually-hidden">{{ _('Loading...') }}</span>
                     </div>
@@ -928,7 +928,7 @@
                 </div>
                 
                 <!-- {{ _('Responses') }} Table -->
-                <div id="companyResponsesContent" style="display: none;">
+                <div id="company{{ _('Responses') }}Content" style="display: none;">
                     <div class="table-responsive">
                         <table class="table table-hover" style="background-color: #ffffff;">
                             <thead style="background-color: #2E5090; color: white; position: sticky; top: 0; z-index: 10;">
@@ -940,7 +940,7 @@
                                     <th style="width: 5%; text-align: center;">Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="companyResponsesTableBody">
+                            <tbody id="company{{ _('Responses') }}TableBody">
                                 <!-- Will be populated by JavaScript -->
                             </tbody>
                         </table>
@@ -949,10 +949,10 @@
                     <!-- Pagination -->
                     <div class="d-flex justify-content-between align-items-center mt-3">
                         <div style="color: #8A8A8A;">
-                            <span id="companyResponsesPaginationInfo"></span>
+                            <span id="company{{ _('Responses') }}PaginationInfo"></span>
                         </div>
                         <nav>
-                            <ul class="pagination pagination-sm mb-0" id="companyResponsesPagination">
+                            <ul class="pagination pagination-sm mb-0" id="company{{ _('Responses') }}Pagination">
                                 <!-- Will be populated by JavaScript -->
                             </ul>
                         </nav>
@@ -960,7 +960,7 @@
                 </div>
                 
                 <!-- No Data State -->
-                <div id="companyResponsesNoData" class="text-center py-5" style="display: none;">
+                <div id="company{{ _('Responses') }}NoData" class="text-center py-5" style="display: none;">
                     <i class="fas fa-inbox fa-4x mb-3" style="color: #BDBDBD;"></i>
                     <h5 style="color: #8A8A8A;">{{ _('No Responses Found') }}</h5>
                     <p style="color: #8A8A8A;">{{ _('No survey responses match your search criteria.') }}</p>
