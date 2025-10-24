@@ -887,12 +887,14 @@ function applyFilters(page = 1) {
                 const newUrl = window.location.pathname + '?' + params.toString();
                 window.history.pushState({}, '', newUrl);
                 
-                // Clear bulk selection
+                // Clear bulk selection and update UI
                 selectedParticipants.clear();
                 const selectAllCheckbox = document.getElementById('selectAll');
                 if (selectAllCheckbox) {
                     selectAllCheckbox.checked = false;
                 }
+                // Update selection UI to hide toolbar
+                updateSelection();
             } else {
                 throw new Error(data.error || 'Unknown error');
             }
