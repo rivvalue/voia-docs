@@ -1,0 +1,1449 @@
+{
+  "metadata": {
+    "project": "VOÏA - Voice Of Client",
+    "source_language": "English",
+    "target_language": "French",
+    "extraction_date": "2025-10-24",
+    "total_files": 10,
+    "total_strings": 2161,
+    "file_number": 7,
+    "part_description": "Templates Part 7/8"
+  },
+  "instructions": {
+    "overview": "Translate all 'text' field values from English to French (France market, professional SaaS tone)",
+    "rules": [
+      "Translate ONLY the 'text' field values",
+      "Keep all other fields (id, file, type, element, etc.) UNCHANGED",
+      "Preserve {variables}, {{variables}}, and {%...%} syntax exactly as-is",
+      "Use professional business French suitable for SaaS platform",
+      "Maintain consistent terminology throughout",
+      "Keep technical terms like 'NPS', 'API', 'VOÏA' unchanged unless noted"
+    ]
+  },
+  "templates": [
+    {
+      "id": "complete_14",
+      "file": "templates/business_auth/onboarding/complete.html",
+      "element": "div",
+      "text": "Add Participants"
+    },
+    {
+      "id": "complete_15",
+      "file": "templates/business_auth/onboarding/complete.html",
+      "element": "div",
+      "text": "Upload your customer list or add participants individually. VOÏA will help you manage and track responses efficiently."
+    },
+    {
+      "id": "complete_16",
+      "file": "templates/business_auth/onboarding/complete.html",
+      "element": "div",
+      "text": "Launch and Analyze"
+    },
+    {
+      "id": "complete_17",
+      "file": "templates/business_auth/onboarding/complete.html",
+      "element": "div",
+      "text": "Send invitations to participants and watch real-time responses come in. Use our AI-powered analytics to gain deeper insights."
+    },
+    {
+      "id": "complete_18",
+      "file": "templates/business_auth/onboarding/complete.html",
+      "element": "a",
+      "text": "Quick Start Guide"
+    },
+    {
+      "id": "upload_1",
+      "file": "templates/participants/upload.html",
+      "element": "p",
+      "text": "Upload multiple participants to {{ business_account.name }} via CSV file"
+    },
+    {
+      "id": "upload_2",
+      "file": "templates/participants/upload.html",
+      "element": "label",
+      "text": "CSV File *"
+    },
+    {
+      "id": "upload_3",
+      "file": "templates/participants/upload.html",
+      "element": "h4",
+      "text": "1. File Validation"
+    },
+    {
+      "id": "upload_4",
+      "file": "templates/participants/upload.html",
+      "element": "p",
+      "text": "System checks CSV format and validates all required columns are present"
+    },
+    {
+      "id": "upload_5",
+      "file": "templates/participants/upload.html",
+      "element": "h4",
+      "text": "2. Duplicate Detection"
+    },
+    {
+      "id": "upload_6",
+      "file": "templates/participants/upload.html",
+      "element": "p",
+      "text": "Automatically skips participants already in your account"
+    },
+    {
+      "id": "upload_7",
+      "file": "templates/participants/upload.html",
+      "element": "h4",
+      "text": "3. Token Generation"
+    },
+    {
+      "id": "upload_8",
+      "file": "templates/participants/upload.html",
+      "element": "p",
+      "text": "Generate unique tokens for secure survey access"
+    },
+    {
+      "id": "upload_9",
+      "file": "templates/participants/upload.html",
+      "element": "h4",
+      "text": "4. Status Report"
+    },
+    {
+      "id": "upload_10",
+      "file": "templates/participants/upload.html",
+      "element": "p",
+      "text": "View detailed results including successes and any errors"
+    },
+    {
+      "id": "upload_11",
+      "file": "templates/participants/upload.html",
+      "element": "p",
+      "text": "Download a sample CSV file with all columns and example data to get started quickly"
+    },
+    {
+      "id": "upload_aria_12",
+      "file": "templates/participants/upload.html",
+      "element": "button[aria-label]",
+      "text": "Close"
+    },
+    {
+      "id": "upload_aria_13",
+      "file": "templates/participants/upload.html",
+      "element": "a[aria-label]",
+      "text": "Cancel and return to participants list"
+    },
+    {
+      "id": "upload_aria_14",
+      "file": "templates/participants/upload.html",
+      "element": "button[aria-label]",
+      "text": "Upload participants from CSV file"
+    },
+    {
+      "id": "upload_aria_15",
+      "file": "templates/participants/upload.html",
+      "element": "button[aria-label]",
+      "text": "Download CSV template file"
+    },
+    {
+      "id": "create_1",
+      "file": "templates/participants/create.html",
+      "element": "p",
+      "text": "Add a new participant to {{ business_account.name }}"
+    },
+    {
+      "id": "create_2",
+      "file": "templates/participants/create.html",
+      "element": "label",
+      "text": "Email Address *"
+    },
+    {
+      "id": "create_3",
+      "file": "templates/participants/create.html",
+      "element": "div",
+      "text": "Participant's email address for survey invitation"
+    },
+    {
+      "id": "create_4",
+      "file": "templates/participants/create.html",
+      "element": "label",
+      "text": "Full Name *"
+    },
+    {
+      "id": "create_5",
+      "file": "templates/participants/create.html",
+      "element": "div",
+      "text": "Participant's full name"
+    },
+    {
+      "id": "create_6",
+      "file": "templates/participants/create.html",
+      "element": "label",
+      "text": "Company Name *"
+    },
+    {
+      "id": "create_7",
+      "file": "templates/participants/create.html",
+      "element": "div",
+      "text": "Participant's company or organization"
+    },
+    {
+      "id": "create_8",
+      "file": "templates/participants/create.html",
+      "element": "span",
+      "text": "Optional"
+    },
+    {
+      "id": "create_9",
+      "file": "templates/participants/create.html",
+      "element": "p",
+      "text": "Add segmentation data for personalized surveys and advanced analytics"
+    },
+    {
+      "id": "create_10",
+      "file": "templates/participants/create.html",
+      "element": "label",
+      "text": "Role"
+    },
+    {
+      "id": "create_11",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "Select role (optional)"
+    },
+    {
+      "id": "create_12",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "C-Level Executive"
+    },
+    {
+      "id": "create_13",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "VP / Director"
+    },
+    {
+      "id": "create_14",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "Manager"
+    },
+    {
+      "id": "create_15",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "Team Lead"
+    },
+    {
+      "id": "create_16",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "End User"
+    },
+    {
+      "id": "create_17",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "Other"
+    },
+    {
+      "id": "create_18",
+      "file": "templates/participants/create.html",
+      "element": "div",
+      "text": "Participant's role for role-based survey personalization"
+    },
+    {
+      "id": "create_19",
+      "file": "templates/participants/create.html",
+      "element": "label",
+      "text": "Region"
+    },
+    {
+      "id": "create_20",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "Select region (optional)"
+    },
+    {
+      "id": "create_21",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "North America"
+    },
+    {
+      "id": "create_22",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "Latin America (LATAM)"
+    },
+    {
+      "id": "create_23",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "Europe, Middle East & Africa (EMEA)"
+    },
+    {
+      "id": "create_24",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "Asia Pacific (APAC)"
+    },
+    {
+      "id": "create_25",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "Other"
+    },
+    {
+      "id": "create_26",
+      "file": "templates/participants/create.html",
+      "element": "div",
+      "text": "Geographic region for regional insights"
+    },
+    {
+      "id": "create_27",
+      "file": "templates/participants/create.html",
+      "element": "label",
+      "text": "Customer Tier"
+    },
+    {
+      "id": "create_28",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "Select tier (optional)"
+    },
+    {
+      "id": "create_29",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "T1: Strategic (Top 5–10% clients)"
+    },
+    {
+      "id": "create_30",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "T2: Managed (bulk of paying clients)"
+    },
+    {
+      "id": "create_31",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "T3: Self-serve or small"
+    },
+    {
+      "id": "create_32",
+      "file": "templates/participants/create.html",
+      "element": "div",
+      "text": "Customer segment for tier-based analysis"
+    },
+    {
+      "id": "create_33",
+      "file": "templates/participants/create.html",
+      "element": "label",
+      "text": "Preferred Language"
+    },
+    {
+      "id": "create_34",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "English"
+    },
+    {
+      "id": "create_35",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "Spanish"
+    },
+    {
+      "id": "create_36",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "French"
+    },
+    {
+      "id": "create_37",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "German"
+    },
+    {
+      "id": "create_38",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "Portuguese"
+    },
+    {
+      "id": "create_39",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "Chinese"
+    },
+    {
+      "id": "create_40",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "Japanese"
+    },
+    {
+      "id": "create_41",
+      "file": "templates/participants/create.html",
+      "element": "option",
+      "text": "Other"
+    },
+    {
+      "id": "create_42",
+      "file": "templates/participants/create.html",
+      "element": "div",
+      "text": "Primary language for future multilingual support"
+    },
+    {
+      "id": "create_43",
+      "file": "templates/participants/create.html",
+      "element": "label",
+      "text": "Tenure (Years)"
+    },
+    {
+      "id": "create_44",
+      "file": "templates/participants/create.html",
+      "element": "div",
+      "text": "Years the participant has been using your product/service (optional)"
+    },
+    {
+      "id": "create_45",
+      "file": "templates/participants/create.html",
+      "element": "label",
+      "text": "Company Commercial Value"
+    },
+    {
+      "id": "create_46",
+      "file": "templates/participants/create.html",
+      "element": "div",
+      "text": "Estimated account value in USD. This will be synced across all participants from the same company in your account."
+    },
+    {
+      "id": "create_47",
+      "file": "templates/participants/create.html",
+      "element": "h4",
+      "text": "1. Create"
+    },
+    {
+      "id": "create_48",
+      "file": "templates/participants/create.html",
+      "element": "p",
+      "text": "Add participant details to your account"
+    },
+    {
+      "id": "create_49",
+      "file": "templates/participants/create.html",
+      "element": "h4",
+      "text": "2. Generate Token"
+    },
+    {
+      "id": "create_50",
+      "file": "templates/participants/create.html",
+      "element": "p",
+      "text": "Unique token for survey access and anonymization"
+    },
+    {
+      "id": "create_51",
+      "file": "templates/participants/create.html",
+      "element": "h4",
+      "text": "3. Assign to Campaign"
+    },
+    {
+      "id": "create_52",
+      "file": "templates/participants/create.html",
+      "element": "p",
+      "text": "Add participant to active campaigns"
+    },
+    {
+      "id": "create_placeholder_53",
+      "file": "templates/participants/create.html",
+      "element": "input[placeholder]",
+      "text": "participant@example.com"
+    },
+    {
+      "id": "create_placeholder_54",
+      "file": "templates/participants/create.html",
+      "element": "input[placeholder]",
+      "text": "John Doe"
+    },
+    {
+      "id": "create_placeholder_55",
+      "file": "templates/participants/create.html",
+      "element": "input[placeholder]",
+      "text": "Acme Corporation"
+    },
+    {
+      "id": "create_placeholder_56",
+      "file": "templates/participants/create.html",
+      "element": "input[placeholder]",
+      "text": "e.g., 2.5"
+    },
+    {
+      "id": "create_placeholder_57",
+      "file": "templates/participants/create.html",
+      "element": "input[placeholder]",
+      "text": "e.g., 250000"
+    },
+    {
+      "id": "create_title_58",
+      "file": "templates/participants/create.html",
+      "element": "i[title]",
+      "text": "This value applies to all participants from this company"
+    },
+    {
+      "id": "create_aria_59",
+      "file": "templates/participants/create.html",
+      "element": "a[aria-label]",
+      "text": "Cancel and return to participants list"
+    },
+    {
+      "id": "create_aria_60",
+      "file": "templates/participants/create.html",
+      "element": "button[aria-label]",
+      "text": "Create participant"
+    },
+    {
+      "id": "edit_1",
+      "file": "templates/participants/edit.html",
+      "element": "p",
+      "text": "Update participant information for {{ business_account.name }}"
+    },
+    {
+      "id": "edit_2",
+      "file": "templates/participants/edit.html",
+      "element": "h5",
+      "text": "Email Address Locked"
+    },
+    {
+      "id": "edit_3",
+      "file": "templates/participants/edit.html",
+      "element": "p",
+      "text": "This participant has survey history (responses, campaign associations, or email deliveries). \n                The email address cannot be changed to protect data integrity."
+    },
+    {
+      "id": "edit_4",
+      "file": "templates/participants/edit.html",
+      "element": "label",
+      "text": "Email Address *\n                            {% if has_survey_history %}"
+    },
+    {
+      "id": "edit_5",
+      "file": "templates/participants/edit.html",
+      "element": "label",
+      "text": "Full Name *"
+    },
+    {
+      "id": "edit_6",
+      "file": "templates/participants/edit.html",
+      "element": "div",
+      "text": "Participant's full name"
+    },
+    {
+      "id": "edit_7",
+      "file": "templates/participants/edit.html",
+      "element": "label",
+      "text": "Company Name *"
+    },
+    {
+      "id": "edit_8",
+      "file": "templates/participants/edit.html",
+      "element": "div",
+      "text": "Participant's company or organization"
+    },
+    {
+      "id": "edit_9",
+      "file": "templates/participants/edit.html",
+      "element": "span",
+      "text": "Optional"
+    },
+    {
+      "id": "edit_10",
+      "file": "templates/participants/edit.html",
+      "element": "p",
+      "text": "Update segmentation data for personalized surveys and advanced analytics"
+    },
+    {
+      "id": "edit_11",
+      "file": "templates/participants/edit.html",
+      "element": "label",
+      "text": "Role"
+    },
+    {
+      "id": "edit_12",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "Select role (optional)"
+    },
+    {
+      "id": "edit_13",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "C-Level Executive"
+    },
+    {
+      "id": "edit_14",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "VP / Director"
+    },
+    {
+      "id": "edit_15",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "Manager"
+    },
+    {
+      "id": "edit_16",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "Team Lead"
+    },
+    {
+      "id": "edit_17",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "End User"
+    },
+    {
+      "id": "edit_18",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "Other"
+    },
+    {
+      "id": "edit_19",
+      "file": "templates/participants/edit.html",
+      "element": "div",
+      "text": "Participant's role for role-based survey personalization"
+    },
+    {
+      "id": "edit_20",
+      "file": "templates/participants/edit.html",
+      "element": "label",
+      "text": "Region"
+    },
+    {
+      "id": "edit_21",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "Select region (optional)"
+    },
+    {
+      "id": "edit_22",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "North America"
+    },
+    {
+      "id": "edit_23",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "Latin America (LATAM)"
+    },
+    {
+      "id": "edit_24",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "Europe, Middle East & Africa (EMEA)"
+    },
+    {
+      "id": "edit_25",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "Asia Pacific (APAC)"
+    },
+    {
+      "id": "edit_26",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "Other"
+    },
+    {
+      "id": "edit_27",
+      "file": "templates/participants/edit.html",
+      "element": "div",
+      "text": "Geographic region for regional insights"
+    },
+    {
+      "id": "edit_28",
+      "file": "templates/participants/edit.html",
+      "element": "label",
+      "text": "Customer Tier"
+    },
+    {
+      "id": "edit_29",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "Select tier (optional)"
+    },
+    {
+      "id": "edit_30",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "T1: Strategic (Top 5–10% clients)"
+    },
+    {
+      "id": "edit_31",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "T2: Managed (bulk of paying clients)"
+    },
+    {
+      "id": "edit_32",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "T3: Self-serve or small"
+    },
+    {
+      "id": "edit_33",
+      "file": "templates/participants/edit.html",
+      "element": "div",
+      "text": "Customer segment for tier-based analysis"
+    },
+    {
+      "id": "edit_34",
+      "file": "templates/participants/edit.html",
+      "element": "label",
+      "text": "Preferred Language"
+    },
+    {
+      "id": "edit_35",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "English"
+    },
+    {
+      "id": "edit_36",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "Spanish"
+    },
+    {
+      "id": "edit_37",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "French"
+    },
+    {
+      "id": "edit_38",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "German"
+    },
+    {
+      "id": "edit_39",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "Portuguese"
+    },
+    {
+      "id": "edit_40",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "Chinese"
+    },
+    {
+      "id": "edit_41",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "Japanese"
+    },
+    {
+      "id": "edit_42",
+      "file": "templates/participants/edit.html",
+      "element": "option",
+      "text": "Other"
+    },
+    {
+      "id": "edit_43",
+      "file": "templates/participants/edit.html",
+      "element": "div",
+      "text": "Primary language for future multilingual support"
+    },
+    {
+      "id": "edit_44",
+      "file": "templates/participants/edit.html",
+      "element": "label",
+      "text": "Tenure (Years)"
+    },
+    {
+      "id": "edit_45",
+      "file": "templates/participants/edit.html",
+      "element": "div",
+      "text": "Years the participant has been using your product/service (optional)"
+    },
+    {
+      "id": "edit_46",
+      "file": "templates/participants/edit.html",
+      "element": "label",
+      "text": "Company Commercial Value"
+    },
+    {
+      "id": "edit_47",
+      "file": "templates/participants/edit.html",
+      "element": "div",
+      "text": "Estimated account value in USD. This will be synced across all participants from the same company in your account."
+    },
+    {
+      "id": "edit_placeholder_48",
+      "file": "templates/participants/edit.html",
+      "element": "input[placeholder]",
+      "text": "participant@example.com"
+    },
+    {
+      "id": "edit_placeholder_49",
+      "file": "templates/participants/edit.html",
+      "element": "input[placeholder]",
+      "text": "John Doe"
+    },
+    {
+      "id": "edit_placeholder_50",
+      "file": "templates/participants/edit.html",
+      "element": "input[placeholder]",
+      "text": "Acme Corporation"
+    },
+    {
+      "id": "edit_placeholder_51",
+      "file": "templates/participants/edit.html",
+      "element": "input[placeholder]",
+      "text": "e.g., 2.5"
+    },
+    {
+      "id": "edit_placeholder_52",
+      "file": "templates/participants/edit.html",
+      "element": "input[placeholder]",
+      "text": "e.g., 250000"
+    },
+    {
+      "id": "edit_title_53",
+      "file": "templates/participants/edit.html",
+      "element": "i[title]",
+      "text": "Email locked - survey history exists"
+    },
+    {
+      "id": "edit_title_54",
+      "file": "templates/participants/edit.html",
+      "element": "i[title]",
+      "text": "This value applies to all participants from this company"
+    },
+    {
+      "id": "edit_aria_55",
+      "file": "templates/participants/edit.html",
+      "element": "button[aria-label]",
+      "text": "Close"
+    },
+    {
+      "id": "edit_aria_56",
+      "file": "templates/participants/edit.html",
+      "element": "a[aria-label]",
+      "text": "Cancel and return to participants list"
+    },
+    {
+      "id": "edit_aria_57",
+      "file": "templates/participants/edit.html",
+      "element": "button[aria-label]",
+      "text": "Update participant"
+    },
+    {
+      "id": "list_1",
+      "file": "templates/participants/list.html",
+      "element": "h1",
+      "text": "Participant Management"
+    },
+    {
+      "id": "list_2",
+      "file": "templates/participants/list.html",
+      "element": "p",
+      "text": "Manage campaign participants for {{ business_account.name }}"
+    },
+    {
+      "id": "list_3",
+      "file": "templates/participants/list.html",
+      "element": "label",
+      "text": "Company"
+    },
+    {
+      "id": "list_4",
+      "file": "templates/participants/list.html",
+      "element": "label",
+      "text": "Role"
+    },
+    {
+      "id": "list_5",
+      "file": "templates/participants/list.html",
+      "element": "label",
+      "text": "Region"
+    },
+    {
+      "id": "list_6",
+      "file": "templates/participants/list.html",
+      "element": "label",
+      "text": "Customer Tier"
+    },
+    {
+      "id": "list_7",
+      "file": "templates/participants/list.html",
+      "element": "label",
+      "text": "Language"
+    },
+    {
+      "id": "list_8",
+      "file": "templates/participants/list.html",
+      "element": "label",
+      "text": "Tenure (Years)"
+    },
+    {
+      "id": "list_9",
+      "file": "templates/participants/list.html",
+      "element": "label",
+      "text": "Search Participants"
+    },
+    {
+      "id": "list_10",
+      "file": "templates/participants/list.html",
+      "element": "span",
+      "text": "0 selected"
+    },
+    {
+      "id": "list_11",
+      "file": "templates/participants/list.html",
+      "element": "h5",
+      "text": "Participant List"
+    },
+    {
+      "id": "list_12",
+      "file": "templates/participants/list.html",
+      "element": "th",
+      "text": "Name"
+    },
+    {
+      "id": "list_13",
+      "file": "templates/participants/list.html",
+      "element": "th",
+      "text": "Email"
+    },
+    {
+      "id": "list_14",
+      "file": "templates/participants/list.html",
+      "element": "th",
+      "text": "Company"
+    },
+    {
+      "id": "list_15",
+      "file": "templates/participants/list.html",
+      "element": "th",
+      "text": "Origin"
+    },
+    {
+      "id": "list_16",
+      "file": "templates/participants/list.html",
+      "element": "th",
+      "text": "Status"
+    },
+    {
+      "id": "list_17",
+      "file": "templates/participants/list.html",
+      "element": "th",
+      "text": "Created"
+    },
+    {
+      "id": "list_18",
+      "file": "templates/participants/list.html",
+      "element": "th",
+      "text": "Actions"
+    },
+    {
+      "id": "list_19",
+      "file": "templates/participants/list.html",
+      "element": "span",
+      "text": "Unknown"
+    },
+    {
+      "id": "list_20",
+      "file": "templates/participants/list.html",
+      "element": "h3",
+      "text": "No participants {% if search_query %}match your search{% else %}yet{% endif %}"
+    },
+    {
+      "id": "list_21",
+      "file": "templates/participants/list.html",
+      "element": "p",
+      "text": "Try adjusting your search terms or clear filters to view all participants."
+    },
+    {
+      "id": "list_22",
+      "file": "templates/participants/list.html",
+      "element": "p",
+      "text": "Add individual participants or upload a CSV file to build your participant database. You can then assign them to campaigns for feedback collection."
+    },
+    {
+      "id": "list_23",
+      "file": "templates/participants/list.html",
+      "element": "label",
+      "text": "Update Role"
+    },
+    {
+      "id": "list_24",
+      "file": "templates/participants/list.html",
+      "element": "label",
+      "text": "Update Region"
+    },
+    {
+      "id": "list_25",
+      "file": "templates/participants/list.html",
+      "element": "label",
+      "text": "Update Customer Tier"
+    },
+    {
+      "id": "list_26",
+      "file": "templates/participants/list.html",
+      "element": "option",
+      "text": "Select tier..."
+    },
+    {
+      "id": "list_27",
+      "file": "templates/participants/list.html",
+      "element": "option",
+      "text": "Enterprise"
+    },
+    {
+      "id": "list_28",
+      "file": "templates/participants/list.html",
+      "element": "option",
+      "text": "Premium"
+    },
+    {
+      "id": "list_29",
+      "file": "templates/participants/list.html",
+      "element": "option",
+      "text": "Standard"
+    },
+    {
+      "id": "list_30",
+      "file": "templates/participants/list.html",
+      "element": "option",
+      "text": "Basic"
+    },
+    {
+      "id": "list_31",
+      "file": "templates/participants/list.html",
+      "element": "label",
+      "text": "Update Language"
+    },
+    {
+      "id": "list_32",
+      "file": "templates/participants/list.html",
+      "element": "label",
+      "text": "Update Tenure (years)"
+    },
+    {
+      "id": "list_33",
+      "file": "templates/participants/list.html",
+      "element": "label",
+      "text": "Update Commercial Value ($)"
+    },
+    {
+      "id": "list_34",
+      "file": "templates/participants/list.html",
+      "element": "button",
+      "text": "Cancel"
+    },
+    {
+      "id": "list_placeholder_35",
+      "file": "templates/participants/list.html",
+      "element": "input[placeholder]",
+      "text": "Search by name, email, or company..."
+    },
+    {
+      "id": "list_placeholder_36",
+      "file": "templates/participants/list.html",
+      "element": "input[placeholder]",
+      "text": "e.g., Manager, Director"
+    },
+    {
+      "id": "list_placeholder_37",
+      "file": "templates/participants/list.html",
+      "element": "input[placeholder]",
+      "text": "e.g., North America, EMEA"
+    },
+    {
+      "id": "list_placeholder_38",
+      "file": "templates/participants/list.html",
+      "element": "input[placeholder]",
+      "text": "e.g., English, Spanish"
+    },
+    {
+      "id": "list_placeholder_39",
+      "file": "templates/participants/list.html",
+      "element": "input[placeholder]",
+      "text": "e.g., 2.5"
+    },
+    {
+      "id": "list_placeholder_40",
+      "file": "templates/participants/list.html",
+      "element": "input[placeholder]",
+      "text": "e.g., 50000"
+    },
+    {
+      "id": "list_title_41",
+      "file": "templates/participants/list.html",
+      "element": "a[title]",
+      "text": "Edit participant"
+    },
+    {
+      "id": "list_title_42",
+      "file": "templates/participants/list.html",
+      "element": "button[title]",
+      "text": "Delete participant"
+    },
+    {
+      "id": "list_aria_43",
+      "file": "templates/participants/list.html",
+      "element": "select[aria-label]",
+      "text": "Filter by company"
+    },
+    {
+      "id": "list_aria_44",
+      "file": "templates/participants/list.html",
+      "element": "select[aria-label]",
+      "text": "Filter by role"
+    },
+    {
+      "id": "list_aria_45",
+      "file": "templates/participants/list.html",
+      "element": "select[aria-label]",
+      "text": "Filter by region"
+    },
+    {
+      "id": "list_aria_46",
+      "file": "templates/participants/list.html",
+      "element": "select[aria-label]",
+      "text": "Filter by customer tier"
+    },
+    {
+      "id": "list_aria_47",
+      "file": "templates/participants/list.html",
+      "element": "select[aria-label]",
+      "text": "Filter by language"
+    },
+    {
+      "id": "list_aria_48",
+      "file": "templates/participants/list.html",
+      "element": "select[aria-label]",
+      "text": "Filter by tenure"
+    },
+    {
+      "id": "list_aria_49",
+      "file": "templates/participants/list.html",
+      "element": "div[aria-label]",
+      "text": "Participant actions"
+    },
+    {
+      "id": "list_aria_50",
+      "file": "templates/participants/list.html",
+      "element": "a[aria-label]",
+      "text": "Edit {{ participant.name }}"
+    },
+    {
+      "id": "list_aria_51",
+      "file": "templates/participants/list.html",
+      "element": "button[aria-label]",
+      "text": "Delete {{ participant.name }}"
+    },
+    {
+      "id": "list_aria_52",
+      "file": "templates/participants/list.html",
+      "element": "button[aria-label]",
+      "text": "Close"
+    },
+    {
+      "id": "campaign_participants_1",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "p",
+      "text": "Manage participants for this campaign"
+    },
+    {
+      "id": "campaign_participants_2",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "div",
+      "text": "Total Participants"
+    },
+    {
+      "id": "campaign_participants_3",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "div",
+      "text": "Invited"
+    },
+    {
+      "id": "campaign_participants_4",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "div",
+      "text": "Started"
+    },
+    {
+      "id": "campaign_participants_5",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "div",
+      "text": "Completed"
+    },
+    {
+      "id": "campaign_participants_6",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "label",
+      "text": "Company"
+    },
+    {
+      "id": "campaign_participants_7",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "label",
+      "text": "Role"
+    },
+    {
+      "id": "campaign_participants_8",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "label",
+      "text": "Region"
+    },
+    {
+      "id": "campaign_participants_9",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "label",
+      "text": "Customer Tier"
+    },
+    {
+      "id": "campaign_participants_10",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "label",
+      "text": "Language"
+    },
+    {
+      "id": "campaign_participants_11",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "label",
+      "text": "Tenure (Years)"
+    },
+    {
+      "id": "campaign_participants_12",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "p",
+      "text": "No participants match your search"
+    },
+    {
+      "id": "campaign_participants_13",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "label",
+      "text": "Search Campaign Participants"
+    },
+    {
+      "id": "campaign_participants_14",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "th",
+      "text": "Participant"
+    },
+    {
+      "id": "campaign_participants_15",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "th",
+      "text": "Email"
+    },
+    {
+      "id": "campaign_participants_16",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "th",
+      "text": "Company"
+    },
+    {
+      "id": "campaign_participants_17",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "th",
+      "text": "Status"
+    },
+    {
+      "id": "campaign_participants_18",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "th",
+      "text": "Progress"
+    },
+    {
+      "id": "campaign_participants_19",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "th",
+      "text": "Survey Link"
+    },
+    {
+      "id": "campaign_participants_20",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "th",
+      "text": "Actions"
+    },
+    {
+      "id": "campaign_participants_21",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "span",
+      "text": "No token"
+    },
+    {
+      "id": "campaign_participants_22",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "h6",
+      "text": "No participants assigned to this campaign yet"
+    },
+    {
+      "id": "campaign_participants_23",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "p",
+      "text": "Use the form above to add participants to this campaign."
+    },
+    {
+      "id": "campaign_participants_24",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "p",
+      "text": "Create participants first, then assign them to campaigns."
+    },
+    {
+      "id": "campaign_participants_25",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "span",
+      "text": "Can add/remove participants"
+    },
+    {
+      "id": "campaign_participants_26",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "span",
+      "text": "Can add/remove participants"
+    },
+    {
+      "id": "campaign_participants_27",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "span",
+      "text": "Participant list locked - collecting responses"
+    },
+    {
+      "id": "campaign_participants_28",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "span",
+      "text": "Participant list permanently locked"
+    },
+    {
+      "id": "campaign_participants_29",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "p",
+      "text": "The campaign is being prepared. You can freely add or remove participants, modify campaign details, and prepare for launch."
+    },
+    {
+      "id": "campaign_participants_30",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "p",
+      "text": "Campaign is prepared and ready to go live. You can still add or remove participants until the campaign is activated."
+    },
+    {
+      "id": "campaign_participants_31",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "p",
+      "text": "Campaign is live and collecting survey responses. Participant list is locked to maintain data integrity. Wait for completion to modify participants."
+    },
+    {
+      "id": "campaign_participants_32",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "p",
+      "text": "Campaign has finished. All data is preserved and participant list is permanently locked to maintain historical accuracy."
+    },
+    {
+      "id": "campaign_participants_33",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "li",
+      "text": "Remove the selected participants from this campaign"
+    },
+    {
+      "id": "campaign_participants_34",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "li",
+      "text": "Not delete the participant records (they can be re-added later)"
+    },
+    {
+      "id": "campaign_participants_35",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "li",
+      "text": "Not affect their participation in other campaigns"
+    },
+    {
+      "id": "campaign_participants_36",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "button",
+      "text": "Cancel"
+    },
+    {
+      "id": "campaign_participants_placeholder_37",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "input[placeholder]",
+      "text": "Quick search by name, email, or company..."
+    },
+    {
+      "id": "campaign_participants_placeholder_38",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "input[placeholder]",
+      "text": "Search participants by name, email, or company..."
+    },
+    {
+      "id": "campaign_participants_title_39",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "button[title]",
+      "text": "Cannot remove participants from {{ campaign.status }} campaign"
+    },
+    {
+      "id": "campaign_participants_aria_40",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "form[aria-label]",
+      "text": "Filter participants form"
+    },
+    {
+      "id": "campaign_participants_aria_41",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "select[aria-label]",
+      "text": "Filter by company"
+    },
+    {
+      "id": "campaign_participants_aria_42",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "select[aria-label]",
+      "text": "Filter by role"
+    },
+    {
+      "id": "campaign_participants_aria_43",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "select[aria-label]",
+      "text": "Filter by region"
+    },
+    {
+      "id": "campaign_participants_aria_44",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "select[aria-label]",
+      "text": "Filter by customer tier"
+    },
+    {
+      "id": "campaign_participants_aria_45",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "select[aria-label]",
+      "text": "Filter by language"
+    },
+    {
+      "id": "campaign_participants_aria_46",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "select[aria-label]",
+      "text": "Filter by tenure"
+    },
+    {
+      "id": "campaign_participants_aria_47",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "button[aria-label]",
+      "text": "Apply filters"
+    },
+    {
+      "id": "campaign_participants_aria_48",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "button[aria-label]",
+      "text": "Clear all filters"
+    }
+  ],
+  "flash_messages": [],
+  "email_templates": []
+}

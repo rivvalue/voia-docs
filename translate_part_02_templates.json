@@ -1,0 +1,1449 @@
+{
+  "metadata": {
+    "project": "VOÏA - Voice Of Client",
+    "source_language": "English",
+    "target_language": "French",
+    "extraction_date": "2025-10-24",
+    "total_files": 10,
+    "total_strings": 2161,
+    "file_number": 2,
+    "part_description": "Templates Part 2/8"
+  },
+  "instructions": {
+    "overview": "Translate all 'text' field values from English to French (France market, professional SaaS tone)",
+    "rules": [
+      "Translate ONLY the 'text' field values",
+      "Keep all other fields (id, file, type, element, etc.) UNCHANGED",
+      "Preserve {variables}, {{variables}}, and {%...%} syntax exactly as-is",
+      "Use professional business French suitable for SaaS platform",
+      "Maintain consistent terminology throughout",
+      "Keep technical terms like 'NPS', 'API', 'VOÏA' unchanged unless noted"
+    ]
+  },
+  "templates": [
+    {
+      "id": "dashboard_139",
+      "file": "templates/dashboard.html",
+      "element": "th",
+      "text": "Date"
+    },
+    {
+      "id": "dashboard_140",
+      "file": "templates/dashboard.html",
+      "element": "th",
+      "text": "Details"
+    },
+    {
+      "id": "dashboard_141",
+      "file": "templates/dashboard.html",
+      "element": "option",
+      "text": "Newest First"
+    },
+    {
+      "id": "dashboard_142",
+      "file": "templates/dashboard.html",
+      "element": "option",
+      "text": "Oldest First"
+    },
+    {
+      "id": "dashboard_143",
+      "file": "templates/dashboard.html",
+      "element": "option",
+      "text": "Highest NPS"
+    },
+    {
+      "id": "dashboard_144",
+      "file": "templates/dashboard.html",
+      "element": "option",
+      "text": "Lowest NPS"
+    },
+    {
+      "id": "dashboard_145",
+      "file": "templates/dashboard.html",
+      "element": "span",
+      "text": "Loading..."
+    },
+    {
+      "id": "dashboard_146",
+      "file": "templates/dashboard.html",
+      "element": "p",
+      "text": "Loading responses..."
+    },
+    {
+      "id": "dashboard_147",
+      "file": "templates/dashboard.html",
+      "element": "th",
+      "text": "Respondent"
+    },
+    {
+      "id": "dashboard_148",
+      "file": "templates/dashboard.html",
+      "element": "th",
+      "text": "NPS"
+    },
+    {
+      "id": "dashboard_149",
+      "file": "templates/dashboard.html",
+      "element": "th",
+      "text": "Ratings"
+    },
+    {
+      "id": "dashboard_150",
+      "file": "templates/dashboard.html",
+      "element": "th",
+      "text": "Date"
+    },
+    {
+      "id": "dashboard_151",
+      "file": "templates/dashboard.html",
+      "element": "th",
+      "text": "Action"
+    },
+    {
+      "id": "dashboard_152",
+      "file": "templates/dashboard.html",
+      "element": "h5",
+      "text": "No Responses Found"
+    },
+    {
+      "id": "dashboard_153",
+      "file": "templates/dashboard.html",
+      "element": "p",
+      "text": "No survey responses match your search criteria."
+    },
+    {
+      "id": "dashboard_154",
+      "file": "templates/dashboard.html",
+      "element": "h6",
+      "text": "Responses"
+    },
+    {
+      "id": "dashboard_155",
+      "file": "templates/dashboard.html",
+      "element": "h6",
+      "text": "NPS Score"
+    },
+    {
+      "id": "dashboard_156",
+      "file": "templates/dashboard.html",
+      "element": "h6",
+      "text": "Companies Analyzed"
+    },
+    {
+      "id": "dashboard_157",
+      "file": "templates/dashboard.html",
+      "element": "h6",
+      "text": "Critical Risk"
+    },
+    {
+      "id": "dashboard_158",
+      "file": "templates/dashboard.html",
+      "element": "h6",
+      "text": "Satisfaction"
+    },
+    {
+      "id": "dashboard_159",
+      "file": "templates/dashboard.html",
+      "element": "h6",
+      "text": "Product Value"
+    },
+    {
+      "id": "dashboard_160",
+      "file": "templates/dashboard.html",
+      "element": "h6",
+      "text": "Pricing"
+    },
+    {
+      "id": "dashboard_161",
+      "file": "templates/dashboard.html",
+      "element": "h6",
+      "text": "Service"
+    },
+    {
+      "id": "dashboard_162",
+      "file": "templates/dashboard.html",
+      "element": "button",
+      "text": "Close"
+    },
+    {
+      "id": "dashboard_placeholder_163",
+      "file": "templates/dashboard.html",
+      "element": "input[placeholder]",
+      "text": "Search by company name..."
+    },
+    {
+      "id": "dashboard_placeholder_164",
+      "file": "templates/dashboard.html",
+      "element": "input[placeholder]",
+      "text": "Search company, opportunities, risks..."
+    },
+    {
+      "id": "dashboard_placeholder_165",
+      "file": "templates/dashboard.html",
+      "element": "input[placeholder]",
+      "text": "Search by company name..."
+    },
+    {
+      "id": "dashboard_placeholder_166",
+      "file": "templates/dashboard.html",
+      "element": "input[placeholder]",
+      "text": "Search by company name, participant name, or email..."
+    },
+    {
+      "id": "dashboard_placeholder_167",
+      "file": "templates/dashboard.html",
+      "element": "input[placeholder]",
+      "text": "Search by respondent name or email..."
+    },
+    {
+      "id": "dashboard_title_168",
+      "file": "templates/dashboard.html",
+      "element": "button[title]",
+      "text": "Refresh data"
+    },
+    {
+      "id": "dashboard_title_169",
+      "file": "templates/dashboard.html",
+      "element": "div[title]",
+      "text": "Click to view full trends"
+    },
+    {
+      "id": "dashboard_title_170",
+      "file": "templates/dashboard.html",
+      "element": "div[title]",
+      "text": "Click to view full trends"
+    },
+    {
+      "id": "dashboard_title_171",
+      "file": "templates/dashboard.html",
+      "element": "div[title]",
+      "text": "Click to view full trends"
+    },
+    {
+      "id": "dashboard_title_172",
+      "file": "templates/dashboard.html",
+      "element": "div[title]",
+      "text": "Click to view full trends"
+    },
+    {
+      "id": "dashboard_title_173",
+      "file": "templates/dashboard.html",
+      "element": "div[title]",
+      "text": "Click to view full trends"
+    },
+    {
+      "id": "dashboard_title_174",
+      "file": "templates/dashboard.html",
+      "element": "div[title]",
+      "text": "Click to view full trends"
+    },
+    {
+      "id": "dashboard_title_175",
+      "file": "templates/dashboard.html",
+      "element": "div[title]",
+      "text": "Click to view full trends"
+    },
+    {
+      "id": "dashboard_title_176",
+      "file": "templates/dashboard.html",
+      "element": "div[title]",
+      "text": "Click to view full trends"
+    },
+    {
+      "id": "dashboard_title_177",
+      "file": "templates/dashboard.html",
+      "element": "button[title]",
+      "text": "Clear Filter"
+    },
+    {
+      "id": "dashboard_title_178",
+      "file": "templates/dashboard.html",
+      "element": "i[title]",
+      "text": "Companies with High or Critical churn risk level based on AI assessment"
+    },
+    {
+      "id": "dashboard_title_179",
+      "file": "templates/dashboard.html",
+      "element": "i[title]",
+      "text": "Companies with High or Critical churn risk level"
+    },
+    {
+      "id": "dashboard_title_180",
+      "file": "templates/dashboard.html",
+      "element": "i[title]",
+      "text": "Shows account health balance: Risk-Heavy (risks outweigh opportunities), High Potential (opportunities with minimal risks), or Balanced"
+    },
+    {
+      "id": "dashboard_aria_181",
+      "file": "templates/dashboard.html",
+      "element": "nav[aria-label]",
+      "text": "Comparison table pagination"
+    },
+    {
+      "id": "dashboard_aria_182",
+      "file": "templates/dashboard.html",
+      "element": "nav[aria-label]",
+      "text": "Account Intelligence pagination"
+    },
+    {
+      "id": "dashboard_aria_183",
+      "file": "templates/dashboard.html",
+      "element": "nav[aria-label]",
+      "text": "Company NPS pagination"
+    },
+    {
+      "id": "dashboard_aria_184",
+      "file": "templates/dashboard.html",
+      "element": "nav[aria-label]",
+      "text": "Tenure NPS pagination"
+    },
+    {
+      "id": "dashboard_aria_185",
+      "file": "templates/dashboard.html",
+      "element": "nav[aria-label]",
+      "text": "Survey responses pagination"
+    },
+    {
+      "id": "dashboard_aria_186",
+      "file": "templates/dashboard.html",
+      "element": "button[aria-label]",
+      "text": "Close"
+    },
+    {
+      "id": "dashboard_aria_187",
+      "file": "templates/dashboard.html",
+      "element": "button[aria-label]",
+      "text": "Close"
+    },
+    {
+      "id": "executive_summary_1",
+      "file": "templates/executive_summary.html",
+      "element": "h1",
+      "text": "Executive Summary"
+    },
+    {
+      "id": "executive_summary_2",
+      "file": "templates/executive_summary.html",
+      "element": "p",
+      "text": "High-level overview of key performance indicators across all campaigns"
+    },
+    {
+      "id": "executive_summary_3",
+      "file": "templates/executive_summary.html",
+      "element": "span",
+      "text": "Loading executive summary..."
+    },
+    {
+      "id": "executive_summary_4",
+      "file": "templates/executive_summary.html",
+      "element": "div",
+      "text": "Loading executive summary..."
+    },
+    {
+      "id": "executive_summary_5",
+      "file": "templates/executive_summary.html",
+      "element": "h5",
+      "text": "Campaign KPI Overview"
+    },
+    {
+      "id": "executive_summary_6",
+      "file": "templates/executive_summary.html",
+      "element": "th",
+      "text": "Campaign"
+    },
+    {
+      "id": "executive_summary_7",
+      "file": "templates/executive_summary.html",
+      "element": "th",
+      "text": "Responses"
+    },
+    {
+      "id": "executive_summary_8",
+      "file": "templates/executive_summary.html",
+      "element": "th",
+      "text": "NPS"
+    },
+    {
+      "id": "executive_summary_9",
+      "file": "templates/executive_summary.html",
+      "element": "th",
+      "text": "Companies"
+    },
+    {
+      "id": "executive_summary_10",
+      "file": "templates/executive_summary.html",
+      "element": "th",
+      "text": "Critical Risk"
+    },
+    {
+      "id": "executive_summary_11",
+      "file": "templates/executive_summary.html",
+      "element": "th",
+      "text": "Satisfaction"
+    },
+    {
+      "id": "executive_summary_12",
+      "file": "templates/executive_summary.html",
+      "element": "th",
+      "text": "Product"
+    },
+    {
+      "id": "executive_summary_13",
+      "file": "templates/executive_summary.html",
+      "element": "th",
+      "text": "Pricing"
+    },
+    {
+      "id": "executive_summary_14",
+      "file": "templates/executive_summary.html",
+      "element": "th",
+      "text": "Service"
+    },
+    {
+      "id": "executive_summary_15",
+      "file": "templates/executive_summary.html",
+      "element": "h5",
+      "text": "Campaign Comparison"
+    },
+    {
+      "id": "executive_summary_16",
+      "file": "templates/executive_summary.html",
+      "element": "label",
+      "text": "Campaign 1"
+    },
+    {
+      "id": "executive_summary_17",
+      "file": "templates/executive_summary.html",
+      "element": "option",
+      "text": "Select first campaign"
+    },
+    {
+      "id": "executive_summary_18",
+      "file": "templates/executive_summary.html",
+      "element": "label",
+      "text": "Campaign 2"
+    },
+    {
+      "id": "executive_summary_19",
+      "file": "templates/executive_summary.html",
+      "element": "option",
+      "text": "Select second campaign"
+    },
+    {
+      "id": "executive_summary_20",
+      "file": "templates/executive_summary.html",
+      "element": "p",
+      "text": "Please select two campaigns above to view comparison results"
+    },
+    {
+      "id": "executive_summary_21",
+      "file": "templates/executive_summary.html",
+      "element": "h6",
+      "text": "Metrics Comparison"
+    },
+    {
+      "id": "executive_summary_22",
+      "file": "templates/executive_summary.html",
+      "element": "th",
+      "text": "Metric"
+    },
+    {
+      "id": "executive_summary_23",
+      "file": "templates/executive_summary.html",
+      "element": "th",
+      "text": "Campaign 1"
+    },
+    {
+      "id": "executive_summary_24",
+      "file": "templates/executive_summary.html",
+      "element": "th",
+      "text": "Campaign 2"
+    },
+    {
+      "id": "executive_summary_25",
+      "file": "templates/executive_summary.html",
+      "element": "th",
+      "text": "Change"
+    },
+    {
+      "id": "executive_summary_26",
+      "file": "templates/executive_summary.html",
+      "element": "h6",
+      "text": "Account-by-Account Analysis"
+    },
+    {
+      "id": "executive_summary_27",
+      "file": "templates/executive_summary.html",
+      "element": "label",
+      "text": "Search"
+    },
+    {
+      "id": "executive_summary_28",
+      "file": "templates/executive_summary.html",
+      "element": "label",
+      "text": "Balance Status"
+    },
+    {
+      "id": "executive_summary_29",
+      "file": "templates/executive_summary.html",
+      "element": "option",
+      "text": "All Companies"
+    },
+    {
+      "id": "executive_summary_30",
+      "file": "templates/executive_summary.html",
+      "element": "option",
+      "text": "Opportunity Heavy"
+    },
+    {
+      "id": "executive_summary_31",
+      "file": "templates/executive_summary.html",
+      "element": "option",
+      "text": "Balanced"
+    },
+    {
+      "id": "executive_summary_32",
+      "file": "templates/executive_summary.html",
+      "element": "option",
+      "text": "Risk Heavy"
+    },
+    {
+      "id": "executive_summary_33",
+      "file": "templates/executive_summary.html",
+      "element": "th",
+      "text": "Company"
+    },
+    {
+      "id": "executive_summary_34",
+      "file": "templates/executive_summary.html",
+      "element": "th",
+      "text": "C1 Risks"
+    },
+    {
+      "id": "executive_summary_35",
+      "file": "templates/executive_summary.html",
+      "element": "th",
+      "text": "C1 Opps"
+    },
+    {
+      "id": "executive_summary_36",
+      "file": "templates/executive_summary.html",
+      "element": "th",
+      "text": "C1 Balance"
+    },
+    {
+      "id": "executive_summary_37",
+      "file": "templates/executive_summary.html",
+      "element": "th",
+      "text": "C2 Risks"
+    },
+    {
+      "id": "executive_summary_38",
+      "file": "templates/executive_summary.html",
+      "element": "th",
+      "text": "C2 Opps"
+    },
+    {
+      "id": "executive_summary_39",
+      "file": "templates/executive_summary.html",
+      "element": "th",
+      "text": "C2 Balance"
+    },
+    {
+      "id": "executive_summary_40",
+      "file": "templates/executive_summary.html",
+      "element": "th",
+      "text": "Status"
+    },
+    {
+      "id": "executive_summary_41",
+      "file": "templates/executive_summary.html",
+      "element": "h6",
+      "text": "Total Responses"
+    },
+    {
+      "id": "executive_summary_42",
+      "file": "templates/executive_summary.html",
+      "element": "h6",
+      "text": "NPS Score"
+    },
+    {
+      "id": "executive_summary_43",
+      "file": "templates/executive_summary.html",
+      "element": "h6",
+      "text": "Companies Analyzed"
+    },
+    {
+      "id": "executive_summary_44",
+      "file": "templates/executive_summary.html",
+      "element": "h6",
+      "text": "Critical Risk Count"
+    },
+    {
+      "id": "executive_summary_45",
+      "file": "templates/executive_summary.html",
+      "element": "h6",
+      "text": "Satisfaction"
+    },
+    {
+      "id": "executive_summary_46",
+      "file": "templates/executive_summary.html",
+      "element": "h6",
+      "text": "Product Value"
+    },
+    {
+      "id": "executive_summary_47",
+      "file": "templates/executive_summary.html",
+      "element": "h6",
+      "text": "Pricing"
+    },
+    {
+      "id": "executive_summary_48",
+      "file": "templates/executive_summary.html",
+      "element": "h6",
+      "text": "Service"
+    },
+    {
+      "id": "executive_summary_49",
+      "file": "templates/executive_summary.html",
+      "element": "button",
+      "text": "Close"
+    },
+    {
+      "id": "executive_summary_placeholder_50",
+      "file": "templates/executive_summary.html",
+      "element": "input[placeholder]",
+      "text": "Search by company name..."
+    },
+    {
+      "id": "executive_summary_title_51",
+      "file": "templates/executive_summary.html",
+      "element": "button[title]",
+      "text": "Refresh data"
+    },
+    {
+      "id": "executive_summary_title_52",
+      "file": "templates/executive_summary.html",
+      "element": "div[title]",
+      "text": "Click to view full trends"
+    },
+    {
+      "id": "executive_summary_title_53",
+      "file": "templates/executive_summary.html",
+      "element": "div[title]",
+      "text": "Click to view full trends"
+    },
+    {
+      "id": "executive_summary_title_54",
+      "file": "templates/executive_summary.html",
+      "element": "div[title]",
+      "text": "Click to view full trends"
+    },
+    {
+      "id": "executive_summary_title_55",
+      "file": "templates/executive_summary.html",
+      "element": "div[title]",
+      "text": "Click to view full trends"
+    },
+    {
+      "id": "executive_summary_title_56",
+      "file": "templates/executive_summary.html",
+      "element": "div[title]",
+      "text": "Click to view full trends"
+    },
+    {
+      "id": "executive_summary_title_57",
+      "file": "templates/executive_summary.html",
+      "element": "div[title]",
+      "text": "Click to view full trends"
+    },
+    {
+      "id": "executive_summary_title_58",
+      "file": "templates/executive_summary.html",
+      "element": "div[title]",
+      "text": "Click to view full trends"
+    },
+    {
+      "id": "executive_summary_title_59",
+      "file": "templates/executive_summary.html",
+      "element": "div[title]",
+      "text": "Click to view full trends"
+    },
+    {
+      "id": "executive_summary_aria_60",
+      "file": "templates/executive_summary.html",
+      "element": "nav[aria-label]",
+      "text": "Comparison table pagination"
+    },
+    {
+      "id": "executive_summary_aria_61",
+      "file": "templates/executive_summary.html",
+      "element": "button[aria-label]",
+      "text": "Close"
+    },
+    {
+      "id": "campaign_insights_1",
+      "file": "templates/campaign_insights.html",
+      "element": "h1",
+      "text": "Campaign Insights"
+    },
+    {
+      "id": "campaign_insights_2",
+      "file": "templates/campaign_insights.html",
+      "element": "p",
+      "text": "Campaign-specific performance analytics and survey insights"
+    },
+    {
+      "id": "campaign_insights_3",
+      "file": "templates/campaign_insights.html",
+      "element": "h6",
+      "text": "Campaign Analytics Filter"
+    },
+    {
+      "id": "campaign_insights_4",
+      "file": "templates/campaign_insights.html",
+      "element": "label",
+      "text": "Campaign:"
+    },
+    {
+      "id": "campaign_insights_5",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "Select Campaign"
+    },
+    {
+      "id": "campaign_insights_6",
+      "file": "templates/campaign_insights.html",
+      "element": "span",
+      "text": "Loading dashboard data..."
+    },
+    {
+      "id": "campaign_insights_7",
+      "file": "templates/campaign_insights.html",
+      "element": "div",
+      "text": "Loading dashboard data..."
+    },
+    {
+      "id": "campaign_insights_8",
+      "file": "templates/campaign_insights.html",
+      "element": "span",
+      "text": "Campaign Name"
+    },
+    {
+      "id": "campaign_insights_9",
+      "file": "templates/campaign_insights.html",
+      "element": "span",
+      "text": "Jan 1 - Dec 31, 2024"
+    },
+    {
+      "id": "campaign_insights_10",
+      "file": "templates/campaign_insights.html",
+      "element": "div",
+      "text": "NPS Score"
+    },
+    {
+      "id": "campaign_insights_11",
+      "file": "templates/campaign_insights.html",
+      "element": "div",
+      "text": "Overall satisfaction metric"
+    },
+    {
+      "id": "campaign_insights_12",
+      "file": "templates/campaign_insights.html",
+      "element": "div",
+      "text": "Total Responses"
+    },
+    {
+      "id": "campaign_insights_13",
+      "file": "templates/campaign_insights.html",
+      "element": "div",
+      "text": "All time feedback collected"
+    },
+    {
+      "id": "campaign_insights_14",
+      "file": "templates/campaign_insights.html",
+      "element": "div",
+      "text": "Recent (30 days)"
+    },
+    {
+      "id": "campaign_insights_15",
+      "file": "templates/campaign_insights.html",
+      "element": "div",
+      "text": "Latest customer feedback"
+    },
+    {
+      "id": "campaign_insights_16",
+      "file": "templates/campaign_insights.html",
+      "element": "div",
+      "text": "High Churn Risk Accounts"
+    },
+    {
+      "id": "campaign_insights_17",
+      "file": "templates/campaign_insights.html",
+      "element": "div",
+      "text": "Imminent churn risk (High/Critical)"
+    },
+    {
+      "id": "campaign_insights_18",
+      "file": "templates/campaign_insights.html",
+      "element": "div",
+      "text": "0%"
+    },
+    {
+      "id": "campaign_insights_19",
+      "file": "templates/campaign_insights.html",
+      "element": "div",
+      "text": "Growth Potential"
+    },
+    {
+      "id": "campaign_insights_20",
+      "file": "templates/campaign_insights.html",
+      "element": "div",
+      "text": "Revenue expansion opportunity"
+    },
+    {
+      "id": "campaign_insights_21",
+      "file": "templates/campaign_insights.html",
+      "element": "h5",
+      "text": "High Churn Risk Accounts"
+    },
+    {
+      "id": "campaign_insights_22",
+      "file": "templates/campaign_insights.html",
+      "element": "h5",
+      "text": "Key Themes"
+    },
+    {
+      "id": "campaign_insights_23",
+      "file": "templates/campaign_insights.html",
+      "element": "h5",
+      "text": "Account Intelligence"
+    },
+    {
+      "id": "campaign_insights_24",
+      "file": "templates/campaign_insights.html",
+      "element": "label",
+      "text": "Search"
+    },
+    {
+      "id": "campaign_insights_25",
+      "file": "templates/campaign_insights.html",
+      "element": "label",
+      "text": "Balance"
+    },
+    {
+      "id": "campaign_insights_26",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "All"
+    },
+    {
+      "id": "campaign_insights_27",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "Risk-Heavy"
+    },
+    {
+      "id": "campaign_insights_28",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "Balanced"
+    },
+    {
+      "id": "campaign_insights_29",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "High Potential"
+    },
+    {
+      "id": "campaign_insights_30",
+      "file": "templates/campaign_insights.html",
+      "element": "label",
+      "text": "Risk Level"
+    },
+    {
+      "id": "campaign_insights_31",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "All"
+    },
+    {
+      "id": "campaign_insights_32",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "Critical"
+    },
+    {
+      "id": "campaign_insights_33",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "High"
+    },
+    {
+      "id": "campaign_insights_34",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "Medium"
+    },
+    {
+      "id": "campaign_insights_35",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "Low"
+    },
+    {
+      "id": "campaign_insights_36",
+      "file": "templates/campaign_insights.html",
+      "element": "label",
+      "text": "Opportunities"
+    },
+    {
+      "id": "campaign_insights_37",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "All"
+    },
+    {
+      "id": "campaign_insights_38",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "Has Opportunities"
+    },
+    {
+      "id": "campaign_insights_39",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "No Opportunities"
+    },
+    {
+      "id": "campaign_insights_40",
+      "file": "templates/campaign_insights.html",
+      "element": "label",
+      "text": "Has Risks"
+    },
+    {
+      "id": "campaign_insights_41",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "All"
+    },
+    {
+      "id": "campaign_insights_42",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "Has Risks"
+    },
+    {
+      "id": "campaign_insights_43",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "No Risks"
+    },
+    {
+      "id": "campaign_insights_44",
+      "file": "templates/campaign_insights.html",
+      "element": "span",
+      "text": "Loading..."
+    },
+    {
+      "id": "campaign_insights_45",
+      "file": "templates/campaign_insights.html",
+      "element": "h5",
+      "text": "NPS Distribution"
+    },
+    {
+      "id": "campaign_insights_46",
+      "file": "templates/campaign_insights.html",
+      "element": "h5",
+      "text": "Sentiment Analysis"
+    },
+    {
+      "id": "campaign_insights_47",
+      "file": "templates/campaign_insights.html",
+      "element": "h5",
+      "text": "Customer Tenure Distribution"
+    },
+    {
+      "id": "campaign_insights_48",
+      "file": "templates/campaign_insights.html",
+      "element": "h5",
+      "text": "NPS-Based Growth Factor Analysis"
+    },
+    {
+      "id": "campaign_insights_49",
+      "file": "templates/campaign_insights.html",
+      "element": "h5",
+      "text": "Average Ratings"
+    },
+    {
+      "id": "campaign_insights_50",
+      "file": "templates/campaign_insights.html",
+      "element": "h5",
+      "text": "NPS by Client Company"
+    },
+    {
+      "id": "campaign_insights_51",
+      "file": "templates/campaign_insights.html",
+      "element": "label",
+      "text": "Search"
+    },
+    {
+      "id": "campaign_insights_52",
+      "file": "templates/campaign_insights.html",
+      "element": "label",
+      "text": "NPS Category"
+    },
+    {
+      "id": "campaign_insights_53",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "All Companies"
+    },
+    {
+      "id": "campaign_insights_54",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "Promoters (9-10)"
+    },
+    {
+      "id": "campaign_insights_55",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "Passives (7-8)"
+    },
+    {
+      "id": "campaign_insights_56",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "Detractors (0-6)"
+    },
+    {
+      "id": "campaign_insights_57",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Company Name"
+    },
+    {
+      "id": "campaign_insights_58",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Respondents"
+    },
+    {
+      "id": "campaign_insights_59",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Avg Individual NPS"
+    },
+    {
+      "id": "campaign_insights_60",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Company NPS"
+    },
+    {
+      "id": "campaign_insights_61",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Distribution"
+    },
+    {
+      "id": "campaign_insights_62",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Risk Level"
+    },
+    {
+      "id": "campaign_insights_63",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Latest Response"
+    },
+    {
+      "id": "campaign_insights_64",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Latest Churn Risk"
+    },
+    {
+      "id": "campaign_insights_65",
+      "file": "templates/campaign_insights.html",
+      "element": "td",
+      "text": "No company data available yet"
+    },
+    {
+      "id": "campaign_insights_66",
+      "file": "templates/campaign_insights.html",
+      "element": "span",
+      "text": "Low (>20)"
+    },
+    {
+      "id": "campaign_insights_67",
+      "file": "templates/campaign_insights.html",
+      "element": "span",
+      "text": "Medium (-20 to 20)"
+    },
+    {
+      "id": "campaign_insights_68",
+      "file": "templates/campaign_insights.html",
+      "element": "span",
+      "text": "High (≤-20)"
+    },
+    {
+      "id": "campaign_insights_69",
+      "file": "templates/campaign_insights.html",
+      "element": "span",
+      "text": "Critical (≤-50)"
+    },
+    {
+      "id": "campaign_insights_70",
+      "file": "templates/campaign_insights.html",
+      "element": "h5",
+      "text": "NPS by Customer Tenure"
+    },
+    {
+      "id": "campaign_insights_71",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Tenure Group"
+    },
+    {
+      "id": "campaign_insights_72",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Respondents"
+    },
+    {
+      "id": "campaign_insights_73",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Avg Individual NPS"
+    },
+    {
+      "id": "campaign_insights_74",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Tenure NPS"
+    },
+    {
+      "id": "campaign_insights_75",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Distribution"
+    },
+    {
+      "id": "campaign_insights_76",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Risk Level"
+    },
+    {
+      "id": "campaign_insights_77",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Latest Response"
+    },
+    {
+      "id": "campaign_insights_78",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Latest Churn Risk"
+    },
+    {
+      "id": "campaign_insights_79",
+      "file": "templates/campaign_insights.html",
+      "element": "span",
+      "text": "Low (>20)"
+    },
+    {
+      "id": "campaign_insights_80",
+      "file": "templates/campaign_insights.html",
+      "element": "span",
+      "text": "Medium (-20 to 20)"
+    },
+    {
+      "id": "campaign_insights_81",
+      "file": "templates/campaign_insights.html",
+      "element": "span",
+      "text": "High (≤-20)"
+    },
+    {
+      "id": "campaign_insights_82",
+      "file": "templates/campaign_insights.html",
+      "element": "span",
+      "text": "Critical (≤-50)"
+    },
+    {
+      "id": "campaign_insights_83",
+      "file": "templates/campaign_insights.html",
+      "element": "span",
+      "text": "Insufficient Data (<2 responses)"
+    },
+    {
+      "id": "campaign_insights_84",
+      "file": "templates/campaign_insights.html",
+      "element": "h5",
+      "text": "Recent Survey Responses"
+    },
+    {
+      "id": "campaign_insights_85",
+      "file": "templates/campaign_insights.html",
+      "element": "label",
+      "text": "Search"
+    },
+    {
+      "id": "campaign_insights_86",
+      "file": "templates/campaign_insights.html",
+      "element": "label",
+      "text": "NPS Category"
+    },
+    {
+      "id": "campaign_insights_87",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "All Responses"
+    },
+    {
+      "id": "campaign_insights_88",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "Promoters (9-10)"
+    },
+    {
+      "id": "campaign_insights_89",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "Passives (7-8)"
+    },
+    {
+      "id": "campaign_insights_90",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "Detractors (0-6)"
+    },
+    {
+      "id": "campaign_insights_91",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Company"
+    },
+    {
+      "id": "campaign_insights_92",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Tenure with FC inc"
+    },
+    {
+      "id": "campaign_insights_93",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "NPS Score"
+    },
+    {
+      "id": "campaign_insights_94",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Category"
+    },
+    {
+      "id": "campaign_insights_95",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Sentiment"
+    },
+    {
+      "id": "campaign_insights_96",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Churn Risk"
+    },
+    {
+      "id": "campaign_insights_97",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Date"
+    },
+    {
+      "id": "campaign_insights_98",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Details"
+    },
+    {
+      "id": "campaign_insights_99",
+      "file": "templates/campaign_insights.html",
+      "element": "h5",
+      "text": "NPS by Role"
+    },
+    {
+      "id": "campaign_insights_100",
+      "file": "templates/campaign_insights.html",
+      "element": "h5",
+      "text": "NPS by Region"
+    },
+    {
+      "id": "campaign_insights_101",
+      "file": "templates/campaign_insights.html",
+      "element": "h5",
+      "text": "NPS by Customer Tier"
+    },
+    {
+      "id": "campaign_insights_102",
+      "file": "templates/campaign_insights.html",
+      "element": "h5",
+      "text": "Satisfaction Ratings by Segment"
+    },
+    {
+      "id": "campaign_insights_103",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Segment Type"
+    },
+    {
+      "id": "campaign_insights_104",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Segment Name"
+    },
+    {
+      "id": "campaign_insights_105",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Responses"
+    },
+    {
+      "id": "campaign_insights_106",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Avg Satisfaction"
+    },
+    {
+      "id": "campaign_insights_107",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "NPS Score"
+    },
+    {
+      "id": "campaign_insights_108",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "Newest First"
+    },
+    {
+      "id": "campaign_insights_109",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "Oldest First"
+    },
+    {
+      "id": "campaign_insights_110",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "Highest NPS"
+    },
+    {
+      "id": "campaign_insights_111",
+      "file": "templates/campaign_insights.html",
+      "element": "option",
+      "text": "Lowest NPS"
+    },
+    {
+      "id": "campaign_insights_112",
+      "file": "templates/campaign_insights.html",
+      "element": "span",
+      "text": "Loading..."
+    },
+    {
+      "id": "campaign_insights_113",
+      "file": "templates/campaign_insights.html",
+      "element": "p",
+      "text": "Loading responses..."
+    },
+    {
+      "id": "campaign_insights_114",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Respondent"
+    },
+    {
+      "id": "campaign_insights_115",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "NPS"
+    },
+    {
+      "id": "campaign_insights_116",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Ratings"
+    },
+    {
+      "id": "campaign_insights_117",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Date"
+    },
+    {
+      "id": "campaign_insights_118",
+      "file": "templates/campaign_insights.html",
+      "element": "th",
+      "text": "Action"
+    },
+    {
+      "id": "campaign_insights_119",
+      "file": "templates/campaign_insights.html",
+      "element": "h5",
+      "text": "No Responses Found"
+    },
+    {
+      "id": "campaign_insights_120",
+      "file": "templates/campaign_insights.html",
+      "element": "p",
+      "text": "No survey responses match your search criteria."
+    },
+    {
+      "id": "campaign_insights_121",
+      "file": "templates/campaign_insights.html",
+      "element": "h6",
+      "text": "Responses"
+    },
+    {
+      "id": "campaign_insights_122",
+      "file": "templates/campaign_insights.html",
+      "element": "h6",
+      "text": "NPS Score"
+    },
+    {
+      "id": "campaign_insights_123",
+      "file": "templates/campaign_insights.html",
+      "element": "h6",
+      "text": "Companies Analyzed"
+    },
+    {
+      "id": "campaign_insights_124",
+      "file": "templates/campaign_insights.html",
+      "element": "h6",
+      "text": "Critical Risk"
+    },
+    {
+      "id": "campaign_insights_125",
+      "file": "templates/campaign_insights.html",
+      "element": "h6",
+      "text": "Satisfaction"
+    },
+    {
+      "id": "campaign_insights_126",
+      "file": "templates/campaign_insights.html",
+      "element": "h6",
+      "text": "Product Value"
+    },
+    {
+      "id": "campaign_insights_127",
+      "file": "templates/campaign_insights.html",
+      "element": "h6",
+      "text": "Pricing"
+    }
+  ],
+  "flash_messages": [],
+  "email_templates": []
+}

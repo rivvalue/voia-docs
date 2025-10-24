@@ -1,41 +1,36 @@
 ==============================================================================
-VOÏA FRENCH TRANSLATION PROMPT FOR CHATGPT
+VOÏA FRENCH TRANSLATION PROMPT FOR CHATGPT (10 PARTS)
 ==============================================================================
 
-Copy and paste this entire prompt into ChatGPT, along with the JSON file content.
+You have 10 small JSON files to translate. Use this prompt for EACH file.
 
 ==============================================================================
-PROMPT START
+PROMPT TO USE FOR EACH FILE
 ==============================================================================
 
-I need you to translate a JSON file containing English strings from a SaaS platform to professional French (France market).
+I need you to translate a JSON file from English to professional French (France market).
 
-**CRITICAL RULES - FOLLOW EXACTLY:**
+**CRITICAL RULES:**
 
-1. **Translate ONLY the "text" field values** - all other fields must remain COMPLETELY unchanged
-2. **Preserve all variables and syntax:**
-   - Keep {variable_name} exactly as-is
-   - Keep {{variable}} exactly as-is  
-   - Keep {%...%} exactly as-is
-   - Example: "Welcome {name}" → "Bienvenue {name}" (NOT "Bienvenue {nom}")
-
-3. **Use professional business French suitable for a SaaS platform**
-4. **Maintain consistent terminology throughout** - use the same French term for the same English word
-5. **Keep these terms UNCHANGED:**
+1. Translate ONLY the "text" field values - keep all other fields unchanged
+2. Preserve all variables EXACTLY as-is:
+   - {variable_name} stays {variable_name} (NOT {nom_de_variable})
+   - {{variable}} stays {{variable}}
+   - {%...%} stays {%...%}
+   
+3. Use professional business French:
+   - France French (not Quebec)
+   - Formal "vous" (not "tu")
+   - Business/SaaS tone
+   
+4. Keep UNCHANGED:
    - VOÏA (brand name)
-   - NPS (Net Promoter Score)
-   - API
-   - Any technical abbreviations in UPPERCASE
+   - NPS, API (technical terms)
+   - All UPPERCASE abbreviations
 
-6. **Translation style:**
-   - Professional, not casual
-   - France French (not Canadian/Swiss)
-   - Use "vous" (formal), not "tu" (informal)
-   - Business/enterprise tone
+5. Return the COMPLETE JSON with only "text" values translated
 
-7. **Return the COMPLETE JSON structure** with all fields intact - only the "text" values should be in French
-
-**SUGGESTED TRANSLATIONS (for consistency):**
+**SUGGESTED TRANSLATIONS:**
 - Campaign → Campagne
 - Participant → Participant
 - Survey → Enquête
@@ -43,24 +38,53 @@ I need you to translate a JSON file containing English strings from a SaaS platf
 - Feedback → Retour d'information
 - Business Account → Compte entreprise
 - Insights → Analyses
-- Analytics → Analytique
 - Settings → Paramètres
 
-**HERE IS THE JSON FILE TO TRANSLATE:**
+**JSON TO TRANSLATE:**
 
-[PASTE THE ENTIRE CONTENTS OF voila_strings_to_translate.json HERE]
+[PASTE ONE translate_part_XX.json FILE HERE]
 
 ==============================================================================
-PROMPT END
+WORKFLOW FOR ALL 10 FILES
 ==============================================================================
 
-INSTRUCTIONS:
-1. Open ChatGPT (use GPT-4 or GPT-4 Turbo for best results)
-2. Copy this entire prompt
-3. Replace the [PASTE JSON HERE] section with the contents of voila_strings_to_translate.json
-4. Send to ChatGPT
-5. ChatGPT will return the complete JSON file with French translations
-6. Copy the translated JSON and save it as "voila_strings_translated.json"
-7. Send the translated file back to me for integration
+1. Open ChatGPT (GPT-4 recommended)
+
+2. For EACH of the 10 files, do this:
+   
+   a) Open translate_part_01_templates.json
+   b) Copy ALL contents
+   c) Paste the prompt above + the JSON into ChatGPT
+   d) Get the translated JSON back
+   e) Save as: translated_part_01.json
+   
+   f) Repeat for parts 02 through 10
+
+3. File naming:
+   translate_part_01_templates.json → translated_part_01.json
+   translate_part_02_templates.json → translated_part_02.json
+   ...
+   translate_part_09_flash_messages.json → translated_part_09.json
+   translate_part_10_email_templates.json → translated_part_10.json
+
+4. After all 10 files are translated, run:
+   python integrate_translations.py
+
+==============================================================================
+FILE CHECKLIST
+==============================================================================
+
+Before running integration, make sure you have all 10 translated files:
+
+[ ] translated_part_01.json (Templates 1-237)
+[ ] translated_part_02.json (Templates 238-474)
+[ ] translated_part_03.json (Templates 475-711)
+[ ] translated_part_04.json (Templates 712-948)
+[ ] translated_part_05.json (Templates 949-1185)
+[ ] translated_part_06.json (Templates 1186-1422)
+[ ] translated_part_07.json (Templates 1423-1659)
+[ ] translated_part_08.json (Templates 1660-1895)
+[ ] translated_part_09.json (259 Flash Messages)
+[ ] translated_part_10.json (7 Email Templates)
 
 ==============================================================================

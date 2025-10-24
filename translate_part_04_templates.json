@@ -1,0 +1,1449 @@
+{
+  "metadata": {
+    "project": "VOÏA - Voice Of Client",
+    "source_language": "English",
+    "target_language": "French",
+    "extraction_date": "2025-10-24",
+    "total_files": 10,
+    "total_strings": 2161,
+    "file_number": 4,
+    "part_description": "Templates Part 4/8"
+  },
+  "instructions": {
+    "overview": "Translate all 'text' field values from English to French (France market, professional SaaS tone)",
+    "rules": [
+      "Translate ONLY the 'text' field values",
+      "Keep all other fields (id, file, type, element, etc.) UNCHANGED",
+      "Preserve {variables}, {{variables}}, and {%...%} syntax exactly as-is",
+      "Use professional business French suitable for SaaS platform",
+      "Maintain consistent terminology throughout",
+      "Keep technical terms like 'NPS', 'API', 'VOÏA' unchanged unless noted"
+    ]
+  },
+  "templates": [
+    {
+      "id": "account_status_9",
+      "file": "templates/business_auth/account_status.html",
+      "element": "h5",
+      "text": "Account Status: {{ account_status|title }}"
+    },
+    {
+      "id": "account_status_10",
+      "file": "templates/business_auth/account_status.html",
+      "element": "p",
+      "text": "Please contact support for assistance with your account."
+    },
+    {
+      "id": "scheduler_status_1",
+      "file": "templates/business_auth/scheduler_status.html",
+      "element": "h2",
+      "text": "Campaign Scheduler Status"
+    },
+    {
+      "id": "scheduler_status_2",
+      "file": "templates/business_auth/scheduler_status.html",
+      "element": "h5",
+      "text": "Scheduler Status"
+    },
+    {
+      "id": "scheduler_status_3",
+      "file": "templates/business_auth/scheduler_status.html",
+      "element": "h5",
+      "text": "Campaign Counts"
+    },
+    {
+      "id": "scheduler_status_4",
+      "file": "templates/business_auth/scheduler_status.html",
+      "element": "h5",
+      "text": "Business Account"
+    },
+    {
+      "id": "scheduler_status_5",
+      "file": "templates/business_auth/scheduler_status.html",
+      "element": "h5",
+      "text": "Actions"
+    },
+    {
+      "id": "activate_account_1",
+      "file": "templates/business_auth/activate_account.html",
+      "element": "h1",
+      "text": "Welcome to VOÏA!"
+    },
+    {
+      "id": "activate_account_2",
+      "file": "templates/business_auth/activate_account.html",
+      "element": "p",
+      "text": "You're invited to join {{ business_account.name }}"
+    },
+    {
+      "id": "activate_account_3",
+      "file": "templates/business_auth/activate_account.html",
+      "element": "span",
+      "text": "Business Name"
+    },
+    {
+      "id": "activate_account_4",
+      "file": "templates/business_auth/activate_account.html",
+      "element": "span",
+      "text": "Your Name"
+    },
+    {
+      "id": "activate_account_5",
+      "file": "templates/business_auth/activate_account.html",
+      "element": "span",
+      "text": "Email Address"
+    },
+    {
+      "id": "activate_account_6",
+      "file": "templates/business_auth/activate_account.html",
+      "element": "span",
+      "text": "Role"
+    },
+    {
+      "id": "activate_account_7",
+      "file": "templates/business_auth/activate_account.html",
+      "element": "span",
+      "text": "Business Account Administrator"
+    },
+    {
+      "id": "activate_account_8",
+      "file": "templates/business_auth/activate_account.html",
+      "element": "p",
+      "text": "Your account security is important to us. Please create a strong password to protect your business data and ensure secure access to the VOÏA platform."
+    },
+    {
+      "id": "activate_account_9",
+      "file": "templates/business_auth/activate_account.html",
+      "element": "p",
+      "text": "Complete your account setup by creating a secure password"
+    },
+    {
+      "id": "activate_account_10",
+      "file": "templates/business_auth/activate_account.html",
+      "element": "div",
+      "text": "Need help? Contact support at"
+    },
+    {
+      "id": "activate_account_11",
+      "file": "templates/business_auth/activate_account.html",
+      "element": "a",
+      "text": "support@voia.com"
+    },
+    {
+      "id": "activate_account_12",
+      "file": "templates/business_auth/activate_account.html",
+      "element": "a",
+      "text": "← Return to VOÏA Home"
+    },
+    {
+      "id": "activate_account_placeholder_13",
+      "file": "templates/business_auth/activate_account.html",
+      "element": "input[placeholder]",
+      "text": "Enter your new password"
+    },
+    {
+      "id": "activate_account_placeholder_14",
+      "file": "templates/business_auth/activate_account.html",
+      "element": "input[placeholder]",
+      "text": "Confirm your new password"
+    },
+    {
+      "id": "license_overview_1",
+      "file": "templates/business_auth/license_overview.html",
+      "element": "p",
+      "text": "License details and usage information for {{ account_data.name }}"
+    },
+    {
+      "id": "license_overview_2",
+      "file": "templates/business_auth/license_overview.html",
+      "element": "label",
+      "text": "License Type:"
+    },
+    {
+      "id": "license_overview_3",
+      "file": "templates/business_auth/license_overview.html",
+      "element": "label",
+      "text": "Status:"
+    },
+    {
+      "id": "license_overview_4",
+      "file": "templates/business_auth/license_overview.html",
+      "element": "label",
+      "text": "License Period:"
+    },
+    {
+      "id": "license_overview_5",
+      "file": "templates/business_auth/license_overview.html",
+      "element": "label",
+      "text": "Account Type:"
+    },
+    {
+      "id": "license_overview_6",
+      "file": "templates/business_auth/license_overview.html",
+      "element": "h4",
+      "text": "Campaigns"
+    },
+    {
+      "id": "license_overview_7",
+      "file": "templates/business_auth/license_overview.html",
+      "element": "h4",
+      "text": "Users"
+    },
+    {
+      "id": "license_overview_8",
+      "file": "templates/business_auth/license_overview.html",
+      "element": "h5",
+      "text": "Campaign Usage Insights"
+    },
+    {
+      "id": "license_overview_9",
+      "file": "templates/business_auth/license_overview.html",
+      "element": "h5",
+      "text": "User Account Insights"
+    },
+    {
+      "id": "license_overview_10",
+      "file": "templates/business_auth/license_overview.html",
+      "element": "span",
+      "text": "Detailed License Info"
+    },
+    {
+      "id": "license_overview_11",
+      "file": "templates/business_auth/license_overview.html",
+      "element": "span",
+      "text": "Manage Campaigns"
+    },
+    {
+      "id": "license_overview_12",
+      "file": "templates/business_auth/license_overview.html",
+      "element": "span",
+      "text": "Manage Users"
+    },
+    {
+      "id": "license_overview_13",
+      "file": "templates/business_auth/license_overview.html",
+      "element": "span",
+      "text": "Settings"
+    },
+    {
+      "id": "admin_panel_1",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "h2",
+      "text": "Welcome {{ current_user.get_full_name() }}"
+    },
+    {
+      "id": "admin_panel_2",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "span",
+      "text": "Business Analytics Hub"
+    },
+    {
+      "id": "admin_panel_3",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "span",
+      "text": "Analytics"
+    },
+    {
+      "id": "admin_panel_4",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "span",
+      "text": "Onboard Business"
+    },
+    {
+      "id": "admin_panel_5",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "span",
+      "text": "Onboard"
+    },
+    {
+      "id": "admin_panel_6",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "span",
+      "text": "Manage"
+    },
+    {
+      "id": "admin_panel_7",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "span",
+      "text": "Manage"
+    },
+    {
+      "id": "admin_panel_8",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "p",
+      "text": "Add and manage team members for your business account. Current usage: {{ admin_data.license_info.users_used if admin_data.license_info else 1 }}/{{ admin_data.license_info.users_limit if admin_data.license_info else 5 }} users."
+    },
+    {
+      "id": "admin_panel_9",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "p",
+      "text": "Create and manage survey campaigns for your business account."
+    },
+    {
+      "id": "admin_panel_10",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "p",
+      "text": "Total Responses"
+    },
+    {
+      "id": "admin_panel_11",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "p",
+      "text": "Total Campaigns"
+    },
+    {
+      "id": "admin_panel_12",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "p",
+      "text": "Active Campaigns"
+    },
+    {
+      "id": "admin_panel_13",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "p",
+      "text": "Total Participants"
+    },
+    {
+      "id": "admin_panel_14",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "p",
+      "text": "Sent Invitations"
+    },
+    {
+      "id": "admin_panel_15",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "p",
+      "text": "Pending Invitations"
+    },
+    {
+      "id": "admin_panel_16",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "p",
+      "text": "Failed Invitations"
+    },
+    {
+      "id": "admin_panel_17",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "p",
+      "text": "Total Invitations"
+    },
+    {
+      "id": "admin_panel_18",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "p",
+      "text": "License Type"
+    },
+    {
+      "id": "admin_panel_19",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "p",
+      "text": "Campaigns Used"
+    },
+    {
+      "id": "admin_panel_20",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "p",
+      "text": "Team Members"
+    },
+    {
+      "id": "admin_panel_21",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "p",
+      "text": "Max Participants"
+    },
+    {
+      "id": "admin_panel_22",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "span",
+      "text": "Description:"
+    },
+    {
+      "id": "admin_panel_23",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "span",
+      "text": "Duration:"
+    },
+    {
+      "id": "admin_panel_24",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "span",
+      "text": "Responses:"
+    },
+    {
+      "id": "admin_panel_25",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "span",
+      "text": "Time Remaining:"
+    },
+    {
+      "id": "admin_panel_26",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "span",
+      "text": "Starts In:"
+    },
+    {
+      "id": "admin_panel_27",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "span",
+      "text": "Completed:"
+    },
+    {
+      "id": "admin_panel_28",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "h5",
+      "text": "No Campaigns Found"
+    },
+    {
+      "id": "admin_panel_29",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "p",
+      "text": "Demo campaigns will appear here once created."
+    },
+    {
+      "id": "admin_panel_30",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "h6",
+      "text": "No Recent Responses"
+    },
+    {
+      "id": "admin_panel_31",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "p",
+      "text": "Responses will appear here as they come in."
+    },
+    {
+      "id": "admin_panel_32",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "h5",
+      "text": "Export All Data"
+    },
+    {
+      "id": "admin_panel_33",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "p",
+      "text": "Export all survey responses across all campaigns for analysis and reporting."
+    },
+    {
+      "id": "admin_panel_34",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "h6",
+      "text": "Export Information"
+    },
+    {
+      "id": "admin_panel_35",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "li",
+      "text": "Includes all campaigns"
+    },
+    {
+      "id": "admin_panel_36",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "li",
+      "text": "JSON format for easy analysis"
+    },
+    {
+      "id": "admin_panel_37",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "li",
+      "text": "Complete response data"
+    },
+    {
+      "id": "admin_panel_38",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "li",
+      "text": "Admin access required"
+    },
+    {
+      "id": "admin_panel_title_39",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "a[title]",
+      "text": "Business analytics hub with comprehensive platform intelligence"
+    },
+    {
+      "id": "admin_panel_title_40",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "a[title]",
+      "text": "Create new business accounts with license assignment"
+    },
+    {
+      "id": "admin_panel_title_41",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "a[title]",
+      "text": "License management dashboard and overview"
+    },
+    {
+      "id": "admin_panel_title_42",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "a[title]",
+      "text": "Manage survey campaigns"
+    },
+    {
+      "id": "admin_panel_title_43",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "a[title]",
+      "text": "Manage survey participants"
+    },
+    {
+      "id": "admin_panel_title_44",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "button[title]",
+      "text": "Quick actions and settings"
+    },
+    {
+      "id": "admin_panel_title_45",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "a[title]",
+      "text": "View analytics and insights"
+    },
+    {
+      "id": "admin_panel_title_46",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "a[title]",
+      "text": "Configure email settings"
+    },
+    {
+      "id": "admin_panel_title_47",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "a[title]",
+      "text": "Configure brand settings"
+    },
+    {
+      "id": "admin_panel_title_48",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "a[title]",
+      "text": "Customize survey experience and conversation settings"
+    },
+    {
+      "id": "admin_panel_title_49",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "a[title]",
+      "text": "Manage team members and users"
+    },
+    {
+      "id": "admin_panel_title_50",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "a[title]",
+      "text": "View license information and usage statistics"
+    },
+    {
+      "id": "admin_panel_title_51",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "a[title]",
+      "text": "View all business accounts and license assignments"
+    },
+    {
+      "id": "admin_panel_title_52",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "a[title]",
+      "text": "Create new business accounts with license assignment"
+    },
+    {
+      "id": "admin_panel_title_53",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "a[title]",
+      "text": "License management dashboard and overview"
+    },
+    {
+      "id": "admin_panel_title_54",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "a[title]",
+      "text": "View account activity trail"
+    },
+    {
+      "id": "admin_panel_title_55",
+      "file": "templates/business_auth/admin_panel.html",
+      "element": "button[title]",
+      "text": "Show more details"
+    },
+    {
+      "id": "brand_config_1",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "p",
+      "text": "Customize your brand identity for {{ business_account.name }}"
+    },
+    {
+      "id": "brand_config_2",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "div",
+      "text": "No logo"
+    },
+    {
+      "id": "brand_config_3",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "div",
+      "text": "Company Logo"
+    },
+    {
+      "id": "brand_config_4",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "div",
+      "text": "Company Display Name"
+    },
+    {
+      "id": "brand_config_5",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "label",
+      "text": "Company Display Name"
+    },
+    {
+      "id": "brand_config_6",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "div",
+      "text": "This name will be displayed in surveys and emails. Leave blank to use \"{{ business_account.name }}\"."
+    },
+    {
+      "id": "brand_config_7",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "label",
+      "text": "Primary Color"
+    },
+    {
+      "id": "brand_config_8",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "div",
+      "text": "Main brand color used for headers, buttons, and accents."
+    },
+    {
+      "id": "brand_config_9",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "label",
+      "text": "Secondary Color"
+    },
+    {
+      "id": "brand_config_10",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "div",
+      "text": "Supporting color for borders and subtle elements."
+    },
+    {
+      "id": "brand_config_11",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "label",
+      "text": "Accent Color"
+    },
+    {
+      "id": "brand_config_12",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "div",
+      "text": "Highlight color for success states and call-to-action elements."
+    },
+    {
+      "id": "brand_config_13",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "label",
+      "text": "Text Color"
+    },
+    {
+      "id": "brand_config_14",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "div",
+      "text": "Primary text color for readability."
+    },
+    {
+      "id": "brand_config_15",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "label",
+      "text": "Background Color"
+    },
+    {
+      "id": "brand_config_16",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "div",
+      "text": "Background color for documents and reports."
+    },
+    {
+      "id": "brand_config_17",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "label",
+      "text": "Color Preview"
+    },
+    {
+      "id": "brand_config_18",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "div",
+      "text": "Live preview of your color palette."
+    },
+    {
+      "id": "brand_config_19",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "label",
+      "text": "Upload Logo"
+    },
+    {
+      "id": "brand_config_20",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "div",
+      "text": "Upload your company logo to personalize surveys and communications. Supported formats: PNG, JPG, JPEG, GIF, WEBP (max 5MB)."
+    },
+    {
+      "id": "brand_config_21",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "li",
+      "text": "Supported formats: PNG, JPG, JPEG, GIF, WEBP"
+    },
+    {
+      "id": "brand_config_22",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "li",
+      "text": "Maximum file size: 5MB"
+    },
+    {
+      "id": "brand_config_23",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "li",
+      "text": "Recommended dimensions: 400x200 pixels or similar ratio"
+    },
+    {
+      "id": "brand_config_24",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "li",
+      "text": "Transparent background recommended for PNG files"
+    },
+    {
+      "id": "brand_config_25",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "li",
+      "text": "PNG format recommended for logos with transparency"
+    },
+    {
+      "id": "brand_config_26",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "div",
+      "text": "Changes will take effect immediately after saving."
+    },
+    {
+      "id": "brand_config_title_27",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "div[title]",
+      "text": "Primary color"
+    },
+    {
+      "id": "brand_config_title_28",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "div[title]",
+      "text": "Secondary color"
+    },
+    {
+      "id": "brand_config_title_29",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "div[title]",
+      "text": "Accent color"
+    },
+    {
+      "id": "brand_config_aria_30",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "div[aria-label]",
+      "text": "No logo uploaded"
+    },
+    {
+      "id": "brand_config_aria_31",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "div[aria-label]",
+      "text": "Color palette preview"
+    },
+    {
+      "id": "brand_config_aria_32",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "div[aria-label]",
+      "text": "Upload requirements"
+    },
+    {
+      "id": "brand_config_aria_33",
+      "file": "templates/business_auth/brand_config.html",
+      "element": "button[aria-label]",
+      "text": "Save brand settings"
+    },
+    {
+      "id": "license_info_1",
+      "file": "templates/business_auth/license_info.html",
+      "element": "div",
+      "text": "License Purchase Date"
+    },
+    {
+      "id": "license_info_2",
+      "file": "templates/business_auth/license_info.html",
+      "element": "div",
+      "text": "License Expiry Date"
+    },
+    {
+      "id": "license_info_3",
+      "file": "templates/business_auth/license_info.html",
+      "element": "div",
+      "text": "License Period"
+    },
+    {
+      "id": "license_info_4",
+      "file": "templates/business_auth/license_info.html",
+      "element": "div",
+      "text": "License Duration"
+    },
+    {
+      "id": "license_info_5",
+      "file": "templates/business_auth/license_info.html",
+      "element": "div",
+      "text": "Campaign running from {{ active_campaign.start_date.strftime('%b %d') }} to {{ active_campaign.end_date.strftime('%b %d, %Y') }}"
+    },
+    {
+      "id": "license_info_6",
+      "file": "templates/business_auth/license_info.html",
+      "element": "div",
+      "text": "Add-on Start Date"
+    },
+    {
+      "id": "license_info_7",
+      "file": "templates/business_auth/license_info.html",
+      "element": "div",
+      "text": "Add-on End Date"
+    },
+    {
+      "id": "license_info_8",
+      "file": "templates/business_auth/license_info.html",
+      "element": "div",
+      "text": "Add-on Period"
+    },
+    {
+      "id": "license_info_9",
+      "file": "templates/business_auth/license_info.html",
+      "element": "div",
+      "text": "Add-on Duration"
+    },
+    {
+      "id": "license_info_10",
+      "file": "templates/business_auth/license_info.html",
+      "element": "div",
+      "text": "Transcript Analysis Not Configured"
+    },
+    {
+      "id": "license_info_11",
+      "file": "templates/business_auth/license_info.html",
+      "element": "div",
+      "text": "Add-on Not Purchased"
+    },
+    {
+      "id": "license_info_12",
+      "file": "templates/business_auth/license_info.html",
+      "element": "div",
+      "text": "Contact your administrator to enable transcript analysis capabilities."
+    },
+    {
+      "id": "license_info_aria_13",
+      "file": "templates/business_auth/license_info.html",
+      "element": "div[aria-label]",
+      "text": "Account type"
+    },
+    {
+      "id": "license_info_aria_14",
+      "file": "templates/business_auth/license_info.html",
+      "element": "div[aria-label]",
+      "text": "License period details"
+    },
+    {
+      "id": "license_info_aria_15",
+      "file": "templates/business_auth/license_info.html",
+      "element": "div[aria-label]",
+      "text": "Campaigns used out of limit"
+    },
+    {
+      "id": "license_info_aria_16",
+      "file": "templates/business_auth/license_info.html",
+      "element": "div[aria-label]",
+      "text": "Users count out of limit"
+    },
+    {
+      "id": "license_info_aria_17",
+      "file": "templates/business_auth/license_info.html",
+      "element": "div[aria-label]",
+      "text": "Add-on period details"
+    },
+    {
+      "id": "manage_users_1",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "p",
+      "text": "Manage users and team members for {{ business_account.name }}"
+    },
+    {
+      "id": "manage_users_2",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "th",
+      "text": "User"
+    },
+    {
+      "id": "manage_users_3",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "th",
+      "text": "Role"
+    },
+    {
+      "id": "manage_users_4",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "th",
+      "text": "Status"
+    },
+    {
+      "id": "manage_users_5",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "th",
+      "text": "Last Login"
+    },
+    {
+      "id": "manage_users_6",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "th",
+      "text": "Actions"
+    },
+    {
+      "id": "manage_users_7",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "span",
+      "text": "Never"
+    },
+    {
+      "id": "manage_users_8",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "span",
+      "text": "Current User"
+    },
+    {
+      "id": "manage_users_9",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "h4",
+      "text": "No users found"
+    },
+    {
+      "id": "manage_users_10",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "p",
+      "text": "Start building your team by adding the first user."
+    },
+    {
+      "id": "manage_users_11",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "label",
+      "text": "First Name"
+    },
+    {
+      "id": "manage_users_12",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "label",
+      "text": "Last Name"
+    },
+    {
+      "id": "manage_users_13",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "label",
+      "text": "Email Address"
+    },
+    {
+      "id": "manage_users_14",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "div",
+      "text": "The user will receive an invitation email to activate their account."
+    },
+    {
+      "id": "manage_users_15",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "label",
+      "text": "Role"
+    },
+    {
+      "id": "manage_users_16",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "option",
+      "text": "Manager - Can manage campaigns and participants"
+    },
+    {
+      "id": "manage_users_17",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "option",
+      "text": "Viewer - Can only view data and reports"
+    },
+    {
+      "id": "manage_users_18",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "option",
+      "text": "Admin - Full access including user management"
+    },
+    {
+      "id": "manage_users_19",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "option",
+      "text": "Platform Admin - Cross-tenant platform management"
+    },
+    {
+      "id": "manage_users_20",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "div",
+      "text": "Role determines what features the user can access."
+    },
+    {
+      "id": "manage_users_21",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "button",
+      "text": "Cancel"
+    },
+    {
+      "id": "manage_users_22",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "label",
+      "text": "First Name"
+    },
+    {
+      "id": "manage_users_23",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "label",
+      "text": "Last Name"
+    },
+    {
+      "id": "manage_users_24",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "label",
+      "text": "Email Address"
+    },
+    {
+      "id": "manage_users_25",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "label",
+      "text": "Role"
+    },
+    {
+      "id": "manage_users_26",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "option",
+      "text": "Manager - Can manage campaigns and participants"
+    },
+    {
+      "id": "manage_users_27",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "option",
+      "text": "Viewer - Can only view data and reports"
+    },
+    {
+      "id": "manage_users_28",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "option",
+      "text": "Admin - Full access including user management"
+    },
+    {
+      "id": "manage_users_29",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "option",
+      "text": "Platform Admin - Cross-tenant platform management"
+    },
+    {
+      "id": "manage_users_30",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "div",
+      "text": "Role determines what features the user can access."
+    },
+    {
+      "id": "manage_users_31",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "button",
+      "text": "Cancel"
+    },
+    {
+      "id": "manage_users_placeholder_32",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "input[placeholder]",
+      "text": "user@company.com"
+    },
+    {
+      "id": "manage_users_title_33",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "button[title]",
+      "text": "License limit reached"
+    },
+    {
+      "id": "manage_users_title_34",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "button[title]",
+      "text": "Edit User"
+    },
+    {
+      "id": "manage_users_title_35",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "button[title]",
+      "text": "Reset Password"
+    },
+    {
+      "id": "manage_users_title_36",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "button[title]",
+      "text": "Deactivate User"
+    },
+    {
+      "id": "manage_users_title_37",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "button[title]",
+      "text": "Activate User"
+    },
+    {
+      "id": "manage_users_aria_38",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "button[aria-label]",
+      "text": "Close"
+    },
+    {
+      "id": "manage_users_aria_39",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "div[aria-label]",
+      "text": "User limit usage"
+    },
+    {
+      "id": "manage_users_aria_40",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "button[aria-label]",
+      "text": "Add new user"
+    },
+    {
+      "id": "manage_users_aria_41",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "button[aria-label]",
+      "text": "Add user button disabled - license limit reached"
+    },
+    {
+      "id": "manage_users_aria_42",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "div[aria-label]",
+      "text": "User avatar for {{ user.get_full_name() }}"
+    },
+    {
+      "id": "manage_users_aria_43",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "span[aria-label]",
+      "text": "User role"
+    },
+    {
+      "id": "manage_users_aria_44",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "span[aria-label]",
+      "text": "User status"
+    },
+    {
+      "id": "manage_users_aria_45",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "button[aria-label]",
+      "text": "Edit {{ user.get_full_name() }}"
+    },
+    {
+      "id": "manage_users_aria_46",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "button[aria-label]",
+      "text": "Reset password for {{ user.get_full_name() }}"
+    },
+    {
+      "id": "manage_users_aria_47",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "button[aria-label]",
+      "text": "Deactivate {{ user.get_full_name() }}"
+    },
+    {
+      "id": "manage_users_aria_48",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "button[aria-label]",
+      "text": "Activate {{ user.get_full_name() }}"
+    },
+    {
+      "id": "manage_users_aria_49",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "button[aria-label]",
+      "text": "Close"
+    },
+    {
+      "id": "manage_users_aria_50",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "span[aria-label]",
+      "text": "required"
+    },
+    {
+      "id": "manage_users_aria_51",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "span[aria-label]",
+      "text": "required"
+    },
+    {
+      "id": "manage_users_aria_52",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "span[aria-label]",
+      "text": "required"
+    },
+    {
+      "id": "manage_users_aria_53",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "button[aria-label]",
+      "text": "Confirm add user"
+    },
+    {
+      "id": "manage_users_aria_54",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "button[aria-label]",
+      "text": "Close"
+    },
+    {
+      "id": "manage_users_aria_55",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "span[aria-label]",
+      "text": "required"
+    },
+    {
+      "id": "manage_users_aria_56",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "span[aria-label]",
+      "text": "required"
+    },
+    {
+      "id": "manage_users_aria_57",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "span[aria-label]",
+      "text": "required"
+    },
+    {
+      "id": "manage_users_aria_58",
+      "file": "templates/business_auth/manage_users.html",
+      "element": "button[aria-label]",
+      "text": "Save changes"
+    },
+    {
+      "id": "audit_logs_1",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "p",
+      "text": "Track all activities and changes in your VOÏA account"
+    },
+    {
+      "id": "audit_logs_2",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "div",
+      "text": "Total Activities"
+    },
+    {
+      "id": "audit_logs_3",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "div",
+      "text": "Activity Types"
+    },
+    {
+      "id": "audit_logs_4",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "div",
+      "text": "Active Users"
+    },
+    {
+      "id": "audit_logs_5",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "div",
+      "text": "Days Shown"
+    },
+    {
+      "id": "audit_logs_6",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "label",
+      "text": "Activity Type"
+    },
+    {
+      "id": "audit_logs_7",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "option",
+      "text": "All Activities"
+    },
+    {
+      "id": "audit_logs_8",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "label",
+      "text": "User"
+    },
+    {
+      "id": "audit_logs_9",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "option",
+      "text": "All Users"
+    },
+    {
+      "id": "audit_logs_10",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "label",
+      "text": "Time Period"
+    },
+    {
+      "id": "audit_logs_11",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "option",
+      "text": "Last 7 days"
+    },
+    {
+      "id": "audit_logs_12",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "option",
+      "text": "Last 30 days"
+    },
+    {
+      "id": "audit_logs_13",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "option",
+      "text": "Last 90 days"
+    },
+    {
+      "id": "audit_logs_14",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "option",
+      "text": "Last year"
+    },
+    {
+      "id": "audit_logs_15",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "th",
+      "text": "Time"
+    },
+    {
+      "id": "audit_logs_16",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "th",
+      "text": "User"
+    },
+    {
+      "id": "audit_logs_17",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "th",
+      "text": "Activity"
+    },
+    {
+      "id": "audit_logs_18",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "th",
+      "text": "Description"
+    },
+    {
+      "id": "audit_logs_19",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "th",
+      "text": "Resource"
+    },
+    {
+      "id": "audit_logs_20",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "h3",
+      "text": "No Activity Yet"
+    },
+    {
+      "id": "audit_logs_21",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "p",
+      "text": "No audit logs found for the selected filters. Try adjusting your filters or create some test data to get started."
+    },
+    {
+      "id": "audit_logs_22",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "span",
+      "text": "Page {{ pagination.page }}"
+    },
+    {
+      "id": "audit_logs_23",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "a",
+      "text": "Next"
+    },
+    {
+      "id": "audit_logs_24",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "span",
+      "text": "Next"
+    },
+    {
+      "id": "audit_logs_aria_25",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "select[aria-label]",
+      "text": "Filter by activity type"
+    },
+    {
+      "id": "audit_logs_aria_26",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "select[aria-label]",
+      "text": "Filter by user"
+    },
+    {
+      "id": "audit_logs_aria_27",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "select[aria-label]",
+      "text": "Filter by time period"
+    },
+    {
+      "id": "audit_logs_aria_28",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "button[aria-label]",
+      "text": "Apply filters"
+    },
+    {
+      "id": "audit_logs_aria_29",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "table[aria-label]",
+      "text": "Audit logs table"
+    },
+    {
+      "id": "audit_logs_aria_30",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "div[aria-label]",
+      "text": "Pagination"
+    },
+    {
+      "id": "audit_logs_aria_31",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "a[aria-label]",
+      "text": "Go to previous page"
+    },
+    {
+      "id": "audit_logs_aria_32",
+      "file": "templates/business_auth/audit_logs.html",
+      "element": "a[aria-label]",
+      "text": "Go to next page"
+    },
+    {
+      "id": "email_config_1",
+      "file": "templates/business_auth/email_config.html",
+      "element": "p",
+      "text": "Configure SMTP settings for {{ business_account.name }}"
+    },
+    {
+      "id": "email_config_2",
+      "file": "templates/business_auth/email_config.html",
+      "element": "label",
+      "text": "Email Provider *"
+    },
+    {
+      "id": "email_config_3",
+      "file": "templates/business_auth/email_config.html",
+      "element": "option",
+      "text": "Standard SMTP"
+    },
+    {
+      "id": "email_config_4",
+      "file": "templates/business_auth/email_config.html",
+      "element": "option",
+      "text": "AWS SES"
+    },
+    {
+      "id": "email_config_5",
+      "file": "templates/business_auth/email_config.html",
+      "element": "div",
+      "text": "Choose your email delivery provider"
+    },
+    {
+      "id": "email_config_6",
+      "file": "templates/business_auth/email_config.html",
+      "element": "label",
+      "text": "AWS Region *"
+    },
+    {
+      "id": "email_config_7",
+      "file": "templates/business_auth/email_config.html",
+      "element": "option",
+      "text": "Select a region"
+    },
+    {
+      "id": "email_config_8",
+      "file": "templates/business_auth/email_config.html",
+      "element": "option",
+      "text": "US East (N. Virginia)"
+    }
+  ],
+  "flash_messages": [],
+  "email_templates": []
+}
