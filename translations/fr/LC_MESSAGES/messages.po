@@ -2685,13 +2685,12 @@ msgid "Maximum Invitations per Campaign"
 msgstr "Nombre maximal d'invitations par campagne"
 
 #: templates/business_auth/licenses/assignment_form.html:304
-#, fuzzy, python-format
 msgid ""
-"Hard limit on survey invitations (typically 5x responses for ~20% "
+"Hard limit on survey invitations (typically 5x responses for ~20%% "
 "response rate)"
 msgstr ""
-"Limite stricte d'invitations (généralement 5× les réponses pour un taux "
-"d’environ 20 %)"
+"Limite stricte d'invitations (généralement 5x les réponses pour un taux "
+"d’environ 20 %%)"
 
 #: templates/business_auth/licenses/assignment_form.html:312
 #: templates/business_auth/licenses/assignment_form.html:317
@@ -3720,8 +3719,7 @@ msgid "Select tier (optional)"
 msgstr "Sélectionnez une catégorie (optionnel)"
 
 #: templates/participants/create.html:145 templates/participants/edit.html:193
-#, fuzzy, python-format
-msgid "T1: Strategic (Top 5–10% clients)"
+msgid "T1: Strategic (Top 5–10%% clients)"
 msgstr "T1 : Stratégique (5–10 % des meilleurs clients)"
 
 #: templates/participants/create.html:146 templates/participants/edit.html:194
