@@ -859,15 +859,15 @@ function applyFilters(page = 1) {
     const formData = new FormData(filterForm);
     const params = new URLSearchParams();
     
-    // Add search if present
-    const searchInput = document.querySelector('input[name="search"]');
-    if (searchInput && searchInput.value) {
-        params.append('search', searchInput.value);
+    // IMPORTANT: Get search value from the visible search input (in separate form)
+    const searchInput = document.getElementById('search');
+    if (searchInput && searchInput.value.trim()) {
+        params.append('search', searchInput.value.trim());
     }
     
-    // Add all filter parameters
+    // Add all filter parameters (skip the hidden search input if present)
     for (const [key, value] of formData.entries()) {
-        if (value) {
+        if (value && key !== 'search') {  // Skip hidden search input from filter form
             params.append(key, value);
         }
     }
@@ -1122,8 +1122,17 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             // Reset all filter selects
             $('.filter-select').val(null).trigger('change');
-            // Apply filters (will be empty)
+            // Apply filters (will be empty, but preserves search)
             applyFilters(1);
+        });
+    }
+    
+    // Intercept search form submission to use AJAX instead
+    const searchForm = document.querySelector('.search-form');
+    if (searchForm) {
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            applyFilters(1); // Apply current filters with new search
         });
     }
     
