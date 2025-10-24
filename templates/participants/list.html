@@ -1277,11 +1277,15 @@ function submitBulkEdit() {
     applyBtn.disabled = true;
     applyBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Applying...';
     
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    
     // Send bulk edit request
     fetch('/business/participants/bulk-edit', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
         },
         body: JSON.stringify({
             participant_ids: Array.from(selectedParticipants),
