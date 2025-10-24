@@ -1,0 +1,465 @@
+ GATE 2: DASHBOARD TABLE HEADERS & LABELS
+Entry Criteria
+✅ Gate 1 passed and signed off
+✅ Application running stable
+Work Scope
+Wrap 38 strings:
+
+28 table headers (Campaign, Company, NPS, Action, etc.)
+10 form labels (Campaign 1, Campaign 2, Balance Status, etc.)
+Validation Steps
+V2.1: Code Review
+
+# Show table header changes
+git diff templates/dashboard.html | grep -E "^\+.*<th" | head -10
+# Show label changes  
+git diff templates/dashboard.html | grep -E "^\+.*<label" | head -10
+# Count markers
+grep -c "{{ _(" templates/dashboard.html
+Expected: 83 + 38 = 121 markers
+
+V2.2: Template Syntax Check
+
+python3 << 'EOF'
+from jinja2 import Template
+with open('templates/dashboard.html') as f:
+    Template(f.read())
+print("✅ Template syntax valid")
+EOF
+V2.3: Extract & Translate
+
+pybabel extract -F babel.cfg -k _l -o messages.pot .
+pybabel update -i messages.pot -d translations
+# Translate the 38 new entries
+# Compile
+pybabel compile -d translations
+V2.4: Functional Testing - English
+
+ All tables render correctly
+ Column headers readable
+ Form labels visible
+ Sorting/filtering still works
+ No layout shifts
+V2.5: Functional Testing - French
+
+ Switch to French
+ Section headers still in French (from Gate 1)
+ Table headers now in French
+ Form labels now in French
+ Test table interactions (sort, filter, pagination)
+ Take screenshots of key tables
+V2.6: Data Integrity Check
+
+ Table data still loads
+ Pagination works
+ Search functionality intact
+ Filter dropdowns populate
+Success Criteria
+✅ 121 translation markers
+✅ All table headers translate
+✅ All form labels translate
+✅ No functional regressions
+✅ Tables still sortable/filterable
+Rollback Plan
+git checkout templates/dashboard.html
+git checkout translations/
+pybabel compile -d translations
+Sign-off
+YOU: Gate 2 validation complete. Proceed to Gate 3? (yes/no)
+
+📋 GATE 3: DASHBOARD STATIC TEXT & LOADING MESSAGES
+Entry Criteria
+✅ Gate 2 passed
+✅ No outstanding bugs from previous gates
+Work Scope
+Wrap 40 strings:
+
+30 static text elements (descriptions, tooltips, status messages)
+10 loading messages (Loading executive summary, Loading KPI overview, etc.)
+Validation Steps
+V3.1: Code Review
+
+git diff templates/dashboard.html | grep "Loading" | head -10
+# Count markers
+grep -c "{{ _(" templates/dashboard.html
+Expected: 121 + 40 = 161 markers
+
+V3.2: Critical - Check Loading Messages
+Ensure we didn't break the ID fix from earlier:
+
+# Verify IDs are still English (not wrapped)
+grep 'id="totalResponses"' templates/dashboard.html
+grep 'id="recentResponses"' templates/dashboard.html
+grep 'id="companyResponsesModal"' templates/dashboard.html
+Expected: All three should be found (IDs stay English)
+
+V3.3: Template Syntax & Compile
+
+python3 -c "from jinja2 import Template; Template(open('templates/dashboard.html').read())"
+pybabel extract -F babel.cfg -k _l -o messages.pot .
+pybabel update -i messages.pot -d translations
+# Translate 40 new entries
+pybabel compile -d translations
+V3.4: Functional Testing - Loading States
+
+ Dashboard loads - verify loading spinners appear
+ Loading messages visible during data fetch
+ Data eventually loads (loading messages disappear)
+ No infinite loading states
+V3.5: Functional Testing - French
+
+ Switch to French
+ Trigger dashboard reload
+ Loading messages now in French ("Chargement...")
+ Static text/tooltips in French
+ All previous translations still working
+V3.6: Tooltip & Hover Testing
+
+ Hover over info icons - tooltips in correct language
+ Hover over sparklines - "Click to view trends" translates
+ All title attributes translate
+Success Criteria
+✅ 161 translation markers
+✅ Loading messages translate correctly
+✅ Static text translates
+✅ No infinite loading states
+✅ IDs still in English (critical)
+Rollback Plan
+git checkout templates/dashboard.html
+git checkout translations/
+pybabel compile -d translations
+Sign-off
+YOU: Gate 3 validation complete. Dashboard template complete? (yes/no)
+
+📋 GATE 4: JAVASCRIPT TRANSLATIONS
+Entry Criteria
+✅ Gates 1-3 passed
+✅ Dashboard template 100% wrapped
+✅ Research completed on JS translation approach
+Work Scope
+Translate 77 JavaScript strings:
+
+dashboard.js: 53 strings
+executive_summary.js: 19 strings
+survey.js: 5 strings
+Validation Steps
+V4.1: Approach Validation
+Review implementation approach:
+
+ Translation variables block added to template
+ No hardcoded strings in JS files
+ All strings reference translation object
+V4.2: Code Review - Template Variables
+
+# Check translation block exists
+grep -A 20 "const translations = {" templates/dashboard.html
+Expected: JSON object with 53+ translated strings
+
+V4.3: Code Review - JS Files
+
+# Verify no hardcoded English (common patterns)
+grep -n '"Loading' static/js/dashboard.js
+grep -n '"No data' static/js/dashboard.js
+grep -n '"Search' static/js/dashboard.js
+Expected: Should find references to translations.loading, not "Loading"
+
+V4.4: Functional Testing - Dynamic Content
+Test JavaScript-generated content:
+
+ Load dashboard - KPI values update (not 0)
+ Executive summary loads with data
+ Company NPS table populates
+ Charts render with labels
+ Modal opens and populates
+V4.5: Functional Testing - French
+Critical: Test all dynamic content in French
+
+ Switch to French
+ KPI values still update correctly
+ "No data" messages in French
+ "Loading..." messages in French
+ Chart tooltips in French
+ Modal content in French
+ Pagination text in French ("Showing X of Y")
+V4.6: Browser Console Validation
+
+ No JavaScript errors
+ No "undefined" in UI
+ No translations.xyz is undefined
+ Check Network tab: no failed requests
+V4.7: Interaction Testing
+Test user interactions that trigger JS:
+
+ Search companies - results update
+ Filter by NPS - table filters
+ Click pagination - page changes
+ Open company modal - data loads
+ Sort columns - order changes
+Success Criteria
+✅ All 77 JS strings translatable
+✅ Dynamic content works in both languages
+✅ No console errors
+✅ No undefined strings in UI
+✅ All interactions functional
+Rollback Plan
+git checkout static/js/
+git checkout templates/dashboard.html
+Sign-off
+YOU: Gate 4 validation complete. Dashboard fully bilingual? (yes/no)
+
+📋 GATE 5: CRITICAL TEMPLATES (Survey Flows)
+Entry Criteria
+✅ Dashboard 100% complete and tested
+✅ No outstanding issues
+Work Scope
+4 critical templates (~113 strings):
+
+public_survey_response.html
+survey_success.html
+conversational_survey_completed.html
+survey_completed.html
+Validation Steps
+V5.1: Template-by-Template Approach
+Test each template individually:
+
+Survey Response Page:
+
+ Wrap all English text
+ Extract & translate
+ Compile
+ Load survey response page in English
+ Load survey response page in French
+ Verify all text translates
+ Take screenshots
+Survey Success Page:
+
+ Same process as above
+ Test "Thank you" message translates
+ Test call-to-action buttons translate
+Survey Completed Pages:
+
+ Test both completion templates
+ Verify messaging is clear in French
+ Check for broken links/buttons
+V5.2: User Flow Testing - English
+Complete user journey:
+
+ Start survey
+ Submit responses
+ See success page
+ View response page
+ All text readable and professional
+V5.3: User Flow Testing - French
+Same journey in French:
+
+ Start survey with language=fr
+ Submit responses
+ Success page in French
+ Response page in French
+ All translations natural and correct
+V5.4: Cross-Check Consistency
+
+ "Thank you" always translates the same way
+ "Submit" button consistent across forms
+ Navigation elements consistent
+Success Criteria
+✅ All 4 templates 100% translated
+✅ User flow works in both languages
+✅ No broken user journeys
+✅ Translations feel natural
+Rollback Plan
+git checkout templates/public_survey_response.html
+git checkout templates/survey_success.html
+git checkout templates/conversational_survey_completed.html
+git checkout templates/survey_completed.html
+git checkout translations/
+pybabel compile -d translations
+Sign-off
+YOU: Gate 5 validation complete. Survey flows bilingual? (yes/no)
+
+📋 GATE 6: REMAINING TEMPLATES
+Entry Criteria
+✅ Gates 1-5 passed
+✅ Critical paths fully tested
+Work Scope
+13 remaining templates (~150 strings)
+
+Validation Steps
+V6.1: Batch Processing
+Group by priority:
+
+High: base.html, server_auth.html, auth.html
+Medium: survey_choice.html, company_responses.html
+Low: Others
+V6.2: Base Template Testing
+Critical: Test base.html thoroughly
+
+ Navigation translates
+ Footer translates
+ Language toggle works
+ All pages inherit correctly
+V6.3: Auth Flow Testing
+
+ Login page in French
+ Registration in French
+ Password reset in French
+ Error messages translate
+V6.4: Spot Check Remaining Pages
+
+ Pick 3-5 random pages
+ Load in English
+ Load in French
+ Verify completeness
+Success Criteria
+✅ All templates wrapped
+✅ Base template works in both languages
+✅ Auth flows work
+✅ No broken pages
+Sign-off
+YOU: Gate 6 validation complete. All templates done? (yes/no)
+
+📋 GATE 7: COMPREHENSIVE QA
+Entry Criteria
+✅ All gates 1-6 passed
+✅ All templates translated
+✅ All JavaScript translated
+Validation Steps
+V7.1: Automated Validation
+
+# Check for untranslated strings
+python3 << 'EOF'
+import re, os
+issues = []
+for root, dirs, files in os.walk('templates'):
+    for file in files:
+        if file.endswith('.html') and not file.endswith('.backup'):
+            path = os.path.join(root, file)
+            with open(path) as f:
+                content = f.read()
+            # Find potential untranslated text
+            # (This is a heuristic, not perfect)
+            lines = content.split('\n')
+            for i, line in enumerate(lines, 1):
+                # Look for English words outside {{ _() }}
+                if re.search(r'>(Loading|Search|Filter|Campaign|Company)[<\s]', line):
+                    if '{{ _(' not in line:
+                        issues.append(f"{file}:{i}")
+if issues:
+    print(f"⚠️ Found {len(issues)} potential untranslated strings")
+else:
+    print("✅ No obvious untranslated strings found")
+EOF
+V7.2: Complete User Journey Testing
+
+Journey 1: Trial User
+
+ Visit index page (English)
+ Switch to French
+ Click demo
+ View conversational survey intro
+ Complete survey
+ See success page
+ View response
+All pages in French
+Journey 2: Business User
+
+ Login (French)
+ View dashboard
+ Filter by campaign
+ View executive summary
+ View campaign insights
+ Open company modal
+ Search/filter data
+ Switch to English
+ Repeat above
+Both languages work identically
+V7.3: Edge Case Testing
+
+ Very long company name in French - layout OK?
+ Special characters (é, à, ç) display correctly
+ Pluralization works ("1 réponse" vs "2 réponses")
+ Numbers format correctly (1,234 vs 1 234)
+ Dates in French format
+V7.4: Performance Testing
+
+ Dashboard loads in <2 seconds (both languages)
+ Language switch <1 second
+ No memory leaks after multiple switches
+ Cache working correctly
+V7.5: Browser Console Audit
+Check in Chrome DevTools:
+
+ Console: No errors
+ Network: All requests succeed
+ Performance: No bottlenecks
+ Lighthouse: Accessibility score >90
+V7.6: Mobile Testing
+
+ Load on mobile viewport
+ All text readable (no overflow)
+ Buttons tappable
+ Language toggle accessible
+ Forms usable
+V7.7: Translation Quality Review
+
+ Review 20 random French translations
+ Check for consistency (same EN → same FR)
+ Verify professional tone
+ No machine translation artifacts
+ Context-appropriate terms
+Success Criteria
+✅ Zero untranslated strings found
+✅ All user journeys work in both languages
+✅ No console errors
+✅ Performance acceptable
+✅ Mobile responsive
+✅ Translation quality high
+Rollback Plan
+Full rollback to pre-translation state:
+
+git checkout main
+pybabel compile -d translations
+Sign-off
+YOU: Gate 7 validation complete. Ready for production? (yes/no)
+
+📋 GATE 8: PRE-PRODUCTION CHECKLIST
+Entry Criteria
+✅ Gate 7 passed with 100% success
+✅ All known issues resolved
+Validation Steps
+V8.1: Documentation
+
+ Translation workflow documented
+ Known issues logged
+ Rollback procedure documented
+ Update replit.md with bilingual status
+V8.2: Backup & Version Control
+
+ All changes committed
+ Git tags created (v1.0.0-bilingual)
+ Production backup created
+ Database migration plan (if needed)
+V8.3: Monitoring Setup
+
+ Error tracking configured (Sentry)
+ Language switch events tracked
+ Performance baseline established
+V8.4: Rollback Rehearsal
+
+ Practice rollback procedure
+ Verify rollback takes <5 minutes
+ Test that rollback restores full functionality
+V8.5: Stakeholder Sign-off
+
+ Demo to stakeholders
+ Gather feedback
+ Address critical feedback
+ Get approval for deployment
+Success Criteria
+✅ Documentation complete
+✅ Backups verified
+✅ Monitoring ready
+✅ Rollback tested
+✅ Stakeholder approval
+Sign-off
+YOU: Final sign-off. Deploy to production? (yes/no)
