@@ -2848,14 +2848,17 @@ a:hover {
 
 /* V2 UI: Offset navbar content for sidebar, keep navbar full-width */
 body[data-ui-version="v2"] .navbar .container {
-    padding-left: 280px;
-    max-width: 100%;
+    margin-left: 260px;
+    max-width: calc(100% - 260px);
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 
-/* Mobile: Reset padding when sidebar collapses */
+/* Mobile: Reset offset when sidebar collapses */
 @media (max-width: 992px) {
     body[data-ui-version="v2"] .navbar .container {
-        padding-left: 1rem;
+        margin-left: 0;
+        max-width: 100%;
     }
 }
 
