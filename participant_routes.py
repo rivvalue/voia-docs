@@ -40,8 +40,70 @@ def list_participants():
         page = request.args.get('page', 1, type=int)
         per_page = 20  # Number of participants per page
         
+        # Get filter parameters
+        filter_companies = request.args.getlist('filter_company')
+        filter_roles = request.args.getlist('filter_role')
+        filter_regions = request.args.getlist('filter_region')
+        filter_tiers = request.args.getlist('filter_tier')
+        filter_languages = request.args.getlist('filter_language')
+        filter_tenure_ranges = request.args.getlist('filter_tenure')
+        
+        # Build filter options from all participants in business account
+        from sqlalchemy import func as sql_func
+        
+        base_filter_query = Participant.query.filter_by(business_account_id=current_account.id)
+        
+        filter_options = {
+            'companies': [c[0] for c in base_filter_query.with_entities(Participant.company_name).filter(
+                Participant.company_name.isnot(None), Participant.company_name != ''
+            ).distinct().order_by(Participant.company_name).all()],
+            'roles': [r[0] for r in base_filter_query.with_entities(Participant.role).filter(
+                Participant.role.isnot(None), Participant.role != ''
+            ).distinct().order_by(Participant.role).all()],
+            'regions': [r[0] for r in base_filter_query.with_entities(Participant.region).filter(
+                Participant.region.isnot(None), Participant.region != ''
+            ).distinct().order_by(Participant.region).all()],
+            'tiers': [t[0] for t in base_filter_query.with_entities(Participant.customer_tier).filter(
+                Participant.customer_tier.isnot(None), Participant.customer_tier != ''
+            ).distinct().order_by(Participant.customer_tier).all()],
+            'languages': [l[0] for l in base_filter_query.with_entities(Participant.language).filter(
+                Participant.language.isnot(None), Participant.language != ''
+            ).distinct().order_by(Participant.language).all()],
+            'tenure_ranges': sorted(list(set([
+                str(t[0]) for t in base_filter_query.with_entities(Participant.tenure_years).filter(
+                    Participant.tenure_years.isnot(None)
+                ).distinct().all()
+            ])), key=lambda x: int(x) if x.isdigit() else 0)
+        }
+        
+        # Store active filters
+        active_filters = {
+            'companies': filter_companies,
+            'roles': filter_roles,
+            'regions': filter_regions,
+            'tiers': filter_tiers,
+            'languages': filter_languages,
+            'tenure_ranges': filter_tenure_ranges
+        }
+        
         # Base query scoped to current business account
         query = Participant.query.filter_by(business_account_id=current_account.id)
+        
+        # Apply attribute filters
+        if filter_companies:
+            query = query.filter(Participant.company_name.in_(filter_companies))
+        if filter_roles:
+            query = query.filter(Participant.role.in_(filter_roles))
+        if filter_regions:
+            query = query.filter(Participant.region.in_(filter_regions))
+        if filter_tiers:
+            query = query.filter(Participant.customer_tier.in_(filter_tiers))
+        if filter_languages:
+            query = query.filter(Participant.language.in_(filter_languages))
+        if filter_tenure_ranges:
+            tenure_years_int = [int(t) for t in filter_tenure_ranges if t.isdigit()]
+            if tenure_years_int:
+                query = query.filter(Participant.tenure_years.in_(tenure_years_int))
         
         # Apply search filter if provided
         if search_query:
@@ -68,6 +130,22 @@ def list_participants():
                 ((Participant.company_name.isnot(None)) & (Participant.company_name != ''), Participant.company_name)
             ))).label('companies')
         ).filter(Participant.business_account_id == current_account.id)
+        
+        # Apply same attribute filters to KPI query
+        if filter_companies:
+            kpi_base_query = kpi_base_query.filter(Participant.company_name.in_(filter_companies))
+        if filter_roles:
+            kpi_base_query = kpi_base_query.filter(Participant.role.in_(filter_roles))
+        if filter_regions:
+            kpi_base_query = kpi_base_query.filter(Participant.region.in_(filter_regions))
+        if filter_tiers:
+            kpi_base_query = kpi_base_query.filter(Participant.customer_tier.in_(filter_tiers))
+        if filter_languages:
+            kpi_base_query = kpi_base_query.filter(Participant.language.in_(filter_languages))
+        if filter_tenure_ranges:
+            tenure_years_int = [int(t) for t in filter_tenure_ranges if t.isdigit()]
+            if tenure_years_int:
+                kpi_base_query = kpi_base_query.filter(Participant.tenure_years.in_(tenure_years_int))
         
         # Apply same search filter if provided
         if search_query:
@@ -129,6 +207,8 @@ def list_participants():
                              business_account=current_account.to_dict() if current_account else {},
                              search_query=search_query,
                              kpi_stats=kpi_stats,
+                             filter_options=filter_options,
+                             active_filters=active_filters,
                              pagination={
                                  'page': page,
                                  'per_page': per_page,
