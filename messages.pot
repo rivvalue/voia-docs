@@ -1,17 +1,17 @@
-# English translations for VOÏA.
-# Copyright (C) 2025 Rivvalue Inc
-# This file is distributed under the same license as the VOÏA project.
+# Translations template for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 #
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: VOÏA 1.0\n"
-"Report-Msgid-Bugs-To: support@rivvalue.com\n"
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2025-10-24 19:08+0000\n"
-"PO-Revision-Date: 2025-10-24 07:35+0000\n"
-"Last-Translator: Rivvalue Team\n"
-"Language: en\n"
-"Language-Team: English\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"

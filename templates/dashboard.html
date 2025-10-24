@@ -17,8 +17,8 @@
     <div class="bg-white border-bottom" style="padding: 2.5rem 0; margin-bottom: 2rem;">
         <div class="row align-items-center">
             <div class="col-12 col-md-8 mb-3 mb-md-0">
-                <h1 class="h2 mb-2">Business Intelligence</h1>
-                <p class="text-muted mb-0">Comprehensive customer feedback insights and analysis</p>
+                <h1 class="h2 mb-2">{{ _('Business Intelligence') }}</h1>
+                <p class="text-muted mb-0">{{ _('Comprehensive customer feedback insights and analysis') }}</p>
             </div>
             <div class="col-12 col-md-4 text-center text-md-end">
                 <div class="d-flex align-items-center justify-content-center justify-content-md-end gap-3">
@@ -45,8 +45,8 @@
     <div class="bg-white border rounded" style="padding: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
         <!-- Section Header -->
         <div class="mb-4">
-            <h3 class="mb-2"><i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>Executive Summary</h3>
-            <p class="text-muted mb-0">High-level overview of key performance indicators across all campaigns</p>
+            <h3 class="mb-2"><i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>{{ _('Executive Summary') }}</h3>
+            <p class="text-muted mb-0">{{ _('High-level overview of key performance indicators across all campaigns') }}</p>
         </div>
 
         <!-- Loading state -->
@@ -61,7 +61,7 @@
         <div class="d-none" id="executiveSummaryContent">
         <!-- KPI Overview Section -->
         <div class="mb-4">
-            <h5 class="mb-3"><i class="fas fa-trending-up me-2" style="color: #E13A44;"></i>Campaign KPI Overview</h5>
+            <h5 class="mb-3"><i class="fas fa-trending-up me-2" style="color: #E13A44;"></i>{{ _('Campaign KPI Overview') }}</h5>
             <div class="table-responsive">
                 <table class="table table-borderless table-sm" id="kpiOverviewTable" style="font-size: 0.85rem;">
                     <thead>
@@ -137,7 +137,7 @@
 
         <!-- Campaign Comparison Section -->
         <div class="mt-4">
-            <h5 class="mb-3"><i class="fas fa-exchange-alt me-2" style="color: #E13A44;"></i>Campaign Comparison</h5>
+            <h5 class="mb-3"><i class="fas fa-exchange-alt me-2" style="color: #E13A44;"></i>{{ _('Campaign Comparison') }}</h5>
             
             <!-- Campaign Comparison Selector -->
             <div class="border rounded p-3 mb-3" style="background-color: #f8f9fa;">
@@ -277,8 +277,8 @@
 <div class="bg-white border rounded mb-4" style="padding: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
     <!-- Section Header -->
     <div class="mb-4">
-        <h3 class="mb-2"><i class="fas fa-chart-bar me-2" style="color: #E13A44;"></i>Campaign Insights</h3>
-        <p class="text-muted mb-0">Analyze and compare campaign-specific performance metrics</p>
+        <h3 class="mb-2"><i class="fas fa-chart-bar me-2" style="color: #E13A44;"></i>{{ _('Campaign Insights') }}</h3>
+        <p class="text-muted mb-0">{{ _('Analyze and compare campaign-specific performance metrics') }}</p>
     </div>
 
 <div class="dashboard-navigation mb-4">
@@ -432,7 +432,7 @@
                 <div class="col-md-6">
                     <div class="chart-card">
                         <div class="card-header">
-                            <h5>High Churn Risk Accounts
+                            <h5>{{ _('High Churn Risk Accounts') }}
                                 <i class="fas fa-info-circle ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
                                    title="{{ _('Companies with High or Critical churn risk level') }}" style="font-size: 0.8em; opacity: 0.7;"></i>
                             </h5>
@@ -447,7 +447,7 @@
                 <div class="col-md-6">
                     <div class="chart-card">
                         <div class="card-header">
-                            <h5>Key Themes</h5>
+                            <h5>{{ _('Key Themes') }}</h5>
                         </div>
                         <div class="card-body" style="height: 550px;">
                             <div class="chart-container">
@@ -552,7 +552,7 @@
         <div class="col-md-6">
             <div class="chart-card">
                 <div class="card-header">
-                    <h5>NPS Distribution</h5>
+                    <h5>{{ _('NPS Distribution') }}</h5>
                 </div>
                 <div class="card-body">
                     <div class="chart-container">
@@ -564,7 +564,7 @@
         <div class="col-md-6">
             <div class="chart-card">
                 <div class="card-header">
-                    <h5>Sentiment Analysis</h5>
+                    <h5>{{ _('Sentiment Analysis') }}</h5>
                 </div>
                 <div class="card-body">
                     <div class="chart-container">
@@ -580,7 +580,7 @@
         <div class="col-md-6">
             <div class="chart-card">
                 <div class="card-header">
-                    <h5>Customer Tenure Distribution</h5>
+                    <h5>{{ _('Customer Tenure Distribution') }}</h5>
                 </div>
                 <div class="card-body">
                     <div class="chart-container">
@@ -592,7 +592,7 @@
         <div class="col-md-6">
             <div class="chart-card">
                 <div class="card-header">
-                    <h5>NPS-Based Growth Factor Analysis</h5>
+                    <h5>{{ _('NPS-Based Growth Factor Analysis') }}</h5>
                 </div>
                 <div class="card-body">
                     <div class="chart-container">
@@ -627,7 +627,7 @@
                 <div class="col-12">
                     <div class="data-table">
                         <div class="table-header">
-                            <h5>NPS by Client Company</h5>
+                            <h5>{{ _('NPS by Client Company') }}</h5>
                             <small class="text-muted">Strategic account management - NPS scores segregated by company evaluating Archelo Group</small>
                         </div>
                         <div class="p-3">
@@ -740,7 +740,7 @@
                 <div class="col-12">
                     <div class="data-table">
                         <div class="table-header">
-                            <h5>NPS by Customer Tenure</h5>
+                            <h5>{{ _('NPS by Customer Tenure') }}</h5>
                             <small class="text-muted">Customer lifecycle insights - NPS scores segregated by length of business relationship</small>
                         </div>
                         <div class="p-0">
