@@ -66,7 +66,7 @@
                 <table class="table table-borderless table-sm" id="kpiOverviewTable" style="font-size: 0.85rem;">
                     <thead>
                         <tr>
-                            <th style="min-width: 120px;">Campaign</th>
+                            <th style="min-width: 120px;">{{ _('Campaign') }}</th>
                             <th class="text-center" style="min-width: 100px;">
                                 {{ _('Responses') }}
                                 <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="{{ _('Click to view full trends') }}">
@@ -74,13 +74,13 @@
                                 </div>
                             </th>
                             <th class="text-center" style="min-width: 100px;">
-                                NPS
+                                {{ _('NPS') }}
                                 <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="{{ _('Click to view full trends') }}">
                                     <canvas id="sparkline-nps"></canvas>
                                 </div>
                             </th>
                             <th class="text-center" style="min-width: 100px;">
-                                Companies
+                                {{ _('Companies') }}
                                 <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="{{ _('Click to view full trends') }}">
                                     <canvas id="sparkline-companies"></canvas>
                                 </div>
@@ -92,13 +92,13 @@
                                 </div>
                             </th>
                             <th class="text-center" style="min-width: 110px;">
-                                Satisfaction
+                                {{ _('Satisfaction') }}
                                 <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="{{ _('Click to view full trends') }}">
                                     <canvas id="sparkline-satisfaction"></canvas>
                                 </div>
                             </th>
                             <th class="text-center" style="min-width: 110px;">
-                                Product
+                                {{ _('Product') }}
                                 <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="{{ _('Click to view full trends') }}">
                                     <canvas id="sparkline-product"></canvas>
                                 </div>
@@ -110,7 +110,7 @@
                                 </div>
                             </th>
                             <th class="text-center" style="min-width: 100px;">
-                                Service
+                                {{ _('Service') }}
                                 <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="{{ _('Click to view full trends') }}">
                                     <canvas id="sparkline-service"></canvas>
                                 </div>
@@ -297,7 +297,7 @@
                     <!-- Filter Controls -->
                     <div class="row align-items-center mb-2">
                         <div class="col-12 col-md-auto mb-2 mb-md-0">
-                            <label for="campaignFilter" class="form-label mb-0">Campaign:</label>
+                            <label for="campaignFilter" class="form-label mb-0">{{ _('Campaign') }}:</label>
                         </div>
                         <div class="col-12 col-md">
                             <div class="d-flex gap-2 align-items-center">
@@ -748,14 +748,14 @@
                                 <table class="table table-striped table-hover">
                                     <thead>
                                         <tr>
-                                            <th>Tenure Group</th>
+                                            <th>{{ _('Tenure Group') }}</th>
                                             <th>{{ _('Respondent') }}s</th>
-                                            <th>Avg Individual NPS</th>
-                                            <th>Tenure NPS</th>
-                                            <th>Distribution</th>
-                                            <th>Risk Level</th>
-                                            <th>Latest Response</th>
-                                            <th>Latest Churn Risk</th>
+                                            <th>{{ _('Avg Individual NPS') }}</th>
+                                            <th>{{ _('Tenure NPS') }}</th>
+                                            <th>{{ _('Distribution') }}</th>
+                                            <th>{{ _('Risk Level') }}</th>
+                                            <th>{{ _('Latest Response') }}</th>
+                                            <th>{{ _('Latest Churn Risk') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tenureNpsTable">
@@ -806,12 +806,12 @@
                             <!-- Search and Filter Controls -->
                             <div class="row align-items-end mb-3">
                                 <div class="col-md-5">
-                                    <label for="responsesSearch" class="form-label">Search</label>
+                                    <label for="responsesSearch" class="form-label">{{ _('Search') }}</label>
                                     <input type="text" class="form-control" id="responsesSearch" 
                                            placeholder="{{ _('Search by company name, participant name, or email...') }}">
                                 </div>
                                 <div class="col-md-3">
-                                    <label for="npsFilter" class="form-label">NPS Category</label>
+                                    <label for="npsFilter" class="form-label">{{ _('NPS Category') }}</label>
                                     <select class="form-select" id="npsFilter" onchange="searchSurvey{{ _('Responses') }}()">
                                         <option value="">All {{ _('Responses') }}</option>
                                         <option value="promoters">Promoters (9-10)</option>
@@ -834,13 +834,13 @@
                                 <table class="table table-striped">
                                     <thead>
                                         <tr>
-                                            <th>Company</th>
-                                            <th>Tenure with FC inc</th>
+                                            <th>{{ _('Company') }}</th>
+                                            <th>{{ _('Tenure with FC inc') }}</th>
                                             <th>{{ _('NPS Score') }}</th>
-                                            <th>Category</th>
-                                            <th>Sentiment</th>
-                                            <th>Churn Risk</th>
-                                            <th>Date</th>
+                                            <th>{{ _('Category') }}</th>
+                                            <th>{{ _('Sentiment') }}</th>
+                                            <th>{{ _('Churn Risk') }}</th>
+                                            <th>{{ _('Date') }}</th>
                                             <th>{{ _('Details') }}</th>
                                         </tr>
                                     </thead>
@@ -934,10 +934,10 @@
                             <thead style="background-color: #2E5090; color: white; position: sticky; top: 0; z-index: 10;">
                                 <tr>
                                     <th style="width: 20%;">{{ _('Respondent') }}</th>
-                                    <th style="width: 10%; text-align: center;">NPS</th>
+                                    <th style="width: 10%; text-align: center;">{{ _('NPS') }}</th>
                                     <th style="width: 50%;" class="text-center">{{ _('Ratings') }}</th>
-                                    <th style="width: 15%;">Date</th>
-                                    <th style="width: 5%; text-align: center;">Action</th>
+                                    <th style="width: 15%;">{{ _('Date') }}</th>
+                                    <th style="width: 5%; text-align: center;">{{ _('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody id="companyResponsesTableBody">
@@ -1025,7 +1025,7 @@
                     <div class="col-lg-6 mb-4">
                         <div class="card border">
                             <div class="card-header bg-white border-bottom">
-                                <h6 class="mb-0">Satisfaction</h6>
+                                <h6 class="mb-0">{{ _('Satisfaction') }}</h6>
                             </div>
                             <div class="card-body">
                                 <canvas id="modal-chart-satisfaction" height="250"></canvas>
@@ -1055,7 +1055,7 @@
                     <div class="col-lg-6 mb-4">
                         <div class="card border">
                             <div class="card-header bg-white border-bottom">
-                                <h6 class="mb-0">Service</h6>
+                                <h6 class="mb-0">{{ _('Service') }}</h6>
                             </div>
                             <div class="card-body">
                                 <canvas id="modal-chart-service" height="250"></canvas>
