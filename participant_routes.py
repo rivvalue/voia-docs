@@ -1559,6 +1559,147 @@ def remove_campaign_participant(campaign_id, association_id):
     return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
 
 
+@participant_bp.route('/campaigns/<int:campaign_id>/participants/bulk-remove', methods=['POST'])
+@require_business_auth
+@require_permission('manage_participants')
+def bulk_remove_campaign_participants(campaign_id):
+    """
+    Bulk remove participants from campaign
+    Only allowed for campaigns in draft or ready status
+    """
+    
+    MAX_BATCH_SIZE = 50
+    
+    try:
+        logger.info(f"Bulk remove request received for campaign {campaign_id}")
+        current_account = get_current_business_account()
+        if not current_account or not current_account.id:
+            logger.error("Bulk remove: Business account context not found")
+            return jsonify({
+                'success': False,
+                'error': 'Business account context not found'
+            }), 401
+        
+        # Parse request data
+        data = request.get_json()
+        association_ids = data.get('association_ids', [])
+        
+        logger.info(f"Bulk remove data received: association_ids count={len(association_ids)}")
+        
+        # Validate batch size
+        if len(association_ids) > MAX_BATCH_SIZE:
+            return jsonify({
+                'success': False,
+                'error': 'Batch limit exceeded',
+                'message': f'Bulk removal limited to {MAX_BATCH_SIZE} participants. Please select fewer participants.',
+                'max_allowed': MAX_BATCH_SIZE,
+                'requested': len(association_ids)
+            }), 413
+        
+        if not association_ids:
+            return jsonify({
+                'success': False,
+                'error': 'No participants selected'
+            }), 400
+        
+        # Get campaign (scoped to current business account)
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            return jsonify({
+                'success': False,
+                'error': 'Campaign not found'
+            }), 404
+        
+        # Validate campaign status - can only remove participants if campaign is draft or ready
+        if campaign.status in ['active', 'completed']:
+            status_msg = 'active and collecting responses' if campaign.status == 'active' else 'completed'
+            return jsonify({
+                'success': False,
+                'error': f'Cannot remove participants from {status_msg} campaign',
+                'message': 'Participants can only be removed when campaign is in draft or ready status.'
+            }), 403
+        
+        # Generate unique bulk operation ID for audit trail correlation
+        bulk_operation_id = str(uuid.uuid4())
+        
+        # Fetch associations (scoped to current business account and campaign)
+        associations = CampaignParticipant.query.filter(
+            CampaignParticipant.id.in_(association_ids),
+            CampaignParticipant.campaign_id == campaign_id,
+            CampaignParticipant.business_account_id == current_account.id
+        ).all()
+        
+        if not associations:
+            return jsonify({
+                'success': False,
+                'error': 'No valid participant associations found'
+            }), 404
+        
+        # Track results
+        removed_count = 0
+        removed_participants = []
+        
+        # Process removals
+        for association in associations:
+            participant_name = association.participant.name if association.participant else 'Unknown'
+            participant_email = association.participant.email if association.participant else 'Unknown'
+            
+            removed_participants.append({
+                'id': association.participant_id,
+                'name': participant_name,
+                'email': participant_email
+            })
+            
+            db.session.delete(association)
+            removed_count += 1
+        
+        db.session.commit()
+        
+        # Audit logging for bulk removal
+        try:
+            queue_audit_log(
+                business_account_id=current_account.id,
+                action_type='participants_removed',
+                resource_type='campaign',
+                resource_id=campaign_id,
+                resource_name=campaign.name,
+                details={
+                    'bulk_operation_id': bulk_operation_id,
+                    'removed_count': removed_count,
+                    'participants': removed_participants,
+                    'campaign_status': campaign.status
+                }
+            )
+        except Exception as audit_error:
+            logger.error(f"Failed to log bulk participant removal audit: {audit_error}")
+        
+        account_name = current_account.name if current_account and hasattr(current_account, 'name') else 'Unknown'
+        logger.info(f"Bulk removal completed: {removed_count} participants removed from campaign {campaign.name} (Bulk ID: {bulk_operation_id}, Business Account: {account_name})")
+        
+        return jsonify({
+            'success': True,
+            'removed': removed_count,
+            'bulk_operation_id': bulk_operation_id,
+            'message': f'Successfully removed {removed_count} participant(s) from {campaign.name}.'
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        import traceback
+        error_traceback = traceback.format_exc()
+        logger.error(f"Error in bulk removal: {e}")
+        logger.error(f"Bulk removal traceback: {error_traceback}")
+        return jsonify({
+            'success': False,
+            'error': 'An error occurred during bulk removal',
+            'details': str(e)
+        }), 500
+
+
 # ==============================================================================
 # INDIVIDUAL PARTICIPANT INVITATION ROUTES
 # ==============================================================================

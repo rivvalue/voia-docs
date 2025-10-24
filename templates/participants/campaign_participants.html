@@ -436,6 +436,12 @@
             </h5>
             {% if current_participants %}
             <div class="btn-group" role="group" aria-label="Participant actions">
+                <!-- Bulk Remove Button (only visible when participants selected and campaign is draft/ready) -->
+                {% if campaign.status in ['draft', 'ready'] %}
+                <button type="button" class="btn btn-outline-danger btn-sm" id="bulkRemoveBtn" style="display: none;" onclick="openBulkRemoveModal()" aria-label="Bulk remove selected participants">
+                    <i class="fas fa-trash me-2" aria-hidden="true"></i>Remove Selected (<span id="bulkRemoveCount">0</span>)
+                </button>
+                {% endif %}
                 <button type="button" class="btn btn-outline-info btn-sm" onclick="copyAllTokens()" aria-label="Copy all survey links to clipboard">
                     <i class="fas fa-copy me-2" aria-hidden="true"></i>Copy All Survey Links
                 </button>
@@ -448,6 +454,11 @@
             <table class="table table-hover campaign-participants-table" aria-label="Campaign participants table">
                 <thead>
                     <tr>
+                        {% if campaign.status in ['draft', 'ready'] %}
+                        <th scope="col" style="width: 40px;">
+                            <input type="checkbox" id="selectAllCampaignParticipants" onchange="toggleSelectAllCampaign(this)" aria-label="Select all participants">
+                        </th>
+                        {% endif %}
                         <th scope="col"><i class="fas fa-user me-2" aria-hidden="true"></i>Participant</th>
                         <th scope="col"><i class="fas fa-envelope me-2" aria-hidden="true"></i>Email</th>
                         <th scope="col"><i class="fas fa-building me-2" aria-hidden="true"></i>Company</th>
@@ -460,6 +471,11 @@
                 <tbody>
                     {% for participant in current_participants %}
                     <tr>
+                        {% if campaign.status in ['draft', 'ready'] %}
+                        <td>
+                            <input type="checkbox" class="campaign-participant-checkbox" value="{{ participant.association_id }}" onchange="updateBulkRemoveSelection()" aria-label="Select {{ participant.name }}">
+                        </td>
+                        {% endif %}
                         <td>
                             <strong>{{ participant.name }}</strong>
                         </td>
@@ -800,5 +816,144 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Bulk Removal Functions
+let selectedCampaignParticipants = new Set();
+
+function toggleSelectAllCampaign(checkbox) {
+    const checkboxes = document.querySelectorAll('.campaign-participant-checkbox');
+    checkboxes.forEach(cb => {
+        cb.checked = checkbox.checked;
+        if (checkbox.checked) {
+            selectedCampaignParticipants.add(cb.value);
+        } else {
+            selectedCampaignParticipants.delete(cb.value);
+        }
+    });
+    updateBulkRemoveSelection();
+}
+
+function updateBulkRemoveSelection() {
+    // Update selected set
+    selectedCampaignParticipants.clear();
+    document.querySelectorAll('.campaign-participant-checkbox:checked').forEach(cb => {
+        selectedCampaignParticipants.add(cb.value);
+    });
+    
+    // Update UI
+    const count = selectedCampaignParticipants.size;
+    const btn = document.getElementById('bulkRemoveBtn');
+    const countSpan = document.getElementById('bulkRemoveCount');
+    
+    if (btn && countSpan) {
+        countSpan.textContent = count;
+        btn.style.display = count > 0 ? 'inline-block' : 'none';
+    }
+    
+    // Update select all checkbox state
+    const selectAllCheckbox = document.getElementById('selectAllCampaignParticipants');
+    const allCheckboxes = document.querySelectorAll('.campaign-participant-checkbox');
+    if (selectAllCheckbox && allCheckboxes.length > 0) {
+        selectAllCheckbox.checked = count === allCheckboxes.length;
+    }
+}
+
+function openBulkRemoveModal() {
+    if (selectedCampaignParticipants.size === 0) {
+        alert('Please select participants to remove.');
+        return;
+    }
+    
+    const modal = new bootstrap.Modal(document.getElementById('bulkRemoveModal'));
+    document.getElementById('bulkRemoveCountModal').textContent = selectedCampaignParticipants.size;
+    modal.show();
+}
+
+function submitBulkRemove() {
+    if (selectedCampaignParticipants.size === 0) {
+        alert('Please select participants to remove.');
+        return;
+    }
+    
+    const btn = document.getElementById('confirmBulkRemoveBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Removing...';
+    
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+    
+    // Send bulk remove request
+    fetch('{{ url_for("participants.bulk_remove_campaign_participants", campaign_id=campaign.id) }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            association_ids: Array.from(selectedCampaignParticipants)
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Close modal
+            bootstrap.Modal.getInstance(document.getElementById('bulkRemoveModal')).hide();
+            
+            // Show success message
+            alert(`Successfully removed ${data.removed} participant(s) from {{ campaign.name }}.`);
+            
+            // Reload page to show updated data
+            window.location.reload();
+        } else {
+            alert(`Error: ${data.error}\n${data.message || data.details || ''}`);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-trash me-1"></i>Remove Participants';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert(`An error occurred while removing participants.\nDetails: ${error.message}`);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-trash me-1"></i>Remove Participants';
+    });
+}
 </script>
+
+<!-- Bulk Remove Confirmation Modal -->
+<div class="modal fade" id="bulkRemoveModal" tabindex="-1" aria-labelledby="bulkRemoveModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="bulkRemoveModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Bulk Removal
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle me-2"></i>
+                    You are about to remove <strong><span id="bulkRemoveCountModal">0</span> participant(s)</strong> from <strong>{{ campaign.name }}</strong>.
+                </div>
+                <p><strong>This action will:</strong></p>
+                <ul>
+                    <li>Remove the selected participants from this campaign</li>
+                    <li>Not delete the participant records (they can be re-added later)</li>
+                    <li>Not affect their participation in other campaigns</li>
+                </ul>
+                <p class="mb-0"><strong>Are you sure you want to continue?</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="submitBulkRemove()" id="confirmBulkRemoveBtn">
+                    <i class="fas fa-trash me-1"></i>Remove Participants
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
