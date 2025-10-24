@@ -226,6 +226,157 @@ def list_participants():
         return redirect(url_for('business_auth.admin_panel'))
 
 
+@participant_bp.route('/api/filter')
+@require_business_auth
+@require_permission('manage_participants')
+def api_filter_participants():
+    """JSON API endpoint for filtered participant data"""
+    
+    try:
+        # Get current business account context
+        current_account = get_current_business_account()
+        if not current_account or not current_account.id:
+            return jsonify({'error': 'Business account context not found'}), 401
+        
+        # Get search and pagination parameters
+        search_query = request.args.get('search', '').strip()
+        page = request.args.get('page', 1, type=int)
+        per_page = 20
+        
+        # Get filter parameters
+        filter_companies = request.args.getlist('filter_company')
+        filter_roles = request.args.getlist('filter_role')
+        filter_regions = request.args.getlist('filter_region')
+        filter_tiers = request.args.getlist('filter_tier')
+        filter_languages = request.args.getlist('filter_language')
+        filter_tenure_ranges = request.args.getlist('filter_tenure')
+        
+        # Base query scoped to current business account
+        query = Participant.query.filter_by(business_account_id=current_account.id)
+        
+        # Apply attribute filters
+        if filter_companies:
+            query = query.filter(Participant.company_name.in_(filter_companies))
+        if filter_roles:
+            query = query.filter(Participant.role.in_(filter_roles))
+        if filter_regions:
+            query = query.filter(Participant.region.in_(filter_regions))
+        if filter_tiers:
+            query = query.filter(Participant.customer_tier.in_(filter_tiers))
+        if filter_languages:
+            query = query.filter(Participant.language.in_(filter_languages))
+        if filter_tenure_ranges:
+            tenure_years_int = [int(t) for t in filter_tenure_ranges if t.isdigit()]
+            if tenure_years_int:
+                query = query.filter(Participant.tenure_years.in_(tenure_years_int))
+        
+        # Apply search filter if provided
+        if search_query:
+            search_term = f"%{search_query}%"
+            query = query.filter(
+                db.or_(
+                    Participant.name.ilike(search_term),
+                    Participant.email.ilike(search_term),
+                    Participant.company_name.ilike(search_term)
+                )
+            )
+        
+        # Get KPI stats with same filters
+        from sqlalchemy import case, func as sql_func
+        
+        kpi_base_query = db.session.query(
+            sql_func.count(Participant.id).label('total'),
+            sql_func.count(case((Participant.status == 'completed', 1))).label('completed'),
+            sql_func.count(case((Participant.status == 'started', 1))).label('started'),
+            sql_func.count(case((Participant.status == 'invited', 1))).label('invited'),
+            sql_func.count(case((Participant.status == 'created', 1))).label('created'),
+            sql_func.count(sql_func.distinct(case(
+                ((Participant.company_name.isnot(None)) & (Participant.company_name != ''), Participant.company_name)
+            ))).label('companies')
+        ).filter(Participant.business_account_id == current_account.id)
+        
+        # Apply same attribute filters to KPI query
+        if filter_companies:
+            kpi_base_query = kpi_base_query.filter(Participant.company_name.in_(filter_companies))
+        if filter_roles:
+            kpi_base_query = kpi_base_query.filter(Participant.role.in_(filter_roles))
+        if filter_regions:
+            kpi_base_query = kpi_base_query.filter(Participant.region.in_(filter_regions))
+        if filter_tiers:
+            kpi_base_query = kpi_base_query.filter(Participant.customer_tier.in_(filter_tiers))
+        if filter_languages:
+            kpi_base_query = kpi_base_query.filter(Participant.language.in_(filter_languages))
+        if filter_tenure_ranges:
+            tenure_years_int = [int(t) for t in filter_tenure_ranges if t.isdigit()]
+            if tenure_years_int:
+                kpi_base_query = kpi_base_query.filter(Participant.tenure_years.in_(tenure_years_int))
+        
+        # Apply same search filter if provided
+        if search_query:
+            search_term = f"%{search_query}%"
+            kpi_base_query = kpi_base_query.filter(
+                db.or_(
+                    Participant.name.ilike(search_term),
+                    Participant.email.ilike(search_term),
+                    Participant.company_name.ilike(search_term)
+                )
+            )
+        
+        # Execute KPI query
+        kpi_result = kpi_base_query.first()
+        total_participants = kpi_result.total
+        
+        kpi_stats = {
+            'total': kpi_result.total,
+            'completed': kpi_result.completed,
+            'started': kpi_result.started,
+            'invited': kpi_result.invited,
+            'created': kpi_result.created,
+            'companies': kpi_result.companies
+        }
+        kpi_stats['active'] = kpi_stats['created'] + kpi_stats['invited']
+        
+        # Calculate participants per company ratio
+        if kpi_stats['companies'] > 0:
+            ratio = kpi_stats['total'] / kpi_stats['companies']
+            kpi_stats['participants_per_company'] = round(float(ratio), 1)
+        else:
+            kpi_stats['participants_per_company'] = 0.0
+        
+        # Apply pagination
+        participants = query.order_by(Participant.created_at.desc()).offset(
+            (page - 1) * per_page
+        ).limit(per_page).all()
+        
+        # Calculate pagination info
+        total_pages = (total_participants + per_page - 1) // per_page
+        has_prev = page > 1
+        has_next = page < total_pages
+        
+        # Prepare participant data
+        participant_data = [p.to_dict() for p in participants]
+        
+        return jsonify({
+            'success': True,
+            'participants': participant_data,
+            'kpi_stats': kpi_stats,
+            'pagination': {
+                'page': page,
+                'per_page': per_page,
+                'total': total_participants,
+                'total_pages': total_pages,
+                'has_prev': has_prev,
+                'has_next': has_next,
+                'prev_page': page - 1 if has_prev else None,
+                'next_page': page + 1 if has_next else None
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Error filtering participants API: {e}")
+        return jsonify({'error': 'Error filtering participants', 'message': str(e)}), 500
+
+
 @participant_bp.route('/create', methods=['GET', 'POST'])
 @require_business_auth
 @require_permission('manage_participants')
