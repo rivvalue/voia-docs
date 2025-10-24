@@ -113,13 +113,13 @@
             </div>
             {% endif %}
             
+            <!-- Language Selector - Always Visible (Mobile & Desktop) -->
+            <div class="d-flex align-items-center ms-auto">
+                {% include 'components/language_selector.html' %}
+            </div>
+            
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <!-- Language Selector -->
-                    <li class="nav-item d-flex align-items-center me-3">
-                        {% include 'components/language_selector.html' %}
-                    </li>
-                    
                     <!-- Business Authentication - UI Version Toggle (inside collapsible menu) -->
                     {% if is_business_authenticated %}
                     <li class="nav-item d-flex align-items-center me-3">
@@ -131,14 +131,14 @@
             
             <!-- User Name Display (No Dropdown - Actions in Sidebar) -->
             {% if is_business_authenticated %}
-            <span class="navbar-text ms-auto me-3 text-white">
+            <span class="navbar-text ms-3 text-white">
                 <i class="fas fa-user-circle me-2"></i>{{ business_user_name }}
             </span>
             {% endif %}
             
             <!-- Hamburger Toggle Button (Right Side - Unauthenticated) / User Dropdown (Right Side - Authenticated) -->
             {% if not is_business_authenticated %}
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             {% endif %}
