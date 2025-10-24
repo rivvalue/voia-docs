@@ -173,7 +173,7 @@
                                 <i class="fas fa-users fa-2x"></i>
                             </div>
                             <div>
-                                <h5 class="mb-0">{{ kpi_stats.total }}</h5>
+                                <h5 class="mb-0" id="kpiTotal">{{ kpi_stats.total }}</h5>
                                 <small>Total Participants</small>
                             </div>
                         </div>
@@ -186,7 +186,7 @@
                                 <i class="fas fa-clock fa-2x"></i>
                             </div>
                             <div>
-                                <h5 class="mb-0">{{ kpi_stats.active }}</h5>
+                                <h5 class="mb-0" id="kpiActive">{{ kpi_stats.active }}</h5>
                                 <small>Active</small>
                             </div>
                         </div>
@@ -199,7 +199,7 @@
                                 <i class="fas fa-building fa-2x"></i>
                             </div>
                             <div>
-                                <h5 class="mb-0">{{ kpi_stats.companies }}</h5>
+                                <h5 class="mb-0" id="kpiCompanies">{{ kpi_stats.companies }}</h5>
                                 <small>Companies</small>
                             </div>
                         </div>
@@ -526,7 +526,7 @@
                                     <th class="text-end">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="participantTableBody">
                                 {% for participant in participants %}
                                 <tr>
                                     <td>
@@ -637,6 +637,7 @@
                 </div>
                 
                 <!-- Pagination -->
+                <div id="paginationContainer">
                 {% if pagination.total_pages > 1 %}
                 <div class="card-footer">
                     <nav aria-label="Participant pagination">
@@ -690,6 +691,7 @@
                     </nav>
                 </div>
                 {% endif %}
+                </div>
             </div>
 
         </div>
@@ -828,15 +830,249 @@ $(document).ready(function() {
     });
 });
 
-// Clear filters button
+// AJAX filter functionality
+let isFilterLoading = false;
+
+function applyFilters(page = 1) {
+    if (isFilterLoading) return;
+    
+    const filterForm = document.getElementById('filterForm');
+    if (!filterForm) return;
+    
+    isFilterLoading = true;
+    
+    // Show loading state
+    const participantTableBody = document.getElementById('participantTableBody');
+    const originalContent = participantTableBody.innerHTML;
+    participantTableBody.innerHTML = `
+        <tr>
+            <td colspan="8" class="text-center py-5">
+                <div class="spinner-border text-voia-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 text-muted">Filtering participants...</p>
+            </td>
+        </tr>
+    `;
+    
+    // Build query parameters from form
+    const formData = new FormData(filterForm);
+    const params = new URLSearchParams();
+    
+    // Add search if present
+    const searchInput = document.querySelector('input[name="search"]');
+    if (searchInput && searchInput.value) {
+        params.append('search', searchInput.value);
+    }
+    
+    // Add all filter parameters
+    for (const [key, value] of formData.entries()) {
+        if (value) {
+            params.append(key, value);
+        }
+    }
+    
+    // Add page parameter
+    params.append('page', page);
+    
+    // Call API
+    fetch('/business/participants/api/filter?' + params.toString())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Update participant table
+                updateParticipantTable(data.participants, data.pagination);
+                
+                // Update KPI cards
+                updateKPICards(data.kpi_stats);
+                
+                // Update URL without reload
+                const newUrl = window.location.pathname + '?' + params.toString();
+                window.history.pushState({}, '', newUrl);
+                
+                // Clear bulk selection
+                selectedParticipants.clear();
+                const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+                if (selectAllCheckbox) {
+                    selectAllCheckbox.checked = false;
+                }
+                updateBulkEditButton();
+            } else {
+                throw new Error(data.error || 'Unknown error');
+            }
+        })
+        .catch(error => {
+            console.error('Error filtering participants:', error);
+            participantTableBody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center py-5">
+                        <i class="fas fa-exclamation-triangle text-danger fa-2x mb-2"></i>
+                        <p class="text-danger">Error loading participants. Please try again.</p>
+                    </td>
+                </tr>
+            `;
+        })
+        .finally(() => {
+            isFilterLoading = false;
+        });
+}
+
+function updateParticipantTable(participants, pagination) {
+    const tbody = document.getElementById('participantTableBody');
+    
+    if (participants.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center py-5">
+                    <i class="fas fa-filter text-muted fa-2x mb-2"></i>
+                    <p class="text-muted mb-0">No participants match your filters.</p>
+                    <p class="text-muted small">Try adjusting your filter criteria.</p>
+                </td>
+            </tr>
+        `;
+        
+        // Update pagination
+        document.getElementById('paginationContainer').innerHTML = '';
+        return;
+    }
+    
+    // Build table rows
+    let html = '';
+    participants.forEach(p => {
+        const statusClass = p.status === 'completed' ? 'success' : 
+                           p.status === 'started' ? 'info' :
+                           p.status === 'invited' ? 'warning' : 'secondary';
+        
+        html += `
+            <tr>
+                <td><input type="checkbox" class="row-checkbox" data-participant-id="${p.id}" onchange="updateSelection()"></td>
+                <td><a href="/business/participants/${p.id}/edit" class="text-decoration-none">${p.name || 'N/A'}</a></td>
+                <td>${p.email || 'N/A'}</td>
+                <td>${p.company_name || '<span class="text-muted">N/A</span>'}</td>
+                <td>${p.role || '<span class="text-muted">N/A</span>'}</td>
+                <td>${p.region || '<span class="text-muted">N/A</span>'}</td>
+                <td><span class="badge bg-${statusClass}">${p.status}</span></td>
+                <td>
+                    <a href="/business/participants/${p.id}/edit" class="btn btn-sm btn-outline-primary" title="Edit">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <button class="btn btn-sm btn-outline-danger delete-participant-btn ms-1" 
+                            data-participant-id="${p.id}" 
+                            data-participant-name="${p.name}"
+                            title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+    
+    tbody.innerHTML = html;
+    
+    // Re-attach delete event listeners
+    attachDeleteListeners();
+    
+    // Update pagination
+    updatePagination(pagination);
+}
+
+function updateKPICards(stats) {
+    document.getElementById('kpiTotal').textContent = stats.total || 0;
+    document.getElementById('kpiActive').textContent = stats.active || 0;
+    document.getElementById('kpiCompanies').textContent = stats.companies || 0;
+}
+
+function updatePagination(pagination) {
+    const container = document.getElementById('paginationContainer');
+    
+    if (pagination.total_pages <= 1) {
+        container.innerHTML = '';
+        return;
+    }
+    
+    let html = '<nav aria-label="Participant pagination"><ul class="pagination justify-content-center mb-0">';
+    
+    // Previous button
+    html += `<li class="page-item ${!pagination.has_prev ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="if(${pagination.has_prev}) { applyFilters(${pagination.prev_page}); return false; }" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+             </li>`;
+    
+    // Page numbers (show max 5 pages)
+    const startPage = Math.max(1, pagination.page - 2);
+    const endPage = Math.min(pagination.total_pages, pagination.page + 2);
+    
+    for (let i = startPage; i <= endPage; i++) {
+        html += `<li class="page-item ${i === pagination.page ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="applyFilters(${i}); return false;">${i}</a>
+                 </li>`;
+    }
+    
+    // Next button
+    html += `<li class="page-item ${!pagination.has_next ? 'disabled' : ''}">
+                <a class="page-link" href="#" onclick="if(${pagination.has_next}) { applyFilters(${pagination.next_page}); return false; }" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+             </li>`;
+    
+    html += '</ul></nav>';
+    container.innerHTML = html;
+}
+
+function attachDeleteListeners() {
+    const deleteButtons = document.querySelectorAll('.delete-participant-btn');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const participantId = this.getAttribute('data-participant-id');
+            const participantName = this.getAttribute('data-participant-name');
+            
+            if (confirm(`Are you sure you want to delete participant "${participantName}"?\n\nThis action cannot be undone. The participant can only be deleted if they have no survey history.`)) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/business/participants/${participantId}/delete`;
+                
+                const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                if (csrfToken) {
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = 'csrf_token';
+                    csrfInput.value = csrfToken.getAttribute('content');
+                    form.appendChild(csrfInput);
+                }
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    });
+}
+
+// Intercept filter form submission
 document.addEventListener('DOMContentLoaded', function() {
+    const filterForm = document.getElementById('filterForm');
+    if (filterForm) {
+        filterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            applyFilters(1); // Reset to page 1 on new filter
+        });
+    }
+    
+    // Clear filters button
     const clearFiltersBtn = document.getElementById('clearFiltersBtn');
     if (clearFiltersBtn) {
-        clearFiltersBtn.addEventListener('click', function() {
-            const searchParam = '{{ search_query }}';
-            const url = new URL(window.location.href);
-            url.search = searchParam ? `?search=${encodeURIComponent(searchParam)}` : '';
-            window.location.href = url.toString();
+        clearFiltersBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Reset all filter selects
+            $('.filter-select').val(null).trigger('change');
+            // Apply filters (will be empty)
+            applyFilters(1);
         });
     }
     
@@ -856,38 +1092,9 @@ document.addEventListener('DOMContentLoaded', function() {
 const MAX_SELECTION = 50;
 let selectedParticipants = new Set();
 
-// Delete participant confirmation
+// Initialize delete listeners on page load
 document.addEventListener('DOMContentLoaded', function() {
-    const deleteButtons = document.querySelectorAll('.delete-participant-btn');
-    
-    deleteButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            const participantId = this.getAttribute('data-participant-id');
-            const participantName = this.getAttribute('data-participant-name');
-            
-            if (confirm(`Are you sure you want to delete participant "${participantName}"?\n\nThis action cannot be undone. The participant can only be deleted if they have no survey history.`)) {
-                // Create and submit a delete form
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = `/business/participants/${participantId}/delete`;
-                
-                // Add CSRF token
-                const csrfToken = document.querySelector('meta[name="csrf-token"]');
-                if (csrfToken) {
-                    const csrfInput = document.createElement('input');
-                    csrfInput.type = 'hidden';
-                    csrfInput.name = 'csrf_token';
-                    csrfInput.value = csrfToken.getAttribute('content');
-                    form.appendChild(csrfInput);
-                }
-                
-                document.body.appendChild(form);
-                form.submit();
-            }
-        });
-    });
+    attachDeleteListeners();
 });
 
 // Bulk edit functions
