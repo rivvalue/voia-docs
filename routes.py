@@ -369,7 +369,7 @@ def ensure_trial_participant(email, name, company_name, campaign_id):
     return participant, campaign_association
 
 @app.route('/')
-@cache.cached(timeout=300, unless=lambda: bool(session.get('auth_token')))
+@cache.cached(timeout=300, key_prefix=lambda: f"index_{session.get('language', 'en')}", unless=lambda: bool(session.get('auth_token')))
 def index():
     """Landing page with survey overview"""
     # Pass authentication status to template
