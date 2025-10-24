@@ -35,7 +35,7 @@
         </div>
         
         <div class="conv-hero-welcome">
-            <h2>Hi {{ participant_name }}, thank you for participating</h2>
+            <h2>Bonjour {{ participant_name }}, merci de votre participation</h2>
             <p>{{ branding.company_name if branding and branding.company_name else 'We' }} value your feedback</p>
         </div>
     </div>
@@ -57,36 +57,36 @@
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         
                         <div class="mb-3">
-                            <label for="companyName" class="form-label">Company Name</label>
+                            <label for="companyName" class="form-label">Nom de l'entreprise</label>
                             <input type="text" class="form-control" id="companyName" required 
                                    value="{{ participant_company }}" readonly>
                         </div>
                         
                         <div class="mb-3">
-                            <label for="respondentName" class="form-label">Your Name</label>
+                            <label for="respondentName" class="form-label">Votre nom</label>
                             <input type="text" class="form-control" id="respondentName" required 
                                    value="{{ participant_name }}" readonly>
                         </div>
                         
                         <div class="mb-3">
-                            <label for="respondentEmail" class="form-label">Email Address</label>
+                            <label for="respondentEmail" class="form-label">Adresse e-mail</label>
                             <input type="email" class="form-control" id="respondentEmail" required 
                                    value="{{ email }}" readonly>
                         </div>
                         
                         <div class="mb-4">
                             <label for="tenureWithFc" class="form-label">
-                                How long have you been working with {{ branding.company_name if branding and branding.company_name else 'us' }}?
+                                Depuis combien de temps travaillez-vous avec {{ branding.company_name if branding and branding.company_name else 'nous' }} ?
                             </label>
                             <select class="form-select" id="tenureWithFc" required>
-                                <option value="">Select duration...</option>
-                                <option value="Less than 6 months">Less than 6 months</option>
-                                <option value="6 months - 1 year">6 months - 1 year</option>
-                                <option value="1-2 years">1-2 years</option>
-                                <option value="2-3 years">2-3 years</option>
-                                <option value="3-5 years">3-5 years</option>
-                                <option value="5-10 years">5-10 years</option>
-                                <option value="More than 10 years">More than 10 years</option>
+                                <option value="">Sélectionnez la durée...</option>
+                                <option value="Moins de 6 mois">Moins de 6 mois</option>
+                                <option value="6 mois - 1 an">6 mois - 1 an</option>
+                                <option value="1 à 2 ans">1 à 2 ans</option>
+                                <option value="2 à 3 ans">2 à 3 ans</option>
+                                <option value="3 à 5 ans">3 à 5 ans</option>
+                                <option value="5 à 10 ans">5 à 10 ans</option>
+                                <option value="Plus de 10 ans">Plus de 10 ans</option>
                             </select>
                         </div>
                         
@@ -117,7 +117,7 @@
                     <div id="inputArea" class="conv-input-area">
                         <div class="input-group">
                             <textarea id="userInput" class="form-control" rows="3" 
-                                      placeholder="Type your response here..."></textarea>
+                                      placeholder="Saisissez votre réponse ici..."></textarea>
                             <button id="sendButton" class="btn" type="button">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
@@ -134,10 +134,10 @@
             <div id="loadingState" class="conv-card" style="display: none;">
                 <div class="conv-card-body text-center" style="padding: 3rem 2rem;">
                     <div class="spinner-border mb-3" style="color: #E13A44;">
-                        <span class="visually-hidden">Loading...</span>
+                        <span class="visually-hidden">Chargement...</span>
                     </div>
-                    <h5 style="font-family: 'Montserrat', sans-serif;">VOÏA is processing your response...</h5>
-                    <p class="text-muted">Please wait while VOÏA analyzes your feedback</p>
+                    <h5 style="font-family: 'Montserrat', sans-serif;">VOÏA traite votre réponse...</h5>
+                    <p class="text-muted">Veuillez patienter pendant que VOÏA analyse votre retour d'information</p>
                 </div>
             </div>
 
@@ -148,10 +148,10 @@
                         <i class="fas fa-check-circle"></i>
                     </div>
                     
-                    <h4>Thank you, {{ participant_name }}!</h4>
+                    <h4>Merci, {{ participant_name }} !</h4>
                     
                     <p class="lead mb-2">
-                        Your feedback for <strong>{{ campaign_name }}</strong> has been successfully submitted.
+                        Votre retour pour <strong>{{ campaign_name }}</strong> has been successfully submitted.
                     </p>
                     
                     {% if custom_end_message %}
@@ -162,7 +162,7 @@
                     {% else %}
                     <!-- Default Completion Message -->
                     <p class="text-muted mb-4">
-                        Your insights help us continuously improve our services. Thank you for taking the time to share your experience.
+                        Vos analyses nous aident à améliorer continuellement nos services. Merci d'avoir pris le temps de partager votre expérience.
                     </p>
                     {% endif %}
                     

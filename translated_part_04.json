@@ -25,1423 +25,1660 @@
       "id": "account_status_9",
       "file": "templates/business_auth/account_status.html",
       "element": "h5",
-      "text": "Statut du compte : {{ account_status|title }}"
+      "text": "Statut du compte : {{ account_status|title }}",
+      "original_text": "Account Status: {{ account_status|title }}"
     },
     {
       "id": "account_status_10",
       "file": "templates/business_auth/account_status.html",
       "element": "p",
-      "text": "Veuillez contacter le support pour obtenir de l'aide concernant votre compte."
+      "text": "Veuillez contacter le support pour obtenir de l'aide concernant votre compte.",
+      "original_text": "Please contact support for assistance with your account."
     },
     {
       "id": "scheduler_status_1",
       "file": "templates/business_auth/scheduler_status.html",
       "element": "h2",
-      "text": "Statut du planificateur de campagnes"
+      "text": "Statut du planificateur de campagnes",
+      "original_text": "Campaign Scheduler Status"
     },
     {
       "id": "scheduler_status_2",
       "file": "templates/business_auth/scheduler_status.html",
       "element": "h5",
-      "text": "Statut du planificateur"
+      "text": "Statut du planificateur",
+      "original_text": "Scheduler Status"
     },
     {
       "id": "scheduler_status_3",
       "file": "templates/business_auth/scheduler_status.html",
       "element": "h5",
-      "text": "Nombre de campagnes"
+      "text": "Nombre de campagnes",
+      "original_text": "Campaign Counts"
     },
     {
       "id": "scheduler_status_4",
       "file": "templates/business_auth/scheduler_status.html",
       "element": "h5",
-      "text": "Compte entreprise"
+      "text": "Compte entreprise",
+      "original_text": "Business Account"
     },
     {
       "id": "scheduler_status_5",
       "file": "templates/business_auth/scheduler_status.html",
       "element": "h5",
-      "text": "Actions"
+      "text": "Actions",
+      "original_text": "Actions"
     },
     {
       "id": "activate_account_1",
       "file": "templates/business_auth/activate_account.html",
       "element": "h1",
-      "text": "Bienvenue sur VOÏA !"
+      "text": "Bienvenue sur VOÏA !",
+      "original_text": "Welcome to VOÏA!"
     },
     {
       "id": "activate_account_2",
       "file": "templates/business_auth/activate_account.html",
       "element": "p",
-      "text": "Vous êtes invité à rejoindre {{ business_account.name }}"
+      "text": "Vous êtes invité à rejoindre {{ business_account.name }}",
+      "original_text": "You're invited to join {{ business_account.name }}"
     },
     {
       "id": "activate_account_3",
       "file": "templates/business_auth/activate_account.html",
       "element": "span",
-      "text": "Nom de l'entreprise"
+      "text": "Nom de l'entreprise",
+      "original_text": "Business Name"
     },
     {
       "id": "activate_account_4",
       "file": "templates/business_auth/activate_account.html",
       "element": "span",
-      "text": "Votre nom"
+      "text": "Votre nom",
+      "original_text": "Your Name"
     },
     {
       "id": "activate_account_5",
       "file": "templates/business_auth/activate_account.html",
       "element": "span",
-      "text": "Adresse e-mail"
+      "text": "Adresse e-mail",
+      "original_text": "Email Address"
     },
     {
       "id": "activate_account_6",
       "file": "templates/business_auth/activate_account.html",
       "element": "span",
-      "text": "Rôle"
+      "text": "Rôle",
+      "original_text": "Role"
     },
     {
       "id": "activate_account_7",
       "file": "templates/business_auth/activate_account.html",
       "element": "span",
-      "text": "Administrateur du compte entreprise"
+      "text": "Administrateur du compte entreprise",
+      "original_text": "Business Account Administrator"
     },
     {
       "id": "activate_account_8",
       "file": "templates/business_auth/activate_account.html",
       "element": "p",
-      "text": "La sécurité de votre compte est importante pour nous. Veuillez créer un mot de passe robuste afin de protéger vos données d'entreprise et d'assurer un accès sécurisé à la plateforme VOÏA."
+      "text": "La sécurité de votre compte est importante pour nous. Veuillez créer un mot de passe robuste afin de protéger vos données d'entreprise et d'assurer un accès sécurisé à la plateforme VOÏA.",
+      "original_text": "Your account security is important to us. Please create a strong password to protect your business data and ensure secure access to the VOÏA platform."
     },
     {
       "id": "activate_account_9",
       "file": "templates/business_auth/activate_account.html",
       "element": "p",
-      "text": "Finalisez la configuration de votre compte en créant un mot de passe sécurisé"
+      "text": "Finalisez la configuration de votre compte en créant un mot de passe sécurisé",
+      "original_text": "Complete your account setup by creating a secure password"
     },
     {
       "id": "activate_account_10",
       "file": "templates/business_auth/activate_account.html",
       "element": "div",
-      "text": "Besoin d'aide ? Contactez le support à"
+      "text": "Besoin d'aide ? Contactez le support à",
+      "original_text": "Need help? Contact support at"
     },
     {
       "id": "activate_account_11",
       "file": "templates/business_auth/activate_account.html",
       "element": "a",
-      "text": "support@voia.com"
+      "text": "support@voia.com",
+      "original_text": "support@voia.com"
     },
     {
       "id": "activate_account_12",
       "file": "templates/business_auth/activate_account.html",
       "element": "a",
-      "text": "← Retour à l'accueil VOÏA"
+      "text": "← Retour à l'accueil VOÏA",
+      "original_text": "← Return to VOÏA Home"
     },
     {
       "id": "activate_account_placeholder_13",
       "file": "templates/business_auth/activate_account.html",
       "element": "input[placeholder]",
-      "text": "Saisissez votre nouveau mot de passe"
+      "text": "Saisissez votre nouveau mot de passe",
+      "original_text": "Enter your new password"
     },
     {
       "id": "activate_account_placeholder_14",
       "file": "templates/business_auth/activate_account.html",
       "element": "input[placeholder]",
-      "text": "Confirmez votre nouveau mot de passe"
+      "text": "Confirmez votre nouveau mot de passe",
+      "original_text": "Confirm your new password"
     },
     {
       "id": "license_overview_1",
       "file": "templates/business_auth/license_overview.html",
       "element": "p",
-      "text": "Détails et informations d'utilisation de la licence pour {{ account_data.name }}"
+      "text": "Détails et informations d'utilisation de la licence pour {{ account_data.name }}",
+      "original_text": "License details and usage information for {{ account_data.name }}"
     },
     {
       "id": "license_overview_2",
       "file": "templates/business_auth/license_overview.html",
       "element": "label",
-      "text": "Type de licence :"
+      "text": "Type de licence :",
+      "original_text": "License Type:"
     },
     {
       "id": "license_overview_3",
       "file": "templates/business_auth/license_overview.html",
       "element": "label",
-      "text": "Statut :"
+      "text": "Statut :",
+      "original_text": "Status:"
     },
     {
       "id": "license_overview_4",
       "file": "templates/business_auth/license_overview.html",
       "element": "label",
-      "text": "Période de licence :"
+      "text": "Période de licence :",
+      "original_text": "License Period:"
     },
     {
       "id": "license_overview_5",
       "file": "templates/business_auth/license_overview.html",
       "element": "label",
-      "text": "Type de compte :"
+      "text": "Type de compte :",
+      "original_text": "Account Type:"
     },
     {
       "id": "license_overview_6",
       "file": "templates/business_auth/license_overview.html",
       "element": "h4",
-      "text": "Campagnes"
+      "text": "Campagnes",
+      "original_text": "Campaigns"
     },
     {
       "id": "license_overview_7",
       "file": "templates/business_auth/license_overview.html",
       "element": "h4",
-      "text": "Utilisateurs"
+      "text": "Utilisateurs",
+      "original_text": "Users"
     },
     {
       "id": "license_overview_8",
       "file": "templates/business_auth/license_overview.html",
       "element": "h5",
-      "text": "Analyses d'utilisation des campagnes"
+      "text": "Analyses d'utilisation des campagnes",
+      "original_text": "Campaign Usage Insights"
     },
     {
       "id": "license_overview_9",
       "file": "templates/business_auth/license_overview.html",
       "element": "h5",
-      "text": "Analyses des comptes utilisateurs"
+      "text": "Analyses des comptes utilisateurs",
+      "original_text": "User Account Insights"
     },
     {
       "id": "license_overview_10",
       "file": "templates/business_auth/license_overview.html",
       "element": "span",
-      "text": "Informations détaillées sur la licence"
+      "text": "Informations détaillées sur la licence",
+      "original_text": "Detailed License Info"
     },
     {
       "id": "license_overview_11",
       "file": "templates/business_auth/license_overview.html",
       "element": "span",
-      "text": "Gérer les campagnes"
+      "text": "Gérer les campagnes",
+      "original_text": "Manage Campaigns"
     },
     {
       "id": "license_overview_12",
       "file": "templates/business_auth/license_overview.html",
       "element": "span",
-      "text": "Gérer les utilisateurs"
+      "text": "Gérer les utilisateurs",
+      "original_text": "Manage Users"
     },
     {
       "id": "license_overview_13",
       "file": "templates/business_auth/license_overview.html",
       "element": "span",
-      "text": "Paramètres"
+      "text": "Paramètres",
+      "original_text": "Settings"
     },
     {
       "id": "admin_panel_1",
       "file": "templates/business_auth/admin_panel.html",
       "element": "h2",
-      "text": "Bienvenue {{ current_user.get_full_name() }}"
+      "text": "Bienvenue {{ current_user.get_full_name() }}",
+      "original_text": "Welcome {{ current_user.get_full_name() }}"
     },
     {
       "id": "admin_panel_2",
       "file": "templates/business_auth/admin_panel.html",
       "element": "span",
-      "text": "Centre d'analytique d'entreprise"
+      "text": "Centre d'analytique d'entreprise",
+      "original_text": "Business Analytics Hub"
     },
     {
       "id": "admin_panel_3",
       "file": "templates/business_auth/admin_panel.html",
       "element": "span",
-      "text": "Analytique"
+      "text": "Analytique",
+      "original_text": "Analytics"
     },
     {
       "id": "admin_panel_4",
       "file": "templates/business_auth/admin_panel.html",
       "element": "span",
-      "text": "Intégrer une entreprise"
+      "text": "Intégrer une entreprise",
+      "original_text": "Onboard Business"
     },
     {
       "id": "admin_panel_5",
       "file": "templates/business_auth/admin_panel.html",
       "element": "span",
-      "text": "Intégrer"
+      "text": "Intégrer",
+      "original_text": "Onboard"
     },
     {
       "id": "admin_panel_6",
       "file": "templates/business_auth/admin_panel.html",
       "element": "span",
-      "text": "Gérer"
+      "text": "Gérer",
+      "original_text": "Manage"
     },
     {
       "id": "admin_panel_7",
       "file": "templates/business_auth/admin_panel.html",
       "element": "span",
-      "text": "Gérer"
+      "text": "Gérer",
+      "original_text": "Manage"
     },
     {
       "id": "admin_panel_8",
       "file": "templates/business_auth/admin_panel.html",
       "element": "p",
-      "text": "Ajoutez et gérez les membres de votre équipe pour votre compte entreprise. Utilisation actuelle : {{ admin_data.license_info.users_used if admin_data.license_info else 1 }}/{{ admin_data.license_info.users_limit if admin_data.license_info else 5 }} utilisateurs."
+      "text": "Ajoutez et gérez les membres de votre équipe pour votre compte entreprise. Utilisation actuelle : {{ admin_data.license_info.users_used if admin_data.license_info else 1 }}/{{ admin_data.license_info.users_limit if admin_data.license_info else 5 }} utilisateurs.",
+      "original_text": "Add and manage team members for your business account. Current usage: {{ admin_data.license_info.users_used if admin_data.license_info else 1 }}/{{ admin_data.license_info.users_limit if admin_data.license_info else 5 }} users."
     },
     {
       "id": "admin_panel_9",
       "file": "templates/business_auth/admin_panel.html",
       "element": "p",
-      "text": "Créez et gérez des campagnes d'enquête pour votre compte entreprise."
+      "text": "Créez et gérez des campagnes d'enquête pour votre compte entreprise.",
+      "original_text": "Create and manage survey campaigns for your business account."
     },
     {
       "id": "admin_panel_10",
       "file": "templates/business_auth/admin_panel.html",
       "element": "p",
-      "text": "Nombre total de réponses"
+      "text": "Nombre total de réponses",
+      "original_text": "Total Responses"
     },
     {
       "id": "admin_panel_11",
       "file": "templates/business_auth/admin_panel.html",
       "element": "p",
-      "text": "Nombre total de campagnes"
+      "text": "Nombre total de campagnes",
+      "original_text": "Total Campaigns"
     },
     {
       "id": "admin_panel_12",
       "file": "templates/business_auth/admin_panel.html",
       "element": "p",
-      "text": "Campagnes actives"
+      "text": "Campagnes actives",
+      "original_text": "Active Campaigns"
     },
     {
       "id": "admin_panel_13",
       "file": "templates/business_auth/admin_panel.html",
       "element": "p",
-      "text": "Nombre total de participants"
+      "text": "Nombre total de participants",
+      "original_text": "Total Participants"
     },
     {
       "id": "admin_panel_14",
       "file": "templates/business_auth/admin_panel.html",
       "element": "p",
-      "text": "Invitations envoyées"
+      "text": "Invitations envoyées",
+      "original_text": "Sent Invitations"
     },
     {
       "id": "admin_panel_15",
       "file": "templates/business_auth/admin_panel.html",
       "element": "p",
-      "text": "Invitations en attente"
+      "text": "Invitations en attente",
+      "original_text": "Pending Invitations"
     },
     {
       "id": "admin_panel_16",
       "file": "templates/business_auth/admin_panel.html",
       "element": "p",
-      "text": "Invitations échouées"
+      "text": "Invitations échouées",
+      "original_text": "Failed Invitations"
     },
     {
       "id": "admin_panel_17",
       "file": "templates/business_auth/admin_panel.html",
       "element": "p",
-      "text": "Nombre total d'invitations"
+      "text": "Nombre total d'invitations",
+      "original_text": "Total Invitations"
     },
     {
       "id": "admin_panel_18",
       "file": "templates/business_auth/admin_panel.html",
       "element": "p",
-      "text": "Type de licence"
+      "text": "Type de licence",
+      "original_text": "License Type"
     },
     {
       "id": "admin_panel_19",
       "file": "templates/business_auth/admin_panel.html",
       "element": "p",
-      "text": "Campagnes utilisées"
+      "text": "Campagnes utilisées",
+      "original_text": "Campaigns Used"
     },
     {
       "id": "admin_panel_20",
       "file": "templates/business_auth/admin_panel.html",
       "element": "p",
-      "text": "Membres de l'équipe"
+      "text": "Membres de l'équipe",
+      "original_text": "Team Members"
     },
     {
       "id": "admin_panel_21",
       "file": "templates/business_auth/admin_panel.html",
       "element": "p",
-      "text": "Nombre maximum de participants"
+      "text": "Nombre maximum de participants",
+      "original_text": "Max Participants"
     },
     {
       "id": "admin_panel_22",
       "file": "templates/business_auth/admin_panel.html",
       "element": "span",
-      "text": "Description :"
+      "text": "Description :",
+      "original_text": "Description:"
     },
     {
       "id": "admin_panel_23",
       "file": "templates/business_auth/admin_panel.html",
       "element": "span",
-      "text": "Durée :"
+      "text": "Durée :",
+      "original_text": "Duration:"
     },
     {
       "id": "admin_panel_24",
       "file": "templates/business_auth/admin_panel.html",
       "element": "span",
-      "text": "Réponses :"
+      "text": "Réponses :",
+      "original_text": "Responses:"
     },
     {
       "id": "admin_panel_25",
       "file": "templates/business_auth/admin_panel.html",
       "element": "span",
-      "text": "Temps restant :"
+      "text": "Temps restant :",
+      "original_text": "Time Remaining:"
     },
     {
       "id": "admin_panel_26",
       "file": "templates/business_auth/admin_panel.html",
       "element": "span",
-      "text": "Commence dans :"
+      "text": "Commence dans :",
+      "original_text": "Starts In:"
     },
     {
       "id": "admin_panel_27",
       "file": "templates/business_auth/admin_panel.html",
       "element": "span",
-      "text": "Terminées :"
+      "text": "Terminées :",
+      "original_text": "Completed:"
     },
     {
       "id": "admin_panel_28",
       "file": "templates/business_auth/admin_panel.html",
       "element": "h5",
-      "text": "Aucune campagne trouvée"
+      "text": "Aucune campagne trouvée",
+      "original_text": "No Campaigns Found"
     },
     {
       "id": "admin_panel_29",
       "file": "templates/business_auth/admin_panel.html",
       "element": "p",
-      "text": "Les campagnes de démonstration apparaîtront ici une fois créées."
+      "text": "Les campagnes de démonstration apparaîtront ici une fois créées.",
+      "original_text": "Demo campaigns will appear here once created."
     },
     {
       "id": "admin_panel_30",
       "file": "templates/business_auth/admin_panel.html",
       "element": "h6",
-      "text": "Aucune réponse récente"
+      "text": "Aucune réponse récente",
+      "original_text": "No Recent Responses"
     },
     {
       "id": "admin_panel_31",
       "file": "templates/business_auth/admin_panel.html",
       "element": "p",
-      "text": "Les réponses apparaîtront ici au fur et à mesure de leur réception."
+      "text": "Les réponses apparaîtront ici au fur et à mesure de leur réception.",
+      "original_text": "Responses will appear here as they come in."
     },
     {
       "id": "admin_panel_32",
       "file": "templates/business_auth/admin_panel.html",
       "element": "h5",
-      "text": "Exporter toutes les données"
+      "text": "Exporter toutes les données",
+      "original_text": "Export All Data"
     },
     {
       "id": "admin_panel_33",
       "file": "templates/business_auth/admin_panel.html",
       "element": "p",
-      "text": "Exportez toutes les réponses aux enquêtes de l'ensemble des campagnes pour l'analyse et les rapports."
+      "text": "Exportez toutes les réponses aux enquêtes de l'ensemble des campagnes pour l'analyse et les rapports.",
+      "original_text": "Export all survey responses across all campaigns for analysis and reporting."
     },
     {
       "id": "admin_panel_34",
       "file": "templates/business_auth/admin_panel.html",
       "element": "h6",
-      "text": "Informations sur l'exportation"
+      "text": "Informations sur l'exportation",
+      "original_text": "Export Information"
     },
     {
       "id": "admin_panel_35",
       "file": "templates/business_auth/admin_panel.html",
       "element": "li",
-      "text": "Inclut toutes les campagnes"
+      "text": "Inclut toutes les campagnes",
+      "original_text": "Includes all campaigns"
     },
     {
       "id": "admin_panel_36",
       "file": "templates/business_auth/admin_panel.html",
       "element": "li",
-      "text": "Format JSON pour une analyse facilitée"
+      "text": "Format JSON pour une analyse facilitée",
+      "original_text": "JSON format for easy analysis"
     },
     {
       "id": "admin_panel_37",
       "file": "templates/business_auth/admin_panel.html",
       "element": "li",
-      "text": "Données de réponse complètes"
+      "text": "Données de réponse complètes",
+      "original_text": "Complete response data"
     },
     {
       "id": "admin_panel_38",
       "file": "templates/business_auth/admin_panel.html",
       "element": "li",
-      "text": "Accès administrateur requis"
+      "text": "Accès administrateur requis",
+      "original_text": "Admin access required"
     },
     {
       "id": "admin_panel_title_39",
       "file": "templates/business_auth/admin_panel.html",
       "element": "a[title]",
-      "text": "Centre d'analytique d'entreprise avec une intelligence complète de la plateforme"
+      "text": "Centre d'analytique d'entreprise avec une intelligence complète de la plateforme",
+      "original_text": "Business analytics hub with comprehensive platform intelligence"
     },
     {
       "id": "admin_panel_title_40",
       "file": "templates/business_auth/admin_panel.html",
       "element": "a[title]",
-      "text": "Créer de nouveaux comptes d'entreprise avec attribution de licence"
+      "text": "Créer de nouveaux comptes d'entreprise avec attribution de licence",
+      "original_text": "Create new business accounts with license assignment"
     },
     {
       "id": "admin_panel_title_41",
       "file": "templates/business_auth/admin_panel.html",
       "element": "a[title]",
-      "text": "Tableau de bord et aperçu de la gestion des licences"
+      "text": "Tableau de bord et aperçu de la gestion des licences",
+      "original_text": "License management dashboard and overview"
     },
     {
       "id": "admin_panel_title_42",
       "file": "templates/business_auth/admin_panel.html",
       "element": "a[title]",
-      "text": "Gérer les campagnes d'enquête"
+      "text": "Gérer les campagnes d'enquête",
+      "original_text": "Manage survey campaigns"
     },
     {
       "id": "admin_panel_title_43",
       "file": "templates/business_auth/admin_panel.html",
       "element": "a[title]",
-      "text": "Gérer les participants aux enquêtes"
+      "text": "Gérer les participants aux enquêtes",
+      "original_text": "Manage survey participants"
     },
     {
       "id": "admin_panel_title_44",
       "file": "templates/business_auth/admin_panel.html",
       "element": "button[title]",
-      "text": "Actions rapides et paramètres"
+      "text": "Actions rapides et paramètres",
+      "original_text": "Quick actions and settings"
     },
     {
       "id": "admin_panel_title_45",
       "file": "templates/business_auth/admin_panel.html",
       "element": "a[title]",
-      "text": "Afficher les analyses et les informations"
+      "text": "Afficher les analyses et les informations",
+      "original_text": "View analytics and insights"
     },
     {
       "id": "admin_panel_title_46",
       "file": "templates/business_auth/admin_panel.html",
       "element": "a[title]",
-      "text": "Configurer les paramètres d'e-mail"
+      "text": "Configurer les paramètres d'e-mail",
+      "original_text": "Configure email settings"
     },
     {
       "id": "admin_panel_title_47",
       "file": "templates/business_auth/admin_panel.html",
       "element": "a[title]",
-      "text": "Configurer les paramètres de marque"
+      "text": "Configurer les paramètres de marque",
+      "original_text": "Configure brand settings"
     },
     {
       "id": "admin_panel_title_48",
       "file": "templates/business_auth/admin_panel.html",
       "element": "a[title]",
-      "text": "Personnaliser l'expérience d'enquête et les paramètres de conversation"
+      "text": "Personnaliser l'expérience d'enquête et les paramètres de conversation",
+      "original_text": "Customize survey experience and conversation settings"
     },
     {
       "id": "admin_panel_title_49",
       "file": "templates/business_auth/admin_panel.html",
       "element": "a[title]",
-      "text": "Gérer les membres de l'équipe et les utilisateurs"
+      "text": "Gérer les membres de l'équipe et les utilisateurs",
+      "original_text": "Manage team members and users"
     },
     {
       "id": "admin_panel_title_50",
       "file": "templates/business_auth/admin_panel.html",
       "element": "a[title]",
-      "text": "Afficher les informations de licence et les statistiques d'utilisation"
+      "text": "Afficher les informations de licence et les statistiques d'utilisation",
+      "original_text": "View license information and usage statistics"
     },
     {
       "id": "admin_panel_title_51",
       "file": "templates/business_auth/admin_panel.html",
       "element": "a[title]",
-      "text": "Afficher tous les comptes d'entreprise et les attributions de licence"
+      "text": "Afficher tous les comptes d'entreprise et les attributions de licence",
+      "original_text": "View all business accounts and license assignments"
     },
     {
       "id": "admin_panel_title_52",
       "file": "templates/business_auth/admin_panel.html",
       "element": "a[title]",
-      "text": "Créer de nouveaux comptes d'entreprise avec attribution de licence"
+      "text": "Créer de nouveaux comptes d'entreprise avec attribution de licence",
+      "original_text": "Create new business accounts with license assignment"
     },
     {
       "id": "admin_panel_title_53",
       "file": "templates/business_auth/admin_panel.html",
       "element": "a[title]",
-      "text": "Tableau de bord et aperçu de la gestion des licences"
+      "text": "Tableau de bord et aperçu de la gestion des licences",
+      "original_text": "License management dashboard and overview"
     },
     {
       "id": "admin_panel_title_54",
       "file": "templates/business_auth/admin_panel.html",
       "element": "a[title]",
-      "text": "Afficher l'historique des activités du compte"
+      "text": "Afficher l'historique des activités du compte",
+      "original_text": "View account activity trail"
     },
     {
       "id": "admin_panel_title_55",
       "file": "templates/business_auth/admin_panel.html",
       "element": "button[title]",
-      "text": "Afficher plus de détails"
+      "text": "Afficher plus de détails",
+      "original_text": "Show more details"
     },
     {
       "id": "brand_config_1",
       "file": "templates/business_auth/brand_config.html",
       "element": "p",
-      "text": "Personnalisez votre identité de marque pour {{ business_account.name }}"
+      "text": "Personnalisez votre identité de marque pour {{ business_account.name }}",
+      "original_text": "Customize your brand identity for {{ business_account.name }}"
     },
     {
       "id": "brand_config_2",
       "file": "templates/business_auth/brand_config.html",
       "element": "div",
-      "text": "Aucun logo"
+      "text": "Aucun logo",
+      "original_text": "No logo"
     },
     {
       "id": "brand_config_3",
       "file": "templates/business_auth/brand_config.html",
       "element": "div",
-      "text": "Logo de l'entreprise"
+      "text": "Logo de l'entreprise",
+      "original_text": "Company Logo"
     },
     {
       "id": "brand_config_4",
       "file": "templates/business_auth/brand_config.html",
       "element": "div",
-      "text": "Nom d'affichage de l'entreprise"
+      "text": "Nom d'affichage de l'entreprise",
+      "original_text": "Company Display Name"
     },
     {
       "id": "brand_config_5",
       "file": "templates/business_auth/brand_config.html",
       "element": "label",
-      "text": "Nom d'affichage de l'entreprise"
+      "text": "Nom d'affichage de l'entreprise",
+      "original_text": "Company Display Name"
     },
     {
       "id": "brand_config_6",
       "file": "templates/business_auth/brand_config.html",
       "element": "div",
-      "text": "Ce nom sera affiché dans les enquêtes et les e-mails. Laissez vide pour utiliser « {{ business_account.name }} »."
+      "text": "Ce nom sera affiché dans les enquêtes et les e-mails. Laissez vide pour utiliser « {{ business_account.name }} ».",
+      "original_text": "This name will be displayed in surveys and emails. Leave blank to use \"{{ business_account.name }}\"."
     },
     {
       "id": "brand_config_7",
       "file": "templates/business_auth/brand_config.html",
       "element": "label",
-      "text": "Couleur principale"
+      "text": "Couleur principale",
+      "original_text": "Primary Color"
     },
     {
       "id": "brand_config_8",
       "file": "templates/business_auth/brand_config.html",
       "element": "div",
-      "text": "Couleur principale de la marque utilisée pour les en-têtes, les boutons et les accents."
+      "text": "Couleur principale de la marque utilisée pour les en-têtes, les boutons et les accents.",
+      "original_text": "Main brand color used for headers, buttons, and accents."
     },
     {
       "id": "brand_config_9",
       "file": "templates/business_auth/brand_config.html",
       "element": "label",
-      "text": "Couleur secondaire"
+      "text": "Couleur secondaire",
+      "original_text": "Secondary Color"
     },
     {
       "id": "brand_config_10",
       "file": "templates/business_auth/brand_config.html",
       "element": "div",
-      "text": "Couleur complémentaire pour les bordures et les éléments discrets."
+      "text": "Couleur complémentaire pour les bordures et les éléments discrets.",
+      "original_text": "Supporting color for borders and subtle elements."
     },
     {
       "id": "brand_config_11",
       "file": "templates/business_auth/brand_config.html",
       "element": "label",
-      "text": "Couleur d'accent"
+      "text": "Couleur d'accent",
+      "original_text": "Accent Color"
     },
     {
       "id": "brand_config_12",
       "file": "templates/business_auth/brand_config.html",
       "element": "div",
-      "text": "Couleur de surbrillance pour les états de succès et les éléments d'appel à l'action."
+      "text": "Couleur de surbrillance pour les états de succès et les éléments d'appel à l'action.",
+      "original_text": "Highlight color for success states and call-to-action elements."
     },
     {
       "id": "brand_config_13",
       "file": "templates/business_auth/brand_config.html",
       "element": "label",
-      "text": "Couleur du texte"
+      "text": "Couleur du texte",
+      "original_text": "Text Color"
     },
     {
       "id": "brand_config_14",
       "file": "templates/business_auth/brand_config.html",
       "element": "div",
-      "text": "Couleur de texte principale pour la lisibilité."
+      "text": "Couleur de texte principale pour la lisibilité.",
+      "original_text": "Primary text color for readability."
     },
     {
       "id": "brand_config_15",
       "file": "templates/business_auth/brand_config.html",
       "element": "label",
-      "text": "Couleur d'arrière-plan"
+      "text": "Couleur d'arrière-plan",
+      "original_text": "Background Color"
     },
     {
       "id": "brand_config_16",
       "file": "templates/business_auth/brand_config.html",
       "element": "div",
-      "text": "Couleur d'arrière-plan pour les documents et les rapports."
+      "text": "Couleur d'arrière-plan pour les documents et les rapports.",
+      "original_text": "Background color for documents and reports."
     },
     {
       "id": "brand_config_17",
       "file": "templates/business_auth/brand_config.html",
       "element": "label",
-      "text": "Aperçu des couleurs"
+      "text": "Aperçu des couleurs",
+      "original_text": "Color Preview"
     },
     {
       "id": "brand_config_18",
       "file": "templates/business_auth/brand_config.html",
       "element": "div",
-      "text": "Aperçu en direct de votre palette de couleurs."
+      "text": "Aperçu en direct de votre palette de couleurs.",
+      "original_text": "Live preview of your color palette."
     },
     {
       "id": "brand_config_19",
       "file": "templates/business_auth/brand_config.html",
       "element": "label",
-      "text": "Téléverser le logo"
+      "text": "Téléverser le logo",
+      "original_text": "Upload Logo"
     },
     {
       "id": "brand_config_20",
       "file": "templates/business_auth/brand_config.html",
       "element": "div",
-      "text": "Téléversez le logo de votre entreprise pour personnaliser les enquêtes et les communications. Formats pris en charge : PNG, JPG, JPEG, GIF, WEBP (max 5 Mo)."
+      "text": "Téléversez le logo de votre entreprise pour personnaliser les enquêtes et les communications. Formats pris en charge : PNG, JPG, JPEG, GIF, WEBP (max 5 Mo).",
+      "original_text": "Upload your company logo to personalize surveys and communications. Supported formats: PNG, JPG, JPEG, GIF, WEBP (max 5MB)."
     },
     {
       "id": "brand_config_21",
       "file": "templates/business_auth/brand_config.html",
       "element": "li",
-      "text": "Formats pris en charge : PNG, JPG, JPEG, GIF, WEBP"
+      "text": "Formats pris en charge : PNG, JPG, JPEG, GIF, WEBP",
+      "original_text": "Supported formats: PNG, JPG, JPEG, GIF, WEBP"
     },
     {
       "id": "brand_config_22",
       "file": "templates/business_auth/brand_config.html",
       "element": "li",
-      "text": "Taille maximale du fichier : 5 Mo"
+      "text": "Taille maximale du fichier : 5 Mo",
+      "original_text": "Maximum file size: 5MB"
     },
     {
       "id": "brand_config_23",
       "file": "templates/business_auth/brand_config.html",
       "element": "li",
-      "text": "Dimensions recommandées : 400x200 pixels ou ratio similaire"
+      "text": "Dimensions recommandées : 400x200 pixels ou ratio similaire",
+      "original_text": "Recommended dimensions: 400x200 pixels or similar ratio"
     },
     {
       "id": "brand_config_24",
       "file": "templates/business_auth/brand_config.html",
       "element": "li",
-      "text": "Arrière-plan transparent recommandé pour les fichiers PNG"
+      "text": "Arrière-plan transparent recommandé pour les fichiers PNG",
+      "original_text": "Transparent background recommended for PNG files"
     },
     {
       "id": "brand_config_25",
       "file": "templates/business_auth/brand_config.html",
       "element": "li",
-      "text": "Format PNG recommandé pour les logos avec transparence"
+      "text": "Format PNG recommandé pour les logos avec transparence",
+      "original_text": "PNG format recommended for logos with transparency"
     },
     {
       "id": "brand_config_26",
       "file": "templates/business_auth/brand_config.html",
       "element": "div",
-      "text": "Les modifications prendront effet immédiatement après l'enregistrement."
+      "text": "Les modifications prendront effet immédiatement après l'enregistrement.",
+      "original_text": "Changes will take effect immediately after saving."
     },
     {
       "id": "brand_config_title_27",
       "file": "templates/business_auth/brand_config.html",
       "element": "div[title]",
-      "text": "Primary color"
+      "text": "Primary color",
+      "original_text": "Primary color"
     },
     {
       "id": "brand_config_title_28",
       "file": "templates/business_auth/brand_config.html",
       "element": "div[title]",
-      "text": "Secondary color"
+      "text": "Secondary color",
+      "original_text": "Secondary color"
     },
     {
       "id": "brand_config_title_29",
       "file": "templates/business_auth/brand_config.html",
       "element": "div[title]",
-      "text": "Accent color"
+      "text": "Accent color",
+      "original_text": "Accent color"
     },
     {
       "id": "brand_config_aria_30",
       "file": "templates/business_auth/brand_config.html",
       "element": "div[aria-label]",
-      "text": "No logo uploaded"
+      "text": "No logo uploaded",
+      "original_text": "No logo uploaded"
     },
     {
       "id": "brand_config_aria_31",
       "file": "templates/business_auth/brand_config.html",
       "element": "div[aria-label]",
-      "text": "Color palette preview"
+      "text": "Color palette preview",
+      "original_text": "Color palette preview"
     },
     {
       "id": "brand_config_aria_32",
       "file": "templates/business_auth/brand_config.html",
       "element": "div[aria-label]",
-      "text": "Upload requirements"
+      "text": "Upload requirements",
+      "original_text": "Upload requirements"
     },
     {
       "id": "brand_config_aria_33",
       "file": "templates/business_auth/brand_config.html",
       "element": "button[aria-label]",
-      "text": "Save brand settings"
+      "text": "Save brand settings",
+      "original_text": "Save brand settings"
     },
     {
       "id": "license_info_1",
       "file": "templates/business_auth/license_info.html",
       "element": "div",
-      "text": "License Purchase Date"
+      "text": "License Purchase Date",
+      "original_text": "License Purchase Date"
     },
     {
       "id": "license_info_2",
       "file": "templates/business_auth/license_info.html",
       "element": "div",
-      "text": "License Expiry Date"
+      "text": "License Expiry Date",
+      "original_text": "License Expiry Date"
     },
     {
       "id": "license_info_3",
       "file": "templates/business_auth/license_info.html",
       "element": "div",
-      "text": "License Period"
+      "text": "License Period",
+      "original_text": "License Period"
     },
     {
       "id": "license_info_4",
       "file": "templates/business_auth/license_info.html",
       "element": "div",
-      "text": "License Duration"
+      "text": "License Duration",
+      "original_text": "License Duration"
     },
     {
       "id": "license_info_5",
       "file": "templates/business_auth/license_info.html",
       "element": "div",
-      "text": "Campaign running from {{ active_campaign.start_date.strftime('%b %d') }} to {{ active_campaign.end_date.strftime('%b %d, %Y') }}"
+      "text": "Campaign running from {{ active_campaign.start_date.strftime('%b %d') }} to {{ active_campaign.end_date.strftime('%b %d, %Y') }}",
+      "original_text": "Campaign running from {{ active_campaign.start_date.strftime('%b %d') }} to {{ active_campaign.end_date.strftime('%b %d, %Y') }}"
     },
     {
       "id": "license_info_6",
       "file": "templates/business_auth/license_info.html",
       "element": "div",
-      "text": "Add-on Start Date"
+      "text": "Add-on Start Date",
+      "original_text": "Add-on Start Date"
     },
     {
       "id": "license_info_7",
       "file": "templates/business_auth/license_info.html",
       "element": "div",
-      "text": "Add-on End Date"
+      "text": "Add-on End Date",
+      "original_text": "Add-on End Date"
     },
     {
       "id": "license_info_8",
       "file": "templates/business_auth/license_info.html",
       "element": "div",
-      "text": "Add-on Period"
+      "text": "Add-on Period",
+      "original_text": "Add-on Period"
     },
     {
       "id": "license_info_9",
       "file": "templates/business_auth/license_info.html",
       "element": "div",
-      "text": "Add-on Duration"
+      "text": "Add-on Duration",
+      "original_text": "Add-on Duration"
     },
     {
       "id": "license_info_10",
       "file": "templates/business_auth/license_info.html",
       "element": "div",
-      "text": "Transcript Analysis Not Configured"
+      "text": "Transcript Analysis Not Configured",
+      "original_text": "Transcript Analysis Not Configured"
     },
     {
       "id": "license_info_11",
       "file": "templates/business_auth/license_info.html",
       "element": "div",
-      "text": "Add-on Not Purchased"
+      "text": "Add-on Not Purchased",
+      "original_text": "Add-on Not Purchased"
     },
     {
       "id": "license_info_12",
       "file": "templates/business_auth/license_info.html",
       "element": "div",
-      "text": "Contact your administrator to enable transcript analysis capabilities."
+      "text": "Contact your administrator to enable transcript analysis capabilities.",
+      "original_text": "Contact your administrator to enable transcript analysis capabilities."
     },
     {
       "id": "license_info_aria_13",
       "file": "templates/business_auth/license_info.html",
       "element": "div[aria-label]",
-      "text": "Account type"
+      "text": "Account type",
+      "original_text": "Account type"
     },
     {
       "id": "license_info_aria_14",
       "file": "templates/business_auth/license_info.html",
       "element": "div[aria-label]",
-      "text": "License period details"
+      "text": "License period details",
+      "original_text": "License period details"
     },
     {
       "id": "license_info_aria_15",
       "file": "templates/business_auth/license_info.html",
       "element": "div[aria-label]",
-      "text": "Campaigns used out of limit"
+      "text": "Campaigns used out of limit",
+      "original_text": "Campaigns used out of limit"
     },
     {
       "id": "license_info_aria_16",
       "file": "templates/business_auth/license_info.html",
       "element": "div[aria-label]",
-      "text": "Users count out of limit"
+      "text": "Users count out of limit",
+      "original_text": "Users count out of limit"
     },
     {
       "id": "license_info_aria_17",
       "file": "templates/business_auth/license_info.html",
       "element": "div[aria-label]",
-      "text": "Add-on period details"
+      "text": "Add-on period details",
+      "original_text": "Add-on period details"
     },
     {
       "id": "manage_users_1",
       "file": "templates/business_auth/manage_users.html",
       "element": "p",
-      "text": "Manage users and team members for {{ business_account.name }}"
+      "text": "Manage users and team members for {{ business_account.name }}",
+      "original_text": "Manage users and team members for {{ business_account.name }}"
     },
     {
       "id": "manage_users_2",
       "file": "templates/business_auth/manage_users.html",
       "element": "th",
-      "text": "User"
+      "text": "User",
+      "original_text": "User"
     },
     {
       "id": "manage_users_3",
       "file": "templates/business_auth/manage_users.html",
       "element": "th",
-      "text": "Rôle"
+      "text": "Rôle",
+      "original_text": "Role"
     },
     {
       "id": "manage_users_4",
       "file": "templates/business_auth/manage_users.html",
       "element": "th",
-      "text": "Status"
+      "text": "Status",
+      "original_text": "Status"
     },
     {
       "id": "manage_users_5",
       "file": "templates/business_auth/manage_users.html",
       "element": "th",
-      "text": "Last Login"
+      "text": "Last Login",
+      "original_text": "Last Login"
     },
     {
       "id": "manage_users_6",
       "file": "templates/business_auth/manage_users.html",
       "element": "th",
-      "text": "Actions"
+      "text": "Actions",
+      "original_text": "Actions"
     },
     {
       "id": "manage_users_7",
       "file": "templates/business_auth/manage_users.html",
       "element": "span",
-      "text": "Never"
+      "text": "Never",
+      "original_text": "Never"
     },
     {
       "id": "manage_users_8",
       "file": "templates/business_auth/manage_users.html",
       "element": "span",
-      "text": "Current User"
+      "text": "Current User",
+      "original_text": "Current User"
     },
     {
       "id": "manage_users_9",
       "file": "templates/business_auth/manage_users.html",
       "element": "h4",
-      "text": "No users found"
+      "text": "No users found",
+      "original_text": "No users found"
     },
     {
       "id": "manage_users_10",
       "file": "templates/business_auth/manage_users.html",
       "element": "p",
-      "text": "Start building your team by adding the first user."
+      "text": "Start building your team by adding the first user.",
+      "original_text": "Start building your team by adding the first user."
     },
     {
       "id": "manage_users_11",
       "file": "templates/business_auth/manage_users.html",
       "element": "label",
-      "text": "First Name"
+      "text": "First Name",
+      "original_text": "First Name"
     },
     {
       "id": "manage_users_12",
       "file": "templates/business_auth/manage_users.html",
       "element": "label",
-      "text": "Last Name"
+      "text": "Last Name",
+      "original_text": "Last Name"
     },
     {
       "id": "manage_users_13",
       "file": "templates/business_auth/manage_users.html",
       "element": "label",
-      "text": "Adresse e-mail"
+      "text": "Adresse e-mail",
+      "original_text": "Email Address"
     },
     {
       "id": "manage_users_14",
       "file": "templates/business_auth/manage_users.html",
       "element": "div",
-      "text": "The user will receive an invitation email to activate their account."
+      "text": "The user will receive an invitation email to activate their account.",
+      "original_text": "The user will receive an invitation email to activate their account."
     },
     {
       "id": "manage_users_15",
       "file": "templates/business_auth/manage_users.html",
       "element": "label",
-      "text": "Rôle"
+      "text": "Rôle",
+      "original_text": "Role"
     },
     {
       "id": "manage_users_16",
       "file": "templates/business_auth/manage_users.html",
       "element": "option",
-      "text": "Manager - Can manage campaigns and participants"
+      "text": "Manager - Can manage campaigns and participants",
+      "original_text": "Manager - Can manage campaigns and participants"
     },
     {
       "id": "manage_users_17",
       "file": "templates/business_auth/manage_users.html",
       "element": "option",
-      "text": "Viewer - Can only view data and reports"
+      "text": "Viewer - Can only view data and reports",
+      "original_text": "Viewer - Can only view data and reports"
     },
     {
       "id": "manage_users_18",
       "file": "templates/business_auth/manage_users.html",
       "element": "option",
-      "text": "Admin - Full access including user management"
+      "text": "Admin - Full access including user management",
+      "original_text": "Admin - Full access including user management"
     },
     {
       "id": "manage_users_19",
       "file": "templates/business_auth/manage_users.html",
       "element": "option",
-      "text": "Platform Admin - Cross-tenant platform management"
+      "text": "Platform Admin - Cross-tenant platform management",
+      "original_text": "Platform Admin - Cross-tenant platform management"
     },
     {
       "id": "manage_users_20",
       "file": "templates/business_auth/manage_users.html",
       "element": "div",
-      "text": "Role determines what features the user can access."
+      "text": "Role determines what features the user can access.",
+      "original_text": "Role determines what features the user can access."
     },
     {
       "id": "manage_users_21",
       "file": "templates/business_auth/manage_users.html",
       "element": "button",
-      "text": "Cancel"
+      "text": "Cancel",
+      "original_text": "Cancel"
     },
     {
       "id": "manage_users_22",
       "file": "templates/business_auth/manage_users.html",
       "element": "label",
-      "text": "First Name"
+      "text": "First Name",
+      "original_text": "First Name"
     },
     {
       "id": "manage_users_23",
       "file": "templates/business_auth/manage_users.html",
       "element": "label",
-      "text": "Last Name"
+      "text": "Last Name",
+      "original_text": "Last Name"
     },
     {
       "id": "manage_users_24",
       "file": "templates/business_auth/manage_users.html",
       "element": "label",
-      "text": "Adresse e-mail"
+      "text": "Adresse e-mail",
+      "original_text": "Email Address"
     },
     {
       "id": "manage_users_25",
       "file": "templates/business_auth/manage_users.html",
       "element": "label",
-      "text": "Rôle"
+      "text": "Rôle",
+      "original_text": "Role"
     },
     {
       "id": "manage_users_26",
       "file": "templates/business_auth/manage_users.html",
       "element": "option",
-      "text": "Manager - Can manage campaigns and participants"
+      "text": "Manager - Can manage campaigns and participants",
+      "original_text": "Manager - Can manage campaigns and participants"
     },
     {
       "id": "manage_users_27",
       "file": "templates/business_auth/manage_users.html",
       "element": "option",
-      "text": "Viewer - Can only view data and reports"
+      "text": "Viewer - Can only view data and reports",
+      "original_text": "Viewer - Can only view data and reports"
     },
     {
       "id": "manage_users_28",
       "file": "templates/business_auth/manage_users.html",
       "element": "option",
-      "text": "Admin - Full access including user management"
+      "text": "Admin - Full access including user management",
+      "original_text": "Admin - Full access including user management"
     },
     {
       "id": "manage_users_29",
       "file": "templates/business_auth/manage_users.html",
       "element": "option",
-      "text": "Platform Admin - Cross-tenant platform management"
+      "text": "Platform Admin - Cross-tenant platform management",
+      "original_text": "Platform Admin - Cross-tenant platform management"
     },
     {
       "id": "manage_users_30",
       "file": "templates/business_auth/manage_users.html",
       "element": "div",
-      "text": "Role determines what features the user can access."
+      "text": "Role determines what features the user can access.",
+      "original_text": "Role determines what features the user can access."
     },
     {
       "id": "manage_users_31",
       "file": "templates/business_auth/manage_users.html",
       "element": "button",
-      "text": "Cancel"
+      "text": "Cancel",
+      "original_text": "Cancel"
     },
     {
       "id": "manage_users_placeholder_32",
       "file": "templates/business_auth/manage_users.html",
       "element": "input[placeholder]",
-      "text": "user@company.com"
+      "text": "user@company.com",
+      "original_text": "user@company.com"
     },
     {
       "id": "manage_users_title_33",
       "file": "templates/business_auth/manage_users.html",
       "element": "button[title]",
-      "text": "License limit reached"
+      "text": "License limit reached",
+      "original_text": "License limit reached"
     },
     {
       "id": "manage_users_title_34",
       "file": "templates/business_auth/manage_users.html",
       "element": "button[title]",
-      "text": "Edit User"
+      "text": "Edit User",
+      "original_text": "Edit User"
     },
     {
       "id": "manage_users_title_35",
       "file": "templates/business_auth/manage_users.html",
       "element": "button[title]",
-      "text": "Reset Password"
+      "text": "Reset Password",
+      "original_text": "Reset Password"
     },
     {
       "id": "manage_users_title_36",
       "file": "templates/business_auth/manage_users.html",
       "element": "button[title]",
-      "text": "Deactivate User"
+      "text": "Deactivate User",
+      "original_text": "Deactivate User"
     },
     {
       "id": "manage_users_title_37",
       "file": "templates/business_auth/manage_users.html",
       "element": "button[title]",
-      "text": "Activate User"
+      "text": "Activate User",
+      "original_text": "Activate User"
     },
     {
       "id": "manage_users_aria_38",
       "file": "templates/business_auth/manage_users.html",
       "element": "button[aria-label]",
-      "text": "Close"
+      "text": "Close",
+      "original_text": "Close"
     },
     {
       "id": "manage_users_aria_39",
       "file": "templates/business_auth/manage_users.html",
       "element": "div[aria-label]",
-      "text": "User limit usage"
+      "text": "User limit usage",
+      "original_text": "User limit usage"
     },
     {
       "id": "manage_users_aria_40",
       "file": "templates/business_auth/manage_users.html",
       "element": "button[aria-label]",
-      "text": "Add new user"
+      "text": "Add new user",
+      "original_text": "Add new user"
     },
     {
       "id": "manage_users_aria_41",
       "file": "templates/business_auth/manage_users.html",
       "element": "button[aria-label]",
-      "text": "Add user button disabled - license limit reached"
+      "text": "Add user button disabled - license limit reached",
+      "original_text": "Add user button disabled - license limit reached"
     },
     {
       "id": "manage_users_aria_42",
       "file": "templates/business_auth/manage_users.html",
       "element": "div[aria-label]",
-      "text": "User avatar for {{ user.get_full_name() }}"
+      "text": "User avatar for {{ user.get_full_name() }}",
+      "original_text": "User avatar for {{ user.get_full_name() }}"
     },
     {
       "id": "manage_users_aria_43",
       "file": "templates/business_auth/manage_users.html",
       "element": "span[aria-label]",
-      "text": "User role"
+      "text": "User role",
+      "original_text": "User role"
     },
     {
       "id": "manage_users_aria_44",
       "file": "templates/business_auth/manage_users.html",
       "element": "span[aria-label]",
-      "text": "User status"
+      "text": "User status",
+      "original_text": "User status"
     },
     {
       "id": "manage_users_aria_45",
       "file": "templates/business_auth/manage_users.html",
       "element": "button[aria-label]",
-      "text": "Edit {{ user.get_full_name() }}"
+      "text": "Edit {{ user.get_full_name() }}",
+      "original_text": "Edit {{ user.get_full_name() }}"
     },
     {
       "id": "manage_users_aria_46",
       "file": "templates/business_auth/manage_users.html",
       "element": "button[aria-label]",
-      "text": "Reset password for {{ user.get_full_name() }}"
+      "text": "Reset password for {{ user.get_full_name() }}",
+      "original_text": "Reset password for {{ user.get_full_name() }}"
     },
     {
       "id": "manage_users_aria_47",
       "file": "templates/business_auth/manage_users.html",
       "element": "button[aria-label]",
-      "text": "Deactivate {{ user.get_full_name() }}"
+      "text": "Deactivate {{ user.get_full_name() }}",
+      "original_text": "Deactivate {{ user.get_full_name() }}"
     },
     {
       "id": "manage_users_aria_48",
       "file": "templates/business_auth/manage_users.html",
       "element": "button[aria-label]",
-      "text": "Activate {{ user.get_full_name() }}"
+      "text": "Activate {{ user.get_full_name() }}",
+      "original_text": "Activate {{ user.get_full_name() }}"
     },
     {
       "id": "manage_users_aria_49",
       "file": "templates/business_auth/manage_users.html",
       "element": "button[aria-label]",
-      "text": "Close"
+      "text": "Close",
+      "original_text": "Close"
     },
     {
       "id": "manage_users_aria_50",
       "file": "templates/business_auth/manage_users.html",
       "element": "span[aria-label]",
-      "text": "required"
+      "text": "required",
+      "original_text": "required"
     },
     {
       "id": "manage_users_aria_51",
       "file": "templates/business_auth/manage_users.html",
       "element": "span[aria-label]",
-      "text": "required"
+      "text": "required",
+      "original_text": "required"
     },
     {
       "id": "manage_users_aria_52",
       "file": "templates/business_auth/manage_users.html",
       "element": "span[aria-label]",
-      "text": "required"
+      "text": "required",
+      "original_text": "required"
     },
     {
       "id": "manage_users_aria_53",
       "file": "templates/business_auth/manage_users.html",
       "element": "button[aria-label]",
-      "text": "Confirm add user"
+      "text": "Confirm add user",
+      "original_text": "Confirm add user"
     },
     {
       "id": "manage_users_aria_54",
       "file": "templates/business_auth/manage_users.html",
       "element": "button[aria-label]",
-      "text": "Close"
+      "text": "Close",
+      "original_text": "Close"
     },
     {
       "id": "manage_users_aria_55",
       "file": "templates/business_auth/manage_users.html",
       "element": "span[aria-label]",
-      "text": "required"
+      "text": "required",
+      "original_text": "required"
     },
     {
       "id": "manage_users_aria_56",
       "file": "templates/business_auth/manage_users.html",
       "element": "span[aria-label]",
-      "text": "required"
+      "text": "required",
+      "original_text": "required"
     },
     {
       "id": "manage_users_aria_57",
       "file": "templates/business_auth/manage_users.html",
       "element": "span[aria-label]",
-      "text": "required"
+      "text": "required",
+      "original_text": "required"
     },
     {
       "id": "manage_users_aria_58",
       "file": "templates/business_auth/manage_users.html",
       "element": "button[aria-label]",
-      "text": "Save changes"
+      "text": "Save changes",
+      "original_text": "Save changes"
     },
     {
       "id": "audit_logs_1",
       "file": "templates/business_auth/audit_logs.html",
       "element": "p",
-      "text": "Track all activities and changes in your VOÏA account"
+      "text": "Track all activities and changes in your VOÏA account",
+      "original_text": "Track all activities and changes in your VOÏA account"
     },
     {
       "id": "audit_logs_2",
       "file": "templates/business_auth/audit_logs.html",
       "element": "div",
-      "text": "Total Activities"
+      "text": "Total Activities",
+      "original_text": "Total Activities"
     },
     {
       "id": "audit_logs_3",
       "file": "templates/business_auth/audit_logs.html",
       "element": "div",
-      "text": "Activity Types"
+      "text": "Activity Types",
+      "original_text": "Activity Types"
     },
     {
       "id": "audit_logs_4",
       "file": "templates/business_auth/audit_logs.html",
       "element": "div",
-      "text": "Active Users"
+      "text": "Active Users",
+      "original_text": "Active Users"
     },
     {
       "id": "audit_logs_5",
       "file": "templates/business_auth/audit_logs.html",
       "element": "div",
-      "text": "Days Shown"
+      "text": "Days Shown",
+      "original_text": "Days Shown"
     },
     {
       "id": "audit_logs_6",
       "file": "templates/business_auth/audit_logs.html",
       "element": "label",
-      "text": "Activity Type"
+      "text": "Activity Type",
+      "original_text": "Activity Type"
     },
     {
       "id": "audit_logs_7",
       "file": "templates/business_auth/audit_logs.html",
       "element": "option",
-      "text": "All Activities"
+      "text": "All Activities",
+      "original_text": "All Activities"
     },
     {
       "id": "audit_logs_8",
       "file": "templates/business_auth/audit_logs.html",
       "element": "label",
-      "text": "User"
+      "text": "User",
+      "original_text": "User"
     },
     {
       "id": "audit_logs_9",
       "file": "templates/business_auth/audit_logs.html",
       "element": "option",
-      "text": "All Users"
+      "text": "All Users",
+      "original_text": "All Users"
     },
     {
       "id": "audit_logs_10",
       "file": "templates/business_auth/audit_logs.html",
       "element": "label",
-      "text": "Time Period"
+      "text": "Time Period",
+      "original_text": "Time Period"
     },
     {
       "id": "audit_logs_11",
       "file": "templates/business_auth/audit_logs.html",
       "element": "option",
-      "text": "Last 7 days"
+      "text": "Last 7 days",
+      "original_text": "Last 7 days"
     },
     {
       "id": "audit_logs_12",
       "file": "templates/business_auth/audit_logs.html",
       "element": "option",
-      "text": "Last 30 days"
+      "text": "Last 30 days",
+      "original_text": "Last 30 days"
     },
     {
       "id": "audit_logs_13",
       "file": "templates/business_auth/audit_logs.html",
       "element": "option",
-      "text": "Last 90 days"
+      "text": "Last 90 days",
+      "original_text": "Last 90 days"
     },
     {
       "id": "audit_logs_14",
       "file": "templates/business_auth/audit_logs.html",
       "element": "option",
-      "text": "Last year"
+      "text": "Last year",
+      "original_text": "Last year"
     },
     {
       "id": "audit_logs_15",
       "file": "templates/business_auth/audit_logs.html",
       "element": "th",
-      "text": "Time"
+      "text": "Time",
+      "original_text": "Time"
     },
     {
       "id": "audit_logs_16",
       "file": "templates/business_auth/audit_logs.html",
       "element": "th",
-      "text": "User"
+      "text": "User",
+      "original_text": "User"
     },
     {
       "id": "audit_logs_17",
       "file": "templates/business_auth/audit_logs.html",
       "element": "th",
-      "text": "Activity"
+      "text": "Activity",
+      "original_text": "Activity"
     },
     {
       "id": "audit_logs_18",
       "file": "templates/business_auth/audit_logs.html",
       "element": "th",
-      "text": "Description"
+      "text": "Description",
+      "original_text": "Description"
     },
     {
       "id": "audit_logs_19",
       "file": "templates/business_auth/audit_logs.html",
       "element": "th",
-      "text": "Resource"
+      "text": "Resource",
+      "original_text": "Resource"
     },
     {
       "id": "audit_logs_20",
       "file": "templates/business_auth/audit_logs.html",
       "element": "h3",
-      "text": "No Activity Yet"
+      "text": "No Activity Yet",
+      "original_text": "No Activity Yet"
     },
     {
       "id": "audit_logs_21",
       "file": "templates/business_auth/audit_logs.html",
       "element": "p",
-      "text": "No audit logs found for the selected filters. Try adjusting your filters or create some test data to get started."
+      "text": "No audit logs found for the selected filters. Try adjusting your filters or create some test data to get started.",
+      "original_text": "No audit logs found for the selected filters. Try adjusting your filters or create some test data to get started."
     },
     {
       "id": "audit_logs_22",
       "file": "templates/business_auth/audit_logs.html",
       "element": "span",
-      "text": "Page {{ pagination.page }}"
+      "text": "Page {{ pagination.page }}",
+      "original_text": "Page {{ pagination.page }}"
     },
     {
       "id": "audit_logs_23",
       "file": "templates/business_auth/audit_logs.html",
       "element": "a",
-      "text": "Next"
+      "text": "Next",
+      "original_text": "Next"
     },
     {
       "id": "audit_logs_24",
       "file": "templates/business_auth/audit_logs.html",
       "element": "span",
-      "text": "Next"
+      "text": "Next",
+      "original_text": "Next"
     },
     {
       "id": "audit_logs_aria_25",
       "file": "templates/business_auth/audit_logs.html",
       "element": "select[aria-label]",
-      "text": "Filter by activity type"
+      "text": "Filter by activity type",
+      "original_text": "Filter by activity type"
     },
     {
       "id": "audit_logs_aria_26",
       "file": "templates/business_auth/audit_logs.html",
       "element": "select[aria-label]",
-      "text": "Filter by user"
+      "text": "Filter by user",
+      "original_text": "Filter by user"
     },
     {
       "id": "audit_logs_aria_27",
       "file": "templates/business_auth/audit_logs.html",
       "element": "select[aria-label]",
-      "text": "Filter by time period"
+      "text": "Filter by time period",
+      "original_text": "Filter by time period"
     },
     {
       "id": "audit_logs_aria_28",
       "file": "templates/business_auth/audit_logs.html",
       "element": "button[aria-label]",
-      "text": "Apply filters"
+      "text": "Apply filters",
+      "original_text": "Apply filters"
     },
     {
       "id": "audit_logs_aria_29",
       "file": "templates/business_auth/audit_logs.html",
       "element": "table[aria-label]",
-      "text": "Audit logs table"
+      "text": "Audit logs table",
+      "original_text": "Audit logs table"
     },
     {
       "id": "audit_logs_aria_30",
       "file": "templates/business_auth/audit_logs.html",
       "element": "div[aria-label]",
-      "text": "Pagination"
+      "text": "Pagination",
+      "original_text": "Pagination"
     },
     {
       "id": "audit_logs_aria_31",
       "file": "templates/business_auth/audit_logs.html",
       "element": "a[aria-label]",
-      "text": "Go to previous page"
+      "text": "Go to previous page",
+      "original_text": "Go to previous page"
     },
     {
       "id": "audit_logs_aria_32",
       "file": "templates/business_auth/audit_logs.html",
       "element": "a[aria-label]",
-      "text": "Go to next page"
+      "text": "Go to next page",
+      "original_text": "Go to next page"
     },
     {
       "id": "email_config_1",
       "file": "templates/business_auth/email_config.html",
       "element": "p",
-      "text": "Configure SMTP settings for {{ business_account.name }}"
+      "text": "Configure SMTP settings for {{ business_account.name }}",
+      "original_text": "Configure SMTP settings for {{ business_account.name }}"
     },
     {
       "id": "email_config_2",
       "file": "templates/business_auth/email_config.html",
       "element": "label",
-      "text": "Email Provider *"
+      "text": "Email Provider *",
+      "original_text": "Email Provider *"
     },
     {
       "id": "email_config_3",
       "file": "templates/business_auth/email_config.html",
       "element": "option",
-      "text": "Standard SMTP"
+      "text": "Standard SMTP",
+      "original_text": "Standard SMTP"
     },
     {
       "id": "email_config_4",
       "file": "templates/business_auth/email_config.html",
       "element": "option",
-      "text": "AWS SES"
+      "text": "AWS SES",
+      "original_text": "AWS SES"
     },
     {
       "id": "email_config_5",
       "file": "templates/business_auth/email_config.html",
       "element": "div",
-      "text": "Choose your email delivery provider"
+      "text": "Choose your email delivery provider",
+      "original_text": "Choose your email delivery provider"
     },
     {
       "id": "email_config_6",
       "file": "templates/business_auth/email_config.html",
       "element": "label",
-      "text": "AWS Region *"
+      "text": "AWS Region *",
+      "original_text": "AWS Region *"
     },
     {
       "id": "email_config_7",
       "file": "templates/business_auth/email_config.html",
       "element": "option",
-      "text": "Select a region"
+      "text": "Select a region",
+      "original_text": "Select a region"
     },
     {
       "id": "email_config_8",
       "file": "templates/business_auth/email_config.html",
       "element": "option",
-      "text": "US East (N. Virginia)"
+      "text": "US East (N. Virginia)",
+      "original_text": "US East (N. Virginia)"
     }
   ],
   "flash_messages": [],

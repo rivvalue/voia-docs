@@ -1,75 +1,429 @@
 {
-“metadata”: {
-“project”: “VOÏA - Voice Of Client”,
-“source_language”: “English”,
-“target_language”: “French”,
-“extraction_date”: “2025-10-24”,
-“total_files”: 10,
-“total_strings”: 2161,
-“file_number”: 8,
-“part_description”: “Templates Part 8B2/8 - Translated”
-},
-“templates”: [
-{ “id”: “view_7”, “file”: “templates/campaigns/view.html”, “element”: “div”, “text”: “En attente” },
-{ “id”: “view_8”, “file”: “templates/campaigns/view.html”, “element”: “h4”, “text”: “Actions de la campagne” },
-{ “id”: “view_9”, “file”: “templates/campaigns/view.html”, “element”: “span”, “text”: “La campagne doit contenir une description et au moins un participant pour être marquée comme prête.” },
-{ “id”: “view_10”, “file”: “templates/campaigns/view.html”, “element”: “span”, “text”: “Les campagnes brouillon peuvent être librement modifiées ou supprimées. Une fois marquées comme prêtes, les détails deviennent verrouillés.” },
-{ “id”: “view_11”, “file”: “templates/campaigns/view.html”, “element”: “span”, “text”: “La campagne est prête pour activation” },
-{ “id”: “view_12”, “file”: “templates/campaigns/view.html”, “element”: “span”, “text”: “La campagne est actuellement active et recueille des réponses” },
-{ “id”: “view_13”, “file”: “templates/campaigns/view.html”, “element”: “p”, “text”: “Cette campagne s’est terminée le {{ campaign.completed_at[:10] if campaign.completed_at else campaign.end_date }}” },
-{ “id”: “view_14”, “file”: “templates/campaigns/view.html”, “element”: “h4”, “text”: “Visualisation des réponses individuelles” },
-{ “id”: “view_15”, “file”: “templates/campaigns/view.html”, “element”: “p”, “text”: “Consultez et analysez les réponses individuelles des participants ainsi que les transcriptions de conversation.” },
-{ “id”: “view_16”, “file”: “templates/campaigns/view.html”, “element”: “label”, “text”: “Sélectionner une transcription (fichiers .txt uniquement)” },
-{ “id”: “view_17”, “file”: “templates/campaigns/view.html”, “element”: “div”, “text”: “Téléversez les transcriptions de réunions pour extraire automatiquement les insights du sondage.” },
-{ “id”: “view_18”, “file”: “templates/campaigns/view.html”, “element”: “label”, “text”: “Nom du participant” },
-{ “id”: “view_19”, “file”: “templates/campaigns/view.html”, “element”: “label”, “text”: “Courriel du participant” },
-{ “id”: “view_20”, “file”: “templates/campaigns/view.html”, “element”: “label”, “text”: “Nom de l’entreprise” },
-{ “id”: “view_21”, “file”: “templates/campaigns/view.html”, “element”: “p”, “text”: “Aucune transcription traitée pour le moment” },
-{ “id”: “view_22”, “file”: “templates/campaigns/view.html”, “element”: “h6”, “text”: “À propos de l’analyse des transcriptions” },
-{ “id”: “view_23”, “file”: “templates/campaigns/view.html”, “element”: “p”, “text”: “VOÏA analyse les transcriptions de réunions pour en extraire les scores NPS, le sentiment, les thèmes et les insights exploitables. Téléversez des fichiers .txt provenant d’appels téléphoniques, de réunions vidéo ou de discussions en personne pour générer automatiquement des réponses de sondage et les intégrer à vos analyses de campagne.” },
-{ “id”: “view_placeholder_24”, “file”: “templates/campaigns/view.html”, “element”: “input[placeholder]”, “text”: “Saisir le nom complet du participant” },
-{ “id”: “view_placeholder_25”, “file”: “templates/campaigns/view.html”, “element”: “input[placeholder]”, “text”: “participant@entreprise.com” },
-{ “id”: “view_placeholder_26”, “file”: “templates/campaigns/view.html”, “element”: “input[placeholder]”, “text”: “Saisir le nom de l’entreprise” },
-{ “id”: “view_title_27”, “file”: “templates/campaigns/view.html”, “element”: “button[title]”, “text”: “Cela n’enverra des invitations qu’aux participants qui n’ont pas encore été invités.” },
-{ “id”: “list_1”, “file”: “templates/campaigns/list.html”, “element”: “h1”, “text”: “Gestion des campagnes” },
-{ “id”: “list_2”, “file”: “templates/campaigns/list.html”, “element”: “p”, “text”: “Gérez les campagnes de sondage pour {{ business_account.name }}” },
-{ “id”: “list_3”, “file”: “templates/campaigns/list.html”, “element”: “div”, “text”: “{# Macro des boutons d’action de campagne #}\n    {% macro campaign_actions(campaign, view_type=‘table’) %}\n        {% set action_class = ‘table-actions’ if view_type == ‘table’ else ‘campaign-card-actions’ %}” },
-{ “id”: “list_4”, “file”: “templates/campaigns/list.html”, “element”: “div”, “text”: “Début” },
-{ “id”: “list_5”, “file”: “templates/campaigns/list.html”, “element”: “div”, “text”: “Fin” },
-{ “id”: “list_6”, “file”: “templates/campaigns/list.html”, “element”: “div”, “text”: “Participants” },
-{ “id”: “list_7”, “file”: “templates/campaigns/list.html”, “element”: “div”, “text”: “Envoyé” },
-{ “id”: “list_8”, “file”: “templates/campaigns/list.html”, “element”: “div”, “text”: “Terminé” },
-{ “id”: “list_9”, “file”: “templates/campaigns/list.html”, “element”: “a”, “text”: “Tous” },
-{ “id”: “list_10”, “file”: “templates/campaigns/list.html”, “element”: “a”, “text”: “Brouillon” },
-{ “id”: “list_11”, “file”: “templates/campaigns/list.html”, “element”: “a”, “text”: “Actif” },
-{ “id”: “list_12”, “file”: “templates/campaigns/list.html”, “element”: “a”, “text”: “Terminé” },
-{ “id”: “list_13”, “file”: “templates/campaigns/list.html”, “element”: “th”, “text”: “Nom de la campagne” },
-{ “id”: “list_14”, “file”: “templates/campaigns/list.html”, “element”: “th”, “text”: “Statut” },
-{ “id”: “list_15”, “file”: “templates/campaigns/list.html”, “element”: “th”, “text”: “Date de début” },
-{ “id”: “list_16”, “file”: “templates/campaigns/list.html”, “element”: “th”, “text”: “Date de fin” },
-{ “id”: “list_17”, “file”: “templates/campaigns/list.html”, “element”: “th”, “text”: “Participants” },
-{ “id”: “list_18”, “file”: “templates/campaigns/list.html”, “element”: “th”, “text”: “Envoyé/Terminé” },
-{ “id”: “list_19”, “file”: “templates/campaigns/list.html”, “element”: “th”, “text”: “Actions” },
-{ “id”: “list_20”, “file”: “templates/campaigns/list.html”, “element”: “h3”, “text”: “Prêt à recueillir des insights ?” },
-{ “id”: “list_21”, “file”: “templates/campaigns/list.html”, “element”: “p”, “text”: “Créez votre première campagne pour commencer à recueillir les retours de vos clients et comprendre leur expérience. Les campagnes vous aident à organiser les participants, envoyer les invitations et analyser les résultats.” },
-{ “id”: “list_22”, “file”: “templates/campaigns/list.html”, “element”: “h6”, “text”: “Nom de la campagne” },
-{ “id”: “list_23”, “file”: “templates/campaigns/list.html”, “element”: “h5”, “text”: “Exportation terminée !” },
-{ “id”: “list_24”, “file”: “templates/campaigns/list.html”, “element”: “p”, “text”: “Les données de votre campagne ont été exportées avec succès.” },
-{ “id”: “list_25”, “file”: “templates/campaigns/list.html”, “element”: “h5”, “text”: “Échec de l’exportation” },
-{ “id”: “list_26”, “file”: “templates/campaigns/list.html”, “element”: “p”, “text”: “Une erreur s’est produite lors de l’exportation de vos données.” },
-{ “id”: “list_27”, “file”: “templates/campaigns/list.html”, “element”: “button”, “text”: “Fermer” },
-{ “id”: “list_title_28”, “file”: “templates/campaigns/list.html”, “element”: “a[title]”, “text”: “Voir les détails” },
-{ “id”: “list_title_29”, “file”: “templates/campaigns/list.html”, “element”: “a[title]”, “text”: “Insights de la campagne” },
-{ “id”: “list_title_30”, “file”: “templates/campaigns/list.html”, “element”: “a[title]”, “text”: “Gérer les participants” },
-{ “id”: “list_title_31”, “file”: “templates/campaigns/list.html”, “element”: “button[title]”, “text”: “Exporter les données” },
-{ “id”: “list_title_32”, “file”: “templates/campaigns/list.html”, “element”: “button[title]”, “text”: “Rapport exécutif” },
-{ “id”: “list_aria_33”, “file”: “templates/campaigns/list.html”, “element”: “button[aria-label]”, “text”: “Fermer” },
-{ “id”: “breadcrumb_aria_1”, “file”: “templates/components/breadcrumb.html”, “element”: “nav[aria-label]”, “text”: “Navigation par fil d’Ariane” },
-{ “id”: “breadcrumb_aria_2”, “file”: “templates/components/breadcrumb.html”, “element”: “a[aria-label]”, “text”: “Aller à {{ item.label }}” },
-{ “id”: “ui_version_toggle_1”, “file”: “templates/components/ui_version_toggle.html”, “element”: “span”, “text”: “UI : {{ ui_version|upper }}” },
-{ “id”: “ui_version_toggle_2”, “file”: “templates/components/ui_version_toggle.html”, “element”: “span”, “text”: “Basculer” },
-{ “id”: “ui_version_toggle_title_3”, “file”: “templates/components/ui_version_toggle.html”, “element”: “button[title]”, “text”: “Basculer vers {% if ui_version == ‘v1’ %}v2 (Nouvelle barre latérale){% else %}v1 (Actuelle){% endif %}” }
-],
-“flash_messages”: [],
-“email_templates”: []
+  "metadata": {
+    "project": "VOÏA - Voice Of Client",
+    "source_language": "English",
+    "target_language": "French",
+    "extraction_date": "2025-10-24",
+    "total_files": 10,
+    "total_strings": 2161,
+    "file_number": 8,
+    "part_description": "Templates Part 8B2/8 - Translated"
+  },
+  "templates": [
+    {
+      "id": "view_7",
+      "file": "templates/campaigns/view.html",
+      "element": "div",
+      "text": "En attente",
+      "original_text": "Pending"
+    },
+    {
+      "id": "view_8",
+      "file": "templates/campaigns/view.html",
+      "element": "h4",
+      "text": "Actions de la campagne",
+      "original_text": "Campaign Actions"
+    },
+    {
+      "id": "view_9",
+      "file": "templates/campaigns/view.html",
+      "element": "span",
+      "text": "La campagne doit contenir une description et au moins un participant pour être marquée comme prête.",
+      "original_text": "Campaign needs description and at least one participant to be marked ready."
+    },
+    {
+      "id": "view_10",
+      "file": "templates/campaigns/view.html",
+      "element": "span",
+      "text": "Les campagnes brouillon peuvent être librement modifiées ou supprimées. Une fois marquées comme prêtes, les détails deviennent verrouillés.",
+      "original_text": "Draft campaigns can be freely edited or deleted. Once marked ready, campaign details become locked."
+    },
+    {
+      "id": "view_11",
+      "file": "templates/campaigns/view.html",
+      "element": "span",
+      "text": "La campagne est prête pour activation",
+      "original_text": "Campaign is ready for activation"
+    },
+    {
+      "id": "view_12",
+      "file": "templates/campaigns/view.html",
+      "element": "span",
+      "text": "La campagne est actuellement active et recueille des réponses",
+      "original_text": "Campaign is currently active and collecting responses"
+    },
+    {
+      "id": "view_13",
+      "file": "templates/campaigns/view.html",
+      "element": "p",
+      "text": "Cette campagne s'est terminée le {{ campaign.completed_at[:10] if campaign.completed_at else campaign.end_date }}",
+      "original_text": "This campaign finished on {{ campaign.completed_at[:10] if campaign.completed_at else campaign.end_date }}"
+    },
+    {
+      "id": "view_14",
+      "file": "templates/campaigns/view.html",
+      "element": "h4",
+      "text": "Visualisation des réponses individuelles",
+      "original_text": "Individual Response Viewer"
+    },
+    {
+      "id": "view_15",
+      "file": "templates/campaigns/view.html",
+      "element": "p",
+      "text": "Consultez et analysez les réponses individuelles des participants ainsi que les transcriptions de conversation.",
+      "original_text": "View and analyze individual participant responses and conversation transcripts."
+    },
+    {
+      "id": "view_16",
+      "file": "templates/campaigns/view.html",
+      "element": "label",
+      "text": "Sélectionner une transcription (fichiers .txt uniquement)",
+      "original_text": "Select Transcript (.txt files only)"
+    },
+    {
+      "id": "view_17",
+      "file": "templates/campaigns/view.html",
+      "element": "div",
+      "text": "Téléversez les transcriptions de réunions pour extraire automatiquement les insights du sondage.",
+      "original_text": "Upload meeting transcripts to extract survey insights automatically."
+    },
+    {
+      "id": "view_18",
+      "file": "templates/campaigns/view.html",
+      "element": "label",
+      "text": "Nom du participant",
+      "original_text": "Participant Name"
+    },
+    {
+      "id": "view_19",
+      "file": "templates/campaigns/view.html",
+      "element": "label",
+      "text": "Courriel du participant",
+      "original_text": "Participant Email"
+    },
+    {
+      "id": "view_20",
+      "file": "templates/campaigns/view.html",
+      "element": "label",
+      "text": "Nom de l'entreprise",
+      "original_text": "Company Name"
+    },
+    {
+      "id": "view_21",
+      "file": "templates/campaigns/view.html",
+      "element": "p",
+      "text": "Aucune transcription traitée pour le moment",
+      "original_text": "No transcripts processed yet"
+    },
+    {
+      "id": "view_22",
+      "file": "templates/campaigns/view.html",
+      "element": "h6",
+      "text": "À propos de l'analyse des transcriptions",
+      "original_text": "About Transcript Analysis"
+    },
+    {
+      "id": "view_23",
+      "file": "templates/campaigns/view.html",
+      "element": "p",
+      "text": "VOÏA analyse les transcriptions de réunions pour en extraire les scores NPS, le sentiment, les thèmes et les insights exploitables. Téléversez des fichiers .txt provenant d'appels téléphoniques, de réunions vidéo ou de discussions en personne pour générer automatiquement des réponses de sondage et les intégrer à vos analyses de campagne.",
+      "original_text": "VOÏA analyzes meeting transcripts to extract NPS scores, sentiment, themes, and actionable insights. Upload .txt files from phone calls, video meetings, or face-to-face discussions to automatically generate survey responses and integrate them with your campaign analytics."
+    },
+    {
+      "id": "view_placeholder_24",
+      "file": "templates/campaigns/view.html",
+      "element": "input[placeholder]",
+      "text": "Saisir le nom complet du participant",
+      "original_text": "Enter participant's full name"
+    },
+    {
+      "id": "view_placeholder_25",
+      "file": "templates/campaigns/view.html",
+      "element": "input[placeholder]",
+      "text": "participant@entreprise.com",
+      "original_text": "participant@company.com"
+    },
+    {
+      "id": "view_placeholder_26",
+      "file": "templates/campaigns/view.html",
+      "element": "input[placeholder]",
+      "text": "Saisir le nom de l'entreprise",
+      "original_text": "Enter company name"
+    },
+    {
+      "id": "view_title_27",
+      "file": "templates/campaigns/view.html",
+      "element": "button[title]",
+      "text": "Cela n'enverra des invitations qu'aux participants qui n'ont pas encore été invités.",
+      "original_text": "This will only send invitations to participants who haven't been invited yet."
+    },
+    {
+      "id": "list_1",
+      "file": "templates/campaigns/list.html",
+      "element": "h1",
+      "text": "Gestion des campagnes",
+      "original_text": "Campaign Management"
+    },
+    {
+      "id": "list_2",
+      "file": "templates/campaigns/list.html",
+      "element": "p",
+      "text": "Gérez les campagnes de sondage pour {{ business_account.name }}",
+      "original_text": "Manage survey campaigns for {{ business_account.name }}"
+    },
+    {
+      "id": "list_3",
+      "file": "templates/campaigns/list.html",
+      "element": "div",
+      "text": "{# Macro des boutons d'action de campagne #}\n    {% macro campaign_actions(campaign, view_type='table') %}\n        {% set action_class = 'table-actions' if view_type == 'table' else 'campaign-card-actions' %}",
+      "original_text": "{# Campaign Action Buttons Macro #}\n    {% macro campaign_actions(campaign, view_type='table') %}\n        {% set action_class = 'table-actions' if view_type == 'table' else 'campaign-card-actions' %}"
+    },
+    {
+      "id": "list_4",
+      "file": "templates/campaigns/list.html",
+      "element": "div",
+      "text": "Début",
+      "original_text": "Start"
+    },
+    {
+      "id": "list_5",
+      "file": "templates/campaigns/list.html",
+      "element": "div",
+      "text": "Fin",
+      "original_text": "End"
+    },
+    {
+      "id": "list_6",
+      "file": "templates/campaigns/list.html",
+      "element": "div",
+      "text": "Participants",
+      "original_text": "Participants"
+    },
+    {
+      "id": "list_7",
+      "file": "templates/campaigns/list.html",
+      "element": "div",
+      "text": "Envoyé",
+      "original_text": "Sent"
+    },
+    {
+      "id": "list_8",
+      "file": "templates/campaigns/list.html",
+      "element": "div",
+      "text": "Terminé",
+      "original_text": "Done"
+    },
+    {
+      "id": "list_9",
+      "file": "templates/campaigns/list.html",
+      "element": "a",
+      "text": "Tous",
+      "original_text": "All"
+    },
+    {
+      "id": "list_10",
+      "file": "templates/campaigns/list.html",
+      "element": "a",
+      "text": "Brouillon",
+      "original_text": "Draft"
+    },
+    {
+      "id": "list_11",
+      "file": "templates/campaigns/list.html",
+      "element": "a",
+      "text": "Actif",
+      "original_text": "Active"
+    },
+    {
+      "id": "list_12",
+      "file": "templates/campaigns/list.html",
+      "element": "a",
+      "text": "Terminé",
+      "original_text": "Completed"
+    },
+    {
+      "id": "list_13",
+      "file": "templates/campaigns/list.html",
+      "element": "th",
+      "text": "Nom de la campagne",
+      "original_text": "Campaign Name"
+    },
+    {
+      "id": "list_14",
+      "file": "templates/campaigns/list.html",
+      "element": "th",
+      "text": "Statut",
+      "original_text": "Status"
+    },
+    {
+      "id": "list_15",
+      "file": "templates/campaigns/list.html",
+      "element": "th",
+      "text": "Date de début",
+      "original_text": "Start Date"
+    },
+    {
+      "id": "list_16",
+      "file": "templates/campaigns/list.html",
+      "element": "th",
+      "text": "Date de fin",
+      "original_text": "End Date"
+    },
+    {
+      "id": "list_17",
+      "file": "templates/campaigns/list.html",
+      "element": "th",
+      "text": "Participants",
+      "original_text": "Participants"
+    },
+    {
+      "id": "list_18",
+      "file": "templates/campaigns/list.html",
+      "element": "th",
+      "text": "Envoyé/Terminé",
+      "original_text": "Sent/Completed"
+    },
+    {
+      "id": "list_19",
+      "file": "templates/campaigns/list.html",
+      "element": "th",
+      "text": "Actions",
+      "original_text": "Actions"
+    },
+    {
+      "id": "list_20",
+      "file": "templates/campaigns/list.html",
+      "element": "h3",
+      "text": "Prêt à recueillir des insights ?",
+      "original_text": "Ready to gather insights?"
+    },
+    {
+      "id": "list_21",
+      "file": "templates/campaigns/list.html",
+      "element": "p",
+      "text": "Créez votre première campagne pour commencer à recueillir les retours de vos clients et comprendre leur expérience. Les campagnes vous aident à organiser les participants, envoyer les invitations et analyser les résultats.",
+      "original_text": "Create your first campaign to start collecting customer feedback and understanding their experience. Campaigns help you organize survey participants, send invitations, and analyze results."
+    },
+    {
+      "id": "list_22",
+      "file": "templates/campaigns/list.html",
+      "element": "h6",
+      "text": "Nom de la campagne",
+      "original_text": "Campaign Name"
+    },
+    {
+      "id": "list_23",
+      "file": "templates/campaigns/list.html",
+      "element": "h5",
+      "text": "Exportation terminée !",
+      "original_text": "Export Complete!"
+    },
+    {
+      "id": "list_24",
+      "file": "templates/campaigns/list.html",
+      "element": "p",
+      "text": "Les données de votre campagne ont été exportées avec succès.",
+      "original_text": "Your campaign data has been successfully exported."
+    },
+    {
+      "id": "list_25",
+      "file": "templates/campaigns/list.html",
+      "element": "h5",
+      "text": "Échec de l'exportation",
+      "original_text": "Export Failed"
+    },
+    {
+      "id": "list_26",
+      "file": "templates/campaigns/list.html",
+      "element": "p",
+      "text": "Une erreur s'est produite lors de l'exportation de vos données.",
+      "original_text": "An error occurred while exporting your data."
+    },
+    {
+      "id": "list_27",
+      "file": "templates/campaigns/list.html",
+      "element": "button",
+      "text": "Fermer",
+      "original_text": "Close"
+    },
+    {
+      "id": "list_title_28",
+      "file": "templates/campaigns/list.html",
+      "element": "a[title]",
+      "text": "Voir les détails",
+      "original_text": "View Details"
+    },
+    {
+      "id": "list_title_29",
+      "file": "templates/campaigns/list.html",
+      "element": "a[title]",
+      "text": "Insights de la campagne",
+      "original_text": "Campaign Insights"
+    },
+    {
+      "id": "list_title_30",
+      "file": "templates/campaigns/list.html",
+      "element": "a[title]",
+      "text": "Gérer les participants",
+      "original_text": "Manage Participants"
+    },
+    {
+      "id": "list_title_31",
+      "file": "templates/campaigns/list.html",
+      "element": "button[title]",
+      "text": "Exporter les données",
+      "original_text": "Export Data"
+    },
+    {
+      "id": "list_title_32",
+      "file": "templates/campaigns/list.html",
+      "element": "button[title]",
+      "text": "Rapport exécutif",
+      "original_text": "Executive Report"
+    },
+    {
+      "id": "list_aria_33",
+      "file": "templates/campaigns/list.html",
+      "element": "button[aria-label]",
+      "text": "Fermer",
+      "original_text": "Close"
+    },
+    {
+      "id": "breadcrumb_aria_1",
+      "file": "templates/components/breadcrumb.html",
+      "element": "nav[aria-label]",
+      "text": "Navigation par fil d'Ariane",
+      "original_text": "Breadcrumb navigation"
+    },
+    {
+      "id": "breadcrumb_aria_2",
+      "file": "templates/components/breadcrumb.html",
+      "element": "a[aria-label]",
+      "text": "Aller à {{ item.label }}",
+      "original_text": "Navigate to {{ item.label }}"
+    },
+    {
+      "id": "ui_version_toggle_1",
+      "file": "templates/components/ui_version_toggle.html",
+      "element": "span",
+      "text": "UI : {{ ui_version|upper }}",
+      "original_text": "UI: {{ ui_version|upper }}"
+    },
+    {
+      "id": "ui_version_toggle_2",
+      "file": "templates/components/ui_version_toggle.html",
+      "element": "span",
+      "text": "Basculer",
+      "original_text": "Switch"
+    },
+    {
+      "id": "ui_version_toggle_title_3",
+      "file": "templates/components/ui_version_toggle.html",
+      "element": "button[title]",
+      "text": "Basculer vers {% if ui_version == 'v1' %}v2 (Nouvelle barre latérale){% else %}v1 (Actuelle){% endif %}",
+      "original_text": "Switch to {% if ui_version == 'v1' %}v2 (New Sidebar){% else %}v1 (Current){% endif %}"
+    }
+  ],
+  "flash_messages": [],
+  "email_templates": []
 }

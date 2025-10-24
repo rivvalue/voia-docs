@@ -25,1423 +25,1660 @@
       "id": "platform_dashboard_9",
       "file": "templates/business_auth/platform_dashboard.html",
       "element": "p",
-      "text": "Moyenne/Compte"
+      "text": "Moyenne/Compte",
+      "original_text": "Avg/Account"
     },
     {
       "id": "platform_dashboard_10",
       "file": "templates/business_auth/platform_dashboard.html",
       "element": "p",
-      "text": "Nombre total de participants"
+      "text": "Nombre total de participants",
+      "original_text": "Total Participants"
     },
     {
       "id": "platform_dashboard_11",
       "file": "templates/business_auth/platform_dashboard.html",
       "element": "p",
-      "text": "Taux de complétion"
+      "text": "Taux de complétion",
+      "original_text": "Completion Rate"
     },
     {
       "id": "platform_dashboard_12",
       "file": "templates/business_auth/platform_dashboard.html",
       "element": "p",
-      "text": "Comptes sous licence"
+      "text": "Comptes sous licence",
+      "original_text": "Licensed Accounts"
     },
     {
       "id": "platform_dashboard_13",
       "file": "templates/business_auth/platform_dashboard.html",
       "element": "span",
-      "text": "Meilleur performeur"
+      "text": "Meilleur performeur",
+      "original_text": "Top Performer"
     },
     {
       "id": "platform_dashboard_14",
       "file": "templates/business_auth/platform_dashboard.html",
       "element": "h4",
-      "text": "Aucun compte récent"
+      "text": "Aucun compte récent",
+      "original_text": "No recent accounts"
     },
     {
       "id": "platform_dashboard_15",
       "file": "templates/business_auth/platform_dashboard.html",
       "element": "p",
-      "text": "Les nouvelles inscriptions de comptes entreprise apparaîtront ici."
+      "text": "Les nouvelles inscriptions de comptes entreprise apparaîtront ici.",
+      "original_text": "New business account registrations will appear here."
     },
     {
       "id": "platform_dashboard_16",
       "file": "templates/business_auth/platform_dashboard.html",
       "element": "span",
-      "text": "Utilisateurs :"
+      "text": "Utilisateurs :",
+      "original_text": "Users:"
     },
     {
       "id": "platform_dashboard_17",
       "file": "templates/business_auth/platform_dashboard.html",
       "element": "span",
-      "text": "Campagnes :"
+      "text": "Campagnes :",
+      "original_text": "Campaigns:"
     },
     {
       "id": "platform_dashboard_18",
       "file": "templates/business_auth/platform_dashboard.html",
       "element": "th",
-      "text": "Nom"
+      "text": "Nom",
+      "original_text": "Name"
     },
     {
       "id": "platform_dashboard_19",
       "file": "templates/business_auth/platform_dashboard.html",
       "element": "th",
-      "text": "E-mail"
+      "text": "E-mail",
+      "original_text": "Email"
     },
     {
       "id": "platform_dashboard_20",
       "file": "templates/business_auth/platform_dashboard.html",
       "element": "th",
-      "text": "Rôle"
+      "text": "Rôle",
+      "original_text": "Role"
     },
     {
       "id": "platform_dashboard_21",
       "file": "templates/business_auth/platform_dashboard.html",
       "element": "th",
-      "text": "Statut"
+      "text": "Statut",
+      "original_text": "Status"
     },
     {
       "id": "platform_dashboard_22",
       "file": "templates/business_auth/platform_dashboard.html",
       "element": "th",
-      "text": "Dernière connexion"
+      "text": "Dernière connexion",
+      "original_text": "Last Login"
     },
     {
       "id": "platform_dashboard_23",
       "file": "templates/business_auth/platform_dashboard.html",
       "element": "p",
-      "text": "Aucun utilisateur dans ce compte"
+      "text": "Aucun utilisateur dans ce compte",
+      "original_text": "No users in this account"
     },
     {
       "id": "assignment_result_1",
       "file": "templates/business_auth/licenses/assignment_result.html",
       "element": "span",
-      "text": "Compte entreprise :"
+      "text": "Compte entreprise :",
+      "original_text": "Business Account:"
     },
     {
       "id": "assignment_result_2",
       "file": "templates/business_auth/licenses/assignment_result.html",
       "element": "span",
-      "text": "Email:"
+      "text": "Email:",
+      "original_text": "Email:"
     },
     {
       "id": "assignment_result_3",
       "file": "templates/business_auth/licenses/assignment_result.html",
       "element": "span",
-      "text": "Date d'attribution :"
+      "text": "Date d'attribution :",
+      "original_text": "Assignment Date:"
     },
     {
       "id": "assignment_result_4",
       "file": "templates/business_auth/licenses/assignment_result.html",
       "element": "span",
-      "text": "Attribué par :"
+      "text": "Attribué par :",
+      "original_text": "Assigned By:"
     },
     {
       "id": "assignment_result_5",
       "file": "templates/business_auth/licenses/assignment_result.html",
       "element": "span",
-      "text": "Notes :"
+      "text": "Notes :",
+      "original_text": "Notes:"
     },
     {
       "id": "assignment_result_6",
       "file": "templates/business_auth/licenses/assignment_result.html",
       "element": "h5",
-      "text": "Licence précédente"
+      "text": "Licence précédente",
+      "original_text": "Previous License"
     },
     {
       "id": "assignment_result_7",
       "file": "templates/business_auth/licenses/assignment_result.html",
       "element": "h5",
-      "text": "Nouvelle licence"
+      "text": "Nouvelle licence",
+      "original_text": "New License"
     },
     {
       "id": "assignment_result_8",
       "file": "templates/business_auth/licenses/assignment_result.html",
       "element": "h5",
-      "text": "Prochaines étapes"
+      "text": "Prochaines étapes",
+      "original_text": "What Happens Next"
     },
     {
       "id": "assignment_result_9",
       "file": "templates/business_auth/licenses/assignment_result.html",
       "element": "li",
-      "text": "La nouvelle licence est active immédiatement"
+      "text": "La nouvelle licence est active immédiatement",
+      "original_text": "The new license is active immediately"
     },
     {
       "id": "assignment_result_10",
       "file": "templates/business_auth/licenses/assignment_result.html",
       "element": "li",
-      "text": "Les utilisateurs auront accès aux fonctionnalités selon le type de licence"
+      "text": "Les utilisateurs auront accès aux fonctionnalités selon le type de licence",
+      "original_text": "Users will have access to features based on the new license type"
     },
     {
       "id": "assignment_result_11",
       "file": "templates/business_auth/licenses/assignment_result.html",
       "element": "li",
-      "text": "This license will expire on {{ new_license.expiration_date.strftime('%B %d, %Y') }}"
+      "text": "This license will expire on {{ new_license.expiration_date.strftime('%B %d, %Y') }}",
+      "original_text": "This license will expire on {{ new_license.expiration_date.strftime('%B %d, %Y') }}"
     },
     {
       "id": "assignment_result_12",
       "file": "templates/business_auth/licenses/assignment_result.html",
       "element": "li",
-      "text": "Vous pouvez suivre l'utilisation et modifier les limites si nécessaire"
+      "text": "Vous pouvez suivre l'utilisation et modifier les limites si nécessaire",
+      "original_text": "You can track usage and modify limits as needed"
     },
     {
       "id": "assignment_result_13",
       "file": "templates/business_auth/licenses/assignment_result.html",
       "element": "li",
-      "text": "Un e-mail de notification a été envoyé au compte entreprise"
+      "text": "Un e-mail de notification a été envoyé au compte entreprise",
+      "original_text": "A notification email has been sent to the business account"
     },
     {
       "id": "assignment_result_14",
       "file": "templates/business_auth/licenses/assignment_result.html",
       "element": "h5",
-      "text": "Les problèmes suivants ont empêché l'attribution de la licence :"
+      "text": "Les problèmes suivants ont empêché l'attribution de la licence :",
+      "original_text": "The following issues prevented the license assignment:"
     },
     {
       "id": "assignment_result_15",
       "file": "templates/business_auth/licenses/assignment_result.html",
       "element": "h5",
-      "text": "Étapes de dépannage"
+      "text": "Étapes de dépannage",
+      "original_text": "Troubleshooting Steps"
     },
     {
       "id": "assignment_result_16",
       "file": "templates/business_auth/licenses/assignment_result.html",
       "element": "li",
-      "text": "Vérifiez que le compte entreprise existe et est valide"
+      "text": "Vérifiez que le compte entreprise existe et est valide",
+      "original_text": "Verify that the business account exists and is valid"
     },
     {
       "id": "assignment_result_17",
       "file": "templates/business_auth/licenses/assignment_result.html",
       "element": "li",
-      "text": "Vérifiez que le type de licence sélectionné est disponible"
+      "text": "Vérifiez que le type de licence sélectionné est disponible",
+      "original_text": "Check that the selected license type is available"
     },
     {
       "id": "assignment_result_18",
       "file": "templates/business_auth/licenses/assignment_result.html",
       "element": "li",
-      "text": "Assurez-vous que les limites personnalisées (pour les licences Pro) sont raisonnables"
+      "text": "Assurez-vous que les limites personnalisées (pour les licences Pro) sont raisonnables",
+      "original_text": "Ensure custom limits (for Pro licenses) are reasonable"
     },
     {
       "id": "assignment_result_19",
       "file": "templates/business_auth/licenses/assignment_result.html",
       "element": "li",
-      "text": "Confirmez que vous disposez des autorisations nécessaires pour attribuer des licences"
+      "text": "Confirmez que vous disposez des autorisations nécessaires pour attribuer des licences",
+      "original_text": "Confirm you have the necessary permissions to assign licenses"
     },
     {
       "id": "assignment_result_20",
       "file": "templates/business_auth/licenses/assignment_result.html",
       "element": "li",
-      "text": "Essayez d'actualiser la page et de refaire l'attribution"
+      "text": "Essayez d'actualiser la page et de refaire l'attribution",
+      "original_text": "Try refreshing the page and attempting the assignment again"
     },
     {
       "id": "history_1",
       "file": "templates/business_auth/licenses/history.html",
       "element": "h2",
-      "text": "Historique des licences"
+      "text": "Historique des licences",
+      "original_text": "License History"
     },
     {
       "id": "history_2",
       "file": "templates/business_auth/licenses/history.html",
       "element": "h4",
-      "text": "Licence actuelle : {{ current_license.type|title }}"
+      "text": "Licence actuelle : {{ current_license.type|title }}",
+      "original_text": "Current License: {{ current_license.type|title }}"
     },
     {
       "id": "history_3",
       "file": "templates/business_auth/licenses/history.html",
       "element": "span",
-      "text": "Nombre maximal d'utilisateurs"
+      "text": "Nombre maximal d'utilisateurs",
+      "original_text": "Max Users"
     },
     {
       "id": "history_4",
       "file": "templates/business_auth/licenses/history.html",
       "element": "span",
-      "text": "Nombre maximal de campagnes"
+      "text": "Nombre maximal de campagnes",
+      "original_text": "Max Campaigns"
     },
     {
       "id": "history_5",
       "file": "templates/business_auth/licenses/history.html",
       "element": "span",
-      "text": "Nombre maximal de réponses"
+      "text": "Nombre maximal de réponses",
+      "original_text": "Max Responses"
     },
     {
       "id": "history_6",
       "file": "templates/business_auth/licenses/history.html",
       "element": "p",
-      "text": "Nombre total de modifications"
+      "text": "Nombre total de modifications",
+      "original_text": "Total Changes"
     },
     {
       "id": "history_7",
       "file": "templates/business_auth/licenses/history.html",
       "element": "p",
-      "text": "Types de licences utilisés"
+      "text": "Types de licences utilisés",
+      "original_text": "License Types Used"
     },
     {
       "id": "history_8",
       "file": "templates/business_auth/licenses/history.html",
       "element": "p",
-      "text": "Jours depuis la première licence"
+      "text": "Jours depuis la première licence",
+      "original_text": "Days Since First License"
     },
     {
       "id": "history_9",
       "file": "templates/business_auth/licenses/history.html",
       "element": "span",
-      "text": "Type de licence"
+      "text": "Type de licence",
+      "original_text": "License Type"
     },
     {
       "id": "history_10",
       "file": "templates/business_auth/licenses/history.html",
       "element": "span",
-      "text": "Nombre maximal d'utilisateurs"
+      "text": "Nombre maximal d'utilisateurs",
+      "original_text": "Max Users"
     },
     {
       "id": "history_11",
       "file": "templates/business_auth/licenses/history.html",
       "element": "span",
-      "text": "Nombre maximal de campagnes"
+      "text": "Nombre maximal de campagnes",
+      "original_text": "Max Campaigns"
     },
     {
       "id": "history_12",
       "file": "templates/business_auth/licenses/history.html",
       "element": "span",
-      "text": "Nombre maximal de réponses"
+      "text": "Nombre maximal de réponses",
+      "original_text": "Max Responses"
     },
     {
       "id": "history_13",
       "file": "templates/business_auth/licenses/history.html",
       "element": "span",
-      "text": "Expiration"
+      "text": "Expiration",
+      "original_text": "Expiration"
     },
     {
       "id": "history_14",
       "file": "templates/business_auth/licenses/history.html",
       "element": "h4",
-      "text": "Aucun historique de licence"
+      "text": "Aucun historique de licence",
+      "original_text": "No License History"
     },
     {
       "id": "history_15",
       "file": "templates/business_auth/licenses/history.html",
       "element": "p",
-      "text": "Ce compte entreprise n'a aucun historique d'attribution de licence."
+      "text": "Ce compte entreprise n'a aucun historique d'attribution de licence.",
+      "original_text": "This business account has no license assignment history."
     },
     {
       "id": "history_16",
       "file": "templates/business_auth/licenses/history.html",
       "element": "p",
-      "text": "Téléchargez les données d'historique des licences pour archivage ou analyse."
+      "text": "Téléchargez les données d'historique des licences pour archivage ou analyse.",
+      "original_text": "Download license history data for record keeping or analysis."
     },
     {
       "id": "history_title_17",
       "file": "templates/business_auth/licenses/history.html",
       "element": "button[title]",
-      "text": "Fonction d'exportation à venir"
+      "text": "Fonction d'exportation à venir",
+      "original_text": "Export feature coming soon"
     },
     {
       "id": "history_title_18",
       "file": "templates/business_auth/licenses/history.html",
       "element": "button[title]",
-      "text": "Fonction d'exportation à venir"
+      "text": "Fonction d'exportation à venir",
+      "original_text": "Export feature coming soon"
     },
     {
       "id": "overview_1",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "h2",
-      "text": "Aperçu des comptes entreprise"
+      "text": "Aperçu des comptes entreprise",
+      "original_text": "Business Accounts Overview"
     },
     {
       "id": "overview_2",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "p",
-      "text": "Gérez les licences et suivez l'utilisation sur tous les comptes entreprise"
+      "text": "Gérez les licences et suivez l'utilisation sur tous les comptes entreprise",
+      "original_text": "Manage licenses and monitor usage across all business accounts"
     },
     {
       "id": "overview_3",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "label",
-      "text": "Rechercher des comptes"
+      "text": "Rechercher des comptes",
+      "original_text": "Search Accounts"
     },
     {
       "id": "overview_4",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "label",
-      "text": "Type de licence"
+      "text": "Type de licence",
+      "original_text": "License Type"
     },
     {
       "id": "overview_5",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "option",
-      "text": "Tous les types de licence"
+      "text": "Tous les types de licence",
+      "original_text": "All License Types"
     },
     {
       "id": "overview_6",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "option",
-      "text": "Core"
+      "text": "Core",
+      "original_text": "Core"
     },
     {
       "id": "overview_7",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "option",
-      "text": "Plus"
+      "text": "Plus",
+      "original_text": "Plus"
     },
     {
       "id": "overview_8",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "option",
-      "text": "Pro"
+      "text": "Pro",
+      "original_text": "Pro"
     },
     {
       "id": "overview_9",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "option",
-      "text": "Trial"
+      "text": "Trial",
+      "original_text": "Trial"
     },
     {
       "id": "overview_10",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "label",
-      "text": "Statut"
+      "text": "Statut",
+      "original_text": "Status"
     },
     {
       "id": "overview_11",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "option",
-      "text": "Tous les statuts"
+      "text": "Tous les statuts",
+      "original_text": "All Statuses"
     },
     {
       "id": "overview_12",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "option",
-      "text": "Actif"
+      "text": "Actif",
+      "original_text": "Active"
     },
     {
       "id": "overview_13",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "option",
-      "text": "Expire bientôt"
+      "text": "Expire bientôt",
+      "original_text": "Expiring Soon"
     },
     {
       "id": "overview_14",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "option",
-      "text": "Expiré"
+      "text": "Expiré",
+      "original_text": "Expired"
     },
     {
       "id": "overview_15",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "th",
-      "text": "Nom de l'entreprise"
+      "text": "Nom de l'entreprise",
+      "original_text": "Business Name"
     },
     {
       "id": "overview_16",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "th",
-      "text": "Type de licence"
+      "text": "Type de licence",
+      "original_text": "License Type"
     },
     {
       "id": "overview_17",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "th",
-      "text": "Statut"
+      "text": "Statut",
+      "original_text": "Status"
     },
     {
       "id": "overview_18",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "th",
-      "text": "Utilisateurs"
+      "text": "Utilisateurs",
+      "original_text": "Users"
     },
     {
       "id": "overview_19",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "th",
-      "text": "Campagnes"
+      "text": "Campagnes",
+      "original_text": "Campaigns"
     },
     {
       "id": "overview_20",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "th",
-      "text": "Utilisation"
+      "text": "Utilisation",
+      "original_text": "Usage"
     },
     {
       "id": "overview_21",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "th",
-      "text": "Expiration"
+      "text": "Expiration",
+      "original_text": "Expiration"
     },
     {
       "id": "overview_22",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "th",
-      "text": "Actions"
+      "text": "Actions",
+      "original_text": "Actions"
     },
     {
       "id": "overview_23",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "span",
-      "text": "Unlimited"
+      "text": "Unlimited",
+      "original_text": "Unlimited"
     },
     {
       "id": "overview_24",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "span",
-      "text": "Pas d'expiration"
+      "text": "Pas d'expiration",
+      "original_text": "No expiration"
     },
     {
       "id": "overview_25",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "h4",
-      "text": "Aucun compte trouvé"
+      "text": "Aucun compte trouvé",
+      "original_text": "No accounts found"
     },
     {
       "id": "overview_26",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "p",
-      "text": "Essayez d'ajuster vos critères de recherche ou vos filtres."
+      "text": "Essayez d'ajuster vos critères de recherche ou vos filtres.",
+      "original_text": "Try adjusting your search criteria or filters."
     },
     {
       "id": "overview_27",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "div",
-      "text": "Showing {{ pagination.per_page * (pagination.page - 1) + 1 }} \n                    to {{ min(pagination.per_page * pagination.page, pagination.total) }} \n                    of {{ pagination.total }} accounts"
+      "text": "Showing {{ pagination.per_page * (pagination.page - 1) + 1 }} \n                    to {{ min(pagination.per_page * pagination.page, pagination.total) }} \n                    of {{ pagination.total }} accounts",
+      "original_text": "Showing {{ pagination.per_page * (pagination.page - 1) + 1 }} \n                    to {{ min(pagination.per_page * pagination.page, pagination.total) }} \n                    of {{ pagination.total }} accounts"
     },
     {
       "id": "overview_placeholder_28",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "input[placeholder]",
-      "text": "Search by business name or email..."
+      "text": "Search by business name or email...",
+      "original_text": "Search by business name or email..."
     },
     {
       "id": "overview_title_29",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "a[title]",
-      "text": "Attribuer une licence"
+      "text": "Attribuer une licence",
+      "original_text": "Assign License"
     },
     {
       "id": "overview_title_30",
       "file": "templates/business_auth/licenses/overview.html",
       "element": "a[title]",
-      "text": "Voir l'historique"
+      "text": "Voir l'historique",
+      "original_text": "View History"
     },
     {
       "id": "assignment_form_1",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "p",
-      "text": "Configurer la licence pour {{ business_account.name }}"
+      "text": "Configurer la licence pour {{ business_account.name }}",
+      "original_text": "Configure license for {{ business_account.name }}"
     },
     {
       "id": "assignment_form_2",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "h5",
-      "text": "Détails du compte"
+      "text": "Détails du compte",
+      "original_text": "Account Details"
     },
     {
       "id": "assignment_form_3",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "td",
-      "text": "Nom de l'entreprise :"
+      "text": "Nom de l'entreprise :",
+      "original_text": "Business Name:"
     },
     {
       "id": "assignment_form_4",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "td",
-      "text": "Email:"
+      "text": "Email:",
+      "original_text": "Email:"
     },
     {
       "id": "assignment_form_5",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "td",
-      "text": "Type de compte :"
+      "text": "Type de compte :",
+      "original_text": "Account Type:"
     },
     {
       "id": "assignment_form_6",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "td",
-      "text": "Licence actuelle :"
+      "text": "Licence actuelle :",
+      "original_text": "Current License:"
     },
     {
       "id": "assignment_form_7",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "td",
-      "text": "Expire :"
+      "text": "Expire :",
+      "original_text": "Expires:"
     },
     {
       "id": "assignment_form_8",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "h5",
-      "text": "Utilisation actuelle"
+      "text": "Utilisation actuelle",
+      "original_text": "Current Usage"
     },
     {
       "id": "assignment_form_9",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "div",
-      "text": "Utilisateurs"
+      "text": "Utilisateurs",
+      "original_text": "Users"
     },
     {
       "id": "assignment_form_10",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "div",
-      "text": "Campagnes"
+      "text": "Campagnes",
+      "original_text": "Campaigns"
     },
     {
       "id": "assignment_form_11",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "p",
-      "text": "Choisissez le niveau de licence approprié pour ce compte entreprise"
+      "text": "Choisissez le niveau de licence approprié pour ce compte entreprise",
+      "original_text": "Choose the appropriate license tier for this business account"
     },
     {
       "id": "assignment_form_12",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "h4",
-      "text": "Licence Core"
+      "text": "Licence Core",
+      "original_text": "Core License"
     },
     {
       "id": "assignment_form_13",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "p",
-      "text": "Fonctionnalités essentielles pour les petites équipes"
+      "text": "Fonctionnalités essentielles pour les petites équipes",
+      "original_text": "Essential features for small teams"
     },
     {
       "id": "assignment_form_14",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "div",
-      "text": "par an"
+      "text": "par an",
+      "original_text": "per year"
     },
     {
       "id": "assignment_form_15",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "Jusqu’à 5 utilisateurs"
+      "text": "Jusqu’à 5 utilisateurs",
+      "original_text": "Up to 5 users"
     },
     {
       "id": "assignment_form_16",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "4 campagnes par an"
+      "text": "4 campagnes par an",
+      "original_text": "4 campaigns per year"
     },
     {
       "id": "assignment_form_17",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "200 réponses cibles par campagne"
+      "text": "200 réponses cibles par campagne",
+      "original_text": "200 target responses per campaign"
     },
     {
       "id": "assignment_form_18",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "1 000 invitations par campagne"
+      "text": "1 000 invitations par campagne",
+      "original_text": "1,000 survey invitations per campaign"
     },
     {
       "id": "assignment_form_19",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "Analytique de base"
+      "text": "Analytique de base",
+      "original_text": "Basic Analytics"
     },
     {
       "id": "assignment_form_20",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "Assistance par e-mail"
+      "text": "Assistance par e-mail",
+      "original_text": "Email Support"
     },
     {
       "id": "assignment_form_21",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "Modèles standard"
+      "text": "Modèles standard",
+      "original_text": "Standard Templates"
     },
     {
       "id": "assignment_form_22",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "h4",
-      "text": "Licence Plus"
+      "text": "Licence Plus",
+      "original_text": "Plus License"
     },
     {
       "id": "assignment_form_23",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "p",
-      "text": "Fonctionnalités avancées pour les équipes en croissance"
+      "text": "Fonctionnalités avancées pour les équipes en croissance",
+      "original_text": "Advanced features for growing teams"
     },
     {
       "id": "assignment_form_24",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "div",
-      "text": "par an"
+      "text": "par an",
+      "original_text": "per year"
     },
     {
       "id": "assignment_form_25",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "Jusqu’à 10 utilisateurs"
+      "text": "Jusqu’à 10 utilisateurs",
+      "original_text": "Up to 10 users"
     },
     {
       "id": "assignment_form_26",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "4 campagnes par an"
+      "text": "4 campagnes par an",
+      "original_text": "4 campaigns per year"
     },
     {
       "id": "assignment_form_27",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "1 000 réponses cibles par campagne"
+      "text": "1 000 réponses cibles par campagne",
+      "original_text": "1,000 target responses per campaign"
     },
     {
       "id": "assignment_form_28",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "5 000 invitations par campagne"
+      "text": "5 000 invitations par campagne",
+      "original_text": "5,000 survey invitations per campaign"
     },
     {
       "id": "assignment_form_29",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "Analytique avancée"
+      "text": "Analytique avancée",
+      "original_text": "Advanced Analytics"
     },
     {
       "id": "assignment_form_30",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "Support prioritaire"
+      "text": "Support prioritaire",
+      "original_text": "Priority Support"
     },
     {
       "id": "assignment_form_31",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "Modèles personnalisés"
+      "text": "Modèles personnalisés",
+      "original_text": "Custom Templates"
     },
     {
       "id": "assignment_form_32",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "API Access"
+      "text": "API Access",
+      "original_text": "API Access"
     },
     {
       "id": "assignment_form_33",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "h4",
-      "text": "Pro License"
+      "text": "Pro License",
+      "original_text": "Pro License"
     },
     {
       "id": "assignment_form_34",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "p",
-      "text": "Limites personnalisées pour les besoins d'entreprise"
+      "text": "Limites personnalisées pour les besoins d'entreprise",
+      "original_text": "Custom limits for enterprise needs"
     },
     {
       "id": "assignment_form_35",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "div",
-      "text": "Custom"
+      "text": "Custom",
+      "original_text": "Custom"
     },
     {
       "id": "assignment_form_36",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "div",
-      "text": "pricing"
+      "text": "pricing",
+      "original_text": "pricing"
     },
     {
       "id": "assignment_form_37",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "Limites d'utilisateurs personnalisées (par défaut : 25)"
+      "text": "Limites d'utilisateurs personnalisées (par défaut : 25)",
+      "original_text": "Custom user limits (default: 25)"
     },
     {
       "id": "assignment_form_38",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "Limites de campagnes personnalisées (par défaut : 12/an)"
+      "text": "Limites de campagnes personnalisées (par défaut : 12/an)",
+      "original_text": "Custom campaign limits (default: 12/year)"
     },
     {
       "id": "assignment_form_39",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "Objectifs de réponses personnalisés (par défaut : 10 000)"
+      "text": "Objectifs de réponses personnalisés (par défaut : 10 000)",
+      "original_text": "Custom response targets (default: 10,000)"
     },
     {
       "id": "assignment_form_40",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "Capacité d'invitations personnalisée (par défaut : 50 000)"
+      "text": "Capacité d'invitations personnalisée (par défaut : 50 000)",
+      "original_text": "Custom invitation capacity (default: 50,000)"
     },
     {
       "id": "assignment_form_41",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "Analytique personnalisée"
+      "text": "Analytique personnalisée",
+      "original_text": "Custom Analytics"
     },
     {
       "id": "assignment_form_42",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "Support dédié"
+      "text": "Support dédié",
+      "original_text": "Dedicated Support"
     },
     {
       "id": "assignment_form_43",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "Options en marque blanche"
+      "text": "Options en marque blanche",
+      "original_text": "White Label Options"
     },
     {
       "id": "assignment_form_44",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "Intégrations personnalisées"
+      "text": "Intégrations personnalisées",
+      "original_text": "Custom Integrations"
     },
     {
       "id": "assignment_form_45",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "li",
-      "text": "Garantie SLA"
+      "text": "Garantie SLA",
+      "original_text": "SLA Guarantee"
     },
     {
       "id": "assignment_form_46",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "h5",
-      "text": "Configuration des limites personnalisées"
+      "text": "Configuration des limites personnalisées",
+      "original_text": "Custom Limits Configuration"
     },
     {
       "id": "assignment_form_47",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "p",
-      "text": "Définissez des limites spécifiques pour ce compte sous licence Pro."
+      "text": "Définissez des limites spécifiques pour ce compte sous licence Pro.",
+      "original_text": "Set specific limits for this Pro license account."
     },
     {
       "id": "assignment_form_48",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "label",
-      "text": "Nombre maximal d'utilisateurs"
+      "text": "Nombre maximal d'utilisateurs",
+      "original_text": "Maximum Users"
     },
     {
       "id": "assignment_form_49",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "div",
-      "text": "Nombre d'utilisateurs pouvant accéder au compte"
+      "text": "Nombre d'utilisateurs pouvant accéder au compte",
+      "original_text": "Number of users that can access the account"
     },
     {
       "id": "assignment_form_50",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "label",
-      "text": "Nombre maximal de campagnes"
+      "text": "Nombre maximal de campagnes",
+      "original_text": "Maximum Campaigns"
     },
     {
       "id": "assignment_form_51",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "div",
-      "text": "Nombre de campagnes par mois"
+      "text": "Nombre de campagnes par mois",
+      "original_text": "Number of campaigns per month"
     },
     {
       "id": "assignment_form_52",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "label",
-      "text": "Réponses cibles par campagne"
+      "text": "Réponses cibles par campagne",
+      "original_text": "Target Responses per Campaign"
     },
     {
       "id": "assignment_form_53",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "div",
-      "text": "Nombre attendu de réponses complètes à l'enquête (à titre informatif)"
+      "text": "Nombre attendu de réponses complètes à l'enquête (à titre informatif)",
+      "original_text": "Expected number of completed survey responses (informational)"
     },
     {
       "id": "assignment_form_54",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "label",
-      "text": "Nombre maximal d'invitations par campagne"
+      "text": "Nombre maximal d'invitations par campagne",
+      "original_text": "Maximum Invitations per Campaign"
     },
     {
       "id": "assignment_form_55",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "div",
-      "text": "Limite stricte d'invitations (généralement 5× les réponses pour un taux d’environ 20 %)"
+      "text": "Limite stricte d'invitations (généralement 5× les réponses pour un taux d’environ 20 %)",
+      "original_text": "Hard limit on survey invitations (typically 5x responses for ~20% response rate)"
     },
     {
       "id": "assignment_form_56",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "p",
-      "text": "Fonctionnalités supplémentaires optionnelles avec tarification et durée personnalisées"
+      "text": "Fonctionnalités supplémentaires optionnelles avec tarification et durée personnalisées",
+      "original_text": "Optional add-on features with custom pricing and duration"
     },
     {
       "id": "assignment_form_57",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "label",
-      "text": "Date de début"
+      "text": "Date de début",
+      "original_text": "Start Date"
     },
     {
       "id": "assignment_form_58",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "div",
-      "text": "When transcript analysis access begins"
+      "text": "When transcript analysis access begins",
+      "original_text": "When transcript analysis access begins"
     },
     {
       "id": "assignment_form_59",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "label",
-      "text": "Date de fin"
+      "text": "Date de fin",
+      "original_text": "End Date"
     },
     {
       "id": "assignment_form_60",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "div",
-      "text": "When transcript analysis access expires"
+      "text": "When transcript analysis access expires",
+      "original_text": "When transcript analysis access expires"
     },
     {
       "id": "assignment_form_61",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "label",
-      "text": "Prix du module complémentaire (USD)"
+      "text": "Prix du module complémentaire (USD)",
+      "original_text": "Add-on Price (USD)"
     },
     {
       "id": "assignment_form_62",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "div",
-      "text": "Custom pricing for this add-on period"
+      "text": "Custom pricing for this add-on period",
+      "original_text": "Custom pricing for this add-on period"
     },
     {
       "id": "assignment_form_63",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "label",
-      "text": "Notes (Optional)"
+      "text": "Notes (Optional)",
+      "original_text": "Notes (Optional)"
     },
     {
       "id": "assignment_form_64",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "div",
-      "text": "Ces notes seront enregistrées dans l'historique des licences à des fins d'audit."
+      "text": "Ces notes seront enregistrées dans l'historique des licences à des fins d'audit.",
+      "original_text": "These notes will be recorded in the license history for audit purposes."
     },
     {
       "id": "assignment_form_65",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "th",
-      "text": "Fonctionnalité"
+      "text": "Fonctionnalité",
+      "original_text": "Feature"
     },
     {
       "id": "assignment_form_66",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "th",
-      "text": "Actuel"
+      "text": "Actuel",
+      "original_text": "Current"
     },
     {
       "id": "assignment_form_67",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "th",
-      "text": "Nouveau"
+      "text": "Nouveau",
+      "original_text": "New"
     },
     {
       "id": "assignment_form_placeholder_68",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "input[placeholder]",
-      "text": "0.00"
+      "text": "0.00",
+      "original_text": "0.00"
     },
     {
       "id": "assignment_form_placeholder_69",
       "file": "templates/business_auth/licenses/assignment_form.html",
       "element": "textarea[placeholder]",
-      "text": "Ajoutez des notes sur cette attribution de licence..."
+      "text": "Ajoutez des notes sur cette attribution de licence...",
+      "original_text": "Add any notes about this license assignment..."
     },
     {
       "id": "dashboard_1",
       "file": "templates/business_auth/licenses/dashboard.html",
       "element": "p",
-      "text": "Surveillez et gérez toutes les licences de comptes entreprise sur la plateforme"
+      "text": "Surveillez et gérez toutes les licences de comptes entreprise sur la plateforme",
+      "original_text": "Monitor and manage all business account licenses across the platform"
     },
     {
       "id": "dashboard_2",
       "file": "templates/business_auth/licenses/dashboard.html",
       "element": "div",
-      "text": "Nombre total de comptes"
+      "text": "Nombre total de comptes",
+      "original_text": "Total Accounts"
     },
     {
       "id": "dashboard_3",
       "file": "templates/business_auth/licenses/dashboard.html",
       "element": "div",
-      "text": "Licences Core"
+      "text": "Licences Core",
+      "original_text": "Core Licenses"
     },
     {
       "id": "dashboard_4",
       "file": "templates/business_auth/licenses/dashboard.html",
       "element": "div",
-      "text": "Licences Plus"
+      "text": "Licences Plus",
+      "original_text": "Plus Licenses"
     },
     {
       "id": "dashboard_5",
       "file": "templates/business_auth/licenses/dashboard.html",
       "element": "div",
-      "text": "Licences Pro"
+      "text": "Licences Pro",
+      "original_text": "Pro Licenses"
     },
     {
       "id": "dashboard_6",
       "file": "templates/business_auth/licenses/dashboard.html",
       "element": "div",
-      "text": "Comptes d'essai"
+      "text": "Comptes d'essai",
+      "original_text": "Trial Accounts"
     },
     {
       "id": "dashboard_7",
       "file": "templates/business_auth/licenses/dashboard.html",
       "element": "div",
-      "text": "Expire bientôt"
+      "text": "Expire bientôt",
+      "original_text": "Expiring Soon"
     },
     {
       "id": "dashboard_8",
       "file": "templates/business_auth/licenses/dashboard.html",
       "element": "p",
-      "text": "Aucune activité de licence récente"
+      "text": "Aucune activité de licence récente",
+      "original_text": "No recent license activity"
     },
     {
       "id": "dashboard_9",
       "file": "templates/business_auth/licenses/dashboard.html",
       "element": "span",
-      "text": "Afficher tous les comptes"
+      "text": "Afficher tous les comptes",
+      "original_text": "View All Accounts"
     },
     {
       "id": "dashboard_10",
       "file": "templates/business_auth/licenses/dashboard.html",
       "element": "span",
-      "text": "Licences en expiration"
+      "text": "Licences en expiration",
+      "original_text": "Expiring Licenses"
     },
     {
       "id": "dashboard_11",
       "file": "templates/business_auth/licenses/dashboard.html",
       "element": "span",
-      "text": "Comptes d'essai"
+      "text": "Comptes d'essai",
+      "original_text": "Trial Accounts"
     },
     {
       "id": "dashboard_12",
       "file": "templates/business_auth/licenses/dashboard.html",
       "element": "span",
-      "text": "Rapports d'utilisation élevée"
+      "text": "Rapports d'utilisation élevée",
+      "original_text": "High Usage Reports"
     },
     {
       "id": "dashboard_13",
       "file": "templates/business_auth/licenses/dashboard.html",
       "element": "span",
-      "text": "Aperçu des licences"
+      "text": "Aperçu des licences",
+      "original_text": "License Overview"
     },
     {
       "id": "dashboard_14",
       "file": "templates/business_auth/licenses/dashboard.html",
       "element": "span",
-      "text": "Détails de l'expiration"
+      "text": "Détails de l'expiration",
+      "original_text": "Expiration Details"
     },
     {
       "id": "dashboard_15",
       "file": "templates/business_auth/licenses/dashboard.html",
       "element": "span",
-      "text": "Informations sur la licence"
+      "text": "Informations sur la licence",
+      "original_text": "License Information"
     },
     {
       "id": "dashboard_16",
       "file": "templates/business_auth/licenses/dashboard.html",
       "element": "span",
-      "text": "Détails d'utilisation"
+      "text": "Détails d'utilisation",
+      "original_text": "Usage Details"
     },
     {
       "id": "welcome_1",
       "file": "templates/business_auth/onboarding/welcome.html",
       "element": "h1",
-      "text": "Bienvenue sur VOÏA !"
+      "text": "Bienvenue sur VOÏA !",
+      "original_text": "Welcome to VOÏA!"
     },
     {
       "id": "welcome_2",
       "file": "templates/business_auth/onboarding/welcome.html",
       "element": "p",
-      "text": "Configurons votre plateforme pour la réussite"
+      "text": "Configurons votre plateforme pour la réussite",
+      "original_text": "Let's set up your platform for success"
     },
     {
       "id": "welcome_3",
       "file": "templates/business_auth/onboarding/welcome.html",
       "element": "div",
-      "text": "Step {{ current_step_index + 1 }} of {{ all_steps|length }}: {{ step.name }}"
+      "text": "Step {{ current_step_index + 1 }} of {{ all_steps|length }}: {{ step.name }}",
+      "original_text": "Step {{ current_step_index + 1 }} of {{ all_steps|length }}: {{ step.name }}"
     },
     {
       "id": "welcome_4",
       "file": "templates/business_auth/onboarding/welcome.html",
       "element": "p",
-      "text": "Bienvenue, {{ current_user.get_full_name() }} ! Vous configurez VOÏA pour votre équipe."
+      "text": "Bienvenue, {{ current_user.get_full_name() }} ! Vous configurez VOÏA pour votre équipe.",
+      "original_text": "Welcome, {{ current_user.get_full_name() }}! You're setting up VOÏA for your team."
     },
     {
       "id": "welcome_5",
       "file": "templates/business_auth/onboarding/welcome.html",
       "element": "p",
-      "text": "Complétez ces étapes pour accéder à votre plateforme VOÏA et commencer à collecter de précieux retours clients."
+      "text": "Complétez ces étapes pour accéder à votre plateforme VOÏA et commencer à collecter de précieux retours clients.",
+      "original_text": "Complete these steps to access your VOÏA platform and start collecting valuable customer feedback."
     },
     {
       "id": "welcome_6",
       "file": "templates/business_auth/onboarding/welcome.html",
       "element": "div",
-      "text": "Configuration de l'e-mail"
+      "text": "Configuration de l'e-mail",
+      "original_text": "Email Configuration"
     },
     {
       "id": "welcome_7",
       "file": "templates/business_auth/onboarding/welcome.html",
       "element": "div",
-      "text": "Configurez vos paramètres SMTP pour envoyer des invitations à l'enquête aux participants"
+      "text": "Configurez vos paramètres SMTP pour envoyer des invitations à l'enquête aux participants",
+      "original_text": "Configure your SMTP settings to send survey invitations to participants"
     },
     {
       "id": "welcome_8",
       "file": "templates/business_auth/onboarding/welcome.html",
       "element": "div",
-      "text": "Ajouter des membres à l'équipe"
+      "text": "Ajouter des membres à l'équipe",
+      "original_text": "Add Team Members"
     },
     {
       "id": "welcome_9",
       "file": "templates/business_auth/onboarding/welcome.html",
       "element": "div",
-      "text": "Invitez des responsables de campagne à vous aider à créer et gérer les enquêtes de retour client"
+      "text": "Invitez des responsables de campagne à vous aider à créer et gérer les enquêtes de retour client",
+      "original_text": "Invite campaign managers to help you create and manage customer feedback surveys"
     },
     {
       "id": "welcome_10",
       "file": "templates/business_auth/onboarding/welcome.html",
       "element": "div",
-      "text": "Start Collecting Feedback"
+      "text": "Start Collecting Feedback",
+      "original_text": "Start Collecting Feedback"
     },
     {
       "id": "welcome_11",
       "file": "templates/business_auth/onboarding/welcome.html",
       "element": "div",
-      "text": "Lancez votre première campagne et commencez à recueillir des informations clients précieuses"
+      "text": "Lancez votre première campagne et commencez à recueillir des informations clients précieuses",
+      "original_text": "Launch your first campaign and begin gathering valuable customer insights"
     },
     {
       "id": "smtp_1",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "h1",
-      "text": "Configuration de l'e-mail"
+      "text": "Configuration de l'e-mail",
+      "original_text": "Email Configuration"
     },
     {
       "id": "smtp_2",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "p",
-      "text": "Configure SMTP settings to send survey invitations"
+      "text": "Configure SMTP settings to send survey invitations",
+      "original_text": "Configure SMTP settings to send survey invitations"
     },
     {
       "id": "smtp_3",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "div",
-      "text": "Step {{ current_step_index + 1 }} of {{ all_steps|length }}: {{ step.name }}"
+      "text": "Step {{ current_step_index + 1 }} of {{ all_steps|length }}: {{ step.name }}",
+      "original_text": "Step {{ current_step_index + 1 }} of {{ all_steps|length }}: {{ step.name }}"
     },
     {
       "id": "smtp_4",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "h5",
-      "text": "SMTP Configuration Guide"
+      "text": "SMTP Configuration Guide",
+      "original_text": "SMTP Configuration Guide"
     },
     {
       "id": "smtp_5",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "p",
-      "text": "Pour envoyer des invitations à l'enquête, VOÏA a besoin d'un accès à votre serveur de messagerie. Vous pouvez utiliser :"
+      "text": "Pour envoyer des invitations à l'enquête, VOÏA a besoin d'un accès à votre serveur de messagerie. Vous pouvez utiliser :",
+      "original_text": "To send survey invitations, VOÏA needs access to your email server. You can use:"
     },
     {
       "id": "smtp_6",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "li",
-      "text": "smtp.gmail.com (port 587, use App Password)"
+      "text": "smtp.gmail.com (port 587, use App Password)",
+      "original_text": "smtp.gmail.com (port 587, use App Password)"
     },
     {
       "id": "smtp_7",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "li",
-      "text": "smtp-mail.outlook.com (port 587)"
+      "text": "smtp-mail.outlook.com (port 587)",
+      "original_text": "smtp-mail.outlook.com (port 587)"
     },
     {
       "id": "smtp_8",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "li",
-      "text": "Les paramètres du serveur de messagerie de votre organisation"
+      "text": "Les paramètres du serveur de messagerie de votre organisation",
+      "original_text": "Your organization's email server settings"
     },
     {
       "id": "smtp_9",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "h3",
-      "text": "Paramètres du serveur"
+      "text": "Paramètres du serveur",
+      "original_text": "Server Settings"
     },
     {
       "id": "smtp_10",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "label",
-      "text": "SMTP Server *"
+      "text": "SMTP Server *",
+      "original_text": "SMTP Server *"
     },
     {
       "id": "smtp_11",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "div",
-      "text": "Adresse du serveur SMTP de votre fournisseur de messagerie"
+      "text": "Adresse du serveur SMTP de votre fournisseur de messagerie",
+      "original_text": "Your email provider's SMTP server address"
     },
     {
       "id": "smtp_12",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "label",
-      "text": "Port *"
+      "text": "Port *",
+      "original_text": "Port *"
     },
     {
       "id": "smtp_13",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "div",
-      "text": "Généralement 587 pour TLS ou 465 pour SSL"
+      "text": "Généralement 587 pour TLS ou 465 pour SSL",
+      "original_text": "Usually 587 for TLS or 465 for SSL"
     },
     {
       "id": "smtp_14",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "label",
-      "text": "Username *"
+      "text": "Username *",
+      "original_text": "Username *"
     },
     {
       "id": "smtp_15",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "div",
-      "text": "Votre adresse e-mail ou nom d'utilisateur SMTP"
+      "text": "Votre adresse e-mail ou nom d'utilisateur SMTP",
+      "original_text": "Your email address or SMTP username"
     },
     {
       "id": "smtp_16",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "label",
-      "text": "Password *"
+      "text": "Password *",
+      "original_text": "Password *"
     },
     {
       "id": "smtp_17",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "label",
-      "text": "Sender Name *"
+      "text": "Sender Name *",
+      "original_text": "Sender Name *"
     },
     {
       "id": "smtp_18",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "div",
-      "text": "Comment votre nom apparaît aux destinataires de l'enquête"
+      "text": "Comment votre nom apparaît aux destinataires de l'enquête",
+      "original_text": "How your name appears to survey recipients"
     },
     {
       "id": "smtp_19",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "p",
-      "text": "Envoyez un e-mail de test pour vérifier que vos paramètres SMTP fonctionnent correctement."
+      "text": "Envoyez un e-mail de test pour vérifier que vos paramètres SMTP fonctionnent correctement.",
+      "original_text": "Send a test email to verify your SMTP settings are working correctly."
     },
     {
       "id": "smtp_20",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "label",
-      "text": "Test Email Address *"
+      "text": "Test Email Address *",
+      "original_text": "Test Email Address *"
     },
     {
       "id": "smtp_placeholder_21",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "input[placeholder]",
-      "text": "smtp.gmail.com"
+      "text": "smtp.gmail.com",
+      "original_text": "smtp.gmail.com"
     },
     {
       "id": "smtp_placeholder_22",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "input[placeholder]",
-      "text": "587"
+      "text": "587",
+      "original_text": "587"
     },
     {
       "id": "smtp_placeholder_23",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "input[placeholder]",
-      "text": "your-email@company.com"
+      "text": "your-email@company.com",
+      "original_text": "your-email@company.com"
     },
     {
       "id": "smtp_placeholder_24",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "input[placeholder]",
-      "text": "{% if email_config %}••••••••{% else %}Enter password{% endif %}"
+      "text": "{% if email_config %}••••••••{% else %}Enter password{% endif %}",
+      "original_text": "{% if email_config %}••••••••{% else %}Enter password{% endif %}"
     },
     {
       "id": "smtp_placeholder_25",
       "file": "templates/business_auth/onboarding/smtp.html",
       "element": "input[placeholder]",
-      "text": "test@example.com"
+      "text": "test@example.com",
+      "original_text": "test@example.com"
     },
     {
       "id": "users_1",
       "file": "templates/business_auth/onboarding/users.html",
       "element": "h1",
-      "text": "Ajouter des membres à l'équipe"
+      "text": "Ajouter des membres à l'équipe",
+      "original_text": "Add Team Members"
     },
     {
       "id": "users_2",
       "file": "templates/business_auth/onboarding/users.html",
       "element": "p",
-      "text": "Invitez des responsables de campagne pour aider à créer et gérer les enquêtes"
+      "text": "Invitez des responsables de campagne pour aider à créer et gérer les enquêtes",
+      "original_text": "Invite campaign managers to help create and manage surveys"
     },
     {
       "id": "users_3",
       "file": "templates/business_auth/onboarding/users.html",
       "element": "div",
-      "text": "Step {{ current_step_index + 1 }} of {{ all_steps|length }}: {{ step.name }}"
+      "text": "Step {{ current_step_index + 1 }} of {{ all_steps|length }}: {{ step.name }}",
+      "original_text": "Step {{ current_step_index + 1 }} of {{ all_steps|length }}: {{ step.name }}"
     },
     {
       "id": "users_4",
       "file": "templates/business_auth/onboarding/users.html",
       "element": "h3",
-      "text": "Membres actuels de l'équipe"
+      "text": "Membres actuels de l'équipe",
+      "original_text": "Current Team Members"
     },
     {
       "id": "users_5",
       "file": "templates/business_auth/onboarding/users.html",
       "element": "li",
-      "text": "Peut créer des enquêtes, gérer les participants et consulter les analyses"
+      "text": "Peut créer des enquêtes, gérer les participants et consulter les analyses",
+      "original_text": "Can create surveys, manage participants, and view analytics"
     },
     {
       "id": "users_6",
       "file": "templates/business_auth/onboarding/users.html",
       "element": "li",
-      "text": "Peut consulter les résultats et analyses mais ne peut pas créer de campagnes"
+      "text": "Peut consulter les résultats et analyses mais ne peut pas créer de campagnes",
+      "original_text": "Can view survey results and analytics but cannot create campaigns"
     },
     {
       "id": "users_7",
       "file": "templates/business_auth/onboarding/users.html",
       "element": "li",
-      "text": "Accès complet à toutes les fonctionnalités et paramètres"
+      "text": "Accès complet à toutes les fonctionnalités et paramètres",
+      "original_text": "Full access to all features and settings"
     },
     {
       "id": "users_8",
       "file": "templates/business_auth/onboarding/users.html",
       "element": "h3",
-      "text": "Ajouter un responsable de campagne"
+      "text": "Ajouter un responsable de campagne",
+      "original_text": "Add Campaign Manager"
     },
     {
       "id": "users_9",
       "file": "templates/business_auth/onboarding/users.html",
       "element": "label",
-      "text": "First Name *"
+      "text": "First Name *",
+      "original_text": "First Name *"
     },
     {
       "id": "users_10",
       "file": "templates/business_auth/onboarding/users.html",
       "element": "label",
-      "text": "Last Name *"
+      "text": "Last Name *",
+      "original_text": "Last Name *"
     },
     {
       "id": "users_11",
       "file": "templates/business_auth/onboarding/users.html",
       "element": "label",
-      "text": "Email Address *"
+      "text": "Email Address *",
+      "original_text": "Email Address *"
     },
     {
       "id": "users_12",
       "file": "templates/business_auth/onboarding/users.html",
       "element": "div",
-      "text": "Une invitation sera envoyée à cette adresse e-mail"
+      "text": "Une invitation sera envoyée à cette adresse e-mail",
+      "original_text": "An invitation will be sent to this email address"
     },
     {
       "id": "users_13",
       "file": "templates/business_auth/onboarding/users.html",
       "element": "label",
-      "text": "Role *"
+      "text": "Role *",
+      "original_text": "Role *"
     },
     {
       "id": "users_14",
       "file": "templates/business_auth/onboarding/users.html",
       "element": "option",
-      "text": "Campaign Manager"
+      "text": "Campaign Manager",
+      "original_text": "Campaign Manager"
     },
     {
       "id": "users_15",
       "file": "templates/business_auth/onboarding/users.html",
       "element": "option",
-      "text": "Administrator"
+      "text": "Administrator",
+      "original_text": "Administrator"
     },
     {
       "id": "users_16",
       "file": "templates/business_auth/onboarding/users.html",
       "element": "option",
-      "text": "Viewer"
+      "text": "Viewer",
+      "original_text": "Viewer"
     },
     {
       "id": "users_17",
       "file": "templates/business_auth/onboarding/users.html",
       "element": "div",
-      "text": "Le rôle de responsable de campagne est recommandé pour la plupart des membres de l'équipe"
+      "text": "Le rôle de responsable de campagne est recommandé pour la plupart des membres de l'équipe",
+      "original_text": "Campaign Manager is recommended for most team members"
     },
     {
       "id": "users_placeholder_18",
       "file": "templates/business_auth/onboarding/users.html",
       "element": "input[placeholder]",
-      "text": "John"
+      "text": "John",
+      "original_text": "John"
     },
     {
       "id": "users_placeholder_19",
       "file": "templates/business_auth/onboarding/users.html",
       "element": "input[placeholder]",
-      "text": "Smith"
+      "text": "Smith",
+      "original_text": "Smith"
     },
     {
       "id": "users_placeholder_20",
       "file": "templates/business_auth/onboarding/users.html",
       "element": "input[placeholder]",
-      "text": "john.smith@company.com"
+      "text": "john.smith@company.com",
+      "original_text": "john.smith@company.com"
     },
     {
       "id": "complete_1",
       "file": "templates/business_auth/onboarding/complete.html",
       "element": "h1",
-      "text": "Configuration terminée !"
+      "text": "Configuration terminée !",
+      "original_text": "Setup Complete!"
     },
     {
       "id": "complete_2",
       "file": "templates/business_auth/onboarding/complete.html",
       "element": "p",
-      "text": "Votre plateforme VOÏA est prête à fonctionner"
+      "text": "Votre plateforme VOÏA est prête à fonctionner",
+      "original_text": "Your VOÏA platform is ready for action"
     },
     {
       "id": "complete_3",
       "file": "templates/business_auth/onboarding/complete.html",
       "element": "p",
-      "text": "Félicitations, {{ current_user.get_full_name() }} ! Votre équipe est prête à commencer à collecter des retours clients précieux."
+      "text": "Félicitations, {{ current_user.get_full_name() }} ! Votre équipe est prête à commencer à collecter des retours clients précieux.",
+      "original_text": "Congratulations, {{ current_user.get_full_name() }}! Your team is ready to start collecting valuable customer feedback."
     },
     {
       "id": "complete_4",
       "file": "templates/business_auth/onboarding/complete.html",
       "element": "p",
-      "text": "Vous avez configuré votre plateforme avec succès et pouvez désormais créer des campagnes de retour client performantes."
+      "text": "Vous avez configuré votre plateforme avec succès et pouvez désormais créer des campagnes de retour client performantes.",
+      "original_text": "You've successfully configured your platform and can now create powerful customer feedback campaigns."
     },
     {
       "id": "complete_5",
       "file": "templates/business_auth/onboarding/complete.html",
       "element": "p",
-      "text": "Voici ce que vous avez configuré avec succès :"
+      "text": "Voici ce que vous avez configuré avec succès :",
+      "original_text": "Here's what you've successfully set up:"
     },
     {
       "id": "complete_6",
       "file": "templates/business_auth/onboarding/complete.html",
       "element": "div",
-      "text": "Configuration de l'e-mail"
+      "text": "Configuration de l'e-mail",
+      "original_text": "Email Configuration"
     },
     {
       "id": "complete_7",
       "file": "templates/business_auth/onboarding/complete.html",
       "element": "div",
-      "text": "Vos paramètres SMTP sont configurés et testés. Vous pouvez maintenant envoyer des invitations à l'enquête."
+      "text": "Vos paramètres SMTP sont configurés et testés. Vous pouvez maintenant envoyer des invitations à l'enquête.",
+      "original_text": "Your SMTP settings are configured and tested. You can now send survey invitations to participants."
     },
     {
       "id": "complete_8",
       "file": "templates/business_auth/onboarding/complete.html",
       "element": "div",
-      "text": "Team Members Added"
+      "text": "Team Members Added",
+      "original_text": "Team Members Added"
     },
     {
       "id": "complete_9",
       "file": "templates/business_auth/onboarding/complete.html",
       "element": "div",
-      "text": "Vos responsables de campagne ont été invités et peuvent aider à créer et gérer les enquêtes de retour client."
+      "text": "Vos responsables de campagne ont été invités et peuvent aider à créer et gérer les enquêtes de retour client.",
+      "original_text": "Your campaign managers have been invited and can help create and manage customer feedback surveys."
     },
     {
       "id": "complete_10",
       "file": "templates/business_auth/onboarding/complete.html",
       "element": "div",
-      "text": "Platform Security"
+      "text": "Platform Security",
+      "original_text": "Platform Security"
     },
     {
       "id": "complete_11",
       "file": "templates/business_auth/onboarding/complete.html",
       "element": "div",
-      "text": "Votre compte est sécurisé grâce à une authentification et des contrôles d'accès basés sur les rôles."
+      "text": "Votre compte est sécurisé grâce à une authentification et des contrôles d'accès basés sur les rôles.",
+      "original_text": "Your account is secured with proper authentication and role-based access controls."
     },
     {
       "id": "complete_12",
       "file": "templates/business_auth/onboarding/complete.html",
       "element": "div",
-      "text": "Créez votre première campagne"
+      "text": "Créez votre première campagne",
+      "original_text": "Create Your First Campaign"
     },
     {
       "id": "complete_13",
       "file": "templates/business_auth/onboarding/complete.html",
       "element": "div",
-      "text": "Commencez par créer une campagne de retour client. Définissez vos objectifs, votre audience cible et vos questions d'enquête pour recueillir des informations précieuses."
+      "text": "Commencez par créer une campagne de retour client. Définissez vos objectifs, votre audience cible et vos questions d'enquête pour recueillir des informations précieuses.",
+      "original_text": "Start by creating a customer feedback campaign. Define your goals, target audience, and survey questions to begin collecting valuable insights."
     }
   ],
   "flash_messages": [],

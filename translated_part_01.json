@@ -25,1423 +25,1660 @@
       "id": "test_token_1",
       "file": "templates/test_token.html",
       "element": "h1",
-      "text": "Test de génération de jeton"
+      "text": "Test de génération de jeton",
+      "original_text": "Token Generation Test"
     },
     {
       "id": "test_token_2",
       "file": "templates/test_token.html",
       "element": "button",
-      "text": "Générer un jeton"
+      "text": "Générer un jeton",
+      "original_text": "Generate Token"
     },
     {
       "id": "test_token_3",
       "file": "templates/test_token.html",
       "element": "button",
-      "text": "Effacer les résultats"
+      "text": "Effacer les résultats",
+      "original_text": "Clear Results"
     },
     {
       "id": "test_token_placeholder_4",
       "file": "templates/test_token.html",
       "element": "input[placeholder]",
-      "text": "Saisissez l'adresse e-mail"
+      "text": "Saisissez l'adresse e-mail",
+      "original_text": "Enter email address"
     },
     {
       "id": "conversational_survey_completed_1",
       "file": "templates/conversational_survey_completed.html",
       "element": "h2",
-      "text": "Enquête conversationnelle déjà complétée"
+      "text": "Enquête conversationnelle déjà complétée",
+      "original_text": "Conversational Survey Already Completed"
     },
     {
       "id": "conversational_survey_completed_2",
       "file": "templates/conversational_survey_completed.html",
       "element": "p",
-      "text": "Merci ! Vous avez déjà soumis votre retour conversationnel le"
+      "text": "Merci ! Vous avez déjà soumis votre retour conversationnel le",
+      "original_text": "Thank you! You have already submitted your conversational feedback on"
     },
     {
       "id": "conversational_survey_completed_3",
       "file": "templates/conversational_survey_completed.html",
       "element": "h5",
-      "text": "Que souhaitez-vous faire ensuite ?"
+      "text": "Que souhaitez-vous faire ensuite ?",
+      "original_text": "What would you like to do next?"
     },
     {
       "id": "survey_completed_1",
       "file": "templates/survey_completed.html",
       "element": "h2",
-      "text": "Enquête déjà complétée"
+      "text": "Enquête déjà complétée",
+      "original_text": "Survey Already Completed"
     },
     {
       "id": "survey_completed_2",
       "file": "templates/survey_completed.html",
       "element": "p",
-      "text": "Merci ! Vous avez déjà soumis votre retour d'information le"
+      "text": "Merci ! Vous avez déjà soumis votre retour d'information le",
+      "original_text": "Thank you! You have already submitted your feedback on"
     },
     {
       "id": "survey_completed_3",
       "file": "templates/survey_completed.html",
       "element": "h5",
-      "text": "Que souhaitez-vous faire ensuite ?"
+      "text": "Que souhaitez-vous faire ensuite ?",
+      "original_text": "What would you like to do next?"
     },
     {
       "id": "simple_auth_1",
       "file": "templates/simple_auth.html",
       "element": "h4",
-      "text": "Génération de jeton simple"
+      "text": "Génération de jeton simple",
+      "original_text": "Simple Token Generation"
     },
     {
       "id": "simple_auth_2",
       "file": "templates/simple_auth.html",
       "element": "label",
-      "text": "Adresse e-mail"
+      "text": "Adresse e-mail",
+      "original_text": "Email Address"
     },
     {
       "id": "simple_auth_3",
       "file": "templates/simple_auth.html",
       "element": "button",
-      "text": "Générer un jeton"
+      "text": "Générer un jeton",
+      "original_text": "Generate Token"
     },
     {
       "id": "simple_auth_4",
       "file": "templates/simple_auth.html",
       "element": "button",
-      "text": "Effacer les résultats"
+      "text": "Effacer les résultats",
+      "original_text": "Clear Results"
     },
     {
       "id": "survey_choice_1",
       "file": "templates/survey_choice.html",
       "element": "h4",
-      "text": "Bienvenue, {{ participant_name }}"
+      "text": "Bienvenue, {{ participant_name }}",
+      "original_text": "Welcome, {{ participant_name }}"
     },
     {
       "id": "survey_choice_2",
       "file": "templates/survey_choice.html",
       "element": "h5",
-      "text": "Choisissez votre expérience d'enquête"
+      "text": "Choisissez votre expérience d'enquête",
+      "original_text": "Choose Your Survey Experience"
     },
     {
       "id": "survey_choice_3",
       "file": "templates/survey_choice.html",
       "element": "h5",
-      "text": "Conversationnel IA"
+      "text": "Conversationnel IA",
+      "original_text": "AI Conversational"
     },
     {
       "id": "survey_choice_4",
       "file": "templates/survey_choice.html",
       "element": "p",
-      "text": "Conversation naturelle avec notre agent IA. Questions dynamiques basées sur vos réponses pour une expérience personnalisée."
+      "text": "Conversation naturelle avec notre agent IA. Questions dynamiques basées sur vos réponses pour une expérience personnalisée.",
+      "original_text": "Natural conversation with our AI agent. Dynamic questions based on your responses for a personalized experience."
     },
     {
       "id": "survey_choice_5",
       "file": "templates/survey_choice.html",
       "element": "li",
-      "text": "Flux conversationnel"
+      "text": "Flux conversationnel",
+      "original_text": "Conversational flow"
     },
     {
       "id": "survey_choice_6",
       "file": "templates/survey_choice.html",
       "element": "li",
-      "text": "Questions dynamiques"
+      "text": "Questions dynamiques",
+      "original_text": "Dynamic questions"
     },
     {
       "id": "survey_choice_7",
       "file": "templates/survey_choice.html",
       "element": "li",
-      "text": "Analyses alimentées par l'IA"
+      "text": "Analyses alimentées par l'IA",
+      "original_text": "AI-powered insights"
     },
     {
       "id": "survey_choice_8",
       "file": "templates/survey_choice.html",
       "element": "li",
-      "text": "5 à 7 minutes"
+      "text": "5 à 7 minutes",
+      "original_text": "5-7 minutes"
     },
     {
       "id": "survey_choice_9",
       "file": "templates/survey_choice.html",
       "element": "h5",
-      "text": "Formulaire traditionnel"
+      "text": "Formulaire traditionnel",
+      "original_text": "Traditional Form"
     },
     {
       "id": "survey_choice_10",
       "file": "templates/survey_choice.html",
       "element": "p",
-      "text": "Formulaire classique étape par étape avec des questions structurées. Interface familière pour une expérience d'enquête rapide."
+      "text": "Formulaire classique étape par étape avec des questions structurées. Interface familière pour une expérience d'enquête rapide.",
+      "original_text": "Classic step-by-step form with structured questions. Familiar interface for a quick survey experience."
     },
     {
       "id": "survey_choice_11",
       "file": "templates/survey_choice.html",
       "element": "li",
-      "text": "Format structuré"
+      "text": "Format structuré",
+      "original_text": "Structured format"
     },
     {
       "id": "survey_choice_12",
       "file": "templates/survey_choice.html",
       "element": "li",
-      "text": "Processus étape par étape"
+      "text": "Processus étape par étape",
+      "original_text": "Step-by-step flow"
     },
     {
       "id": "survey_choice_13",
       "file": "templates/survey_choice.html",
       "element": "li",
-      "text": "Interface traditionnelle"
+      "text": "Interface traditionnelle",
+      "original_text": "Traditional interface"
     },
     {
       "id": "survey_choice_14",
       "file": "templates/survey_choice.html",
       "element": "li",
-      "text": "3 à 5 minutes"
+      "text": "3 à 5 minutes",
+      "original_text": "3-5 minutes"
     },
     {
       "id": "survey_1",
       "file": "templates/survey.html",
       "element": "h4",
-      "text": "Enquête de retour client"
+      "text": "Enquête de retour client",
+      "original_text": "Customer Feedback Survey"
     },
     {
       "id": "survey_2",
       "file": "templates/survey.html",
       "element": "h5",
-      "text": "Informations de base"
+      "text": "Informations de base",
+      "original_text": "Basic Information"
     },
     {
       "id": "survey_3",
       "file": "templates/survey.html",
       "element": "label",
-      "text": "Nom de l'entreprise"
+      "text": "Nom de l'entreprise",
+      "original_text": "Company Name"
     },
     {
       "id": "survey_4",
       "file": "templates/survey.html",
       "element": "label",
-      "text": "Votre nom"
+      "text": "Votre nom",
+      "original_text": "Your Name"
     },
     {
       "id": "survey_5",
       "file": "templates/survey.html",
       "element": "label",
-      "text": "Adresse e-mail"
+      "text": "Adresse e-mail",
+      "original_text": "Email Address"
     },
     {
       "id": "survey_6",
       "file": "templates/survey.html",
       "element": "label",
-      "text": "Depuis combien de temps travaillez-vous avec Archelo Group ?"
+      "text": "Depuis combien de temps travaillez-vous avec Archelo Group ?",
+      "original_text": "How long have you been working with Archelo Group?"
     },
     {
       "id": "survey_7",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "Sélectionnez la durée..."
+      "text": "Sélectionnez la durée...",
+      "original_text": "Select duration..."
     },
     {
       "id": "survey_8",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "Moins de 6 mois"
+      "text": "Moins de 6 mois",
+      "original_text": "Less than 6 months"
     },
     {
       "id": "survey_9",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "6 mois - 1 an"
+      "text": "6 mois - 1 an",
+      "original_text": "6 months - 1 year"
     },
     {
       "id": "survey_10",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "1 à 2 ans"
+      "text": "1 à 2 ans",
+      "original_text": "1-2 years"
     },
     {
       "id": "survey_11",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "2 à 3 ans"
+      "text": "2 à 3 ans",
+      "original_text": "2-3 years"
     },
     {
       "id": "survey_12",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "3 à 5 ans"
+      "text": "3 à 5 ans",
+      "original_text": "3-5 years"
     },
     {
       "id": "survey_13",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "5 à 10 ans"
+      "text": "5 à 10 ans",
+      "original_text": "5-10 years"
     },
     {
       "id": "survey_14",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "Plus de 10 ans"
+      "text": "Plus de 10 ans",
+      "original_text": "More than 10 years"
     },
     {
       "id": "survey_15",
       "file": "templates/survey.html",
       "element": "button",
-      "text": "Suivant"
+      "text": "Suivant",
+      "original_text": "Next"
     },
     {
       "id": "survey_16",
       "file": "templates/survey.html",
       "element": "h5",
-      "text": "Net Promoter Score"
+      "text": "Net Promoter Score",
+      "original_text": "Net Promoter Score"
     },
     {
       "id": "survey_17",
       "file": "templates/survey.html",
       "element": "p",
-      "text": "Sur une échelle de 0 à 10, quelle est la probabilité que vous recommandiez nos services à un ami ou un collègue ?"
+      "text": "Sur une échelle de 0 à 10, quelle est la probabilité que vous recommandiez nos services à un ami ou un collègue ?",
+      "original_text": "On a scale of 0-10, how likely are you to recommend our services to a friend or colleague?"
     },
     {
       "id": "survey_18",
       "file": "templates/survey.html",
       "element": "label",
-      "text": "10"
+      "text": "10",
+      "original_text": "10"
     },
     {
       "id": "survey_19",
       "file": "templates/survey.html",
       "element": "button",
-      "text": "Précédent"
+      "text": "Précédent",
+      "original_text": "Previous"
     },
     {
       "id": "survey_20",
       "file": "templates/survey.html",
       "element": "button",
-      "text": "Suivant"
+      "text": "Suivant",
+      "original_text": "Next"
     },
     {
       "id": "survey_21",
       "file": "templates/survey.html",
       "element": "h5",
-      "text": "Parlez-nous davantage de votre expérience"
+      "text": "Parlez-nous davantage de votre expérience",
+      "original_text": "Tell us more about your experience"
     },
     {
       "id": "survey_22",
       "file": "templates/survey.html",
       "element": "label",
-      "text": "Quelle est la principale raison de votre note ?"
+      "text": "Quelle est la principale raison de votre note ?",
+      "original_text": "What is the main reason for your score?"
     },
     {
       "id": "survey_23",
       "file": "templates/survey.html",
       "element": "label",
-      "text": "Satisfaction globale (1-5)"
+      "text": "Satisfaction globale (1-5)",
+      "original_text": "Overall Satisfaction (1-5)"
     },
     {
       "id": "survey_24",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "Sélectionnez la note"
+      "text": "Sélectionnez la note",
+      "original_text": "Select rating"
     },
     {
       "id": "survey_25",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "1 - Très faible"
+      "text": "1 - Très faible",
+      "original_text": "1 - Very Poor"
     },
     {
       "id": "survey_26",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "2 - Faible"
+      "text": "2 - Faible",
+      "original_text": "2 - Poor"
     },
     {
       "id": "survey_27",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "3 - Moyen"
+      "text": "3 - Moyen",
+      "original_text": "3 - Average"
     },
     {
       "id": "survey_28",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "4 - Bon"
+      "text": "4 - Bon",
+      "original_text": "4 - Good"
     },
     {
       "id": "survey_29",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "5 - Excellent"
+      "text": "5 - Excellent",
+      "original_text": "5 - Excellent"
     },
     {
       "id": "survey_30",
       "file": "templates/survey.html",
       "element": "label",
-      "text": "Valeur du produit (1-5)"
+      "text": "Valeur du produit (1-5)",
+      "original_text": "Product Value (1-5)"
     },
     {
       "id": "survey_31",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "Sélectionnez la note"
+      "text": "Sélectionnez la note",
+      "original_text": "Select rating"
     },
     {
       "id": "survey_32",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "1 - Très faible"
+      "text": "1 - Très faible",
+      "original_text": "1 - Very Poor"
     },
     {
       "id": "survey_33",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "2 - Faible"
+      "text": "2 - Faible",
+      "original_text": "2 - Poor"
     },
     {
       "id": "survey_34",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "3 - Moyen"
+      "text": "3 - Moyen",
+      "original_text": "3 - Average"
     },
     {
       "id": "survey_35",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "4 - Bon"
+      "text": "4 - Bon",
+      "original_text": "4 - Good"
     },
     {
       "id": "survey_36",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "5 - Excellent"
+      "text": "5 - Excellent",
+      "original_text": "5 - Excellent"
     },
     {
       "id": "survey_37",
       "file": "templates/survey.html",
       "element": "label",
-      "text": "Prestation de service et support Archelo Group (1-5)"
+      "text": "Prestation de service et support Archelo Group (1-5)",
+      "original_text": "Archelo Group Service Delivery & Support (1-5)"
     },
     {
       "id": "survey_38",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "Sélectionnez la note"
+      "text": "Sélectionnez la note",
+      "original_text": "Select rating"
     },
     {
       "id": "survey_39",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "1 - Très faible"
+      "text": "1 - Très faible",
+      "original_text": "1 - Very Poor"
     },
     {
       "id": "survey_40",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "2 - Faible"
+      "text": "2 - Faible",
+      "original_text": "2 - Poor"
     },
     {
       "id": "survey_41",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "3 - Moyen"
+      "text": "3 - Moyen",
+      "original_text": "3 - Average"
     },
     {
       "id": "survey_42",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "4 - Bon"
+      "text": "4 - Bon",
+      "original_text": "4 - Good"
     },
     {
       "id": "survey_43",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "5 - Excellent"
+      "text": "5 - Excellent",
+      "original_text": "5 - Excellent"
     },
     {
       "id": "survey_44",
       "file": "templates/survey.html",
       "element": "label",
-      "text": "Tarification (1-5)"
+      "text": "Tarification (1-5)",
+      "original_text": "Pricing (1-5)"
     },
     {
       "id": "survey_45",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "Sélectionnez la note"
+      "text": "Sélectionnez la note",
+      "original_text": "Select rating"
     },
     {
       "id": "survey_46",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "1 - Très faible"
+      "text": "1 - Très faible",
+      "original_text": "1 - Very Poor"
     },
     {
       "id": "survey_47",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "2 - Faible"
+      "text": "2 - Faible",
+      "original_text": "2 - Poor"
     },
     {
       "id": "survey_48",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "3 - Moyen"
+      "text": "3 - Moyen",
+      "original_text": "3 - Average"
     },
     {
       "id": "survey_49",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "4 - Bon"
+      "text": "4 - Bon",
+      "original_text": "4 - Good"
     },
     {
       "id": "survey_50",
       "file": "templates/survey.html",
       "element": "option",
-      "text": "5 - Excellent"
+      "text": "5 - Excellent",
+      "original_text": "5 - Excellent"
     },
     {
       "id": "survey_51",
       "file": "templates/survey.html",
       "element": "button",
-      "text": "Précédent"
+      "text": "Précédent",
+      "original_text": "Previous"
     },
     {
       "id": "survey_52",
       "file": "templates/survey.html",
       "element": "button",
-      "text": "Suivant"
+      "text": "Suivant",
+      "original_text": "Next"
     },
     {
       "id": "survey_53",
       "file": "templates/survey.html",
       "element": "h5",
-      "text": "Retour d'information supplémentaire"
+      "text": "Retour d'information supplémentaire",
+      "original_text": "Additional Feedback"
     },
     {
       "id": "survey_54",
       "file": "templates/survey.html",
       "element": "label",
-      "text": "Que pourrions-nous améliorer ?"
+      "text": "Que pourrions-nous améliorer ?",
+      "original_text": "What could we improve?"
     },
     {
       "id": "survey_55",
       "file": "templates/survey.html",
       "element": "label",
-      "text": "Autres commentaires ?"
+      "text": "Autres commentaires ?",
+      "original_text": "Any additional comments?"
     },
     {
       "id": "survey_56",
       "file": "templates/survey.html",
       "element": "button",
-      "text": "Précédent"
+      "text": "Précédent",
+      "original_text": "Previous"
     },
     {
       "id": "survey_57",
       "file": "templates/survey.html",
       "element": "span",
-      "text": "Chargement..."
+      "text": "Chargement...",
+      "original_text": "Loading..."
     },
     {
       "id": "survey_58",
       "file": "templates/survey.html",
       "element": "p",
-      "text": "Traitement de votre retour d'information..."
+      "text": "Traitement de votre retour d'information...",
+      "original_text": "Processing your feedback..."
     },
     {
       "id": "survey_59",
       "file": "templates/survey.html",
       "element": "h4",
-      "text": "Merci de partager votre retour d'information avec nous."
+      "text": "Merci de partager votre retour d'information avec nous.",
+      "original_text": "Thank you for sharing with us your feedback."
     },
     {
       "id": "survey_60",
       "file": "templates/survey.html",
       "element": "p",
-      "text": "Votre retour d'information a été analysé avec succès par VOÏA Intelligence."
+      "text": "Votre retour d'information a été analysé avec succès par VOÏA Intelligence.",
+      "original_text": "Your feedback has been successfully analyzed by VOÏA Intelligence."
     },
     {
       "id": "survey_61",
       "file": "templates/survey.html",
       "element": "p",
-      "text": "Cela conclut votre démonstration des capacités de notre agent Voice of Client."
+      "text": "Cela conclut votre démonstration des capacités de notre agent Voice of Client.",
+      "original_text": "This completes your demonstration of our Voice of Client Agent capabilities."
     },
     {
       "id": "survey_62",
       "file": "templates/survey.html",
       "element": "h5",
-      "text": "Quelle est la prochaine étape ?"
+      "text": "Quelle est la prochaine étape ?",
+      "original_text": "What's Next?"
     },
     {
       "id": "survey_63",
       "file": "templates/survey.html",
       "element": "p",
-      "text": "Découvrez toute la puissance de l'agent Voice of Client pour votre organisation."
+      "text": "Découvrez toute la puissance de l'agent Voice of Client pour votre organisation.",
+      "original_text": "Experience the full power of Voice of Client Agent for your organization."
     },
     {
       "id": "survey_placeholder_64",
       "file": "templates/survey.html",
       "element": "textarea[placeholder]",
-      "text": "Please share your suggestions for improvement..."
+      "text": "Please share your suggestions for improvement...",
+      "original_text": "Please share your suggestions for improvement..."
     },
     {
       "id": "survey_placeholder_65",
       "file": "templates/survey.html",
       "element": "textarea[placeholder]",
-      "text": "Feel free to share any other thoughts or feedback..."
+      "text": "Feel free to share any other thoughts or feedback...",
+      "original_text": "Feel free to share any other thoughts or feedback..."
     },
     {
       "id": "survey_success_1",
       "file": "templates/survey_success.html",
       "element": "h4",
-      "text": "Merci de partager votre retour d'information avec nous."
+      "text": "Merci de partager votre retour d'information avec nous.",
+      "original_text": "Thank you for sharing with us your feedback."
     },
     {
       "id": "survey_success_2",
       "file": "templates/survey_success.html",
       "element": "p",
-      "text": "Your feedback has been successfully analyzed by {{ branding.company_name }} Intelligence."
+      "text": "Your feedback has been successfully analyzed by {{ branding.company_name }} Intelligence.",
+      "original_text": "Your feedback has been successfully analyzed by {{ branding.company_name }} Intelligence."
     },
     {
       "id": "survey_success_3",
       "file": "templates/survey_success.html",
       "element": "p",
-      "text": "Votre retour d'information a été analysé avec succès par VOÏA Intelligence."
+      "text": "Votre retour d'information a été analysé avec succès par VOÏA Intelligence.",
+      "original_text": "Your feedback has been successfully analyzed by VOÏA Intelligence."
     },
     {
       "id": "survey_success_4",
       "file": "templates/survey_success.html",
       "element": "p",
-      "text": "Cela conclut votre démonstration des capacités de notre agent Voice of Client."
+      "text": "Cela conclut votre démonstration des capacités de notre agent Voice of Client.",
+      "original_text": "This completes your demonstration of our Voice of Client Agent capabilities."
     },
     {
       "id": "survey_success_5",
       "file": "templates/survey_success.html",
       "element": "h5",
-      "text": "Quelle est la prochaine étape ?"
+      "text": "Quelle est la prochaine étape ?",
+      "original_text": "What's Next?"
     },
     {
       "id": "survey_success_6",
       "file": "templates/survey_success.html",
       "element": "p",
-      "text": "Découvrez toute la puissance de l'agent Voice of Client pour votre organisation."
+      "text": "Découvrez toute la puissance de l'agent Voice of Client pour votre organisation.",
+      "original_text": "Experience the full power of Voice of Client Agent for your organization."
     },
     {
       "id": "dashboard_1",
       "file": "templates/dashboard.html",
       "element": "h1",
-      "text": "Business Intelligence"
+      "text": "Business Intelligence",
+      "original_text": "Business Intelligence"
     },
     {
       "id": "dashboard_2",
       "file": "templates/dashboard.html",
       "element": "p",
-      "text": "Comprehensive customer feedback insights and analysis"
+      "text": "Comprehensive customer feedback insights and analysis",
+      "original_text": "Comprehensive customer feedback insights and analysis"
     },
     {
       "id": "dashboard_3",
       "file": "templates/dashboard.html",
       "element": "h3",
-      "text": "Executive Summary"
+      "text": "Executive Summary",
+      "original_text": "Executive Summary"
     },
     {
       "id": "dashboard_4",
       "file": "templates/dashboard.html",
       "element": "p",
-      "text": "High-level overview of key performance indicators across all campaigns"
+      "text": "High-level overview of key performance indicators across all campaigns",
+      "original_text": "High-level overview of key performance indicators across all campaigns"
     },
     {
       "id": "dashboard_5",
       "file": "templates/dashboard.html",
       "element": "span",
-      "text": "Loading executive summary..."
+      "text": "Loading executive summary...",
+      "original_text": "Loading executive summary..."
     },
     {
       "id": "dashboard_6",
       "file": "templates/dashboard.html",
       "element": "div",
-      "text": "Loading executive summary..."
+      "text": "Loading executive summary...",
+      "original_text": "Loading executive summary..."
     },
     {
       "id": "dashboard_7",
       "file": "templates/dashboard.html",
       "element": "h5",
-      "text": "Campaign KPI Overview"
+      "text": "Campaign KPI Overview",
+      "original_text": "Campaign KPI Overview"
     },
     {
       "id": "dashboard_8",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Campaign"
+      "text": "Campaign",
+      "original_text": "Campaign"
     },
     {
       "id": "dashboard_9",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Responses"
+      "text": "Responses",
+      "original_text": "Responses"
     },
     {
       "id": "dashboard_10",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "NPS"
+      "text": "NPS",
+      "original_text": "NPS"
     },
     {
       "id": "dashboard_11",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Companies"
+      "text": "Companies",
+      "original_text": "Companies"
     },
     {
       "id": "dashboard_12",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Critical Risk"
+      "text": "Critical Risk",
+      "original_text": "Critical Risk"
     },
     {
       "id": "dashboard_13",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Satisfaction"
+      "text": "Satisfaction",
+      "original_text": "Satisfaction"
     },
     {
       "id": "dashboard_14",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Product"
+      "text": "Product",
+      "original_text": "Product"
     },
     {
       "id": "dashboard_15",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Pricing"
+      "text": "Pricing",
+      "original_text": "Pricing"
     },
     {
       "id": "dashboard_16",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Service"
+      "text": "Service",
+      "original_text": "Service"
     },
     {
       "id": "dashboard_17",
       "file": "templates/dashboard.html",
       "element": "h5",
-      "text": "Campaign Comparison"
+      "text": "Campaign Comparison",
+      "original_text": "Campaign Comparison"
     },
     {
       "id": "dashboard_18",
       "file": "templates/dashboard.html",
       "element": "label",
-      "text": "Campaign 1"
+      "text": "Campaign 1",
+      "original_text": "Campaign 1"
     },
     {
       "id": "dashboard_19",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "Select first campaign"
+      "text": "Select first campaign",
+      "original_text": "Select first campaign"
     },
     {
       "id": "dashboard_20",
       "file": "templates/dashboard.html",
       "element": "label",
-      "text": "Campaign 2"
+      "text": "Campaign 2",
+      "original_text": "Campaign 2"
     },
     {
       "id": "dashboard_21",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "Select second campaign"
+      "text": "Select second campaign",
+      "original_text": "Select second campaign"
     },
     {
       "id": "dashboard_22",
       "file": "templates/dashboard.html",
       "element": "p",
-      "text": "Please select two campaigns above to view comparison results"
+      "text": "Please select two campaigns above to view comparison results",
+      "original_text": "Please select two campaigns above to view comparison results"
     },
     {
       "id": "dashboard_23",
       "file": "templates/dashboard.html",
       "element": "h6",
-      "text": "Metrics Comparison"
+      "text": "Metrics Comparison",
+      "original_text": "Metrics Comparison"
     },
     {
       "id": "dashboard_24",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Metric"
+      "text": "Metric",
+      "original_text": "Metric"
     },
     {
       "id": "dashboard_25",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Campaign 1"
+      "text": "Campaign 1",
+      "original_text": "Campaign 1"
     },
     {
       "id": "dashboard_26",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Campaign 2"
+      "text": "Campaign 2",
+      "original_text": "Campaign 2"
     },
     {
       "id": "dashboard_27",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Change"
+      "text": "Change",
+      "original_text": "Change"
     },
     {
       "id": "dashboard_28",
       "file": "templates/dashboard.html",
       "element": "h6",
-      "text": "Account-by-Account Analysis"
+      "text": "Account-by-Account Analysis",
+      "original_text": "Account-by-Account Analysis"
     },
     {
       "id": "dashboard_29",
       "file": "templates/dashboard.html",
       "element": "label",
-      "text": "Search"
+      "text": "Search",
+      "original_text": "Search"
     },
     {
       "id": "dashboard_30",
       "file": "templates/dashboard.html",
       "element": "label",
-      "text": "Balance Status"
+      "text": "Balance Status",
+      "original_text": "Balance Status"
     },
     {
       "id": "dashboard_31",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "All Companies"
+      "text": "All Companies",
+      "original_text": "All Companies"
     },
     {
       "id": "dashboard_32",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "Opportunity Heavy"
+      "text": "Opportunity Heavy",
+      "original_text": "Opportunity Heavy"
     },
     {
       "id": "dashboard_33",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "Balanced"
+      "text": "Balanced",
+      "original_text": "Balanced"
     },
     {
       "id": "dashboard_34",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "Risk Heavy"
+      "text": "Risk Heavy",
+      "original_text": "Risk Heavy"
     },
     {
       "id": "dashboard_35",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Company"
+      "text": "Company",
+      "original_text": "Company"
     },
     {
       "id": "dashboard_36",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "C1 Risks"
+      "text": "C1 Risks",
+      "original_text": "C1 Risks"
     },
     {
       "id": "dashboard_37",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "C1 Opps"
+      "text": "C1 Opps",
+      "original_text": "C1 Opps"
     },
     {
       "id": "dashboard_38",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "C1 Balance"
+      "text": "C1 Balance",
+      "original_text": "C1 Balance"
     },
     {
       "id": "dashboard_39",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "C2 Risks"
+      "text": "C2 Risks",
+      "original_text": "C2 Risks"
     },
     {
       "id": "dashboard_40",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "C2 Opps"
+      "text": "C2 Opps",
+      "original_text": "C2 Opps"
     },
     {
       "id": "dashboard_41",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "C2 Balance"
+      "text": "C2 Balance",
+      "original_text": "C2 Balance"
     },
     {
       "id": "dashboard_42",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Status"
+      "text": "Status",
+      "original_text": "Status"
     },
     {
       "id": "dashboard_43",
       "file": "templates/dashboard.html",
       "element": "h3",
-      "text": "Campaign Insights"
+      "text": "Campaign Insights",
+      "original_text": "Campaign Insights"
     },
     {
       "id": "dashboard_44",
       "file": "templates/dashboard.html",
       "element": "p",
-      "text": "Analyze and compare campaign-specific performance metrics"
+      "text": "Analyze and compare campaign-specific performance metrics",
+      "original_text": "Analyze and compare campaign-specific performance metrics"
     },
     {
       "id": "dashboard_45",
       "file": "templates/dashboard.html",
       "element": "h6",
-      "text": "Campaign Analytics Filter"
+      "text": "Campaign Analytics Filter",
+      "original_text": "Campaign Analytics Filter"
     },
     {
       "id": "dashboard_46",
       "file": "templates/dashboard.html",
       "element": "label",
-      "text": "Campaign:"
+      "text": "Campaign:",
+      "original_text": "Campaign:"
     },
     {
       "id": "dashboard_47",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "Select Campaign"
+      "text": "Select Campaign",
+      "original_text": "Select Campaign"
     },
     {
       "id": "dashboard_48",
       "file": "templates/dashboard.html",
       "element": "span",
-      "text": "Loading dashboard data..."
+      "text": "Loading dashboard data...",
+      "original_text": "Loading dashboard data..."
     },
     {
       "id": "dashboard_49",
       "file": "templates/dashboard.html",
       "element": "div",
-      "text": "Loading dashboard data..."
+      "text": "Loading dashboard data...",
+      "original_text": "Loading dashboard data..."
     },
     {
       "id": "dashboard_50",
       "file": "templates/dashboard.html",
       "element": "span",
-      "text": "Campaign Name"
+      "text": "Campaign Name",
+      "original_text": "Campaign Name"
     },
     {
       "id": "dashboard_51",
       "file": "templates/dashboard.html",
       "element": "span",
-      "text": "Jan 1 - Dec 31, 2024"
+      "text": "Jan 1 - Dec 31, 2024",
+      "original_text": "Jan 1 - Dec 31, 2024"
     },
     {
       "id": "dashboard_52",
       "file": "templates/dashboard.html",
       "element": "div",
-      "text": "NPS Score"
+      "text": "NPS Score",
+      "original_text": "NPS Score"
     },
     {
       "id": "dashboard_53",
       "file": "templates/dashboard.html",
       "element": "div",
-      "text": "Overall satisfaction metric"
+      "text": "Overall satisfaction metric",
+      "original_text": "Overall satisfaction metric"
     },
     {
       "id": "dashboard_54",
       "file": "templates/dashboard.html",
       "element": "div",
-      "text": "Total Responses"
+      "text": "Total Responses",
+      "original_text": "Total Responses"
     },
     {
       "id": "dashboard_55",
       "file": "templates/dashboard.html",
       "element": "div",
-      "text": "All time feedback collected"
+      "text": "All time feedback collected",
+      "original_text": "All time feedback collected"
     },
     {
       "id": "dashboard_56",
       "file": "templates/dashboard.html",
       "element": "div",
-      "text": "Recent (30 days)"
+      "text": "Recent (30 days)",
+      "original_text": "Recent (30 days)"
     },
     {
       "id": "dashboard_57",
       "file": "templates/dashboard.html",
       "element": "div",
-      "text": "Latest customer feedback"
+      "text": "Latest customer feedback",
+      "original_text": "Latest customer feedback"
     },
     {
       "id": "dashboard_58",
       "file": "templates/dashboard.html",
       "element": "div",
-      "text": "High Churn Risk Accounts"
+      "text": "High Churn Risk Accounts",
+      "original_text": "High Churn Risk Accounts"
     },
     {
       "id": "dashboard_59",
       "file": "templates/dashboard.html",
       "element": "div",
-      "text": "Imminent churn risk (High/Critical)"
+      "text": "Imminent churn risk (High/Critical)",
+      "original_text": "Imminent churn risk (High/Critical)"
     },
     {
       "id": "dashboard_60",
       "file": "templates/dashboard.html",
       "element": "div",
-      "text": "0%"
+      "text": "0%",
+      "original_text": "0%"
     },
     {
       "id": "dashboard_61",
       "file": "templates/dashboard.html",
       "element": "div",
-      "text": "Growth Potential"
+      "text": "Growth Potential",
+      "original_text": "Growth Potential"
     },
     {
       "id": "dashboard_62",
       "file": "templates/dashboard.html",
       "element": "div",
-      "text": "Revenue expansion opportunity"
+      "text": "Revenue expansion opportunity",
+      "original_text": "Revenue expansion opportunity"
     },
     {
       "id": "dashboard_63",
       "file": "templates/dashboard.html",
       "element": "h5",
-      "text": "High Churn Risk Accounts"
+      "text": "High Churn Risk Accounts",
+      "original_text": "High Churn Risk Accounts"
     },
     {
       "id": "dashboard_64",
       "file": "templates/dashboard.html",
       "element": "h5",
-      "text": "Key Themes"
+      "text": "Key Themes",
+      "original_text": "Key Themes"
     },
     {
       "id": "dashboard_65",
       "file": "templates/dashboard.html",
       "element": "h5",
-      "text": "Account Intelligence"
+      "text": "Account Intelligence",
+      "original_text": "Account Intelligence"
     },
     {
       "id": "dashboard_66",
       "file": "templates/dashboard.html",
       "element": "label",
-      "text": "Search"
+      "text": "Search",
+      "original_text": "Search"
     },
     {
       "id": "dashboard_67",
       "file": "templates/dashboard.html",
       "element": "label",
-      "text": "Balance"
+      "text": "Balance",
+      "original_text": "Balance"
     },
     {
       "id": "dashboard_68",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "All"
+      "text": "All",
+      "original_text": "All"
     },
     {
       "id": "dashboard_69",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "Risk-Heavy"
+      "text": "Risk-Heavy",
+      "original_text": "Risk-Heavy"
     },
     {
       "id": "dashboard_70",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "Balanced"
+      "text": "Balanced",
+      "original_text": "Balanced"
     },
     {
       "id": "dashboard_71",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "High Potential"
+      "text": "High Potential",
+      "original_text": "High Potential"
     },
     {
       "id": "dashboard_72",
       "file": "templates/dashboard.html",
       "element": "label",
-      "text": "Risk Level"
+      "text": "Risk Level",
+      "original_text": "Risk Level"
     },
     {
       "id": "dashboard_73",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "All"
+      "text": "All",
+      "original_text": "All"
     },
     {
       "id": "dashboard_74",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "Critical"
+      "text": "Critical",
+      "original_text": "Critical"
     },
     {
       "id": "dashboard_75",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "High"
+      "text": "High",
+      "original_text": "High"
     },
     {
       "id": "dashboard_76",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "Medium"
+      "text": "Medium",
+      "original_text": "Medium"
     },
     {
       "id": "dashboard_77",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "Low"
+      "text": "Low",
+      "original_text": "Low"
     },
     {
       "id": "dashboard_78",
       "file": "templates/dashboard.html",
       "element": "label",
-      "text": "Opportunities"
+      "text": "Opportunities",
+      "original_text": "Opportunities"
     },
     {
       "id": "dashboard_79",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "All"
+      "text": "All",
+      "original_text": "All"
     },
     {
       "id": "dashboard_80",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "Has Opportunities"
+      "text": "Has Opportunities",
+      "original_text": "Has Opportunities"
     },
     {
       "id": "dashboard_81",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "No Opportunities"
+      "text": "No Opportunities",
+      "original_text": "No Opportunities"
     },
     {
       "id": "dashboard_82",
       "file": "templates/dashboard.html",
       "element": "label",
-      "text": "Has Risks"
+      "text": "Has Risks",
+      "original_text": "Has Risks"
     },
     {
       "id": "dashboard_83",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "All"
+      "text": "All",
+      "original_text": "All"
     },
     {
       "id": "dashboard_84",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "Has Risks"
+      "text": "Has Risks",
+      "original_text": "Has Risks"
     },
     {
       "id": "dashboard_85",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "No Risks"
+      "text": "No Risks",
+      "original_text": "No Risks"
     },
     {
       "id": "dashboard_86",
       "file": "templates/dashboard.html",
       "element": "span",
-      "text": "Chargement..."
+      "text": "Chargement...",
+      "original_text": "Loading..."
     },
     {
       "id": "dashboard_87",
       "file": "templates/dashboard.html",
       "element": "h5",
-      "text": "NPS Distribution"
+      "text": "NPS Distribution",
+      "original_text": "NPS Distribution"
     },
     {
       "id": "dashboard_88",
       "file": "templates/dashboard.html",
       "element": "h5",
-      "text": "Sentiment Analysis"
+      "text": "Sentiment Analysis",
+      "original_text": "Sentiment Analysis"
     },
     {
       "id": "dashboard_89",
       "file": "templates/dashboard.html",
       "element": "h5",
-      "text": "Customer Tenure Distribution"
+      "text": "Customer Tenure Distribution",
+      "original_text": "Customer Tenure Distribution"
     },
     {
       "id": "dashboard_90",
       "file": "templates/dashboard.html",
       "element": "h5",
-      "text": "NPS-Based Growth Factor Analysis"
+      "text": "NPS-Based Growth Factor Analysis",
+      "original_text": "NPS-Based Growth Factor Analysis"
     },
     {
       "id": "dashboard_91",
       "file": "templates/dashboard.html",
       "element": "h5",
-      "text": "Average Ratings"
+      "text": "Average Ratings",
+      "original_text": "Average Ratings"
     },
     {
       "id": "dashboard_92",
       "file": "templates/dashboard.html",
       "element": "h5",
-      "text": "NPS by Client Company"
+      "text": "NPS by Client Company",
+      "original_text": "NPS by Client Company"
     },
     {
       "id": "dashboard_93",
       "file": "templates/dashboard.html",
       "element": "label",
-      "text": "Search"
+      "text": "Search",
+      "original_text": "Search"
     },
     {
       "id": "dashboard_94",
       "file": "templates/dashboard.html",
       "element": "label",
-      "text": "NPS Category"
+      "text": "NPS Category",
+      "original_text": "NPS Category"
     },
     {
       "id": "dashboard_95",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "All Companies"
+      "text": "All Companies",
+      "original_text": "All Companies"
     },
     {
       "id": "dashboard_96",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "Promoters (9-10)"
+      "text": "Promoters (9-10)",
+      "original_text": "Promoters (9-10)"
     },
     {
       "id": "dashboard_97",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "Passives (7-8)"
+      "text": "Passives (7-8)",
+      "original_text": "Passives (7-8)"
     },
     {
       "id": "dashboard_98",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "Detractors (0-6)"
+      "text": "Detractors (0-6)",
+      "original_text": "Detractors (0-6)"
     },
     {
       "id": "dashboard_99",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Nom de l'entreprise"
+      "text": "Nom de l'entreprise",
+      "original_text": "Company Name"
     },
     {
       "id": "dashboard_100",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Respondents"
+      "text": "Respondents",
+      "original_text": "Respondents"
     },
     {
       "id": "dashboard_101",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Avg Individual NPS"
+      "text": "Avg Individual NPS",
+      "original_text": "Avg Individual NPS"
     },
     {
       "id": "dashboard_102",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Company NPS"
+      "text": "Company NPS",
+      "original_text": "Company NPS"
     },
     {
       "id": "dashboard_103",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Distribution"
+      "text": "Distribution",
+      "original_text": "Distribution"
     },
     {
       "id": "dashboard_104",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Risk Level"
+      "text": "Risk Level",
+      "original_text": "Risk Level"
     },
     {
       "id": "dashboard_105",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Latest Response"
+      "text": "Latest Response",
+      "original_text": "Latest Response"
     },
     {
       "id": "dashboard_106",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Latest Churn Risk"
+      "text": "Latest Churn Risk",
+      "original_text": "Latest Churn Risk"
     },
     {
       "id": "dashboard_107",
       "file": "templates/dashboard.html",
       "element": "td",
-      "text": "No company data available yet"
+      "text": "No company data available yet",
+      "original_text": "No company data available yet"
     },
     {
       "id": "dashboard_108",
       "file": "templates/dashboard.html",
       "element": "span",
-      "text": "Low (>20)"
+      "text": "Low (>20)",
+      "original_text": "Low (>20)"
     },
     {
       "id": "dashboard_109",
       "file": "templates/dashboard.html",
       "element": "span",
-      "text": "Medium (-20 to 20)"
+      "text": "Medium (-20 to 20)",
+      "original_text": "Medium (-20 to 20)"
     },
     {
       "id": "dashboard_110",
       "file": "templates/dashboard.html",
       "element": "span",
-      "text": "High (≤-20)"
+      "text": "High (≤-20)",
+      "original_text": "High (≤-20)"
     },
     {
       "id": "dashboard_111",
       "file": "templates/dashboard.html",
       "element": "span",
-      "text": "Critical (≤-50)"
+      "text": "Critical (≤-50)",
+      "original_text": "Critical (≤-50)"
     },
     {
       "id": "dashboard_112",
       "file": "templates/dashboard.html",
       "element": "h5",
-      "text": "NPS by Customer Tenure"
+      "text": "NPS by Customer Tenure",
+      "original_text": "NPS by Customer Tenure"
     },
     {
       "id": "dashboard_113",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Tenure Group"
+      "text": "Tenure Group",
+      "original_text": "Tenure Group"
     },
     {
       "id": "dashboard_114",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Respondents"
+      "text": "Respondents",
+      "original_text": "Respondents"
     },
     {
       "id": "dashboard_115",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Avg Individual NPS"
+      "text": "Avg Individual NPS",
+      "original_text": "Avg Individual NPS"
     },
     {
       "id": "dashboard_116",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Tenure NPS"
+      "text": "Tenure NPS",
+      "original_text": "Tenure NPS"
     },
     {
       "id": "dashboard_117",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Distribution"
+      "text": "Distribution",
+      "original_text": "Distribution"
     },
     {
       "id": "dashboard_118",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Risk Level"
+      "text": "Risk Level",
+      "original_text": "Risk Level"
     },
     {
       "id": "dashboard_119",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Latest Response"
+      "text": "Latest Response",
+      "original_text": "Latest Response"
     },
     {
       "id": "dashboard_120",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Latest Churn Risk"
+      "text": "Latest Churn Risk",
+      "original_text": "Latest Churn Risk"
     },
     {
       "id": "dashboard_121",
       "file": "templates/dashboard.html",
       "element": "span",
-      "text": "Low (>20)"
+      "text": "Low (>20)",
+      "original_text": "Low (>20)"
     },
     {
       "id": "dashboard_122",
       "file": "templates/dashboard.html",
       "element": "span",
-      "text": "Medium (-20 to 20)"
+      "text": "Medium (-20 to 20)",
+      "original_text": "Medium (-20 to 20)"
     },
     {
       "id": "dashboard_123",
       "file": "templates/dashboard.html",
       "element": "span",
-      "text": "High (≤-20)"
+      "text": "High (≤-20)",
+      "original_text": "High (≤-20)"
     },
     {
       "id": "dashboard_124",
       "file": "templates/dashboard.html",
       "element": "span",
-      "text": "Critical (≤-50)"
+      "text": "Critical (≤-50)",
+      "original_text": "Critical (≤-50)"
     },
     {
       "id": "dashboard_125",
       "file": "templates/dashboard.html",
       "element": "span",
-      "text": "Insufficient Data (<2 responses)"
+      "text": "Insufficient Data (<2 responses)",
+      "original_text": "Insufficient Data (<2 responses)"
     },
     {
       "id": "dashboard_126",
       "file": "templates/dashboard.html",
       "element": "h5",
-      "text": "Recent Survey Responses"
+      "text": "Recent Survey Responses",
+      "original_text": "Recent Survey Responses"
     },
     {
       "id": "dashboard_127",
       "file": "templates/dashboard.html",
       "element": "label",
-      "text": "Search"
+      "text": "Search",
+      "original_text": "Search"
     },
     {
       "id": "dashboard_128",
       "file": "templates/dashboard.html",
       "element": "label",
-      "text": "NPS Category"
+      "text": "NPS Category",
+      "original_text": "NPS Category"
     },
     {
       "id": "dashboard_129",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "All Responses"
+      "text": "All Responses",
+      "original_text": "All Responses"
     },
     {
       "id": "dashboard_130",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "Promoters (9-10)"
+      "text": "Promoters (9-10)",
+      "original_text": "Promoters (9-10)"
     },
     {
       "id": "dashboard_131",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "Passives (7-8)"
+      "text": "Passives (7-8)",
+      "original_text": "Passives (7-8)"
     },
     {
       "id": "dashboard_132",
       "file": "templates/dashboard.html",
       "element": "option",
-      "text": "Detractors (0-6)"
+      "text": "Detractors (0-6)",
+      "original_text": "Detractors (0-6)"
     },
     {
       "id": "dashboard_133",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Company"
+      "text": "Company",
+      "original_text": "Company"
     },
     {
       "id": "dashboard_134",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Tenure with FC inc"
+      "text": "Tenure with FC inc",
+      "original_text": "Tenure with FC inc"
     },
     {
       "id": "dashboard_135",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "NPS Score"
+      "text": "NPS Score",
+      "original_text": "NPS Score"
     },
     {
       "id": "dashboard_136",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Category"
+      "text": "Category",
+      "original_text": "Category"
     },
     {
       "id": "dashboard_137",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Sentiment"
+      "text": "Sentiment",
+      "original_text": "Sentiment"
     },
     {
       "id": "dashboard_138",
       "file": "templates/dashboard.html",
       "element": "th",
-      "text": "Churn Risk"
+      "text": "Churn Risk",
+      "original_text": "Churn Risk"
     }
   ],
   "flash_messages": [],

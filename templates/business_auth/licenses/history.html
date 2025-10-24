@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}License History - {{ business_account.name }}{% endblock %}
+{% block title %}Historique des licences - {{ business_account.name }}{% endblock %}
 
 {% block page_class %}page-license-history{% endblock %}
 
 {% block content %}
 <style>
-/* License History specific styling */
+/* Historique des licences specific styling */
 .history-header {
     background: linear-gradient(135deg, rgba(var(--primary-red-rgb, 220, 53, 69), 0.1) 0%, rgba(var(--red-hover-rgb, 200, 40, 55), 0.15) 100%);
     border: 1px solid var(--red-light);
@@ -301,7 +301,7 @@
                             <i class="fas fa-history"></i>
                         </div>
                         <div>
-                            <h2 class="mb-1">License History</h2>
+                            <h2 class="mb-1">Historique des licences</h2>
                             <p class="mb-0 opacity-75">{{ business_account.name }}</p>
                         </div>
                     </div>
@@ -336,23 +336,23 @@
         <div class="current-license-summary">
             <div class="row">
                 <div class="col-md-8">
-                    <h4><i class="fas fa-certificate me-2"></i>Current License: {{ current_license.type|title }}</h4>
+                    <h4><i class="fas fa-certificate me-2"></i>Licence actuelle : {{ current_license.type|title }}</h4>
                     <div class="license-details-grid mt-3">
                         {% if current_license.max_users %}
                         <div class="detail-item">
-                            <span class="detail-label">Max Users</span>
+                            <span class="detail-label">Nombre maximal d'utilisateurs</span>
                             <span class="detail-value">{{ current_license.max_users }}</span>
                         </div>
                         {% endif %}
                         {% if current_license.max_campaigns %}
                         <div class="detail-item">
-                            <span class="detail-label">Max Campaigns</span>
+                            <span class="detail-label">Nombre maximal de campagnes</span>
                             <span class="detail-value">{{ current_license.max_campaigns }}</span>
                         </div>
                         {% endif %}
                         {% if current_license.max_responses %}
                         <div class="detail-item">
-                            <span class="detail-label">Max Responses</span>
+                            <span class="detail-label">Nombre maximal de réponses</span>
                             <span class="detail-value">{{ current_license.max_responses }}</span>
                         </div>
                         {% endif %}
@@ -386,14 +386,14 @@
         <div class="quick-stats">
             <div class="stat-item">
                 <h3 class="stat-number">{{ license_history|length }}</h3>
-                <p class="stat-label">Total Changes</p>
+                <p class="stat-label">Nombre total de modifications</p>
             </div>
             <div class="stat-item">
                 <h3 class="stat-number">
                     {% set different_types = license_history | map(attribute='license_type') | list | unique | list %}
                     {{ different_types|length }}
                 </h3>
-                <p class="stat-label">License Types Used</p>
+                <p class="stat-label">Types de licences utilisés</p>
             </div>
             <div class="stat-item">
                 <h3 class="stat-number">
@@ -405,11 +405,11 @@
                         0
                     {% endif %}
                 </h3>
-                <p class="stat-label">Days Since First License</p>
+                <p class="stat-label">Jours depuis la première licence</p>
             </div>
         </div>
 
-        <!-- License History Timeline -->
+        <!-- Historique des licences Timeline -->
         <div class="admin-section">
             <div class="section-header">
                 <h3 class="section-title">
@@ -460,24 +460,24 @@
                     <div class="license-details">
                         <div class="license-details-grid">
                             <div class="detail-item">
-                                <span class="detail-label">License Type</span>
+                                <span class="detail-label">Type de licence</span>
                                 <span class="detail-value">{{ record.license_type|title }}</span>
                             </div>
                             {% if record.max_users %}
                             <div class="detail-item">
-                                <span class="detail-label">Max Users</span>
+                                <span class="detail-label">Nombre maximal d'utilisateurs</span>
                                 <span class="detail-value">{{ record.max_users }}</span>
                             </div>
                             {% endif %}
                             {% if record.max_campaigns %}
                             <div class="detail-item">
-                                <span class="detail-label">Max Campaigns</span>
+                                <span class="detail-label">Nombre maximal de campagnes</span>
                                 <span class="detail-value">{{ record.max_campaigns }}</span>
                             </div>
                             {% endif %}
                             {% if record.max_responses %}
                             <div class="detail-item">
-                                <span class="detail-label">Max Responses</span>
+                                <span class="detail-label">Nombre maximal de réponses</span>
                                 <span class="detail-value">{{ record.max_responses }}</span>
                             </div>
                             {% endif %}
@@ -502,8 +502,8 @@
             {% else %}
             <div class="empty-history">
                 <i class="fas fa-history"></i>
-                <h4>No License History</h4>
-                <p>This business account has no license assignment history.</p>
+                <h4>No Historique des licences</h4>
+                <p>Ce compte entreprise n'a aucun historique d'attribution de licence.</p>
                 <a href="{{ url_for('business_auth.license_assignment_form', business_id=business_account.id) }}" class="btn btn-primary mt-3">
                     <i class="fas fa-plus me-2"></i>Assign First License
                 </a>
@@ -520,12 +520,12 @@
                     Export History
                 </h3>
             </div>
-            <p class="text-muted mb-3">Download license history data for record keeping or analysis.</p>
+            <p class="text-muted mb-3">Téléchargez les données d'historique des licences pour archivage ou analyse.</p>
             <div class="d-flex gap-2">
-                <button class="btn btn-outline-primary" disabled title="Export feature coming soon">
+                <button class="btn btn-outline-primary" disabled title="Fonction d'exportation à venir">
                     <i class="fas fa-file-csv me-2"></i>Export as CSV
                 </button>
-                <button class="btn btn-outline-primary" disabled title="Export feature coming soon">
+                <button class="btn btn-outline-primary" disabled title="Fonction d'exportation à venir">
                     <i class="fas fa-file-pdf me-2"></i>Export as PDF
                 </button>
             </div>

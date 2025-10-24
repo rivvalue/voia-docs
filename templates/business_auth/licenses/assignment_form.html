@@ -19,7 +19,7 @@
                 <h1 class="admin-title">
                     <i class="fas fa-certificate me-3"></i>Assign License
                 </h1>
-                <p class="admin-subtitle">Configure license for {{ business_account.name }}</p>
+                <p class="admin-subtitle">Configurer la licence pour {{ business_account.name }}</p>
             </div>
             <div class="col-md-6 text-end">
                 <a href="{{ url_for('business_auth.license_history', business_id=business_account.id) }}" class="btn btn-outline-primary me-2">
@@ -44,22 +44,22 @@
         {% endif %}
     {% endwith %}
 
-    <!-- Current License Information -->
+    <!-- Actuel License Information -->
     <div class="admin-section">
         <div class="section-header">
             <h3 class="section-title">
                 <i class="fas fa-info-circle"></i>
-                Current Account Information
+                Actuel Account Information
             </h3>
         </div>
         <div class="card">
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
-                        <h5 class="mb-3">Account Details</h5>
+                        <h5 class="mb-3">Détails du compte</h5>
                         <table class="table table-sm table-borderless">
                             <tr>
-                                <td class="text-muted" style="width: 40%;">Business Name:</td>
+                                <td class="text-muted" style="width: 40%;">Nom de l'entreprise :</td>
                                 <td><strong>{{ business_account.name }}</strong></td>
                             </tr>
                             <tr>
@@ -67,17 +67,17 @@
                                 <td>{{ business_account.email }}</td>
                             </tr>
                             <tr>
-                                <td class="text-muted">Account Type:</td>
+                                <td class="text-muted">Type de compte :</td>
                                 <td><span class="badge bg-secondary">{{ business_account.account_type|title }}</span></td>
                             </tr>
                             {% if current_license %}
                             <tr>
-                                <td class="text-muted">Current License:</td>
+                                <td class="text-muted">Licence actuelle :</td>
                                 <td><span class="license-badge license-{{ current_license.type }}">{{ current_license.type|title }}</span></td>
                             </tr>
                             {% if current_license.expiration_date %}
                             <tr>
-                                <td class="text-muted">Expires:</td>
+                                <td class="text-muted">Expire :</td>
                                 <td>{{ current_license.expiration_date.strftime('%B %d, %Y') }}</td>
                             </tr>
                             {% endif %}
@@ -85,7 +85,7 @@
                         </table>
                     </div>
                     <div class="col-md-6">
-                        <h5 class="mb-3">Current Usage</h5>
+                        <h5 class="mb-3">Utilisation actuelle</h5>
                         <div class="row g-3">
                             <div class="col-6">
                                 <div class="text-center p-3" style="background: var(--light-gray); border-radius: var(--radius-lg);">
@@ -93,7 +93,7 @@
                                         {{ usage_stats.users_count }}
                                     </div>
                                     <div class="text-muted" style="font-size: var(--font-size-xs); text-transform: uppercase;">
-                                        Users
+                                        Utilisateurs
                                     </div>
                                 </div>
                             </div>
@@ -103,7 +103,7 @@
                                         {{ usage_stats.campaigns_count }}
                                     </div>
                                     <div class="text-muted" style="font-size: var(--font-size-xs); text-transform: uppercase;">
-                                        Campaigns
+                                        Campagnes
                                     </div>
                                 </div>
                             </div>
@@ -126,11 +126,11 @@
                     <i class="fas fa-certificate"></i>
                     Select License Type
                 </h3>
-                <p class="text-muted">Choose the appropriate license tier for this business account</p>
+                <p class="text-muted">Choisissez le niveau de licence approprié pour ce compte entreprise</p>
             </div>
 
             <div class="row g-4">
-                <!-- Core License -->
+                <!-- Licence Core -->
                 <div class="col-12">
                     <label class="license-card" for="license_core">
                         <input type="radio" id="license_core" name="license_type" value="core" {{ 'checked' if current_license and current_license.type == 'core' else '' }}>
@@ -144,28 +144,28 @@
                                 <div class="flex-grow-1">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <div>
-                                            <h4 class="mb-1" style="font-weight: 600;">Core License</h4>
-                                            <p class="text-muted mb-0" style="font-size: var(--font-size-sm);">Essential features for small teams</p>
+                                            <h4 class="mb-1" style="font-weight: 600;">Licence Core</h4>
+                                            <p class="text-muted mb-0" style="font-size: var(--font-size-sm);">Fonctionnalités essentielles pour les petites équipes</p>
                                         </div>
                                         <div class="text-end">
                                             <div style="font-size: var(--font-size-xl); font-weight: 600; color: var(--primary-red);">{{ "${:,}".format(core_template.annual_price|int) if core_template and core_template.annual_price else 'N/A' }}</div>
-                                            <div class="text-muted" style="font-size: var(--font-size-xs);">per year</div>
+                                            <div class="text-muted" style="font-size: var(--font-size-xs);">par an</div>
                                         </div>
                                     </div>
                                     <div class="row mt-3">
                                         <div class="col-md-6">
                                             <ul class="license-features-list">
-                                                <li><i class="fas fa-check"></i> Up to 5 users</li>
-                                                <li><i class="fas fa-check"></i> 4 campaigns per year</li>
-                                                <li><i class="fas fa-check"></i> 200 target responses per campaign</li>
-                                                <li><i class="fas fa-check"></i> 1,000 survey invitations per campaign</li>
+                                                <li><i class="fas fa-check"></i> Jusqu’à 5 utilisateurs</li>
+                                                <li><i class="fas fa-check"></i> 4 campaigns par an</li>
+                                                <li><i class="fas fa-check"></i> 200 réponses cibles par campagne</li>
+                                                <li><i class="fas fa-check"></i> 1 000 invitations par campagne</li>
                                             </ul>
                                         </div>
                                         <div class="col-md-6">
                                             <ul class="license-features-list">
-                                                <li><i class="fas fa-check"></i> Basic Analytics</li>
-                                                <li><i class="fas fa-check"></i> Email Support</li>
-                                                <li><i class="fas fa-check"></i> Standard Templates</li>
+                                                <li><i class="fas fa-check"></i> Analytique de base</li>
+                                                <li><i class="fas fa-check"></i> Assistance par e-mail</li>
+                                                <li><i class="fas fa-check"></i> Modèles standard</li>
                                             </ul>
                                         </div>
                                     </div>
@@ -175,7 +175,7 @@
                     </label>
                 </div>
 
-                <!-- Plus License -->
+                <!-- Licence Plus -->
                 <div class="col-12">
                     <label class="license-card" for="license_plus">
                         <input type="radio" id="license_plus" name="license_type" value="plus" {{ 'checked' if current_license and current_license.type == 'plus' else '' }}>
@@ -189,28 +189,28 @@
                                 <div class="flex-grow-1">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <div>
-                                            <h4 class="mb-1" style="font-weight: 600;">Plus License</h4>
-                                            <p class="text-muted mb-0" style="font-size: var(--font-size-sm);">Advanced features for growing teams</p>
+                                            <h4 class="mb-1" style="font-weight: 600;">Licence Plus</h4>
+                                            <p class="text-muted mb-0" style="font-size: var(--font-size-sm);">Fonctionnalités avancées pour les équipes en croissance</p>
                                         </div>
                                         <div class="text-end">
                                             <div style="font-size: var(--font-size-xl); font-weight: 600; color: var(--primary-red);">{{ "${:,}".format(plus_template.annual_price|int) if plus_template and plus_template.annual_price else 'N/A' }}</div>
-                                            <div class="text-muted" style="font-size: var(--font-size-xs);">per year</div>
+                                            <div class="text-muted" style="font-size: var(--font-size-xs);">par an</div>
                                         </div>
                                     </div>
                                     <div class="row mt-3">
                                         <div class="col-md-6">
                                             <ul class="license-features-list">
-                                                <li><i class="fas fa-check"></i> Up to 10 users</li>
-                                                <li><i class="fas fa-check"></i> 4 campaigns per year</li>
-                                                <li><i class="fas fa-check"></i> 1,000 target responses per campaign</li>
-                                                <li><i class="fas fa-check"></i> 5,000 survey invitations per campaign</li>
+                                                <li><i class="fas fa-check"></i> Jusqu’à 10 utilisateurs</li>
+                                                <li><i class="fas fa-check"></i> 4 campaigns par an</li>
+                                                <li><i class="fas fa-check"></i> 1 000 réponses cibles par campagne</li>
+                                                <li><i class="fas fa-check"></i> 5 000 invitations par campagne</li>
                                             </ul>
                                         </div>
                                         <div class="col-md-6">
                                             <ul class="license-features-list">
-                                                <li><i class="fas fa-check"></i> Advanced Analytics</li>
-                                                <li><i class="fas fa-check"></i> Priority Support</li>
-                                                <li><i class="fas fa-check"></i> Custom Templates</li>
+                                                <li><i class="fas fa-check"></i> Analytique avancée</li>
+                                                <li><i class="fas fa-check"></i> Support prioritaire</li>
+                                                <li><i class="fas fa-check"></i> Modèles personnalisés</li>
                                                 <li><i class="fas fa-check"></i> API Access</li>
                                             </ul>
                                         </div>
@@ -236,7 +236,7 @@
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <div>
                                             <h4 class="mb-1" style="font-weight: 600;">Pro License</h4>
-                                            <p class="text-muted mb-0" style="font-size: var(--font-size-sm);">Custom limits for enterprise needs</p>
+                                            <p class="text-muted mb-0" style="font-size: var(--font-size-sm);">Limites personnalisées pour les besoins d'entreprise</p>
                                         </div>
                                         <div class="text-end">
                                             <div style="font-size: var(--font-size-xl); font-weight: 600; color: var(--primary-red);">Custom</div>
@@ -246,19 +246,19 @@
                                     <div class="row mt-3">
                                         <div class="col-md-6">
                                             <ul class="license-features-list">
-                                                <li><i class="fas fa-check"></i> Custom user limits (default: 25)</li>
-                                                <li><i class="fas fa-check"></i> Custom campaign limits (default: 12/year)</li>
-                                                <li><i class="fas fa-check"></i> Custom response targets (default: 10,000)</li>
-                                                <li><i class="fas fa-check"></i> Custom invitation capacity (default: 50,000)</li>
+                                                <li><i class="fas fa-check"></i> Limites d'utilisateurs personnalisées (par défaut : 25)</li>
+                                                <li><i class="fas fa-check"></i> Limites de campagnes personnalisées (par défaut : 12/an)</li>
+                                                <li><i class="fas fa-check"></i> Objectifs de réponses personnalisés (par défaut : 10 000)</li>
+                                                <li><i class="fas fa-check"></i> Capacité d'invitations personnalisée (par défaut : 50 000)</li>
                                             </ul>
                                         </div>
                                         <div class="col-md-6">
                                             <ul class="license-features-list">
-                                                <li><i class="fas fa-check"></i> Custom Analytics</li>
-                                                <li><i class="fas fa-check"></i> Dedicated Support</li>
-                                                <li><i class="fas fa-check"></i> White Label Options</li>
-                                                <li><i class="fas fa-check"></i> Custom Integrations</li>
-                                                <li><i class="fas fa-check"></i> SLA Guarantee</li>
+                                                <li><i class="fas fa-check"></i> Analytique personnalisée</li>
+                                                <li><i class="fas fa-check"></i> Support dédié</li>
+                                                <li><i class="fas fa-check"></i> Options en marque blanche</li>
+                                                <li><i class="fas fa-check"></i> Intégrations personnalisées</li>
+                                                <li><i class="fas fa-check"></i> Garantie SLA</li>
                                             </ul>
                                         </div>
                                     </div>
@@ -273,35 +273,35 @@
             <div class="mt-4" id="proCustomLimits" style="display: none;">
                 <div class="card">
                     <div class="card-header" style="background: var(--light-gray); border-bottom: 2px solid var(--primary-red);">
-                        <h5 class="mb-0"><i class="fas fa-cog me-2"></i>Custom Limits Configuration</h5>
+                        <h5 class="mb-0"><i class="fas fa-cog me-2"></i>Configuration des limites personnalisées</h5>
                     </div>
                     <div class="card-body">
-                        <p class="text-muted mb-4">Set specific limits for this Pro license account.</p>
+                        <p class="text-muted mb-4">Définissez des limites spécifiques pour ce compte sous licence Pro.</p>
                         
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label for="max_users" class="form-label">Maximum Users</label>
+                                <label for="max_users" class="form-label">Maximum Utilisateurs</label>
                                 <input type="number" class="form-control" id="max_users" name="max_users" 
                                        min="1" value="{{ current_license.max_users if current_license and current_license.type == 'pro' else 25 }}">
-                                <div class="form-text">Number of users that can access the account</div>
+                                <div class="form-text">Nombre d'utilisateurs pouvant accéder au compte</div>
                             </div>
                             <div class="col-md-6">
-                                <label for="max_campaigns" class="form-label">Maximum Campaigns</label>
+                                <label for="max_campaigns" class="form-label">Maximum Campagnes</label>
                                 <input type="number" class="form-control" id="max_campaigns" name="max_campaigns" 
                                        min="1" value="{{ current_license.max_campaigns if current_license and current_license.type == 'pro' else 100 }}">
-                                <div class="form-text">Number of campaigns per month</div>
+                                <div class="form-text">Nombre de campagnes par mois</div>
                             </div>
                             <div class="col-md-6">
-                                <label for="max_participants_per_campaign" class="form-label">Target Responses per Campaign</label>
+                                <label for="max_participants_per_campaign" class="form-label">Réponses cibles par campagne</label>
                                 <input type="number" class="form-control" id="max_participants_per_campaign" name="max_participants_per_campaign" 
                                        min="1" max="1000000" value="{{ current_license.max_participants_per_campaign if current_license and current_license.type == 'pro' else 10000 }}">
-                                <div class="form-text">Expected number of completed survey responses (informational)</div>
+                                <div class="form-text">Nombre attendu de réponses complètes à l'enquête (à titre informatif)</div>
                             </div>
                             <div class="col-md-6">
-                                <label for="max_invitations_per_campaign" class="form-label">Maximum Invitations per Campaign</label>
+                                <label for="max_invitations_per_campaign" class="form-label">Nombre maximal d'invitations par campagne</label>
                                 <input type="number" class="form-control" id="max_invitations_per_campaign" name="max_invitations_per_campaign" 
                                        min="1" max="5000000" value="{{ current_license.max_invitations_per_campaign if current_license and current_license.type == 'pro' else 50000 }}">
-                                <div class="form-text">Hard limit on survey invitations (typically 5x responses for ~20% response rate)</div>
+                                <div class="form-text">Limite stricte d'invitations (généralement 5× les réponses pour un taux d’environ 20 %)</div>
                             </div>
                         </div>
                     </div>
@@ -309,14 +309,14 @@
             </div>
         </div>
 
-        <!-- Add-on Features -->
+        <!-- Add-on Fonctionnalités -->
         <div class="admin-section">
             <div class="section-header">
                 <h3 class="section-title">
                     <i class="fas fa-puzzle-piece"></i>
-                    Add-on Features
+                    Add-on Fonctionnalités
                 </h3>
-                <p class="text-muted">Optional add-on features with custom pricing and duration</p>
+                <p class="text-muted">Fonctionnalités supplémentaires optionnelles avec tarification et durée personnalisées</p>
             </div>
             
             <div class="card">
@@ -333,19 +333,19 @@
                 <div class="card-body transcript-addon-config" style="{{ 'display: none;' if not (current_license and (current_license.transcript_analysis_start_date or current_license.has_transcript_analysis)) else '' }}">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label for="transcript_start_date" class="form-label">Start Date</label>
+                            <label for="transcript_start_date" class="form-label">Date de début</label>
                             <input type="date" class="form-control" id="transcript_start_date" name="transcript_start_date" 
                                    value="{{ current_license.transcript_analysis_start_date.strftime('%Y-%m-%d') if current_license and current_license.transcript_analysis_start_date else '' }}">
                             <div class="form-text">When transcript analysis access begins</div>
                         </div>
                         <div class="col-md-6">
-                            <label for="transcript_end_date" class="form-label">End Date</label>
+                            <label for="transcript_end_date" class="form-label">Date de fin</label>
                             <input type="date" class="form-control" id="transcript_end_date" name="transcript_end_date" 
                                    value="{{ current_license.transcript_analysis_end_date.strftime('%Y-%m-%d') if current_license and current_license.transcript_analysis_end_date else '' }}">
                             <div class="form-text">When transcript analysis access expires</div>
                         </div>
                         <div class="col-md-6">
-                            <label for="transcript_price" class="form-label">Add-on Price (USD)</label>
+                            <label for="transcript_price" class="form-label">Prix du module complémentaire (USD)</label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
                                 <input type="number" class="form-control" id="transcript_price" name="transcript_price" 
@@ -375,8 +375,8 @@
                 <div class="card-body">
                     <label for="notes" class="form-label">Notes (Optional)</label>
                     <textarea class="form-control" id="notes" name="notes" rows="3" 
-                              placeholder="Add any notes about this license assignment..."></textarea>
-                    <div class="form-text">These notes will be recorded in the license history for audit purposes.</div>
+                              placeholder="Ajoutez des notes sur cette attribution de licence..."></textarea>
+                    <div class="form-text">Ces notes seront enregistrées dans l'historique des licences à des fins d'audit.</div>
                 </div>
             </div>
         </div>
@@ -402,9 +402,9 @@
                         <table class="table table-bordered">
                             <thead style="background: var(--light-gray);">
                                 <tr>
-                                    <th>Feature</th>
-                                    <th>Current</th>
-                                    <th style="color: var(--primary-red);">New</th>
+                                    <th>Fonctionnalité</th>
+                                    <th>Actuel</th>
+                                    <th style="color: var(--primary-red);">Nouveau</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -414,17 +414,17 @@
                                     <td style="color: var(--primary-red); font-weight: 600;" id="newLicenseType">-</td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Max Users</strong></td>
+                                    <td><strong>Max Utilisateurs</strong></td>
                                     <td class="text-muted">{{ current_license.max_users if current_license else 'N/A' }}</td>
-                                    <td style="color: var(--primary-red); font-weight: 600;" id="newMaxUsers">-</td>
+                                    <td style="color: var(--primary-red); font-weight: 600;" id="newMaxUtilisateurs">-</td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Max Campaigns</strong></td>
+                                    <td><strong>Max Campagnes</strong></td>
                                     <td class="text-muted">{{ current_license.max_campaigns if current_license else 'N/A' }}</td>
-                                    <td style="color: var(--primary-red); font-weight: 600;" id="newMaxCampaigns">-</td>
+                                    <td style="color: var(--primary-red); font-weight: 600;" id="newMaxCampagnes">-</td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Target Responses per Campaign</strong></td>
+                                    <td><strong>Réponses cibles par campagne</strong></td>
                                     <td class="text-muted">{{ current_license.max_participants_per_campaign if current_license else 'N/A' }}</td>
                                     <td style="color: var(--primary-red); font-weight: 600;" id="newMaxParticipants">-</td>
                                 </tr>
@@ -557,7 +557,7 @@ document.addEventListener('DOMContentLoaded', function() {
         pro: { users: 'custom', campaigns: 'custom', participants: 'custom', invitations: 'custom' }
     };
     
-    // Current usage from backend
+    // Actuel usage from backend
     const currentUsage = {
         users: {{ usage_stats.users_count }},
         campaigns: {{ usage_stats.campaigns_count }}
@@ -606,13 +606,13 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('newLicenseType').textContent = licenseType.charAt(0).toUpperCase() + licenseType.slice(1);
         
         if (licenseType === 'pro') {
-            document.getElementById('newMaxUsers').textContent = document.getElementById('max_users').value || 'Custom';
-            document.getElementById('newMaxCampaigns').textContent = document.getElementById('max_campaigns').value || 'Custom';
+            document.getElementById('newMaxUtilisateurs').textContent = document.getElementById('max_users').value || 'Custom';
+            document.getElementById('newMaxCampagnes').textContent = document.getElementById('max_campaigns').value || 'Custom';
             document.getElementById('newMaxParticipants').textContent = document.getElementById('max_participants_per_campaign').value || 'Custom';
             document.getElementById('newMaxInvitations').textContent = document.getElementById('max_invitations_per_campaign').value || 'Custom';
         } else {
-            document.getElementById('newMaxUsers').textContent = limits.users.toLocaleString();
-            document.getElementById('newMaxCampaigns').textContent = limits.campaigns.toLocaleString();
+            document.getElementById('newMaxUtilisateurs').textContent = limits.users.toLocaleString();
+            document.getElementById('newMaxCampagnes').textContent = limits.campaigns.toLocaleString();
             document.getElementById('newMaxParticipants').textContent = limits.participants.toLocaleString();
             document.getElementById('newMaxInvitations').textContent = limits.invitations.toLocaleString();
         }
@@ -630,11 +630,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 isDowngrade = true;
             }
         } else {
-            const maxUsers = parseInt(document.getElementById('max_users').value) || 0;
-            const maxCampaigns = parseInt(document.getElementById('max_campaigns').value) || 0;
+            const maxUtilisateurs = parseInt(document.getElementById('max_users').value) || 0;
+            const maxCampagnes = parseInt(document.getElementById('max_campaigns').value) || 0;
             
-            if (currentUsage.users > maxUsers ||
-                currentUsage.campaigns > maxCampaigns) {
+            if (currentUsage.users > maxUtilisateurs ||
+                currentUsage.campaigns > maxCampagnes) {
                 isDowngrade = true;
             }
         }

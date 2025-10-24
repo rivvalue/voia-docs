@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Edit Campaign - {{ business_account.name }}{% endblock %}
+{% block title %}Modifier la campagne - {{ business_account.name }}{% endblock %}
 
 {% block page_class %}page-edit-campaign{% endblock %}
 
@@ -71,12 +71,12 @@
             <div class="row align-items-center">
                 <div class="col-md-8">
                     <h1 class="mb-1">
-                        Edit Campaign
+                        Modifier la campagne
                         <span class="draft-badge ms-2">
                             <i class="fas fa-pencil-alt me-1"></i>Draft
                         </span>
                     </h1>
-                    <p class="mb-0 opacity-75">Update campaign details for {{ business_account.name }}</p>
+                    <p class="mb-0 opacity-75">Mettre à jour les détails de la campagne pour {{ business_account.name }}</p>
                 </div>
             </div>
         </div>
@@ -94,19 +94,19 @@
                 </h3>
                 
                 <div class="mb-3">
-                    <label for="name" class="form-label">Campaign Name <span class="text-danger">*</span></label>
+                    <label for="name" class="form-label">Nom de la campagne <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="name" name="name" 
                            value="{{ campaign.name }}"
                            placeholder="e.g., Q2 2025 Product Satisfaction Survey" 
                            required maxlength="200">
-                    <div class="form-text">A clear, descriptive name for your campaign</div>
+                    <div class="form-text">Un nom clair et descriptif pour votre campagne</div>
                 </div>
                 
                 <div class="mb-3">
                     <label for="description" class="form-label">Description</label>
                     <textarea class="form-control" id="description" name="description" rows="3" 
                               placeholder="Optional description of campaign goals, focus areas, or target audience">{{ campaign.description or '' }}</textarea>
-                    <div class="form-text">Optional details about this campaign's purpose and scope</div>
+                    <div class="form-text">Détails optionnels sur l’objectif et la portée de cette campagne</div>
                 </div>
             </div>
 
@@ -119,18 +119,18 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="start_date" class="form-label">Start Date <span class="text-danger">*</span></label>
+                            <label for="start_date" class="form-label">Date de début <span class="text-danger">*</span></label>
                             <input type="date" class="form-control" id="start_date" name="start_date" 
                                    value="{{ campaign.start_date }}" required>
-                            <div class="form-text">When should this campaign begin?</div>
+                            <div class="form-text">Quand cette campagne doit-elle commencer ?</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="end_date" class="form-label">End Date <span class="text-danger">*</span></label>
+                            <label for="end_date" class="form-label">Date de fin <span class="text-danger">*</span></label>
                             <input type="date" class="form-control" id="end_date" name="end_date" 
                                    value="{{ campaign.end_date }}" required>
-                            <div class="form-text">When should this campaign end?</div>
+                            <div class="form-text">Quand cette campagne doit-elle se terminer ?</div>
                         </div>
                     </div>
                 </div>
@@ -163,7 +163,7 @@
 
                 <div id="reminderDelayFields">
                     <div class="mb-3">
-                        <label for="reminder_delay_days" class="form-label">Days to Wait Before Reminder</label>
+                        <label for="reminder_delay_days" class="form-label">Nombre de jours avant le rappel</label>
                         <select class="form-select" id="reminder_delay_days" name="reminder_delay_days">
                             <option value="3" {% if campaign.reminder_delay_days == 3 %}selected{% endif %}>3 days</option>
                             <option value="5" {% if campaign.reminder_delay_days == 5 %}selected{% endif %}>5 days</option>
@@ -171,16 +171,16 @@
                             <option value="10" {% if campaign.reminder_delay_days == 10 %}selected{% endif %}>10 days</option>
                             <option value="14" {% if campaign.reminder_delay_days == 14 %}selected{% endif %}>14 days</option>
                         </select>
-                        <div class="form-text">How many days after the invitation should we send the reminder?</div>
+                        <div class="form-text">Combien de jours après l’invitation devons-nous envoyer le rappel ?</div>
                     </div>
 
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle me-2"></i>
                         <strong>How it works:</strong>
                         <ul class="mb-0 mt-2">
-                            <li>Reminders are sent only to participants who haven't responded yet</li>
-                            <li>Only one reminder is sent per participant</li>
-                            <li>Reminders are processed daily during active campaigns</li>
+                            <li>Les rappels sont envoyés uniquement aux participants qui n’ont pas encore répondu</li>
+                            <li>Un seul rappel est envoyé par participant</li>
+                            <li>Les rappels sont traités quotidiennement pendant les campagnes actives</li>
                         </ul>
                     </div>
                 </div>

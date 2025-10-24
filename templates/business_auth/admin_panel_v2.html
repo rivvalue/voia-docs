@@ -229,7 +229,7 @@
     padding: var(--spacing-xl);
 }
 
-/* Help Tooltips */
+/* Aide Tooltips */
 .help-tooltip {
     position: relative;
     display: inline-block;
@@ -421,20 +421,20 @@
                 <i class="fas fa-cog me-2"></i>Settings Hub
             </h1>
             <p class="settings-hub-subtitle">
-                Manage your account, team, data, and system settings
+                Gérez votre compte, votre équipe, vos données et vos paramètres système
             </p>
         </div>
         <div class="settings-hub-actions">
-            <button class="settings-action-btn" onclick="expandAll()" aria-label="Expand all sections">
+            <button class="settings-action-btn" onclick="expandAll()" aria-label="Développer toutes les sections">
                 <i class="fas fa-chevron-down"></i>
-                <span>Expand All</span>
+                <span>Tout développer</span>
             </button>
-            <button class="settings-action-btn" onclick="collapseAll()" aria-label="Collapse all sections">
+            <button class="settings-action-btn" onclick="collapseAll()" aria-label="Réduire toutes les sections">
                 <i class="fas fa-chevron-up"></i>
-                <span>Collapse All</span>
+                <span>Tout réduire</span>
             </button>
             <div class="help-tooltip">
-                <button class="settings-action-btn help-icon-btn" aria-label="Help">
+                <button class="settings-action-btn help-icon-btn" aria-label="Aide">
                     <i class="fas fa-question-circle"></i>
                 </button>
                 <span class="tooltip-text">
@@ -453,7 +453,7 @@
 
     <!-- 4-Card Grid -->
     <div class="settings-grid">
-        <!-- Card 1: Account Settings -->
+        <!-- Card 1: Paramètres du compte -->
         <div class="settings-card">
             <div class="settings-card-header" 
                  onclick="toggleCard('account-settings')" 
@@ -465,7 +465,7 @@
                     <div class="settings-card-icon">
                         <i class="fas fa-cog"></i>
                     </div>
-                    <h2 class="settings-card-title">Account Settings</h2>
+                    <h2 class="settings-card-title">Paramètres du compte</h2>
                 </div>
                 <div class="settings-card-toggle">
                     <i class="fas fa-chevron-down"></i>
@@ -473,15 +473,15 @@
             </div>
             <div class="settings-card-content" id="account-settings-content">
                 <div class="settings-card-body">
-                    <!-- Email Configuration -->
+                    <!-- Configuration de l'e-mail -->
                     <div class="settings-item">
                         <div class="settings-item-header">
                             <div class="settings-item-icon">
                                 <i class="fas fa-envelope"></i>
                             </div>
                             <div class="settings-item-info">
-                                <h4 class="settings-item-title">Email Configuration</h4>
-                                <p class="settings-item-desc">Configure SMTP settings for sending survey invitations</p>
+                                <h4 class="settings-item-title">Configuration de l'e-mail</h4>
+                                <p class="settings-item-desc">Configurez les paramètres SMTP pour l'envoi des invitations à l'enquête</p>
                             </div>
                         </div>
                         <a href="{{ url_for('business_auth.email_config') }}" class="btn btn-outline-primary btn-sm">
@@ -489,15 +489,15 @@
                         </a>
                     </div>
 
-                    <!-- Brand Configuration -->
+                    <!-- Configuration de la marque -->
                     <div class="settings-item">
                         <div class="settings-item-header">
                             <div class="settings-item-icon">
                                 <i class="fas fa-palette"></i>
                             </div>
                             <div class="settings-item-info">
-                                <h4 class="settings-item-title">Brand Configuration</h4>
-                                <p class="settings-item-desc">Customize your brand colors, logo, and visual identity</p>
+                                <h4 class="settings-item-title">Configuration de la marque</h4>
+                                <p class="settings-item-desc">Personnalisez les couleurs, le logo et l'identité visuelle de votre marque</p>
                             </div>
                         </div>
                         <a href="{{ url_for('business_auth.brand_config') }}" class="btn btn-outline-primary btn-sm">
@@ -505,7 +505,7 @@
                         </a>
                     </div>
 
-                    <!-- Survey Defaults -->
+                    <!-- Paramètres par défaut de l'enquête -->
                     {% if business_account.account_type in ['core', 'plus', 'demo'] %}
                     <div class="settings-item">
                         <div class="settings-item-header">
@@ -513,8 +513,8 @@
                                 <i class="fas fa-comment-dots"></i>
                             </div>
                             <div class="settings-item-info">
-                                <h4 class="settings-item-title">Survey Defaults</h4>
-                                <p class="settings-item-desc">Set default AI conversation settings for surveys</p>
+                                <h4 class="settings-item-title">Paramètres par défaut de l'enquête</h4>
+                                <p class="settings-item-desc">Définissez les paramètres de conversation IA par défaut pour les enquêtes</p>
                             </div>
                         </div>
                         <a href="{{ url_for('business_auth.survey_config') }}" class="btn btn-outline-primary btn-sm">
@@ -526,7 +526,7 @@
             </div>
         </div>
 
-        <!-- Card 2: User Management -->
+        <!-- Card 2: Gestion des utilisateurs -->
         <div class="settings-card">
             <div class="settings-card-header" 
                  onclick="toggleCard('user-management')" 
@@ -538,7 +538,7 @@
                     <div class="settings-card-icon">
                         <i class="fas fa-users"></i>
                     </div>
-                    <h2 class="settings-card-title">User Management</h2>
+                    <h2 class="settings-card-title">Gestion des utilisateurs</h2>
                 </div>
                 <div class="settings-card-toggle">
                     <i class="fas fa-chevron-down"></i>
@@ -547,15 +547,15 @@
             <div class="settings-card-content" id="user-management-content">
                 <div class="settings-card-body">
                     {% if current_user.has_permission('manage_users') %}
-                    <!-- Team Members -->
+                    <!-- Membres de l'équipe -->
                     <div class="settings-item">
                         <div class="settings-item-header">
                             <div class="settings-item-icon">
                                 <i class="fas fa-users"></i>
                             </div>
                             <div class="settings-item-info">
-                                <h4 class="settings-item-title">Team Members</h4>
-                                <p class="settings-item-desc">Add and manage team members for your business account</p>
+                                <h4 class="settings-item-title">Membres de l'équipe</h4>
+                                <p class="settings-item-desc">Ajoutez et gérez les membres de votre équipe pour votre compte entreprise</p>
                             </div>
                         </div>
                         <a href="{{ url_for('business_auth.manage_users') }}" class="btn btn-outline-primary btn-sm">
@@ -568,18 +568,18 @@
                     <div class="settings-stats">
                         <div class="settings-stat">
                             <div class="settings-stat-number">{{ admin_data.license_info.users_used }}</div>
-                            <div class="settings-stat-label">Users Active</div>
+                            <div class="settings-stat-label">Utilisateurs actifs</div>
                         </div>
                         <div class="settings-stat">
                             <div class="settings-stat-number">{{ admin_data.license_info.users_limit }}</div>
-                            <div class="settings-stat-label">User Limit</div>
+                            <div class="settings-stat-label">Limite d'utilisateurs</div>
                         </div>
                     </div>
                     {% endif %}
                     {% else %}
                     <div class="card-empty-state">
                         <i class="fas fa-lock"></i>
-                        <p>Permission Required</p>
+                        <p>Autorisation requise</p>
                         <small class="text-muted">Contact your administrator for user management access</small>
                     </div>
                     {% endif %}
@@ -587,7 +587,7 @@
             </div>
         </div>
 
-        <!-- Card 3: Data Management -->
+        <!-- Card 3: Gestion des données -->
         <div class="settings-card">
             <div class="settings-card-header" 
                  onclick="toggleCard('data-management')" 
@@ -599,7 +599,7 @@
                     <div class="settings-card-icon">
                         <i class="fas fa-database"></i>
                     </div>
-                    <h2 class="settings-card-title">Data Management</h2>
+                    <h2 class="settings-card-title">Gestion des données</h2>
                 </div>
                 <div class="settings-card-toggle">
                     <i class="fas fa-chevron-down"></i>
@@ -614,8 +614,8 @@
                                 <i class="fas fa-download"></i>
                             </div>
                             <div class="settings-item-info">
-                                <h4 class="settings-item-title">Export Data</h4>
-                                <p class="settings-item-desc">Export all survey responses for analysis and reporting</p>
+                                <h4 class="settings-item-title">Exporter les données</h4>
+                                <p class="settings-item-desc">Exportez toutes les réponses aux enquêtes pour l'analyse et les rapports</p>
                             </div>
                         </div>
                         <button class="btn btn-outline-primary btn-sm" onclick="exportAllData()" id="exportBtn">
@@ -623,15 +623,15 @@
                         </button>
                     </div>
 
-                    <!-- Audit Logs -->
+                    <!-- Journaux d'audit -->
                     <div class="settings-item">
                         <div class="settings-item-header">
                             <div class="settings-item-icon">
                                 <i class="fas fa-clipboard-list"></i>
                             </div>
                             <div class="settings-item-info">
-                                <h4 class="settings-item-title">Audit Logs</h4>
-                                <p class="settings-item-desc">View system activity and user action history</p>
+                                <h4 class="settings-item-title">Journaux d'audit</h4>
+                                <p class="settings-item-desc">Consultez l'activité du système et l'historique des actions utilisateur</p>
                             </div>
                         </div>
                         <a href="{{ url_for('business_auth.audit_logs') }}" class="btn btn-outline-primary btn-sm">
@@ -639,15 +639,15 @@
                         </a>
                     </div>
 
-                    <!-- Database Health -->
+                    <!-- Santé de la base de données -->
                     <div class="settings-item">
                         <div class="settings-item-header">
                             <div class="settings-item-icon">
                                 <i class="fas fa-heartbeat"></i>
                             </div>
                             <div class="settings-item-info">
-                                <h4 class="settings-item-title">Database Health</h4>
-                                <p class="settings-item-desc">Monitor database connection and performance status</p>
+                                <h4 class="settings-item-title">Santé de la base de données</h4>
+                                <p class="settings-item-desc">Surveillez l'état de la connexion et les performances de la base de données</p>
                             </div>
                         </div>
                         <button class="btn btn-outline-primary btn-sm" onclick="checkDatabaseHealth()">
@@ -658,7 +658,7 @@
             </div>
         </div>
 
-        <!-- Card 4: System Settings -->
+        <!-- Card 4: Paramètres du système -->
         <div class="settings-card">
             <div class="settings-card-header" 
                  onclick="toggleCard('system-settings')" 
@@ -670,7 +670,7 @@
                     <div class="settings-card-icon">
                         <i class="fas fa-sliders-h"></i>
                     </div>
-                    <h2 class="settings-card-title">System Settings</h2>
+                    <h2 class="settings-card-title">Paramètres du système</h2>
                 </div>
                 <div class="settings-card-toggle">
                     <i class="fas fa-chevron-down"></i>
@@ -678,7 +678,7 @@
             </div>
             <div class="settings-card-content" id="system-settings-content">
                 <div class="settings-card-body">
-                    <!-- License Information -->
+                    <!-- Informations sur la licence -->
                     {% if admin_data.license_info %}
                     <div class="settings-item">
                         <div class="settings-item-header">
@@ -686,7 +686,7 @@
                                 <i class="fas fa-certificate"></i>
                             </div>
                             <div class="settings-item-info">
-                                <h4 class="settings-item-title">License Information</h4>
+                                <h4 class="settings-item-title">Informations sur la licence</h4>
                                 <p class="settings-item-desc">{{ admin_data.license_info.license_type|title }} - {{ admin_data.license_info.status|title }}</p>
                             </div>
                         </div>
@@ -712,15 +712,15 @@
                     </div>
                     {% endif %}
 
-                    <!-- Performance Metrics -->
+                    <!-- Indicateurs de performance -->
                     <div class="settings-item">
                         <div class="settings-item-header">
                             <div class="settings-item-icon">
                                 <i class="fas fa-tachometer-alt"></i>
                             </div>
                             <div class="settings-item-info">
-                                <h4 class="settings-item-title">Performance Metrics</h4>
-                                <p class="settings-item-desc">Monitor system performance and cache status</p>
+                                <h4 class="settings-item-title">Indicateurs de performance</h4>
+                                <p class="settings-item-desc">Surveillez les performances du système et l'état du cache</p>
                             </div>
                         </div>
                         <a href="/business/admin/performance-metrics" class="btn btn-outline-primary btn-sm">
@@ -735,8 +735,8 @@
                                 <i class="fas fa-clock"></i>
                             </div>
                             <div class="settings-item-info">
-                                <h4 class="settings-item-title">Campaign Scheduler</h4>
-                                <p class="settings-item-desc">View and manage automated campaign lifecycle</p>
+                                <h4 class="settings-item-title">Planificateur de campagnes</h4>
+                                <p class="settings-item-desc">Afficher et gérer le cycle de vie automatisé des campagnes</p>
                             </div>
                         </div>
                         <button class="btn btn-outline-primary btn-sm" onclick="checkSchedulerStatus()">
@@ -747,7 +747,7 @@
             </div>
         </div>
 
-        <!-- Card 5: Platform Administration (Platform Admin Only) -->
+        <!-- Card 5: Administration de la plateforme (Platform Admin Only) -->
         {% if current_user.role == 'platform_admin' or current_user.is_platform_admin() %}
         <div class="settings-card">
             <div class="settings-card-header" 
@@ -760,7 +760,7 @@
                     <div class="settings-card-icon">
                         <i class="fas fa-crown"></i>
                     </div>
-                    <h2 class="settings-card-title">Platform Administration</h2>
+                    <h2 class="settings-card-title">Administration de la plateforme</h2>
                 </div>
                 <div class="settings-card-toggle">
                     <i class="fas fa-chevron-down"></i>
@@ -768,15 +768,15 @@
             </div>
             <div class="settings-card-content" id="platform-administration-content">
                 <div class="settings-card-body">
-                    <!-- Business Analytics Hub -->
+                    <!-- Centre d'analytique d'entreprise -->
                     <div class="settings-item">
                         <div class="settings-item-header">
                             <div class="settings-item-icon">
                                 <i class="fas fa-chart-line"></i>
                             </div>
                             <div class="settings-item-info">
-                                <h4 class="settings-item-title">Business Analytics Hub</h4>
-                                <p class="settings-item-desc">Platform-wide metrics, license usage, and business intelligence</p>
+                                <h4 class="settings-item-title">Centre d'analytique d'entreprise</h4>
+                                <p class="settings-item-desc">Indicateurs globaux, utilisation des licences et intelligence d'affaires</p>
                             </div>
                         </div>
                         <a href="{{ url_for('business_auth.business_analytics_hub') }}" class="btn btn-outline-primary btn-sm">
@@ -791,8 +791,8 @@
                                 <i class="fas fa-building"></i>
                             </div>
                             <div class="settings-item-info">
-                                <h4 class="settings-item-title">Onboard Business Account</h4>
-                                <p class="settings-item-desc">Create and configure new business accounts with license assignment</p>
+                                <h4 class="settings-item-title">Intégrer un compte entreprise</h4>
+                                <p class="settings-item-desc">Créez et configurez de nouveaux comptes d'entreprise avec attribution de licence</p>
                             </div>
                         </div>
                         <a href="{{ url_for('business_auth.business_account_onboarding') }}" class="btn btn-outline-primary btn-sm">
@@ -807,8 +807,8 @@
                                 <i class="fas fa-certificate"></i>
                             </div>
                             <div class="settings-item-info">
-                                <h4 class="settings-item-title">License Management</h4>
-                                <p class="settings-item-desc">Cross-tenant license usage, trends, and compliance monitoring</p>
+                                <h4 class="settings-item-title">Gestion des licences</h4>
+                                <p class="settings-item-desc">Utilisation des licences inter-locataires, tendances et suivi de conformité</p>
                             </div>
                         </div>
                         <a href="{{ url_for('business_auth.license_dashboard') }}" class="btn btn-outline-primary btn-sm">
@@ -816,15 +816,15 @@
                         </a>
                     </div>
 
-                    <!-- Platform Admin Users -->
+                    <!-- Administrateurs de la plateforme -->
                     <div class="settings-item">
                         <div class="settings-item-header">
                             <div class="settings-item-icon">
                                 <i class="fas fa-user-shield"></i>
                             </div>
                             <div class="settings-item-info">
-                                <h4 class="settings-item-title">Platform Admin Users</h4>
-                                <p class="settings-item-desc">Manage cross-tenant administrator accounts and permissions</p>
+                                <h4 class="settings-item-title">Administrateurs de la plateforme</h4>
+                                <p class="settings-item-desc">Gérez les comptes et autorisations des administrateurs inter-locataires</p>
                             </div>
                         </div>
                         <a href="{{ url_for('business_auth.manage_users') }}" class="btn btn-outline-primary btn-sm">

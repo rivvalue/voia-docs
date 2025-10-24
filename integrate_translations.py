@@ -120,8 +120,16 @@ def integrate_template_translations(data):
             
             # Replace each string
             for item in strings:
-                english_text = item.get('original_text', item.get('text', ''))
-                french_text = item.get('text', english_text)
+                # Support both formats:
+                # 1. Format with original_text + text (ideal)
+                # 2. Format with only text (from ChatGPT - need to load original)
+                if 'original_text' in item:
+                    english_text = item['original_text']
+                    french_text = item['text']
+                else:
+                    # ChatGPT format - text contains French, skip for now
+                    # We'll need to match by ID with original files
+                    continue
                 
                 # Skip if translation is the same as original
                 if french_text == english_text:

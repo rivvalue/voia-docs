@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Business Accounts Overview - License Management{% endblock %}
+{% block title %}Aperçu des comptes entreprise - License Management{% endblock %}
 
 {% block page_class %}page-license-overview{% endblock %}
 
@@ -248,8 +248,8 @@
                             <i class="fas fa-list"></i>
                         </div>
                         <div>
-                            <h2 class="mb-1">Business Accounts Overview</h2>
-                            <p class="mb-0 opacity-75">Manage licenses and monitor usage across all business accounts</p>
+                            <h2 class="mb-1">Aperçu des comptes entreprise</h2>
+                            <p class="mb-0 opacity-75">Gérez les licences et suivez l'utilisation sur tous les comptes entreprise</p>
                         </div>
                     </div>
                 </div>
@@ -282,15 +282,15 @@
         <div class="search-filters">
             <form method="GET" class="filters-form">
                 <div>
-                    <label for="search" class="form-label">Search Accounts</label>
+                    <label for="search" class="form-label">Rechercher des comptes</label>
                     <input type="text" class="form-control" id="search" name="search" 
                            placeholder="Search by business name or email..." 
                            value="{{ request.args.get('search', '') }}">
                 </div>
                 <div>
-                    <label for="license_filter" class="form-label">License Type</label>
+                    <label for="license_filter" class="form-label">Type de licence</label>
                     <select class="form-select" id="license_filter" name="license_type">
-                        <option value="">All License Types</option>
+                        <option value="">All Type de licences</option>
                         <option value="core" {{ 'selected' if request.args.get('license_type') == 'core' }}>Core</option>
                         <option value="plus" {{ 'selected' if request.args.get('license_type') == 'plus' }}>Plus</option>
                         <option value="pro" {{ 'selected' if request.args.get('license_type') == 'pro' }}>Pro</option>
@@ -298,12 +298,12 @@
                     </select>
                 </div>
                 <div>
-                    <label for="status_filter" class="form-label">Status</label>
+                    <label for="status_filter" class="form-label">Statut</label>
                     <select class="form-select" id="status_filter" name="status">
-                        <option value="">All Statuses</option>
-                        <option value="active" {{ 'selected' if request.args.get('status') == 'active' }}>Active</option>
-                        <option value="expiring" {{ 'selected' if request.args.get('status') == 'expiring' }}>Expiring Soon</option>
-                        <option value="expired" {{ 'selected' if request.args.get('status') == 'expired' }}>Expired</option>
+                        <option value="">All Statutes</option>
+                        <option value="active" {{ 'selected' if request.args.get('status') == 'active' }}>Actif</option>
+                        <option value="expiring" {{ 'selected' if request.args.get('status') == 'expiring' }}>Expire bientôt</option>
+                        <option value="expired" {{ 'selected' if request.args.get('status') == 'expired' }}>Expiré</option>
                     </select>
                 </div>
                 <div>
@@ -320,12 +320,12 @@
             <table class="table table-striped mb-0">
                 <thead>
                     <tr>
-                        <th>Business Name</th>
-                        <th>License Type</th>
-                        <th>Status</th>
-                        <th>Users</th>
-                        <th>Campaigns</th>
-                        <th>Usage</th>
+                        <th>Nom de l'entreprise</th>
+                        <th>Type de licence</th>
+                        <th>Statut</th>
+                        <th>Utilisateurs</th>
+                        <th>Campagnes</th>
+                        <th>Utilisation</th>
                         <th>Expiration</th>
                         <th>Actions</th>
                     </tr>
@@ -388,23 +388,23 @@
                                             {% elif account.license.days_until_expiration == 0 %}
                                                 Expires today
                                             {% else %}
-                                                Expired {{ -account.license.days_until_expiration }} days ago
+                                                Expiré {{ -account.license.days_until_expiration }} days ago
                                             {% endif %}
                                         </div>
                                     {% endif %}
                                 </div>
                             {% else %}
-                                <span class="text-muted">No expiration</span>
+                                <span class="text-muted">Pas d'expiration</span>
                             {% endif %}
                         </td>
                         <td>
                             <div class="action-buttons">
                                 <a href="{{ url_for('business_auth.license_assignment_form', business_id=account.id) }}" 
-                                   class="action-btn action-btn-primary" title="Assign License">
+                                   class="action-btn action-btn-primary" title="Attribuer une licence">
                                     <i class="fas fa-edit"></i>
                                 </a>
                                 <a href="{{ url_for('business_auth.license_history', business_id=account.id) }}" 
-                                   class="action-btn action-btn-secondary" title="View History">
+                                   class="action-btn action-btn-secondary" title="Voir l'historique">
                                     <i class="fas fa-history"></i>
                                 </a>
                             </div>
@@ -416,8 +416,8 @@
             {% else %}
             <div class="empty-state">
                 <i class="fas fa-search"></i>
-                <h4>No accounts found</h4>
-                <p>Try adjusting your search criteria or filters.</p>
+                <h4>Aucun compte trouvé</h4>
+                <p>Essayez d'ajuster vos critères de recherche ou vos filtres.</p>
             </div>
             {% endif %}
         </div>

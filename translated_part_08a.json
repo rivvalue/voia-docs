@@ -1,0 +1,853 @@
+{
+  "metadata": {
+    "project": "VOÏA - Voice Of Client",
+    "source_language": "English",
+    "target_language": "French",
+    "extraction_date": "2025-10-24",
+    "total_files": 10,
+    "total_strings": 2161,
+    "file_number": 8,
+    "part_description": "Templates Part 8A/8"
+  },
+  "instructions": {
+    "overview": "Translate all 'text' field values from English to French (France market, professional SaaS tone)",
+    "rules": [
+      "Translate ONLY the 'text' field values",
+      "Keep all other fields (id, file, type, element, etc.) UNCHANGED",
+      "Preserve {variables}, {{variables}}, and {%...%} syntax exactly as-is",
+      "Use professional business French suitable for SaaS platform",
+      "Maintain consistent terminology throughout",
+      "Keep technical terms like 'NPS', 'API', 'VOÏA' unchanged unless noted"
+    ]
+  },
+  "templates": [
+    {
+      "id": "campaign_participants_aria_49",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "a[aria-label]",
+      "text": "Effacer tous les filtres",
+      "original_text": "Clear all filters"
+    },
+    {
+      "id": "campaign_participants_aria_50",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "a[aria-label]",
+      "text": "Supprimer le filtre {{ company }}",
+      "original_text": "Remove {{ company }} filter"
+    },
+    {
+      "id": "campaign_participants_aria_51",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "a[aria-label]",
+      "text": "Supprimer le filtre {{ role }}",
+      "original_text": "Remove {{ role }} filter"
+    },
+    {
+      "id": "campaign_participants_aria_52",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "a[aria-label]",
+      "text": "Supprimer le filtre {{ region }}",
+      "original_text": "Remove {{ region }} filter"
+    },
+    {
+      "id": "campaign_participants_aria_53",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "a[aria-label]",
+      "text": "Supprimer le filtre {{ tier }}",
+      "original_text": "Remove {{ tier }} filter"
+    },
+    {
+      "id": "campaign_participants_aria_54",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "a[aria-label]",
+      "text": "Supprimer le filtre {{ language }}",
+      "original_text": "Remove {{ language }} filter"
+    },
+    {
+      "id": "campaign_participants_aria_55",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "a[aria-label]",
+      "text": "Supprimer le filtre {{ tenure }}",
+      "original_text": "Remove {{ tenure }} filter"
+    },
+    {
+      "id": "campaign_participants_aria_56",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "form[aria-label]",
+      "text": "Formulaire d’ajout de participants",
+      "original_text": "Add participants form"
+    },
+    {
+      "id": "campaign_participants_aria_57",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "input[aria-label]",
+      "text": "Rechercher des participants",
+      "original_text": "Search participants"
+    },
+    {
+      "id": "campaign_participants_aria_58",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "input[aria-label]",
+      "text": "Sélectionner tous les participants",
+      "original_text": "Select all participants"
+    },
+    {
+      "id": "campaign_participants_aria_59",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "input[aria-label]",
+      "text": "Sélectionner {{ participant.name }}",
+      "original_text": "Select {{ participant.name }}"
+    },
+    {
+      "id": "campaign_participants_aria_60",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "button[aria-label]",
+      "text": "Ajouter les participants sélectionnés à la campagne",
+      "original_text": "Add selected participants to campaign"
+    },
+    {
+      "id": "campaign_participants_aria_61",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "a[aria-label]",
+      "text": "Créer un nouveau participant",
+      "original_text": "Create new participant"
+    },
+    {
+      "id": "campaign_participants_aria_62",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "form[aria-label]",
+      "text": "Formulaire de recherche de participants",
+      "original_text": "Search participants form"
+    },
+    {
+      "id": "campaign_participants_aria_63",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "input[aria-label]",
+      "text": "Rechercher des participants par nom, e-mail ou entreprise",
+      "original_text": "Search participants by name, email, or company"
+    },
+    {
+      "id": "campaign_participants_aria_64",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "div[aria-label]",
+      "text": "Actions de recherche",
+      "original_text": "Search actions"
+    },
+    {
+      "id": "campaign_participants_aria_65",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "button[aria-label]",
+      "text": "Rechercher des participants",
+      "original_text": "Search participants"
+    },
+    {
+      "id": "campaign_participants_aria_66",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "a[aria-label]",
+      "text": "Effacer la recherche",
+      "original_text": "Clear search"
+    },
+    {
+      "id": "campaign_participants_aria_67",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "div[aria-label]",
+      "text": "Actions du participant",
+      "original_text": "Participant actions"
+    },
+    {
+      "id": "campaign_participants_aria_68",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "button[aria-label]",
+      "text": "Supprimer en masse les participants sélectionnés",
+      "original_text": "Bulk remove selected participants"
+    },
+    {
+      "id": "campaign_participants_aria_69",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "button[aria-label]",
+      "text": "Copier tous les liens d’enquête dans le presse-papiers",
+      "original_text": "Copy all survey links to clipboard"
+    },
+    {
+      "id": "campaign_participants_aria_70",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "table[aria-label]",
+      "text": "Tableau des participants à la campagne",
+      "original_text": "Campaign participants table"
+    },
+    {
+      "id": "campaign_participants_aria_71",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "input[aria-label]",
+      "text": "Sélectionner tous les participants",
+      "original_text": "Select all participants"
+    },
+    {
+      "id": "campaign_participants_aria_72",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "input[aria-label]",
+      "text": "Sélectionner {{ participant.name }}",
+      "original_text": "Select {{ participant.name }}"
+    },
+    {
+      "id": "campaign_participants_aria_73",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "a[aria-label]",
+      "text": "Envoyer un e-mail à {{ participant.name }}",
+      "original_text": "Email {{ participant.name }}"
+    },
+    {
+      "id": "campaign_participants_aria_74",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "span[aria-label]",
+      "text": "Statut : {{ participant.status|title }}",
+      "original_text": "Status: {{ participant.status|title }}"
+    },
+    {
+      "id": "campaign_participants_aria_75",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "input[aria-label]",
+      "text": "Lien d’enquête pour {{ participant.name }}",
+      "original_text": "Survey link for {{ participant.name }}"
+    },
+    {
+      "id": "campaign_participants_aria_76",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "button[aria-label]",
+      "text": "Copier le lien d’enquête pour {{ participant.name }}",
+      "original_text": "Copy survey link for {{ participant.name }}"
+    },
+    {
+      "id": "campaign_participants_aria_77",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "div[aria-label]",
+      "text": "Actions du participant",
+      "original_text": "Participant actions"
+    },
+    {
+      "id": "campaign_participants_aria_78",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "button[aria-label]",
+      "text": "Retirer {{ participant.name }} de la campagne",
+      "original_text": "Remove {{ participant.name }} from campaign"
+    },
+    {
+      "id": "campaign_participants_aria_79",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "button[aria-label]",
+      "text": "Impossible de retirer le participant - la campagne est {{ campaign.status }}",
+      "original_text": "Cannot remove participant - campaign is {{ campaign.status }}"
+    },
+    {
+      "id": "campaign_participants_aria_80",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "a[aria-label]",
+      "text": "Créer le premier participant",
+      "original_text": "Create first participant"
+    },
+    {
+      "id": "campaign_participants_aria_81",
+      "file": "templates/participants/campaign_participants.html",
+      "element": "button[aria-label]",
+      "text": "Fermer",
+      "original_text": "Close"
+    },
+    {
+      "id": "responses_list_1",
+      "file": "templates/campaigns/responses_list.html",
+      "element": "p",
+      "text": "Examiner et analyser les réponses individuelles des participants",
+      "original_text": "Review and analyze individual participant responses"
+    },
+    {
+      "id": "responses_list_2",
+      "file": "templates/campaigns/responses_list.html",
+      "element": "span",
+      "text": "Showing {{ ((pagination.page - 1) * pagination.per_page) + 1 }} to \n            {{ pagination.page * pagination.per_page if pagination.page * pagination.per_page < pagination.total else pagination.total }} \n            of {{ pagination.total }} responses\n            {% if search_query %} (filtered by \"{{ search_query }}\"){% endif %}",
+      "original_text": "Showing {{ ((pagination.page - 1) * pagination.per_page) + 1 }} to \n            {{ pagination.page * pagination.per_page if pagination.page * pagination.per_page < pagination.total else pagination.total }} \n            of {{ pagination.total }} responses\n            {% if search_query %} (filtered by \"{{ search_query }}\"){% endif %}"
+    },
+    {
+      "id": "responses_list_3",
+      "file": "templates/campaigns/responses_list.html",
+      "element": "th",
+      "text": "Participant",
+      "original_text": "Participant"
+    },
+    {
+      "id": "responses_list_4",
+      "file": "templates/campaigns/responses_list.html",
+      "element": "th",
+      "text": "Entreprise",
+      "original_text": "Company"
+    },
+    {
+      "id": "responses_list_5",
+      "file": "templates/campaigns/responses_list.html",
+      "element": "th",
+      "text": "Score NPS",
+      "original_text": "NPS Score"
+    },
+    {
+      "id": "responses_list_6",
+      "file": "templates/campaigns/responses_list.html",
+      "element": "th",
+      "text": "Statut",
+      "original_text": "Status"
+    },
+    {
+      "id": "responses_list_7",
+      "file": "templates/campaigns/responses_list.html",
+      "element": "th",
+      "text": "Date de réponse",
+      "original_text": "Response Date"
+    },
+    {
+      "id": "responses_list_8",
+      "file": "templates/campaigns/responses_list.html",
+      "element": "th",
+      "text": "Actions",
+      "original_text": "Actions"
+    },
+    {
+      "id": "responses_list_9",
+      "file": "templates/campaigns/responses_list.html",
+      "element": "h4",
+      "text": "Aucune réponse trouvée",
+      "original_text": "No Responses Found"
+    },
+    {
+      "id": "responses_list_placeholder_10",
+      "file": "templates/campaigns/responses_list.html",
+      "element": "input[placeholder]",
+      "text": "Rechercher des participants, des entreprises ou du contenu de conversation...",
+      "original_text": "Search participants, companies, or conversation content..."
+    },
+    {
+      "id": "responses_list_title_11",
+      "file": "templates/campaigns/responses_list.html",
+      "element": "button[title]",
+      "text": "Exporter les réponses de la campagne",
+      "original_text": "Export campaign responses"
+    },
+    {
+      "id": "responses_list_aria_12",
+      "file": "templates/campaigns/responses_list.html",
+      "element": "nav[aria-label]",
+      "text": "Pagination des réponses",
+      "original_text": "Response pagination"
+    },
+    {
+      "id": "create_1",
+      "file": "templates/campaigns/create.html",
+      "element": "h1",
+      "text": "Créer une nouvelle campagne",
+      "original_text": "Create New Campaign"
+    },
+    {
+      "id": "create_2",
+      "file": "templates/campaigns/create.html",
+      "element": "p",
+      "text": "Configurer une nouvelle campagne d’enquête pour {{ business_account.name }}",
+      "original_text": "Set up a new survey campaign for {{ business_account.name }}"
+    },
+    {
+      "id": "create_3",
+      "file": "templates/campaigns/create.html",
+      "element": "label",
+      "text": "Nom de la campagne",
+      "original_text": "Campaign Name"
+    },
+    {
+      "id": "create_4",
+      "file": "templates/campaigns/create.html",
+      "element": "div",
+      "text": "Un nom clair et descriptif pour votre campagne",
+      "original_text": "A clear, descriptive name for your campaign"
+    },
+    {
+      "id": "create_5",
+      "file": "templates/campaigns/create.html",
+      "element": "label",
+      "text": "Description",
+      "original_text": "Description"
+    },
+    {
+      "id": "create_6",
+      "file": "templates/campaigns/create.html",
+      "element": "div",
+      "text": "Détails optionnels sur l’objectif et la portée de cette campagne",
+      "original_text": "Optional details about this campaign's purpose and scope"
+    },
+    {
+      "id": "create_7",
+      "file": "templates/campaigns/create.html",
+      "element": "label",
+      "text": "Date de début",
+      "original_text": "Start Date"
+    },
+    {
+      "id": "create_8",
+      "file": "templates/campaigns/create.html",
+      "element": "div",
+      "text": "Quand cette campagne doit-elle commencer ?",
+      "original_text": "When should this campaign begin?"
+    },
+    {
+      "id": "create_9",
+      "file": "templates/campaigns/create.html",
+      "element": "label",
+      "text": "Date de fin",
+      "original_text": "End Date"
+    },
+    {
+      "id": "create_10",
+      "file": "templates/campaigns/create.html",
+      "element": "div",
+      "text": "Quand cette campagne doit-elle se terminer ?",
+      "original_text": "When should this campaign end?"
+    },
+    {
+      "id": "create_11",
+      "file": "templates/campaigns/create.html",
+      "element": "li",
+      "text": "Affecter des participants à la campagne",
+      "original_text": "Assign participants to the campaign"
+    },
+    {
+      "id": "create_12",
+      "file": "templates/campaigns/create.html",
+      "element": "li",
+      "text": "Générer des jetons d’enquête personnalisés",
+      "original_text": "Generate personalized survey tokens"
+    },
+    {
+      "id": "create_13",
+      "file": "templates/campaigns/create.html",
+      "element": "li",
+      "text": "Planifier l’activation de la campagne et les invitations par e-mail",
+      "original_text": "Schedule campaign activation and email invitations"
+    },
+    {
+      "id": "create_14",
+      "file": "templates/campaigns/create.html",
+      "element": "div",
+      "text": "When enabled, participant names and company names will be anonymized using secure hashing. \n                        Anonymized participants will appear as \"Participant-{hash}\" in reports and analytics. \n                        This cannot be changed after campaign creation.",
+      "original_text": "When enabled, participant names and company names will be anonymized using secure hashing. \n                        Anonymized participants will appear as \"Participant-{hash}\" in reports and analytics. \n                        This cannot be changed after campaign creation."
+    },
+    {
+      "id": "create_15",
+      "file": "templates/campaigns/create.html",
+      "element": "div",
+      "text": "When enabled, customize the email sent to participants. Leave unchecked to use your account's default email templates.",
+      "original_text": "When enabled, customize the email sent to participants. Leave unchecked to use your account's default email templates."
+    },
+    {
+      "id": "create_16",
+      "file": "templates/campaigns/create.html",
+      "element": "label",
+      "text": "Objet de l’e-mail",
+      "original_text": "Email Subject"
+    },
+    {
+      "id": "create_17",
+      "file": "templates/campaigns/create.html",
+      "element": "div",
+      "text": "Available variables: {participant_name}, {campaign_name}, {business_account_name}",
+      "original_text": "Available variables: {participant_name}, {campaign_name}, {business_account_name}"
+    },
+    {
+      "id": "create_18",
+      "file": "templates/campaigns/create.html",
+      "element": "label",
+      "text": "Message d’introduction",
+      "original_text": "Introduction Message"
+    },
+    {
+      "id": "create_19",
+      "file": "templates/campaigns/create.html",
+      "element": "div",
+      "text": "Opens the email body. Available variables: {participant_name}, {campaign_name}, {business_account_name}",
+      "original_text": "Opens the email body. Available variables: {participant_name}, {campaign_name}, {business_account_name}"
+    },
+    {
+      "id": "create_20",
+      "file": "templates/campaigns/create.html",
+      "element": "label",
+      "text": "Texte du bouton d’appel à l’action",
+      "original_text": "Call-to-Action Button Text"
+    },
+    {
+      "id": "create_21",
+      "file": "templates/campaigns/create.html",
+      "element": "div",
+      "text": "Texte affiché sur le bouton d’enquête",
+      "original_text": "Text displayed on the survey button"
+    },
+    {
+      "id": "create_22",
+      "file": "templates/campaigns/create.html",
+      "element": "label",
+      "text": "Message de clôture",
+      "original_text": "Closing Message"
+    },
+    {
+      "id": "create_23",
+      "file": "templates/campaigns/create.html",
+      "element": "div",
+      "text": "Message before sign-off. Available variables: {participant_name}, {campaign_name}, {business_account_name}",
+      "original_text": "Message before sign-off. Available variables: {participant_name}, {campaign_name}, {business_account_name}"
+    },
+    {
+      "id": "create_24",
+      "file": "templates/campaigns/create.html",
+      "element": "label",
+      "text": "Note de bas de page",
+      "original_text": "Footer Note"
+    },
+    {
+      "id": "create_25",
+      "file": "templates/campaigns/create.html",
+      "element": "div",
+      "text": "Texte en bas de l’e-mail",
+      "original_text": "Small print at the bottom of the email"
+    },
+    {
+      "id": "create_26",
+      "file": "templates/campaigns/create.html",
+      "element": "div",
+      "text": "Automatically send a follow-up email to participants who haven't completed the survey",
+      "original_text": "Automatically send a follow-up email to participants who haven't completed the survey"
+    },
+    {
+      "id": "create_27",
+      "file": "templates/campaigns/create.html",
+      "element": "label",
+      "text": "Nombre de jours avant le rappel",
+      "original_text": "Days to Wait Before Reminder"
+    },
+    {
+      "id": "create_28",
+      "file": "templates/campaigns/create.html",
+      "element": "option",
+      "text": "3 days",
+      "original_text": "3 days"
+    },
+    {
+      "id": "create_29",
+      "file": "templates/campaigns/create.html",
+      "element": "option",
+      "text": "5 days",
+      "original_text": "5 days"
+    },
+    {
+      "id": "create_30",
+      "file": "templates/campaigns/create.html",
+      "element": "option",
+      "text": "7 days (recommended)",
+      "original_text": "7 days (recommended)"
+    },
+    {
+      "id": "create_31",
+      "file": "templates/campaigns/create.html",
+      "element": "option",
+      "text": "10 days",
+      "original_text": "10 days"
+    },
+    {
+      "id": "create_32",
+      "file": "templates/campaigns/create.html",
+      "element": "option",
+      "text": "14 days",
+      "original_text": "14 days"
+    },
+    {
+      "id": "create_33",
+      "file": "templates/campaigns/create.html",
+      "element": "div",
+      "text": "Combien de jours après l’invitation devons-nous envoyer le rappel ?",
+      "original_text": "How many days after the invitation should we send the reminder?"
+    },
+    {
+      "id": "create_34",
+      "file": "templates/campaigns/create.html",
+      "element": "li",
+      "text": "Les rappels sont envoyés uniquement aux participants qui n’ont pas encore répondu",
+      "original_text": "Reminders are sent only to participants who haven't responded yet"
+    },
+    {
+      "id": "create_35",
+      "file": "templates/campaigns/create.html",
+      "element": "li",
+      "text": "Un seul rappel est envoyé par participant",
+      "original_text": "Only one reminder is sent per participant"
+    },
+    {
+      "id": "create_36",
+      "file": "templates/campaigns/create.html",
+      "element": "li",
+      "text": "Les rappels sont traités quotidiennement pendant les campagnes actives",
+      "original_text": "Reminders are processed daily during active campaigns"
+    },
+    {
+      "id": "create_placeholder_37",
+      "file": "templates/campaigns/create.html",
+      "element": "input[placeholder]",
+      "text": "e.g., Q2 2025 Product Satisfaction Survey",
+      "original_text": "e.g., Q2 2025 Product Satisfaction Survey"
+    },
+    {
+      "id": "create_placeholder_38",
+      "file": "templates/campaigns/create.html",
+      "element": "textarea[placeholder]",
+      "text": "Optional description of campaign goals, focus areas, or target audience",
+      "original_text": "Optional description of campaign goals, focus areas, or target audience"
+    },
+    {
+      "id": "create_placeholder_39",
+      "file": "templates/campaigns/create.html",
+      "element": "input[placeholder]",
+      "text": "Your feedback is requested: {campaign_name}",
+      "original_text": "Your feedback is requested: {campaign_name}"
+    },
+    {
+      "id": "create_placeholder_40",
+      "file": "templates/campaigns/create.html",
+      "element": "textarea[placeholder]",
+      "text": "{business_account_name} is requesting your valuable feedback through our Voice of Client system.",
+      "original_text": "{business_account_name} is requesting your valuable feedback through our Voice of Client system."
+    },
+    {
+      "id": "create_placeholder_41",
+      "file": "templates/campaigns/create.html",
+      "element": "input[placeholder]",
+      "text": "Complete Your Survey",
+      "original_text": "Complete Your Survey"
+    },
+    {
+      "id": "create_placeholder_42",
+      "file": "templates/campaigns/create.html",
+      "element": "textarea[placeholder]",
+      "text": "Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.\n\nThank you for your time and valuable insights!",
+      "original_text": "Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.\n\nThank you for your time and valuable insights!"
+    },
+    {
+      "id": "create_placeholder_43",
+      "file": "templates/campaigns/create.html",
+      "element": "textarea[placeholder]",
+      "text": "This is an automated message. If you have any questions, please contact the organization that sent this survey.",
+      "original_text": "This is an automated message. If you have any questions, please contact the organization that sent this survey."
+    },
+    {
+      "id": "edit_1",
+      "file": "templates/campaigns/edit.html",
+      "element": "h1",
+      "text": "Modifier la campagne",
+      "original_text": "Edit Campaign"
+    },
+    {
+      "id": "edit_2",
+      "file": "templates/campaigns/edit.html",
+      "element": "p",
+      "text": "Mettre à jour les détails de la campagne pour {{ business_account.name }}",
+      "original_text": "Update campaign details for {{ business_account.name }}"
+    },
+    {
+      "id": "edit_3",
+      "file": "templates/campaigns/edit.html",
+      "element": "label",
+      "text": "Nom de la campagne",
+      "original_text": "Campaign Name"
+    },
+    {
+      "id": "edit_4",
+      "file": "templates/campaigns/edit.html",
+      "element": "div",
+      "text": "Un nom clair et descriptif pour votre campagne",
+      "original_text": "A clear, descriptive name for your campaign"
+    },
+    {
+      "id": "edit_5",
+      "file": "templates/campaigns/edit.html",
+      "element": "label",
+      "text": "Description",
+      "original_text": "Description"
+    },
+    {
+      "id": "edit_6",
+      "file": "templates/campaigns/edit.html",
+      "element": "div",
+      "text": "Détails optionnels sur l’objectif et la portée de cette campagne",
+      "original_text": "Optional details about this campaign's purpose and scope"
+    },
+    {
+      "id": "edit_7",
+      "file": "templates/campaigns/edit.html",
+      "element": "label",
+      "text": "Date de début",
+      "original_text": "Start Date"
+    },
+    {
+      "id": "edit_8",
+      "file": "templates/campaigns/edit.html",
+      "element": "div",
+      "text": "Quand cette campagne doit-elle commencer ?",
+      "original_text": "When should this campaign begin?"
+    },
+    {
+      "id": "edit_9",
+      "file": "templates/campaigns/edit.html",
+      "element": "label",
+      "text": "Date de fin",
+      "original_text": "End Date"
+    },
+    {
+      "id": "edit_10",
+      "file": "templates/campaigns/edit.html",
+      "element": "div",
+      "text": "Quand cette campagne doit-elle se terminer ?",
+      "original_text": "When should this campaign end?"
+    },
+    {
+      "id": "edit_11",
+      "file": "templates/campaigns/edit.html",
+      "element": "div",
+      "text": "Automatically send a follow-up email to participants who haven't completed the survey",
+      "original_text": "Automatically send a follow-up email to participants who haven't completed the survey"
+    },
+    {
+      "id": "edit_12",
+      "file": "templates/campaigns/edit.html",
+      "element": "label",
+      "text": "Nombre de jours avant le rappel",
+      "original_text": "Days to Wait Before Reminder"
+    },
+    {
+      "id": "edit_13",
+      "file": "templates/campaigns/edit.html",
+      "element": "option",
+      "text": "3 days",
+      "original_text": "3 days"
+    },
+    {
+      "id": "edit_14",
+      "file": "templates/campaigns/edit.html",
+      "element": "option",
+      "text": "5 days",
+      "original_text": "5 days"
+    },
+    {
+      "id": "edit_15",
+      "file": "templates/campaigns/edit.html",
+      "element": "option",
+      "text": "7 days (recommended)",
+      "original_text": "7 days (recommended)"
+    },
+    {
+      "id": "edit_16",
+      "file": "templates/campaigns/edit.html",
+      "element": "option",
+      "text": "10 days",
+      "original_text": "10 days"
+    },
+    {
+      "id": "edit_17",
+      "file": "templates/campaigns/edit.html",
+      "element": "option",
+      "text": "14 days",
+      "original_text": "14 days"
+    },
+    {
+      "id": "edit_18",
+      "file": "templates/campaigns/edit.html",
+      "element": "div",
+      "text": "Combien de jours après l’invitation devons-nous envoyer le rappel ?",
+      "original_text": "How many days after the invitation should we send the reminder?"
+    },
+    {
+      "id": "edit_19",
+      "file": "templates/campaigns/edit.html",
+      "element": "li",
+      "text": "Les rappels sont envoyés uniquement aux participants qui n’ont pas encore répondu",
+      "original_text": "Reminders are sent only to participants who haven't responded yet"
+    },
+    {
+      "id": "edit_20",
+      "file": "templates/campaigns/edit.html",
+      "element": "li",
+      "text": "Un seul rappel est envoyé par participant",
+      "original_text": "Only one reminder is sent per participant"
+    },
+    {
+      "id": "edit_21",
+      "file": "templates/campaigns/edit.html",
+      "element": "li",
+      "text": "Les rappels sont traités quotidiennement pendant les campagnes actives",
+      "original_text": "Reminders are processed daily during active campaigns"
+    },
+    {
+      "id": "edit_placeholder_22",
+      "file": "templates/campaigns/edit.html",
+      "element": "input[placeholder]",
+      "text": "e.g., Q2 2025 Product Satisfaction Survey",
+      "original_text": "e.g., Q2 2025 Product Satisfaction Survey"
+    },
+    {
+      "id": "edit_placeholder_23",
+      "file": "templates/campaigns/edit.html",
+      "element": "textarea[placeholder]",
+      "text": "Optional description of campaign goals, focus areas, or target audience",
+      "original_text": "Optional description of campaign goals, focus areas, or target audience"
+    },
+    {
+      "id": "individual_response_1",
+      "file": "templates/campaigns/individual_response.html",
+      "element": "span",
+      "text": "Résultats de recherche mis en surbrillance pour :",
+      "original_text": "Search results highlighted for:"
+    },
+    {
+      "id": "individual_response_2",
+      "file": "templates/campaigns/individual_response.html",
+      "element": "span",
+      "text": "Nom :",
+      "original_text": "Name:"
+    },
+    {
+      "id": "individual_response_3",
+      "file": "templates/campaigns/individual_response.html",
+      "element": "span",
+      "text": "E-mail :",
+      "original_text": "Email:"
+    },
+    {
+      "id": "individual_response_4",
+      "file": "templates/campaigns/individual_response.html",
+      "element": "span",
+      "text": "Company:",
+      "original_text": "Company:"
+    },
+    {
+      "id": "individual_response_5",
+      "file": "templates/campaigns/individual_response.html",
+      "element": "span",
+      "text": "Ancienneté :",
+      "original_text": "Tenure:"
+    },
+    {
+      "id": "individual_response_6",
+      "file": "templates/campaigns/individual_response.html",
+      "element": "span",
+      "text": "NPS Score:",
+      "original_text": "NPS Score:"
+    },
+    {
+      "id": "individual_response_7",
+      "file": "templates/campaigns/individual_response.html",
+      "element": "span",
+      "text": "Satisfaction :",
+      "original_text": "Satisfaction:"
+    }
+  ],
+  "flash_messages": [],
+  "email_templates": []
+}

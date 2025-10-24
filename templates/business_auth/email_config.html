@@ -82,39 +82,39 @@
                                 aria-describedby="aws_region_help">
                             <option value="">Select a region</option>
                             <option value="us-east-1" {{ 'selected' if email_config and email_config.aws_region == 'us-east-1' else '' }}>US East (N. Virginia)</option>
-                            <option value="us-east-2" {{ 'selected' if email_config and email_config.aws_region == 'us-east-2' else '' }}>US East (Ohio)</option>
-                            <option value="us-west-1" {{ 'selected' if email_config and email_config.aws_region == 'us-west-1' else '' }}>US West (N. California)</option>
-                            <option value="us-west-2" {{ 'selected' if email_config and email_config.aws_region == 'us-west-2' else '' }}>US West (Oregon)</option>
-                            <option value="ca-central-1" {{ 'selected' if email_config and email_config.aws_region == 'ca-central-1' else '' }}>Canada (Central)</option>
-                            <option value="eu-west-1" {{ 'selected' if email_config and email_config.aws_region == 'eu-west-1' else '' }}>Europe (Ireland)</option>
-                            <option value="eu-west-2" {{ 'selected' if email_config and email_config.aws_region == 'eu-west-2' else '' }}>Europe (London)</option>
+                            <option value="us-east-2" {{ 'selected' if email_config and email_config.aws_region == 'us-east-2' else '' }}>États-Unis Est (Ohio)</option>
+                            <option value="us-west-1" {{ 'selected' if email_config and email_config.aws_region == 'us-west-1' else '' }}>États-Unis Ouest (N. Californie)</option>
+                            <option value="us-west-2" {{ 'selected' if email_config and email_config.aws_region == 'us-west-2' else '' }}>États-Unis Ouest (Oregon)</option>
+                            <option value="ca-central-1" {{ 'selected' if email_config and email_config.aws_region == 'ca-central-1' else '' }}>Canada (Centre)</option>
+                            <option value="eu-west-1" {{ 'selected' if email_config and email_config.aws_region == 'eu-west-1' else '' }}>Europe (Irlande)</option>
+                            <option value="eu-west-2" {{ 'selected' if email_config and email_config.aws_region == 'eu-west-2' else '' }}>Europe (Londres)</option>
                             <option value="eu-west-3" {{ 'selected' if email_config and email_config.aws_region == 'eu-west-3' else '' }}>Europe (Paris)</option>
-                            <option value="eu-central-1" {{ 'selected' if email_config and email_config.aws_region == 'eu-central-1' else '' }}>Europe (Frankfurt)</option>
-                            <option value="ap-south-1" {{ 'selected' if email_config and email_config.aws_region == 'ap-south-1' else '' }}>Asia Pacific (Mumbai)</option>
-                            <option value="ap-northeast-1" {{ 'selected' if email_config and email_config.aws_region == 'ap-northeast-1' else '' }}>Asia Pacific (Tokyo)</option>
-                            <option value="ap-northeast-2" {{ 'selected' if email_config and email_config.aws_region == 'ap-northeast-2' else '' }}>Asia Pacific (Seoul)</option>
-                            <option value="ap-southeast-1" {{ 'selected' if email_config and email_config.aws_region == 'ap-southeast-1' else '' }}>Asia Pacific (Singapore)</option>
-                            <option value="ap-southeast-2" {{ 'selected' if email_config and email_config.aws_region == 'ap-southeast-2' else '' }}>Asia Pacific (Sydney)</option>
-                            <option value="sa-east-1" {{ 'selected' if email_config and email_config.aws_region == 'sa-east-1' else '' }}>South America (São Paulo)</option>
+                            <option value="eu-central-1" {{ 'selected' if email_config and email_config.aws_region == 'eu-central-1' else '' }}>Europe (Francfort)</option>
+                            <option value="ap-south-1" {{ 'selected' if email_config and email_config.aws_region == 'ap-south-1' else '' }}>Asie-Pacifique (Mumbai)</option>
+                            <option value="ap-northeast-1" {{ 'selected' if email_config and email_config.aws_region == 'ap-northeast-1' else '' }}>Asie-Pacifique (Tokyo)</option>
+                            <option value="ap-northeast-2" {{ 'selected' if email_config and email_config.aws_region == 'ap-northeast-2' else '' }}>Asie-Pacifique (Séoul)</option>
+                            <option value="ap-southeast-1" {{ 'selected' if email_config and email_config.aws_region == 'ap-southeast-1' else '' }}>Asie-Pacifique (Singapour)</option>
+                            <option value="ap-southeast-2" {{ 'selected' if email_config and email_config.aws_region == 'ap-southeast-2' else '' }}>Asie-Pacifique (Sydney)</option>
+                            <option value="sa-east-1" {{ 'selected' if email_config and email_config.aws_region == 'sa-east-1' else '' }}>Amérique du Sud (São Paulo)</option>
                         </select>
-                        <div class="email-help-text" id="aws_region_help">Select the AWS region where you configured SES</div>
+                        <div class="email-help-text" id="aws_region_help">Sélectionnez la région AWS où vous avez configuré SES</div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- SMTP Server Settings -->
+        <!-- Serveur SMTP Settings -->
         <div class="email-config-form-section">
             <h3 class="email-section-title">
                 <i class="fas fa-server" aria-hidden="true"></i>
-                SMTP Server Settings
+                Serveur SMTP Settings
             </h3>
             
             <div class="row">
                 <!-- Standard SMTP server field (hidden for AWS SES) -->
                 <div class="col-md-8" id="smtp_server_field">
                     <div class="email-form-group">
-                        <label class="email-form-label" for="smtp_server">SMTP Server *</label>
+                        <label class="email-form-label" for="smtp_server">Serveur SMTP *</label>
                         <input type="text" 
                                class="email-form-control" 
                                id="smtp_server" 
@@ -122,18 +122,18 @@
                                value="{{ email_config.smtp_server if email_config else '' }}" 
                                placeholder="smtp.gmail.com"
                                aria-describedby="smtp_server_help">
-                        <div class="email-help-text" id="smtp_server_help">Your email provider's SMTP server address</div>
+                        <div class="email-help-text" id="smtp_server_help">Adresse du serveur SMTP de votre fournisseur de messagerie</div>
                     </div>
                 </div>
                 
                 <!-- AWS SES info field (shown for AWS SES) -->
                 <div class="col-md-8" id="aws_ses_server_info" style="display: none;">
                     <div class="email-form-group">
-                        <label class="email-form-label">SMTP Server</label>
+                        <label class="email-form-label">Serveur SMTP</label>
                         <div class="email-form-control" style="background-color: #f8f9fa; cursor: not-allowed;" readonly>
-                            <span id="ses_server_display">Auto-generated from region</span>
+                            <span id="ses_server_display">Généré automatiquement à partir de la région</span>
                         </div>
-                        <div class="email-help-text">AWS SES SMTP server is automatically set based on your region</div>
+                        <div class="email-help-text">Le serveur SMTP AWS SES est automatiquement défini en fonction de votre région</div>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -149,7 +149,7 @@
                                required
                                aria-required="true"
                                aria-describedby="smtp_port_help">
-                        <div class="email-help-text" id="smtp_port_help">Usually 587 (TLS) or 465 (SSL)</div>
+                        <div class="email-help-text" id="smtp_port_help">Généralement 587 (TLS) ou 465 (SSL)</div>
                     </div>
                 </div>
             </div>
@@ -158,7 +158,7 @@
                 <div class="col-md-6">
                     <div class="email-form-group">
                         <label class="email-form-label" for="smtp_username">
-                            <span id="smtp_username_label">Username</span> *
+                            <span id="smtp_username_label">Nom d'utilisateur</span> *
                         </label>
                         <input type="text" 
                                class="email-form-control" 
@@ -169,13 +169,13 @@
                                required
                                aria-required="true"
                                aria-describedby="smtp_username_help">
-                        <div class="email-help-text" id="smtp_username_help">Usually your email address</div>
+                        <div class="email-help-text" id="smtp_username_help">Généralement votre adresse e-mail</div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="email-form-group">
                         <label class="email-form-label" for="smtp_password">
-                            <span id="smtp_password_label">Password</span> {{ '*' if not email_config else '(leave blank to keep current)' }}
+                            <span id="smtp_password_label">Mot de passe</span> {{ '*' if not email_config else '(leave blank to keep current)' }}
                         </label>
                         <input type="password" 
                                class="email-form-control" 
@@ -184,7 +184,7 @@
                                placeholder="Enter SMTP password" 
                                {{ 'required aria-required=true' if not email_config else '' }}
                                aria-describedby="smtp_password_help">
-                        <div class="email-help-text" id="smtp_password_help">Your email password or app-specific password</div>
+                        <div class="email-help-text" id="smtp_password_help">Votre mot de passe e-mail ou un mot de passe d'application spécifique</div>
                     </div>
                 </div>
             </div>
@@ -199,7 +199,7 @@
                                {{ 'checked' if (email_config and email_config.use_tls) or not email_config else '' }}
                                aria-describedby="use_tls_help">
                         <label class="email-form-check-label" for="use_tls">
-                            Use TLS (recommended for port 587)
+                            Utiliser TLS (recommandé pour le port 587)
                         </label>
                     </div>
                 </div>
@@ -212,7 +212,7 @@
                                {{ 'checked' if email_config and email_config.use_ssl else '' }}
                                aria-describedby="use_ssl_help">
                         <label class="email-form-check-label" for="use_ssl">
-                            Use SSL (for port 465)
+                            Utiliser SSL (pour le port 465)
                         </label>
                     </div>
                 </div>
@@ -229,7 +229,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="email-form-group">
-                        <label class="email-form-label" for="sender_name">Sender Name *</label>
+                        <label class="email-form-label" for="sender_name">Nom de l'expéditeur *</label>
                         <input type="text" 
                                class="email-form-control" 
                                id="sender_name" 
@@ -239,12 +239,12 @@
                                required
                                aria-required="true"
                                aria-describedby="sender_name_help">
-                        <div class="email-help-text" id="sender_name_help">Name that appears in the "From" field</div>
+                        <div class="email-help-text" id="sender_name_help">Nom affiché dans le champ « De »</div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="email-form-group">
-                        <label class="email-form-label" for="sender_email">Sender Email *</label>
+                        <label class="email-form-label" for="sender_email">Adresse e-mail de l'expéditeur *</label>
                         <input type="email" 
                                class="email-form-control" 
                                id="sender_email" 
@@ -254,13 +254,13 @@
                                required
                                aria-required="true"
                                aria-describedby="sender_email_help">
-                        <div class="email-help-text" id="sender_email_help">Email address that appears in the "From" field</div>
+                        <div class="email-help-text" id="sender_email_help">Adresse e-mail affichée dans le champ « De »</div>
                     </div>
                 </div>
             </div>
 
             <div class="email-form-group">
-                <label class="email-form-label" for="reply_to_email">Reply-To Email (optional)</label>
+                <label class="email-form-label" for="reply_to_email">Adresse e-mail de réponse (optionnelle)</label>
                 <input type="email" 
                        class="email-form-control" 
                        id="reply_to_email" 
@@ -268,7 +268,7 @@
                        value="{{ email_config.reply_to_email if email_config and email_config.reply_to_email else '' }}" 
                        placeholder="support@yourcompany.com"
                        aria-describedby="reply_to_email_help">
-                <div class="email-help-text" id="reply_to_email_help">Where replies should be sent (if different from sender)</div>
+                <div class="email-help-text" id="reply_to_email_help">Adresse à laquelle les réponses doivent être envoyées (si différente de l'expéditeur)</div>
             </div>
         </div>
 
@@ -280,7 +280,7 @@
             </h3>
             
             <div class="email-form-group">
-                <label class="email-form-label" for="admin_emails">Admin Email Addresses</label>
+                <label class="email-form-label" for="admin_emails">Adresses e-mail administrateur</label>
                 <input type="text" 
                        class="email-form-control" 
                        id="admin_emails" 
@@ -288,7 +288,7 @@
                        value="{{ email_config.get_admin_emails() | join(', ') if email_config and email_config.get_admin_emails() else '' }}" 
                        placeholder="admin@yourcompany.com, manager@yourcompany.com"
                        aria-describedby="admin_emails_help">
-                <div class="email-help-text" id="admin_emails_help">Comma-separated list of email addresses for admin notifications</div>
+                <div class="email-help-text" id="admin_emails_help">Liste d'adresses e-mail séparées par des virgules pour les notifications administrateur</div>
             </div>
         </div>
         
@@ -313,7 +313,7 @@
                     </label>
                 </div>
                 <div class="email-help-text" id="use_custom_content_help">
-                    Customize the invitation email content. If unchecked, default professional templates will be used.
+                    Personnalisez le contenu de l'e-mail d'invitation. Si décoché, les modèles professionnels par défaut seront utilisés.
                 </div>
             </div>
             
@@ -321,8 +321,8 @@
             <div id="custom_content_fields" style="display: none;">
                 <div class="email-form-group">
                     <label class="email-form-label" for="custom_subject_template">
-                        Email Subject
-                        <span style="color: #999; font-weight: normal;">(Max 200 characters)</span>
+                        Objet de l'e-mail
+                        <span style="color: #999; font-weight: normal;">(200 caractères maximum)</span>
                     </label>
                     <input type="text" 
                            class="email-form-control" 
@@ -334,12 +334,12 @@
                            oninput="updatePreview()"
                            aria-describedby="custom_subject_help">
                     <div class="email-help-text" id="custom_subject_help">
-                        Variables: <code>{participant_name}</code>, <code>{campaign_name}</code>, <code>{business_account_name}</code>
+                        Variables : <code>{participant_name}</code>, <code>{campaign_name}</code>, <code>{business_account_name}</code>
                     </div>
                 </div>
                 
                 <div class="email-form-group">
-                    <label class="email-form-label" for="custom_intro_message">Introduction Message</label>
+                    <label class="email-form-label" for="custom_intro_message">Message d'introduction</label>
                     <textarea class="email-form-control" 
                               id="custom_intro_message" 
                               name="custom_intro_message" 
@@ -348,14 +348,14 @@
                               oninput="updatePreview()"
                               aria-describedby="custom_intro_help">{{ email_config.custom_intro_message if email_config else '' }}</textarea>
                     <div class="email-help-text" id="custom_intro_help">
-                        The opening message in the email body
+                        Le message d'ouverture dans le corps de l'e-mail
                     </div>
                 </div>
                 
                 <div class="email-form-group">
                     <label class="email-form-label" for="custom_cta_text">
-                        Button Text
-                        <span style="color: #999; font-weight: normal;">(Max 50 characters)</span>
+                        Texte du bouton
+                        <span style="color: #999; font-weight: normal;">(50 caractères maximum)</span>
                     </label>
                     <input type="text" 
                            class="email-form-control" 
@@ -367,12 +367,12 @@
                            oninput="updatePreview()"
                            aria-describedby="custom_cta_help">
                     <div class="email-help-text" id="custom_cta_help">
-                        Text displayed on the survey button
+                        Texte affiché sur le bouton du sondage
                     </div>
                 </div>
                 
                 <div class="email-form-group">
-                    <label class="email-form-label" for="custom_closing_message">Closing Message</label>
+                    <label class="email-form-label" for="custom_closing_message">Message de clôture</label>
                     <textarea class="email-form-control" 
                               id="custom_closing_message" 
                               name="custom_closing_message" 
@@ -381,12 +381,12 @@
                               oninput="updatePreview()"
                               aria-describedby="custom_closing_help">{{ email_config.custom_closing_message if email_config else '' }}</textarea>
                     <div class="email-help-text" id="custom_closing_help">
-                        Message before the signature
+                        Message avant la signature
                     </div>
                 </div>
                 
                 <div class="email-form-group">
-                    <label class="email-form-label" for="custom_footer_note">Footer Disclaimer</label>
+                    <label class="email-form-label" for="custom_footer_note">Avertissement en bas de page</label>
                     <textarea class="email-form-control" 
                               id="custom_footer_note" 
                               name="custom_footer_note" 
@@ -395,7 +395,7 @@
                               oninput="updatePreview()"
                               aria-describedby="custom_footer_help">{{ email_config.custom_footer_note if email_config else '' }}</textarea>
                     <div class="email-help-text" id="custom_footer_help">
-                        Small print at the bottom of the email
+                        Texte en bas de l'e-mail
                     </div>
                 </div>
                 
@@ -405,7 +405,7 @@
                             class="email-btn-test" 
                             id="previewEmailBtn"
                             onclick="showPreview()"
-                            aria-label="Preview email">
+                            aria-label="Aperçu de l'e-mail">
                         <i class="fas fa-eye" aria-hidden="true"></i>
                         Preview Email
                     </button>
@@ -422,7 +422,7 @@
                         <button type="button" 
                                 onclick="document.getElementById('emailPreviewContainer').style.display='none'" 
                                 style="background: none; border: none; font-size: 20px; cursor: pointer; color: #666;"
-                                aria-label="Close preview">
+                                aria-label="Fermer l'aperçu">
                             ×
                         </button>
                     </div>
@@ -444,7 +444,7 @@
                     <button type="button" 
                             class="email-btn-test" 
                             id="testConnectionBtn"
-                            aria-label="Test SMTP connection">
+                            aria-label="Tester la connexion SMTP">
                         <i class="fas fa-plug" aria-hidden="true"></i>
                         Test Connection
                     </button>
@@ -452,7 +452,7 @@
                             class="email-btn-test" 
                             id="sendTestEmailBtn" 
                             style="display: none;"
-                            aria-label="Send test email">
+                            aria-label="Envoyer un e-mail de test">
                         <i class="fas fa-paper-plane" aria-hidden="true"></i>
                         Send Test Email
                     </button>
@@ -460,7 +460,7 @@
                 <div class="email-actions-right">
                     <button type="submit" 
                             class="email-btn-save"
-                            aria-label="Save email configuration">
+                            aria-label="Enregistrer la configuration de l'e-mail">
                         <i class="fas fa-save" aria-hidden="true"></i>
                         Save Configuration
                     </button>
@@ -479,17 +479,17 @@
                  style="display: none;">
                 <div class="email-input-group">
                     <div class="email-form-group">
-                        <label class="email-form-label" for="test_email">Test Email Address</label>
+                        <label class="email-form-label" for="test_email">Adresse e-mail de test</label>
                         <input type="email" 
                                class="email-form-control" 
                                id="test_email" 
                                placeholder="test@example.com"
-                               aria-label="Enter test email address">
+                               aria-label="Saisir l'adresse e-mail de test">
                     </div>
                     <button type="button" 
                             class="email-btn-test" 
                             id="sendTestBtn"
-                            aria-label="Send test email">
+                            aria-label="Envoyer un e-mail de test">
                         <i class="fas fa-paper-plane" aria-hidden="true"></i>
                         Send
                     </button>
@@ -509,10 +509,10 @@ function toggleProviderFields() {
     const smtpServerInput = document.getElementById('smtp_server');
     const awsSesServerInfo = document.getElementById('aws_ses_server_info');
     const sesServerDisplay = document.getElementById('ses_server_display');
-    const smtpUsernameHelp = document.getElementById('smtp_username_help');
-    const smtpPasswordHelp = document.getElementById('smtp_password_help');
-    const smtpUsernameLabel = document.getElementById('smtp_username_label');
-    const smtpPasswordLabel = document.getElementById('smtp_password_label');
+    const smtpNom d'utilisateurHelp = document.getElementById('smtp_username_help');
+    const smtpMot de passeHelp = document.getElementById('smtp_password_help');
+    const smtpNom d'utilisateurLabel = document.getElementById('smtp_username_label');
+    const smtpMot de passeLabel = document.getElementById('smtp_password_label');
     
     if (provider === 'aws_ses') {
         // Show AWS SES fields
@@ -527,10 +527,10 @@ function toggleProviderFields() {
         awsSesServerInfo.style.display = 'block';
         
         // Update help text for AWS SES
-        smtpUsernameLabel.textContent = 'AWS SES SMTP Username';
-        smtpPasswordLabel.textContent = 'AWS SES SMTP Password';
-        smtpUsernameHelp.textContent = 'SMTP username from AWS SES Console > SMTP Settings';
-        smtpPasswordHelp.textContent = 'SMTP password from AWS SES Console (not your AWS password)';
+        smtpNom d'utilisateurLabel.textContent = 'AWS SES SMTP Nom d'utilisateur';
+        smtpMot de passeLabel.textContent = 'AWS SES SMTP Mot de passe';
+        smtpNom d'utilisateurHelp.textContent = 'SMTP username from AWS SES Console > SMTP Settings';
+        smtpMot de passeHelp.textContent = 'SMTP password from AWS SES Console (not your AWS password)';
         
         // Update SES server display based on region
         const region = awsRegionSelect.value;
@@ -550,10 +550,10 @@ function toggleProviderFields() {
         awsSesServerInfo.style.display = 'none';
         
         // Reset help text for standard SMTP
-        smtpUsernameLabel.textContent = 'Username';
-        smtpPasswordLabel.textContent = 'Password';
-        smtpUsernameHelp.textContent = 'Usually your email address';
-        smtpPasswordHelp.textContent = 'Your email password or app-specific password';
+        smtpNom d'utilisateurLabel.textContent = 'Nom d'utilisateur';
+        smtpMot de passeLabel.textContent = 'Mot de passe';
+        smtpNom d'utilisateurHelp.textContent = 'Généralement votre adresse e-mail';
+        smtpMot de passeHelp.textContent = 'Votre mot de passe e-mail ou un mot de passe d'application spécifique';
     }
 }
 
@@ -693,7 +693,7 @@ document.addEventListener('DOMContentLoaded', function() {
         testEmailForm.style.display = testEmailForm.style.display === 'none' ? 'block' : 'none';
     });
 
-    // Send test email
+    // Envoyer un e-mail de test
     sendTestBtn.addEventListener('click', function() {
         const testEmail = document.getElementById('test_email').value;
         

@@ -25,1423 +25,1660 @@
       "id": "email_config_9",
       "file": "templates/business_auth/email_config.html",
       "element": "option",
-      "text": "États-Unis Est (Ohio)"
+      "text": "États-Unis Est (Ohio)",
+      "original_text": "US East (Ohio)"
     },
     {
       "id": "email_config_10",
       "file": "templates/business_auth/email_config.html",
       "element": "option",
-      "text": "États-Unis Ouest (N. Californie)"
+      "text": "États-Unis Ouest (N. Californie)",
+      "original_text": "US West (N. California)"
     },
     {
       "id": "email_config_11",
       "file": "templates/business_auth/email_config.html",
       "element": "option",
-      "text": "États-Unis Ouest (Oregon)"
+      "text": "États-Unis Ouest (Oregon)",
+      "original_text": "US West (Oregon)"
     },
     {
       "id": "email_config_12",
       "file": "templates/business_auth/email_config.html",
       "element": "option",
-      "text": "Canada (Centre)"
+      "text": "Canada (Centre)",
+      "original_text": "Canada (Central)"
     },
     {
       "id": "email_config_13",
       "file": "templates/business_auth/email_config.html",
       "element": "option",
-      "text": "Europe (Irlande)"
+      "text": "Europe (Irlande)",
+      "original_text": "Europe (Ireland)"
     },
     {
       "id": "email_config_14",
       "file": "templates/business_auth/email_config.html",
       "element": "option",
-      "text": "Europe (Londres)"
+      "text": "Europe (Londres)",
+      "original_text": "Europe (London)"
     },
     {
       "id": "email_config_15",
       "file": "templates/business_auth/email_config.html",
       "element": "option",
-      "text": "Europe (Paris)"
+      "text": "Europe (Paris)",
+      "original_text": "Europe (Paris)"
     },
     {
       "id": "email_config_16",
       "file": "templates/business_auth/email_config.html",
       "element": "option",
-      "text": "Europe (Francfort)"
+      "text": "Europe (Francfort)",
+      "original_text": "Europe (Frankfurt)"
     },
     {
       "id": "email_config_17",
       "file": "templates/business_auth/email_config.html",
       "element": "option",
-      "text": "Asie-Pacifique (Mumbai)"
+      "text": "Asie-Pacifique (Mumbai)",
+      "original_text": "Asia Pacific (Mumbai)"
     },
     {
       "id": "email_config_18",
       "file": "templates/business_auth/email_config.html",
       "element": "option",
-      "text": "Asie-Pacifique (Tokyo)"
+      "text": "Asie-Pacifique (Tokyo)",
+      "original_text": "Asia Pacific (Tokyo)"
     },
     {
       "id": "email_config_19",
       "file": "templates/business_auth/email_config.html",
       "element": "option",
-      "text": "Asie-Pacifique (Séoul)"
+      "text": "Asie-Pacifique (Séoul)",
+      "original_text": "Asia Pacific (Seoul)"
     },
     {
       "id": "email_config_20",
       "file": "templates/business_auth/email_config.html",
       "element": "option",
-      "text": "Asie-Pacifique (Singapour)"
+      "text": "Asie-Pacifique (Singapour)",
+      "original_text": "Asia Pacific (Singapore)"
     },
     {
       "id": "email_config_21",
       "file": "templates/business_auth/email_config.html",
       "element": "option",
-      "text": "Asie-Pacifique (Sydney)"
+      "text": "Asie-Pacifique (Sydney)",
+      "original_text": "Asia Pacific (Sydney)"
     },
     {
       "id": "email_config_22",
       "file": "templates/business_auth/email_config.html",
       "element": "option",
-      "text": "Amérique du Sud (São Paulo)"
+      "text": "Amérique du Sud (São Paulo)",
+      "original_text": "South America (São Paulo)"
     },
     {
       "id": "email_config_23",
       "file": "templates/business_auth/email_config.html",
       "element": "div",
-      "text": "Sélectionnez la région AWS où vous avez configuré SES"
+      "text": "Sélectionnez la région AWS où vous avez configuré SES",
+      "original_text": "Select the AWS region where you configured SES"
     },
     {
       "id": "email_config_24",
       "file": "templates/business_auth/email_config.html",
       "element": "label",
-      "text": "Serveur SMTP *"
+      "text": "Serveur SMTP *",
+      "original_text": "SMTP Server *"
     },
     {
       "id": "email_config_25",
       "file": "templates/business_auth/email_config.html",
       "element": "div",
-      "text": "Adresse du serveur SMTP de votre fournisseur de messagerie"
+      "text": "Adresse du serveur SMTP de votre fournisseur de messagerie",
+      "original_text": "Your email provider's SMTP server address"
     },
     {
       "id": "email_config_26",
       "file": "templates/business_auth/email_config.html",
       "element": "label",
-      "text": "Serveur SMTP"
+      "text": "Serveur SMTP",
+      "original_text": "SMTP Server"
     },
     {
       "id": "email_config_27",
       "file": "templates/business_auth/email_config.html",
       "element": "span",
-      "text": "Généré automatiquement à partir de la région"
+      "text": "Généré automatiquement à partir de la région",
+      "original_text": "Auto-generated from region"
     },
     {
       "id": "email_config_28",
       "file": "templates/business_auth/email_config.html",
       "element": "div",
-      "text": "Le serveur SMTP AWS SES est automatiquement défini en fonction de votre région"
+      "text": "Le serveur SMTP AWS SES est automatiquement défini en fonction de votre région",
+      "original_text": "AWS SES SMTP server is automatically set based on your region"
     },
     {
       "id": "email_config_29",
       "file": "templates/business_auth/email_config.html",
       "element": "label",
-      "text": "Port *"
+      "text": "Port *",
+      "original_text": "Port *"
     },
     {
       "id": "email_config_30",
       "file": "templates/business_auth/email_config.html",
       "element": "div",
-      "text": "Généralement 587 (TLS) ou 465 (SSL)"
+      "text": "Généralement 587 (TLS) ou 465 (SSL)",
+      "original_text": "Usually 587 (TLS) or 465 (SSL)"
     },
     {
       "id": "email_config_31",
       "file": "templates/business_auth/email_config.html",
       "element": "span",
-      "text": "Nom d'utilisateur"
+      "text": "Nom d'utilisateur",
+      "original_text": "Username"
     },
     {
       "id": "email_config_32",
       "file": "templates/business_auth/email_config.html",
       "element": "div",
-      "text": "Généralement votre adresse e-mail"
+      "text": "Généralement votre adresse e-mail",
+      "original_text": "Usually your email address"
     },
     {
       "id": "email_config_33",
       "file": "templates/business_auth/email_config.html",
       "element": "span",
-      "text": "Mot de passe"
+      "text": "Mot de passe",
+      "original_text": "Password"
     },
     {
       "id": "email_config_34",
       "file": "templates/business_auth/email_config.html",
       "element": "div",
-      "text": "Votre mot de passe e-mail ou un mot de passe d'application spécifique"
+      "text": "Votre mot de passe e-mail ou un mot de passe d'application spécifique",
+      "original_text": "Your email password or app-specific password"
     },
     {
       "id": "email_config_35",
       "file": "templates/business_auth/email_config.html",
       "element": "label",
-      "text": "Utiliser TLS (recommandé pour le port 587)"
+      "text": "Utiliser TLS (recommandé pour le port 587)",
+      "original_text": "Use TLS (recommended for port 587)"
     },
     {
       "id": "email_config_36",
       "file": "templates/business_auth/email_config.html",
       "element": "label",
-      "text": "Utiliser SSL (pour le port 465)"
+      "text": "Utiliser SSL (pour le port 465)",
+      "original_text": "Use SSL (for port 465)"
     },
     {
       "id": "email_config_37",
       "file": "templates/business_auth/email_config.html",
       "element": "label",
-      "text": "Nom de l'expéditeur *"
+      "text": "Nom de l'expéditeur *",
+      "original_text": "Sender Name *"
     },
     {
       "id": "email_config_38",
       "file": "templates/business_auth/email_config.html",
       "element": "div",
-      "text": "Nom affiché dans le champ « De »"
+      "text": "Nom affiché dans le champ « De »",
+      "original_text": "Name that appears in the \"From\" field"
     },
     {
       "id": "email_config_39",
       "file": "templates/business_auth/email_config.html",
       "element": "label",
-      "text": "Adresse e-mail de l'expéditeur *"
+      "text": "Adresse e-mail de l'expéditeur *",
+      "original_text": "Sender Email *"
     },
     {
       "id": "email_config_40",
       "file": "templates/business_auth/email_config.html",
       "element": "div",
-      "text": "Adresse e-mail affichée dans le champ « De »"
+      "text": "Adresse e-mail affichée dans le champ « De »",
+      "original_text": "Email address that appears in the \"From\" field"
     },
     {
       "id": "email_config_41",
       "file": "templates/business_auth/email_config.html",
       "element": "label",
-      "text": "Adresse e-mail de réponse (optionnelle)"
+      "text": "Adresse e-mail de réponse (optionnelle)",
+      "original_text": "Reply-To Email (optional)"
     },
     {
       "id": "email_config_42",
       "file": "templates/business_auth/email_config.html",
       "element": "div",
-      "text": "Adresse à laquelle les réponses doivent être envoyées (si différente de l'expéditeur)"
+      "text": "Adresse à laquelle les réponses doivent être envoyées (si différente de l'expéditeur)",
+      "original_text": "Where replies should be sent (if different from sender)"
     },
     {
       "id": "email_config_43",
       "file": "templates/business_auth/email_config.html",
       "element": "label",
-      "text": "Adresses e-mail administrateur"
+      "text": "Adresses e-mail administrateur",
+      "original_text": "Admin Email Addresses"
     },
     {
       "id": "email_config_44",
       "file": "templates/business_auth/email_config.html",
       "element": "div",
-      "text": "Liste d'adresses e-mail séparées par des virgules pour les notifications administrateur"
+      "text": "Liste d'adresses e-mail séparées par des virgules pour les notifications administrateur",
+      "original_text": "Comma-separated list of email addresses for admin notifications"
     },
     {
       "id": "email_config_45",
       "file": "templates/business_auth/email_config.html",
       "element": "div",
-      "text": "Personnalisez le contenu de l'e-mail d'invitation. Si décoché, les modèles professionnels par défaut seront utilisés."
+      "text": "Personnalisez le contenu de l'e-mail d'invitation. Si décoché, les modèles professionnels par défaut seront utilisés.",
+      "original_text": "Customize the invitation email content. If unchecked, default professional templates will be used."
     },
     {
       "id": "email_config_46",
       "file": "templates/business_auth/email_config.html",
       "element": "label",
-      "text": "Objet de l'e-mail"
+      "text": "Objet de l'e-mail",
+      "original_text": "Email Subject"
     },
     {
       "id": "email_config_47",
       "file": "templates/business_auth/email_config.html",
       "element": "span",
-      "text": "(200 caractères maximum)"
+      "text": "(200 caractères maximum)",
+      "original_text": "(Max 200 characters)"
     },
     {
       "id": "email_config_48",
       "file": "templates/business_auth/email_config.html",
       "element": "div",
-      "text": "Variables :"
+      "text": "Variables :",
+      "original_text": "Variables:"
     },
     {
       "id": "email_config_49",
       "file": "templates/business_auth/email_config.html",
       "element": "label",
-      "text": "Message d'introduction"
+      "text": "Message d'introduction",
+      "original_text": "Introduction Message"
     },
     {
       "id": "email_config_50",
       "file": "templates/business_auth/email_config.html",
       "element": "div",
-      "text": "Le message d'ouverture dans le corps de l'e-mail"
+      "text": "Le message d'ouverture dans le corps de l'e-mail",
+      "original_text": "The opening message in the email body"
     },
     {
       "id": "email_config_51",
       "file": "templates/business_auth/email_config.html",
       "element": "label",
-      "text": "Texte du bouton"
+      "text": "Texte du bouton",
+      "original_text": "Button Text"
     },
     {
       "id": "email_config_52",
       "file": "templates/business_auth/email_config.html",
       "element": "span",
-      "text": "(50 caractères maximum)"
+      "text": "(50 caractères maximum)",
+      "original_text": "(Max 50 characters)"
     },
     {
       "id": "email_config_53",
       "file": "templates/business_auth/email_config.html",
       "element": "div",
-      "text": "Texte affiché sur le bouton du sondage"
+      "text": "Texte affiché sur le bouton du sondage",
+      "original_text": "Text displayed on the survey button"
     },
     {
       "id": "email_config_54",
       "file": "templates/business_auth/email_config.html",
       "element": "label",
-      "text": "Message de clôture"
+      "text": "Message de clôture",
+      "original_text": "Closing Message"
     },
     {
       "id": "email_config_55",
       "file": "templates/business_auth/email_config.html",
       "element": "div",
-      "text": "Message avant la signature"
+      "text": "Message avant la signature",
+      "original_text": "Message before the signature"
     },
     {
       "id": "email_config_56",
       "file": "templates/business_auth/email_config.html",
       "element": "label",
-      "text": "Avertissement en bas de page"
+      "text": "Avertissement en bas de page",
+      "original_text": "Footer Disclaimer"
     },
     {
       "id": "email_config_57",
       "file": "templates/business_auth/email_config.html",
       "element": "div",
-      "text": "Texte en bas de l'e-mail"
+      "text": "Texte en bas de l'e-mail",
+      "original_text": "Small print at the bottom of the email"
     },
     {
       "id": "email_config_58",
       "file": "templates/business_auth/email_config.html",
       "element": "label",
-      "text": "Adresse e-mail de test"
+      "text": "Adresse e-mail de test",
+      "original_text": "Test Email Address"
     },
     {
       "id": "email_config_placeholder_59",
       "file": "templates/business_auth/email_config.html",
       "element": "input[placeholder]",
-      "text": "smtp.gmail.com"
+      "text": "smtp.gmail.com",
+      "original_text": "smtp.gmail.com"
     },
     {
       "id": "email_config_placeholder_60",
       "file": "templates/business_auth/email_config.html",
       "element": "input[placeholder]",
-      "text": "your-email@domain.com"
+      "text": "your-email@domain.com",
+      "original_text": "your-email@domain.com"
     },
     {
       "id": "email_config_placeholder_61",
       "file": "templates/business_auth/email_config.html",
       "element": "input[placeholder]",
-      "text": "Enter SMTP password"
+      "text": "Enter SMTP password",
+      "original_text": "Enter SMTP password"
     },
     {
       "id": "email_config_placeholder_62",
       "file": "templates/business_auth/email_config.html",
       "element": "input[placeholder]",
-      "text": "Your Company Name"
+      "text": "Your Company Name",
+      "original_text": "Your Company Name"
     },
     {
       "id": "email_config_placeholder_63",
       "file": "templates/business_auth/email_config.html",
       "element": "input[placeholder]",
-      "text": "noreply@yourcompany.com"
+      "text": "noreply@yourcompany.com",
+      "original_text": "noreply@yourcompany.com"
     },
     {
       "id": "email_config_placeholder_64",
       "file": "templates/business_auth/email_config.html",
       "element": "input[placeholder]",
-      "text": "support@yourcompany.com"
+      "text": "support@yourcompany.com",
+      "original_text": "support@yourcompany.com"
     },
     {
       "id": "email_config_placeholder_65",
       "file": "templates/business_auth/email_config.html",
       "element": "input[placeholder]",
-      "text": "admin@yourcompany.com, manager@yourcompany.com"
+      "text": "admin@yourcompany.com, manager@yourcompany.com",
+      "original_text": "admin@yourcompany.com, manager@yourcompany.com"
     },
     {
       "id": "email_config_placeholder_66",
       "file": "templates/business_auth/email_config.html",
       "element": "input[placeholder]",
-      "text": "Your feedback is requested: {campaign_name}"
+      "text": "Your feedback is requested: {campaign_name}",
+      "original_text": "Your feedback is requested: {campaign_name}"
     },
     {
       "id": "email_config_placeholder_67",
       "file": "templates/business_auth/email_config.html",
       "element": "textarea[placeholder]",
-      "text": "{business_account_name} is requesting your valuable feedback through our Voice of Client system."
+      "text": "{business_account_name} is requesting your valuable feedback through our Voice of Client system.",
+      "original_text": "{business_account_name} is requesting your valuable feedback through our Voice of Client system."
     },
     {
       "id": "email_config_placeholder_68",
       "file": "templates/business_auth/email_config.html",
       "element": "input[placeholder]",
-      "text": "Complete Your Survey"
+      "text": "Complete Your Survey",
+      "original_text": "Complete Your Survey"
     },
     {
       "id": "email_config_placeholder_69",
       "file": "templates/business_auth/email_config.html",
       "element": "textarea[placeholder]",
-      "text": "Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.\n\nThank you for your time and valuable insights!"
+      "text": "Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.\n\nThank you for your time and valuable insights!",
+      "original_text": "Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.\n\nThank you for your time and valuable insights!"
     },
     {
       "id": "email_config_placeholder_70",
       "file": "templates/business_auth/email_config.html",
       "element": "textarea[placeholder]",
-      "text": "This is an automated message. If you have any questions, please contact the organization that sent this survey."
+      "text": "This is an automated message. If you have any questions, please contact the organization that sent this survey.",
+      "original_text": "This is an automated message. If you have any questions, please contact the organization that sent this survey."
     },
     {
       "id": "email_config_placeholder_71",
       "file": "templates/business_auth/email_config.html",
       "element": "input[placeholder]",
-      "text": "test@example.com"
+      "text": "test@example.com",
+      "original_text": "test@example.com"
     },
     {
       "id": "email_config_aria_72",
       "file": "templates/business_auth/email_config.html",
       "element": "button[aria-label]",
-      "text": "Aperçu de l'e-mail"
+      "text": "Aperçu de l'e-mail",
+      "original_text": "Preview email"
     },
     {
       "id": "email_config_aria_73",
       "file": "templates/business_auth/email_config.html",
       "element": "button[aria-label]",
-      "text": "Fermer l'aperçu"
+      "text": "Fermer l'aperçu",
+      "original_text": "Close preview"
     },
     {
       "id": "email_config_aria_74",
       "file": "templates/business_auth/email_config.html",
       "element": "button[aria-label]",
-      "text": "Tester la connexion SMTP"
+      "text": "Tester la connexion SMTP",
+      "original_text": "Test SMTP connection"
     },
     {
       "id": "email_config_aria_75",
       "file": "templates/business_auth/email_config.html",
       "element": "button[aria-label]",
-      "text": "Envoyer un e-mail de test"
+      "text": "Envoyer un e-mail de test",
+      "original_text": "Send test email"
     },
     {
       "id": "email_config_aria_76",
       "file": "templates/business_auth/email_config.html",
       "element": "button[aria-label]",
-      "text": "Enregistrer la configuration de l'e-mail"
+      "text": "Enregistrer la configuration de l'e-mail",
+      "original_text": "Save email configuration"
     },
     {
       "id": "email_config_aria_77",
       "file": "templates/business_auth/email_config.html",
       "element": "input[aria-label]",
-      "text": "Saisir l'adresse e-mail de test"
+      "text": "Saisir l'adresse e-mail de test",
+      "original_text": "Enter test email address"
     },
     {
       "id": "email_config_aria_78",
       "file": "templates/business_auth/email_config.html",
       "element": "button[aria-label]",
-      "text": "Envoyer un e-mail de test"
+      "text": "Envoyer un e-mail de test",
+      "original_text": "Send test email"
     },
     {
       "id": "survey_config_1",
       "file": "templates/business_auth/survey_config.html",
       "element": "p",
-      "text": "Configurez votre expérience d'enquête personnalisée pour {{ business_account.name }}"
+      "text": "Configurez votre expérience d'enquête personnalisée pour {{ business_account.name }}",
+      "original_text": "Configure your personalized survey experience for {{ business_account.name }}"
     },
     {
       "id": "survey_config_2",
       "file": "templates/business_auth/survey_config.html",
       "element": "p",
-      "text": "Parlez-nous de votre entreprise pour personnaliser la conversation de l'enquête"
+      "text": "Parlez-nous de votre entreprise pour personnaliser la conversation de l'enquête",
+      "original_text": "Tell us about your business to personalize the survey conversation"
     },
     {
       "id": "survey_config_3",
       "file": "templates/business_auth/survey_config.html",
       "element": "label",
-      "text": "Secteur d'activité"
+      "text": "Secteur d'activité",
+      "original_text": "Industry"
     },
     {
       "id": "survey_config_4",
       "file": "templates/business_auth/survey_config.html",
       "element": "option",
-      "text": "Sélectionnez votre secteur d'activité"
+      "text": "Sélectionnez votre secteur d'activité",
+      "original_text": "Select your industry"
     },
     {
       "id": "survey_config_5",
       "file": "templates/business_auth/survey_config.html",
       "element": "div",
-      "text": "Cela aide à adapter les questions de l'enquête à votre contexte sectoriel"
+      "text": "Cela aide à adapter les questions de l'enquête à votre contexte sectoriel",
+      "original_text": "This helps tailor survey questions to your industry context"
     },
     {
       "id": "survey_config_6",
       "file": "templates/business_auth/survey_config.html",
       "element": "label",
-      "text": "Tonalité de la conversation"
+      "text": "Tonalité de la conversation",
+      "original_text": "Conversation Tone"
     },
     {
       "id": "survey_config_7",
       "file": "templates/business_auth/survey_config.html",
       "element": "div",
-      "text": "Choisissez comment l'IA doit communiquer avec vos participants à l'enquête"
+      "text": "Choisissez comment l'IA doit communiquer avec vos participants à l'enquête",
+      "original_text": "Choose how the AI should communicate with your survey participants"
     },
     {
       "id": "survey_config_8",
       "file": "templates/business_auth/survey_config.html",
       "element": "label",
-      "text": "Description de l'entreprise"
+      "text": "Description de l'entreprise",
+      "original_text": "Company Description"
     },
     {
       "id": "survey_config_9",
       "file": "templates/business_auth/survey_config.html",
       "element": "div",
-      "text": "Ce contexte aide l'IA à comprendre votre entreprise et à poser des questions pertinentes"
+      "text": "Ce contexte aide l'IA à comprendre votre entreprise et à poser des questions pertinentes",
+      "original_text": "This context helps the AI understand your business and ask relevant questions"
     },
     {
       "id": "survey_config_10",
       "file": "templates/business_auth/survey_config.html",
       "element": "label",
-      "text": "Description du produit/service"
+      "text": "Description du produit/service",
+      "original_text": "Product/Service Description"
     },
     {
       "id": "survey_config_11",
       "file": "templates/business_auth/survey_config.html",
       "element": "div",
-      "text": "Les détails spécifiques des produits permettent une collecte de retours plus ciblée"
+      "text": "Les détails spécifiques des produits permettent une collecte de retours plus ciblée",
+      "original_text": "Specific product details enable more targeted feedback collection"
     },
     {
       "id": "survey_config_12",
       "file": "templates/business_auth/survey_config.html",
       "element": "label",
-      "text": "Clients cibles"
+      "text": "Clients cibles",
+      "original_text": "Target Customers"
     },
     {
       "id": "survey_config_13",
       "file": "templates/business_auth/survey_config.html",
       "element": "div",
-      "text": "Comprendre votre audience aide à formuler les questions de manière appropriée"
+      "text": "Comprendre votre audience aide à formuler les questions de manière appropriée",
+      "original_text": "Understanding your audience helps frame questions appropriately"
     },
     {
       "id": "survey_config_14",
       "file": "templates/business_auth/survey_config.html",
       "element": "p",
-      "text": "Que souhaitez-vous apprendre de vos participants à l'enquête ?"
+      "text": "Que souhaitez-vous apprendre de vos participants à l'enquête ?",
+      "original_text": "What do you want to learn from your survey participants?"
     },
     {
       "id": "survey_config_15",
       "file": "templates/business_auth/survey_config.html",
       "element": "label",
-      "text": "Objectifs principaux de l'enquête (sélectionnez tout ce qui s'applique)"
+      "text": "Objectifs principaux de l'enquête (sélectionnez tout ce qui s'applique)",
+      "original_text": "Primary Survey Goals (select all that apply)"
     },
     {
       "id": "survey_config_16",
       "file": "templates/business_auth/survey_config.html",
       "element": "label",
-      "text": "Net Promoter Score"
+      "text": "Net Promoter Score",
+      "original_text": "Net Promoter Score"
     },
     {
       "id": "survey_config_17",
       "file": "templates/business_auth/survey_config.html",
       "element": "label",
-      "text": "Satisfaction globale"
+      "text": "Satisfaction globale",
+      "original_text": "Overall Satisfaction"
     },
     {
       "id": "survey_config_18",
       "file": "templates/business_auth/survey_config.html",
       "element": "label",
-      "text": "Retour sur le produit"
+      "text": "Retour sur le produit",
+      "original_text": "Product Feedback"
     },
     {
       "id": "survey_config_19",
       "file": "templates/business_auth/survey_config.html",
       "element": "label",
-      "text": "Qualité du support"
+      "text": "Qualité du support",
+      "original_text": "Support Quality"
     },
     {
       "id": "survey_config_20",
       "file": "templates/business_auth/survey_config.html",
       "element": "label",
-      "text": "Perception de la tarification"
+      "text": "Perception de la tarification",
+      "original_text": "Pricing Perception"
     },
     {
       "id": "survey_config_21",
       "file": "templates/business_auth/survey_config.html",
       "element": "label",
-      "text": "Recherche personnalisée"
+      "text": "Recherche personnalisée",
+      "original_text": "Custom Research"
     },
     {
       "id": "survey_config_22",
       "file": "templates/business_auth/survey_config.html",
       "element": "p",
-      "text": "Ajustez l'expérience de l'enquête et le rythme de la conversation"
+      "text": "Ajustez l'expérience de l'enquête et le rythme de la conversation",
+      "original_text": "Fine-tune the survey experience and conversation pacing"
     },
     {
       "id": "survey_config_23",
       "file": "templates/business_auth/survey_config.html",
       "element": "label",
-      "text": "Nombre maximum de questions"
+      "text": "Nombre maximum de questions",
+      "original_text": "Maximum Questions"
     },
     {
       "id": "survey_config_24",
       "file": "templates/business_auth/survey_config.html",
       "element": "span",
-      "text": "15"
+      "text": "15",
+      "original_text": "15"
     },
     {
       "id": "survey_config_25",
       "file": "templates/business_auth/survey_config.html",
       "element": "div",
-      "text": "Limite absolue pour garder les enquêtes concises et engageantes"
+      "text": "Limite absolue pour garder les enquêtes concises et engageantes",
+      "original_text": "Absolute limit to keep surveys concise and engaging"
     },
     {
       "id": "survey_config_26",
       "file": "templates/business_auth/survey_config.html",
       "element": "label",
-      "text": "Limite de temps (secondes)"
+      "text": "Limite de temps (secondes)",
+      "original_text": "Time Limit (seconds)"
     },
     {
       "id": "survey_config_27",
       "file": "templates/business_auth/survey_config.html",
       "element": "span",
-      "text": "1min"
+      "text": "1min",
+      "original_text": "1min"
     },
     {
       "id": "survey_config_28",
       "file": "templates/business_auth/survey_config.html",
       "element": "span",
-      "text": "5min"
+      "text": "5min",
+      "original_text": "5min"
     },
     {
       "id": "survey_config_29",
       "file": "templates/business_auth/survey_config.html",
       "element": "div",
-      "text": "Durée maximale que les participants peuvent consacrer à l'enquête"
+      "text": "Durée maximale que les participants peuvent consacrer à l'enquête",
+      "original_text": "Maximum time participants can spend on the survey"
     },
     {
       "id": "survey_config_30",
       "file": "templates/business_auth/survey_config.html",
       "element": "label",
-      "text": "Relances par sujet"
+      "text": "Relances par sujet",
+      "original_text": "Follow-ups per Topic"
     },
     {
       "id": "survey_config_31",
       "file": "templates/business_auth/survey_config.html",
       "element": "div",
-      "text": "Profondeur d'exploration de chaque sujet avec des questions de relance"
+      "text": "Profondeur d'exploration de chaque sujet avec des questions de relance",
+      "original_text": "How deep to explore each topic with follow-up questions"
     },
     {
       "id": "survey_config_32",
       "file": "templates/business_auth/survey_config.html",
       "element": "p",
-      "text": "Contrôlez les sujets que l'enquête couvre en premier et ceux qui sont facultatifs si le temps est écoulé"
+      "text": "Contrôlez les sujets que l'enquête couvre en premier et ceux qui sont facultatifs si le temps est écoulé",
+      "original_text": "Control which topics the survey covers first and which are optional if time runs out"
     },
     {
       "id": "survey_config_33",
       "file": "templates/business_auth/survey_config.html",
       "element": "label",
-      "text": "Sujets prioritaires (couverts en premier)"
+      "text": "Sujets prioritaires (couverts en premier)",
+      "original_text": "Prioritized Topics (covered first)"
     },
     {
       "id": "survey_config_34",
       "file": "templates/business_auth/survey_config.html",
       "element": "div",
-      "text": "Ces sujets seront toujours abordés, selon leur importance"
+      "text": "Ces sujets seront toujours abordés, selon leur importance",
+      "original_text": "These topics will always be covered, in order of importance"
     },
     {
       "id": "survey_config_35",
       "file": "templates/business_auth/survey_config.html",
       "element": "label",
-      "text": "Sujets optionnels (si le temps le permet)"
+      "text": "Sujets optionnels (si le temps le permet)",
+      "original_text": "Optional Topics (if time allows)"
     },
     {
       "id": "survey_config_36",
       "file": "templates/business_auth/survey_config.html",
       "element": "div",
-      "text": "Ces sujets peuvent être ignorés si la limite de temps ou de questions est atteinte"
+      "text": "Ces sujets peuvent être ignorés si la limite de temps ou de questions est atteinte",
+      "original_text": "These topics can be skipped if the time/question limit is reached"
     },
     {
       "id": "survey_config_37",
       "file": "templates/business_auth/survey_config.html",
       "element": "p",
-      "text": "Personnalisez l'expérience d'enquête avec des messages personnalisés"
+      "text": "Personnalisez l'expérience d'enquête avec des messages personnalisés",
+      "original_text": "Personalize the survey experience with custom messages"
     },
     {
       "id": "survey_config_38",
       "file": "templates/business_auth/survey_config.html",
       "element": "label",
-      "text": "Message de fin personnalisé"
+      "text": "Message de fin personnalisé",
+      "original_text": "Custom Completion Message"
     },
     {
       "id": "survey_config_39",
       "file": "templates/business_auth/survey_config.html",
       "element": "div",
-      "text": "Ce message sera affiché aux participants lorsqu'ils termineront l'enquête. Laissez vide pour utiliser le message par défaut"
+      "text": "Ce message sera affiché aux participants lorsqu'ils termineront l'enquête. Laissez vide pour utiliser le message par défaut",
+      "original_text": "This message will be shown to participants when they complete the survey. Leave blank to use the default message"
     },
     {
       "id": "survey_config_placeholder_40",
       "file": "templates/business_auth/survey_config.html",
       "element": "textarea[placeholder]",
-      "text": "Briefly describe what your company does and your mission..."
+      "text": "Briefly describe what your company does and your mission...",
+      "original_text": "Briefly describe what your company does and your mission..."
     },
     {
       "id": "survey_config_placeholder_41",
       "file": "templates/business_auth/survey_config.html",
       "element": "textarea[placeholder]",
-      "text": "Describe your main products or services in detail..."
+      "text": "Describe your main products or services in detail...",
+      "original_text": "Describe your main products or services in detail..."
     },
     {
       "id": "survey_config_placeholder_42",
       "file": "templates/business_auth/survey_config.html",
       "element": "textarea[placeholder]",
-      "text": "Describe your typical customers (e.g., small business owners, CFOs, healthcare providers...)"
+      "text": "Describe your typical customers (e.g., small business owners, CFOs, healthcare providers...)",
+      "original_text": "Describe your typical customers (e.g., small business owners, CFOs, healthcare providers...)"
     },
     {
       "id": "survey_config_placeholder_43",
       "file": "templates/business_auth/survey_config.html",
       "element": "textarea[placeholder]",
-      "text": "Thank you for your valuable feedback! We truly appreciate the time you've taken to help us improve..."
+      "text": "Thank you for your valuable feedback! We truly appreciate the time you've taken to help us improve...",
+      "original_text": "Thank you for your valuable feedback! We truly appreciate the time you've taken to help us improve..."
     },
     {
       "id": "survey_config_aria_44",
       "file": "templates/business_auth/survey_config.html",
       "element": "a[aria-label]",
-      "text": "Annuler et revenir aux paramètres"
+      "text": "Annuler et revenir aux paramètres",
+      "original_text": "Cancel and return to settings"
     },
     {
       "id": "survey_config_aria_45",
       "file": "templates/business_auth/survey_config.html",
       "element": "button[aria-label]",
-      "text": "Enregistrer la configuration de l'enquête"
+      "text": "Enregistrer la configuration de l'enquête",
+      "original_text": "Save survey configuration"
     },
     {
       "id": "admin_panel_v2_1",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "p",
-      "text": "Gérez votre compte, votre équipe, vos données et vos paramètres système"
+      "text": "Gérez votre compte, votre équipe, vos données et vos paramètres système",
+      "original_text": "Manage your account, team, data, and system settings"
     },
     {
       "id": "admin_panel_v2_2",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "span",
-      "text": "Tout développer"
+      "text": "Tout développer",
+      "original_text": "Expand All"
     },
     {
       "id": "admin_panel_v2_3",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "span",
-      "text": "Tout réduire"
+      "text": "Tout réduire",
+      "original_text": "Collapse All"
     },
     {
       "id": "admin_panel_v2_4",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "h2",
-      "text": "Paramètres du compte"
+      "text": "Paramètres du compte",
+      "original_text": "Account Settings"
     },
     {
       "id": "admin_panel_v2_5",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "h4",
-      "text": "Configuration de l'e-mail"
+      "text": "Configuration de l'e-mail",
+      "original_text": "Email Configuration"
     },
     {
       "id": "admin_panel_v2_6",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "p",
-      "text": "Configurez les paramètres SMTP pour l'envoi des invitations à l'enquête"
+      "text": "Configurez les paramètres SMTP pour l'envoi des invitations à l'enquête",
+      "original_text": "Configure SMTP settings for sending survey invitations"
     },
     {
       "id": "admin_panel_v2_7",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "h4",
-      "text": "Configuration de la marque"
+      "text": "Configuration de la marque",
+      "original_text": "Brand Configuration"
     },
     {
       "id": "admin_panel_v2_8",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "p",
-      "text": "Personnalisez les couleurs, le logo et l'identité visuelle de votre marque"
+      "text": "Personnalisez les couleurs, le logo et l'identité visuelle de votre marque",
+      "original_text": "Customize your brand colors, logo, and visual identity"
     },
     {
       "id": "admin_panel_v2_9",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "h4",
-      "text": "Paramètres par défaut de l'enquête"
+      "text": "Paramètres par défaut de l'enquête",
+      "original_text": "Survey Defaults"
     },
     {
       "id": "admin_panel_v2_10",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "p",
-      "text": "Définissez les paramètres de conversation IA par défaut pour les enquêtes"
+      "text": "Définissez les paramètres de conversation IA par défaut pour les enquêtes",
+      "original_text": "Set default AI conversation settings for surveys"
     },
     {
       "id": "admin_panel_v2_11",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "h2",
-      "text": "Gestion des utilisateurs"
+      "text": "Gestion des utilisateurs",
+      "original_text": "User Management"
     },
     {
       "id": "admin_panel_v2_12",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "h4",
-      "text": "Membres de l'équipe"
+      "text": "Membres de l'équipe",
+      "original_text": "Team Members"
     },
     {
       "id": "admin_panel_v2_13",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "p",
-      "text": "Ajoutez et gérez les membres de votre équipe pour votre compte entreprise"
+      "text": "Ajoutez et gérez les membres de votre équipe pour votre compte entreprise",
+      "original_text": "Add and manage team members for your business account"
     },
     {
       "id": "admin_panel_v2_14",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "div",
-      "text": "Utilisateurs actifs"
+      "text": "Utilisateurs actifs",
+      "original_text": "Users Active"
     },
     {
       "id": "admin_panel_v2_15",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "div",
-      "text": "Limite d'utilisateurs"
+      "text": "Limite d'utilisateurs",
+      "original_text": "User Limit"
     },
     {
       "id": "admin_panel_v2_16",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "p",
-      "text": "Autorisation requise"
+      "text": "Autorisation requise",
+      "original_text": "Permission Required"
     },
     {
       "id": "admin_panel_v2_17",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "h2",
-      "text": "Gestion des données"
+      "text": "Gestion des données",
+      "original_text": "Data Management"
     },
     {
       "id": "admin_panel_v2_18",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "h4",
-      "text": "Exporter les données"
+      "text": "Exporter les données",
+      "original_text": "Export Data"
     },
     {
       "id": "admin_panel_v2_19",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "p",
-      "text": "Exportez toutes les réponses aux enquêtes pour l'analyse et les rapports"
+      "text": "Exportez toutes les réponses aux enquêtes pour l'analyse et les rapports",
+      "original_text": "Export all survey responses for analysis and reporting"
     },
     {
       "id": "admin_panel_v2_20",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "h4",
-      "text": "Journaux d'audit"
+      "text": "Journaux d'audit",
+      "original_text": "Audit Logs"
     },
     {
       "id": "admin_panel_v2_21",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "p",
-      "text": "Consultez l'activité du système et l'historique des actions utilisateur"
+      "text": "Consultez l'activité du système et l'historique des actions utilisateur",
+      "original_text": "View system activity and user action history"
     },
     {
       "id": "admin_panel_v2_22",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "h4",
-      "text": "Santé de la base de données"
+      "text": "Santé de la base de données",
+      "original_text": "Database Health"
     },
     {
       "id": "admin_panel_v2_23",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "p",
-      "text": "Surveillez l'état de la connexion et les performances de la base de données"
+      "text": "Surveillez l'état de la connexion et les performances de la base de données",
+      "original_text": "Monitor database connection and performance status"
     },
     {
       "id": "admin_panel_v2_24",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "h2",
-      "text": "Paramètres du système"
+      "text": "Paramètres du système",
+      "original_text": "System Settings"
     },
     {
       "id": "admin_panel_v2_25",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "h4",
-      "text": "Informations sur la licence"
+      "text": "Informations sur la licence",
+      "original_text": "License Information"
     },
     {
       "id": "admin_panel_v2_26",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "div",
-      "text": "Campaigns"
+      "text": "Campaigns",
+      "original_text": "Campaigns"
     },
     {
       "id": "admin_panel_v2_27",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "div",
-      "text": "Users"
+      "text": "Users",
+      "original_text": "Users"
     },
     {
       "id": "admin_panel_v2_28",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "div",
-      "text": "Max Participants"
+      "text": "Max Participants",
+      "original_text": "Max Participants"
     },
     {
       "id": "admin_panel_v2_29",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "h4",
-      "text": "Indicateurs de performance"
+      "text": "Indicateurs de performance",
+      "original_text": "Performance Metrics"
     },
     {
       "id": "admin_panel_v2_30",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "p",
-      "text": "Surveillez les performances du système et l'état du cache"
+      "text": "Surveillez les performances du système et l'état du cache",
+      "original_text": "Monitor system performance and cache status"
     },
     {
       "id": "admin_panel_v2_31",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "h4",
-      "text": "Planificateur de campagnes"
+      "text": "Planificateur de campagnes",
+      "original_text": "Campaign Scheduler"
     },
     {
       "id": "admin_panel_v2_32",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "p",
-      "text": "Afficher et gérer le cycle de vie automatisé des campagnes"
+      "text": "Afficher et gérer le cycle de vie automatisé des campagnes",
+      "original_text": "View and manage automated campaign lifecycle"
     },
     {
       "id": "admin_panel_v2_33",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "h2",
-      "text": "Administration de la plateforme"
+      "text": "Administration de la plateforme",
+      "original_text": "Platform Administration"
     },
     {
       "id": "admin_panel_v2_34",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "h4",
-      "text": "Centre d'analytique d'entreprise"
+      "text": "Centre d'analytique d'entreprise",
+      "original_text": "Business Analytics Hub"
     },
     {
       "id": "admin_panel_v2_35",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "p",
-      "text": "Indicateurs globaux, utilisation des licences et intelligence d'affaires"
+      "text": "Indicateurs globaux, utilisation des licences et intelligence d'affaires",
+      "original_text": "Platform-wide metrics, license usage, and business intelligence"
     },
     {
       "id": "admin_panel_v2_36",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "h4",
-      "text": "Intégrer un compte entreprise"
+      "text": "Intégrer un compte entreprise",
+      "original_text": "Onboard Business Account"
     },
     {
       "id": "admin_panel_v2_37",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "p",
-      "text": "Créez et configurez de nouveaux comptes d'entreprise avec attribution de licence"
+      "text": "Créez et configurez de nouveaux comptes d'entreprise avec attribution de licence",
+      "original_text": "Create and configure new business accounts with license assignment"
     },
     {
       "id": "admin_panel_v2_38",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "h4",
-      "text": "Gestion des licences"
+      "text": "Gestion des licences",
+      "original_text": "License Management"
     },
     {
       "id": "admin_panel_v2_39",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "p",
-      "text": "Utilisation des licences inter-locataires, tendances et suivi de conformité"
+      "text": "Utilisation des licences inter-locataires, tendances et suivi de conformité",
+      "original_text": "Cross-tenant license usage, trends, and compliance monitoring"
     },
     {
       "id": "admin_panel_v2_40",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "h4",
-      "text": "Administrateurs de la plateforme"
+      "text": "Administrateurs de la plateforme",
+      "original_text": "Platform Admin Users"
     },
     {
       "id": "admin_panel_v2_41",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "p",
-      "text": "Gérez les comptes et autorisations des administrateurs inter-locataires"
+      "text": "Gérez les comptes et autorisations des administrateurs inter-locataires",
+      "original_text": "Manage cross-tenant administrator accounts and permissions"
     },
     {
       "id": "admin_panel_v2_aria_42",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "button[aria-label]",
-      "text": "Développer toutes les sections"
+      "text": "Développer toutes les sections",
+      "original_text": "Expand all sections"
     },
     {
       "id": "admin_panel_v2_aria_43",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "button[aria-label]",
-      "text": "Réduire toutes les sections"
+      "text": "Réduire toutes les sections",
+      "original_text": "Collapse all sections"
     },
     {
       "id": "admin_panel_v2_aria_44",
       "file": "templates/business_auth/admin_panel_v2.html",
       "element": "button[aria-label]",
-      "text": "Aide"
+      "text": "Aide",
+      "original_text": "Help"
     },
     {
       "id": "admin_licenses_1",
       "file": "templates/business_auth/admin_licenses.html",
       "element": "p",
-      "text": "Platform license management - {{ total_accounts }} total accounts"
+      "text": "Platform license management - {{ total_accounts }} total accounts",
+      "original_text": "Platform license management - {{ total_accounts }} total accounts"
     },
     {
       "id": "admin_licenses_2",
       "file": "templates/business_auth/admin_licenses.html",
       "element": "th",
-      "text": "Business Account"
+      "text": "Business Account",
+      "original_text": "Business Account"
     },
     {
       "id": "admin_licenses_3",
       "file": "templates/business_auth/admin_licenses.html",
       "element": "th",
-      "text": "License Type"
+      "text": "License Type",
+      "original_text": "License Type"
     },
     {
       "id": "admin_licenses_4",
       "file": "templates/business_auth/admin_licenses.html",
       "element": "th",
-      "text": "Status"
+      "text": "Status",
+      "original_text": "Status"
     },
     {
       "id": "admin_licenses_5",
       "file": "templates/business_auth/admin_licenses.html",
       "element": "th",
-      "text": "Campaigns"
+      "text": "Campaigns",
+      "original_text": "Campaigns"
     },
     {
       "id": "admin_licenses_6",
       "file": "templates/business_auth/admin_licenses.html",
       "element": "th",
-      "text": "Users"
+      "text": "Users",
+      "original_text": "Users"
     },
     {
       "id": "admin_licenses_7",
       "file": "templates/business_auth/admin_licenses.html",
       "element": "th",
-      "text": "Respondents"
+      "text": "Respondents",
+      "original_text": "Respondents"
     },
     {
       "id": "admin_licenses_8",
       "file": "templates/business_auth/admin_licenses.html",
       "element": "th",
-      "text": "Invitations"
+      "text": "Invitations",
+      "original_text": "Invitations"
     },
     {
       "id": "admin_licenses_9",
       "file": "templates/business_auth/admin_licenses.html",
       "element": "th",
-      "text": "Expiration"
+      "text": "Expiration",
+      "original_text": "Expiration"
     },
     {
       "id": "admin_licenses_10",
       "file": "templates/business_auth/admin_licenses.html",
       "element": "th",
-      "text": "Actions"
+      "text": "Actions",
+      "original_text": "Actions"
     },
     {
       "id": "admin_licenses_11",
       "file": "templates/business_auth/admin_licenses.html",
       "element": "span",
-      "text": "No expiration"
+      "text": "No expiration",
+      "original_text": "No expiration"
     },
     {
       "id": "admin_licenses_12",
       "file": "templates/business_auth/admin_licenses.html",
       "element": "h4",
-      "text": "No accounts found"
+      "text": "No accounts found",
+      "original_text": "No accounts found"
     },
     {
       "id": "admin_licenses_13",
       "file": "templates/business_auth/admin_licenses.html",
       "element": "p",
-      "text": "No business accounts match the current filter criteria."
+      "text": "No business accounts match the current filter criteria.",
+      "original_text": "No business accounts match the current filter criteria."
     },
     {
       "id": "admin_licenses_title_14",
       "file": "templates/business_auth/admin_licenses.html",
       "element": "a[title]",
-      "text": "Manage License"
+      "text": "Manage License",
+      "original_text": "Manage License"
     },
     {
       "id": "admin_licenses_title_15",
       "file": "templates/business_auth/admin_licenses.html",
       "element": "a[title]",
-      "text": "View History"
+      "text": "View History",
+      "original_text": "View History"
     },
     {
       "id": "business_account_onboarding_1",
       "file": "templates/business_auth/business_account_onboarding.html",
       "element": "h1",
-      "text": "Business Account Onboarding"
+      "text": "Business Account Onboarding",
+      "original_text": "Business Account Onboarding"
     },
     {
       "id": "business_account_onboarding_2",
       "file": "templates/business_auth/business_account_onboarding.html",
       "element": "p",
-      "text": "Create a new business account and invite the account administrator"
+      "text": "Create a new business account and invite the account administrator",
+      "original_text": "Create a new business account and invite the account administrator"
     },
     {
       "id": "business_account_onboarding_3",
       "file": "templates/business_auth/business_account_onboarding.html",
       "element": "li",
-      "text": "A new business account with the selected license template"
+      "text": "A new business account with the selected license template",
+      "original_text": "A new business account with the selected license template"
     },
     {
       "id": "business_account_onboarding_4",
       "file": "templates/business_auth/business_account_onboarding.html",
       "element": "li",
-      "text": "An admin user account for managing the business"
+      "text": "An admin user account for managing the business",
+      "original_text": "An admin user account for managing the business"
     },
     {
       "id": "business_account_onboarding_5",
       "file": "templates/business_auth/business_account_onboarding.html",
       "element": "li",
-      "text": "An invitation email sent to the administrator with activation instructions"
+      "text": "An invitation email sent to the administrator with activation instructions",
+      "original_text": "An invitation email sent to the administrator with activation instructions"
     },
     {
       "id": "business_account_onboarding_6",
       "file": "templates/business_auth/business_account_onboarding.html",
       "element": "li",
-      "text": "Immediate activation of the business account for use"
+      "text": "Immediate activation of the business account for use",
+      "original_text": "Immediate activation of the business account for use"
     },
     {
       "id": "business_account_onboarding_7",
       "file": "templates/business_auth/business_account_onboarding.html",
       "element": "h3",
-      "text": "Business Account Information"
+      "text": "Business Account Information",
+      "original_text": "Business Account Information"
     },
     {
       "id": "business_account_onboarding_8",
       "file": "templates/business_auth/business_account_onboarding.html",
       "element": "div",
-      "text": "This will be displayed throughout the platform and in communications"
+      "text": "This will be displayed throughout the platform and in communications",
+      "original_text": "This will be displayed throughout the platform and in communications"
     },
     {
       "id": "business_account_onboarding_9",
       "file": "templates/business_auth/business_account_onboarding.html",
       "element": "option",
-      "text": "Select a license template..."
+      "text": "Select a license template...",
+      "original_text": "Select a license template..."
     },
     {
       "id": "business_account_onboarding_10",
       "file": "templates/business_auth/business_account_onboarding.html",
       "element": "option",
-      "text": "No license templates available"
+      "text": "No license templates available",
+      "original_text": "No license templates available"
     },
     {
       "id": "business_account_onboarding_11",
       "file": "templates/business_auth/business_account_onboarding.html",
       "element": "div",
-      "text": "Choose the license tier that best fits the business needs"
+      "text": "Choose the license tier that best fits the business needs",
+      "original_text": "Choose the license tier that best fits the business needs"
     },
     {
       "id": "business_account_onboarding_12",
       "file": "templates/business_auth/business_account_onboarding.html",
       "element": "h3",
-      "text": "Account Administrator Information"
+      "text": "Account Administrator Information",
+      "original_text": "Account Administrator Information"
     },
     {
       "id": "business_account_onboarding_13",
       "file": "templates/business_auth/business_account_onboarding.html",
       "element": "div",
-      "text": "The administrator will receive an invitation email at this address"
+      "text": "The administrator will receive an invitation email at this address",
+      "original_text": "The administrator will receive an invitation email at this address"
     },
     {
       "id": "business_account_onboarding_14",
       "file": "templates/business_auth/business_account_onboarding.html",
       "element": "p",
-      "text": "An invitation email will be sent to"
+      "text": "An invitation email will be sent to",
+      "original_text": "An invitation email will be sent to"
     },
     {
       "id": "business_account_onboarding_15",
       "file": "templates/business_auth/business_account_onboarding.html",
       "element": "span",
-      "text": "the administrator"
+      "text": "the administrator",
+      "original_text": "the administrator"
     },
     {
       "id": "business_account_onboarding_16",
       "file": "templates/business_auth/business_account_onboarding.html",
       "element": "span",
-      "text": "business name"
+      "text": "business name",
+      "original_text": "business name"
     },
     {
       "id": "business_account_onboarding_placeholder_17",
       "file": "templates/business_auth/business_account_onboarding.html",
       "element": "input[placeholder]",
-      "text": "Enter the complete business name"
+      "text": "Enter the complete business name",
+      "original_text": "Enter the complete business name"
     },
     {
       "id": "business_account_onboarding_placeholder_18",
       "file": "templates/business_auth/business_account_onboarding.html",
       "element": "input[placeholder]",
-      "text": "Administrator's first name"
+      "text": "Administrator's first name",
+      "original_text": "Administrator's first name"
     },
     {
       "id": "business_account_onboarding_placeholder_19",
       "file": "templates/business_auth/business_account_onboarding.html",
       "element": "input[placeholder]",
-      "text": "Administrator's last name"
+      "text": "Administrator's last name",
+      "original_text": "Administrator's last name"
     },
     {
       "id": "business_account_onboarding_placeholder_20",
       "file": "templates/business_auth/business_account_onboarding.html",
       "element": "input[placeholder]",
-      "text": "admin@company.com"
+      "text": "admin@company.com",
+      "original_text": "admin@company.com"
     },
     {
       "id": "business_account_onboarding_aria_21",
       "file": "templates/business_auth/business_account_onboarding.html",
       "element": "button[aria-label]",
-      "text": "Close"
+      "text": "Close",
+      "original_text": "Close"
     },
     {
       "id": "forgot_password_1",
       "file": "templates/business_auth/forgot_password.html",
       "element": "h2",
-      "text": "Reset Your Password"
+      "text": "Reset Your Password",
+      "original_text": "Reset Your Password"
     },
     {
       "id": "forgot_password_2",
       "file": "templates/business_auth/forgot_password.html",
       "element": "p",
-      "text": "Enter your email address and we'll send you a password reset link"
+      "text": "Enter your email address and we'll send you a password reset link",
+      "original_text": "Enter your email address and we'll send you a password reset link"
     },
     {
       "id": "forgot_password_placeholder_3",
       "file": "templates/business_auth/forgot_password.html",
       "element": "input[placeholder]",
-      "text": "name@example.com"
+      "text": "name@example.com",
+      "original_text": "name@example.com"
     },
     {
       "id": "forgot_password_aria_4",
       "file": "templates/business_auth/forgot_password.html",
       "element": "div[aria-label]",
-      "text": "VOÏA Password Reset"
+      "text": "VOÏA Password Reset",
+      "original_text": "VOÏA Password Reset"
     },
     {
       "id": "forgot_password_aria_5",
       "file": "templates/business_auth/forgot_password.html",
       "element": "button[aria-label]",
-      "text": "Close"
+      "text": "Close",
+      "original_text": "Close"
     },
     {
       "id": "forgot_password_aria_6",
       "file": "templates/business_auth/forgot_password.html",
       "element": "form[aria-label]",
-      "text": "Password reset request form"
+      "text": "Password reset request form",
+      "original_text": "Password reset request form"
     },
     {
       "id": "forgot_password_aria_7",
       "file": "templates/business_auth/forgot_password.html",
       "element": "input[aria-label]",
-      "text": "Email address"
+      "text": "Email address",
+      "original_text": "Email address"
     },
     {
       "id": "forgot_password_aria_8",
       "file": "templates/business_auth/forgot_password.html",
       "element": "button[aria-label]",
-      "text": "Send password reset email"
+      "text": "Send password reset email",
+      "original_text": "Send password reset email"
     },
     {
       "id": "forgot_password_aria_9",
       "file": "templates/business_auth/forgot_password.html",
       "element": "a[aria-label]",
-      "text": "Return to login page"
+      "text": "Return to login page",
+      "original_text": "Return to login page"
     },
     {
       "id": "reset_password_1",
       "file": "templates/business_auth/reset_password.html",
       "element": "h2",
-      "text": "Set New Password"
+      "text": "Set New Password",
+      "original_text": "Set New Password"
     },
     {
       "id": "reset_password_2",
       "file": "templates/business_auth/reset_password.html",
       "element": "p",
-      "text": "Choose a strong password for your account"
+      "text": "Choose a strong password for your account",
+      "original_text": "Choose a strong password for your account"
     },
     {
       "id": "reset_password_placeholder_3",
       "file": "templates/business_auth/reset_password.html",
       "element": "input[placeholder]",
-      "text": "New Password"
+      "text": "New Password",
+      "original_text": "New Password"
     },
     {
       "id": "reset_password_placeholder_4",
       "file": "templates/business_auth/reset_password.html",
       "element": "input[placeholder]",
-      "text": "Confirm New Password"
+      "text": "Confirm New Password",
+      "original_text": "Confirm New Password"
     },
     {
       "id": "reset_password_aria_5",
       "file": "templates/business_auth/reset_password.html",
       "element": "div[aria-label]",
-      "text": "VOÏA Password Reset"
+      "text": "VOÏA Password Reset",
+      "original_text": "VOÏA Password Reset"
     },
     {
       "id": "reset_password_aria_6",
       "file": "templates/business_auth/reset_password.html",
       "element": "button[aria-label]",
-      "text": "Close"
+      "text": "Close",
+      "original_text": "Close"
     },
     {
       "id": "reset_password_aria_7",
       "file": "templates/business_auth/reset_password.html",
       "element": "form[aria-label]",
-      "text": "Password reset form"
+      "text": "Password reset form",
+      "original_text": "Password reset form"
     },
     {
       "id": "reset_password_aria_8",
       "file": "templates/business_auth/reset_password.html",
       "element": "input[aria-label]",
-      "text": "New password"
+      "text": "New password",
+      "original_text": "New password"
     },
     {
       "id": "reset_password_aria_9",
       "file": "templates/business_auth/reset_password.html",
       "element": "input[aria-label]",
-      "text": "Confirm new password"
+      "text": "Confirm new password",
+      "original_text": "Confirm new password"
     },
     {
       "id": "reset_password_aria_10",
       "file": "templates/business_auth/reset_password.html",
       "element": "button[aria-label]",
-      "text": "Reset password"
+      "text": "Reset password",
+      "original_text": "Reset password"
     },
     {
       "id": "reset_password_aria_11",
       "file": "templates/business_auth/reset_password.html",
       "element": "a[aria-label]",
-      "text": "Return to login page"
+      "text": "Return to login page",
+      "original_text": "Return to login page"
     },
     {
       "id": "login_1",
       "file": "templates/business_auth/login.html",
       "element": "h2",
-      "text": "VO"
+      "text": "VO",
+      "original_text": "VO"
     },
     {
       "id": "login_2",
       "file": "templates/business_auth/login.html",
       "element": "p",
-      "text": "Access your VO"
+      "text": "Access your VO",
+      "original_text": "Access your VO"
     },
     {
       "id": "login_3",
       "file": "templates/business_auth/login.html",
       "element": "span",
-      "text": "VO"
+      "text": "VO",
+      "original_text": "VO"
     },
     {
       "id": "login_4",
       "file": "templates/business_auth/login.html",
       "element": "a",
-      "text": "RIVVALUE inc."
+      "text": "RIVVALUE inc.",
+      "original_text": "RIVVALUE inc."
     },
     {
       "id": "login_5",
       "file": "templates/business_auth/login.html",
       "element": "h6",
-      "text": "Demo Account"
+      "text": "Demo Account",
+      "original_text": "Demo Account"
     },
     {
       "id": "login_placeholder_6",
       "file": "templates/business_auth/login.html",
       "element": "input[placeholder]",
-      "text": "name@example.com"
+      "text": "name@example.com",
+      "original_text": "name@example.com"
     },
     {
       "id": "login_placeholder_7",
       "file": "templates/business_auth/login.html",
       "element": "input[placeholder]",
-      "text": "Mot de passe"
+      "text": "Mot de passe",
+      "original_text": "Password"
     },
     {
       "id": "login_aria_8",
       "file": "templates/business_auth/login.html",
       "element": "div[aria-label]",
-      "text": "VOÏA Business Login"
+      "text": "VOÏA Business Login",
+      "original_text": "VOÏA Business Login"
     },
     {
       "id": "login_aria_9",
       "file": "templates/business_auth/login.html",
       "element": "button[aria-label]",
-      "text": "Close"
+      "text": "Close",
+      "original_text": "Close"
     },
     {
       "id": "login_aria_10",
       "file": "templates/business_auth/login.html",
       "element": "form[aria-label]",
-      "text": "Business login form"
+      "text": "Business login form",
+      "original_text": "Business login form"
     },
     {
       "id": "login_aria_11",
       "file": "templates/business_auth/login.html",
       "element": "input[aria-label]",
-      "text": "Email address"
+      "text": "Email address",
+      "original_text": "Email address"
     },
     {
       "id": "login_aria_12",
       "file": "templates/business_auth/login.html",
       "element": "input[aria-label]",
-      "text": "Mot de passe"
+      "text": "Mot de passe",
+      "original_text": "Password"
     },
     {
       "id": "login_aria_13",
       "file": "templates/business_auth/login.html",
       "element": "button[aria-label]",
-      "text": "Sign in to business account"
+      "text": "Sign in to business account",
+      "original_text": "Sign in to business account"
     },
     {
       "id": "login_aria_14",
       "file": "templates/business_auth/login.html",
       "element": "a[aria-label]",
-      "text": "Forgot password"
+      "text": "Forgot password",
+      "original_text": "Forgot password"
     },
     {
       "id": "platform_dashboard_1",
       "file": "templates/business_auth/platform_dashboard.html",
       "element": "h2",
-      "text": "Centre d'analytique d'entreprise"
+      "text": "Centre d'analytique d'entreprise",
+      "original_text": "Business Analytics Hub"
     },
     {
       "id": "platform_dashboard_2",
       "file": "templates/business_auth/platform_dashboard.html",
       "element": "p",
-      "text": "System-wide overview and management for {{ current_user.get_full_name() }}"
+      "text": "System-wide overview and management for {{ current_user.get_full_name() }}",
+      "original_text": "System-wide overview and management for {{ current_user.get_full_name() }}"
     },
     {
       "id": "platform_dashboard_3",
       "file": "templates/business_auth/platform_dashboard.html",
       "element": "p",
-      "text": "Total Business Accounts"
+      "text": "Total Business Accounts",
+      "original_text": "Total Business Accounts"
     },
     {
       "id": "platform_dashboard_4",
       "file": "templates/business_auth/platform_dashboard.html",
       "element": "p",
-      "text": "Total Active Users"
+      "text": "Total Active Users",
+      "original_text": "Total Active Users"
     },
     {
       "id": "platform_dashboard_5",
       "file": "templates/business_auth/platform_dashboard.html",
       "element": "p",
-      "text": "Campaigns This Month"
+      "text": "Campaigns This Month",
+      "original_text": "Campaigns This Month"
     },
     {
       "id": "platform_dashboard_6",
       "file": "templates/business_auth/platform_dashboard.html",
       "element": "p",
-      "text": "Responses This Month"
+      "text": "Responses This Month",
+      "original_text": "Responses This Month"
     },
     {
       "id": "platform_dashboard_7",
       "file": "templates/business_auth/platform_dashboard.html",
       "element": "p",
-      "text": "Survey submissions"
+      "text": "Survey submissions",
+      "original_text": "Survey submissions"
     },
     {
       "id": "platform_dashboard_8",
       "file": "templates/business_auth/platform_dashboard.html",
       "element": "p",
-      "text": "Total Users"
+      "text": "Total Users",
+      "original_text": "Total Users"
     }
   ],
   "flash_messages": [],

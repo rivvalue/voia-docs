@@ -21,7 +21,7 @@
                 <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
                     <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'info-circle' if category == 'info' else 'check-circle' }} me-2"></i>
                     {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
                 </div>
                 {% endfor %}
             </div>
@@ -35,7 +35,7 @@
                 <i class="fas fa-user-edit me-2" aria-hidden="true"></i>
                 Edit Participant
             </h1>
-            <p>Update participant information for {{ business_account.name }}</p>
+            <p>Mettre à jour le participant information for {{ business_account.name }}</p>
         </div>
     </div>
 
@@ -74,7 +74,7 @@
                         <label class="participant-form-label" for="email">
                             Email Address *
                             {% if has_survey_history %}
-                            <i class="fas fa-lock ms-1 text-muted" aria-hidden="true" title="Email locked - survey history exists"></i>
+                            <i class="fas fa-lock ms-1 text-muted" aria-hidden="true" title="E-mail verrouillé - historique d'enquête existant"></i>
                             {% endif %}
                         </label>
                         <input type="email" 
@@ -101,7 +101,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="participant-form-group">
-                        <label class="participant-form-label" for="name">Full Name *</label>
+                        <label class="participant-form-label" for="name">Nom complet *</label>
                         <input type="text" 
                                class="participant-form-control" 
                                id="name" 
@@ -111,13 +111,13 @@
                                required
                                aria-required="true"
                                aria-describedby="name_help">
-                        <div class="participant-help-text" id="name_help">Participant's full name</div>
+                        <div class="participant-help-text" id="name_help">Nom complet du participant</div>
                     </div>
                 </div>
                 
                 <div class="col-md-6">
                     <div class="participant-form-group">
-                        <label class="participant-form-label" for="company_name">Company Name *</label>
+                        <label class="participant-form-label" for="company_name">Nom de l'entreprise *</label>
                         <input type="text" 
                                class="participant-form-control" 
                                id="company_name" 
@@ -127,56 +127,56 @@
                                required
                                aria-required="true"
                                aria-describedby="company_name_help">
-                        <div class="participant-help-text" id="company_name_help">Participant's company or organization</div>
+                        <div class="participant-help-text" id="company_name_help">Entreprise ou organisation du participant</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Segmentation Attributes (Optional) -->
+        <!-- Segmentation Attributes (Optionnel) -->
         <div class="participant-config-form-section">
             <h3 class="participant-section-title">
                 <i class="fas fa-tags" aria-hidden="true"></i>
                 Segmentation Attributes
-                <span class="badge bg-secondary ms-2">Optional</span>
+                <span class="badge bg-secondary ms-2">Optionnel</span>
             </h3>
             <p class="participant-help-text mb-3">Update segmentation data for personalized surveys and advanced analytics</p>
             
             <div class="row">
                 <div class="col-md-6">
                     <div class="participant-form-group">
-                        <label class="participant-form-label" for="role">Role</label>
+                        <label class="participant-form-label" for="role">Rôle</label>
                         <select class="participant-form-control" 
                                 id="role" 
                                 name="role"
                                 aria-describedby="role_help">
-                            <option value="">Select role (optional)</option>
-                            <option value="C-Level" {% if participant.role == "C-Level" %}selected{% endif %}>C-Level Executive</option>
-                            <option value="VP" {% if participant.role == "VP" %}selected{% endif %}>VP / Director</option>
-                            <option value="Manager" {% if participant.role == "Manager" %}selected{% endif %}>Manager</option>
-                            <option value="Team Lead" {% if participant.role == "Team Lead" %}selected{% endif %}>Team Lead</option>
-                            <option value="End User" {% if participant.role == "End User" %}selected{% endif %}>End User</option>
-                            <option value="Other" {% if participant.role == "Other" %}selected{% endif %}>Other</option>
+                            <option value="">Sélectionnez un rôle (optionnel)</option>
+                            <option value="C-Level" {% if participant.role == "C-Level" %}selected{% endif %}>Cadre dirigeant (C-Level)</option>
+                            <option value="VP" {% if participant.role == "VP" %}selected{% endif %}>VP / Directeur</option>
+                            <option value="Gestionnaire" {% if participant.role == "Gestionnaire" %}selected{% endif %}>Gestionnaire</option>
+                            <option value="Chef d'équipe" {% if participant.role == "Chef d'équipe" %}selected{% endif %}>Chef d'équipe</option>
+                            <option value="Utilisateur final" {% if participant.role == "Utilisateur final" %}selected{% endif %}>Utilisateur final</option>
+                            <option value="Autre" {% if participant.role == "Autre" %}selected{% endif %}>Autre</option>
                         </select>
-                        <div class="participant-help-text" id="role_help">Participant's role for role-based survey personalization</div>
+                        <div class="participant-help-text" id="role_help">Rôle du participant pour la personnalisation de l'enquête selon le rôle</div>
                     </div>
                 </div>
                 
                 <div class="col-md-6">
                     <div class="participant-form-group">
-                        <label class="participant-form-label" for="region">Region</label>
+                        <label class="participant-form-label" for="region">Région</label>
                         <select class="participant-form-control" 
                                 id="region" 
                                 name="region"
                                 aria-describedby="region_help">
-                            <option value="">Select region (optional)</option>
-                            <option value="North America" {% if participant.region == "North America" %}selected{% endif %}>North America</option>
-                            <option value="LATAM" {% if participant.region == "LATAM" %}selected{% endif %}>Latin America (LATAM)</option>
-                            <option value="EMEA" {% if participant.region == "EMEA" %}selected{% endif %}>Europe, Middle East & Africa (EMEA)</option>
-                            <option value="APAC" {% if participant.region == "APAC" %}selected{% endif %}>Asia Pacific (APAC)</option>
-                            <option value="Other" {% if participant.region == "Other" %}selected{% endif %}>Other</option>
+                            <option value="">Sélectionnez une région (optionnel)</option>
+                            <option value="Amérique du Nord" {% if participant.region == "Amérique du Nord" %}selected{% endif %}>Amérique du Nord</option>
+                            <option value="LATAM" {% if participant.region == "LATAM" %}selected{% endif %}>Amérique latine (LATAM)</option>
+                            <option value="EMEA" {% if participant.region == "EMEA" %}selected{% endif %}>Europe, Moyen-Orient et Afrique (EMEA)</option>
+                            <option value="APAC" {% if participant.region == "APAC" %}selected{% endif %}>Asie-Pacifique (APAC)</option>
+                            <option value="Autre" {% if participant.region == "Autre" %}selected{% endif %}>Autre</option>
                         </select>
-                        <div class="participant-help-text" id="region_help">Geographic region for regional insights</div>
+                        <div class="participant-help-text" id="region_help">Région géographique pour des analyses régionales</div>
                     </div>
                 </div>
             </div>
@@ -184,23 +184,23 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="participant-form-group">
-                        <label class="participant-form-label" for="customer_tier">Customer Tier</label>
+                        <label class="participant-form-label" for="customer_tier">Catégorie de client</label>
                         <select class="participant-form-control" 
                                 id="customer_tier" 
                                 name="customer_tier"
                                 aria-describedby="customer_tier_help">
-                            <option value="">Select tier (optional)</option>
-                            <option value="T1: Strategic (Top 5–10% clients)" {% if participant.customer_tier == "T1: Strategic (Top 5–10% clients)" %}selected{% endif %}>T1: Strategic (Top 5–10% clients)</option>
-                            <option value="T2: Managed (bulk of paying clients)" {% if participant.customer_tier == "T2: Managed (bulk of paying clients)" %}selected{% endif %}>T2: Managed (bulk of paying clients)</option>
-                            <option value="T3: Self-serve or small" {% if participant.customer_tier == "T3: Self-serve or small" %}selected{% endif %}>T3: Self-serve or small</option>
+                            <option value="">Sélectionnez une catégorie (optionnel)</option>
+                            <option value="T1 : Stratégique (5–10 % des meilleurs clients)" {% if participant.customer_tier == "T1 : Stratégique (5–10 % des meilleurs clients)" %}selected{% endif %}>T1 : Stratégique (5–10 % des meilleurs clients)</option>
+                            <option value="T2 : Gérés (majorité des clients payants)" {% if participant.customer_tier == "T2 : Gérés (majorité des clients payants)" %}selected{% endif %}>T2 : Gérés (majorité des clients payants)</option>
+                            <option value="T3 : Libre-service ou petit client" {% if participant.customer_tier == "T3 : Libre-service ou petit client" %}selected{% endif %}>T3 : Libre-service ou petit client</option>
                         </select>
-                        <div class="participant-help-text" id="customer_tier_help">Customer segment for tier-based analysis</div>
+                        <div class="participant-help-text" id="customer_tier_help">Segment client pour l'analyse par catégorie</div>
                     </div>
                 </div>
                 
                 <div class="col-md-6">
                     <div class="participant-form-group">
-                        <label class="participant-form-label" for="language">Preferred Language</label>
+                        <label class="participant-form-label" for="language">Langue préférée</label>
                         <select class="participant-form-control" 
                                 id="language" 
                                 name="language"
@@ -212,9 +212,9 @@
                             <option value="pt" {% if participant.language == "pt" %}selected{% endif %}>Portuguese</option>
                             <option value="zh" {% if participant.language == "zh" %}selected{% endif %}>Chinese</option>
                             <option value="ja" {% if participant.language == "ja" %}selected{% endif %}>Japanese</option>
-                            <option value="other" {% if participant.language == "other" %}selected{% endif %}>Other</option>
+                            <option value="other" {% if participant.language == "other" %}selected{% endif %}>Autre</option>
                         </select>
-                        <div class="participant-help-text" id="language_help">Primary language for future multilingual support</div>
+                        <div class="participant-help-text" id="language_help">Langue principale pour la prise en charge multilingue future</div>
                     </div>
                 </div>
             </div>
@@ -223,7 +223,7 @@
                 <div class="col-md-6">
                     <div class="participant-form-group">
                         <label class="participant-form-label" for="tenure_years">
-                            Tenure (Years)
+                            Ancienneté (années)
                         </label>
                         <input type="number" 
                                class="participant-form-control" 
@@ -236,7 +236,7 @@
                                placeholder="e.g., 2.5"
                                aria-describedby="tenure_years_help">
                         <div class="participant-help-text" id="tenure_years_help">
-                            Years the participant has been using your product/service (optional)
+                            Nombre d'années d'utilisation de votre produit/service par le participant (optionnel)
                         </div>
                     </div>
                 </div>
@@ -244,8 +244,8 @@
                 <div class="col-md-6">
                     <div class="participant-form-group">
                         <label class="participant-form-label" for="company_commercial_value">
-                            Company Commercial Value
-                            <i class="fas fa-info-circle ms-1" aria-hidden="true" title="This value applies to all participants from this company"></i>
+                            Valeur commerciale de l'entreprise
+                            <i class="fas fa-info-circle ms-1" aria-hidden="true" title="Cette valeur s'applique à tous les participants de cette entreprise"></i>
                         </label>
                         <input type="number" 
                                class="participant-form-control" 
@@ -257,7 +257,7 @@
                                placeholder="e.g., 250000"
                                aria-describedby="company_commercial_value_help">
                         <div class="participant-help-text" id="company_commercial_value_help">
-                            Estimated account value in USD. This will be synced across all participants from the same company in your account.
+                            Valeur estimée du compte en USD. Cette valeur sera synchronisée pour tous les participants de la même entreprise dans votre compte.
                         </div>
                     </div>
                 </div>
@@ -270,7 +270,7 @@
                 <div class="participant-actions-left">
                     <a href="{{ url_for('participants.list_participants') }}" 
                        class="participant-btn-cancel"
-                       aria-label="Cancel and return to participants list">
+                       aria-label="Annuler et revenir à la liste des participants">
                         <i class="fas fa-arrow-left" aria-hidden="true"></i>
                         Cancel
                     </a>
@@ -278,7 +278,7 @@
                 <div class="participant-actions-right">
                     <button type="submit" 
                             class="participant-btn-save"
-                            aria-label="Update participant">
+                            aria-label="Mettre à jour le participant">
                         <i class="fas fa-save" aria-hidden="true"></i>
                         Update Participant
                     </button>

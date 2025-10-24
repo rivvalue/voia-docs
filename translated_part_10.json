@@ -29,7 +29,8 @@
       "type": "email_template",
       "context": "Email subject line for survey invitations",
       "text": "Votre avis est sollicité : {campaign_name}",
-      "note": "Keep {campaign_name} variable unchanged"
+      "note": "Keep {campaign_name} variable unchanged",
+      "original_text": "Your feedback is requested: {campaign_name}"
     },
     {
       "id": "email_intro",
@@ -37,28 +38,32 @@
       "type": "email_template",
       "context": "Email introduction paragraph",
       "text": "{business_account_name} sollicite votre précieux retour d'expérience via notre système Voice of Client.",
-      "note": "Keep {business_account_name} variable unchanged"
+      "note": "Keep {business_account_name} variable unchanged",
+      "original_text": "{business_account_name} is requesting your valuable feedback through our Voice of Client system."
     },
     {
       "id": "email_cta_text",
       "file": "email_service.py",
       "type": "email_template",
       "context": "Call-to-action button text",
-      "text": "Complétez votre enquête"
+      "text": "Complétez votre enquête",
+      "original_text": "Complete Your Survey"
     },
     {
       "id": "email_closing",
       "file": "email_service.py",
       "type": "email_template",
       "context": "Email closing message (before footer)",
-      "text": "Votre retour d'information contribue à améliorer les services et les expériences. L'enquête ne vous prendra que quelques minutes.\n\nMerci pour votre temps et vos précieuses informations !"
+      "text": "Votre retour d'information contribue à améliorer les services et les expériences. L'enquête ne vous prendra que quelques minutes.\n\nMerci pour votre temps et vos précieuses informations !",
+      "original_text": "Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.\n\nThank you for your time and valuable insights!"
     },
     {
       "id": "email_footer",
       "file": "email_service.py",
       "type": "email_template",
       "context": "Email footer disclaimer",
-      "text": "Ceci est un message automatique. Si vous avez des questions, veuillez contacter l'organisation qui vous a envoyé cette enquête."
+      "text": "Ceci est un message automatique. Si vous avez des questions, veuillez contacter l'organisation qui vous a envoyé cette enquête.",
+      "original_text": "This is an automated message. If you have any questions, please contact the organization that sent this survey."
     },
     {
       "id": "email_reminder_subject",
@@ -66,7 +71,8 @@
       "type": "email_template",
       "context": "Subject line for reminder emails",
       "text": "Rappel : votre avis est toujours attendu - {campaign_name}",
-      "note": "Keep {campaign_name} variable unchanged"
+      "note": "Keep {campaign_name} variable unchanged",
+      "original_text": "Reminder: Your feedback is still needed - {campaign_name}"
     },
     {
       "id": "email_reminder_intro",
@@ -74,7 +80,8 @@
       "type": "email_template",
       "context": "Reminder email introduction",
       "text": "Ceci est un rappel amical indiquant que {business_account_name} attend toujours votre retour d'expérience.",
-      "note": "Keep {business_account_name} variable unchanged"
+      "note": "Keep {business_account_name} variable unchanged",
+      "original_text": "This is a friendly reminder that {business_account_name} is still looking forward to your feedback."
     }
   ]
 }

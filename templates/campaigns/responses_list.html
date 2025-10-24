@@ -109,10 +109,10 @@
             <div class="row align-items-center">
                 <div class="col-md-8">
                     <h1 class="mb-1">{{ campaign.name }} - Individual Responses</h1>
-                    <p class="mb-0 opacity-75">Review and analyze individual participant responses</p>
+                    <p class="mb-0 opacity-75">Examiner et analyser les réponses individuelles des participants</p>
                 </div>
                 <div class="col-md-4 text-end">
-                    <button onclick="exportCampaignResponses({{ campaign.id }})" class="btn btn-light me-2" title="Export campaign responses">
+                    <button onclick="exportCampaignResponses({{ campaign.id }})" class="btn btn-light me-2" title="Exporter les réponses de la campagne">
                         <i class="fas fa-download me-2"></i>Export
                     </button>
                     <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" class="btn btn-outline-light">
@@ -135,7 +135,7 @@
                            class="form-control" 
                            name="search" 
                            value="{{ search_query or '' }}" 
-                           placeholder="Search participants, companies, or conversation content..."
+                           placeholder="Rechercher des participants, des entreprises ou du contenu de conversation..."
                            autocomplete="off">
                 </div>
             </div>
@@ -174,10 +174,10 @@
                 <thead class="table-light">
                     <tr>
                         <th>Participant</th>
-                        <th>Company</th>
-                        <th>NPS Score</th>
-                        <th>Status</th>
-                        <th>Response Date</th>
+                        <th>Entreprise</th>
+                        <th>Score NPS</th>
+                        <th>Statut</th>
+                        <th>Date de réponse</th>
                         <th class="text-end">Actions</th>
                     </tr>
                 </thead>
@@ -229,7 +229,7 @@
         {% else %}
         <div class="text-center py-5">
             <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-            <h4 class="text-muted">No Responses Found</h4>
+            <h4 class="text-muted">Aucune réponse trouvée</h4>
             <p class="text-muted">
                 {% if search_query %}
                     No responses match your search criteria. Try adjusting your search terms.
@@ -249,7 +249,7 @@
     <!-- Pagination -->
     {% if pagination.pages > 1 %}
     <div class="pagination-container">
-        <nav aria-label="Response pagination">
+        <nav aria-label="Pagination des réponses">
             <ul class="pagination justify-content-center mb-0">
                 <!-- Previous Page -->
                 <li class="page-item {{ 'disabled' if not pagination.has_prev else '' }}">
@@ -308,7 +308,7 @@ document.querySelector('input[name="search"]').addEventListener('keypress', func
     }
 });
 
-// Export campaign responses
+// Exporter les réponses de la campagne
 function exportCampaignResponses(campaignId) {
     console.log('Exporting campaign responses for campaign:', campaignId);
     

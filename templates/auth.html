@@ -19,11 +19,11 @@
                 <!-- Token Request Form -->
                 <div id="tokenRequestForm">
                     <div class="mb-3">
-                        <label for="emailInput" class="form-label">Email Address</label>
+                        <label for="emailInput" class="form-label">Adresse e-mail</label>
                         <input type="email" class="form-control" id="emailInput" 
                                placeholder="your.email@company.com" required>
                         <div class="form-text">
-                            You'll receive a secure token valid for 24 hours
+                            Vous recevrez un jeton sécurisé valable 24 heures
                         </div>
                     </div>
                     
@@ -37,9 +37,9 @@
                 <!-- Loading State -->
                 <div class="d-none text-center" id="loadingState">
                     <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
+                        <span class="visually-hidden">Chargement...</span>
                     </div>
-                    <p class="mt-2">Generating your authentication token...</p>
+                    <p class="mt-2">Génération de votre jeton d'authentification...</p>
                 </div>
 
                 <!-- Success State -->
@@ -48,9 +48,9 @@
                         <h6 class="alert-heading">
                             <i class="fas fa-check-circle me-2"></i>Token Generated Successfully!
                         </h6>
-                        <p class="mb-2">Your authentication token has been created:</p>
+                        <p class="mb-2">Votre jeton d'authentification a été créé :</p>
                         <div class="mb-3">
-                            <label class="form-label">Authentication Token:</label>
+                            <label class="form-label">Jeton d'authentification :</label>
                             <div class="input-group">
                                 <input type="text" class="form-control font-monospace" 
                                        id="generatedToken" readonly>
@@ -66,8 +66,8 @@
                         
                         <!-- Survey Type Selection -->
                         <div class="mb-3">
-                            <label class="form-label">Choose Survey Experience:</label>
-                            <div class="btn-group w-100" role="group" aria-label="Survey type selection">
+                            <label class="form-label">Choisissez l'expérience d'enquête :</label>
+                            <div class="btn-group w-100" role="group" aria-label="Sélection du type d'enquête">
                                 <input type="radio" class="btn-check" name="surveyType" id="conversationalOption" value="conversational" checked>
                                 <label class="btn btn-outline-primary" for="conversationalOption">
                                     <i class="fas fa-comments me-2"></i>Conversational (AI)
@@ -89,7 +89,7 @@
                                 <i class="fas fa-poll-h me-2"></i>Start Survey
                             </button>
                             <button type="button" class="btn btn-outline-primary" onclick="resetForm()">
-                                Generate Another Token
+                                Générer un autre jeton
                             </button>
                         </div>
                     </div>
@@ -101,9 +101,9 @@
                         <h6 class="alert-heading">
                             <i class="fas fa-exclamation-triangle me-2"></i>Error
                         </h6>
-                        <p id="errorMessage">Something went wrong. Please try again.</p>
+                        <p id="errorMessage">Une erreur est survenue. Veuillez réessayer.</p>
                         <button type="button" class="btn btn-outline-danger" onclick="resetForm()">
-                            Try Again
+                            Réessayer
                         </button>
                     </div>
                 </div>
@@ -120,18 +120,17 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-12">
-                        <h6>Why do I need a token?</h6>
+                        <h6>Pourquoi ai-je besoin d'un jeton ?</h6>
                         <p class="small text-muted">
-                            Authentication tokens ensure that only authorized users can submit survey responses 
-                            and prevent duplicate submissions. Your token is unique to your email address.
+                            Les jetons d'authentification garantissent que seuls les utilisateurs autorisés peuvent soumettre des réponses à l'enquête et empêchent les doublons. Votre jeton est unique à votre adresse e-mail.
                         </p>
 
-                        <h6>Security Features:</h6>
+                        <h6>Fonctionnalités de sécurité :</h6>
                         <ul class="small text-muted">
-                            <li>Tokens are tied to your email address</li>
-                            <li>Each token expires after 24 hours</li>
-                            <li>One response per email address (unless overwriting)</li>
-                            <li>Rate limiting prevents abuse</li>
+                            <li>Les jetons sont liés à votre adresse e-mail</li>
+                            <li>Chaque jeton expire après 24 heures</li>
+                            <li>Une réponse par adresse e-mail (sauf remplacement)</li>
+                            <li>La limitation du débit empêche les abus</li>
                         </ul>
                     </div>
                 </div>

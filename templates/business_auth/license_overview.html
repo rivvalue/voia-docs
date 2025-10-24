@@ -11,7 +11,7 @@
                 <h1 class="admin-title">
                     <i class="fas fa-certificate me-3"></i>{{ page_title }}
                 </h1>
-                <p class="admin-subtitle">License details and usage information for {{ account_data.name }}</p>
+                <p class="admin-subtitle">Détails et informations d'utilisation de la licence pour {{ account_data.name }}</p>
             </div>
             <div class="col-md-6 text-end">
                 <a href="{{ url_for('business_auth.license_dashboard') }}" class="btn btn-outline-primary me-2">
@@ -37,13 +37,13 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="license-detail">
-                        <label>License Type:</label>
+                        <label>Type de licence :</label>
                         <span class="license-type license-{{ account_data.license_type }}">
                             {{ account_data.license_type|title }}
                         </span>
                     </div>
                     <div class="license-detail">
-                        <label>Status:</label>
+                        <label>Statut :</label>
                         <span class="license-status status-{{ account_data.license_status }}">
                             {{ account_data.license_status|title }}
                             {% if account_data.expires_soon and account_data.days_remaining > 0 %}
@@ -55,13 +55,13 @@
                 <div class="col-md-6">
                     {% if account_data.license_start %}
                     <div class="license-detail">
-                        <label>License Period:</label>
+                        <label>Période de licence :</label>
                         <span>{{ account_data.license_start.strftime('%B %d, %Y') }} - 
                               {{ account_data.license_end.strftime('%B %d, %Y') if account_data.license_end else 'Ongoing' }}</span>
                     </div>
                     {% endif %}
                     <div class="license-detail">
-                        <label>Account Type:</label>
+                        <label>Type de compte :</label>
                         <span>{{ account_data.account_type|title }}</span>
                     </div>
                 </div>
@@ -82,7 +82,7 @@
             <div class="col-md-6">
                 <div class="usage-card">
                     <div class="usage-header">
-                        <h4><i class="fas fa-bullhorn me-2"></i>Campaigns</h4>
+                        <h4><i class="fas fa-bullhorn me-2"></i>Campagnes</h4>
                     </div>
                     <div class="usage-stats">
                         <div class="usage-numbers">
@@ -104,7 +104,7 @@
             <div class="col-md-6">
                 <div class="usage-card">
                     <div class="usage-header">
-                        <h4><i class="fas fa-users me-2"></i>Users</h4>
+                        <h4><i class="fas fa-users me-2"></i>Utilisateurs</h4>
                     </div>
                     <div class="usage-stats">
                         <div class="usage-numbers">
@@ -139,7 +139,7 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="analysis-card">
-                        <h5>Campaign Usage Insights</h5>
+                        <h5>Analyses d'utilisation des campagnes</h5>
                         {% set campaign_percentage = (account_data.campaigns_used / account_data.campaigns_limit * 100) if account_data.campaigns_limit > 0 else 0 %}
                         {% if campaign_percentage > 80 %}
                             <div class="alert alert-warning">
@@ -158,7 +158,7 @@
                             </div>
                         {% endif %}
                         
-                        <h5>User Account Insights</h5>
+                        <h5>Analyses des comptes utilisateurs</h5>
                         {% set user_percentage = (account_data.users_count / account_data.users_limit * 100) if account_data.users_limit > 0 else 0 %}
                         {% if user_percentage > 80 %}
                             <div class="alert alert-warning">
@@ -228,22 +228,22 @@
         <div class="quick-actions-grid">
             <a href="{{ url_for('business_auth.license_info') }}" class="dashboard-action-btn">
                 <i class="fas fa-info-circle"></i>
-                <span>Detailed License Info</span>
+                <span>Informations détaillées sur la licence</span>
             </a>
             
             <a href="{{ url_for('campaigns.list_campaigns') }}" class="dashboard-action-btn">
                 <i class="fas fa-bullhorn"></i>
-                <span>Manage Campaigns</span>
+                <span>Manage Campagnes</span>
             </a>
             
             <a href="{{ url_for('participants.list_participants') }}" class="dashboard-action-btn">
                 <i class="fas fa-users"></i>
-                <span>Manage Users</span>
+                <span>Manage Utilisateurs</span>
             </a>
             
             <a href="{{ url_for('business_auth.admin_panel') }}" class="dashboard-action-btn">
                 <i class="fas fa-cog"></i>
-                <span>Settings</span>
+                <span>Paramètres</span>
             </a>
         </div>
     </div>

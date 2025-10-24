@@ -168,11 +168,11 @@ class EmailService:
         """
         # Default templates (tier 3)
         defaults = {
-            'subject': "Your feedback is requested: {campaign_name}",
-            'intro': "{business_account_name} is requesting your valuable feedback through our Voice of Client system.",
-            'cta_text': "Complete Your Survey",
+            'subject': "Votre avis est sollicité : {campaign_name}",
+            'intro': "{business_account_name} sollicite votre précieux retour d'expérience via notre système Voice of Client.",
+            'cta_text': "Complétez votre enquête",
             'closing': "Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.\n\nThank you for your time and valuable insights!",
-            'footer': "This is an automated message. If you have any questions, please contact the organization that sent this survey."
+            'footer': "Ceci est un message automatique. Si vous avez des questions, veuillez contacter l'organisation qui vous a envoyé cette enquête."
         }
         
         # Try campaign-specific content first (tier 1)
