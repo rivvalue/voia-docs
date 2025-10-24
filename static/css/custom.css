@@ -2833,9 +2833,16 @@ a:hover {
    ========================================== */
 
 /* Language Selector - Always Above Sidebar */
-.navbar .dropdown,
+.navbar .dropdown {
+    z-index: 10003 !important;
+    position: relative;
+}
+
 .navbar .dropdown-menu {
     z-index: 10003 !important;
+    position: absolute !important;
+    right: 0 !important;
+    left: auto !important;
 }
 
 /* Sidebar Container */
