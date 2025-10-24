@@ -981,8 +981,10 @@ def bulk_edit_participants():
     MAX_BATCH_SIZE = 50
     
     try:
+        logger.info("Bulk edit request received")
         current_account = get_current_business_account()
         if not current_account or not current_account.id:
+            logger.error("Bulk edit: Business account context not found")
             return jsonify({
                 'success': False,
                 'error': 'Business account context not found'
@@ -990,6 +992,7 @@ def bulk_edit_participants():
         
         # Parse request data
         data = request.get_json()
+        logger.info(f"Bulk edit data received: participant_ids count={len(data.get('participant_ids', []))}, updates={data.get('updates', {})}")
         participant_ids = data.get('participant_ids', [])
         updates = data.get('updates', {})
         
@@ -1153,7 +1156,10 @@ def bulk_edit_participants():
         
     except Exception as e:
         db.session.rollback()
+        import traceback
+        error_traceback = traceback.format_exc()
         logger.error(f"Error in bulk edit: {e}")
+        logger.error(f"Bulk edit traceback: {error_traceback}")
         return jsonify({
             'success': False,
             'error': 'An error occurred during bulk edit',
