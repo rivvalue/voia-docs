@@ -56,6 +56,10 @@
     <!-- Configuration Form -->
     <form method="POST" action="{{ url_for('participants.edit_participant', participant_id=participant.id) }}" id="participantEditForm">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        {% if has_survey_history %}
+        {# Hidden field to submit email when visible field is disabled #}
+        <input type="hidden" name="email" value="{{ participant.email }}"/>
+        {% endif %}
         
         <!-- Participant Information -->
         <div class="participant-config-form-section">
