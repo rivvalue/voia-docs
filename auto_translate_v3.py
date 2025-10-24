@@ -100,21 +100,14 @@ Return in this exact format:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a professional French translator for SaaS applications. You preserve all markup tags and technical syntax while translating content."
+                        "content": "You are a professional French translator for SaaS applications. You preserve all markup tags and technical syntax while translating content. Always return valid JSON."
                     },
                     {
                         "role": "user",
                         "content": prompt
                     }
                 ],
-                response_format={
-                    "type": "json_schema",
-                    "json_schema": {
-                        "name": "translation_response",
-                        "strict": True,
-                        "schema": response_schema
-                    }
-                },
+                response_format={"type": "json_object"},
                 max_completion_tokens=8192
             )
             

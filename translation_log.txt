@@ -1,0 +1,66 @@
+============================================================
+VOÏA Automated French Translation v3 (Production)
+JSON Schema + Optimized Batching
+============================================================
+
+✓ OpenAI API key configured
+✓ Batch size: 20 items
+✓ Placeholder protection: enabled
+✓ Auto-retry: enabled (3 attempts per batch)
+
+Starting translation...
+
+
+============================================================
+Translating: translate_part_01_templates.json
+============================================================
+  Found 237 templates to translate
+  Batch 1/12 (20 items)... ✓
+  Batch 2/12 (20 items)... ✓
+  Batch 3/12 (20 items)... ✓
+  Batch 4/12 (20 items)... ✓
+  Batch 5/12 (20 items)... ✓
+  Batch 6/12 (20 items)... ✓
+  Batch 7/12 (20 items)... ✓
+  Batch 8/12 (20 items)... ✓
+  Batch 9/12 (20 items)... ✓
+  Batch 10/12 (20 items)... ✓
+  Batch 11/12 (20 items)... ✓
+  Batch 12/12 (17 items)... ✓
+  ✓ Translated: 237/237
+  ✓ Saved: translated_part_01.json
+
+============================================================
+Translating: translate_part_02_templates.json
+============================================================
+  Found 237 templates to translate
+  Batch 1/12 (20 items)... ✓
+  Batch 2/12 (20 items)... ✓
+  Batch 3/12 (20 items)... ✓
+  Batch 4/12 (20 items)... ✓
+  Batch 5/12 (20 items)... ✓
+  Batch 6/12 (20 items)... ✓
+  Batch 7/12 (20 items)... ✓
+  Batch 8/12 (20 items)... ✓
+  Batch 9/12 (20 items)... ✓
+  Batch 10/12 (20 items)... ✓
+  Batch 11/12 (20 items)... ✓
+  Batch 12/12 (17 items)... ✓
+  ✓ Translated: 237/237
+  ✓ Saved: translated_part_02.json
+
+============================================================
+Translating: translate_part_03_templates.json
+============================================================
+  Found 237 templates to translate
+  Batch 1/12 (20 items)... ✓
+  Batch 2/12 (20 items)... ✓
+  Batch 3/12 (20 items)... ✓
+  Batch 4/12 (20 items)... ✓
+  Batch 5/12 (20 items)... ✓
+  Batch 6/12 (20 items)... ✓
+  Batch 7/12 (20 items)... ✓
+  Batch 8/12 (20 items)... ✓
+  Batch 9/12 (20 items)... ✓
+  Batch 10/12 (20 items)... ✓
+  Batch 11/12 (20 items)... 

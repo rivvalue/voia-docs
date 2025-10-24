@@ -1,0 +1,80 @@
+{
+  "metadata": {
+    "project": "VOÏA - Voice Of Client",
+    "source_language": "English",
+    "target_language": "French",
+    "extraction_date": "2025-10-24",
+    "total_files": 10,
+    "total_strings": 2161,
+    "file_number": 10,
+    "part_description": "Email Templates"
+  },
+  "instructions": {
+    "overview": "Translate all 'text' field values from English to French (France market, professional SaaS tone)",
+    "rules": [
+      "Translate ONLY the 'text' field values",
+      "Keep all other fields (id, file, type, element, etc.) UNCHANGED",
+      "Preserve {variables}, {{variables}}, and {%...%} syntax exactly as-is",
+      "Use professional business French suitable for SaaS platform",
+      "Maintain consistent terminology throughout",
+      "Keep technical terms like 'NPS', 'API', 'VOÏA' unchanged unless noted"
+    ]
+  },
+  "templates": [],
+  "flash_messages": [],
+  "email_templates": [
+    {
+      "id": "email_subject",
+      "file": "email_service.py",
+      "type": "email_template",
+      "context": "Email subject line for survey invitations",
+      "text": "Your feedback is requested: {campaign_name}",
+      "note": "Keep {campaign_name} variable unchanged"
+    },
+    {
+      "id": "email_intro",
+      "file": "email_service.py",
+      "type": "email_template",
+      "context": "Email introduction paragraph",
+      "text": "{business_account_name} is requesting your valuable feedback through our Voice of Client system.",
+      "note": "Keep {business_account_name} variable unchanged"
+    },
+    {
+      "id": "email_cta_text",
+      "file": "email_service.py",
+      "type": "email_template",
+      "context": "Call-to-action button text",
+      "text": "Complete Your Survey"
+    },
+    {
+      "id": "email_closing",
+      "file": "email_service.py",
+      "type": "email_template",
+      "context": "Email closing message (before footer)",
+      "text": "Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.\n\nThank you for your time and valuable insights!"
+    },
+    {
+      "id": "email_footer",
+      "file": "email_service.py",
+      "type": "email_template",
+      "context": "Email footer disclaimer",
+      "text": "This is an automated message. If you have any questions, please contact the organization that sent this survey."
+    },
+    {
+      "id": "email_reminder_subject",
+      "file": "email_service.py",
+      "type": "email_template",
+      "context": "Subject line for reminder emails",
+      "text": "Reminder: Your feedback is still needed - {campaign_name}",
+      "note": "Keep {campaign_name} variable unchanged"
+    },
+    {
+      "id": "email_reminder_intro",
+      "file": "email_service.py",
+      "type": "email_template",
+      "context": "Reminder email introduction",
+      "text": "This is a friendly reminder that {business_account_name} is still looking forward to your feedback.",
+      "note": "Keep {business_account_name} variable unchanged"
+    }
+  ]
+}

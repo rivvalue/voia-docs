@@ -1,0 +1,1581 @@
+{
+  "metadata": {
+    "project": "VOÏA - Voice Of Client",
+    "source_language": "English",
+    "target_language": "French",
+    "extraction_date": "2025-10-24",
+    "total_files": 10,
+    "total_strings": 2161,
+    "file_number": 9,
+    "part_description": "Flash Messages"
+  },
+  "instructions": {
+    "overview": "Translate all 'text' field values from English to French (France market, professional SaaS tone)",
+    "rules": [
+      "Translate ONLY the 'text' field values",
+      "Keep all other fields (id, file, type, element, etc.) UNCHANGED",
+      "Preserve {variables}, {{variables}}, and {%...%} syntax exactly as-is",
+      "Use professional business French suitable for SaaS platform",
+      "Maintain consistent terminology throughout",
+      "Keep technical terms like 'NPS', 'API', 'VOÏA' unchanged unless noted"
+    ]
+  },
+  "templates": [],
+  "flash_messages": [
+    {
+      "id": "routes_flash_1",
+      "file": "routes.py",
+      "type": "flash_message",
+      "text": "You do not have permission to view this survey response."
+    },
+    {
+      "id": "routes_flash_2",
+      "file": "routes.py",
+      "type": "flash_message",
+      "text": "This survey response requires authentication. Please log in to view."
+    },
+    {
+      "id": "routes_flash_3",
+      "file": "routes.py",
+      "type": "flash_message",
+      "text": "Survey response not found or unavailable."
+    },
+    {
+      "id": "routes_flash_4",
+      "file": "routes.py",
+      "type": "flash_message",
+      "text": "Campaign ID is required"
+    },
+    {
+      "id": "routes_flash_5",
+      "file": "routes.py",
+      "type": "flash_message",
+      "text": "Demo account not available"
+    },
+    {
+      "id": "routes_flash_6",
+      "file": "routes.py",
+      "type": "flash_message",
+      "text": "Campaign not found or not accessible"
+    },
+    {
+      "id": "routes_flash_7",
+      "file": "routes.py",
+      "type": "flash_message",
+      "text": "Error loading company responses"
+    },
+    {
+      "id": "campaign_routes_flash_1",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "campaign_routes_flash_2",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Error loading campaigns."
+    },
+    {
+      "id": "campaign_routes_flash_3",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "campaign_routes_flash_4",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Campaign name, start date, and end date are required."
+    },
+    {
+      "id": "campaign_routes_flash_5",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "End date must be after start date."
+    },
+    {
+      "id": "campaign_routes_flash_6",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Invalid date format."
+    },
+    {
+      "id": "campaign_routes_flash_7",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Failed to create campaign. Please try again."
+    },
+    {
+      "id": "campaign_routes_flash_8",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "campaign_routes_flash_9",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Campaign not found."
+    },
+    {
+      "id": "campaign_routes_flash_10",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Error loading campaign details."
+    },
+    {
+      "id": "campaign_routes_flash_11",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "campaign_routes_flash_12",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Campaign not found."
+    },
+    {
+      "id": "campaign_routes_flash_13",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Campaign name, start date, and end date are required."
+    },
+    {
+      "id": "campaign_routes_flash_14",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "End date must be after start date."
+    },
+    {
+      "id": "campaign_routes_flash_15",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Invalid date format."
+    },
+    {
+      "id": "campaign_routes_flash_16",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Failed to update campaign. Please try again."
+    },
+    {
+      "id": "campaign_routes_flash_17",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "campaign_routes_flash_18",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Campaign not found."
+    },
+    {
+      "id": "campaign_routes_flash_19",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Failed to delete campaign. Please try again."
+    },
+    {
+      "id": "campaign_routes_flash_20",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "campaign_routes_flash_21",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Campaign not found."
+    },
+    {
+      "id": "campaign_routes_flash_22",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Campaign must have name and description to be marked ready."
+    },
+    {
+      "id": "campaign_routes_flash_23",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Campaign must have at least one participant to be marked ready."
+    },
+    {
+      "id": "campaign_routes_flash_24",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Failed to mark campaign as ready. Please try again."
+    },
+    {
+      "id": "campaign_routes_flash_25",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "campaign_routes_flash_26",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Campaign not found."
+    },
+    {
+      "id": "campaign_routes_flash_27",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Failed to activate campaign. Please try again."
+    },
+    {
+      "id": "campaign_routes_flash_28",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "campaign_routes_flash_29",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Campaign not found."
+    },
+    {
+      "id": "campaign_routes_flash_30",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Failed to complete campaign. Please try again."
+    },
+    {
+      "id": "campaign_routes_flash_31",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "campaign_routes_flash_32",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Campaign not found."
+    },
+    {
+      "id": "campaign_routes_flash_33",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Email service is not configured. Please configure SMTP settings first."
+    },
+    {
+      "id": "campaign_routes_flash_34",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "No participants found for this campaign."
+    },
+    {
+      "id": "campaign_routes_flash_35",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "All participants have already been invited successfully."
+    },
+    {
+      "id": "campaign_routes_flash_36",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Failed to send invitations. Please try again."
+    },
+    {
+      "id": "campaign_routes_flash_37",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "campaign_routes_flash_38",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Campaign not found."
+    },
+    {
+      "id": "campaign_routes_flash_39",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Email service is not configured. Please configure SMTP settings first."
+    },
+    {
+      "id": "campaign_routes_flash_40",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "No failed invitations found that can be retried."
+    },
+    {
+      "id": "campaign_routes_flash_41",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "No invitations were queued for retry."
+    },
+    {
+      "id": "campaign_routes_flash_42",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Failed to resend invitations. Please try again."
+    },
+    {
+      "id": "campaign_routes_flash_43",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "campaign_routes_flash_44",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Campaign not found."
+    },
+    {
+      "id": "campaign_routes_flash_45",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Error loading survey configuration."
+    },
+    {
+      "id": "campaign_routes_flash_46",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "campaign_routes_flash_47",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Campaign not found."
+    },
+    {
+      "id": "campaign_routes_flash_48",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Max questions must be between 3 and 15."
+    },
+    {
+      "id": "campaign_routes_flash_49",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Max duration must be between 60 and 300 seconds."
+    },
+    {
+      "id": "campaign_routes_flash_50",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Max follow-ups per topic must be between 1 and 3."
+    },
+    {
+      "id": "campaign_routes_flash_51",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Invalid numeric values in survey controls."
+    },
+    {
+      "id": "campaign_routes_flash_52",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Survey configuration saved successfully!"
+    },
+    {
+      "id": "campaign_routes_flash_53",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Failed to save survey configuration. Please try again."
+    },
+    {
+      "id": "campaign_routes_flash_54",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "campaign_routes_flash_55",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Campaign not found."
+    },
+    {
+      "id": "campaign_routes_flash_56",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Error loading campaign responses."
+    },
+    {
+      "id": "campaign_routes_flash_57",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "campaign_routes_flash_58",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Campaign not found."
+    },
+    {
+      "id": "campaign_routes_flash_59",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Survey response not found for this participant."
+    },
+    {
+      "id": "campaign_routes_flash_60",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Participant not found in this campaign."
+    },
+    {
+      "id": "campaign_routes_flash_61",
+      "file": "campaign_routes.py",
+      "type": "flash_message",
+      "text": "Error loading individual response."
+    },
+    {
+      "id": "participant_routes_flash_1",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "participant_routes_flash_2",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Error loading participants."
+    },
+    {
+      "id": "participant_routes_flash_3",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "participant_routes_flash_4",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "participant_routes_flash_5",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Commercial value must be a positive number."
+    },
+    {
+      "id": "participant_routes_flash_6",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Invalid commercial value. Please enter a valid number."
+    },
+    {
+      "id": "participant_routes_flash_7",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Tenure must be a positive number."
+    },
+    {
+      "id": "participant_routes_flash_8",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Invalid tenure value. Please enter a valid number."
+    },
+    {
+      "id": "participant_routes_flash_9",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Email, name, and company name are required."
+    },
+    {
+      "id": "participant_routes_flash_10",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Error creating participant."
+    },
+    {
+      "id": "participant_routes_flash_11",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "participant_routes_flash_12",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Participant not found."
+    },
+    {
+      "id": "participant_routes_flash_13",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Commercial value must be a positive number."
+    },
+    {
+      "id": "participant_routes_flash_14",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Invalid commercial value. Please enter a valid number."
+    },
+    {
+      "id": "participant_routes_flash_15",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Tenure must be a positive number."
+    },
+    {
+      "id": "participant_routes_flash_16",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Invalid tenure value. Please enter a valid number."
+    },
+    {
+      "id": "participant_routes_flash_17",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Email, name, and company name are required."
+    },
+    {
+      "id": "participant_routes_flash_18",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Email cannot be changed - this participant has survey history (responses, campaigns, or email deliveries)."
+    },
+    {
+      "id": "participant_routes_flash_19",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Error updating participant."
+    },
+    {
+      "id": "participant_routes_flash_20",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "participant_routes_flash_21",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "participant_routes_flash_22",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "No CSV file provided."
+    },
+    {
+      "id": "participant_routes_flash_23",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "No file selected."
+    },
+    {
+      "id": "participant_routes_flash_24",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "CSV file appears to be empty or invalid."
+    },
+    {
+      "id": "participant_routes_flash_25",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Error processing CSV file."
+    },
+    {
+      "id": "participant_routes_flash_26",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "participant_routes_flash_27",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Participant not found."
+    },
+    {
+      "id": "participant_routes_flash_28",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Error deleting participant."
+    },
+    {
+      "id": "participant_routes_flash_29",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "participant_routes_flash_30",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Participant not found."
+    },
+    {
+      "id": "participant_routes_flash_31",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Error regenerating token."
+    },
+    {
+      "id": "participant_routes_flash_32",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "participant_routes_flash_33",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Campaign not found."
+    },
+    {
+      "id": "participant_routes_flash_34",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "No participants selected."
+    },
+    {
+      "id": "participant_routes_flash_35",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "No new participants were added."
+    },
+    {
+      "id": "participant_routes_flash_36",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Error managing campaign participants."
+    },
+    {
+      "id": "participant_routes_flash_37",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "participant_routes_flash_38",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Campaign not found."
+    },
+    {
+      "id": "participant_routes_flash_39",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Participant association not found."
+    },
+    {
+      "id": "participant_routes_flash_40",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Error removing participant from campaign."
+    },
+    {
+      "id": "participant_routes_flash_41",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "participant_routes_flash_42",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Participant not found."
+    },
+    {
+      "id": "participant_routes_flash_43",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Email service is not configured. Please configure SMTP settings first."
+    },
+    {
+      "id": "participant_routes_flash_44",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Failed to send invitation. Please try again."
+    },
+    {
+      "id": "participant_routes_flash_45",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "participant_routes_flash_46",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Campaign not found."
+    },
+    {
+      "id": "participant_routes_flash_47",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Participant association not found."
+    },
+    {
+      "id": "participant_routes_flash_48",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Email service is not configured. Please configure SMTP settings first."
+    },
+    {
+      "id": "participant_routes_flash_49",
+      "file": "participant_routes.py",
+      "type": "flash_message",
+      "text": "Failed to send invitation. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_1",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Please log in to access this page."
+    },
+    {
+      "id": "business_auth_routes_flash_2",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Invalid session. Please log in again."
+    },
+    {
+      "id": "business_auth_routes_flash_3",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Your account has been suspended. Please contact support."
+    },
+    {
+      "id": "business_auth_routes_flash_4",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Your account is in trial mode."
+    },
+    {
+      "id": "business_auth_routes_flash_5",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Your account is not active. Please contact support."
+    },
+    {
+      "id": "business_auth_routes_flash_6",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Please log in to access this page."
+    },
+    {
+      "id": "business_auth_routes_flash_7",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Please log in to access this page."
+    },
+    {
+      "id": "business_auth_routes_flash_8",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Account access blocked. Please contact support."
+    },
+    {
+      "id": "business_auth_routes_flash_9",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Your account is in trial mode."
+    },
+    {
+      "id": "business_auth_routes_flash_10",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "You do not have permission to access this page."
+    },
+    {
+      "id": "business_auth_routes_flash_11",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Please log in to access this page."
+    },
+    {
+      "id": "business_auth_routes_flash_12",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Please log in to access this page."
+    },
+    {
+      "id": "business_auth_routes_flash_13",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Account access blocked. Please contact support."
+    },
+    {
+      "id": "business_auth_routes_flash_14",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "User session invalid. Please log in again."
+    },
+    {
+      "id": "business_auth_routes_flash_15",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Platform administrator access required. This action requires cross-tenant permissions."
+    },
+    {
+      "id": "business_auth_routes_flash_16",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Authentication required."
+    },
+    {
+      "id": "business_auth_routes_flash_17",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Business account not found."
+    },
+    {
+      "id": "business_auth_routes_flash_18",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "User not found."
+    },
+    {
+      "id": "business_auth_routes_flash_19",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to load user management page."
+    },
+    {
+      "id": "business_auth_routes_flash_20",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Authentication required."
+    },
+    {
+      "id": "business_auth_routes_flash_21",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "All fields are required."
+    },
+    {
+      "id": "business_auth_routes_flash_22",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "A user with this email address already exists."
+    },
+    {
+      "id": "business_auth_routes_flash_23",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to add user. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_24",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Authentication required."
+    },
+    {
+      "id": "business_auth_routes_flash_25",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "User not found."
+    },
+    {
+      "id": "business_auth_routes_flash_26",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "All fields are required."
+    },
+    {
+      "id": "business_auth_routes_flash_27",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "A user with this email address already exists."
+    },
+    {
+      "id": "business_auth_routes_flash_28",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Invalid role selected."
+    },
+    {
+      "id": "business_auth_routes_flash_29",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to update user. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_30",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Authentication required."
+    },
+    {
+      "id": "business_auth_routes_flash_31",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "User not found."
+    },
+    {
+      "id": "business_auth_routes_flash_32",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "You cannot deactivate your own account."
+    },
+    {
+      "id": "business_auth_routes_flash_33",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Cannot deactivate the last admin. Add another admin first."
+    },
+    {
+      "id": "business_auth_routes_flash_34",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to update user status. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_35",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Authentication required."
+    },
+    {
+      "id": "business_auth_routes_flash_36",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "User not found."
+    },
+    {
+      "id": "business_auth_routes_flash_37",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "You cannot reset your own password through this interface. Use the account settings instead."
+    },
+    {
+      "id": "business_auth_routes_flash_38",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to reset password. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_39",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to load onboarding page."
+    },
+    {
+      "id": "business_auth_routes_flash_40",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "All fields are required."
+    },
+    {
+      "id": "business_auth_routes_flash_41",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Please provide a valid email address."
+    },
+    {
+      "id": "business_auth_routes_flash_42",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Invalid license template selected."
+    },
+    {
+      "id": "business_auth_routes_flash_43",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to create business account. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_44",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Error accessing onboarding. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_45",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Authentication required."
+    },
+    {
+      "id": "business_auth_routes_flash_46",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Invalid onboarding step."
+    },
+    {
+      "id": "business_auth_routes_flash_47",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Please complete previous steps first."
+    },
+    {
+      "id": "business_auth_routes_flash_48",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Error loading onboarding step. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_49",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Invalid activation link."
+    },
+    {
+      "id": "business_auth_routes_flash_50",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Activation link has expired. Please contact support for a new invitation."
+    },
+    {
+      "id": "business_auth_routes_flash_51",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Account already activated. Please log in."
+    },
+    {
+      "id": "business_auth_routes_flash_52",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Error loading activation page."
+    },
+    {
+      "id": "business_auth_routes_flash_53",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Invalid activation link."
+    },
+    {
+      "id": "business_auth_routes_flash_54",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Activation link has expired. Please contact support for a new invitation."
+    },
+    {
+      "id": "business_auth_routes_flash_55",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Account already activated. Please log in."
+    },
+    {
+      "id": "business_auth_routes_flash_56",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Password is required."
+    },
+    {
+      "id": "business_auth_routes_flash_57",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Password must be at least 8 characters long."
+    },
+    {
+      "id": "business_auth_routes_flash_58",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Passwords do not match."
+    },
+    {
+      "id": "business_auth_routes_flash_59",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to activate account. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_60",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Email and password are required"
+    },
+    {
+      "id": "business_auth_routes_flash_61",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Invalid email or password"
+    },
+    {
+      "id": "business_auth_routes_flash_62",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Account is deactivated. Please contact support."
+    },
+    {
+      "id": "business_auth_routes_flash_63",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Login failed. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_64",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "You have been logged out successfully."
+    },
+    {
+      "id": "business_auth_routes_flash_65",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Logout completed. Please log in again if needed."
+    },
+    {
+      "id": "business_auth_routes_flash_66",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Please enter your email address."
+    },
+    {
+      "id": "business_auth_routes_flash_67",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "If an account exists with that email, you will receive a password reset link shortly."
+    },
+    {
+      "id": "business_auth_routes_flash_68",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "An error occurred. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_69",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Invalid or expired password reset link."
+    },
+    {
+      "id": "business_auth_routes_flash_70",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "This password reset link has expired. Please request a new one."
+    },
+    {
+      "id": "business_auth_routes_flash_71",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "An error occurred. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_72",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Please fill in all required fields."
+    },
+    {
+      "id": "business_auth_routes_flash_73",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Passwords do not match. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_74",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Password must be at least 8 characters long."
+    },
+    {
+      "id": "business_auth_routes_flash_75",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Invalid or expired password reset link."
+    },
+    {
+      "id": "business_auth_routes_flash_76",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "This password reset link has expired. Please request a new one."
+    },
+    {
+      "id": "business_auth_routes_flash_77",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Your password has been reset successfully. Please log in with your new password."
+    },
+    {
+      "id": "business_auth_routes_flash_78",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "An error occurred while resetting your password. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_79",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "UI version switching is currently disabled."
+    },
+    {
+      "id": "business_auth_routes_flash_80",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to switch UI version."
+    },
+    {
+      "id": "business_auth_routes_flash_81",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Error toggling UI version."
+    },
+    {
+      "id": "business_auth_routes_flash_82",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Business account not found."
+    },
+    {
+      "id": "business_auth_routes_flash_83",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Error loading admin panel."
+    },
+    {
+      "id": "business_auth_routes_flash_84",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "User session invalid."
+    },
+    {
+      "id": "business_auth_routes_flash_85",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Error loading platform dashboard."
+    },
+    {
+      "id": "business_auth_routes_flash_86",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "business_auth_routes_flash_87",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to execute scheduler. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_88",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "business_auth_routes_flash_89",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to get scheduler status."
+    },
+    {
+      "id": "business_auth_routes_flash_90",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "business_auth_routes_flash_91",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to load audit logs."
+    },
+    {
+      "id": "business_auth_routes_flash_92",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "business_auth_routes_flash_93",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to load email configuration."
+    },
+    {
+      "id": "business_auth_routes_flash_94",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "business_auth_routes_flash_95",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Invalid SMTP port. Please enter a number between 1 and 65535."
+    },
+    {
+      "id": "business_auth_routes_flash_96",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Email configuration saved successfully!"
+    },
+    {
+      "id": "business_auth_routes_flash_97",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to save email configuration. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_98",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "business_auth_routes_flash_99",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to load branding configuration."
+    },
+    {
+      "id": "business_auth_routes_flash_100",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "business_auth_routes_flash_101",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to process logo upload. Please try again with a different image."
+    },
+    {
+      "id": "business_auth_routes_flash_102",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Branding configuration saved successfully!"
+    },
+    {
+      "id": "business_auth_routes_flash_103",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to save branding configuration. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_104",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Business account not found."
+    },
+    {
+      "id": "business_auth_routes_flash_105",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to load license information. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_106",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "business_auth_routes_flash_107",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to load survey configuration."
+    },
+    {
+      "id": "business_auth_routes_flash_108",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "business_auth_routes_flash_109",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Survey configuration saved successfully! Your changes will be reflected in new survey sessions."
+    },
+    {
+      "id": "business_auth_routes_flash_110",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to save survey configuration. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_111",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Business account not found."
+    },
+    {
+      "id": "business_auth_routes_flash_112",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to load license information. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_113",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to load license overview. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_114",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to load license information. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_115",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Access denied. You cannot access this business account."
+    },
+    {
+      "id": "business_auth_routes_flash_116",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Business account not found."
+    },
+    {
+      "id": "business_auth_routes_flash_117",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to load assignment form. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_118",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Business account and license type are required."
+    },
+    {
+      "id": "business_auth_routes_flash_119",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Invalid business account ID."
+    },
+    {
+      "id": "business_auth_routes_flash_120",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Invalid license type selected."
+    },
+    {
+      "id": "business_auth_routes_flash_121",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Access denied. You cannot assign licenses to this business account."
+    },
+    {
+      "id": "business_auth_routes_flash_122",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Business account not found."
+    },
+    {
+      "id": "business_auth_routes_flash_123",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Invalid user session. Please log in again."
+    },
+    {
+      "id": "business_auth_routes_flash_124",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Maximum campaigns per year must be between 1 and 1000."
+    },
+    {
+      "id": "business_auth_routes_flash_125",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Maximum users must be between 1 and 10,000."
+    },
+    {
+      "id": "business_auth_routes_flash_126",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Maximum target responses per campaign must be between 1 and 1,000,000."
+    },
+    {
+      "id": "business_auth_routes_flash_127",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Maximum invitations per campaign must be between 1 and 5,000,000."
+    },
+    {
+      "id": "business_auth_routes_flash_128",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Custom limit values must be valid positive numbers."
+    },
+    {
+      "id": "business_auth_routes_flash_129",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Business account validation failed. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_130",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Invalid transcript analysis start date format."
+    },
+    {
+      "id": "business_auth_routes_flash_131",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Invalid transcript analysis end date format."
+    },
+    {
+      "id": "business_auth_routes_flash_132",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Invalid transcript analysis price format."
+    },
+    {
+      "id": "business_auth_routes_flash_133",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Transcript analysis price must be non-negative."
+    },
+    {
+      "id": "business_auth_routes_flash_134",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Invalid transcript analysis price format."
+    },
+    {
+      "id": "business_auth_routes_flash_135",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Transcript analysis end date must be after start date."
+    },
+    {
+      "id": "business_auth_routes_flash_136",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to process license assignment. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_137",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Access denied. You cannot view this business account license history."
+    },
+    {
+      "id": "business_auth_routes_flash_138",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Business account not found."
+    },
+    {
+      "id": "business_auth_routes_flash_139",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to load license history. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_140",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Failed to load license dashboard. Please try again."
+    },
+    {
+      "id": "business_auth_routes_flash_141",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Business account context not found."
+    },
+    {
+      "id": "business_auth_routes_flash_142",
+      "file": "business_auth_routes.py",
+      "type": "flash_message",
+      "text": "Error loading analytics dashboard."
+    }
+  ],
+  "email_templates": []
+}
