@@ -243,7 +243,7 @@
                                     <select class="form-select filter-select" id="filter_company" name="filter_company" multiple 
                                             aria-label="Filter by company">
                                         {% for company in filter_options.companies %}
-                                        <option value="{{ company }}" {% if company in active_filters.companies %}selected{% endif %}>
+                                        <option value="{{ company }}">
                                             {{ company }}
                                         </option>
                                         {% endfor %}
@@ -256,7 +256,7 @@
                                     <select class="form-select filter-select" id="filter_role" name="filter_role" multiple 
                                             aria-label="Filter by role">
                                         {% for role in filter_options.roles %}
-                                        <option value="{{ role }}" {% if role in active_filters.roles %}selected{% endif %}>
+                                        <option value="{{ role }}">
                                             {{ role }}
                                         </option>
                                         {% endfor %}
@@ -269,7 +269,7 @@
                                     <select class="form-select filter-select" id="filter_region" name="filter_region" multiple 
                                             aria-label="Filter by region">
                                         {% for region in filter_options.regions %}
-                                        <option value="{{ region }}" {% if region in active_filters.regions %}selected{% endif %}>
+                                        <option value="{{ region }}">
                                             {{ region }}
                                         </option>
                                         {% endfor %}
@@ -284,7 +284,7 @@
                                     <select class="form-select filter-select" id="filter_tier" name="filter_tier" multiple 
                                             aria-label="Filter by customer tier">
                                         {% for tier in filter_options.tiers %}
-                                        <option value="{{ tier }}" {% if tier in active_filters.tiers %}selected{% endif %}>
+                                        <option value="{{ tier }}">
                                             {{ tier }}
                                         </option>
                                         {% endfor %}
@@ -297,7 +297,7 @@
                                     <select class="form-select filter-select" id="filter_language" name="filter_language" multiple 
                                             aria-label="Filter by language">
                                         {% for language in filter_options.languages %}
-                                        <option value="{{ language }}" {% if language in active_filters.languages %}selected{% endif %}>
+                                        <option value="{{ language }}">
                                             {{ language }}
                                         </option>
                                         {% endfor %}
@@ -310,7 +310,7 @@
                                     <select class="form-select filter-select" id="filter_tenure" name="filter_tenure" multiple 
                                             aria-label="Filter by tenure">
                                         {% for tenure in filter_options.tenure_ranges %}
-                                        <option value="{{ tenure }}" {% if tenure in active_filters.tenure_ranges %}selected{% endif %}>
+                                        <option value="{{ tenure }}">
                                             {{ tenure }}
                                         </option>
                                         {% endfor %}
@@ -334,117 +334,6 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Active Filters Summary Bar -->
-            {% if active_filters.companies or active_filters.roles or active_filters.regions or active_filters.tiers or active_filters.languages or active_filters.tenure_ranges %}
-            <div class="filter-summary-bar mb-4">
-                <div class="filter-summary-header">
-                    <span class="filter-summary-label">
-                        <i class="fas fa-filter me-2"></i>Active Filters:
-                    </span>
-                    <a href="{{ url_for('participants.list_participants', search=search_query if search_query else '') }}" class="btn btn-sm btn-outline-secondary">
-                        <i class="fas fa-times me-1"></i>Clear All
-                    </a>
-                </div>
-                <div class="filter-chips">
-                    {% for company in active_filters.companies %}
-                    <span class="filter-chip">
-                        <strong>Company:</strong> {{ company }}
-                        <a href="{{ url_for('participants.list_participants', 
-                            search=search_query if search_query else '',
-                            filter_company=active_filters.companies|reject('equalto', company)|list,
-                            filter_role=active_filters.roles,
-                            filter_region=active_filters.regions,
-                            filter_tier=active_filters.tiers,
-                            filter_language=active_filters.languages,
-                            filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove">
-                            <i class="fas fa-times"></i>
-                        </a>
-                    </span>
-                    {% endfor %}
-                    
-                    {% for role in active_filters.roles %}
-                    <span class="filter-chip">
-                        <strong>Role:</strong> {{ role }}
-                        <a href="{{ url_for('participants.list_participants',
-                            search=search_query if search_query else '',
-                            filter_company=active_filters.companies,
-                            filter_role=active_filters.roles|reject('equalto', role)|list,
-                            filter_region=active_filters.regions,
-                            filter_tier=active_filters.tiers,
-                            filter_language=active_filters.languages,
-                            filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove">
-                            <i class="fas fa-times"></i>
-                        </a>
-                    </span>
-                    {% endfor %}
-                    
-                    {% for region in active_filters.regions %}
-                    <span class="filter-chip">
-                        <strong>Region:</strong> {{ region }}
-                        <a href="{{ url_for('participants.list_participants',
-                            search=search_query if search_query else '',
-                            filter_company=active_filters.companies,
-                            filter_role=active_filters.roles,
-                            filter_region=active_filters.regions|reject('equalto', region)|list,
-                            filter_tier=active_filters.tiers,
-                            filter_language=active_filters.languages,
-                            filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove">
-                            <i class="fas fa-times"></i>
-                        </a>
-                    </span>
-                    {% endfor %}
-                    
-                    {% for tier in active_filters.tiers %}
-                    <span class="filter-chip">
-                        <strong>Tier:</strong> {{ tier }}
-                        <a href="{{ url_for('participants.list_participants',
-                            search=search_query if search_query else '',
-                            filter_company=active_filters.companies,
-                            filter_role=active_filters.roles,
-                            filter_region=active_filters.regions,
-                            filter_tier=active_filters.tiers|reject('equalto', tier)|list,
-                            filter_language=active_filters.languages,
-                            filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove">
-                            <i class="fas fa-times"></i>
-                        </a>
-                    </span>
-                    {% endfor %}
-                    
-                    {% for language in active_filters.languages %}
-                    <span class="filter-chip">
-                        <strong>Language:</strong> {{ language }}
-                        <a href="{{ url_for('participants.list_participants',
-                            search=search_query if search_query else '',
-                            filter_company=active_filters.companies,
-                            filter_role=active_filters.roles,
-                            filter_region=active_filters.regions,
-                            filter_tier=active_filters.tiers,
-                            filter_language=active_filters.languages|reject('equalto', language)|list,
-                            filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove">
-                            <i class="fas fa-times"></i>
-                        </a>
-                    </span>
-                    {% endfor %}
-                    
-                    {% for tenure in active_filters.tenure_ranges %}
-                    <span class="filter-chip">
-                        <strong>Tenure:</strong> {{ tenure }} years
-                        <a href="{{ url_for('participants.list_participants',
-                            search=search_query if search_query else '',
-                            filter_company=active_filters.companies,
-                            filter_role=active_filters.roles,
-                            filter_region=active_filters.regions,
-                            filter_tier=active_filters.tiers,
-                            filter_language=active_filters.languages,
-                            filter_tenure=active_filters.tenure_ranges|reject('equalto', tenure)|list) }}" class="filter-chip-remove">
-                            <i class="fas fa-times"></i>
-                        </a>
-                    </span>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
 
             <!-- Search -->
             <div class="card mb-4">
@@ -612,7 +501,7 @@
                         </div>
                         <h3>No participants {% if search_query %}match your search{% else %}yet{% endif %}</h3>
                         {% if search_query %}
-                        <p>Try adjusting your search terms or <a href="{{ url_for('participants.list_participants') }}">view all participants</a>.</p>
+                        <p>Try adjusting your search terms or clear filters to view all participants.</p>
                         {% else %}
                         <p>Add individual participants or upload a CSV file to build your participant database. You can then assign them to campaigns for feedback collection.</p>
                         <div class="d-flex gap-2 justify-content-center">
@@ -628,61 +517,9 @@
                     {% endif %}
                 </div>
                 
-                <!-- Pagination -->
+                <!-- Pagination (populated dynamically by JavaScript) -->
                 <div id="paginationContainer">
-                {% if pagination.total_pages > 1 %}
-                <div class="card-footer">
-                    <nav aria-label="Participant pagination">
-                        <div class="row align-items-center">
-                            <div class="col-md-6">
-                                <small class="text-muted">
-                                    Showing {{ (pagination.page - 1) * pagination.per_page + 1 }} to 
-                                    {{ pagination.page * pagination.per_page if pagination.page * pagination.per_page <= pagination.total else pagination.total }} 
-                                    of {{ pagination.total }} participants
-                                </small>
-                            </div>
-                            <div class="col-md-6">
-                                <ul class="pagination pagination-sm justify-content-end mb-0">
-                                    <!-- Previous page -->
-                                    <li class="page-item {{ 'disabled' if not pagination.has_prev else '' }}">
-                                        <a class="page-link" href="{{ url_for('participants.list_participants', page=pagination.prev_page, search=search_query) if pagination.has_prev else '#' }}">
-                                            <i class="fas fa-chevron-left"></i> Previous
-                                        </a>
-                                    </li>
-                                    
-                                    <!-- Page numbers -->
-                                    {% for page_num in range(1, pagination.total_pages + 1) %}
-                                        {% if page_num == pagination.page %}
-                                            <li class="page-item active">
-                                                <span class="page-link">{{ page_num }}</span>
-                                            </li>
-                                        {% elif page_num <= 3 or page_num > pagination.total_pages - 3 or (page_num >= pagination.page - 1 and page_num <= pagination.page + 1) %}
-                                            <li class="page-item">
-                                                <a class="page-link" href="{{ url_for('participants.list_participants', page=page_num, search=search_query) }}">{{ page_num }}</a>
-                                            </li>
-                                        {% elif page_num == 4 and pagination.page > 5 %}
-                                            <li class="page-item disabled">
-                                                <span class="page-link">...</span>
-                                            </li>
-                                        {% elif page_num == pagination.total_pages - 3 and pagination.page < pagination.total_pages - 4 %}
-                                            <li class="page-item disabled">
-                                                <span class="page-link">...</span>
-                                            </li>
-                                        {% endif %}
-                                    {% endfor %}
-                                    
-                                    <!-- Next page -->
-                                    <li class="page-item {{ 'disabled' if not pagination.has_next else '' }}">
-                                        <a class="page-link" href="{{ url_for('participants.list_participants', page=pagination.next_page, search=search_query) if pagination.has_next else '#' }}">
-                                            Next <i class="fas fa-chevron-right"></i>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </nav>
-                </div>
-                {% endif %}
+                    <!-- JavaScript updatePagination() function populates this -->
                 </div>
             </div>
 

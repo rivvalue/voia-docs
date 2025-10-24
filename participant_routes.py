@@ -22,12 +22,151 @@ participant_bp = Blueprint('participants', __name__, url_prefix='/business/parti
 logger = logging.getLogger(__name__)
 
 
+# ============================================================================
+# HELPER FUNCTIONS - Shared filtering logic
+# ============================================================================
+
+def get_filter_options(business_account_id):
+    """
+    Get all available filter options for participant attributes
+    Used to populate filter dropdowns on initial page load
+    """
+    from sqlalchemy import func as sql_func
+    
+    base_query = Participant.query.filter_by(business_account_id=business_account_id)
+    
+    return {
+        'companies': [c[0] for c in base_query.with_entities(Participant.company_name).filter(
+            Participant.company_name.isnot(None), Participant.company_name != ''
+        ).distinct().order_by(Participant.company_name).all()],
+        'roles': [r[0] for r in base_query.with_entities(Participant.role).filter(
+            Participant.role.isnot(None), Participant.role != ''
+        ).distinct().order_by(Participant.role).all()],
+        'regions': [r[0] for r in base_query.with_entities(Participant.region).filter(
+            Participant.region.isnot(None), Participant.region != ''
+        ).distinct().order_by(Participant.region).all()],
+        'tiers': [t[0] for t in base_query.with_entities(Participant.customer_tier).filter(
+            Participant.customer_tier.isnot(None), Participant.customer_tier != ''
+        ).distinct().order_by(Participant.customer_tier).all()],
+        'languages': [l[0] for l in base_query.with_entities(Participant.language).filter(
+            Participant.language.isnot(None), Participant.language != ''
+        ).distinct().order_by(Participant.language).all()],
+        'tenure_ranges': sorted(list(set([
+            str(t[0]) for t in base_query.with_entities(Participant.tenure_years).filter(
+                Participant.tenure_years.isnot(None)
+            ).distinct().all()
+        ])), key=lambda x: int(x) if x.isdigit() else 0)
+    }
+
+
+def apply_participant_filters(query, filter_companies=None, filter_roles=None, 
+                             filter_regions=None, filter_tiers=None, 
+                             filter_languages=None, filter_tenure_ranges=None, 
+                             search_query=None):
+    """
+    Apply filters to a participant query
+    Shared by both list_participants() and api_filter_participants()
+    """
+    # Apply attribute filters
+    if filter_companies:
+        query = query.filter(Participant.company_name.in_(filter_companies))
+    if filter_roles:
+        query = query.filter(Participant.role.in_(filter_roles))
+    if filter_regions:
+        query = query.filter(Participant.region.in_(filter_regions))
+    if filter_tiers:
+        query = query.filter(Participant.customer_tier.in_(filter_tiers))
+    if filter_languages:
+        query = query.filter(Participant.language.in_(filter_languages))
+    if filter_tenure_ranges:
+        tenure_years_int = [int(t) for t in filter_tenure_ranges if t.isdigit()]
+        if tenure_years_int:
+            query = query.filter(Participant.tenure_years.in_(tenure_years_int))
+    
+    # Apply search filter if provided
+    if search_query:
+        search_term = f"%{search_query}%"
+        query = query.filter(
+            db.or_(
+                Participant.name.ilike(search_term),
+                Participant.email.ilike(search_term),
+                Participant.company_name.ilike(search_term)
+            )
+        )
+    
+    return query
+
+
+def calculate_participant_kpi_stats(business_account_id, filter_companies=None, 
+                                   filter_roles=None, filter_regions=None, 
+                                   filter_tiers=None, filter_languages=None, 
+                                   filter_tenure_ranges=None, search_query=None):
+    """
+    Calculate KPI stats for participants with optional filters
+    Returns dict with total, completed, started, invited, created, active, companies counts
+    """
+    from sqlalchemy import case, func as sql_func
+    
+    kpi_query = db.session.query(
+        sql_func.count(Participant.id).label('total'),
+        sql_func.count(case((Participant.status == 'completed', 1))).label('completed'),
+        sql_func.count(case((Participant.status == 'started', 1))).label('started'),
+        sql_func.count(case((Participant.status == 'invited', 1))).label('invited'),
+        sql_func.count(case((Participant.status == 'created', 1))).label('created'),
+        sql_func.count(sql_func.distinct(case(
+            ((Participant.company_name.isnot(None)) & (Participant.company_name != ''), Participant.company_name)
+        ))).label('companies')
+    ).filter(Participant.business_account_id == business_account_id)
+    
+    # Apply same filters using helper function
+    kpi_query = apply_participant_filters(
+        kpi_query, 
+        filter_companies=filter_companies,
+        filter_roles=filter_roles,
+        filter_regions=filter_regions,
+        filter_tiers=filter_tiers,
+        filter_languages=filter_languages,
+        filter_tenure_ranges=filter_tenure_ranges,
+        search_query=search_query
+    )
+    
+    # Execute query
+    kpi_result = kpi_query.first()
+    
+    # Build stats dictionary
+    kpi_stats = {
+        'total': kpi_result.total,
+        'completed': kpi_result.completed,
+        'started': kpi_result.started,
+        'invited': kpi_result.invited,
+        'created': kpi_result.created,
+        'companies': kpi_result.companies
+    }
+    kpi_stats['active'] = kpi_stats['created'] + kpi_stats['invited']
+    
+    # Calculate participants per company ratio
+    if kpi_stats['companies'] > 0:
+        ratio = kpi_stats['total'] / kpi_stats['companies']
+        kpi_stats['participants_per_company'] = round(float(ratio), 1)
+    else:
+        kpi_stats['participants_per_company'] = 0.0
+    
+    return kpi_stats
+
+
+# ============================================================================
+# ROUTES
+# ============================================================================
+
 @participant_bp.route('/')
 @require_business_auth
 @require_permission('manage_participants')
 def list_participants():
-    """List all participants for current business account with search and pagination"""
-    
+    """
+    Initial page load for participant list
+    Provides filter options and unfiltered initial state
+    All filtering is handled client-side via AJAX (api_filter_participants endpoint)
+    """
     try:
         # Get current business account context
         current_account = get_current_business_account()
@@ -35,160 +174,22 @@ def list_participants():
             flash('Business account context not found.', 'error')
             return redirect(url_for('business_auth.login'))
         
-        # Get search and pagination parameters
-        search_query = request.args.get('search', '').strip()
-        page = request.args.get('page', 1, type=int)
-        per_page = 20  # Number of participants per page
+        per_page = 20
         
-        # Get filter parameters
-        filter_companies = request.args.getlist('filter_company')
-        filter_roles = request.args.getlist('filter_role')
-        filter_regions = request.args.getlist('filter_region')
-        filter_tiers = request.args.getlist('filter_tier')
-        filter_languages = request.args.getlist('filter_language')
-        filter_tenure_ranges = request.args.getlist('filter_tenure')
+        # Get filter options for dropdowns (all available values)
+        filter_options = get_filter_options(current_account.id)
         
-        # Build filter options from all participants in business account
-        from sqlalchemy import func as sql_func
+        # Get unfiltered KPI stats for initial display
+        kpi_stats = calculate_participant_kpi_stats(current_account.id)
         
-        base_filter_query = Participant.query.filter_by(business_account_id=current_account.id)
+        # Get first page of unfiltered participants for initial display
+        participants = Participant.query.filter_by(
+            business_account_id=current_account.id
+        ).order_by(Participant.created_at.desc()).limit(per_page).all()
         
-        filter_options = {
-            'companies': [c[0] for c in base_filter_query.with_entities(Participant.company_name).filter(
-                Participant.company_name.isnot(None), Participant.company_name != ''
-            ).distinct().order_by(Participant.company_name).all()],
-            'roles': [r[0] for r in base_filter_query.with_entities(Participant.role).filter(
-                Participant.role.isnot(None), Participant.role != ''
-            ).distinct().order_by(Participant.role).all()],
-            'regions': [r[0] for r in base_filter_query.with_entities(Participant.region).filter(
-                Participant.region.isnot(None), Participant.region != ''
-            ).distinct().order_by(Participant.region).all()],
-            'tiers': [t[0] for t in base_filter_query.with_entities(Participant.customer_tier).filter(
-                Participant.customer_tier.isnot(None), Participant.customer_tier != ''
-            ).distinct().order_by(Participant.customer_tier).all()],
-            'languages': [l[0] for l in base_filter_query.with_entities(Participant.language).filter(
-                Participant.language.isnot(None), Participant.language != ''
-            ).distinct().order_by(Participant.language).all()],
-            'tenure_ranges': sorted(list(set([
-                str(t[0]) for t in base_filter_query.with_entities(Participant.tenure_years).filter(
-                    Participant.tenure_years.isnot(None)
-                ).distinct().all()
-            ])), key=lambda x: int(x) if x.isdigit() else 0)
-        }
-        
-        # Store active filters
-        active_filters = {
-            'companies': filter_companies,
-            'roles': filter_roles,
-            'regions': filter_regions,
-            'tiers': filter_tiers,
-            'languages': filter_languages,
-            'tenure_ranges': filter_tenure_ranges
-        }
-        
-        # Base query scoped to current business account
-        query = Participant.query.filter_by(business_account_id=current_account.id)
-        
-        # Apply attribute filters
-        if filter_companies:
-            query = query.filter(Participant.company_name.in_(filter_companies))
-        if filter_roles:
-            query = query.filter(Participant.role.in_(filter_roles))
-        if filter_regions:
-            query = query.filter(Participant.region.in_(filter_regions))
-        if filter_tiers:
-            query = query.filter(Participant.customer_tier.in_(filter_tiers))
-        if filter_languages:
-            query = query.filter(Participant.language.in_(filter_languages))
-        if filter_tenure_ranges:
-            tenure_years_int = [int(t) for t in filter_tenure_ranges if t.isdigit()]
-            if tenure_years_int:
-                query = query.filter(Participant.tenure_years.in_(tenure_years_int))
-        
-        # Apply search filter if provided
-        if search_query:
-            search_term = f"%{search_query}%"
-            query = query.filter(
-                db.or_(
-                    Participant.name.ilike(search_term),
-                    Participant.email.ilike(search_term),
-                    Participant.company_name.ilike(search_term)
-                )
-            )
-        
-        # OPTIMIZATION: Get all KPI stats in ONE query using SQL CASE statements
-        from sqlalchemy import case, func as sql_func
-        
-        # Build base query with same filters
-        kpi_base_query = db.session.query(
-            sql_func.count(Participant.id).label('total'),
-            sql_func.count(case((Participant.status == 'completed', 1))).label('completed'),
-            sql_func.count(case((Participant.status == 'started', 1))).label('started'),
-            sql_func.count(case((Participant.status == 'invited', 1))).label('invited'),
-            sql_func.count(case((Participant.status == 'created', 1))).label('created'),
-            sql_func.count(sql_func.distinct(case(
-                ((Participant.company_name.isnot(None)) & (Participant.company_name != ''), Participant.company_name)
-            ))).label('companies')
-        ).filter(Participant.business_account_id == current_account.id)
-        
-        # Apply same attribute filters to KPI query
-        if filter_companies:
-            kpi_base_query = kpi_base_query.filter(Participant.company_name.in_(filter_companies))
-        if filter_roles:
-            kpi_base_query = kpi_base_query.filter(Participant.role.in_(filter_roles))
-        if filter_regions:
-            kpi_base_query = kpi_base_query.filter(Participant.region.in_(filter_regions))
-        if filter_tiers:
-            kpi_base_query = kpi_base_query.filter(Participant.customer_tier.in_(filter_tiers))
-        if filter_languages:
-            kpi_base_query = kpi_base_query.filter(Participant.language.in_(filter_languages))
-        if filter_tenure_ranges:
-            tenure_years_int = [int(t) for t in filter_tenure_ranges if t.isdigit()]
-            if tenure_years_int:
-                kpi_base_query = kpi_base_query.filter(Participant.tenure_years.in_(tenure_years_int))
-        
-        # Apply same search filter if provided
-        if search_query:
-            search_term = f"%{search_query}%"
-            kpi_base_query = kpi_base_query.filter(
-                db.or_(
-                    Participant.name.ilike(search_term),
-                    Participant.email.ilike(search_term),
-                    Participant.company_name.ilike(search_term)
-                )
-            )
-        
-        # Execute single query to get all KPI stats
-        kpi_result = kpi_base_query.first()
-        
-        # Build KPI stats dictionary from single query result
-        total_participants = kpi_result.total  # Use for pagination
-        kpi_stats = {
-            'total': kpi_result.total,
-            'completed': kpi_result.completed,
-            'started': kpi_result.started,
-            'invited': kpi_result.invited,
-            'created': kpi_result.created,
-            'companies': kpi_result.companies
-        }
-        kpi_stats['active'] = kpi_stats['created'] + kpi_stats['invited']
-        
-        # Calculate participants per company ratio
-        if kpi_stats['companies'] > 0:
-            ratio = kpi_stats['total'] / kpi_stats['companies']
-            kpi_stats['participants_per_company'] = round(float(ratio), 1)
-        else:
-            kpi_stats['participants_per_company'] = 0.0
-        
-        # Apply pagination
-        participants = query.order_by(Participant.created_at.desc()).offset(
-            (page - 1) * per_page
-        ).limit(per_page).all()
-        
-        # Calculate pagination info
-        total_pages = (total_participants + per_page - 1) // per_page
-        has_prev = page > 1
-        has_next = page < total_pages
+        # Calculate initial pagination (unfiltered total)
+        total_participants = kpi_stats['total']
+        total_pages = (total_participants + per_page - 1) // per_page if total_participants > 0 else 1
         
         # Get campaigns for dropdown (scoped to current business account)
         campaigns = Campaign.query.filter_by(
@@ -196,28 +197,24 @@ def list_participants():
         ).order_by(Campaign.name).all()
         
         # Prepare participant data
-        participant_data = []
-        for participant in participants:
-            data = participant.to_dict()
-            participant_data.append(data)
+        participant_data = [p.to_dict() for p in participants]
         
         return render_template('participants/list.html',
                              participants=participant_data,
-                             campaigns=[c.to_dict() if c else {} for c in campaigns],
-                             business_account=current_account.to_dict() if current_account else {},
-                             search_query=search_query,
+                             campaigns=[c.to_dict() for c in campaigns],
+                             business_account=current_account.to_dict(),
+                             search_query='',  # Initial state has no search
                              kpi_stats=kpi_stats,
                              filter_options=filter_options,
-                             active_filters=active_filters,
                              pagination={
-                                 'page': page,
+                                 'page': 1,
                                  'per_page': per_page,
                                  'total': total_participants,
                                  'total_pages': total_pages,
-                                 'has_prev': has_prev,
-                                 'has_next': has_next,
-                                 'prev_page': page - 1 if has_prev else None,
-                                 'next_page': page + 1 if has_next else None
+                                 'has_prev': False,
+                                 'has_next': total_pages > 1,
+                                 'prev_page': None,
+                                 'next_page': 2 if total_pages > 1 else None
                              })
         
     except Exception as e:
@@ -230,8 +227,7 @@ def list_participants():
 @require_business_auth
 @require_permission('manage_participants')
 def api_filter_participants():
-    """JSON API endpoint for filtered participant data"""
-    
+    """JSON API endpoint for filtered participant data - used by AJAX filtering"""
     try:
         # Get current business account context
         current_account = get_current_business_account()
@@ -239,109 +235,44 @@ def api_filter_participants():
             return jsonify({'error': 'Business account context not found'}), 401
         
         # Get search and pagination parameters
-        search_query = request.args.get('search', '').strip()
+        search_query = request.args.get('search', '').strip() or None
         page = request.args.get('page', 1, type=int)
         per_page = 20
         
         # Get filter parameters
-        filter_companies = request.args.getlist('filter_company')
-        filter_roles = request.args.getlist('filter_role')
-        filter_regions = request.args.getlist('filter_region')
-        filter_tiers = request.args.getlist('filter_tier')
-        filter_languages = request.args.getlist('filter_language')
-        filter_tenure_ranges = request.args.getlist('filter_tenure')
+        filter_companies = request.args.getlist('filter_company') or None
+        filter_roles = request.args.getlist('filter_role') or None
+        filter_regions = request.args.getlist('filter_region') or None
+        filter_tiers = request.args.getlist('filter_tier') or None
+        filter_languages = request.args.getlist('filter_language') or None
+        filter_tenure_ranges = request.args.getlist('filter_tenure') or None
         
-        # Base query scoped to current business account
+        # Build filtered query using helper function
         query = Participant.query.filter_by(business_account_id=current_account.id)
+        query = apply_participant_filters(
+            query,
+            filter_companies=filter_companies,
+            filter_roles=filter_roles,
+            filter_regions=filter_regions,
+            filter_tiers=filter_tiers,
+            filter_languages=filter_languages,
+            filter_tenure_ranges=filter_tenure_ranges,
+            search_query=search_query
+        )
         
-        # Apply attribute filters
-        if filter_companies:
-            query = query.filter(Participant.company_name.in_(filter_companies))
-        if filter_roles:
-            query = query.filter(Participant.role.in_(filter_roles))
-        if filter_regions:
-            query = query.filter(Participant.region.in_(filter_regions))
-        if filter_tiers:
-            query = query.filter(Participant.customer_tier.in_(filter_tiers))
-        if filter_languages:
-            query = query.filter(Participant.language.in_(filter_languages))
-        if filter_tenure_ranges:
-            tenure_years_int = [int(t) for t in filter_tenure_ranges if t.isdigit()]
-            if tenure_years_int:
-                query = query.filter(Participant.tenure_years.in_(tenure_years_int))
+        # Calculate KPI stats with same filters using helper function
+        kpi_stats = calculate_participant_kpi_stats(
+            current_account.id,
+            filter_companies=filter_companies,
+            filter_roles=filter_roles,
+            filter_regions=filter_regions,
+            filter_tiers=filter_tiers,
+            filter_languages=filter_languages,
+            filter_tenure_ranges=filter_tenure_ranges,
+            search_query=search_query
+        )
         
-        # Apply search filter if provided
-        if search_query:
-            search_term = f"%{search_query}%"
-            query = query.filter(
-                db.or_(
-                    Participant.name.ilike(search_term),
-                    Participant.email.ilike(search_term),
-                    Participant.company_name.ilike(search_term)
-                )
-            )
-        
-        # Get KPI stats with same filters
-        from sqlalchemy import case, func as sql_func
-        
-        kpi_base_query = db.session.query(
-            sql_func.count(Participant.id).label('total'),
-            sql_func.count(case((Participant.status == 'completed', 1))).label('completed'),
-            sql_func.count(case((Participant.status == 'started', 1))).label('started'),
-            sql_func.count(case((Participant.status == 'invited', 1))).label('invited'),
-            sql_func.count(case((Participant.status == 'created', 1))).label('created'),
-            sql_func.count(sql_func.distinct(case(
-                ((Participant.company_name.isnot(None)) & (Participant.company_name != ''), Participant.company_name)
-            ))).label('companies')
-        ).filter(Participant.business_account_id == current_account.id)
-        
-        # Apply same attribute filters to KPI query
-        if filter_companies:
-            kpi_base_query = kpi_base_query.filter(Participant.company_name.in_(filter_companies))
-        if filter_roles:
-            kpi_base_query = kpi_base_query.filter(Participant.role.in_(filter_roles))
-        if filter_regions:
-            kpi_base_query = kpi_base_query.filter(Participant.region.in_(filter_regions))
-        if filter_tiers:
-            kpi_base_query = kpi_base_query.filter(Participant.customer_tier.in_(filter_tiers))
-        if filter_languages:
-            kpi_base_query = kpi_base_query.filter(Participant.language.in_(filter_languages))
-        if filter_tenure_ranges:
-            tenure_years_int = [int(t) for t in filter_tenure_ranges if t.isdigit()]
-            if tenure_years_int:
-                kpi_base_query = kpi_base_query.filter(Participant.tenure_years.in_(tenure_years_int))
-        
-        # Apply same search filter if provided
-        if search_query:
-            search_term = f"%{search_query}%"
-            kpi_base_query = kpi_base_query.filter(
-                db.or_(
-                    Participant.name.ilike(search_term),
-                    Participant.email.ilike(search_term),
-                    Participant.company_name.ilike(search_term)
-                )
-            )
-        
-        # Execute KPI query
-        kpi_result = kpi_base_query.first()
-        total_participants = kpi_result.total
-        
-        kpi_stats = {
-            'total': kpi_result.total,
-            'completed': kpi_result.completed,
-            'started': kpi_result.started,
-            'invited': kpi_result.invited,
-            'created': kpi_result.created,
-            'companies': kpi_result.companies
-        }
-        kpi_stats['active'] = kpi_stats['created'] + kpi_stats['invited']
-        
-        # Calculate participants per company ratio
-        if kpi_stats['companies'] > 0:
-            ratio = kpi_stats['total'] / kpi_stats['companies']
-            kpi_stats['participants_per_company'] = round(float(ratio), 1)
-        else:
-            kpi_stats['participants_per_company'] = 0.0
+        total_participants = kpi_stats['total']
         
         # Apply pagination
         participants = query.order_by(Participant.created_at.desc()).offset(
@@ -349,7 +280,7 @@ def api_filter_participants():
         ).limit(per_page).all()
         
         # Calculate pagination info
-        total_pages = (total_participants + per_page - 1) // per_page
+        total_pages = (total_participants + per_page - 1) // per_page if total_participants > 0 else 1
         has_prev = page > 1
         has_next = page < total_pages
         
