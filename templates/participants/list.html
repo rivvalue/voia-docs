@@ -325,9 +325,9 @@
                                 <button type="button" class="btn btn-outline-secondary" id="clearFiltersBtn">
                                     <i class="fas fa-times me-2"></i>Clear Filters
                                 </button>
-                                <small class="text-muted ms-3">
+                                <small class="text-muted ms-3" id="filterResultCount">
                                     <i class="fas fa-info-circle me-1"></i>
-                                    Showing {{ pagination.total }} participant{{ 's' if pagination.total != 1 else '' }}
+                                    Showing <span id="filterTotalCount">{{ pagination.total }}</span> participant<span id="filterPluralSuffix">{{ 's' if pagination.total != 1 else '' }}</span>
                                 </small>
                             </div>
                         </form>
@@ -496,15 +496,9 @@
             <div class="card participant-table">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="fas fa-list me-2"></i>Participant List</h5>
-                    {% if search_query %}
-                    <small class="text-muted">
-                        {{ pagination.total }} result{{ 's' if pagination.total != 1 else '' }} for "{{ search_query }}"
+                    <small class="text-muted" id="tableHeaderCount">
+                        <span id="tableHeaderTotal">{{ pagination.total }}</span> <span id="tableHeaderLabel">{% if search_query %}result{{ 's' if pagination.total != 1 else '' }} for "{{ search_query }}"{% else %}participant{{ 's' if pagination.total != 1 else '' }}{% endif %}</span>
                     </small>
-                    {% else %}
-                    <small class="text-muted">
-                        {{ pagination.total }} participant{{ 's' if pagination.total != 1 else '' }}
-                    </small>
-                    {% endif %}
                 </div>
                 <div class="card-body p-0">
                     {% if participants %}
@@ -1031,9 +1025,36 @@ function updateParticipantTable(participants, pagination) {
 }
 
 function updateKPICards(stats) {
+    // Update KPI card values
     document.getElementById('kpiTotal').textContent = stats.total || 0;
     document.getElementById('kpiActive').textContent = stats.active || 0;
     document.getElementById('kpiCompanies').textContent = stats.companies || 0;
+    
+    // Update filter result count (in filter panel)
+    const filterTotalCount = document.getElementById('filterTotalCount');
+    const filterPluralSuffix = document.getElementById('filterPluralSuffix');
+    if (filterTotalCount) {
+        filterTotalCount.textContent = stats.total || 0;
+    }
+    if (filterPluralSuffix) {
+        filterPluralSuffix.textContent = (stats.total === 1) ? '' : 's';
+    }
+    
+    // Update table header count
+    const tableHeaderTotal = document.getElementById('tableHeaderTotal');
+    const tableHeaderLabel = document.getElementById('tableHeaderLabel');
+    if (tableHeaderTotal) {
+        tableHeaderTotal.textContent = stats.total || 0;
+    }
+    if (tableHeaderLabel) {
+        const searchInput = document.getElementById('search');
+        const searchQuery = searchInput ? searchInput.value.trim() : '';
+        if (searchQuery) {
+            tableHeaderLabel.textContent = `result${(stats.total === 1) ? '' : 's'} for "${searchQuery}"`;
+        } else {
+            tableHeaderLabel.textContent = `participant${(stats.total === 1) ? '' : 's'}`;
+        }
+    }
 }
 
 function updatePagination(pagination) {
