@@ -462,11 +462,9 @@
                                     <button type="submit" class="btn btn-primary">
                                         <i class="fas fa-search me-1"></i>Search
                                     </button>
-                                    {% if search_query %}
-                                    <a href="{{ url_for('participants.list_participants') }}" class="btn btn-outline-secondary">
+                                    <button type="button" id="clearSearchBtn" class="btn btn-outline-secondary" style="display: none;">
                                         <i class="fas fa-times me-1"></i>Clear
-                                    </a>
-                                    {% endif %}
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1133,6 +1131,38 @@ document.addEventListener('DOMContentLoaded', function() {
         searchForm.addEventListener('submit', function(e) {
             e.preventDefault();
             applyFilters(1); // Apply current filters with new search
+        });
+    }
+    
+    // Manage search clear button visibility and functionality
+    const searchInput = document.getElementById('search');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    
+    function updateClearButtonVisibility() {
+        if (searchInput && clearSearchBtn) {
+            if (searchInput.value.trim()) {
+                clearSearchBtn.style.display = 'block';
+            } else {
+                clearSearchBtn.style.display = 'none';
+            }
+        }
+    }
+    
+    if (searchInput) {
+        // Update button visibility on input change
+        searchInput.addEventListener('input', updateClearButtonVisibility);
+        
+        // Initial check on page load
+        updateClearButtonVisibility();
+    }
+    
+    if (clearSearchBtn) {
+        clearSearchBtn.addEventListener('click', function() {
+            if (searchInput) {
+                searchInput.value = '';
+                updateClearButtonVisibility();
+                applyFilters(1); // Trigger filter refresh with empty search
+            }
         });
     }
     
