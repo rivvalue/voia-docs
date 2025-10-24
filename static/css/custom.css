@@ -2857,8 +2857,11 @@ body[data-ui-version="v2"] .navbar .container {
     margin: 0 !important;
     padding-left: 1rem !important;
     padding-right: 1rem !important;
-    display: flex !important;
-    justify-content: flex-end !important;
+}
+
+/* FIX: Prevent navbar-collapse from consuming flex space */
+body[data-ui-version="v2"] .navbar .navbar-collapse {
+    flex: 0 0 auto !important;
 }
 
 /* Mobile: Reset offset when sidebar collapses */

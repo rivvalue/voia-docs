@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}?v=lang-fix-202410242101">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}?v=lang-fix-202410242110">
     
     <!-- CSRF Token for AJAX requests -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -96,7 +96,7 @@
 
     <!-- Top Navbar -->
     <nav class="navbar navbar-expand-lg">
-        <div class="container position-relative" {% if ui_version == 'v2' and is_business_authenticated %}style="display: flex; justify-content: flex-end; width: 100%;"{% endif %}>
+        <div class="container position-relative">
             <!-- Demo Logo for Trial Users (not authenticated) - Hidden on demo intro page -->
             {% if not is_business_authenticated and branding_context and branding_context.logo_url and request.endpoint != 'demo_intro' %}
             <div class="navbar-brand d-flex align-items-center">
@@ -114,7 +114,7 @@
             {% endif %}
             
             <!-- Right-aligned utility cluster: Language + User actions -->
-            <div class="d-flex align-items-center gap-3" {% if not (ui_version == 'v2' and is_business_authenticated) %}style="margin-left: auto;"{% endif %}>
+            <div class="d-flex align-items-center gap-3 ms-auto">
                 {% include 'components/language_selector.html' %}
                 
                 {% if is_business_authenticated %}
