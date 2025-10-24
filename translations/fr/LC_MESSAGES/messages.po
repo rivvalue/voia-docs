@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-24 21:33+0000\n"
+"POT-Creation-Date: 2025-10-24 23:47+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -475,6 +475,11 @@ msgstr ""
 msgid "Campaign KPI Overview"
 msgstr "Vue d'ensemble des indicateurs de campagne"
 
+#: templates/dashboard.html:69 templates/dashboard.html:300
+#, fuzzy
+msgid "Campaign"
+msgstr "Campagnes"
+
 #: templates/dashboard.html:71 templates/dashboard.html:399
 #: templates/dashboard.html:795 templates/dashboard.html:800
 #: templates/dashboard.html:815 templates/dashboard.html:816
@@ -492,9 +497,33 @@ msgstr "Réponses"
 msgid "Click to view full trends"
 msgstr "Cliquez pour voir les tendances complètes"
 
+#: templates/dashboard.html:77 templates/dashboard.html:937
+msgid "NPS"
+msgstr "NPS"
+
+#: templates/dashboard.html:83
+#, fuzzy
+msgid "Companies"
+msgstr "Nombre total de campagnes"
+
 #: templates/dashboard.html:89 templates/dashboard.html:1018
 msgid "Critical Risk"
 msgstr "Risque critique"
+
+#: templates/dashboard.html:95 templates/dashboard.html:1028
+#, fuzzy
+msgid "Satisfaction"
+msgstr "Satisfaction :"
+
+#: templates/dashboard.html:101
+#, fuzzy
+msgid "Product"
+msgstr "Valeur du produit"
+
+#: templates/dashboard.html:113 templates/dashboard.html:1058
+#, fuzzy
+msgid "Service"
+msgstr "Vue d'ensemble"
 
 #: templates/dashboard.html:140
 msgid "Campaign Comparison"
@@ -547,7 +576,7 @@ msgstr "À propos de l'analyse des transcriptions"
 
 #: templates/dashboard.html:213 templates/dashboard.html:229
 #: templates/dashboard.html:479 templates/dashboard.html:637
-#: templates/dashboard.html:653
+#: templates/dashboard.html:653 templates/dashboard.html:809
 #, fuzzy
 msgid "Search"
 msgstr "Effacer la recherche"
@@ -584,6 +613,7 @@ msgid "Clear"
 msgstr "Fermer"
 
 #: templates/campaigns/responses_list.html:177 templates/dashboard.html:241
+#: templates/dashboard.html:837
 #: templates/participants/campaign_participants.html:61
 #: templates/participants/campaign_participants.html:63
 #: templates/participants/campaign_participants.html:171
@@ -748,6 +778,7 @@ msgid "High Potential"
 msgstr ""
 
 #: templates/dashboard.html:497 templates/dashboard.html:675
+#: templates/dashboard.html:756
 msgid "Risk Level"
 msgstr "Niveau de Risque"
 
@@ -826,7 +857,7 @@ msgid ""
 "evaluating Archelo Group"
 msgstr ""
 
-#: templates/dashboard.html:642
+#: templates/dashboard.html:642 templates/dashboard.html:814
 #, fuzzy
 msgid "NPS Category"
 msgstr "Score NPS"
@@ -843,7 +874,7 @@ msgstr "Passifs (7-8)"
 msgid "Detractors (0-6)"
 msgstr "Détracteurs (0-6)"
 
-#: templates/dashboard.html:672
+#: templates/dashboard.html:672 templates/dashboard.html:753
 msgid "Avg Individual NPS"
 msgstr "NPS Individuel Moyen"
 
@@ -852,17 +883,17 @@ msgstr "NPS Individuel Moyen"
 msgid "Company NPS"
 msgstr "Nom de l'entreprise"
 
-#: templates/dashboard.html:674
+#: templates/dashboard.html:674 templates/dashboard.html:755
 #, fuzzy
 msgid "Distribution"
 msgstr "Répartition du NPS"
 
-#: templates/dashboard.html:676
+#: templates/dashboard.html:676 templates/dashboard.html:757
 #, fuzzy
 msgid "Latest Response"
 msgstr "Nombre total de réponses"
 
-#: templates/dashboard.html:677
+#: templates/dashboard.html:677 templates/dashboard.html:758
 #, fuzzy
 msgid "Latest Churn Risk"
 msgstr "Indicateurs de risque de résiliation"
@@ -879,6 +910,16 @@ msgstr "Pagination du NPS par entreprise"
 msgid "NPS by Customer Tenure"
 msgstr "NPS par ancienneté client"
 
+#: templates/dashboard.html:751
+#, fuzzy
+msgid "Tenure Group"
+msgstr "Ancienneté :"
+
+#: templates/dashboard.html:754
+#, fuzzy
+msgid "Tenure NPS"
+msgstr "Ancienneté :"
+
 #: templates/dashboard.html:772
 msgid "Tenure NPS pagination"
 msgstr "Pagination du NPS par ancienneté"
@@ -886,6 +927,30 @@ msgstr "Pagination du NPS par ancienneté"
 #: templates/dashboard.html:811
 msgid "Search by company name, participant name, or email..."
 msgstr "Rechercher par nom d'entreprise, nom de participant ou e-mail..."
+
+#: templates/dashboard.html:838
+msgid "Tenure with FC inc"
+msgstr "Ancienneté avec FC inc"
+
+#: templates/dashboard.html:840
+#, fuzzy
+msgid "Category"
+msgstr "Score NPS"
+
+#: templates/dashboard.html:841
+#, fuzzy
+msgid "Sentiment"
+msgstr "Sentiment :"
+
+#: templates/dashboard.html:842
+#, fuzzy
+msgid "Churn Risk"
+msgstr "Indicateurs de risque de résiliation"
+
+#: templates/dashboard.html:843 templates/dashboard.html:939
+#, fuzzy
+msgid "Date"
+msgstr "Date de fin"
 
 #: templates/dashboard.html:858
 msgid "Survey responses pagination"
@@ -923,6 +988,11 @@ msgstr "NPS le plus faible"
 #: templates/dashboard.html:927
 msgid "Loading responses..."
 msgstr "Chargement des réponses..."
+
+#: templates/dashboard.html:940
+#, fuzzy
+msgid "Action"
+msgstr "Durée :"
 
 #: templates/campaigns/responses_list.html:232 templates/dashboard.html:965
 msgid "No Responses Found"
@@ -2617,7 +2687,7 @@ msgstr "Nombre maximal d'invitations par campagne"
 #: templates/business_auth/licenses/assignment_form.html:304
 #, fuzzy, python-format
 msgid ""
-"Hard limit on survey invitations (typically 5x responses for ~20%% "
+"Hard limit on survey invitations (typically 5x responses for ~20% "
 "response rate)"
 msgstr ""
 "Limite stricte d'invitations (généralement 5× les réponses pour un taux "
@@ -3651,7 +3721,7 @@ msgstr "Sélectionnez une catégorie (optionnel)"
 
 #: templates/participants/create.html:145 templates/participants/edit.html:193
 #, fuzzy, python-format
-msgid "T1: Strategic (Top 5.10%% clients)"
+msgid "T1: Strategic (Top 5–10% clients)"
 msgstr "T1 : Stratégique (5–10 % des meilleurs clients)"
 
 #: templates/participants/create.html:146 templates/participants/edit.html:194

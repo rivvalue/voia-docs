@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-24 20:01+0000\n"
+"POT-Creation-Date: 2025-10-24 23:47+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: en\n"
@@ -21,7 +21,7 @@ msgstr ""
 #: templates/business_auth/manage_users.html:242
 #: templates/business_auth/manage_users.html:325
 #: templates/conversational_survey.html:76
-#: templates/conversational_survey_business.html:72
+#: templates/conversational_survey_business.html:77
 #: templates/server_auth.html:38 templates/simple_auth.html:15
 #: templates/survey.html:54
 msgid "Email Address"
@@ -33,7 +33,7 @@ msgstr ""
 
 #: templates/auth.html:40 templates/company_responses.html:55
 #: templates/company_responses.html:62 templates/conversational_survey.html:163
-#: templates/conversational_survey_business.html:137
+#: templates/conversational_survey_business.html:142
 #: templates/dashboard.html:260 templates/dashboard.html:527
 #: templates/dashboard.html:714 templates/dashboard.html:770
 #: templates/dashboard.html:856 templates/dashboard.html:925
@@ -105,7 +105,7 @@ msgstr ""
 msgid "Rate limiting prevents abuse"
 msgstr ""
 
-#: templates/base.html:53 templates/base.html:171 templates/dashboard.html:20
+#: templates/base.html:53 templates/base.html:170 templates/dashboard.html:20
 msgid "Business Intelligence"
 msgstr ""
 
@@ -210,7 +210,7 @@ msgstr ""
 #: templates/business_auth/activate_account.html:435
 #: templates/business_auth/licenses/overview.html:323
 #: templates/campaigns/view.html:491 templates/conversational_survey.html:52
-#: templates/conversational_survey_business.html:60
+#: templates/conversational_survey_business.html:65
 #: templates/dashboard.html:670 templates/survey.html:42
 msgid "Company Name"
 msgstr ""
@@ -221,7 +221,7 @@ msgstr ""
 
 #: templates/business_auth/activate_account.html:439
 #: templates/conversational_survey.html:64
-#: templates/conversational_survey_business.html:66 templates/survey.html:48
+#: templates/conversational_survey_business.html:71 templates/survey.html:48
 msgid "Your Name"
 msgstr ""
 
@@ -234,47 +234,47 @@ msgid "Enter your email address"
 msgstr ""
 
 #: templates/conversational_survey.html:88
-#: templates/conversational_survey_business.html:79
+#: templates/conversational_survey_business.html:84
 msgid "How long have you been working with"
 msgstr ""
 
 #: templates/conversational_survey.html:90
-#: templates/conversational_survey_business.html:82 templates/survey.html:62
+#: templates/conversational_survey_business.html:87 templates/survey.html:62
 msgid "Select duration..."
 msgstr ""
 
 #: templates/conversational_survey.html:91
-#: templates/conversational_survey_business.html:83 templates/survey.html:63
+#: templates/conversational_survey_business.html:88 templates/survey.html:63
 msgid "Less than 6 months"
 msgstr ""
 
 #: templates/conversational_survey.html:92
-#: templates/conversational_survey_business.html:84 templates/survey.html:64
+#: templates/conversational_survey_business.html:89 templates/survey.html:64
 msgid "6 months - 1 year"
 msgstr ""
 
 #: templates/conversational_survey.html:93
-#: templates/conversational_survey_business.html:85 templates/survey.html:65
+#: templates/conversational_survey_business.html:90 templates/survey.html:65
 msgid "1-2 years"
 msgstr ""
 
 #: templates/conversational_survey.html:94
-#: templates/conversational_survey_business.html:86 templates/survey.html:66
+#: templates/conversational_survey_business.html:91 templates/survey.html:66
 msgid "2-3 years"
 msgstr ""
 
 #: templates/conversational_survey.html:95
-#: templates/conversational_survey_business.html:87 templates/survey.html:67
+#: templates/conversational_survey_business.html:92 templates/survey.html:67
 msgid "3-5 years"
 msgstr ""
 
 #: templates/conversational_survey.html:96
-#: templates/conversational_survey_business.html:88 templates/survey.html:68
+#: templates/conversational_survey_business.html:93 templates/survey.html:68
 msgid "5-10 years"
 msgstr ""
 
 #: templates/conversational_survey.html:97
-#: templates/conversational_survey_business.html:89 templates/survey.html:69
+#: templates/conversational_survey_business.html:94 templates/survey.html:69
 msgid "More than 10 years"
 msgstr ""
 
@@ -306,12 +306,12 @@ msgid "Processing response"
 msgstr ""
 
 #: templates/conversational_survey.html:165
-#: templates/conversational_survey_business.html:139
+#: templates/conversational_survey_business.html:144
 msgid "VOÏA is processing your response..."
 msgstr ""
 
 #: templates/conversational_survey.html:166
-#: templates/conversational_survey_business.html:140
+#: templates/conversational_survey_business.html:145
 msgid "Please wait while VOÏA analyzes your feedback"
 msgstr ""
 
@@ -356,34 +356,71 @@ msgstr ""
 msgid "Return to home page"
 msgstr ""
 
-#: templates/conversational_survey_business.html:38
+#: templates/conversational_survey_business.html:43
 msgid "Hi"
 msgstr ""
 
-#: templates/conversational_survey_business.html:38
+#: templates/conversational_survey_business.html:43
 msgid "thank you for participating"
 msgstr ""
 
-#: templates/conversational_survey_business.html:39
+#: templates/conversational_survey_business.html:44
 msgid "value your feedback"
 msgstr ""
 
-#: templates/conversational_survey_business.html:120
+#: templates/conversational_survey_business.html:56
+msgid "Your Information"
+msgstr ""
+
+#: templates/conversational_survey_business.html:58
+msgid "Participating on behalf of"
+msgstr ""
+
+#: templates/conversational_survey_business.html:99
+msgid "Start Conversation"
+msgstr ""
+
+#: templates/conversational_survey_business.html:125
 msgid "Type your response here..."
 msgstr ""
 
-#: templates/conversational_survey_business.html:151
-msgid "Thank you, {{ participant_name }}!"
+#: templates/conversational_survey_business.html:132
+msgid "Tip: Speak naturally! VOÏA understands conversational responses."
 msgstr ""
 
-#: templates/conversational_survey_business.html:154
+#: templates/conversational_survey_business.html:156
+#, python-format
+msgid "Thank you, %s!"
+msgstr ""
+
+#: templates/conversational_survey_business.html:159
 msgid "Your feedback for"
 msgstr ""
 
-#: templates/conversational_survey_business.html:165
+#: templates/conversational_survey_business.html:170
 msgid ""
 "Your insights help us continuously improve our services. Thank you for "
 "taking the time to share your experience."
+msgstr ""
+
+#: templates/conversational_survey_business.html:177
+msgid "What Happens Next?"
+msgstr ""
+
+#: templates/conversational_survey_business.html:182
+msgid "Our AI analyzes your feedback to extract key insights"
+msgstr ""
+
+#: templates/conversational_survey_business.html:186
+msgid "Your responses contribute to comprehensive analytics"
+msgstr ""
+
+#: templates/conversational_survey_business.html:190
+msgid "We use your input to improve our services and client experience"
+msgstr ""
+
+#: templates/conversational_survey_business.html:195
+msgid "You can now close this window."
 msgstr ""
 
 #: templates/conversational_survey_completed.html:3
@@ -416,6 +453,10 @@ msgstr ""
 msgid "Campaign KPI Overview"
 msgstr ""
 
+#: templates/dashboard.html:69 templates/dashboard.html:300
+msgid "Campaign"
+msgstr ""
+
 #: templates/dashboard.html:71 templates/dashboard.html:399
 #: templates/dashboard.html:795 templates/dashboard.html:800
 #: templates/dashboard.html:815 templates/dashboard.html:816
@@ -433,8 +474,28 @@ msgstr ""
 msgid "Click to view full trends"
 msgstr ""
 
+#: templates/dashboard.html:77 templates/dashboard.html:937
+msgid "NPS"
+msgstr ""
+
+#: templates/dashboard.html:83
+msgid "Companies"
+msgstr ""
+
 #: templates/dashboard.html:89 templates/dashboard.html:1018
 msgid "Critical Risk"
+msgstr ""
+
+#: templates/dashboard.html:95 templates/dashboard.html:1028
+msgid "Satisfaction"
+msgstr ""
+
+#: templates/dashboard.html:101
+msgid "Product"
+msgstr ""
+
+#: templates/dashboard.html:113 templates/dashboard.html:1058
+msgid "Service"
 msgstr ""
 
 #: templates/dashboard.html:140
@@ -479,7 +540,7 @@ msgstr ""
 
 #: templates/dashboard.html:213 templates/dashboard.html:229
 #: templates/dashboard.html:479 templates/dashboard.html:637
-#: templates/dashboard.html:653
+#: templates/dashboard.html:653 templates/dashboard.html:809
 msgid "Search"
 msgstr ""
 
@@ -512,6 +573,7 @@ msgid "Clear"
 msgstr ""
 
 #: templates/campaigns/responses_list.html:177 templates/dashboard.html:241
+#: templates/dashboard.html:837
 #: templates/participants/campaign_participants.html:61
 #: templates/participants/campaign_participants.html:63
 #: templates/participants/campaign_participants.html:171
@@ -662,6 +724,7 @@ msgid "High Potential"
 msgstr ""
 
 #: templates/dashboard.html:497 templates/dashboard.html:675
+#: templates/dashboard.html:756
 msgid "Risk Level"
 msgstr ""
 
@@ -736,7 +799,7 @@ msgid ""
 "evaluating Archelo Group"
 msgstr ""
 
-#: templates/dashboard.html:642
+#: templates/dashboard.html:642 templates/dashboard.html:814
 msgid "NPS Category"
 msgstr ""
 
@@ -752,7 +815,7 @@ msgstr ""
 msgid "Detractors (0-6)"
 msgstr ""
 
-#: templates/dashboard.html:672
+#: templates/dashboard.html:672 templates/dashboard.html:753
 msgid "Avg Individual NPS"
 msgstr ""
 
@@ -760,15 +823,15 @@ msgstr ""
 msgid "Company NPS"
 msgstr ""
 
-#: templates/dashboard.html:674
+#: templates/dashboard.html:674 templates/dashboard.html:755
 msgid "Distribution"
 msgstr ""
 
-#: templates/dashboard.html:676
+#: templates/dashboard.html:676 templates/dashboard.html:757
 msgid "Latest Response"
 msgstr ""
 
-#: templates/dashboard.html:677
+#: templates/dashboard.html:677 templates/dashboard.html:758
 msgid "Latest Churn Risk"
 msgstr ""
 
@@ -784,12 +847,40 @@ msgstr ""
 msgid "NPS by Customer Tenure"
 msgstr ""
 
+#: templates/dashboard.html:751
+msgid "Tenure Group"
+msgstr ""
+
+#: templates/dashboard.html:754
+msgid "Tenure NPS"
+msgstr ""
+
 #: templates/dashboard.html:772
 msgid "Tenure NPS pagination"
 msgstr ""
 
 #: templates/dashboard.html:811
 msgid "Search by company name, participant name, or email..."
+msgstr ""
+
+#: templates/dashboard.html:838
+msgid "Tenure with FC inc"
+msgstr ""
+
+#: templates/dashboard.html:840
+msgid "Category"
+msgstr ""
+
+#: templates/dashboard.html:841
+msgid "Sentiment"
+msgstr ""
+
+#: templates/dashboard.html:842
+msgid "Churn Risk"
+msgstr ""
+
+#: templates/dashboard.html:843 templates/dashboard.html:939
+msgid "Date"
 msgstr ""
 
 #: templates/dashboard.html:858
@@ -827,6 +918,10 @@ msgstr ""
 
 #: templates/dashboard.html:927
 msgid "Loading responses..."
+msgstr ""
+
+#: templates/dashboard.html:940
+msgid "Action"
 msgstr ""
 
 #: templates/campaigns/responses_list.html:232 templates/dashboard.html:965
@@ -3606,5 +3701,8 @@ msgstr ""
 #~ "How long have you been working "
 #~ "with {{ branding.company_name if branding "
 #~ "and branding.company_name else 'us' }}?"
+#~ msgstr ""
+
+#~ msgid "Thank you, {{ participant_name }}!"
 #~ msgstr ""
 

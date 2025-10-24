@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-24 21:33+0000\n"
+"POT-Creation-Date: 2025-10-24 23:47+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -453,6 +453,10 @@ msgstr ""
 msgid "Campaign KPI Overview"
 msgstr ""
 
+#: templates/dashboard.html:69 templates/dashboard.html:300
+msgid "Campaign"
+msgstr ""
+
 #: templates/dashboard.html:71 templates/dashboard.html:399
 #: templates/dashboard.html:795 templates/dashboard.html:800
 #: templates/dashboard.html:815 templates/dashboard.html:816
@@ -470,8 +474,28 @@ msgstr ""
 msgid "Click to view full trends"
 msgstr ""
 
+#: templates/dashboard.html:77 templates/dashboard.html:937
+msgid "NPS"
+msgstr ""
+
+#: templates/dashboard.html:83
+msgid "Companies"
+msgstr ""
+
 #: templates/dashboard.html:89 templates/dashboard.html:1018
 msgid "Critical Risk"
+msgstr ""
+
+#: templates/dashboard.html:95 templates/dashboard.html:1028
+msgid "Satisfaction"
+msgstr ""
+
+#: templates/dashboard.html:101
+msgid "Product"
+msgstr ""
+
+#: templates/dashboard.html:113 templates/dashboard.html:1058
+msgid "Service"
 msgstr ""
 
 #: templates/dashboard.html:140
@@ -516,7 +540,7 @@ msgstr ""
 
 #: templates/dashboard.html:213 templates/dashboard.html:229
 #: templates/dashboard.html:479 templates/dashboard.html:637
-#: templates/dashboard.html:653
+#: templates/dashboard.html:653 templates/dashboard.html:809
 msgid "Search"
 msgstr ""
 
@@ -549,6 +573,7 @@ msgid "Clear"
 msgstr ""
 
 #: templates/campaigns/responses_list.html:177 templates/dashboard.html:241
+#: templates/dashboard.html:837
 #: templates/participants/campaign_participants.html:61
 #: templates/participants/campaign_participants.html:63
 #: templates/participants/campaign_participants.html:171
@@ -699,6 +724,7 @@ msgid "High Potential"
 msgstr ""
 
 #: templates/dashboard.html:497 templates/dashboard.html:675
+#: templates/dashboard.html:756
 msgid "Risk Level"
 msgstr ""
 
@@ -773,7 +799,7 @@ msgid ""
 "evaluating Archelo Group"
 msgstr ""
 
-#: templates/dashboard.html:642
+#: templates/dashboard.html:642 templates/dashboard.html:814
 msgid "NPS Category"
 msgstr ""
 
@@ -789,7 +815,7 @@ msgstr ""
 msgid "Detractors (0-6)"
 msgstr ""
 
-#: templates/dashboard.html:672
+#: templates/dashboard.html:672 templates/dashboard.html:753
 msgid "Avg Individual NPS"
 msgstr ""
 
@@ -797,15 +823,15 @@ msgstr ""
 msgid "Company NPS"
 msgstr ""
 
-#: templates/dashboard.html:674
+#: templates/dashboard.html:674 templates/dashboard.html:755
 msgid "Distribution"
 msgstr ""
 
-#: templates/dashboard.html:676
+#: templates/dashboard.html:676 templates/dashboard.html:757
 msgid "Latest Response"
 msgstr ""
 
-#: templates/dashboard.html:677
+#: templates/dashboard.html:677 templates/dashboard.html:758
 msgid "Latest Churn Risk"
 msgstr ""
 
@@ -821,12 +847,40 @@ msgstr ""
 msgid "NPS by Customer Tenure"
 msgstr ""
 
+#: templates/dashboard.html:751
+msgid "Tenure Group"
+msgstr ""
+
+#: templates/dashboard.html:754
+msgid "Tenure NPS"
+msgstr ""
+
 #: templates/dashboard.html:772
 msgid "Tenure NPS pagination"
 msgstr ""
 
 #: templates/dashboard.html:811
 msgid "Search by company name, participant name, or email..."
+msgstr ""
+
+#: templates/dashboard.html:838
+msgid "Tenure with FC inc"
+msgstr ""
+
+#: templates/dashboard.html:840
+msgid "Category"
+msgstr ""
+
+#: templates/dashboard.html:841
+msgid "Sentiment"
+msgstr ""
+
+#: templates/dashboard.html:842
+msgid "Churn Risk"
+msgstr ""
+
+#: templates/dashboard.html:843 templates/dashboard.html:939
+msgid "Date"
 msgstr ""
 
 #: templates/dashboard.html:858
@@ -864,6 +918,10 @@ msgstr ""
 
 #: templates/dashboard.html:927
 msgid "Loading responses..."
+msgstr ""
+
+#: templates/dashboard.html:940
+msgid "Action"
 msgstr ""
 
 #: templates/campaigns/responses_list.html:232 templates/dashboard.html:965
