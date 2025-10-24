@@ -2832,6 +2832,12 @@ a:hover {
    PHASE 2B: SIDEBAR NAVIGATION (v2 UI)
    ========================================== */
 
+/* Language Selector - Always Above Sidebar */
+.navbar .dropdown,
+.navbar .dropdown-menu {
+    z-index: 10003 !important;
+}
+
 /* Sidebar Container */
 .sidebar {
     position: fixed;
