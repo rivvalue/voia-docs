@@ -2846,16 +2846,16 @@ a:hover {
     transform: translateX(0) !important;
 }
 
-/* Ensure navbar doesn't overlap with sidebar on V2 UI */
-body[data-ui-version="v2"] .navbar {
-    margin-left: 260px;
-    width: calc(100% - 260px);
+/* V2 UI: Offset navbar content for sidebar, keep navbar full-width */
+body[data-ui-version="v2"] .navbar .container {
+    padding-left: 280px;
+    max-width: 100%;
 }
 
-@media (max-width: 768px) {
-    body[data-ui-version="v2"] .navbar {
-        margin-left: 0;
-        width: 100%;
+/* Mobile: Reset padding when sidebar collapses */
+@media (max-width: 992px) {
+    body[data-ui-version="v2"] .navbar .container {
+        padding-left: 1rem;
     }
 }
 
