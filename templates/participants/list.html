@@ -220,6 +220,232 @@
                 </div>
             </div>
 
+            <!-- Filter Panel -->
+            <div class="card mb-4">
+                <div class="card-header" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="true" aria-controls="filterCollapse" role="button" style="cursor: pointer;">
+                    <h5 class="mb-0">
+                        <i class="fas fa-filter me-2"></i>Filter Participants
+                        <i class="fas fa-chevron-down ms-2" id="filterChevron"></i>
+                    </h5>
+                </div>
+                <div class="collapse show" id="filterCollapse">
+                    <div class="card-body">
+                        <form method="GET" action="{{ url_for('participants.list_participants') }}" id="filterForm">
+                            <!-- Preserve search query when filtering -->
+                            {% if search_query %}
+                            <input type="hidden" name="search" value="{{ search_query }}">
+                            {% endif %}
+                            
+                            <div class="row g-3 mb-3">
+                                <!-- Company Filter -->
+                                <div class="col-md-4">
+                                    <label for="filter_company" class="form-label">Company</label>
+                                    <select class="form-select filter-select" id="filter_company" name="filter_company" multiple 
+                                            aria-label="Filter by company">
+                                        {% for company in filter_options.companies %}
+                                        <option value="{{ company }}" {% if company in active_filters.companies %}selected{% endif %}>
+                                            {{ company }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <!-- Role Filter -->
+                                <div class="col-md-4">
+                                    <label for="filter_role" class="form-label">Role</label>
+                                    <select class="form-select filter-select" id="filter_role" name="filter_role" multiple 
+                                            aria-label="Filter by role">
+                                        {% for role in filter_options.roles %}
+                                        <option value="{{ role }}" {% if role in active_filters.roles %}selected{% endif %}>
+                                            {{ role }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <!-- Region Filter -->
+                                <div class="col-md-4">
+                                    <label for="filter_region" class="form-label">Region</label>
+                                    <select class="form-select filter-select" id="filter_region" name="filter_region" multiple 
+                                            aria-label="Filter by region">
+                                        {% for region in filter_options.regions %}
+                                        <option value="{{ region }}" {% if region in active_filters.regions %}selected{% endif %}>
+                                            {{ region }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="row g-3 mb-3">
+                                <!-- Customer Tier Filter -->
+                                <div class="col-md-4">
+                                    <label for="filter_tier" class="form-label">Customer Tier</label>
+                                    <select class="form-select filter-select" id="filter_tier" name="filter_tier" multiple 
+                                            aria-label="Filter by customer tier">
+                                        {% for tier in filter_options.tiers %}
+                                        <option value="{{ tier }}" {% if tier in active_filters.tiers %}selected{% endif %}>
+                                            {{ tier }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <!-- Language Filter -->
+                                <div class="col-md-4">
+                                    <label for="filter_language" class="form-label">Language</label>
+                                    <select class="form-select filter-select" id="filter_language" name="filter_language" multiple 
+                                            aria-label="Filter by language">
+                                        {% for language in filter_options.languages %}
+                                        <option value="{{ language }}" {% if language in active_filters.languages %}selected{% endif %}>
+                                            {{ language }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                
+                                <!-- Tenure Filter -->
+                                <div class="col-md-4">
+                                    <label for="filter_tenure" class="form-label">Tenure (Years)</label>
+                                    <select class="form-select filter-select" id="filter_tenure" name="filter_tenure" multiple 
+                                            aria-label="Filter by tenure">
+                                        {% for tenure in filter_options.tenure_ranges %}
+                                        <option value="{{ tenure }}" {% if tenure in active_filters.tenure_ranges %}selected{% endif %}>
+                                            {{ tenure }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex align-items-center gap-2">
+                                <button type="submit" class="btn btn-voïa-red">
+                                    <i class="fas fa-check me-2"></i>Apply Filters
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" id="clearFiltersBtn">
+                                    <i class="fas fa-times me-2"></i>Clear Filters
+                                </button>
+                                <small class="text-muted ms-3">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Showing {{ pagination.total }} participant{{ 's' if pagination.total != 1 else '' }}
+                                </small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Active Filters Summary Bar -->
+            {% if active_filters.companies or active_filters.roles or active_filters.regions or active_filters.tiers or active_filters.languages or active_filters.tenure_ranges %}
+            <div class="filter-summary-bar mb-4">
+                <div class="filter-summary-header">
+                    <span class="filter-summary-label">
+                        <i class="fas fa-filter me-2"></i>Active Filters:
+                    </span>
+                    <a href="{{ url_for('participants.list_participants', search=search_query if search_query else '') }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-times me-1"></i>Clear All
+                    </a>
+                </div>
+                <div class="filter-chips">
+                    {% for company in active_filters.companies %}
+                    <span class="filter-chip">
+                        <strong>Company:</strong> {{ company }}
+                        <a href="{{ url_for('participants.list_participants', 
+                            search=search_query if search_query else '',
+                            filter_company=active_filters.companies|reject('equalto', company)|list,
+                            filter_role=active_filters.roles,
+                            filter_region=active_filters.regions,
+                            filter_tier=active_filters.tiers,
+                            filter_language=active_filters.languages,
+                            filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    </span>
+                    {% endfor %}
+                    
+                    {% for role in active_filters.roles %}
+                    <span class="filter-chip">
+                        <strong>Role:</strong> {{ role }}
+                        <a href="{{ url_for('participants.list_participants',
+                            search=search_query if search_query else '',
+                            filter_company=active_filters.companies,
+                            filter_role=active_filters.roles|reject('equalto', role)|list,
+                            filter_region=active_filters.regions,
+                            filter_tier=active_filters.tiers,
+                            filter_language=active_filters.languages,
+                            filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    </span>
+                    {% endfor %}
+                    
+                    {% for region in active_filters.regions %}
+                    <span class="filter-chip">
+                        <strong>Region:</strong> {{ region }}
+                        <a href="{{ url_for('participants.list_participants',
+                            search=search_query if search_query else '',
+                            filter_company=active_filters.companies,
+                            filter_role=active_filters.roles,
+                            filter_region=active_filters.regions|reject('equalto', region)|list,
+                            filter_tier=active_filters.tiers,
+                            filter_language=active_filters.languages,
+                            filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    </span>
+                    {% endfor %}
+                    
+                    {% for tier in active_filters.tiers %}
+                    <span class="filter-chip">
+                        <strong>Tier:</strong> {{ tier }}
+                        <a href="{{ url_for('participants.list_participants',
+                            search=search_query if search_query else '',
+                            filter_company=active_filters.companies,
+                            filter_role=active_filters.roles,
+                            filter_region=active_filters.regions,
+                            filter_tier=active_filters.tiers|reject('equalto', tier)|list,
+                            filter_language=active_filters.languages,
+                            filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    </span>
+                    {% endfor %}
+                    
+                    {% for language in active_filters.languages %}
+                    <span class="filter-chip">
+                        <strong>Language:</strong> {{ language }}
+                        <a href="{{ url_for('participants.list_participants',
+                            search=search_query if search_query else '',
+                            filter_company=active_filters.companies,
+                            filter_role=active_filters.roles,
+                            filter_region=active_filters.regions,
+                            filter_tier=active_filters.tiers,
+                            filter_language=active_filters.languages|reject('equalto', language)|list,
+                            filter_tenure=active_filters.tenure_ranges) }}" class="filter-chip-remove">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    </span>
+                    {% endfor %}
+                    
+                    {% for tenure in active_filters.tenure_ranges %}
+                    <span class="filter-chip">
+                        <strong>Tenure:</strong> {{ tenure }} years
+                        <a href="{{ url_for('participants.list_participants',
+                            search=search_query if search_query else '',
+                            filter_company=active_filters.companies,
+                            filter_role=active_filters.roles,
+                            filter_region=active_filters.regions,
+                            filter_tier=active_filters.tiers,
+                            filter_language=active_filters.languages,
+                            filter_tenure=active_filters.tenure_ranges|reject('equalto', tenure)|list) }}" class="filter-chip-remove">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    </span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
             <!-- Search -->
             <div class="card mb-4">
                 <div class="card-body">
@@ -584,7 +810,49 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- jQuery and Select2 for filter dropdowns -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script>
+// Initialize Select2 on filter dropdowns
+$(document).ready(function() {
+    $('.filter-select').select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: 'Select options...',
+        allowClear: false,
+        closeOnSelect: false
+    });
+});
+
+// Clear filters button
+document.addEventListener('DOMContentLoaded', function() {
+    const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+    if (clearFiltersBtn) {
+        clearFiltersBtn.addEventListener('click', function() {
+            const searchParam = '{{ search_query }}';
+            const url = new URL(window.location.href);
+            url.search = searchParam ? `?search=${encodeURIComponent(searchParam)}` : '';
+            window.location.href = url.toString();
+        });
+    }
+    
+    // Chevron rotation on collapse
+    const filterCollapse = document.getElementById('filterCollapse');
+    const filterChevron = document.getElementById('filterChevron');
+    if (filterCollapse && filterChevron) {
+        filterCollapse.addEventListener('show.bs.collapse', function () {
+            filterChevron.style.transform = 'rotate(0deg)';
+        });
+        filterCollapse.addEventListener('hide.bs.collapse', function () {
+            filterChevron.style.transform = 'rotate(-90deg)';
+        });
+    }
+});
+
 const MAX_SELECTION = 50;
 let selectedParticipants = new Set();
 
