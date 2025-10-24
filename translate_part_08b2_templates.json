@@ -1,0 +1,381 @@
+{
+  "metadata": {
+    "project": "VOÏA - Voice Of Client",
+    "source_language": "English",
+    "target_language": "French",
+    "extraction_date": "2025-10-24",
+    "total_files": 10,
+    "total_strings": 2161,
+    "file_number": 8,
+    "part_description": "Templates Part 8B2/8"
+  },
+  "instructions": {
+    "overview": "Translate all 'text' field values from English to French (France market, professional SaaS tone)",
+    "rules": [
+      "Translate ONLY the 'text' field values",
+      "Keep all other fields (id, file, type, element, etc.) UNCHANGED",
+      "Preserve {variables}, {{variables}}, and {%...%} syntax exactly as-is",
+      "Use professional business French suitable for SaaS platform",
+      "Maintain consistent terminology throughout",
+      "Keep technical terms like 'NPS', 'API', 'VOÏA' unchanged unless noted"
+    ]
+  },
+  "templates": [
+    {
+      "id": "view_7",
+      "file": "templates/campaigns/view.html",
+      "element": "div",
+      "text": "Pending"
+    },
+    {
+      "id": "view_8",
+      "file": "templates/campaigns/view.html",
+      "element": "h4",
+      "text": "Campaign Actions"
+    },
+    {
+      "id": "view_9",
+      "file": "templates/campaigns/view.html",
+      "element": "span",
+      "text": "Campaign needs description and at least one participant to be marked ready."
+    },
+    {
+      "id": "view_10",
+      "file": "templates/campaigns/view.html",
+      "element": "span",
+      "text": "Draft campaigns can be freely edited or deleted. Once marked ready, campaign details become locked."
+    },
+    {
+      "id": "view_11",
+      "file": "templates/campaigns/view.html",
+      "element": "span",
+      "text": "Campaign is ready for activation"
+    },
+    {
+      "id": "view_12",
+      "file": "templates/campaigns/view.html",
+      "element": "span",
+      "text": "Campaign is currently active and collecting responses"
+    },
+    {
+      "id": "view_13",
+      "file": "templates/campaigns/view.html",
+      "element": "p",
+      "text": "This campaign finished on {{ campaign.completed_at[:10] if campaign.completed_at else campaign.end_date }}"
+    },
+    {
+      "id": "view_14",
+      "file": "templates/campaigns/view.html",
+      "element": "h4",
+      "text": "Individual Response Viewer"
+    },
+    {
+      "id": "view_15",
+      "file": "templates/campaigns/view.html",
+      "element": "p",
+      "text": "View and analyze individual participant responses and conversation transcripts."
+    },
+    {
+      "id": "view_16",
+      "file": "templates/campaigns/view.html",
+      "element": "label",
+      "text": "Select Transcript (.txt files only)"
+    },
+    {
+      "id": "view_17",
+      "file": "templates/campaigns/view.html",
+      "element": "div",
+      "text": "Upload meeting transcripts to extract survey insights automatically."
+    },
+    {
+      "id": "view_18",
+      "file": "templates/campaigns/view.html",
+      "element": "label",
+      "text": "Participant Name"
+    },
+    {
+      "id": "view_19",
+      "file": "templates/campaigns/view.html",
+      "element": "label",
+      "text": "Participant Email"
+    },
+    {
+      "id": "view_20",
+      "file": "templates/campaigns/view.html",
+      "element": "label",
+      "text": "Company Name"
+    },
+    {
+      "id": "view_21",
+      "file": "templates/campaigns/view.html",
+      "element": "p",
+      "text": "No transcripts processed yet"
+    },
+    {
+      "id": "view_22",
+      "file": "templates/campaigns/view.html",
+      "element": "h6",
+      "text": "About Transcript Analysis"
+    },
+    {
+      "id": "view_23",
+      "file": "templates/campaigns/view.html",
+      "element": "p",
+      "text": "VOÏA analyzes meeting transcripts to extract NPS scores, sentiment, themes, and actionable insights. Upload .txt files from phone calls, video meetings, or face-to-face discussions to automatically generate survey responses and integrate them with your campaign analytics."
+    },
+    {
+      "id": "view_placeholder_24",
+      "file": "templates/campaigns/view.html",
+      "element": "input[placeholder]",
+      "text": "Enter participant's full name"
+    },
+    {
+      "id": "view_placeholder_25",
+      "file": "templates/campaigns/view.html",
+      "element": "input[placeholder]",
+      "text": "participant@company.com"
+    },
+    {
+      "id": "view_placeholder_26",
+      "file": "templates/campaigns/view.html",
+      "element": "input[placeholder]",
+      "text": "Enter company name"
+    },
+    {
+      "id": "view_title_27",
+      "file": "templates/campaigns/view.html",
+      "element": "button[title]",
+      "text": "This will only send invitations to participants who haven't been invited yet."
+    },
+    {
+      "id": "list_1",
+      "file": "templates/campaigns/list.html",
+      "element": "h1",
+      "text": "Campaign Management"
+    },
+    {
+      "id": "list_2",
+      "file": "templates/campaigns/list.html",
+      "element": "p",
+      "text": "Manage survey campaigns for {{ business_account.name }}"
+    },
+    {
+      "id": "list_3",
+      "file": "templates/campaigns/list.html",
+      "element": "div",
+      "text": "{# Campaign Action Buttons Macro #}\n    {% macro campaign_actions(campaign, view_type='table') %}\n        {% set action_class = 'table-actions' if view_type == 'table' else 'campaign-card-actions' %}"
+    },
+    {
+      "id": "list_4",
+      "file": "templates/campaigns/list.html",
+      "element": "div",
+      "text": "Start"
+    },
+    {
+      "id": "list_5",
+      "file": "templates/campaigns/list.html",
+      "element": "div",
+      "text": "End"
+    },
+    {
+      "id": "list_6",
+      "file": "templates/campaigns/list.html",
+      "element": "div",
+      "text": "Participants"
+    },
+    {
+      "id": "list_7",
+      "file": "templates/campaigns/list.html",
+      "element": "div",
+      "text": "Sent"
+    },
+    {
+      "id": "list_8",
+      "file": "templates/campaigns/list.html",
+      "element": "div",
+      "text": "Done"
+    },
+    {
+      "id": "list_9",
+      "file": "templates/campaigns/list.html",
+      "element": "a",
+      "text": "All"
+    },
+    {
+      "id": "list_10",
+      "file": "templates/campaigns/list.html",
+      "element": "a",
+      "text": "Draft"
+    },
+    {
+      "id": "list_11",
+      "file": "templates/campaigns/list.html",
+      "element": "a",
+      "text": "Active"
+    },
+    {
+      "id": "list_12",
+      "file": "templates/campaigns/list.html",
+      "element": "a",
+      "text": "Completed"
+    },
+    {
+      "id": "list_13",
+      "file": "templates/campaigns/list.html",
+      "element": "th",
+      "text": "Campaign Name"
+    },
+    {
+      "id": "list_14",
+      "file": "templates/campaigns/list.html",
+      "element": "th",
+      "text": "Status"
+    },
+    {
+      "id": "list_15",
+      "file": "templates/campaigns/list.html",
+      "element": "th",
+      "text": "Start Date"
+    },
+    {
+      "id": "list_16",
+      "file": "templates/campaigns/list.html",
+      "element": "th",
+      "text": "End Date"
+    },
+    {
+      "id": "list_17",
+      "file": "templates/campaigns/list.html",
+      "element": "th",
+      "text": "Participants"
+    },
+    {
+      "id": "list_18",
+      "file": "templates/campaigns/list.html",
+      "element": "th",
+      "text": "Sent/Completed"
+    },
+    {
+      "id": "list_19",
+      "file": "templates/campaigns/list.html",
+      "element": "th",
+      "text": "Actions"
+    },
+    {
+      "id": "list_20",
+      "file": "templates/campaigns/list.html",
+      "element": "h3",
+      "text": "Ready to gather insights?"
+    },
+    {
+      "id": "list_21",
+      "file": "templates/campaigns/list.html",
+      "element": "p",
+      "text": "Create your first campaign to start collecting customer feedback and understanding their experience. Campaigns help you organize survey participants, send invitations, and analyze results."
+    },
+    {
+      "id": "list_22",
+      "file": "templates/campaigns/list.html",
+      "element": "h6",
+      "text": "Campaign Name"
+    },
+    {
+      "id": "list_23",
+      "file": "templates/campaigns/list.html",
+      "element": "h5",
+      "text": "Export Complete!"
+    },
+    {
+      "id": "list_24",
+      "file": "templates/campaigns/list.html",
+      "element": "p",
+      "text": "Your campaign data has been successfully exported."
+    },
+    {
+      "id": "list_25",
+      "file": "templates/campaigns/list.html",
+      "element": "h5",
+      "text": "Export Failed"
+    },
+    {
+      "id": "list_26",
+      "file": "templates/campaigns/list.html",
+      "element": "p",
+      "text": "An error occurred while exporting your data."
+    },
+    {
+      "id": "list_27",
+      "file": "templates/campaigns/list.html",
+      "element": "button",
+      "text": "Close"
+    },
+    {
+      "id": "list_title_28",
+      "file": "templates/campaigns/list.html",
+      "element": "a[title]",
+      "text": "View Details"
+    },
+    {
+      "id": "list_title_29",
+      "file": "templates/campaigns/list.html",
+      "element": "a[title]",
+      "text": "Campaign Insights"
+    },
+    {
+      "id": "list_title_30",
+      "file": "templates/campaigns/list.html",
+      "element": "a[title]",
+      "text": "Manage Participants"
+    },
+    {
+      "id": "list_title_31",
+      "file": "templates/campaigns/list.html",
+      "element": "button[title]",
+      "text": "Export Data"
+    },
+    {
+      "id": "list_title_32",
+      "file": "templates/campaigns/list.html",
+      "element": "button[title]",
+      "text": "Executive Report"
+    },
+    {
+      "id": "list_aria_33",
+      "file": "templates/campaigns/list.html",
+      "element": "button[aria-label]",
+      "text": "Close"
+    },
+    {
+      "id": "breadcrumb_aria_1",
+      "file": "templates/components/breadcrumb.html",
+      "element": "nav[aria-label]",
+      "text": "Breadcrumb navigation"
+    },
+    {
+      "id": "breadcrumb_aria_2",
+      "file": "templates/components/breadcrumb.html",
+      "element": "a[aria-label]",
+      "text": "Navigate to {{ item.label }}"
+    },
+    {
+      "id": "ui_version_toggle_1",
+      "file": "templates/components/ui_version_toggle.html",
+      "element": "span",
+      "text": "UI: {{ ui_version|upper }}"
+    },
+    {
+      "id": "ui_version_toggle_2",
+      "file": "templates/components/ui_version_toggle.html",
+      "element": "span",
+      "text": "Switch"
+    },
+    {
+      "id": "ui_version_toggle_title_3",
+      "file": "templates/components/ui_version_toggle.html",
+      "element": "button[title]",
+      "text": "Switch to {% if ui_version == 'v1' %}v2 (New Sidebar){% else %}v1 (Current){% endif %}"
+    }
+  ],
+  "flash_messages": [],
+  "email_templates": []
+}

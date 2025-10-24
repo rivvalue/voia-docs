@@ -39,8 +39,8 @@ def load_all_translations():
         except Exception as e:
             print(f"  ✗ Error loading {filename}: {e}")
     
-    # Load part 8a and 8b (split file)
-    for part in ['08a', '08b']:
+    # Load part 8a, 8b1, 8b2 (split files)
+    for part in ['08a', '08b1', '08b2']:
         filename = f"translated_part_{part}.json"
         
         if not os.path.exists(filename):
