@@ -1056,15 +1056,149 @@ def manage_campaign_participants(campaign_id: int):
                 'completed': len([cp for cp in all_campaign_participants if cp.status == 'completed'])
             }
             assigned_participant_ids = [cp.participant_id for cp in all_campaign_participants]
+            
+            # Build base query for available participants
+            available_query = Participant.query.filter(
+                Participant.business_account_id == current_account.id
+            )
+            
+            # Exclude already assigned participants
             if assigned_participant_ids:
-                available_participants = Participant.query.filter(
-                    Participant.business_account_id == current_account.id,
-                    ~Participant.id.in_(assigned_participant_ids)
-                ).order_by(Participant.name).all()
-            else:
-                available_participants = Participant.query.filter(
-                    Participant.business_account_id == current_account.id
-                ).order_by(Participant.name).all()
+                available_query = available_query.filter(~Participant.id.in_(assigned_participant_ids))
+            
+            # Apply multi-value filters if provided
+            filter_companies = request.args.getlist('filter_company')
+            filter_roles = request.args.getlist('filter_role')
+            filter_regions = request.args.getlist('filter_region')
+            filter_tiers = request.args.getlist('filter_tier')
+            filter_languages = request.args.getlist('filter_language')
+            filter_tenure_ranges = request.args.getlist('filter_tenure')
+            
+            # Company name filter (support multiple companies)
+            if filter_companies:
+                # Handle "Unspecified" as NULL
+                if 'Unspecified' in filter_companies:
+                    other_companies = [c for c in filter_companies if c != 'Unspecified']
+                    if other_companies:
+                        available_query = available_query.filter(
+                            db.or_(
+                                Participant.company_name.in_(other_companies),
+                                Participant.company_name.is_(None)
+                            )
+                        )
+                    else:
+                        available_query = available_query.filter(Participant.company_name.is_(None))
+                else:
+                    available_query = available_query.filter(Participant.company_name.in_(filter_companies))
+            
+            # Role filter (support multiple roles)
+            if filter_roles:
+                if 'Unspecified' in filter_roles:
+                    other_roles = [r for r in filter_roles if r != 'Unspecified']
+                    if other_roles:
+                        available_query = available_query.filter(
+                            db.or_(
+                                Participant.role.in_(other_roles),
+                                Participant.role.is_(None)
+                            )
+                        )
+                    else:
+                        available_query = available_query.filter(Participant.role.is_(None))
+                else:
+                    available_query = available_query.filter(Participant.role.in_(filter_roles))
+            
+            # Region filter (support multiple regions)
+            if filter_regions:
+                if 'Unspecified' in filter_regions:
+                    other_regions = [r for r in filter_regions if r != 'Unspecified']
+                    if other_regions:
+                        available_query = available_query.filter(
+                            db.or_(
+                                Participant.region.in_(other_regions),
+                                Participant.region.is_(None)
+                            )
+                        )
+                    else:
+                        available_query = available_query.filter(Participant.region.is_(None))
+                else:
+                    available_query = available_query.filter(Participant.region.in_(filter_regions))
+            
+            # Customer tier filter (support multiple tiers)
+            if filter_tiers:
+                if 'Unspecified' in filter_tiers:
+                    other_tiers = [t for t in filter_tiers if t != 'Unspecified']
+                    if other_tiers:
+                        available_query = available_query.filter(
+                            db.or_(
+                                Participant.customer_tier.in_(other_tiers),
+                                Participant.customer_tier.is_(None)
+                            )
+                        )
+                    else:
+                        available_query = available_query.filter(Participant.customer_tier.is_(None))
+                else:
+                    available_query = available_query.filter(Participant.customer_tier.in_(filter_tiers))
+            
+            # Language filter (support multiple languages)
+            if filter_languages:
+                if 'Unspecified' in filter_languages:
+                    other_languages = [l for l in filter_languages if l != 'Unspecified']
+                    if other_languages:
+                        available_query = available_query.filter(
+                            db.or_(
+                                Participant.language.in_(other_languages),
+                                Participant.language.is_(None)
+                            )
+                        )
+                    else:
+                        available_query = available_query.filter(Participant.language.is_(None))
+                else:
+                    available_query = available_query.filter(Participant.language.in_(filter_languages))
+            
+            # Tenure filter (support multiple tenure ranges)
+            if filter_tenure_ranges:
+                tenure_conditions = []
+                for tenure_range in filter_tenure_ranges:
+                    if tenure_range == 'Unspecified':
+                        tenure_conditions.append(Participant.tenure_years.is_(None))
+                    elif tenure_range == '0-1':
+                        tenure_conditions.append(db.and_(Participant.tenure_years >= 0, Participant.tenure_years < 1))
+                    elif tenure_range == '1-3':
+                        tenure_conditions.append(db.and_(Participant.tenure_years >= 1, Participant.tenure_years < 3))
+                    elif tenure_range == '3-5':
+                        tenure_conditions.append(db.and_(Participant.tenure_years >= 3, Participant.tenure_years < 5))
+                    elif tenure_range == '5+':
+                        tenure_conditions.append(Participant.tenure_years >= 5)
+                
+                if tenure_conditions:
+                    available_query = available_query.filter(db.or_(*tenure_conditions))
+            
+            # Execute query with ordering
+            available_participants = available_query.order_by(Participant.name).all()
+            
+            # Get unique filter options from all participants in this business account
+            all_participants_for_filters = Participant.query.filter(
+                Participant.business_account_id == current_account.id
+            ).all()
+            
+            filter_options = {
+                'companies': sorted(list(set([p.company_name for p in all_participants_for_filters if p.company_name]))) + ['Unspecified'],
+                'roles': sorted(list(set([p.role for p in all_participants_for_filters if p.role]))) + ['Unspecified'],
+                'regions': sorted(list(set([p.region for p in all_participants_for_filters if p.region]))) + ['Unspecified'],
+                'tiers': sorted(list(set([p.customer_tier for p in all_participants_for_filters if p.customer_tier]))) + ['Unspecified'],
+                'languages': sorted(list(set([p.language for p in all_participants_for_filters if p.language]))) + ['Unspecified'],
+                'tenure_ranges': ['0-1', '1-3', '3-5', '5+', 'Unspecified']
+            }
+            
+            # Track active filters for UI
+            active_filters = {
+                'companies': filter_companies,
+                'roles': filter_roles,
+                'regions': filter_regions,
+                'tiers': filter_tiers,
+                'languages': filter_languages,
+                'tenure_ranges': filter_tenure_ranges
+            }
             
             # Prepare data for template
             current_participants = []
@@ -1086,7 +1220,9 @@ def manage_campaign_participants(campaign_id: int):
                                  available_participants=[p.to_dict() for p in available_participants],
                                  business_account=current_account.to_dict(),
                                  search_query=search_query,
-                                 campaign_stats=campaign_stats)
+                                 campaign_stats=campaign_stats,
+                                 filter_options=filter_options,
+                                 active_filters=active_filters)
         
         # Handle POST - Add participants to campaign
         if request.method == 'POST':
