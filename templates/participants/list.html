@@ -1105,6 +1105,20 @@ function attachDeleteListeners() {
 
 // Intercept filter form submission
 document.addEventListener('DOMContentLoaded', function() {
+    // Define search elements and helper function FIRST
+    const searchInput = document.getElementById('search');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    
+    function updateClearButtonVisibility() {
+        if (searchInput && clearSearchBtn) {
+            if (searchInput.value.trim()) {
+                clearSearchBtn.style.display = 'inline-block';
+            } else {
+                clearSearchBtn.style.display = 'none';
+            }
+        }
+    }
+    
     const filterForm = document.getElementById('filterForm');
     if (filterForm) {
         filterForm.addEventListener('submit', function(e) {
@@ -1113,14 +1127,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Clear filters button
+    // Clear filters button - clears BOTH filters and search
     const clearFiltersBtn = document.getElementById('clearFiltersBtn');
     if (clearFiltersBtn) {
         clearFiltersBtn.addEventListener('click', function(e) {
             e.preventDefault();
             // Reset all filter selects
             $('.filter-select').val(null).trigger('change');
-            // Apply filters (will be empty, but preserves search)
+            // ALSO clear search input
+            if (searchInput) {
+                searchInput.value = '';
+                updateClearButtonVisibility();
+            }
+            // Apply filters (everything will be empty)
             applyFilters(1);
         });
     }
@@ -1132,20 +1151,6 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             applyFilters(1); // Apply current filters with new search
         });
-    }
-    
-    // Manage search clear button visibility and functionality
-    const searchInput = document.getElementById('search');
-    const clearSearchBtn = document.getElementById('clearSearchBtn');
-    
-    function updateClearButtonVisibility() {
-        if (searchInput && clearSearchBtn) {
-            if (searchInput.value.trim()) {
-                clearSearchBtn.style.display = 'block';
-            } else {
-                clearSearchBtn.style.display = 'none';
-            }
-        }
     }
     
     if (searchInput) {
