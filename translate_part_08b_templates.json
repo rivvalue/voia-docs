@@ -1,0 +1,735 @@
+{
+  "metadata": {
+    "project": "VOÏA - Voice Of Client",
+    "source_language": "English",
+    "target_language": "French",
+    "extraction_date": "2025-10-24",
+    "total_files": 10,
+    "total_strings": 2161,
+    "file_number": 8,
+    "part_description": "Templates Part 8B/8"
+  },
+  "instructions": {
+    "overview": "Translate all 'text' field values from English to French (France market, professional SaaS tone)",
+    "rules": [
+      "Translate ONLY the 'text' field values",
+      "Keep all other fields (id, file, type, element, etc.) UNCHANGED",
+      "Preserve {variables}, {{variables}}, and {%...%} syntax exactly as-is",
+      "Use professional business French suitable for SaaS platform",
+      "Maintain consistent terminology throughout",
+      "Keep technical terms like 'NPS', 'API', 'VOÏA' unchanged unless noted"
+    ]
+  },
+  "templates": [
+    {
+      "id": "individual_response_8",
+      "file": "templates/campaigns/individual_response.html",
+      "element": "span",
+      "text": "Product Value:"
+    },
+    {
+      "id": "individual_response_9",
+      "file": "templates/campaigns/individual_response.html",
+      "element": "span",
+      "text": "Service Quality:"
+    },
+    {
+      "id": "individual_response_10",
+      "file": "templates/campaigns/individual_response.html",
+      "element": "span",
+      "text": "Pricing:"
+    },
+    {
+      "id": "individual_response_11",
+      "file": "templates/campaigns/individual_response.html",
+      "element": "span",
+      "text": "Sentiment:"
+    },
+    {
+      "id": "individual_response_12",
+      "file": "templates/campaigns/individual_response.html",
+      "element": "span",
+      "text": "Churn Risk:"
+    },
+    {
+      "id": "individual_response_13",
+      "file": "templates/campaigns/individual_response.html",
+      "element": "span",
+      "text": "Key Themes:"
+    },
+    {
+      "id": "individual_response_14",
+      "file": "templates/campaigns/individual_response.html",
+      "element": "span",
+      "text": "Submitted:"
+    },
+    {
+      "id": "individual_response_15",
+      "file": "templates/campaigns/individual_response.html",
+      "element": "span",
+      "text": "(updated)"
+    },
+    {
+      "id": "individual_response_16",
+      "file": "templates/campaigns/individual_response.html",
+      "element": "span",
+      "text": "Campaign:"
+    },
+    {
+      "id": "individual_response_17",
+      "file": "templates/campaigns/individual_response.html",
+      "element": "span",
+      "text": "Commercial Value:"
+    },
+    {
+      "id": "individual_response_18",
+      "file": "templates/campaigns/individual_response.html",
+      "element": "span",
+      "text": "${{ \"{:,.0f}\".format(response.commercial_value) }}"
+    },
+    {
+      "id": "individual_response_19",
+      "file": "templates/campaigns/individual_response.html",
+      "element": "span",
+      "text": "Improvement Feedback:"
+    },
+    {
+      "id": "individual_response_20",
+      "file": "templates/campaigns/individual_response.html",
+      "element": "span",
+      "text": "Recommendation Reason:"
+    },
+    {
+      "id": "individual_response_21",
+      "file": "templates/campaigns/individual_response.html",
+      "element": "span",
+      "text": "Additional Comments:"
+    },
+    {
+      "id": "individual_response_22",
+      "file": "templates/campaigns/individual_response.html",
+      "element": "h5",
+      "text": "No Conversation History"
+    },
+    {
+      "id": "individual_response_23",
+      "file": "templates/campaigns/individual_response.html",
+      "element": "p",
+      "text": "This response doesn't contain conversational transcript data."
+    },
+    {
+      "id": "survey_config_1",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "h1",
+      "text": "Survey Configuration"
+    },
+    {
+      "id": "survey_config_2",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "p",
+      "text": "Customize survey behavior for \"{{ campaign.name }}\""
+    },
+    {
+      "id": "survey_config_3",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "p",
+      "text": "Define what your campaign surveys are about. This helps the AI ask more relevant questions and better understand your business context."
+    },
+    {
+      "id": "survey_config_4",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "label",
+      "text": "Product/Service Description"
+    },
+    {
+      "id": "survey_config_5",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "div",
+      "text": "Help the AI understand what you offer to ask better questions"
+    },
+    {
+      "id": "survey_config_6",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "label",
+      "text": "Target Clients"
+    },
+    {
+      "id": "survey_config_7",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "div",
+      "text": "Who are you primarily serving? This helps tailor conversation tone and questions"
+    },
+    {
+      "id": "survey_config_8",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "p",
+      "text": "Select the key objectives for this campaign. The AI will prioritize these areas during conversations."
+    },
+    {
+      "id": "survey_config_9",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "div",
+      "text": "NPS is recommended for all campaigns to track customer loyalty"
+    },
+    {
+      "id": "survey_config_10",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "p",
+      "text": "Set limits to keep conversations focused and manageable for your participants."
+    },
+    {
+      "id": "survey_config_11",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "label",
+      "text": "Max Questions"
+    },
+    {
+      "id": "survey_config_12",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "span",
+      "text": "(3-15)"
+    },
+    {
+      "id": "survey_config_13",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "div",
+      "text": "Hard limit on conversation length"
+    },
+    {
+      "id": "survey_config_14",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "label",
+      "text": "Max Duration (seconds)"
+    },
+    {
+      "id": "survey_config_15",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "span",
+      "text": "(60-300)"
+    },
+    {
+      "id": "survey_config_16",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "div",
+      "text": "Time limit for entire conversation"
+    },
+    {
+      "id": "survey_config_17",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "label",
+      "text": "Max Follow-ups per Topic"
+    },
+    {
+      "id": "survey_config_18",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "span",
+      "text": "(1-3)"
+    },
+    {
+      "id": "survey_config_19",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "div",
+      "text": "Control topic depth exploration"
+    },
+    {
+      "id": "survey_config_20",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "p",
+      "text": "Choose which topics to cover first and which ones can be skipped if time runs out."
+    },
+    {
+      "id": "survey_config_21",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "label",
+      "text": "Prioritized Topics (cover first)"
+    },
+    {
+      "id": "survey_config_22",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "div",
+      "text": "These topics will be covered first and are most important"
+    },
+    {
+      "id": "survey_config_23",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "label",
+      "text": "Optional Topics (can be skipped)"
+    },
+    {
+      "id": "survey_config_24",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "div",
+      "text": "These topics will be skipped if time/questions run out"
+    },
+    {
+      "id": "survey_config_25",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "label",
+      "text": "Custom End Message"
+    },
+    {
+      "id": "survey_config_26",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "div",
+      "text": "Personalized message shown when participants complete the survey"
+    },
+    {
+      "id": "survey_config_27",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "div",
+      "text": "\"{{ campaign.custom_end_message }}\""
+    },
+    {
+      "id": "survey_config_28",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "label",
+      "text": "Custom System Prompt"
+    },
+    {
+      "id": "survey_config_29",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "div",
+      "text": "Advanced: Custom instructions for the AI conversation engine. Leave blank to use intelligent defaults."
+    },
+    {
+      "id": "survey_config_30",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "li",
+      "text": "Start with default settings and customize based on your needs"
+    },
+    {
+      "id": "survey_config_31",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "li",
+      "text": "Shorter surveys (5-8 questions) typically get better completion rates"
+    },
+    {
+      "id": "survey_config_32",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "li",
+      "text": "NPS score is recommended for all campaigns to track customer loyalty"
+    },
+    {
+      "id": "survey_config_33",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "li",
+      "text": "Use product description to help AI ask more relevant questions"
+    },
+    {
+      "id": "survey_config_placeholder_34",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "textarea[placeholder]",
+      "text": "Describe your main products or services (e.g., 'Cloud-based accounting software for small businesses')"
+    },
+    {
+      "id": "survey_config_placeholder_35",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "textarea[placeholder]",
+      "text": "Describe your ideal customers (e.g., 'Small business owners, CFOs, accounting firms')"
+    },
+    {
+      "id": "survey_config_placeholder_36",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "textarea[placeholder]",
+      "text": "Optional custom thank you message for survey completion"
+    },
+    {
+      "id": "survey_config_placeholder_37",
+      "file": "templates/campaigns/survey_config.html",
+      "element": "textarea[placeholder]",
+      "text": "Optional: Override the default AI system prompt with custom instructions"
+    },
+    {
+      "id": "view_1",
+      "file": "templates/campaigns/view.html",
+      "element": "div",
+      "text": "Start Date"
+    },
+    {
+      "id": "view_2",
+      "file": "templates/campaigns/view.html",
+      "element": "div",
+      "text": "End Date"
+    },
+    {
+      "id": "view_3",
+      "file": "templates/campaigns/view.html",
+      "element": "div",
+      "text": "Participants"
+    },
+    {
+      "id": "view_4",
+      "file": "templates/campaigns/view.html",
+      "element": "h5",
+      "text": "Campaign Participants ({{ participant_stats.total }})"
+    },
+    {
+      "id": "view_5",
+      "file": "templates/campaigns/view.html",
+      "element": "div",
+      "text": "Completed"
+    },
+    {
+      "id": "view_6",
+      "file": "templates/campaigns/view.html",
+      "element": "div",
+      "text": "Invited"
+    },
+    {
+      "id": "view_7",
+      "file": "templates/campaigns/view.html",
+      "element": "div",
+      "text": "Pending"
+    },
+    {
+      "id": "view_8",
+      "file": "templates/campaigns/view.html",
+      "element": "h4",
+      "text": "Campaign Actions"
+    },
+    {
+      "id": "view_9",
+      "file": "templates/campaigns/view.html",
+      "element": "span",
+      "text": "Campaign needs description and at least one participant to be marked ready."
+    },
+    {
+      "id": "view_10",
+      "file": "templates/campaigns/view.html",
+      "element": "span",
+      "text": "Draft campaigns can be freely edited or deleted. Once marked ready, campaign details become locked."
+    },
+    {
+      "id": "view_11",
+      "file": "templates/campaigns/view.html",
+      "element": "span",
+      "text": "Campaign is ready for activation"
+    },
+    {
+      "id": "view_12",
+      "file": "templates/campaigns/view.html",
+      "element": "span",
+      "text": "Campaign is currently active and collecting responses"
+    },
+    {
+      "id": "view_13",
+      "file": "templates/campaigns/view.html",
+      "element": "p",
+      "text": "This campaign finished on {{ campaign.completed_at[:10] if campaign.completed_at else campaign.end_date }}"
+    },
+    {
+      "id": "view_14",
+      "file": "templates/campaigns/view.html",
+      "element": "h4",
+      "text": "Individual Response Viewer"
+    },
+    {
+      "id": "view_15",
+      "file": "templates/campaigns/view.html",
+      "element": "p",
+      "text": "View and analyze individual participant responses and conversation transcripts."
+    },
+    {
+      "id": "view_16",
+      "file": "templates/campaigns/view.html",
+      "element": "label",
+      "text": "Select Transcript (.txt files only)"
+    },
+    {
+      "id": "view_17",
+      "file": "templates/campaigns/view.html",
+      "element": "div",
+      "text": "Upload meeting transcripts to extract survey insights automatically."
+    },
+    {
+      "id": "view_18",
+      "file": "templates/campaigns/view.html",
+      "element": "label",
+      "text": "Participant Name"
+    },
+    {
+      "id": "view_19",
+      "file": "templates/campaigns/view.html",
+      "element": "label",
+      "text": "Participant Email"
+    },
+    {
+      "id": "view_20",
+      "file": "templates/campaigns/view.html",
+      "element": "label",
+      "text": "Company Name"
+    },
+    {
+      "id": "view_21",
+      "file": "templates/campaigns/view.html",
+      "element": "p",
+      "text": "No transcripts processed yet"
+    },
+    {
+      "id": "view_22",
+      "file": "templates/campaigns/view.html",
+      "element": "h6",
+      "text": "About Transcript Analysis"
+    },
+    {
+      "id": "view_23",
+      "file": "templates/campaigns/view.html",
+      "element": "p",
+      "text": "VOÏA analyzes meeting transcripts to extract NPS scores, sentiment, themes, and actionable insights. Upload .txt files from phone calls, video meetings, or face-to-face discussions to automatically generate survey responses and integrate them with your campaign analytics."
+    },
+    {
+      "id": "view_placeholder_24",
+      "file": "templates/campaigns/view.html",
+      "element": "input[placeholder]",
+      "text": "Enter participant's full name"
+    },
+    {
+      "id": "view_placeholder_25",
+      "file": "templates/campaigns/view.html",
+      "element": "input[placeholder]",
+      "text": "participant@company.com"
+    },
+    {
+      "id": "view_placeholder_26",
+      "file": "templates/campaigns/view.html",
+      "element": "input[placeholder]",
+      "text": "Enter company name"
+    },
+    {
+      "id": "view_title_27",
+      "file": "templates/campaigns/view.html",
+      "element": "button[title]",
+      "text": "This will only send invitations to participants who haven't been invited yet."
+    },
+    {
+      "id": "list_1",
+      "file": "templates/campaigns/list.html",
+      "element": "h1",
+      "text": "Campaign Management"
+    },
+    {
+      "id": "list_2",
+      "file": "templates/campaigns/list.html",
+      "element": "p",
+      "text": "Manage survey campaigns for {{ business_account.name }}"
+    },
+    {
+      "id": "list_3",
+      "file": "templates/campaigns/list.html",
+      "element": "div",
+      "text": "{# Campaign Action Buttons Macro #}\n    {% macro campaign_actions(campaign, view_type='table') %}\n        {% set action_class = 'table-actions' if view_type == 'table' else 'campaign-card-actions' %}"
+    },
+    {
+      "id": "list_4",
+      "file": "templates/campaigns/list.html",
+      "element": "div",
+      "text": "Start"
+    },
+    {
+      "id": "list_5",
+      "file": "templates/campaigns/list.html",
+      "element": "div",
+      "text": "End"
+    },
+    {
+      "id": "list_6",
+      "file": "templates/campaigns/list.html",
+      "element": "div",
+      "text": "Participants"
+    },
+    {
+      "id": "list_7",
+      "file": "templates/campaigns/list.html",
+      "element": "div",
+      "text": "Sent"
+    },
+    {
+      "id": "list_8",
+      "file": "templates/campaigns/list.html",
+      "element": "div",
+      "text": "Done"
+    },
+    {
+      "id": "list_9",
+      "file": "templates/campaigns/list.html",
+      "element": "a",
+      "text": "All"
+    },
+    {
+      "id": "list_10",
+      "file": "templates/campaigns/list.html",
+      "element": "a",
+      "text": "Draft"
+    },
+    {
+      "id": "list_11",
+      "file": "templates/campaigns/list.html",
+      "element": "a",
+      "text": "Active"
+    },
+    {
+      "id": "list_12",
+      "file": "templates/campaigns/list.html",
+      "element": "a",
+      "text": "Completed"
+    },
+    {
+      "id": "list_13",
+      "file": "templates/campaigns/list.html",
+      "element": "th",
+      "text": "Campaign Name"
+    },
+    {
+      "id": "list_14",
+      "file": "templates/campaigns/list.html",
+      "element": "th",
+      "text": "Status"
+    },
+    {
+      "id": "list_15",
+      "file": "templates/campaigns/list.html",
+      "element": "th",
+      "text": "Start Date"
+    },
+    {
+      "id": "list_16",
+      "file": "templates/campaigns/list.html",
+      "element": "th",
+      "text": "End Date"
+    },
+    {
+      "id": "list_17",
+      "file": "templates/campaigns/list.html",
+      "element": "th",
+      "text": "Participants"
+    },
+    {
+      "id": "list_18",
+      "file": "templates/campaigns/list.html",
+      "element": "th",
+      "text": "Sent/Completed"
+    },
+    {
+      "id": "list_19",
+      "file": "templates/campaigns/list.html",
+      "element": "th",
+      "text": "Actions"
+    },
+    {
+      "id": "list_20",
+      "file": "templates/campaigns/list.html",
+      "element": "h3",
+      "text": "Ready to gather insights?"
+    },
+    {
+      "id": "list_21",
+      "file": "templates/campaigns/list.html",
+      "element": "p",
+      "text": "Create your first campaign to start collecting customer feedback and understanding their experience. Campaigns help you organize survey participants, send invitations, and analyze results."
+    },
+    {
+      "id": "list_22",
+      "file": "templates/campaigns/list.html",
+      "element": "h6",
+      "text": "Campaign Name"
+    },
+    {
+      "id": "list_23",
+      "file": "templates/campaigns/list.html",
+      "element": "h5",
+      "text": "Export Complete!"
+    },
+    {
+      "id": "list_24",
+      "file": "templates/campaigns/list.html",
+      "element": "p",
+      "text": "Your campaign data has been successfully exported."
+    },
+    {
+      "id": "list_25",
+      "file": "templates/campaigns/list.html",
+      "element": "h5",
+      "text": "Export Failed"
+    },
+    {
+      "id": "list_26",
+      "file": "templates/campaigns/list.html",
+      "element": "p",
+      "text": "An error occurred while exporting your data."
+    },
+    {
+      "id": "list_27",
+      "file": "templates/campaigns/list.html",
+      "element": "button",
+      "text": "Close"
+    },
+    {
+      "id": "list_title_28",
+      "file": "templates/campaigns/list.html",
+      "element": "a[title]",
+      "text": "View Details"
+    },
+    {
+      "id": "list_title_29",
+      "file": "templates/campaigns/list.html",
+      "element": "a[title]",
+      "text": "Campaign Insights"
+    },
+    {
+      "id": "list_title_30",
+      "file": "templates/campaigns/list.html",
+      "element": "a[title]",
+      "text": "Manage Participants"
+    },
+    {
+      "id": "list_title_31",
+      "file": "templates/campaigns/list.html",
+      "element": "button[title]",
+      "text": "Export Data"
+    },
+    {
+      "id": "list_title_32",
+      "file": "templates/campaigns/list.html",
+      "element": "button[title]",
+      "text": "Executive Report"
+    },
+    {
+      "id": "list_aria_33",
+      "file": "templates/campaigns/list.html",
+      "element": "button[aria-label]",
+      "text": "Close"
+    },
+    {
+      "id": "breadcrumb_aria_1",
+      "file": "templates/components/breadcrumb.html",
+      "element": "nav[aria-label]",
+      "text": "Breadcrumb navigation"
+    },
+    {
+      "id": "breadcrumb_aria_2",
+      "file": "templates/components/breadcrumb.html",
+      "element": "a[aria-label]",
+      "text": "Navigate to {{ item.label }}"
+    },
+    {
+      "id": "ui_version_toggle_1",
+      "file": "templates/components/ui_version_toggle.html",
+      "element": "span",
+      "text": "UI: {{ ui_version|upper }}"
+    },
+    {
+      "id": "ui_version_toggle_2",
+      "file": "templates/components/ui_version_toggle.html",
+      "element": "span",
+      "text": "Switch"
+    },
+    {
+      "id": "ui_version_toggle_title_3",
+      "file": "templates/components/ui_version_toggle.html",
+      "element": "button[title]",
+      "text": "Switch to {% if ui_version == 'v1' %}v2 (New Sidebar){% else %}v1 (Current){% endif %}"
+    }
+  ],
+  "flash_messages": [],
+  "email_templates": []
+}

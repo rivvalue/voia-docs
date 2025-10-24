@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 
 def load_all_translations():
-    """Load and merge all 10 translated JSON files"""
+    """Load and merge all translated JSON files"""
     
     all_data = {
         'templates': [],
@@ -17,8 +17,52 @@ def load_all_translations():
         'email_templates': []
     }
     
-    # Load all 10 parts
-    for i in range(1, 11):
+    # Load parts 1-7
+    for i in range(1, 8):
+        filename = f"translated_part_{i:02d}.json"
+        
+        if not os.path.exists(filename):
+            print(f"  ⚠ Warning: {filename} not found - skipping")
+            continue
+        
+        try:
+            with open(filename, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            # Merge data
+            all_data['templates'].extend(data.get('templates', []))
+            all_data['flash_messages'].extend(data.get('flash_messages', []))
+            all_data['email_templates'].extend(data.get('email_templates', []))
+            
+            print(f"  ✓ Loaded {filename}")
+            
+        except Exception as e:
+            print(f"  ✗ Error loading {filename}: {e}")
+    
+    # Load part 8a and 8b (split file)
+    for part in ['08a', '08b']:
+        filename = f"translated_part_{part}.json"
+        
+        if not os.path.exists(filename):
+            print(f"  ⚠ Warning: {filename} not found - skipping")
+            continue
+        
+        try:
+            with open(filename, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            
+            # Merge data
+            all_data['templates'].extend(data.get('templates', []))
+            all_data['flash_messages'].extend(data.get('flash_messages', []))
+            all_data['email_templates'].extend(data.get('email_templates', []))
+            
+            print(f"  ✓ Loaded {filename}")
+            
+        except Exception as e:
+            print(f"  ✗ Error loading {filename}: {e}")
+    
+    # Load parts 9-10
+    for i in range(9, 11):
         filename = f"translated_part_{i:02d}.json"
         
         if not os.path.exists(filename):
