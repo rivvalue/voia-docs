@@ -897,11 +897,10 @@ function applyFilters(page = 1) {
                 
                 // Clear bulk selection
                 selectedParticipants.clear();
-                const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+                const selectAllCheckbox = document.getElementById('selectAll');
                 if (selectAllCheckbox) {
                     selectAllCheckbox.checked = false;
                 }
-                updateBulkEditButton();
             } else {
                 throw new Error(data.error || 'Unknown error');
             }
@@ -929,9 +928,11 @@ function updateParticipantTable(participants, pagination) {
         tbody.innerHTML = `
             <tr>
                 <td colspan="8" class="text-center py-5">
-                    <i class="fas fa-filter text-muted fa-2x mb-2"></i>
-                    <p class="text-muted mb-0">No participants match your filters.</p>
-                    <p class="text-muted small">Try adjusting your filter criteria.</p>
+                    <div class="empty-state-icon">
+                        <i class="fas fa-filter"></i>
+                    </div>
+                    <h3>No participants match your filters</h3>
+                    <p class="text-muted">Try adjusting your filter criteria.</p>
                 </td>
             </tr>
         `;
@@ -944,29 +945,79 @@ function updateParticipantTable(participants, pagination) {
     // Build table rows
     let html = '';
     participants.forEach(p => {
-        const statusClass = p.status === 'completed' ? 'success' : 
-                           p.status === 'started' ? 'info' :
-                           p.status === 'invited' ? 'warning' : 'secondary';
+        // Determine status badge
+        let statusBadge = '';
+        if (p.status === 'completed') {
+            statusBadge = '<span class="badge bg-success"><i class="fas fa-check me-1"></i>Completed</span>';
+        } else if (p.status === 'started') {
+            statusBadge = '<span class="badge bg-info"><i class="fas fa-play me-1"></i>Started</span>';
+        } else if (p.status === 'invited') {
+            statusBadge = '<span class="badge bg-warning"><i class="fas fa-clock me-1"></i>Invited</span>';
+        } else if (p.status === 'created') {
+            statusBadge = '<span class="badge bg-primary"><i class="fas fa-plus me-1"></i>Created</span>';
+        } else {
+            statusBadge = `<span class="badge bg-secondary">${p.status}</span>`;
+        }
+        
+        // Determine origin badge
+        let originBadge = '';
+        if (p.origin_badge) {
+            const iconMap = {
+                'trial': '<i class="fas fa-flask me-1"></i>',
+                'admin_single': '<i class="fas fa-user-plus me-1"></i>',
+                'admin_bulk': '<i class="fas fa-upload me-1"></i>'
+            };
+            const icon = iconMap[p.source] || '';
+            originBadge = `<span class="badge ${p.origin_badge.class}">${icon}${p.origin_badge.text}</span>`;
+        } else {
+            originBadge = '<span class="badge bg-secondary">Unknown</span>';
+        }
+        
+        const createdDate = p.created_at ? p.created_at.substring(0, 10) : '-';
         
         html += `
             <tr>
-                <td><input type="checkbox" class="row-checkbox" data-participant-id="${p.id}" onchange="updateSelection()"></td>
-                <td><a href="/business/participants/${p.id}/edit" class="text-decoration-none">${p.name || 'N/A'}</a></td>
-                <td>${p.email || 'N/A'}</td>
-                <td>${p.company_name || '<span class="text-muted">N/A</span>'}</td>
-                <td>${p.role || '<span class="text-muted">N/A</span>'}</td>
-                <td>${p.region || '<span class="text-muted">N/A</span>'}</td>
-                <td><span class="badge bg-${statusClass}">${p.status}</span></td>
                 <td>
-                    <a href="/business/participants/${p.id}/edit" class="btn btn-sm btn-outline-primary" title="Edit">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <button class="btn btn-sm btn-outline-danger delete-participant-btn ms-1" 
-                            data-participant-id="${p.id}" 
-                            data-participant-name="${p.name}"
-                            title="Delete">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                    <input type="checkbox" 
+                           class="participant-checkbox row-checkbox" 
+                           data-participant-id="${p.id}"
+                           onchange="updateSelection()">
+                </td>
+                <td data-label="Name">
+                    <div class="fw-bold">${p.name || 'N/A'}</div>
+                </td>
+                <td data-label="Email">
+                    <div class="text-muted">${p.email || 'N/A'}</div>
+                </td>
+                <td data-label="Company">
+                    <div>${p.company_name || '-'}</div>
+                </td>
+                <td data-label="Origin" class="hide-on-tablet">
+                    ${originBadge}
+                </td>
+                <td data-label="Status">
+                    ${statusBadge}
+                </td>
+                <td data-label="Created" class="hide-on-tablet">
+                    <small class="text-muted">${createdDate}</small>
+                </td>
+                <td data-label="Actions" class="text-end">
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Participant actions">
+                        <a href="/business/participants/${p.id}/edit" 
+                           class="btn btn-outline-primary"
+                           title="Edit participant"
+                           aria-label="Edit ${p.name}">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <button type="button" 
+                                class="btn btn-outline-danger delete-participant-btn"
+                                data-participant-id="${p.id}"
+                                data-participant-name="${p.name}"
+                                title="Delete participant"
+                                aria-label="Delete ${p.name}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                 </td>
             </tr>
         `;
