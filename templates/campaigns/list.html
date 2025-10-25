@@ -658,10 +658,10 @@ function switchView(viewType) {
     sessionStorage.setItem('campaignView', viewType);
 }
 
-// {{ _('Status') }} Filtering Functions
+// Status Filtering Functions
 function filterCampaigns(status) {
-    const listRows = document.querySelector{{ _('All') }}('#listView tbody tr[data-status]');
-    const gridCards = document.querySelector{{ _('All') }}('#gridView [data-status]');
+    const listRows = document.querySelectorAll('#listView tbody tr[data-status]');
+    const gridCards = document.querySelectorAll('#gridView [data-status]');
     
     // Filter list view
     listRows.forEach(row => {
@@ -694,12 +694,12 @@ document.addEventListener('DOMContentLoaded', function() {
     switchView(savedView);
     
     // Add status filter click handlers (needed for interactivity)
-    document.querySelector{{ _('All') }}('.status-filter').forEach(filter => {
+    document.querySelectorAll('.status-filter').forEach(filter => {
         filter.addEventListener('click', function(e) {
             e.preventDefault();
             
             // Remove active class from all filters
-            document.querySelector{{ _('All') }}('.status-filter').forEach(f => {
+            document.querySelectorAll('.status-filter').forEach(f => {
                 f.classList.remove('active-filter');
             });
             
@@ -719,7 +719,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('⏳ Loading executive report statuses (non-blocking)...');
         
         // Find all executive report buttons and check their status
-        const reportButtons = document.querySelector{{ _('All') }}('[id^="execReportBtn_"]');
+        const reportButtons = document.querySelectorAll('[id^="execReportBtn_"]');
         
         // OPTIMIZATION: Defer each status check to prevent blocking
         reportButtons.forEach((button, index) => {
