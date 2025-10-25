@@ -226,7 +226,13 @@ class Campaign(db.Model):
             'optional_topics': self.optional_topics,
             'custom_end_message': self.custom_end_message,
             'custom_system_prompt': self.custom_system_prompt,
-            'anonymize_responses': self.anonymize_responses
+            'anonymize_responses': self.anonymize_responses,
+            # Reminder configuration
+            'reminder_enabled': self.reminder_enabled,
+            'reminder_delay_days': self.reminder_delay_days,
+            # Email customization flags
+            'use_custom_email_content': self.use_custom_email_content,
+            'has_campaign_customization': self.product_description is not None or self.target_clients_description is not None
         }
         
         # OPTIMIZATION: Only include response_count if explicitly requested or pre-computed
