@@ -30,16 +30,16 @@
         </div>
         <h3 class="mb-2">{{ response.respondent_name }} - {{ response.company_name }}</h3>
         <div class="d-flex align-items-center gap-3">
-            <span class="public-nps-score public-nps-{{ response.nps_category.lower() }}" role="status" aria-label="Net Promoter Score: {{ response.nps_score }} out of 10, {{ response.nps_category }}">
-                NPS: {{ response.nps_score }}/10
+            <span class="public-nps-score public-nps-{{ response.nps_category.lower() }}" role="status" aria-label="{{ _('Net Promoter Score: {} out of 10, {}').format(response.nps_score, response.nps_category) }}">
+                {{ _('NPS: {}/10').format(response.nps_score) }}
             </span>
             <span class="text-muted">
                 {% if response.updated_at %}
-                    {{ response.updated_at[:10] }} <small>(updated)</small>
+                    {{ response.updated_at[:10] }} <small>({{ _('updated') }})</small>
                 {% elif response.created_at %}
                     {{ response.created_at[:10] }}
                 {% else %}
-                    Unknown
+                    {{ _('Unknown') }}
                 {% endif %}
             </span>
         </div>
@@ -53,7 +53,7 @@
             <section class="public-section" aria-labelledby="response-info-heading">
                 <h5 class="public-section-title" id="response-info-heading">
                     <i class="fas fa-info-circle" aria-hidden="true"></i>
-                    Response Information
+                    {{ _('Response Information') }}
                 </h5>
                 <div class="public-data-item">
                     <span class="public-data-label">{{ _('Respondent:') }}</span>
@@ -79,7 +79,7 @@
             <section class="public-section" aria-labelledby="ratings-heading">
                 <h5 class="public-section-title" id="ratings-heading">
                     <i class="fas fa-star" aria-hidden="true"></i>
-                    Ratings & Scores
+                    {{ _('Ratings & Scores') }}
                 </h5>
                 <div class="public-data-item">
                     <span class="public-data-label">{{ _('NPS Score:') }}</span>
@@ -109,7 +109,7 @@
                 {% endif %}
                 {% if response.pricing_rating %}
                 <div class="public-data-item">
-                    <span class="public-data-label">Pricing:</span>
+                    <span class="public-data-label">{{ _('Pricing:') }}</span>
                     <span class="public-data-value">{{ response.pricing_rating }}/5</span>
                 </div>
                 {% endif %}
@@ -120,7 +120,7 @@
             <section class="public-section" aria-labelledby="ai-analysis-heading">
                 <h5 class="public-section-title" id="ai-analysis-heading">
                     <i class="fas fa-brain" aria-hidden="true"></i>
-                    AI Analysis
+                    {{ _('AI Analysis') }}
                 </h5>
                 <div class="public-data-item">
                     <span class="public-data-label">{{ _('Sentiment:') }}</span>
@@ -151,7 +151,7 @@
             <section class="public-section" aria-labelledby="themes-heading">
                 <h5 class="public-section-title" id="themes-heading">
                     <i class="fas fa-tags" aria-hidden="true"></i>
-                    Key Themes
+                    {{ _('Key Themes') }}
                 </h5>
                 <div class="public-themes-list" role="list" aria-label="{{ _('Key themes identified') }}">
                     {% for theme in response.key_themes %}
@@ -166,7 +166,7 @@
             <section class="public-section" aria-labelledby="opportunities-heading">
                 <h5 class="public-section-title" id="opportunities-heading">
                     <i class="fas fa-chart-line" aria-hidden="true"></i>
-                    Growth Opportunities
+                    {{ _('Growth Opportunities') }}
                 </h5>
                 <div class="public-opportunities-list" role="list" aria-label="{{ _('Growth opportunities identified') }}">
                     {% for opportunity in response.growth_opportunities %}
@@ -181,16 +181,16 @@
         <article class="public-conversation-panel" role="article" aria-labelledby="conversation-heading">
             <h5 class="public-section-title" id="conversation-heading">
                 <i class="fas fa-comments" aria-hidden="true"></i>
-                Conversation Transcript
+                {{ _('Conversation Transcript') }}
             </h5>
             
             {% if response.conversation_history and response.conversation_history|length > 0 %}
             <div class="public-conversation" role="log" aria-label="{{ _('Conversation history') }}">
                 {% for message in response.conversation_history %}
-                <div class="public-message public-message-{{ message.role }}" role="article" aria-label="{{ 'AI message' if message.role == 'ai' else 'User message' }}">
+                <div class="public-message public-message-{{ message.role }}" role="article" aria-label="{{ _('AI message') if message.role == 'ai' else _('User message') }}">
                     <div class="public-message-avatar public-avatar-{{ message.role }}" aria-hidden="true">
                         {% if message.role == 'ai' %}
-                            AI
+                            {{ _('AI') }}
                         {% else %}
                             {{ response.respondent_name[0]|upper if response.respondent_name else 'U' }}
                         {% endif %}
@@ -209,7 +209,7 @@
             {% else %}
             <div class="alert alert-info" role="alert">
                 <i class="fas fa-info-circle me-2" aria-hidden="true"></i>
-                No conversation transcript available for this response.
+                {{ _('No conversation transcript available for this response.') }}
             </div>
             {% endif %}
         </article>
@@ -222,27 +222,27 @@
             <div class="card-header">
                 <h5 class="mb-0" id="additional-feedback-heading">
                     <i class="fas fa-comment-alt me-2" aria-hidden="true"></i>
-                    Additional Feedback
+                    {{ _('Additional Feedback') }}
                 </h5>
             </div>
             <div class="card-body">
                 {% if response.improvement_feedback %}
                 <div class="mb-3">
-                    <strong>Improvement Suggestions:</strong>
+                    <strong>{{ _('Improvement Suggestions:') }}</strong>
                     <p class="mb-0 mt-1">{{ response.improvement_feedback }}</p>
                 </div>
                 {% endif %}
                 
                 {% if response.recommendation_reason %}
                 <div class="mb-3">
-                    <strong>Recommendation Reason:</strong>
+                    <strong>{{ _('Recommendation Reason:') }}</strong>
                     <p class="mb-0 mt-1">{{ response.recommendation_reason }}</p>
                 </div>
                 {% endif %}
                 
                 {% if response.additional_comments %}
                 <div class="mb-0">
-                    <strong>Additional Comments:</strong>
+                    <strong>{{ _('Additional Comments:') }}</strong>
                     <p class="mb-0 mt-1">{{ response.additional_comments }}</p>
                 </div>
                 {% endif %}
@@ -258,8 +258,7 @@
     <div class="alert alert-light text-center" role="note">
         <small class="text-muted">
             <i class="fas fa-shield-alt me-1" aria-hidden="true"></i>
-            This is a public view of a trial survey response. 
-            Business survey responses require authentication to access.
+            {{ _('This is a public view of a trial survey response. Business survey responses require authentication to access.') }}
         </small>
     </div>
 </footer>

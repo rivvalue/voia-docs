@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-25 02:33+0000\n"
+"POT-Creation-Date: 2025-10-25 02:37+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -296,7 +296,7 @@ msgid "Revenue expansion opportunity"
 msgstr ""
 
 #: templates/campaign_insights.html:195 templates/campaign_insights.html:215
-#: templates/dashboard.html:451
+#: templates/dashboard.html:451 templates/public_survey_response.html:154
 msgid "Key Themes"
 msgstr ""
 
@@ -654,6 +654,7 @@ msgstr ""
 #: templates/campaign_insights.html:941 templates/dashboard.html:1091
 #: templates/executive_summary.html:382 templates/participants/list.html:441
 #: templates/participants/list.html:736 templates/participants/list.html:804
+#: templates/public_survey_response.html:42
 msgid "Unknown"
 msgstr ""
 
@@ -1759,8 +1760,26 @@ msgstr ""
 msgid "Survey response details"
 msgstr ""
 
+#: templates/public_survey_response.html:33
+#, python-brace-format
+msgid "Net Promoter Score: {} out of 10, {}"
+msgstr ""
+
+#: templates/public_survey_response.html:34
+#, python-brace-format
+msgid "NPS: {}/10"
+msgstr ""
+
+#: templates/public_survey_response.html:38
+msgid "updated"
+msgstr ""
+
 #: templates/public_survey_response.html:51
 msgid "Survey response analysis data"
+msgstr ""
+
+#: templates/public_survey_response.html:56
+msgid "Response Information"
 msgstr ""
 
 #: templates/public_survey_response.html:59
@@ -1781,6 +1800,10 @@ msgstr ""
 msgid "Tenure:"
 msgstr ""
 
+#: templates/public_survey_response.html:82
+msgid "Ratings & Scores"
+msgstr ""
+
 #: templates/public_survey_response.html:85
 msgid "NPS Score:"
 msgstr ""
@@ -1798,6 +1821,14 @@ msgstr ""
 msgid "Service Quality:"
 msgstr ""
 
+#: templates/public_survey_response.html:112
+msgid "Pricing:"
+msgstr ""
+
+#: templates/public_survey_response.html:123
+msgid "AI Analysis"
+msgstr ""
+
 #: templates/public_survey_response.html:126
 #: templates/public_survey_response.html:128
 msgid "Sentiment:"
@@ -1811,12 +1842,59 @@ msgstr ""
 msgid "Key themes identified"
 msgstr ""
 
+#: templates/public_survey_response.html:169
+msgid "Growth Opportunities"
+msgstr ""
+
 #: templates/public_survey_response.html:171
 msgid "Growth opportunities identified"
 msgstr ""
 
+#: templates/public_survey_response.html:184
+msgid "Conversation Transcript"
+msgstr ""
+
 #: templates/public_survey_response.html:188
 msgid "Conversation history"
+msgstr ""
+
+#: templates/public_survey_response.html:190
+msgid "AI message"
+msgstr ""
+
+#: templates/public_survey_response.html:190
+msgid "User message"
+msgstr ""
+
+#: templates/public_survey_response.html:193
+msgid "AI"
+msgstr ""
+
+#: templates/public_survey_response.html:212
+msgid "No conversation transcript available for this response."
+msgstr ""
+
+#: templates/public_survey_response.html:225 templates/survey.html:190
+#: templates/survey.html:192
+msgid "Additional Feedback"
+msgstr ""
+
+#: templates/public_survey_response.html:231
+msgid "Improvement Suggestions:"
+msgstr ""
+
+#: templates/public_survey_response.html:238
+msgid "Recommendation Reason:"
+msgstr ""
+
+#: templates/public_survey_response.html:245
+msgid "Additional Comments:"
+msgstr ""
+
+#: templates/public_survey_response.html:261
+msgid ""
+"This is a public view of a trial survey response. Business survey "
+"responses require authentication to access."
 msgstr ""
 
 #: templates/server_auth.html:12
@@ -1987,10 +2065,6 @@ msgstr ""
 
 #: templates/survey.html:171
 msgid "Pricing (1-5)"
-msgstr ""
-
-#: templates/survey.html:190 templates/survey.html:192
-msgid "Additional Feedback"
 msgstr ""
 
 #: templates/survey.html:195
