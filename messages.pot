@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-25 02:57+0000\n"
+"POT-Creation-Date: 2025-10-25 03:02+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,6 +37,10 @@ msgstr ""
 #: templates/server_auth.html:38 templates/simple_auth.html:15
 #: templates/survey.html:54
 msgid "Email Address"
+msgstr ""
+
+#: templates/auth.html:24
+msgid "your.email@company.com"
 msgstr ""
 
 #: templates/auth.html:26
@@ -576,13 +580,13 @@ msgstr ""
 #: templates/campaign_insights.html:743 templates/campaign_insights.html:781
 #: templates/campaign_insights.html:816 templates/campaign_insights.html:839
 #: templates/campaign_insights.html:982 templates/campaign_insights.html:1126
-#: templates/company_responses.html:170 templates/dashboard.html:72
-#: templates/dashboard.html:400 templates/dashboard.html:796
-#: templates/dashboard.html:801 templates/dashboard.html:817
-#: templates/dashboard.html:879 templates/dashboard.html:893
-#: templates/dashboard.html:931 templates/dashboard.html:989
-#: templates/dashboard.html:1132 templates/executive_summary.html:65
-#: templates/executive_summary.html:285
+#: templates/company_responses.html:3 templates/company_responses.html:170
+#: templates/dashboard.html:72 templates/dashboard.html:400
+#: templates/dashboard.html:796 templates/dashboard.html:801
+#: templates/dashboard.html:817 templates/dashboard.html:879
+#: templates/dashboard.html:893 templates/dashboard.html:931
+#: templates/dashboard.html:989 templates/dashboard.html:1132
+#: templates/executive_summary.html:65 templates/executive_summary.html:285
 msgid "Responses"
 msgstr ""
 
@@ -985,6 +989,10 @@ msgstr ""
 
 #: templates/company_responses.html:99
 msgid "Retry"
+msgstr ""
+
+#: templates/company_responses.html:152
+msgid "Failed to load responses"
 msgstr ""
 
 #: templates/company_responses.html:165

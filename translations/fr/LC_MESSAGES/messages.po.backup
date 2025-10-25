@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-25 03:02+0000\n"
+"POT-Creation-Date: 2025-10-25 03:01+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -993,17 +993,17 @@ msgstr "Détails"
 #: templates/campaign_insights.html:1010 templates/company_responses.html:253
 #: templates/dashboard.html:1160
 msgid "Authentication required"
-msgstr "Authentification requise"
+msgstr "Jeton d'authentification :"
 
 #: templates/campaign_insights.html:1012 templates/dashboard.html:1162
 msgid "Value"
-msgstr "Valeur"
+msgstr ""
 
 #: templates/campaign_insights.html:1015 templates/company_responses.html:247
 #: templates/dashboard.html:1165
 #, fuzzy
 msgid "View Full Response"
-msgstr "Voir la réponse complète"
+msgstr "Saisissez votre réponse"
 
 #: templates/campaign_insights.html:1218
 #, fuzzy
@@ -1014,16 +1014,16 @@ msgstr "Aucune donnée d'entreprise disponible pour le moment"
 msgid "Campaign Responses"
 msgstr "Réponses de la campagne"
 
-#: templates/company_responses.html:78 templates/dashboard.html:844
+msgstr "Réponses de la campagne"
 #: templates/dashboard.html:940
 msgid "Date"
+msgstr "Date de fin"
+
 msgstr "Date"
-
-#: templates/company_responses.html:79 templates/dashboard.html:941
 msgid "Action"
-msgstr "Action"
+msgstr "Durée :"
 
-#: templates/company_responses.html:91
+msgstr "Action"
 msgid "No responses found for this company"
 msgstr "Aucune réponse trouvée pour cette entreprise"
 
@@ -1036,17 +1036,17 @@ msgid "Retry"
 msgstr "Réessayer"
 
 #: templates/company_responses.html:152
+msgstr "Réessayer"
 msgid "Failed to load responses"
-msgstr "Échec du chargement des réponses"
+msgstr "Erreur lors du chargement des réponses"
 
 #: templates/company_responses.html:165
-#, fuzzy
-msgid "0 Responses"
+msgstr "Échec du chargement des réponses"
 msgstr "0 réponse"
 
 #: templates/company_responses.html:195
 msgid "Anonymous"
-msgstr "Anonyme"
+msgstr "0 réponse"
 
 #: templates/conversational_survey.html:3
 msgid "AI Survey - VOÏA - Voice Of Client Agent"

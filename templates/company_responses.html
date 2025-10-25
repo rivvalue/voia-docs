@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ company_name }} Responses - {{ campaign.name }} - VOÏA{% endblock %}
+{% block title %}{{ company_name }} {{ _('Responses') }} - {{ campaign.name }} - VOÏA{% endblock %}
 
 {% block page_class %}page-company-responses{% endblock %}
 
@@ -149,7 +149,7 @@
         // Fetch responses from API
         fetch(`/api/campaigns/${campaignId}/companies/${encodeURIComponent(companyName)}/responses?page=${page}&per_page=${perPage}`)
             .then(response => {
-                if (!response.ok) throw new Error('Failed to load responses');
+                if (!response.ok) throw new Error('{{ _("Failed to load responses") }}');
                 return response.json();
             })
             .then(data => {
