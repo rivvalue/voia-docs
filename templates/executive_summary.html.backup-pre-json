@@ -371,36 +371,44 @@
 {% endblock %}
 
 {% block scripts %}
-<!-- Translation Loader - Async JSON files for better performance -->
-<script src="{{ url_for('static', filename='js/translation-loader.js') }}"></script>
+<!-- Translation strings for JavaScript -->
 <script>
-// Translation object - populated asynchronously from JSON files
-const translations = {};
-
-// Load translations asynchronously
-(async function initializeTranslations() {
-    try {
-        // Load common translations (executive summary uses common + dashboard keys)
-        const [dashboard, common] = await Promise.all([
-            window.translationLoader.load('dashboard'),
-            window.translationLoader.load('common')
-        ]);
-        
-        // Merge translations into global object for backward compatibility
-        Object.assign(translations, dashboard, common);
-        
-        // Dispatch event to notify that translations are ready
-        window.dispatchEvent(new CustomEvent('translationsLoaded', {
-            detail: { namespaces: ['dashboard', 'common'] }
-        }));
-        
-        console.log('✅ Executive Summary translations loaded');
-        
-    } catch (error) {
-        console.error('❌ Translation loading failed:', error);
-        // Executive Summary will use English fallbacks via translation keys
-    }
-})();
+const translations = {
+    // Campaign Status
+    draft: "{{ _('Draft') }}",
+    ready: "{{ _('Ready') }}",
+    active: "{{ _('Active') }}",
+    completed: "{{ _('Completed') }}",
+    unknown: "{{ _('Unknown') }}",
+    
+    // Dropdown Options
+    selectFirstCampaign: "{{ _('Select first campaign') }}",
+    selectSecondCampaign: "{{ _('Select second campaign') }}",
+    
+    // Loading & Error Messages
+    loadingComparison: "{{ _('Loading comparison...') }}",
+    loadingComparisonData: "{{ _('Loading comparison data...') }}",
+    errorLoadingComparison: "{{ _('Error Loading Comparison') }}",
+    failedToLoadComparisonData: "{{ _('Failed to load comparison data. Please try again.') }}",
+    failedToFetchComparisonData: "{{ _('Failed to fetch comparison data') }}",
+    failedToLoadCampaignOptions: "{{ _('Failed to load campaign options') }}",
+    errorLoadingKpiData: "{{ _('Error loading KPI overview data') }}",
+    noCampaignDataAvailable: "{{ _('No campaign data available') }}",
+    
+    // Table Labels
+    totalResponses: "{{ _('Total Responses') }}",
+    npsScore: "{{ _('NPS Score') }}",
+    companiesAnalyzed: "{{ _('Companies Analyzed') }}",
+    criticalRiskCompanies: "{{ _('Critical Risk Companies') }}",
+    
+    // Additional Metric Names
+    riskHeavyAccounts: "{{ _('Risk-Heavy Accounts') }}",
+    opportunityHeavyAccounts: "{{ _('Opportunity-Heavy Accounts') }}",
+    satisfactionRating: "{{ _('Satisfaction Rating') }}",
+    productValueRating: "{{ _('Product Value Rating') }}",
+    pricingRating: "{{ _('Pricing Rating') }}",
+    serviceRating: "{{ _('Service Rating') }}"
+};
 </script>
 
 <!-- JavaScript for {{ _('Executive Summary') }} -->

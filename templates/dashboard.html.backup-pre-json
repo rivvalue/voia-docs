@@ -1080,36 +1080,90 @@
     window.isBusinessAuthenticated = {{ 'true' if is_business_authenticated else 'false' }};
 </script>
 
-<!-- Translation Loader - Async JSON files for better performance -->
-<script src="{{ url_for('static', filename='js/translation-loader.js') }}"></script>
+<!-- Translation strings for JavaScript -->
 <script>
-// Translation object - populated asynchronously from JSON files
-const translations = {};
-
-// Load translations asynchronously
-(async function initializeTranslations() {
-    try {
-        // Load dashboard and common translations in parallel
-        const [dashboard, common] = await Promise.all([
-            window.translationLoader.load('dashboard'),
-            window.translationLoader.load('common')
-        ]);
-        
-        // Merge translations into global object for backward compatibility
-        Object.assign(translations, dashboard, common);
-        
-        // Dispatch event to notify that translations are ready
-        window.dispatchEvent(new CustomEvent('translationsLoaded', {
-            detail: { namespaces: ['dashboard', 'common'] }
-        }));
-        
-        console.log('✅ Dashboard translations loaded');
-        
-    } catch (error) {
-        console.error('❌ Translation loading failed:', error);
-        // Dashboard will use English fallbacks via translation keys
-    }
-})();
+const translations = {
+    // Campaign Status
+    draft: "{{ _('Draft') }}",
+    ready: "{{ _('Ready') }}",
+    active: "{{ _('Active') }}",
+    completed: "{{ _('Completed') }}",
+    unknown: "{{ _('Unknown') }}",
+    
+    // Campaign Filter UI
+    filteredBy: "{{ _('Filtered by:') }}",
+    clearFilter: "{{ _('Clear filter') }}",
+    selectFirstCampaign: "{{ _('Select first campaign') }}",
+    selectSecondCampaign: "{{ _('Select second campaign') }}",
+    
+    // Time/Date Display
+    daysLeft: "{{ _('days left') }}",
+    daysAgo: "{{ _('days ago') }}",
+    month: "{{ _('month') }}",
+    months: "{{ _('months') }}",
+    ago: "{{ _('ago') }}",
+    year: "{{ _('year') }}",
+    years: "{{ _('years') }}",
+    
+    // Loading Messages
+    loadingComparison: "{{ _('Loading comparison...') }}",
+    loadingComparisonData: "{{ _('Loading comparison data...') }}",
+    loading: "{{ _('Loading...') }}",
+    
+    // Error Messages
+    failedToFetchComparisonData: "{{ _('Failed to fetch comparison data') }}",
+    errorLoadingComparison: "{{ _('Error Loading Comparison') }}",
+    failedToLoadComparisonData: "{{ _('Failed to load comparison data. Please try again.') }}",
+    noCampaignDataAvailable: "{{ _('No campaign data available') }}",
+    errorLoadingKpiData: "{{ _('Error loading KPI overview data') }}",
+    errorLoadingDashboardData: "{{ _('Error loading dashboard data:') }}",
+    failedToLoadCampaignOptions: "{{ _('Failed to load campaign options') }}",
+    errorLoadingAccountIntelligence: "{{ _('Error loading account intelligence') }}",
+    errorLoadingResponses: "{{ _('Error loading responses.') }}",
+    networkErrorLoadingTenureData: "{{ _('Network error loading tenure data') }}",
+    networkErrorLoadingCompanyData: "{{ _('Network error loading company data') }}",
+    
+    // Chart Labels & Metrics
+    satisfaction: "{{ _('Satisfaction') }}",
+    productValue: "{{ _('Product Value') }}",
+    service: "{{ _('Service') }}",
+    pricing: "{{ _('Pricing') }}",
+    averageRating: "{{ _('Average Rating') }}",
+    responses: "{{ _('Responses') }}",
+    nps: "{{ _('NPS') }}",
+    companies: "{{ _('Companies') }}",
+    criticalRisk: "{{ _('Critical Risk') }}",
+    product: "{{ _('Product') }}",
+    
+    // Table Content & Empty States
+    na: "{{ _('N/A') }}",
+    noTenureDataAvailable: "{{ _('No tenure data available yet') }}",
+    noCompanyDataAvailable: "{{ _('No company data available yet') }}",
+    
+    // Pagination Text
+    showing: "{{ _('Showing') }}",
+    of: "{{ _('of') }}",
+    tenureGroups: "{{ _('tenure groups') }}",
+    companiesPagination: "{{ _('companies') }}",
+    responsesPagination: "{{ _('responses') }}",
+    accounts: "{{ _('accounts') }}",
+    
+    // NPS Category Labels
+    promoters: "{{ _('Promoters (9-10)') }}",
+    passives: "{{ _('Passives (7-8)') }}",
+    detractors: "{{ _('Detractors (0-6)') }}",
+    
+    // Accessibility Attributes (aria-label, title)
+    previous: "{{ _('Previous') }}",
+    next: "{{ _('Next') }}",
+    viewDetails: "{{ _('View Details') }}",
+    authenticationRequired: "{{ _('Authentication required') }}",
+    satisfactionBadge: "{{ _('Satisfaction') }}",
+    valueBadge: "{{ _('Value') }}",
+    serviceBadge: "{{ _('Service') }}",
+    pricingBadge: "{{ _('Pricing') }}",
+    viewFullResponse: "{{ _('View Full Response') }}"
+};
 </script>
 
 <!-- Hash redirect handler for old bookmarks -->

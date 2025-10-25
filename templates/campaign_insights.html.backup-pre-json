@@ -1,14 +1,15 @@
 {% extends "base.html" %}
 {% set needs_charts = True %}
 
-{% block title %}Business Intelligence Hub - VOÏA - Voice Of Client Agent{% endblock %}
+{% block title %}{{ _('Campaign Insights') }} - VOÏA - Voice Of Client Agent{% endblock %}
 
 {% block page_class %}page-dashboard{% endblock %}
 
 {% block content %}
 {# Breadcrumb Navigation #}
 {% set breadcrumb_items = [
-    {'label': 'Business Intelligence', 'current': true}
+    {'label': 'Business Intelligence', 'url': url_for('dashboard')},
+    {'label': 'Campaign Insights', 'current': true}
 ] %}
 {% include 'components/breadcrumb.html' %}
 <div class="container">
@@ -17,23 +18,20 @@
     <div class="bg-white border-bottom" style="padding: 2.5rem 0; margin-bottom: 2rem;">
         <div class="row align-items-center">
             <div class="col-12 col-md-8 mb-3 mb-md-0">
-                <h1 class="h2 mb-2">{{ _('Business Intelligence') }}</h1>
-                <p class="text-muted mb-0">{{ _('Comprehensive customer feedback insights and analysis') }}</p>
+                <h1 class="h2 mb-2">{{ _('Campaign Insights') }}</h1>
+                <p class="text-muted mb-0">{{ _('Campaign-specific performance analytics and survey insights') }}</p>
             </div>
             <div class="col-12 col-md-4 text-center text-md-end">
                 <div class="d-flex align-items-center justify-content-center justify-content-md-end gap-3">
-                    <!-- Export Response Data - Only for trial/public users -->
-                    {% if not is_business_authenticated %}
-                    <button class="btn btn-outline-secondary btn-sm" onclick="exportUserData()">
-                        <i class="fas fa-user-circle me-2"></i>Export Response Data
-                    </button>
-                    {% endif %}
+                    <!-- Link to Executive Summary -->
+                    <a href="{{ url_for('executive_summary') }}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-chart-line me-2"></i>{{ _('Executive Summary') }}
+                    </a>
                     
                     <!-- Refresh Icon -->
                     <button class="btn btn-sm btn-link text-muted p-1" 
                             onclick="refreshData()" 
-                            data-bs-toggle="tooltip" 
-                            data-bs-title="{{ _('Refresh data') }}">
+                            title="{{ _('Refresh data') }}">
                         <i class="fas fa-sync-alt"></i>
                     </button>
                 </div>
@@ -41,249 +39,10 @@
         </div>
     </div>
 
-<!-- Executive Summary - All Campaigns Overview -->
-<div class="mb-5">
-    <div class="bg-white border rounded" style="padding: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-        <!-- Section Header -->
-        <div class="mb-4">
-            <h3 class="mb-2"><i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>{{ _('Executive Summary') }}</h3>
-            <p class="text-muted mb-0">{{ _('High-level overview of key performance indicators across all campaigns') }}</p>
-        </div>
-
-        <!-- Loading state -->
-        <div class="loading-card" id="executiveSummaryLoading">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">{{ _('Loading executive summary...') }}</span>
-            </div>
-            <div class="loading-text">{{ _('Loading executive summary...') }}</div>
-        </div>
-
-        <!-- Executive Summary Content (toggles during loading) -->
-        <div class="d-none" id="executiveSummaryContent">
-        <!-- KPI Overview Section -->
-        <div class="mb-4">
-            <h5 class="mb-3"><i class="fas fa-trending-up me-2" style="color: #E13A44;"></i>{{ _('Campaign KPI Overview') }}</h5>
-            <div class="table-responsive">
-                <table class="table table-borderless table-sm" id="kpiOverviewTable" style="font-size: 0.85rem;">
-                    <thead>
-                        <tr>
-                            <th style="min-width: 120px;">{{ _('Campaign') }}</th>
-                            <th class="text-center" style="min-width: 100px;">
-                                {{ _('Responses') }}
-                                <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" data-bs-toggle="tooltip" data-bs-title="{{ _('Click to view full trends') }}">
-                                    <canvas id="sparkline-responses"></canvas>
-                                </div>
-                            </th>
-                            <th class="text-center" style="min-width: 100px;">
-                                {{ _('NPS') }}
-                                <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" data-bs-toggle="tooltip" data-bs-title="{{ _('Click to view full trends') }}">
-                                    <canvas id="sparkline-nps"></canvas>
-                                </div>
-                            </th>
-                            <th class="text-center" style="min-width: 100px;">
-                                {{ _('Companies') }}
-                                <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" data-bs-toggle="tooltip" data-bs-title="{{ _('Click to view full trends') }}">
-                                    <canvas id="sparkline-companies"></canvas>
-                                </div>
-                            </th>
-                            <th class="text-center" style="min-width: 110px;">
-                                {{ _('Critical Risk') }}
-                                <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" data-bs-toggle="tooltip" data-bs-title="{{ _('Click to view full trends') }}">
-                                    <canvas id="sparkline-critical"></canvas>
-                                </div>
-                            </th>
-                            <th class="text-center" style="min-width: 110px;">
-                                {{ _('Satisfaction') }}
-                                <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" data-bs-toggle="tooltip" data-bs-title="{{ _('Click to view full trends') }}">
-                                    <canvas id="sparkline-satisfaction"></canvas>
-                                </div>
-                            </th>
-                            <th class="text-center" style="min-width: 110px;">
-                                {{ _('Product') }}
-                                <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" data-bs-toggle="tooltip" data-bs-title="{{ _('Click to view full trends') }}">
-                                    <canvas id="sparkline-product"></canvas>
-                                </div>
-                            </th>
-                            <th class="text-center" style="min-width: 100px;">
-                                {{ _('Pricing') }}
-                                <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" data-bs-toggle="tooltip" data-bs-title="{{ _('Click to view full trends') }}">
-                                    <canvas id="sparkline-pricing"></canvas>
-                                </div>
-                            </th>
-                            <th class="text-center" style="min-width: 100px;">
-                                {{ _('Service') }}
-                                <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" data-bs-toggle="tooltip" data-bs-title="{{ _('Click to view full trends') }}">
-                                    <canvas id="sparkline-service"></canvas>
-                                </div>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody id="kpiOverviewTableBody">
-                        <tr>
-                            <td colspan="9" class="text-center text-muted">
-                                <i class="fas fa-spinner fa-spin me-2"></i>{{ _('Loading KPI overview...') }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <!-- Mobile: View Trends Button (hidden on desktop) -->
-            <div class="text-center mt-3 d-md-none">
-                <button class="btn btn-outline-secondary btn-sm" onclick="openTrendsModal()" style="border-color: #BDBDBD; color: #000000;">
-                    <i class="fas fa-chart-line me-2"></i>{{ _('View Trends') }}
-                </button>
-            </div>
-        </div>
-
-        <!-- Campaign Comparison Section -->
-        <div class="mt-4">
-            <h5 class="mb-3"><i class="fas fa-exchange-alt me-2" style="color: #E13A44;"></i>{{ _('Campaign Comparison') }}</h5>
-            
-            <!-- Campaign Comparison Selector -->
-            <div class="border rounded p-3 mb-3" style="background-color: #f8f9fa;">
-                <div class="row align-items-center">
-                    <div class="col-md-5">
-                        <label for="campaign1Select" class="form-label fw-semibold">{{ _('Campaign 1') }}</label>
-                        <select class="form-select" id="campaign1Select" onchange="updateComparison()">
-                            <option value="">{{ _('Select first campaign') }}</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2 text-center">
-                        <i class="fas fa-exchange-alt fa-2x mt-4" style="color: #E13A44;"></i>
-                    </div>
-                    <div class="col-md-5">
-                        <label for="campaign2Select" class="form-label fw-semibold">{{ _('Campaign 2') }}</label>
-                        <select class="form-select" id="campaign2Select" onchange="updateComparison()">
-                            <option value="">{{ _('Select second campaign') }}</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <!-- No Selection Message -->
-                <div id="noComparisonMessage" class="text-center py-4 mt-3" style="background-color: #ffffff; border-radius: 8px;">
-                    <i class="fas fa-info-circle fa-2x mb-2" style="color: #E13A44;"></i>
-                    <p class="text-muted mb-0">{{ _('Please select two campaigns above to view comparison results') }}</p>
-                </div>
-            </div>
-            
-            <!-- Comparison Results -->
-            <div id="comparisonResults" style="display: none;">
-                <!-- Metrics Comparison -->
-                <div class="border rounded p-3 mb-3" style="background-color: #ffffff;">
-                    <h6 class="mb-3">{{ _('Metrics Comparison') }}</h6>
-                    <div class="table-responsive">
-                        <table class="table table-borderless table-sm">
-                            <thead>
-                                <tr style="background-color: #f8f9fa;">
-                                    <th style="width: 30%;">{{ _('Metric') }}</th>
-                                    <th style="width: 25%;" class="text-center" id="campaign1Header">{{ _('Campaign 1') }}</th>
-                                    <th style="width: 25%;" class="text-center" id="campaign2Header">{{ _('Campaign 2') }}</th>
-                                    <th style="width: 20%;" class="text-center">{{ _('Change') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody id="summaryTable">
-                                <!-- Will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <!-- Account-by-Account Analysis -->
-                <div class="border rounded p-3" style="background-color: #ffffff;">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <h6 class="mb-0">{{ _('Account-by-Account Analysis') }}</h6>
-                            <small class="text-muted" id="comparisonSearchInfo"></small>
-                        </div>
-                    </div>
-                    
-                    <!-- Campaign Identifiers -->
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <small class="text-muted">C1 = <strong id="c1CampaignName">Campaign 1</strong></small>
-                        </div>
-                        <div class="col-md-6 text-end">
-                            <small class="text-muted">C2 = <strong id="c2CampaignName">Campaign 2</strong></small>
-                        </div>
-                    </div>
-                    
-                    <!-- Search and Filter Controls -->
-                    <div class="row align-items-end mb-3">
-                        <div class="col-md-5">
-                            <label for="comparisonSearch" class="form-label">{{ _('Search') }}</label>
-                            <input type="text" class="form-control" id="comparisonSearch" 
-                                   placeholder="{{ _('Search by company name...') }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="comparisonBalanceFilter" class="form-label">{{ _('Balance Status') }}</label>
-                            <select class="form-select" id="comparisonBalanceFilter" onchange="searchComparisonTable()">
-                                <option value="">{{ _('All Companies') }}</option>
-                                <option value="opportunity_heavy">{{ _('Opportunity Heavy') }}</option>
-                                <option value="balanced">{{ _('Balanced') }}</option>
-                                <option value="risk_heavy">{{ _('Risk Heavy') }}</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="btn-group w-100">
-                                <button type="button" class="btn btn-primary" onclick="searchComparisonTable()">
-                                    <i class="fas fa-search me-1"></i>{{ _('Search') }}
-                                </button>
-                                <button type="button" class="btn btn-outline-secondary" onclick="clearComparisonSearch()">
-                                    <i class="fas fa-times me-1"></i>{{ _('Clear') }}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover table-sm">
-                            <thead style="background-color: #f8f9fa;">
-                                <tr>
-                                    <th style="width: 15%;">{{ _('Company') }}</th>
-                                    <th style="width: 15%;" class="text-center">{{ _('C1 Risks') }}</th>
-                                    <th style="width: 15%;" class="text-center">{{ _('C1 Opps') }}</th>
-                                    <th style="width: 15%;" class="text-center">{{ _('C1 Balance') }}</th>
-                                    <th style="width: 15%;" class="text-center">{{ _('C2 Risks') }}</th>
-                                    <th style="width: 15%;" class="text-center">{{ _('C2 Opps') }}</th>
-                                    <th style="width: 15%;" class="text-center">{{ _('C2 Balance') }}</th>
-                                    <th style="width: 15%;" class="text-center">{{ _('Status') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody id="companyTable">
-                                <!-- Will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <!-- Pagination Controls for Comparison Table -->
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <div class="pagination-info">
-                            <small class="text-muted" id="comparisonPaginationInfo">{{ _('Loading...') }}</small>
-                        </div>
-                        <nav aria-label="{{ _('Comparison table pagination') }}">
-                            <ul class="pagination pagination-sm mb-0" id="comparisonPaginationControls">
-                                <!-- Will be populated by JavaScript -->
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-        </div>
-        </div>
-        <!-- End Executive Summary Content -->
-    </div>
-</div>
-
-<!-- Campaign Insights Section -->
+<!-- {{ _('Campaign Insights') }} Section -->
 <div class="bg-white border rounded mb-4" style="padding: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-    <!-- Section Header -->
-    <div class="mb-4">
-        <h3 class="mb-2"><i class="fas fa-chart-bar me-2" style="color: #E13A44;"></i>{{ _('Campaign Insights') }}</h3>
-        <p class="text-muted mb-0">{{ _('Analyze and compare campaign-specific performance metrics') }}</p>
-    </div>
-
 <div class="dashboard-navigation mb-4">
-        <!-- Campaign Analytics Filter (Only for Insights) -->
+        <!-- {{ _('Campaign Analytics Filter') }} (Only for Insights) -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="border rounded" style="padding: 1.5rem; background-color: #f8f9fa;">
@@ -298,7 +57,7 @@
                     <!-- Filter Controls -->
                     <div class="row align-items-center mb-2">
                         <div class="col-12 col-md-auto mb-2 mb-md-0">
-                            <label for="campaignFilter" class="form-label mb-0">{{ _('Campaign') }}:</label>
+                            <label for="campaignFilter" class="form-label mb-0">{{ _('Campaign:') }}</label>
                         </div>
                         <div class="col-12 col-md">
                             <div class="d-flex gap-2 align-items-center">
@@ -306,7 +65,7 @@
                                     <option value="">{{ _('Select Campaign') }}</option>
                                     <!-- Will be populated by JavaScript -->
                                 </select>
-                                <button class="btn btn-outline-secondary btn-sm" onclick="clearCampaignFilter()" data-bs-toggle="tooltip" data-bs-title="{{ _('Clear Filter') }}">
+                                <button class="btn btn-outline-secondary btn-sm" onclick="clearCampaignFilter()" title="{{ _('Clear Filter') }}">
                                     <i class="fas fa-times"></i>
                                 </button>
                             </div>
@@ -354,6 +113,11 @@
                 <i class="fas fa-comments me-2" style="color: #E13A44;"></i>{{ _('Survey Insights') }}
             </button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="segmentation-tab" data-bs-toggle="tab" data-bs-target="#segmentation" type="button" role="tab" aria-controls="segmentation" aria-selected="false">
+                <i class="fas fa-users me-2" style="color: #E13A44;"></i>{{ _('Segmentation Insights') }}
+            </button>
+        </li>
     </ul>
 </div>
 
@@ -377,8 +141,8 @@
                     <div class="alert d-flex align-items-center border rounded" style="background: #fff; border-color: #E13A44 !important; padding: 1rem;">
                         <i class="fas fa-bullhorn me-3" style="color: #E13A44;"></i>
                         <div>
-                            <strong>{{ _('Survey Insights') }}</strong> - {{ _('Currently showing data from active campaign') }}: 
-                            <span id="activeCampaignName" class="fw-bold">Campaign Name</span>
+                            <strong>{{ _('Survey Insights') }}</strong> - {{ _('Currently showing data from active campaign:') }} 
+                            <span id="activeCampaignName" class="fw-bold">{{ _('Campaign Name') }}</span>
                             <span class="ms-2 text-muted" id="activeCampaignDates">Jan 1 - Dec 31, 2024</span>
                         </div>
                     </div>
@@ -397,7 +161,7 @@
                 <div class="col">
                     <div class="kpi-card kpi-primary">
                         <div class="kpi-value text-success" id="totalResponses">0</div>
-                        <div class="kpi-label">Total {{ _('Responses') }}</div>
+                        <div class="kpi-label">{{ _('Total Responses') }}</div>
                         <div class="kpi-trend" id="totalResponsesTrend">{{ _('All time feedback collected') }}</div>
                     </div>
                 </div>
@@ -414,7 +178,7 @@
                         <div class="kpi-label">
                             {{ _('High Churn Risk Accounts') }}
                             <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top" 
-                               data-bs-title="{{ _('Companies with High or Critical churn risk level based on AI assessment') }}" style="font-size: 0.8em; opacity: 0.7;"></i>
+                               title="Companies with {{ _('High') }} or {{ _('Critical') }} churn risk level based on AI assessment" style="font-size: 0.8em; opacity: 0.7;"></i>
                         </div>
                         <div class="kpi-trend" id="highRiskTrend">{{ _('Imminent churn risk (High/Critical)') }}</div>
                     </div>
@@ -428,14 +192,14 @@
                 </div>
             </div>
 
-            <!-- High Churn Risk Accounts & Key Themes Summary -->
+            <!-- {{ _('High Churn Risk Accounts') }} & {{ _('Key Themes') }} Summary -->
             <div class="row mb-4">
                 <div class="col-md-6">
                     <div class="chart-card">
                         <div class="card-header">
                             <h5>{{ _('High Churn Risk Accounts') }}
                                 <i class="fas fa-info-circle ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
-                                   data-bs-title="{{ _('Companies with High or Critical churn risk level') }}" style="font-size: 0.8em; opacity: 0.7;"></i>
+                                   title="Companies with {{ _('High') }} or {{ _('Critical') }} churn risk level" style="font-size: 0.8em; opacity: 0.7;"></i>
                             </h5>
                         </div>
                         <div class="card-body" style="height: 550px; overflow-y: auto; padding: 1.5rem;">
@@ -460,38 +224,38 @@
             </div>
         </div>
 
-        <!-- Account Intelligence Tab -->
+        <!-- {{ _('Account Intelligence') }} Tab -->
         <div class="tab-pane fade" id="intelligence" role="tabpanel" aria-labelledby="intelligence-tab">
-            <!-- Account Intelligence - Unified View -->
+            <!-- {{ _('Account Intelligence') }} - Unified View -->
             <div class="chart-card mb-4">
                 <div class="card-header">
                     <h5 class="mb-0">
                         {{ _('Account Intelligence') }}
                         <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top" 
-                           data-bs-title="{{ _('Shows account health balance: Risk-Heavy (risks outweigh opportunities), High Potential (opportunities with minimal risks), or Balanced') }}" 
+                           title="Shows account health balance: Risk-Heavy (risks outweigh opportunities), {{ _('High') }} Potential (opportunities with minimal risks), or {{ _('Balance') }}d" 
                            style="font-size: 0.8em; opacity: 0.7;"></i>
                     </h5>
-                    <small class="text-muted">{{ _('Risk vs Opportunity Balance by Company') }}</small>
+                    <small class="text-muted">Risk vs Opportunity {{ _('Balance') }} by {{ _('Company') }}</small>
                 </div>
                 <div class="card-body">
-                            <!-- Search and Filters -->
+                            <!-- {{ _('Search') }} and Filters -->
                             <div class="row g-3 mb-4">
                                 <div class="col-md-4">
-                                    <label for="accountIntelSearch" class="form-label">{{ _('Search') }}</label>
+                                    <label for="accountIntel{{ _('Search') }}" class="form-label">{{ _('Search') }}</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-search"></i></span>
                                         <input type="text" class="form-control" id="accountIntelSearch" 
-                                               placeholder="{{ _('Search company, opportunities, risks...') }}" 
+                                               placeholder="{{ _('Search') }} company, opportunities, risks..." 
                                                onkeyup="searchAccountIntelligence()">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
-                                    <label for="accountBalanceFilter" class="form-label">{{ _('Balance') }}</label>
+                                    <label for="account{{ _('Balance') }}Filter" class="form-label">{{ _('Balance') }}</label>
                                     <select class="form-select" id="accountBalanceFilter" onchange="searchAccountIntelligence()">
                                         <option value="">{{ _('All') }}</option>
-                                        <option value="risk_heavy">{{ _('Risk-Heavy') }}</option>
-                                        <option value="balanced">{{ _('Balanced') }}</option>
-                                        <option value="opportunity_heavy">{{ _('High Potential') }}</option>
+                                        <option value="risk_heavy">Risk-Heavy</option>
+                                        <option value="balanced">{{ _('Balance') }}d</option>
+                                        <option value="opportunity_heavy">{{ _('High') }} Potential</option>
                                     </select>
                                 </div>
                                 <div class="col-md-2">
@@ -508,8 +272,8 @@
                                     <label for="accountOppFilter" class="form-label">{{ _('Opportunities') }}</label>
                                     <select class="form-select" id="accountOppFilter" onchange="searchAccountIntelligence()">
                                         <option value="">{{ _('All') }}</option>
-                                        <option value="yes">{{ _('Has Opportunities') }}</option>
-                                        <option value="no">{{ _('No Opportunities') }}</option>
+                                        <option value="yes">Has {{ _('Opportunities') }}</option>
+                                        <option value="no">No {{ _('Opportunities') }}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-2">
@@ -539,7 +303,7 @@
                             </div>
                             
                             <!-- Pagination Controls -->
-                            <nav aria-label="{{ _('Account Intelligence pagination') }}" id="accountIntelPaginationContainer" style="display: none;">
+                            <nav aria-label="{{ _('Account Intelligence') }} pagination" id="accountIntelPaginationContainer" style="display: none;">
                                 <ul class="pagination justify-content-center" id="accountIntelPagination"></ul>
                             </nav>
                         </div>
@@ -604,12 +368,12 @@
         </div>
     </div>
 
-            <!-- Average {{ _('Ratings') }} -->
+            <!-- {{ _('Average Ratings') }} -->
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="chart-card">
                         <div class="card-header">
-                            <h5>Average {{ _('Ratings') }}</h5>
+                            <h5>{{ _('Average Ratings') }}</h5>
                         </div>
                         <div class="card-body">
                             <div class="chart-container">
@@ -623,7 +387,7 @@
 
         <!-- Survey Insights Tab -->
         <div class="tab-pane fade" id="survey-insights" role="tabpanel" aria-labelledby="survey-insights-tab">
-            <!-- Company NPS Segregation Section -->
+            <!-- {{ _('Company') }} NPS Segregation Section -->
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="data-table">
@@ -632,17 +396,17 @@
                             <small class="text-muted">{{ _('Strategic account management - NPS scores segregated by company evaluating Archelo Group') }}</small>
                         </div>
                         <div class="p-3">
-                            <!-- Search and Filter Controls -->
+                            <!-- {{ _('Search') }} and Filter Controls -->
                             <div class="row align-items-end mb-3">
                                 <div class="col-md-5">
-                                    <label for="companySearch" class="form-label">{{ _('Search') }}</label>
+                                    <label for="company{{ _('Search') }}" class="form-label">{{ _('Search') }}</label>
                                     <input type="text" class="form-control" id="companySearch" 
-                                           placeholder="{{ _('Search by company name...') }}">
+                                           placeholder="{{ _('Search') }} by company name...">
                                 </div>
                                 <div class="col-md-3">
                                     <label for="companyNpsFilter" class="form-label">{{ _('NPS Category') }}</label>
                                     <select class="form-select" id="companyNpsFilter" onchange="searchCompanyNPS()">
-                                        <option value="">{{ _('All Companies') }}</option>
+                                        <option value="">{{ _('All') }} Companies</option>
                                         <option value="promoters">{{ _('Promoters (9-10)') }}</option>
                                         <option value="passives">{{ _('Passives (7-8)') }}</option>
                                         <option value="detractors">{{ _('Detractors (0-6)') }}</option>
@@ -650,10 +414,10 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="btn-group w-100">
-                                        <button type="button" class="btn btn-primary" onclick="searchCompanyNPS()">
+                                        <button type="button" class="btn btn-primary" onclick="search{{ _('Company') }}NPS()">
                                             <i class="fas fa-search me-1"></i>{{ _('Search') }}
                                         </button>
-                                        <button type="button" class="btn btn-outline-secondary" onclick="clearCompanySearch()">
+                                        <button type="button" class="btn btn-outline-secondary" onclick="clear{{ _('Company') }}{{ _('Search') }}()">
                                             <i class="fas fa-times me-1"></i>{{ _('Clear') }}
                                         </button>
                                     </div>
@@ -668,14 +432,14 @@
                                 <table class="table table-striped table-hover">
                                     <thead>
                                         <tr>
-                                            <th>{{ _('Company Name') }}</th>
+                                            <th>{{ _('Company') }} Name</th>
                                             <th>{{ _('Respondent') }}s</th>
                                             <th>{{ _('Avg Individual NPS') }}</th>
-                                            <th>{{ _('Company NPS') }}</th>
+                                            <th>{{ _('Company') }} NPS</th>
                                             <th>{{ _('Distribution') }}</th>
                                             <th>{{ _('Risk Level') }}</th>
                                             <th>{{ _('Latest Response') }}</th>
-                                            <th>{{ _('Latest Churn Risk') }}</th>
+                                            <th>{{ _('Latest') }} {{ _('Churn Risk') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="companyNpsTableServerSide" style="display: table-row-group !important; visibility: visible !important;">
@@ -709,12 +473,12 @@
                                 </table>
                             </div>
                             
-                            <!-- Pagination Controls for Company NPS Table -->
+                            <!-- Pagination Controls for {{ _('Company') }} NPS Table -->
                             <div class="d-flex justify-content-between align-items-center mt-3">
                                 <div class="pagination-info">
                                     <small class="text-muted" id="companyPaginationInfo">{{ _('Loading...') }}</small>
                                 </div>
-                                <nav aria-label="{{ _('Company NPS pagination') }}">
+                                <nav aria-label="{{ _('Company') }} NPS pagination">
                                     <ul class="pagination pagination-sm mb-0" id="companyPaginationControls">
                                         <!-- Will be populated by JavaScript -->
                                     </ul>
@@ -723,12 +487,12 @@
                             
                             <div class="mt-3">
                                 <small class="text-muted">
-                                    <strong>Company NPS</strong> = (% Promoters - % Detractors) within each company |
-                                    <strong>{{ _('Risk Levels:') }}</strong> 
-                                    <span class="badge bg-success">{{ _('Low (>20)') }}</span>
-                                    <span class="badge bg-secondary">{{ _('Medium (-20 to 20)') }}</span>
-                                    <span class="badge bg-danger">{{ _('High (≤-20)') }}</span>
-                                    <span class="badge bg-dark">{{ _('Critical (≤-50)') }}</span>
+                                    <strong>{{ _('Company') }} NPS</strong> = (% Promoters - % Detractors) within each company |
+                                    <strong>{{ _('Risk Level') }}s:</strong> 
+                                    <span class="badge bg-success">{{ _('Low') }} (>20)</span>
+                                    <span class="badge bg-secondary">{{ _('Medium') }} (-20 to 20)</span>
+                                    <span class="badge bg-danger">{{ _('High') }} (≤-20)</span>
+                                    <span class="badge bg-dark">{{ _('Critical') }} (≤-50)</span>
                                 </small>
                             </div>
                         </div>
@@ -736,13 +500,13 @@
                 </div>
             </div>
 
-            <!-- Tenure NPS Segregation Section -->
+            <!-- {{ _('Tenure NPS') }} Segregation Section -->
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="data-table">
                         <div class="table-header">
                             <h5>{{ _('NPS by Customer Tenure') }}</h5>
-                            <small class="text-muted">Customer lifecycle insights - NPS scores segregated by length of business relationship</small>
+                            <small class="text-muted">{{ _('Customer lifecycle insights - NPS scores segregated by length of business relationship') }}</small>
                         </div>
                         <div class="p-0">
                             <div class="table-responsive">
@@ -753,10 +517,10 @@
                                             <th>{{ _('Respondent') }}s</th>
                                             <th>{{ _('Avg Individual NPS') }}</th>
                                             <th>{{ _('Tenure NPS') }}</th>
-                                            <th>{{ _('Distribution') }}</th>
+                                            <th>Distribution</th>
                                             <th>{{ _('Risk Level') }}</th>
                                             <th>{{ _('Latest Response') }}</th>
-                                            <th>{{ _('Latest Churn Risk') }}</th>
+                                            <th>Latest {{ _('Churn Risk') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tenureNpsTable">
@@ -765,12 +529,12 @@
                                 </table>
                             </div>
                             
-                            <!-- Pagination Controls for Tenure NPS Table -->
+                            <!-- Pagination Controls for {{ _('Tenure NPS') }} Table -->
                             <div class="d-flex justify-content-between align-items-center mt-3">
                                 <div class="pagination-info">
                                     <small class="text-muted" id="tenurePaginationInfo">{{ _('Loading...') }}</small>
                                 </div>
-                                <nav aria-label="{{ _('Tenure NPS pagination') }}">
+                                <nav aria-label="{{ _('Tenure NPS') }} pagination">
                                     <ul class="pagination pagination-sm mb-0" id="tenurePaginationControls">
                                         <!-- Will be populated by JavaScript -->
                                     </ul>
@@ -779,12 +543,12 @@
                             
                             <div class="mt-3">
                                 <small class="text-muted">
-                                    <strong>Tenure NPS</strong> = (% Promoters - % Detractors) within each tenure group |
-                                    <strong>{{ _('Risk Levels:') }}</strong> 
-                                    <span class="badge bg-success">{{ _('Low (>20)') }}</span>
-                                    <span class="badge bg-secondary">{{ _('Medium (-20 to 20)') }}</span>
-                                    <span class="badge bg-danger">{{ _('High (≤-20)') }}</span>
-                                    <span class="badge bg-dark">{{ _('Critical (≤-50)') }}</span>
+                                    <strong>{{ _('Tenure NPS') }}</strong> = (% Promoters - % Detractors) within each tenure group |
+                                    <strong>{{ _('Risk Level') }}s:</strong> 
+                                    <span class="badge bg-success">{{ _('Low') }} (>20)</span>
+                                    <span class="badge bg-secondary">{{ _('Medium') }} (-20 to 20)</span>
+                                    <span class="badge bg-danger">{{ _('High') }} (≤-20)</span>
+                                    <span class="badge bg-dark">{{ _('Critical') }} (≤-50)</span>
                                     <span class="badge bg-secondary">{{ _('Insufficient Data (<2 responses)') }}</span>
                                 </small>
                             </div>
@@ -798,35 +562,35 @@
                 <div class="card-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h5 class="mb-0">Recent Survey {{ _('Responses') }}</h5>
+                            <h5 class="mb-0">{{ _('Recent Survey Responses') }}</h5>
                             <small class="text-muted" id="responsesSearchInfo"></small>
                         </div>
                     </div>
                 </div>
                 <div class="card-body">
-                            <!-- Search and Filter Controls -->
+                            <!-- {{ _('Search') }} and Filter Controls -->
                             <div class="row align-items-end mb-3">
                                 <div class="col-md-5">
-                                    <label for="responsesSearch" class="form-label">{{ _('Search') }}</label>
+                                    <label for="responses{{ _('Search') }}" class="form-label">{{ _('Search') }}</label>
                                     <input type="text" class="form-control" id="responsesSearch" 
-                                           placeholder="{{ _('Search by company name, participant name, or email...') }}">
+                                           placeholder="{{ _('Search') }} by company name, participant name, or email...">
                                 </div>
                                 <div class="col-md-3">
                                     <label for="npsFilter" class="form-label">{{ _('NPS Category') }}</label>
                                     <select class="form-select" id="npsFilter" onchange="searchSurveyResponses()">
-                                        <option value="">All {{ _('Responses') }}</option>
-                                        <option value="promoters">Promoters (9-10)</option>
-                                        <option value="passives">Passives (7-8)</option>
-                                        <option value="detractors">Detractors (0-6)</option>
+                                        <option value="">{{ _('All') }} {{ _('Responses') }}</option>
+                                        <option value="promoters">{{ _('Promoters (9-10)') }}</option>
+                                        <option value="passives">{{ _('Passives (7-8)') }}</option>
+                                        <option value="detractors">{{ _('Detractors (0-6)') }}</option>
                                     </select>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="btn-group w-100">
-                                        <button type="button" class="btn btn-primary" onclick="searchSurveyResponses()">
-                                            <i class="fas fa-search me-1"></i>Search
+                                        <button type="button" class="btn btn-primary" onclick="searchSurvey{{ _('Responses') }}()">
+                                            <i class="fas fa-search me-1"></i>{{ _('Search') }}
                                         </button>
-                                        <button type="button" class="btn btn-outline-secondary" onclick="clearResponsesSearch()">
-                                            <i class="fas fa-times me-1"></i>Clear
+                                        <button type="button" class="btn btn-outline-secondary" onclick="clear{{ _('Responses') }}{{ _('Search') }}()">
+                                            <i class="fas fa-times me-1"></i>{{ _('Clear') }}
                                         </button>
                                     </div>
                                 </div>
@@ -866,17 +630,103 @@
                     </div>
         </div>
     </div>
+    
+        <!-- Segmentation Insights Tab -->
+        <div class="tab-pane fade" id="segmentation" role="tabpanel" aria-labelledby="segmentation-tab">
+            <div id="segmentationEmptyState" class="alert alert-info" style="display: none;">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>{{ _('No Segmentation Data Available') }}</strong> - {{ _('This campaign was created before segmentation analytics were implemented. Segmentation data is only available for campaigns created after this feature was deployed.') }}
+            </div>
+            
+            <div id="segmentationContent">
+                <!-- {{ _('NPS by Role') }} Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-user-tie me-2" style="color: #E13A44;"></i>{{ _('NPS by Role') }}</h5>
+                                <small class="text-muted">{{ _('Net Promoter Score distribution across different participant roles') }}</small>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="npsByRoleChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- {{ _('NPS by Region') }} Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-globe me-2" style="color: #E13A44;"></i>{{ _('NPS by Region') }}</h5>
+                                <small class="text-muted">{{ _('Geographic distribution of customer satisfaction') }}</small>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="npsByRegionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- {{ _('NPS by Customer Tier') }} Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="chart-card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-layer-group me-2" style="color: #E13A44;"></i>{{ _('NPS by Customer Tier') }}</h5>
+                                <small class="text-muted">{{ _('Customer satisfaction across different tier levels') }}</small>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="npsByTierChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Satisfaction by Segmentation Table -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="data-table">
+                            <div class="table-header">
+                                <h5>{{ _('Satisfaction Ratings by Segment') }}</h5>
+                                <small class="text-muted">{{ _('Average satisfaction scores across all segmentation dimensions') }}</small>
+                            </div>
+                            <div class="p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>{{ _('Segment Type') }}</th>
+                                                <th>{{ _('Segment Name') }}</th>
+                                                <th>{{ _('Responses') }}</th>
+                                                <th>{{ _('Avg Satisfaction') }}</th>
+                                                <th>{{ _('NPS Score') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="segmentationTable">
+                                            <!-- Will be populated by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- End Tab Content -->
 
     </div>
 </div>
-<!-- End Campaign Insights Section -->
+<!-- End {{ _('Campaign Insights') }} Section -->
 
     <!-- End Dashboard Content -->
 </div>
 <!-- End Dashboard Column -->
 
-<!-- Company {{ _('Responses') }} Modal -->
+<!-- {{ _('Company') }} {{ _('Responses') }} Modal -->
 <div class="modal fade" id="companyResponsesModal" tabindex="-1" aria-labelledby="companyResponsesModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content" style="background-color: #ffffff; border: 2px solid #2E5090;">
@@ -897,7 +747,7 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
             </div>
             <div class="modal-body" style="background-color: #f8f9fa;">
-                <!-- Search and Filters -->
+                <!-- {{ _('Search') }} and Filters -->
                 <div class="row mb-3">
                     <div class="col-md-8">
                         <div class="input-group">
@@ -905,7 +755,7 @@
                                 <i class="fas fa-search" style="color: #8A8A8A;"></i>
                             </span>
                             <input type="text" class="form-control" id="companyResponseSearch" 
-                                   placeholder="{{ _('Search by respondent name or email...') }}"
+                                   placeholder="{{ _('Search') }} by respondent name or email..."
                                    style="background-color: #ffffff; border-color: #dee2e6; color: #212529;">
                         </div>
                     </div>
@@ -914,8 +764,8 @@
                                 style="background-color: #ffffff; border-color: #dee2e6; color: #212529;">
                             <option value="created_at_desc">{{ _('Newest First') }}</option>
                             <option value="created_at_asc">{{ _('Oldest First') }}</option>
-                            <option value="nps_score_desc">{{ _('Highest NPS') }}</option>
-                            <option value="nps_score_asc">{{ _('Lowest NPS') }}</option>
+                            <option value="nps_score_desc">{{ _('High') }}est NPS</option>
+                            <option value="nps_score_asc">{{ _('Low') }}est NPS</option>
                         </select>
                     </div>
                 </div>
@@ -935,7 +785,7 @@
                             <thead style="background-color: #2E5090; color: white; position: sticky; top: 0; z-index: 10;">
                                 <tr>
                                     <th style="width: 20%;">{{ _('Respondent') }}</th>
-                                    <th style="width: 10%; text-align: center;">{{ _('NPS') }}</th>
+                                    <th style="width: 10%; text-align: center;">NPS</th>
                                     <th style="width: 50%;" class="text-center">{{ _('Ratings') }}</th>
                                     <th style="width: 15%;">{{ _('Date') }}</th>
                                     <th style="width: 5%; text-align: center;">{{ _('Action') }}</th>
@@ -963,7 +813,7 @@
                 <!-- No Data State -->
                 <div id="companyResponsesNoData" class="text-center py-5" style="display: none;">
                     <i class="fas fa-inbox fa-4x mb-3" style="color: #BDBDBD;"></i>
-                    <h5 style="color: #8A8A8A;">{{ _('No Responses Found') }}</h5>
+                    <h5 style="color: #8A8A8A;">No {{ _('Responses') }} Found</h5>
                     <p style="color: #8A8A8A;">{{ _('No survey responses match your search criteria.') }}</p>
                 </div>
             </div>
@@ -977,7 +827,7 @@
         <div class="modal-content">
             <div class="modal-header bg-white border-bottom">
                 <h5 class="modal-title" id="kpiTrendsModalLabel">
-                    <i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>Campaign KPI Trends
+                    <i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>{{ _('Campaign KPI Trends') }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
             </div>
@@ -1016,7 +866,7 @@
                     <div class="col-lg-6 mb-4">
                         <div class="card border">
                             <div class="card-header bg-white border-bottom">
-                                <h6 class="mb-0">{{ _('Critical Risk') }}</h6>
+                                <h6 class="mb-0">{{ _('Critical') }} Risk</h6>
                             </div>
                             <div class="card-body">
                                 <canvas id="modal-chart-critical" height="250"></canvas>
@@ -1080,36 +930,90 @@
     window.isBusinessAuthenticated = {{ 'true' if is_business_authenticated else 'false' }};
 </script>
 
-<!-- Translation Loader - Async JSON files for better performance -->
-<script src="{{ url_for('static', filename='js/translation-loader.js') }}"></script>
+<!-- Translation strings for JavaScript -->
 <script>
-// Translation object - populated asynchronously from JSON files
-const translations = {};
-
-// Load translations asynchronously
-(async function initializeTranslations() {
-    try {
-        // Load dashboard and common translations in parallel
-        const [dashboard, common] = await Promise.all([
-            window.translationLoader.load('dashboard'),
-            window.translationLoader.load('common')
-        ]);
-        
-        // Merge translations into global object for backward compatibility
-        Object.assign(translations, dashboard, common);
-        
-        // Dispatch event to notify that translations are ready
-        window.dispatchEvent(new CustomEvent('translationsLoaded', {
-            detail: { namespaces: ['dashboard', 'common'] }
-        }));
-        
-        console.log('✅ Dashboard translations loaded');
-        
-    } catch (error) {
-        console.error('❌ Translation loading failed:', error);
-        // Dashboard will use English fallbacks via translation keys
-    }
-})();
+const translations = {
+    // Campaign Status
+    draft: "{{ _('Draft') }}",
+    ready: "{{ _('Ready') }}",
+    active: "{{ _('Active') }}",
+    completed: "{{ _('Completed') }}",
+    unknown: "{{ _('Unknown') }}",
+    
+    // Campaign Filter UI
+    filteredBy: "{{ _('Filtered by:') }}",
+    clearFilter: "{{ _('Clear filter') }}",
+    selectFirstCampaign: "{{ _('Select first campaign') }}",
+    selectSecondCampaign: "{{ _('Select second campaign') }}",
+    
+    // Time/Date Display
+    daysLeft: "{{ _('days left') }}",
+    daysAgo: "{{ _('days ago') }}",
+    month: "{{ _('month') }}",
+    months: "{{ _('months') }}",
+    ago: "{{ _('ago') }}",
+    year: "{{ _('year') }}",
+    years: "{{ _('years') }}",
+    
+    // Loading Messages
+    loadingComparison: "{{ _('Loading comparison...') }}",
+    loadingComparisonData: "{{ _('Loading comparison data...') }}",
+    loading: "{{ _('Loading...') }}",
+    
+    // Error Messages
+    failedToFetchComparisonData: "{{ _('Failed to fetch comparison data') }}",
+    errorLoadingComparison: "{{ _('Error Loading Comparison') }}",
+    failedToLoadComparisonData: "{{ _('Failed to load comparison data. Please try again.') }}",
+    noCampaignDataAvailable: "{{ _('No campaign data available') }}",
+    errorLoadingKpiData: "{{ _('Error loading KPI overview data') }}",
+    errorLoadingDashboardData: "{{ _('Error loading dashboard data:') }}",
+    failedToLoadCampaignOptions: "{{ _('Failed to load campaign options') }}",
+    errorLoadingAccountIntelligence: "{{ _('Error loading account intelligence') }}",
+    errorLoadingResponses: "{{ _('Error loading responses.') }}",
+    networkErrorLoadingTenureData: "{{ _('Network error loading tenure data') }}",
+    networkErrorLoadingCompanyData: "{{ _('Network error loading company data') }}",
+    
+    // Chart Labels & Metrics
+    satisfaction: "{{ _('Satisfaction') }}",
+    productValue: "{{ _('Product Value') }}",
+    service: "{{ _('Service') }}",
+    pricing: "{{ _('Pricing') }}",
+    averageRating: "{{ _('Average Rating') }}",
+    responses: "{{ _('Responses') }}",
+    nps: "{{ _('NPS') }}",
+    companies: "{{ _('Companies') }}",
+    criticalRisk: "{{ _('Critical Risk') }}",
+    product: "{{ _('Product') }}",
+    
+    // Table Content & Empty States
+    na: "{{ _('N/A') }}",
+    noTenureDataAvailable: "{{ _('No tenure data available yet') }}",
+    noCompanyDataAvailable: "{{ _('No company data available yet') }}",
+    
+    // Pagination Text
+    showing: "{{ _('Showing') }}",
+    of: "{{ _('of') }}",
+    tenureGroups: "{{ _('tenure groups') }}",
+    companiesPagination: "{{ _('companies') }}",
+    responsesPagination: "{{ _('responses') }}",
+    accounts: "{{ _('accounts') }}",
+    
+    // NPS Category Labels
+    promoters: "{{ _('Promoters (9-10)') }}",
+    passives: "{{ _('Passives (7-8)') }}",
+    detractors: "{{ _('Detractors (0-6)') }}",
+    
+    // Accessibility
+    previous: "{{ _('Previous') }}",
+    next: "{{ _('Next') }}",
+    viewDetails: "{{ _('View Details') }}",
+    authenticationRequired: "{{ _('Authentication required') }}",
+    satisfactionBadge: "{{ _('Satisfaction') }}",
+    valueBadge: "{{ _('Value') }}",
+    serviceBadge: "{{ _('Service') }}",
+    pricingBadge: "{{ _('Pricing') }}",
+    viewFullResponse: "{{ _('View Full Response') }}"
+};
 </script>
 
 <!-- Hash redirect handler for old bookmarks -->
@@ -1130,4 +1034,203 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- JavaScript disabled for company NPS table - using server-side rendering only -->
 <script src="{{ url_for('static', filename='js/dashboard.js') }}?v={{ range(1000, 9999) | random }}"></script>
+
+<!-- Segmentation Analytics Rendering -->
+<script>
+// Store segmentation charts globally for cleanup
+let segmentationCharts = {
+    role: null,
+    region: null,
+    tier: null
+};
+
+function renderSegmentationInsights(data) {
+    const segmentationData = data.segmentation_analytics || {};
+    
+    // Check if segmentation data exists
+    if (!segmentationData || Object.keys(segmentationData).length === 0) {
+        document.getElementById('segmentationEmptyState').style.display = 'block';
+        document.getElementById('segmentationContent').style.display = 'none';
+        return;
+    }
+    
+    document.getElementById('segmentationEmptyState').style.display = 'none';
+    document.getElementById('segmentationContent').style.display = 'block';
+    
+    // Render {{ _('NPS by Role') }} Chart
+    renderSegmentationChart('npsByRoleChart', 'role', segmentationData.nps_by_role || {},  'Role');
+    
+    // Render {{ _('NPS by Region') }} Chart
+    renderSegmentationChart('npsByRegionChart', 'region', segmentationData.nps_by_region || {}, 'Region');
+    
+    // Render NPS by Tier Chart
+    renderSegmentationChart('npsByTierChart', 'tier', segmentationData.nps_by_tier || {}, 'Customer Tier');
+    
+    // Render Segmentation Table
+    renderSegmentationTable(segmentationData);
+}
+
+function renderSegmentationChart(canvasId, chartKey, npsData, label) {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return;
+    
+    // Destroy existing chart if it exists
+    if (segmentationCharts[chartKey]) {
+        segmentationCharts[chartKey].destroy();
+    }
+    
+    const labels = Object.keys(npsData);
+    const npsScores = labels.map(key => npsData[key].nps_score || 0);
+    const responseCounts = labels.map(key => npsData[key].total_responses || 0);
+    
+    segmentationCharts[chartKey] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '{{ _('NPS Score') }}',
+                data: npsScores,
+                backgroundColor: labels.map(label => {
+                    const score = npsData[label].nps_score || 0;
+                    if (score >= 50) return 'rgba(40, 167, 69, 0.8)';
+                    if (score >= 0) return 'rgba(255, 193, 7, 0.8)';
+                    return 'rgba(220, 53, 69, 0.8)';
+                }),
+                borderColor: labels.map(label => {
+                    const score = npsData[label].nps_score || 0;
+                    if (score >= 50) return 'rgb(40, 167, 69)';
+                    if (score >= 0) return 'rgb(255, 193, 7)';
+                    return 'rgb(220, 53, 69)';
+                }),
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: `{{ _('NPS Score') }} by ${label}`
+                },
+                tooltip: {
+                    callbacks: {
+                        afterLabel: function(context) {
+                            const idx = context.dataIndex;
+                            const key = labels[idx];
+                            const metrics = npsData[key];
+                            return [
+                                `{{ _('Responses') }}: ${metrics.total_responses}`,
+                                `Promoters: ${metrics.promoters}`,
+                                `Passives: ${metrics.passives}`,
+                                `Detractors: ${metrics.detractors}`
+                            ];
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    min: -100,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value;
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: '{{ _('NPS Score') }}'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: label
+                    }
+                }
+            }
+        }
+    });
+}
+
+function renderSegmentationTable(segmentationData) {
+    const tbody = document.getElementById('segmentationTable');
+    if (!tbody) return;
+    
+    let html = '';
+    
+    // Add role segments
+    const roleData = segmentationData.nps_by_role || {};
+    const roleSatisfaction = segmentationData.satisfaction_by_role || {};
+    Object.keys(roleData).forEach(role => {
+        const metrics = roleData[role];
+        const satisfaction = roleSatisfaction[role];
+        html += `
+            <tr>
+                <td><span class="badge bg-primary">Role</span></td>
+                <td>${role}</td>
+                <td>${metrics.total_responses || 0}</td>
+                <td>${satisfaction !== null && satisfaction !== undefined ? satisfaction.toFixed(2) : 'N/A'}</td>
+                <td><span class="badge ${getNPSBadgeClass(metrics.nps_score)}">${metrics.nps_score || 0}</span></td>
+            </tr>
+        `;
+    });
+    
+    // Add region segments
+    const regionData = segmentationData.nps_by_region || {};
+    const regionSatisfaction = segmentationData.satisfaction_by_region || {};
+    Object.keys(regionData).forEach(region => {
+        const metrics = regionData[region];
+        const satisfaction = regionSatisfaction[region];
+        html += `
+            <tr>
+                <td><span class="badge bg-info">Region</span></td>
+                <td>${region}</td>
+                <td>${metrics.total_responses || 0}</td>
+                <td>${satisfaction !== null && satisfaction !== undefined ? satisfaction.toFixed(2) : 'N/A'}</td>
+                <td><span class="badge ${getNPSBadgeClass(metrics.nps_score)}">${metrics.nps_score || 0}</span></td>
+            </tr>
+        `;
+    });
+    
+    // Add tier segments
+    const tierData = segmentationData.nps_by_tier || {};
+    const tierSatisfaction = segmentationData.satisfaction_by_tier || {};
+    Object.keys(tierData).forEach(tier => {
+        const metrics = tierData[tier];
+        const satisfaction = tierSatisfaction[tier];
+        html += `
+            <tr>
+                <td><span class="badge bg-warning text-dark">Tier</span></td>
+                <td>${tier}</td>
+                <td>${metrics.total_responses || 0}</td>
+                <td>${satisfaction !== null && satisfaction !== undefined ? satisfaction.toFixed(2) : 'N/A'}</td>
+                <td><span class="badge ${getNPSBadgeClass(metrics.nps_score)}">${metrics.nps_score || 0}</span></td>
+            </tr>
+        `;
+    });
+    
+    tbody.innerHTML = html || '<tr><td colspan="5" class="text-center text-muted">{{ _('No segmentation data available') }}</td></tr>';
+}
+
+function getNPSBadgeClass(score) {
+    if (score >= 50) return 'bg-success';
+    if (score >= 0) return 'bg-warning text-dark';
+    return 'bg-danger';
+}
+
+// Hook into existing dashboard rendering
+if (typeof window.originalRenderDashboard === 'undefined' && typeof renderDashboard !== 'undefined') {
+    window.originalRenderDashboard = renderDashboard;
+    renderDashboard = function(data) {
+        window.originalRenderDashboard(data);
+        renderSegmentationInsights(data);
+    };
+}
+</script>
 {% endblock %}
