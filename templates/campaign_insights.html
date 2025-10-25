@@ -457,7 +457,7 @@
                                                 </td>
                                                 <td><small>{{ company.promoters }}P / {{ company.passives }}Pa / {{ company.detractors }}D</small></td>
                                                 <td>
-                                                    <span class="badge {% if company.risk_level == '{{ _('Low') }}' %}bg-success{% elif company.risk_level == '{{ _('Medium') }}' %}bg-secondary{% elif company.risk_level == '{{ _('High') }}' %}bg-danger{% elif company.risk_level == '{{ _('Critical') }}' %}bg-dark{% else %}bg-secondary{% endif %}">
+                                                    <span class="badge {% if company.risk_level == 'Low' %}bg-success{% elif company.risk_level == 'Medium' %}bg-secondary{% elif company.risk_level == 'High' %}bg-danger{% elif company.risk_level == 'Critical' %}bg-dark{% else %}bg-secondary{% endif %}">
                                                         {{ company.risk_level }}
                                                     </span>
                                                 </td>
