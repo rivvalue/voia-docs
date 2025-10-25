@@ -1,0 +1,57 @@
+GATE 3: DASHBOARD STATIC TEXT & LOADING MESSAGES
+Entry Criteria
+	•	✅ Gate 2 passed
+	•	✅ No outstanding bugs from previous gates
+Work Scope
+Wrap 40 strings:
+	•	30 static text elements (descriptions, tooltips, status messages)
+	•	10 loading messages (Loading executive summary, Loading KPI overview, etc.)
+Validation Steps
+V3.1: Code Review
+git diff templates/dashboard.html | grep "Loading" | head -10
+# Count markers
+grep -c "{{ _(" templates/dashboard.html
+
+Expected: 121 + 40 = 161 markers
+V3.2: Critical - Check Loading Messages Ensure we didn't break the ID fix from earlier:
+# Verify IDs are still English (not wrapped)
+grep 'id="totalResponses"' templates/dashboard.html
+grep 'id="recentResponses"' templates/dashboard.html
+grep 'id="companyResponsesModal"' templates/dashboard.html
+
+Expected: All three should be found (IDs stay English)
+V3.3: Template Syntax & Compile
+python3 -c "from jinja2 import Template; Template(open('templates/dashboard.html').read())"
+pybabel extract -F babel.cfg -k _l -o messages.pot .
+pybabel update -i messages.pot -d translations
+# Translate 40 new entries
+pybabel compile -d translations
+
+V3.4: Functional Testing - Loading States
+	•	Dashboard loads - verify loading spinners appear
+	•	Loading messages visible during data fetch
+	•	Data eventually loads (loading messages disappear)
+	•	No infinite loading states
+V3.5: Functional Testing - French
+	•	Switch to French
+	•	Trigger dashboard reload
+	•	Loading messages now in French ("Chargement...")
+	•	Static text/tooltips in French
+	•	All previous translations still working
+V3.6: Tooltip & Hover Testing
+	•	Hover over info icons - tooltips in correct language
+	•	Hover over sparklines - "Click to view trends" translates
+	•	All title attributes translate
+Success Criteria
+	•	✅ 161 translation markers
+	•	✅ Loading messages translate correctly
+	•	✅ Static text translates
+	•	✅ No infinite loading states
+	•	✅ IDs still in English (critical)
+Rollback Plan
+git checkout templates/dashboard.html
+git checkout translations/
+pybabel compile -d translations
+
+Sign-off
+YOU: Gate 3 validation complete. Dashboard template complete? (yes/no)
