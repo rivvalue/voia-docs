@@ -104,7 +104,7 @@
                                     </div>
                                 </th>
                                 <th class="text-center" style="min-width: 100px;">
-                                    Service
+                                    {{ _('Service') }}
                                     <div class="sparkline-container d-none d-md-block" style="height: 30px; margin-top: 5px; cursor: pointer;" onclick="openTrendsModal()" title="{{ _('Click to view full trends') }}">
                                         <canvas id="sparkline-service"></canvas>
                                     </div>
@@ -114,7 +114,7 @@
                         <tbody id="kpiOverviewTableBody">
                             <tr>
                                 <td colspan="9" class="text-center text-muted">
-                                    <i class="fas fa-spinner fa-spin me-2"></i>Loading KPI overview...
+                                    <i class="fas fa-spinner fa-spin me-2"></i>{{ _('Loading KPI overview...') }}
                                 </td>
                             </tr>
                         </tbody>
@@ -124,7 +124,7 @@
                 <!-- Mobile: View Trends Button (hidden on desktop) -->
                 <div class="text-center mt-3 d-md-none">
                     <button class="btn btn-outline-secondary btn-sm" onclick="openTrendsModal()" style="border-color: #BDBDBD; color: #000000;">
-                        <i class="fas fa-chart-line me-2"></i>View Trends
+                        <i class="fas fa-chart-line me-2"></i>{{ _('View Trends') }}
                     </button>
                 </div>
             </div>
@@ -223,7 +223,7 @@
                                         <i class="fas fa-search me-1"></i>{{ _('Search') }}
                                     </button>
                                     <button type="button" class="btn btn-outline-secondary" onclick="clearComparison{{ _('Search') }}()">
-                                        <i class="fas fa-times me-1"></i>Clear
+                                        <i class="fas fa-times me-1"></i>{{ _('Clear') }}
                                     </button>
                                 </div>
                             </div>
@@ -251,7 +251,7 @@
                         <!-- Pagination Controls for Comparison Table -->
                         <div class="d-flex justify-content-between align-items-center mt-3">
                             <div class="pagination-info">
-                                <small class="text-muted" id="comparisonPaginationInfo">Loading...</small>
+                                <small class="text-muted" id="comparisonPaginationInfo">{{ _('Loading...') }}</small>
                             </div>
                             <nav aria-label="{{ _('Comparison table pagination') }}">
                                 <ul class="pagination pagination-sm mb-0" id="comparisonPaginationControls">
@@ -352,7 +352,7 @@
                     <div class="col-lg-6 mb-4">
                         <div class="card border">
                             <div class="card-header bg-white border-bottom">
-                                <h6 class="mb-0">Service</h6>
+                                <h6 class="mb-0">{{ _('Service') }}</h6>
                             </div>
                             <div class="card-body">
                                 <canvas id="modal-chart-service" height="250"></canvas>
