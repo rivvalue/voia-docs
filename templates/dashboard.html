@@ -404,7 +404,7 @@
                 <div class="col">
                     <div class="kpi-card kpi-info">
                         <div class="kpi-value text-info" id="recentResponses">0</div>
-                        <div class="kpi-label">Recent (30 days)</div>
+                        <div class="kpi-label">{{ _('Recent (30 days)') }}</div>
                         <div class="kpi-trend" id="recentResponsesTrend">{{ _('Latest customer feedback') }}</div>
                     </div>
                 </div>
@@ -412,7 +412,7 @@
                     <div class="kpi-card kpi-danger">
                         <div class="kpi-value text-danger" id="highRiskCount">0</div>
                         <div class="kpi-label">
-                            High Churn Risk Accounts
+                            {{ _('High Churn Risk Accounts') }}
                             <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top" 
                                data-bs-title="{{ _('Companies with High or Critical churn risk level based on AI assessment') }}" style="font-size: 0.8em; opacity: 0.7;"></i>
                         </div>
@@ -422,7 +422,7 @@
                 <div class="col">
                     <div class="kpi-card kpi-success">
                         <div class="kpi-value text-success" id="growthPotential">0%</div>
-                        <div class="kpi-label">Growth Potential</div>
+                        <div class="kpi-label">{{ _('Growth Potential') }}</div>
                         <div class="kpi-trend" id="growthPotentialTrend">{{ _('Revenue expansion opportunity') }}</div>
                     </div>
                 </div>
@@ -724,11 +724,11 @@
                             <div class="mt-3">
                                 <small class="text-muted">
                                     <strong>Company NPS</strong> = (% Promoters - % Detractors) within each company |
-                                    <strong>Risk Levels:</strong> 
-                                    <span class="badge bg-success">Low (>20)</span>
-                                    <span class="badge bg-secondary">Medium (-20 to 20)</span>
-                                    <span class="badge bg-danger">High (≤-20)</span>
-                                    <span class="badge bg-dark">Critical (≤-50)</span>
+                                    <strong>{{ _('Risk Levels:') }}</strong> 
+                                    <span class="badge bg-success">{{ _('Low (>20)') }}</span>
+                                    <span class="badge bg-secondary">{{ _('Medium (-20 to 20)') }}</span>
+                                    <span class="badge bg-danger">{{ _('High (≤-20)') }}</span>
+                                    <span class="badge bg-dark">{{ _('Critical (≤-50)') }}</span>
                                 </small>
                             </div>
                         </div>
@@ -780,12 +780,12 @@
                             <div class="mt-3">
                                 <small class="text-muted">
                                     <strong>Tenure NPS</strong> = (% Promoters - % Detractors) within each tenure group |
-                                    <strong>Risk Levels:</strong> 
-                                    <span class="badge bg-success">Low (>20)</span>
-                                    <span class="badge bg-secondary">Medium (-20 to 20)</span>
-                                    <span class="badge bg-danger">High (≤-20)</span>
-                                    <span class="badge bg-dark">Critical (≤-50)</span>
-                                    <span class="badge bg-secondary">Insufficient Data (&lt;2 responses)</span>
+                                    <strong>{{ _('Risk Levels:') }}</strong> 
+                                    <span class="badge bg-success">{{ _('Low (>20)') }}</span>
+                                    <span class="badge bg-secondary">{{ _('Medium (-20 to 20)') }}</span>
+                                    <span class="badge bg-danger">{{ _('High (≤-20)') }}</span>
+                                    <span class="badge bg-dark">{{ _('Critical (≤-50)') }}</span>
+                                    <span class="badge bg-secondary">{{ _('Insufficient Data (<2 responses)') }}</span>
                                 </small>
                             </div>
                         </div>

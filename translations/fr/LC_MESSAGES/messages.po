@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-25 03:25+0000\n"
+"POT-Creation-Date: 2025-10-25 03:28+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -221,7 +221,8 @@ msgstr "VOÏA - Voice Of Client"
 msgid "Business Intelligence"
 msgstr "Intelligence d'affaires"
 
-#: templates/base.html:58 templates/dashboard.html:339
+#: templates/base.html:58 templates/campaign_insights.html:98
+#: templates/dashboard.html:339
 msgid "Overview"
 msgstr "Vue d'ensemble"
 
@@ -323,10 +324,24 @@ msgstr "Détails"
 msgid "Account Intelligence"
 msgstr "Intelligence de compte"
 
+#: templates/business_auth/admin_panel.html:408
+#: templates/business_auth/admin_panel.html:432
+#: templates/business_auth/admin_panel.html:435
+#: templates/business_auth/admin_panel.html:820
+#: templates/business_auth/admin_panel.html:940
+#: templates/campaign_insights.html:108 templates/dashboard.html:349
+msgid "Analytics"
+msgstr "Analytique"
+
 #: templates/campaign_insights.html:113 templates/campaign_insights.html:144
 #: templates/dashboard.html:354 templates/dashboard.html:380
 msgid "Survey Insights"
 msgstr "Informations sur l'enquête"
+
+#: templates/campaign_insights.html:118
+#, fuzzy
+msgid "Segmentation Insights"
+msgstr "Voir les analyses IA"
 
 #: templates/campaign_insights.html:127 templates/campaign_insights.html:129
 #: templates/dashboard.html:363 templates/dashboard.html:365
@@ -367,7 +382,7 @@ msgstr "Total des réponses"
 msgid "All time feedback collected"
 msgstr ""
 
-#: templates/campaign_insights.html:171
+#: templates/campaign_insights.html:171 templates/dashboard.html:407
 msgid "Recent (30 days)"
 msgstr ""
 
@@ -377,7 +392,8 @@ msgid "Latest customer feedback"
 msgstr "Enquête de retour client"
 
 #: templates/campaign_insights.html:179 templates/campaign_insights.html:195
-#: templates/campaign_insights.html:200 templates/dashboard.html:436
+#: templates/campaign_insights.html:200 templates/dashboard.html:415
+#: templates/dashboard.html:436
 msgid "High Churn Risk Accounts"
 msgstr "Comptes à risque élevé de résiliation"
 
@@ -400,7 +416,7 @@ msgstr "Risque critique"
 msgid "Imminent churn risk (High/Critical)"
 msgstr ""
 
-#: templates/campaign_insights.html:189
+#: templates/campaign_insights.html:189 templates/dashboard.html:425
 #, fuzzy
 msgid "Growth Potential"
 msgstr "Opportunités de croissance"
@@ -550,6 +566,12 @@ msgstr "Passifs (7-8)"
 msgid "Detractors (0-6)"
 msgstr "Détracteurs (0-6)"
 
+#: templates/campaign_insights.html:421 templates/campaign_insights.html:593
+#: templates/dashboard.html:233 templates/dashboard.html:657
+#: templates/executive_summary.html:226
+msgid "Clear"
+msgstr "Effacer"
+
 #: templates/campaign_insights.html:436 templates/campaign_insights.html:517
 #: templates/campaign_insights.html:787 templates/company_responses.html:72
 #: templates/company_responses.html:193 templates/dashboard.html:672
@@ -562,10 +584,20 @@ msgstr "Répondant"
 msgid "Avg Individual NPS"
 msgstr "NPS individuel moyen"
 
+#: templates/campaign_insights.html:439 templates/dashboard.html:675
+#: templates/dashboard.html:756
+msgid "Distribution"
+msgstr "Répartition du NPS"
+
 #: templates/campaign_insights.html:441 templates/campaign_insights.html:522
 #: templates/dashboard.html:677 templates/dashboard.html:758
 msgid "Latest Response"
 msgstr "Dernière réponse"
+
+#: templates/campaign_insights.html:442
+#, fuzzy
+msgid "Latest"
+msgstr "Date"
 
 #: templates/campaign_insights.html:442 templates/campaign_insights.html:523
 #: templates/campaign_insights.html:607 templates/dashboard.html:843
@@ -597,7 +629,7 @@ msgstr ""
 msgid "Tenure Group"
 msgstr "Ancienneté :"
 
-#: templates/campaign_insights.html:552
+#: templates/campaign_insights.html:552 templates/dashboard.html:788
 msgid "Insufficient Data (<2 responses)"
 msgstr ""
 
@@ -629,6 +661,16 @@ msgstr "Ancienneté avec FC inc"
 #: templates/campaign_insights.html:605 templates/dashboard.html:841
 msgid "Category"
 msgstr "Score NPS"
+
+#: templates/campaign_insights.html:606 templates/dashboard.html:842
+msgid "Sentiment"
+msgstr "Sentiment :"
+
+#: templates/campaign_insights.html:608 templates/campaign_insights.html:790
+#: templates/company_responses.html:78 templates/dashboard.html:844
+#: templates/dashboard.html:940
+msgid "Date"
+msgstr "Date"
 
 #: templates/campaign_insights.html:623 templates/dashboard.html:859
 msgid "Survey responses pagination"
@@ -727,14 +769,31 @@ msgstr "Chargement des réponses..."
 msgid "Ratings"
 msgstr "Évaluations"
 
+#: templates/campaign_insights.html:791 templates/company_responses.html:79
+#: templates/dashboard.html:941
+msgid "Action"
+msgstr "Action"
+
 #: templates/campaign_insights.html:817 templates/dashboard.html:967
 msgid "No survey responses match your search criteria."
 msgstr "Aucune réponse d'enquête ne correspond à vos critères de recherche."
+
+#: templates/campaign_insights.html:830
+#, fuzzy
+msgid "Campaign KPI Trends"
+msgstr "Vue d'ensemble des indicateurs de campagne"
 
 #: templates/campaign_insights.html:859 templates/dashboard.html:1009
 #: templates/executive_summary.html:401
 msgid "Companies Analyzed"
 msgstr "Entreprises analysées"
+
+#: templates/campaign_insights.html:879 templates/campaign_insights.html:977
+#: templates/campaign_insights.html:1011 templates/company_responses.html:74
+#: templates/dashboard.html:96 templates/dashboard.html:1029
+#: templates/dashboard.html:1127 templates/dashboard.html:1161
+msgid "Satisfaction"
+msgstr "Satisfaction"
 
 #: templates/campaign_insights.html:889 templates/campaign_insights.html:978
 #: templates/company_responses.html:75 templates/company_responses.html:210
@@ -750,6 +809,14 @@ msgstr "Valeur du produit"
 #: templates/executive_summary.html:345
 msgid "Pricing"
 msgstr "Tarification"
+
+#: templates/campaign_insights.html:909 templates/campaign_insights.html:979
+#: templates/campaign_insights.html:1013 templates/company_responses.html:76
+#: templates/dashboard.html:114 templates/dashboard.html:1059
+#: templates/dashboard.html:1129 templates/dashboard.html:1163
+#: templates/executive_summary.html:107 templates/executive_summary.html:355
+msgid "Service"
+msgstr "Service"
 
 #: templates/campaign_insights.html:937 templates/dashboard.html:1087
 #: templates/executive_summary.html:378
@@ -906,21 +973,6 @@ msgstr ""
 msgid "Network error loading company data"
 msgstr ""
 
-#: templates/campaign_insights.html:977 templates/campaign_insights.html:1011
-#: templates/company_responses.html:74 templates/dashboard.html:96
-#: templates/dashboard.html:1029 templates/dashboard.html:1127
-#: templates/dashboard.html:1161
-msgid "Satisfaction"
-msgstr "Satisfaction"
-
-#: templates/campaign_insights.html:979 templates/campaign_insights.html:1013
-#: templates/company_responses.html:76 templates/dashboard.html:114
-#: templates/dashboard.html:1059 templates/dashboard.html:1129
-#: templates/dashboard.html:1163 templates/executive_summary.html:107
-#: templates/executive_summary.html:355
-msgid "Service"
-msgstr "Service"
-
 #: templates/campaign_insights.html:981 templates/dashboard.html:1131
 #, fuzzy
 msgid "Average Rating"
@@ -1028,15 +1080,6 @@ msgstr "Aucune donnée d'entreprise disponible pour le moment"
 #: templates/company_responses.html:53
 msgid "Campaign Responses"
 msgstr "Réponses de la campagne"
-
-#: templates/company_responses.html:78 templates/dashboard.html:844
-#: templates/dashboard.html:940
-msgid "Date"
-msgstr "Date"
-
-#: templates/company_responses.html:79 templates/dashboard.html:941
-msgid "Action"
-msgstr "Action"
 
 #: templates/company_responses.html:91
 msgid "No responses found for this company"
@@ -1574,11 +1617,6 @@ msgstr "Équilibré"
 msgid "Risk Heavy"
 msgstr "Risque Élevé"
 
-#: templates/dashboard.html:233 templates/dashboard.html:657
-#: templates/executive_summary.html:226
-msgid "Clear"
-msgstr "Effacer"
-
 #: templates/dashboard.html:243 templates/executive_summary.html:236
 msgid "C1 Risks"
 msgstr "Risques C1"
@@ -1622,14 +1660,6 @@ msgid "Analyze and compare campaign-specific performance metrics"
 msgstr ""
 "Analyser et comparer les métriques de performance spécifiques aux "
 "campagnes"
-
-#: templates/business_auth/admin_panel.html:408
-#: templates/business_auth/admin_panel.html:432
-#: templates/business_auth/admin_panel.html:435
-#: templates/business_auth/admin_panel.html:820
-#: templates/business_auth/admin_panel.html:940 templates/dashboard.html:349
-msgid "Analytics"
-msgstr "Analytique"
 
 #: templates/dashboard.html:380
 msgid "Currently showing data from active campaign"
@@ -1681,10 +1711,6 @@ msgstr "Intelligence de compte"
 msgid "Company NPS"
 msgstr "Nom de l'entreprise"
 
-#: templates/dashboard.html:675 templates/dashboard.html:756
-msgid "Distribution"
-msgstr "Répartition du NPS"
-
 #: templates/dashboard.html:678 templates/dashboard.html:759
 msgid "Latest Churn Risk"
 msgstr "Indicateurs de risque de résiliation"
@@ -1693,6 +1719,28 @@ msgstr "Indicateurs de risque de résiliation"
 msgid "Company NPS pagination"
 msgstr "Pagination du NPS par entreprise"
 
+#: templates/dashboard.html:727 templates/dashboard.html:783
+#, fuzzy
+msgid "Risk Levels:"
+msgstr "Niveau de Risque"
+
+#: templates/dashboard.html:728 templates/dashboard.html:784
+msgid "Low (>20)"
+msgstr ""
+
+#: templates/dashboard.html:729 templates/dashboard.html:785
+msgid "Medium (-20 to 20)"
+msgstr ""
+
+#: templates/dashboard.html:730 templates/dashboard.html:786
+msgid "High (≤-20)"
+msgstr ""
+
+#: templates/dashboard.html:731 templates/dashboard.html:787
+#, fuzzy
+msgid "Critical (≤-50)"
+msgstr "Risque critique"
+
 #: templates/dashboard.html:773
 msgid "Tenure NPS pagination"
 msgstr "Pagination du NPS par ancienneté"
@@ -1700,10 +1748,6 @@ msgstr "Pagination du NPS par ancienneté"
 #: templates/dashboard.html:812
 msgid "Search by company name, participant name, or email..."
 msgstr ""
-
-#: templates/dashboard.html:842
-msgid "Sentiment"
-msgstr "Sentiment :"
 
 #: templates/dashboard.html:908
 #, fuzzy

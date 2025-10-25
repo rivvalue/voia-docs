@@ -95,7 +95,7 @@
     <ul class="nav nav-tabs mb-4" id="dashboardNav" role="tablist" style="border-bottom: 1px solid #e5e5e5;">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab" aria-controls="overview" aria-selected="true">
-                <i class="fas fa-tachometer-alt me-2" style="color: #E13A44;"></i>Overview
+                <i class="fas fa-tachometer-alt me-2" style="color: #E13A44;"></i>{{ _('Overview') }}
             </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -105,7 +105,7 @@
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab" aria-controls="analytics" aria-selected="false">
-                <i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>Analytics
+                <i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>{{ _('Analytics') }}
             </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -115,7 +115,7 @@
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="segmentation-tab" data-bs-toggle="tab" data-bs-target="#segmentation" type="button" role="tab" aria-controls="segmentation" aria-selected="false">
-                <i class="fas fa-users me-2" style="color: #E13A44;"></i>Segmentation Insights
+                <i class="fas fa-users me-2" style="color: #E13A44;"></i>{{ _('Segmentation Insights') }}
             </button>
         </li>
     </ul>
@@ -418,7 +418,7 @@
                                             <i class="fas fa-search me-1"></i>{{ _('Search') }}
                                         </button>
                                         <button type="button" class="btn btn-outline-secondary" onclick="clear{{ _('Company') }}{{ _('Search') }}()">
-                                            <i class="fas fa-times me-1"></i>Clear
+                                            <i class="fas fa-times me-1"></i>{{ _('Clear') }}
                                         </button>
                                     </div>
                                 </div>
@@ -436,10 +436,10 @@
                                             <th>{{ _('Respondent') }}s</th>
                                             <th>{{ _('Avg Individual NPS') }}</th>
                                             <th>{{ _('Company') }} NPS</th>
-                                            <th>Distribution</th>
+                                            <th>{{ _('Distribution') }}</th>
                                             <th>{{ _('Risk Level') }}</th>
                                             <th>{{ _('Latest Response') }}</th>
-                                            <th>Latest {{ _('Churn Risk') }}</th>
+                                            <th>{{ _('Latest') }} {{ _('Churn Risk') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="companyNpsTableServerSide" style="display: table-row-group !important; visibility: visible !important;">
@@ -590,7 +590,7 @@
                                             <i class="fas fa-search me-1"></i>{{ _('Search') }}
                                         </button>
                                         <button type="button" class="btn btn-outline-secondary" onclick="clear{{ _('Responses') }}{{ _('Search') }}()">
-                                            <i class="fas fa-times me-1"></i>Clear
+                                            <i class="fas fa-times me-1"></i>{{ _('Clear') }}
                                         </button>
                                     </div>
                                 </div>
@@ -603,9 +603,9 @@
                                             <th>{{ _('Tenure with FC inc') }}</th>
                                             <th>{{ _('NPS Score') }}</th>
                                             <th>{{ _('Category') }}</th>
-                                            <th>Sentiment</th>
+                                            <th>{{ _('Sentiment') }}</th>
                                             <th>{{ _('Churn Risk') }}</th>
-                                            <th>Date</th>
+                                            <th>{{ _('Date') }}</th>
                                             <th>{{ _('Details') }}</th>
                                         </tr>
                                     </thead>
@@ -787,8 +787,8 @@
                                     <th style="width: 20%;">{{ _('Respondent') }}</th>
                                     <th style="width: 10%; text-align: center;">NPS</th>
                                     <th style="width: 50%;" class="text-center">{{ _('Ratings') }}</th>
-                                    <th style="width: 15%;">Date</th>
-                                    <th style="width: 5%; text-align: center;">Action</th>
+                                    <th style="width: 15%;">{{ _('Date') }}</th>
+                                    <th style="width: 5%; text-align: center;">{{ _('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody id="companyResponsesTableBody">
@@ -827,7 +827,7 @@
         <div class="modal-content">
             <div class="modal-header bg-white border-bottom">
                 <h5 class="modal-title" id="kpiTrendsModalLabel">
-                    <i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>Campaign KPI Trends
+                    <i class="fas fa-chart-line me-2" style="color: #E13A44;"></i>{{ _('Campaign KPI Trends') }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
             </div>
@@ -876,7 +876,7 @@
                     <div class="col-lg-6 mb-4">
                         <div class="card border">
                             <div class="card-header bg-white border-bottom">
-                                <h6 class="mb-0">Satisfaction</h6>
+                                <h6 class="mb-0">{{ _('Satisfaction') }}</h6>
                             </div>
                             <div class="card-body">
                                 <canvas id="modal-chart-satisfaction" height="250"></canvas>
@@ -906,7 +906,7 @@
                     <div class="col-lg-6 mb-4">
                         <div class="card border">
                             <div class="card-header bg-white border-bottom">
-                                <h6 class="mb-0">Service</h6>
+                                <h6 class="mb-0">{{ _('Service') }}</h6>
                             </div>
                             <div class="card-body">
                                 <canvas id="modal-chart-service" height="250"></canvas>
