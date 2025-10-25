@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-25 03:02+0000\n"
+"POT-Creation-Date: 2025-10-25 03:05+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2133,6 +2133,10 @@ msgstr ""
 msgid "Token Generation Failed"
 msgstr ""
 
+#: templates/simple_auth.html:3
+msgid "Simple Authentication Test"
+msgstr ""
+
 #: templates/simple_auth.html:11
 msgid "Simple Token Generation"
 msgstr ""
@@ -2143,6 +2147,38 @@ msgstr ""
 
 #: templates/simple_auth.html:24 templates/test_token.html:22
 msgid "Clear Results"
+msgstr ""
+
+#: templates/simple_auth.html:42
+msgid "Please enter an email address"
+msgstr ""
+
+#: templates/simple_auth.html:46
+msgid "Generating token..."
+msgstr ""
+
+#: templates/simple_auth.html:52
+msgid "SUCCESS: Token generated for"
+msgstr ""
+
+#: templates/simple_auth.html:53
+msgid "Token:"
+msgstr ""
+
+#: templates/simple_auth.html:59
+msgid "Token saved to localStorage"
+msgstr ""
+
+#: templates/simple_auth.html:61
+msgid "ERROR:"
+msgstr ""
+
+#: templates/simple_auth.html:61
+msgid "Unknown error"
+msgstr ""
+
+#: templates/simple_auth.html:64
+msgid "FAILED:"
 msgstr ""
 
 #: templates/survey.html:3
@@ -3294,6 +3330,7 @@ msgstr ""
 #: templates/business_auth/licenses/assignment_form.html:52
 #: templates/business_auth/licenses/assignment_form.html:406
 #: templates/business_auth/licenses/assignment_form.html:560
+#: templates/components/ui_version_toggle.html:26
 msgid "Current"
 msgstr ""
 
@@ -4105,14 +4142,27 @@ msgid "Breadcrumb navigation"
 msgstr ""
 
 #: templates/components/breadcrumb.html:24
-msgid "Navigate to {{ item.label }}"
+msgid "Navigate to"
+msgstr ""
+
+#: templates/components/language_selector.html:8
+msgid "Select language"
 msgstr ""
 
 #: templates/components/ui_version_toggle.html:13
-msgid "UI: {{ ui_version|upper }}"
+#, python-brace-format
+msgid "UI: {}"
 msgstr ""
 
 #: templates/components/ui_version_toggle.html:26
+#, python-brace-format
+msgid "Switch to {}"
+msgstr ""
+
+#: templates/components/ui_version_toggle.html:26
+msgid "New Sidebar"
+msgstr ""
+
 #: templates/components/ui_version_toggle.html:28
 msgid "Switch"
 msgstr ""

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-25 03:02+0000\n"
+"POT-Creation-Date: 2025-10-25 03:05+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -2238,6 +2238,11 @@ msgstr "Démarrer le type d'enquête sélectionné"
 msgid "Token Generation Failed"
 msgstr "Échec de la génération du jeton"
 
+#: templates/simple_auth.html:3
+#, fuzzy
+msgid "Simple Authentication Test"
+msgstr "Test d'authentification simple"
+
 #: templates/simple_auth.html:11
 msgid "Simple Token Generation"
 msgstr "Génération de jeton simple"
@@ -2249,6 +2254,45 @@ msgstr "Générer un jeton"
 #: templates/simple_auth.html:24 templates/test_token.html:22
 msgid "Clear Results"
 msgstr "Effacer les résultats"
+
+#: templates/simple_auth.html:42
+#, fuzzy
+msgid "Please enter an email address"
+msgstr "Veuillez entrer une adresse e-mail"
+
+#: templates/simple_auth.html:46
+#, fuzzy
+msgid "Generating token..."
+msgstr "Génération du jeton..."
+
+#: templates/simple_auth.html:52
+#, fuzzy
+msgid "SUCCESS: Token generated for"
+msgstr "SUCCÈS : Jeton généré pour"
+
+#: templates/simple_auth.html:53
+#, fuzzy
+msgid "Token:"
+msgstr "Jeton :"
+
+#: templates/simple_auth.html:59
+msgid "Token saved to localStorage"
+msgstr "Jeton enregistré dans localStorage"
+
+#: templates/simple_auth.html:61
+#, fuzzy
+msgid "ERROR:"
+msgstr "ERREUR :"
+
+#: templates/simple_auth.html:61
+#, fuzzy
+msgid "Unknown error"
+msgstr "Erreur inconnue"
+
+#: templates/simple_auth.html:64
+#, fuzzy
+msgid "FAILED:"
+msgstr "ÉCHEC :"
 
 #: templates/survey.html:3
 msgid "Customer Survey - VOÏA - Voice Of Client Agent"
@@ -3469,6 +3513,7 @@ msgstr "Configurer la licence pour {{ business_account.name }}"
 #: templates/business_auth/licenses/assignment_form.html:52
 #: templates/business_auth/licenses/assignment_form.html:406
 #: templates/business_auth/licenses/assignment_form.html:560
+#: templates/components/ui_version_toggle.html:26
 msgid "Current"
 msgstr "Actuel"
 
@@ -4353,14 +4398,29 @@ msgid "Breadcrumb navigation"
 msgstr "Navigation par fil d'Ariane"
 
 #: templates/components/breadcrumb.html:24
-msgid "Navigate to {{ item.label }}"
-msgstr "Aller à {{ item.label }}"
+msgid "Navigate to"
+msgstr "Naviguer vers"
+
+#: templates/components/language_selector.html:8
+#, fuzzy
+msgid "Select language"
+msgstr "Sélectionner la langue"
 
 #: templates/components/ui_version_toggle.html:13
-msgid "UI: {{ ui_version|upper }}"
-msgstr "UI : {{ ui_version|upper }}"
+#, python-brace-format
+msgid "UI: {}"
+msgstr "IU : {}"
 
 #: templates/components/ui_version_toggle.html:26
+#, fuzzy, python-brace-format
+msgid "Switch to {}"
+msgstr "Basculer vers {}"
+
+#: templates/components/ui_version_toggle.html:26
+#, fuzzy
+msgid "New Sidebar"
+msgstr "Nouvelle barre latérale"
+
 #: templates/components/ui_version_toggle.html:28
 msgid "Switch"
 msgstr "Basculer"
@@ -5256,4 +5316,10 @@ msgstr "Télécharger le modèle de fichier CSV"
 
 #~ msgid "Welcome, {{ participant_name }}"
 #~ msgstr "Bienvenue, {{ participant_name }}"
+
+#~ msgid "Navigate to {{ item.label }}"
+#~ msgstr "Aller à {{ item.label }}"
+
+#~ msgid "UI: {{ ui_version|upper }}"
+#~ msgstr "UI : {{ ui_version|upper }}"
 

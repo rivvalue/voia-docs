@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Simple Authentication Test{% endblock %}
+{% block title %}{{ _('Simple Authentication Test') }}{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
@@ -39,29 +39,29 @@ async function generateToken() {
     const resultsDiv = document.getElementById('results');
     
     if (!email) {
-        addResult('Please enter an email address', 'danger');
+        addResult('{{ _("Please enter an email address") }}', 'danger');
         return;
     }
     
-    addResult('Generating token...', 'info');
+    addResult('{{ _("Generating token...") }}', 'info');
     
     try {
         const result = await window.simpleAuth.requestToken(email);
         
         if (result.token) {
-            addResult(`SUCCESS: Token generated for ${result.email}`, 'success');
-            addResult(`Token: ${result.token}`, 'success');
+            addResult(`{{ _("SUCCESS: Token generated for") }} ${result.email}`, 'success');
+            addResult(`{{ _("Token:") }} ${result.token}`, 'success');
             
             // Store token
             localStorage.setItem('auth_token', result.token);
             localStorage.setItem('auth_email', result.email);
             
-            addResult('Token saved to localStorage', 'info');
+            addResult('{{ _("Token saved to localStorage") }}', 'info');
         } else {
-            addResult(`ERROR: ${result.error || 'Unknown error'}`, 'danger');
+            addResult(`{{ _("ERROR:") }} ${result.error || '{{ _("Unknown error") }}'}`, 'danger');
         }
     } catch (error) {
-        addResult(`FAILED: ${error.message}`, 'danger');
+        addResult(`{{ _("FAILED:") }} ${error.message}`, 'danger');
         console.error('Token generation failed:', error);
     }
 }

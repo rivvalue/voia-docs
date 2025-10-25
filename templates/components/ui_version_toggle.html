@@ -10,7 +10,7 @@
         font-weight: 600;
         letter-spacing: 0.5px;
     ">
-        {{ _('UI: {{ ui_version|upper }}') }}
+        {{ _('UI: {}').format(ui_version|upper) }}
     </span>
     
     <form action="{{ url_for('business_auth.toggle_ui_version') }}" method="POST" style="margin: 0;">
@@ -23,7 +23,7 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
-        " title="{{ _('Switch') }} to {% if ui_version == 'v1' %}v2 (New Sidebar){% else %}v1 (Current){% endif %}">
+        " title="{{ _('Switch to {}').format('v2 (' ~ _('New Sidebar') ~ ')' if ui_version == 'v1' else 'v1 (' ~ _('Current') ~ ')') }}">
             <i class="fas fa-exchange-alt" style="font-size: 10px;"></i>
             <span>{{ _('Switch') }}</span>
         </button>

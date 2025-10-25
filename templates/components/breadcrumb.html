@@ -21,7 +21,7 @@
                     </li>
                 {% else %}
                     <li class="breadcrumb-item">
-                        <a href="{{ item.url }}" class="breadcrumb-link" aria-label="{{ _('Navigate to {{ item.label }}') }}">
+                        <a href="{{ item.url }}" class="breadcrumb-link" aria-label="{{ _('Navigate to').format() }} {{ item.label }}">
                             {{ item.label }}
                         </a>
                         <i class="fas fa-chevron-right breadcrumb-separator" aria-hidden="true"></i>
