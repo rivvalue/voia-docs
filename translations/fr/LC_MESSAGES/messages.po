@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-25 02:41+0000\n"
+"POT-Creation-Date: 2025-10-25 02:44+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -1184,6 +1184,11 @@ msgstr "Retour à la page d'accueil"
 msgid "Return Home"
 msgstr "Retour à la page d'accueil"
 
+#: templates/conversational_survey_business.html:4
+#, python-brace-format
+msgid "{}  - VOÏA Survey"
+msgstr "{} - Enquête VOÏA"
+
 #: templates/conversational_survey_business.html:43
 msgid "Hi"
 msgstr "Bonjour"
@@ -1266,9 +1271,9 @@ msgid ""
 "valuable insights for business improvement and customer satisfaction "
 "enhancement."
 msgstr ""
-"Vos réponses conversationnelles alimentées par l'IA ont été analysées pour "
-"fournir des informations précieuses pour l'amélioration des activités et "
-"l'amélioration de la satisfaction client."
+"Vos réponses conversationnelles alimentées par l'IA ont été analysées "
+"pour fournir des informations précieuses pour l'amélioration des "
+"activités et l'amélioration de la satisfaction client."
 
 #: templates/conversational_survey_completed.html:32
 #: templates/survey_completed.html:32
@@ -1899,6 +1904,10 @@ msgstr "Voir les plans tarifaires"
 msgid "Get Started Today"
 msgstr "Commencez aujourd'hui"
 
+#: templates/public_survey_response.html:3
+msgid "Survey Response Details - VOÏA"
+msgstr "Détails de la réponse à l'enquête - VOÏA"
+
 #: templates/public_survey_response.html:25
 msgid "Survey response details"
 msgstr "Détails de la réponse à l'enquête"
@@ -2127,6 +2136,10 @@ msgstr "Générer un jeton"
 msgid "Clear Results"
 msgstr "Effacer les résultats"
 
+#: templates/survey.html:3
+msgid "Customer Survey - VOÏA - Voice Of Client Agent"
+msgstr "Enquête client - VOÏA - Agent Voice Of Client"
+
 #: templates/survey.html:18
 msgid "Customer Feedback Survey"
 msgstr "Enquête de retour client"
@@ -2134,6 +2147,11 @@ msgstr "Enquête de retour client"
 #: templates/survey.html:19
 msgid "Help us improve by sharing your experience"
 msgstr "Aidez-nous à nous améliorer en partageant votre expérience"
+
+#: templates/survey.html:22 templates/survey_choice.html:21
+#, python-brace-format
+msgid "Powered by {}"
+msgstr "Propulsé par {}"
 
 #: templates/survey.html:26 templates/survey_choice.html:25
 msgid "Powered by VOÏA - Voice Of Client Agent"
@@ -2283,11 +2301,6 @@ msgstr "Sondage IA - VOÏA - Agent Voix du Client"
 msgid "Welcome, {}!"
 msgstr "Bienvenue sur VOÏA !"
 
-#: templates/survey_choice.html:21
-#, python-brace-format
-msgid "Powered by {}"
-msgstr "Propulsé par {}"
-
 #: templates/survey_choice.html:33 templates/survey_choice.html:38
 msgid "AI Conversational"
 msgstr "Conversationnel IA"
@@ -2373,9 +2386,9 @@ msgid ""
 "Your feedback is being analyzed by our AI system to provide valuable "
 "insights for business improvement and customer satisfaction enhancement."
 msgstr ""
-"Votre retour est en cours d'analyse par notre système IA pour fournir des "
-"informations précieuses pour l'amélioration des activités et l'amélioration "
-"de la satisfaction client."
+"Votre retour est en cours d'analyse par notre système IA pour fournir des"
+" informations précieuses pour l'amélioration des activités et "
+"l'amélioration de la satisfaction client."
 
 #: templates/survey_completed.html:38
 msgid "Try Our Conversational Survey"
@@ -2413,8 +2426,8 @@ msgstr ""
 "souhaite en savoir plus sur la mise en œuvre du service complet Agent "
 "Voice of Client pour mon organisation.\n"
 "\n"
-"Veuillez me contacter pour discuter de la façon dont cela peut bénéficier "
-"à notre stratégie de retours clients.\n"
+"Veuillez me contacter pour discuter de la façon dont cela peut bénéficier"
+" à notre stratégie de retours clients.\n"
 "\n"
 "Merci !"
 

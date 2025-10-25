@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Customer Survey - VOÏA - Voice Of Client Agent{% endblock %}
+{% block title %}{{ _('Customer Survey - VOÏA - Voice Of Client Agent') }}{% endblock %}
 
 {% block page_class %}page-survey{% endblock %}
 
@@ -19,7 +19,7 @@
                 <small class="text-muted">{{ _('Help us improve by sharing your experience') }}</small>
                 {% if branding and branding.company_name %}
                     <div class="mt-2">
-                        <small class="text-muted">Powered by {{ branding.company_name }}</small>
+                        <small class="text-muted">{{ _('Powered by {}').format(branding.company_name) }}</small>
                     </div>
                 {% else %}
                     <div class="mt-2">
