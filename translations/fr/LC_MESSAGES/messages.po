@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-25 02:44+0000\n"
+"POT-Creation-Date: 2025-10-25 02:54+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -16,6 +16,18 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
+
+#: templates/auth.html:3
+msgid "Authentication - VOÏA - Voice Of Client Agent"
+msgstr "Authentification - VOÏA - Agent Voice Of Client"
+
+#: templates/auth.html:14
+msgid "Get Access Token"
+msgstr "Obtenir un jeton d'accès"
+
+#: templates/auth.html:16
+msgid "Enter your email to receive an authentication token"
+msgstr "Entrez votre e-mail pour recevoir un jeton d'authentification"
 
 #: templates/auth.html:22 templates/business_auth/activate_account.html:443
 #: templates/business_auth/manage_users.html:242
@@ -30,6 +42,10 @@ msgstr "Adresse e-mail"
 #: templates/auth.html:26
 msgid "You'll receive a secure token valid for 24 hours"
 msgstr "Vous recevrez un jeton sécurisé valable 24 heures"
+
+#: templates/auth.html:32
+msgid "Request Token"
+msgstr "Demander un jeton"
 
 #: templates/auth.html:40 templates/campaign_insights.html:292
 #: templates/campaign_insights.html:479 templates/campaign_insights.html:535
@@ -49,6 +65,10 @@ msgstr "Chargement..."
 msgid "Generating your authentication token..."
 msgstr "Génération de votre jeton d'authentification..."
 
+#: templates/auth.html:49 templates/server_auth.html:120
+msgid "Token Generated Successfully!"
+msgstr "Jeton généré avec succès !"
+
 #: templates/auth.html:51
 msgid "Your authentication token has been created:"
 msgstr "Votre jeton d'authentification a été créé :"
@@ -56,6 +76,10 @@ msgstr "Votre jeton d'authentification a été créé :"
 #: templates/auth.html:53
 msgid "Authentication Token:"
 msgstr "Jeton d'authentification :"
+
+#: templates/auth.html:63
+msgid "This token expires in 24 hours. Keep it secure and don't share it."
+msgstr "Ce jeton expire dans 24 heures. Gardez-le en sécurité et ne le partagez pas."
 
 #: templates/auth.html:69
 msgid "Choose Survey Experience:"
@@ -65,9 +89,41 @@ msgstr "Choisissez l'expérience d'enquête :"
 msgid "Survey type selection"
 msgstr "Sélection du type d'enquête"
 
+#: templates/auth.html:73
+msgid "Conversational (AI)"
+msgstr "Conversationnelle (IA)"
+
+#: templates/auth.html:78 templates/survey_choice.html:65
+msgid "Traditional Form"
+msgstr "Formulaire traditionnel"
+
+#: templates/auth.html:82
+msgid "Conversational:"
+msgstr "Conversationnelle :"
+
+#: templates/auth.html:82
+msgid "Chat with VOÏA AI for a natural feedback experience"
+msgstr "Discutez avec l'IA VOÏA pour une expérience de retour naturelle"
+
+#: templates/auth.html:83
+msgid "Traditional:"
+msgstr "Traditionnelle :"
+
+#: templates/auth.html:83
+msgid "Standard form-based survey"
+msgstr "Enquête basée sur un formulaire standard"
+
+#: templates/auth.html:89
+msgid "Start Survey"
+msgstr "Démarrer l'enquête"
+
 #: templates/auth.html:92
 msgid "Generate Another Token"
 msgstr "Générer un autre jeton"
+
+#: templates/auth.html:102
+msgid "Error"
+msgstr "Erreur"
 
 #: templates/auth.html:104
 msgid "Something went wrong. Please try again."
@@ -76,6 +132,10 @@ msgstr "Une erreur est survenue. Veuillez réessayer."
 #: templates/auth.html:106
 msgid "Try Again"
 msgstr "Réessayer"
+
+#: templates/auth.html:117
+msgid "Security Information"
+msgstr "Informations de sécurité"
 
 #: templates/auth.html:123
 msgid "Why do I need a token?"
@@ -111,6 +171,30 @@ msgstr "Une réponse par adresse e-mail (sauf remplacement)"
 #: templates/auth.html:134
 msgid "Rate limiting prevents abuse"
 msgstr "La limitation du débit empêche les abus"
+
+#: templates/auth.html:152
+msgid "Please enter your email address"
+msgstr "Veuillez entrer votre adresse e-mail"
+
+#: templates/auth.html:159
+msgid "Please enter a valid email address"
+msgstr "Veuillez entrer une adresse e-mail valide"
+
+#: templates/auth.html:230
+msgid "Failed to generate token"
+msgstr "Échec de la génération du jeton"
+
+#: templates/auth.html:236
+msgid "Network error:"
+msgstr "Erreur réseau :"
+
+#: templates/auth.html:236
+msgid "Please check your connection and try again."
+msgstr "Veuillez vérifier votre connexion et réessayer."
+
+#: templates/base.html:6 templates/base_minimal.html:6
+msgid "VOÏA - Voice Of Client"
+msgstr "VOÏA - Voice Of Client"
 
 #: templates/base.html:53 templates/base.html:170 templates/dashboard.html:20
 msgid "Business Intelligence"
@@ -2112,10 +2196,6 @@ msgstr ""
 msgid "Generate secure authentication token"
 msgstr "Générer un jeton d'authentification sécurisé"
 
-#: templates/server_auth.html:120
-msgid "Token Generated Successfully!"
-msgstr "Jeton généré avec succès !"
-
 #: templates/server_auth.html:131
 msgid "Start selected survey type"
 msgstr "Démarrer le type d'enquête sélectionné"
@@ -2333,10 +2413,6 @@ msgstr "5 à 7 minutes"
 #, fuzzy
 msgid "Start AI Conversation"
 msgstr "Démarrer la conversation"
-
-#: templates/survey_choice.html:65
-msgid "Traditional Form"
-msgstr "Formulaire traditionnel"
 
 #: templates/survey_choice.html:67
 msgid ""

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Authentication - VOÏA - Voice Of Client Agent{% endblock %}
+{% block title %}{{ _('Authentication - VOÏA - Voice Of Client Agent') }}{% endblock %}
 
 {% block page_class %}page-auth{% endblock %}
 
@@ -11,9 +11,9 @@
         <div class="card">
             <div class="card-header">
                 <h4 class="card-title mb-0">
-                    <i class="fas fa-key me-2"></i>Get Access Token
+                    <i class="fas fa-key me-2"></i>{{ _('Get Access Token') }}
                 </h4>
-                <small class="text-muted">Enter your email to receive an authentication token</small>
+                <small class="text-muted">{{ _('Enter your email to receive an authentication token') }}</small>
             </div>
             <div class="card-body">
                 <!-- Token Request Form -->
@@ -29,7 +29,7 @@
                     
                     <div class="d-grid">
                         <button type="button" class="btn btn-primary" onclick="requestToken()">
-                            <i class="fas fa-paper-plane me-2"></i>Request Token
+                            <i class="fas fa-paper-plane me-2"></i>{{ _('Request Token') }}
                         </button>
                     </div>
                 </div>
@@ -46,7 +46,7 @@
                 <div class="d-none" id="successState">
                     <div class="alert alert-success">
                         <h6 class="alert-heading">
-                            <i class="fas fa-check-circle me-2"></i>Token Generated Successfully!
+                            <i class="fas fa-check-circle me-2"></i>{{ _('Token Generated Successfully!') }}
                         </h6>
                         <p class="mb-2">{{ _('Your authentication token has been created:') }}</p>
                         <div class="mb-3">
@@ -60,7 +60,7 @@
                                 </button>
                             </div>
                             <small class="form-text text-muted">
-                                This token expires in 24 hours. Keep it secure and don't share it.
+                                {{ _("This token expires in 24 hours. Keep it secure and don't share it.") }}
                             </small>
                         </div>
                         
@@ -70,23 +70,23 @@
                             <div class="btn-group w-100" role="group" aria-label="{{ _('Survey type selection') }}">
                                 <input type="radio" class="btn-check" name="surveyType" id="conversationalOption" value="conversational" checked>
                                 <label class="btn btn-outline-primary" for="conversationalOption">
-                                    <i class="fas fa-comments me-2"></i>Conversational (AI)
+                                    <i class="fas fa-comments me-2"></i>{{ _('Conversational (AI)') }}
                                 </label>
                                 
                                 <input type="radio" class="btn-check" name="surveyType" id="traditionalOption" value="traditional">
                                 <label class="btn btn-outline-secondary" for="traditionalOption">
-                                    <i class="fas fa-list-alt me-2"></i>Traditional Form
+                                    <i class="fas fa-list-alt me-2"></i>{{ _('Traditional Form') }}
                                 </label>
                             </div>
                             <small class="form-text text-muted mt-1">
-                                <strong>Conversational:</strong> Chat with VOÏA AI for a natural feedback experience<br>
-                                <strong>Traditional:</strong> Standard form-based survey
+                                <strong>{{ _('Conversational:') }}</strong> {{ _('Chat with VOÏA AI for a natural feedback experience') }}<br>
+                                <strong>{{ _('Traditional:') }}</strong> {{ _('Standard form-based survey') }}
                             </small>
                         </div>
                         
                         <div class="d-grid gap-2">
                             <button type="button" class="btn btn-success" onclick="startSelectedSurvey()">
-                                <i class="fas fa-poll-h me-2"></i>Start Survey
+                                <i class="fas fa-poll-h me-2"></i>{{ _('Start Survey') }}
                             </button>
                             <button type="button" class="btn btn-outline-primary" onclick="resetForm()">
                                 {{ _('Generate Another Token') }}
@@ -99,7 +99,7 @@
                 <div class="d-none" id="errorState">
                     <div class="alert alert-danger">
                         <h6 class="alert-heading">
-                            <i class="fas fa-exclamation-triangle me-2"></i>Error
+                            <i class="fas fa-exclamation-triangle me-2"></i>{{ _('Error') }}
                         </h6>
                         <p id="errorMessage">{{ _('Something went wrong. Please try again.') }}</p>
                         <button type="button" class="btn btn-outline-danger" onclick="resetForm()">
@@ -114,7 +114,7 @@
         <div class="card mt-4">
             <div class="card-header">
                 <h6 class="card-title mb-0">
-                    <i class="fas fa-info-circle me-2"></i>Security Information
+                    <i class="fas fa-info-circle me-2"></i>{{ _('Security Information') }}
                 </h6>
             </div>
             <div class="card-body">
@@ -149,14 +149,14 @@ async function requestToken() {
     const email = document.getElementById('emailInput').value.trim();
     
     if (!email) {
-        alert('Please enter your email address');
+        alert('{{ _("Please enter your email address") }}');
         return;
     }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-        alert('Please enter a valid email address');
+        alert('{{ _("Please enter a valid email address") }}');
         return;
     }
 
@@ -227,13 +227,13 @@ async function requestToken() {
             // Error
             console.error('Token generation failed:', data);
             document.getElementById('errorMessage').textContent = 
-                data.error || 'Failed to generate token';
+                data.error || '{{ _("Failed to generate token") }}';
             showState('error');
         }
     } catch (error) {
         console.error('Error requesting token:', error);
         document.getElementById('errorMessage').textContent = 
-            `Network error: ${error.message}. Please check your connection and try again.`;
+            `{{ _("Network error:") }} ${error.message}. {{ _("Please check your connection and try again.") }}`;
         showState('error');
     }
 }

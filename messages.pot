@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-25 02:44+0000\n"
+"POT-Creation-Date: 2025-10-25 02:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,18 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
+
+#: templates/auth.html:3
+msgid "Authentication - VOÏA - Voice Of Client Agent"
+msgstr ""
+
+#: templates/auth.html:14
+msgid "Get Access Token"
+msgstr ""
+
+#: templates/auth.html:16
+msgid "Enter your email to receive an authentication token"
+msgstr ""
 
 #: templates/auth.html:22 templates/business_auth/activate_account.html:443
 #: templates/business_auth/manage_users.html:242
@@ -29,6 +41,10 @@ msgstr ""
 
 #: templates/auth.html:26
 msgid "You'll receive a secure token valid for 24 hours"
+msgstr ""
+
+#: templates/auth.html:32
+msgid "Request Token"
 msgstr ""
 
 #: templates/auth.html:40 templates/campaign_insights.html:292
@@ -49,12 +65,20 @@ msgstr ""
 msgid "Generating your authentication token..."
 msgstr ""
 
+#: templates/auth.html:49 templates/server_auth.html:120
+msgid "Token Generated Successfully!"
+msgstr ""
+
 #: templates/auth.html:51
 msgid "Your authentication token has been created:"
 msgstr ""
 
 #: templates/auth.html:53
 msgid "Authentication Token:"
+msgstr ""
+
+#: templates/auth.html:63
+msgid "This token expires in 24 hours. Keep it secure and don't share it."
 msgstr ""
 
 #: templates/auth.html:69
@@ -65,8 +89,40 @@ msgstr ""
 msgid "Survey type selection"
 msgstr ""
 
+#: templates/auth.html:73
+msgid "Conversational (AI)"
+msgstr ""
+
+#: templates/auth.html:78 templates/survey_choice.html:65
+msgid "Traditional Form"
+msgstr ""
+
+#: templates/auth.html:82
+msgid "Conversational:"
+msgstr ""
+
+#: templates/auth.html:82
+msgid "Chat with VOÏA AI for a natural feedback experience"
+msgstr ""
+
+#: templates/auth.html:83
+msgid "Traditional:"
+msgstr ""
+
+#: templates/auth.html:83
+msgid "Standard form-based survey"
+msgstr ""
+
+#: templates/auth.html:89
+msgid "Start Survey"
+msgstr ""
+
 #: templates/auth.html:92
 msgid "Generate Another Token"
+msgstr ""
+
+#: templates/auth.html:102
+msgid "Error"
 msgstr ""
 
 #: templates/auth.html:104
@@ -75,6 +131,10 @@ msgstr ""
 
 #: templates/auth.html:106
 msgid "Try Again"
+msgstr ""
+
+#: templates/auth.html:117
+msgid "Security Information"
 msgstr ""
 
 #: templates/auth.html:123
@@ -107,6 +167,30 @@ msgstr ""
 
 #: templates/auth.html:134
 msgid "Rate limiting prevents abuse"
+msgstr ""
+
+#: templates/auth.html:152
+msgid "Please enter your email address"
+msgstr ""
+
+#: templates/auth.html:159
+msgid "Please enter a valid email address"
+msgstr ""
+
+#: templates/auth.html:230
+msgid "Failed to generate token"
+msgstr ""
+
+#: templates/auth.html:236
+msgid "Network error:"
+msgstr ""
+
+#: templates/auth.html:236
+msgid "Please check your connection and try again."
+msgstr ""
+
+#: templates/base.html:6 templates/base_minimal.html:6
+msgid "VOÏA - Voice Of Client"
 msgstr ""
 
 #: templates/base.html:53 templates/base.html:170 templates/dashboard.html:20
@@ -2009,10 +2093,6 @@ msgstr ""
 msgid "Generate secure authentication token"
 msgstr ""
 
-#: templates/server_auth.html:120
-msgid "Token Generated Successfully!"
-msgstr ""
-
 #: templates/server_auth.html:131
 msgid "Start selected survey type"
 msgstr ""
@@ -2213,10 +2293,6 @@ msgstr ""
 
 #: templates/survey_choice.html:53
 msgid "Start AI Conversation"
-msgstr ""
-
-#: templates/survey_choice.html:65
-msgid "Traditional Form"
 msgstr ""
 
 #: templates/survey_choice.html:67
