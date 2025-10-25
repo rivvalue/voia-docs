@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-25 02:14+0000\n"
+"POT-Creation-Date: 2025-10-25 02:17+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -2068,9 +2068,25 @@ msgstr "Traitement de votre retour d'information..."
 msgid "Thank you for sharing with us your feedback."
 msgstr "Merci de partager votre retour d'information avec nous."
 
+#: templates/survey_choice.html:3
+#, fuzzy
+msgid "Choose Survey Type - VOÏA - Voice Of Client Agent"
+msgstr "Sondage IA - VOÏA - Agent Voix du Client"
+
 #: templates/survey_choice.html:17
-msgid "Welcome, {{ participant_name }}"
-msgstr "Bienvenue, {{ participant_name }}"
+#, fuzzy, python-brace-format
+msgid "Welcome, {}!"
+msgstr "Bienvenue sur VOÏA !"
+
+#: templates/survey_choice.html:21
+#, python-brace-format
+msgid "Powered by {}"
+msgstr "Propulsé par {}"
+
+#: templates/survey_choice.html:25
+#, fuzzy
+msgid "Powered by VOÏA - Voice Of Client Agent"
+msgstr "Sondage IA - VOÏA - Agent Voix du Client"
 
 #: templates/survey_choice.html:33 templates/survey_choice.html:38
 msgid "AI Conversational"
@@ -2100,6 +2116,11 @@ msgstr "Analyses alimentées par l'IA"
 msgid "5-7 minutes"
 msgstr "5 à 7 minutes"
 
+#: templates/survey_choice.html:53
+#, fuzzy
+msgid "Start AI Conversation"
+msgstr "Démarrer la conversation"
+
 #: templates/survey_choice.html:65
 msgid "Traditional Form"
 msgstr "Formulaire traditionnel"
@@ -2127,6 +2148,17 @@ msgstr "Interface traditionnelle"
 #: templates/survey_choice.html:73
 msgid "3-5 minutes"
 msgstr "3 à 5 minutes"
+
+#: templates/survey_choice.html:80
+#, fuzzy
+msgid "Start Form Survey"
+msgstr "Démarrer l'enquête conversationnelle"
+
+#: templates/survey_choice.html:90
+msgid ""
+"Both options provide the same valuable insights. Choose what feels most "
+"comfortable for you."
+msgstr ""
 
 #: templates/survey_completed.html:3 templates/survey_completed.html:17
 msgid "Survey Already Completed"
@@ -4831,4 +4863,7 @@ msgstr "Télécharger le modèle de fichier CSV"
 
 #~ msgid "Campaign Manager is recommended for most team members"
 #~ msgstr ""
+
+#~ msgid "Welcome, {{ participant_name }}"
+#~ msgstr "Bienvenue, {{ participant_name }}"
 

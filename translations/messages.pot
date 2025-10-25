@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-25 02:14+0000\n"
+"POT-Creation-Date: 2025-10-25 02:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1971,8 +1971,22 @@ msgstr ""
 msgid "Thank you for sharing with us your feedback."
 msgstr ""
 
+#: templates/survey_choice.html:3
+msgid "Choose Survey Type - VOÏA - Voice Of Client Agent"
+msgstr ""
+
 #: templates/survey_choice.html:17
-msgid "Welcome, {{ participant_name }}"
+#, python-brace-format
+msgid "Welcome, {}!"
+msgstr ""
+
+#: templates/survey_choice.html:21
+#, python-brace-format
+msgid "Powered by {}"
+msgstr ""
+
+#: templates/survey_choice.html:25
+msgid "Powered by VOÏA - Voice Of Client Agent"
 msgstr ""
 
 #: templates/survey_choice.html:33 templates/survey_choice.html:38
@@ -2001,6 +2015,10 @@ msgstr ""
 msgid "5-7 minutes"
 msgstr ""
 
+#: templates/survey_choice.html:53
+msgid "Start AI Conversation"
+msgstr ""
+
 #: templates/survey_choice.html:65
 msgid "Traditional Form"
 msgstr ""
@@ -2025,6 +2043,16 @@ msgstr ""
 
 #: templates/survey_choice.html:73
 msgid "3-5 minutes"
+msgstr ""
+
+#: templates/survey_choice.html:80
+msgid "Start Form Survey"
+msgstr ""
+
+#: templates/survey_choice.html:90
+msgid ""
+"Both options provide the same valuable insights. Choose what feels most "
+"comfortable for you."
 msgstr ""
 
 #: templates/survey_completed.html:3 templates/survey_completed.html:17
