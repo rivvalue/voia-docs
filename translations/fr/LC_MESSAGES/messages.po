@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-25 02:54+0000\n"
+"POT-Creation-Date: 2025-10-25 02:57+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -79,7 +79,9 @@ msgstr "Jeton d'authentification :"
 
 #: templates/auth.html:63
 msgid "This token expires in 24 hours. Keep it secure and don't share it."
-msgstr "Ce jeton expire dans 24 heures. Gardez-le en sécurité et ne le partagez pas."
+msgstr ""
+"Ce jeton expire dans 24 heures. Gardez-le en sécurité et ne le partagez "
+"pas."
 
 #: templates/auth.html:69
 msgid "Choose Survey Experience:"
@@ -586,12 +588,13 @@ msgstr ""
 #: templates/campaign_insights.html:743 templates/campaign_insights.html:781
 #: templates/campaign_insights.html:816 templates/campaign_insights.html:839
 #: templates/campaign_insights.html:982 templates/campaign_insights.html:1126
-#: templates/dashboard.html:72 templates/dashboard.html:400
-#: templates/dashboard.html:796 templates/dashboard.html:801
-#: templates/dashboard.html:817 templates/dashboard.html:879
-#: templates/dashboard.html:893 templates/dashboard.html:931
-#: templates/dashboard.html:989 templates/dashboard.html:1132
-#: templates/executive_summary.html:65 templates/executive_summary.html:285
+#: templates/company_responses.html:170 templates/dashboard.html:72
+#: templates/dashboard.html:400 templates/dashboard.html:796
+#: templates/dashboard.html:801 templates/dashboard.html:817
+#: templates/dashboard.html:879 templates/dashboard.html:893
+#: templates/dashboard.html:931 templates/dashboard.html:989
+#: templates/dashboard.html:1132 templates/executive_summary.html:65
+#: templates/executive_summary.html:285
 msgid "Responses"
 msgstr "Réponses"
 
@@ -695,7 +698,8 @@ msgstr "Les plus récents"
 msgid "Oldest First"
 msgstr "Les plus anciens"
 
-#: templates/campaign_insights.html:778 templates/dashboard.html:928
+#: templates/campaign_insights.html:778 templates/company_responses.html:64
+#: templates/dashboard.html:928
 msgid "Loading responses..."
 msgstr "Chargement des réponses..."
 
@@ -884,15 +888,17 @@ msgid "Network error loading company data"
 msgstr ""
 
 #: templates/campaign_insights.html:977 templates/campaign_insights.html:1011
-#: templates/dashboard.html:96 templates/dashboard.html:1029
-#: templates/dashboard.html:1127 templates/dashboard.html:1161
+#: templates/company_responses.html:74 templates/dashboard.html:96
+#: templates/dashboard.html:1029 templates/dashboard.html:1127
+#: templates/dashboard.html:1161
 msgid "Satisfaction"
 msgstr "Satisfaction"
 
 #: templates/campaign_insights.html:979 templates/campaign_insights.html:1013
-#: templates/dashboard.html:114 templates/dashboard.html:1059
-#: templates/dashboard.html:1129 templates/dashboard.html:1163
-#: templates/executive_summary.html:107 templates/executive_summary.html:355
+#: templates/company_responses.html:76 templates/dashboard.html:114
+#: templates/dashboard.html:1059 templates/dashboard.html:1129
+#: templates/dashboard.html:1163 templates/executive_summary.html:107
+#: templates/executive_summary.html:355
 msgid "Service"
 msgstr "Service"
 
@@ -962,14 +968,15 @@ msgstr "Réponses"
 msgid "accounts"
 msgstr "Moyenne/Compte"
 
-#: templates/campaign_insights.html:1007 templates/dashboard.html:1157
-#: templates/survey.html:110 templates/survey.html:185
-#: templates/survey.html:205
+#: templates/campaign_insights.html:1007 templates/company_responses.html:292
+#: templates/dashboard.html:1157 templates/survey.html:110
+#: templates/survey.html:185 templates/survey.html:205
 msgid "Previous"
 msgstr "Précédent"
 
-#: templates/campaign_insights.html:1008 templates/dashboard.html:1158
-#: templates/survey.html:72 templates/survey.html:111 templates/survey.html:186
+#: templates/campaign_insights.html:1008 templates/company_responses.html:313
+#: templates/dashboard.html:1158 templates/survey.html:72
+#: templates/survey.html:111 templates/survey.html:186
 #: templates/survey.html:241
 msgid "Next"
 msgstr "Suivant"
@@ -979,7 +986,8 @@ msgstr "Suivant"
 msgid "View Details"
 msgstr "Détails"
 
-#: templates/campaign_insights.html:1010 templates/dashboard.html:1160
+#: templates/campaign_insights.html:1010 templates/company_responses.html:253
+#: templates/dashboard.html:1160
 #, fuzzy
 msgid "Authentication required"
 msgstr "Jeton d'authentification :"
@@ -988,7 +996,8 @@ msgstr "Jeton d'authentification :"
 msgid "Value"
 msgstr ""
 
-#: templates/campaign_insights.html:1015 templates/dashboard.html:1165
+#: templates/campaign_insights.html:1015 templates/company_responses.html:247
+#: templates/dashboard.html:1165
 #, fuzzy
 msgid "View Full Response"
 msgstr "Saisissez votre réponse"
@@ -998,6 +1007,20 @@ msgstr "Saisissez votre réponse"
 msgid "No segmentation data available"
 msgstr "Aucune donnée d'entreprise disponible pour le moment"
 
+#: templates/company_responses.html:53
+#, fuzzy
+msgid "Campaign Responses"
+msgstr "Exporter les réponses de la campagne"
+
+#: templates/company_responses.html:78 templates/dashboard.html:844
+#: templates/dashboard.html:940
+msgid "Date"
+msgstr "Date de fin"
+
+#: templates/company_responses.html:79 templates/dashboard.html:941
+msgid "Action"
+msgstr "Durée :"
+
 #: templates/company_responses.html:91
 msgid "No responses found for this company"
 msgstr "Aucune réponse trouvée pour cette entreprise"
@@ -1005,6 +1028,20 @@ msgstr "Aucune réponse trouvée pour cette entreprise"
 #: templates/company_responses.html:97 templates/company_responses.html:180
 msgid "Error loading responses"
 msgstr "Erreur lors du chargement des réponses"
+
+#: templates/company_responses.html:99
+#, fuzzy
+msgid "Retry"
+msgstr "Créé"
+
+#: templates/company_responses.html:165
+#, fuzzy
+msgid "0 Responses"
+msgstr "Réponses"
+
+#: templates/company_responses.html:195
+msgid "Anonymous"
+msgstr ""
 
 #: templates/conversational_survey.html:3
 msgid "AI Survey - VOÏA - Voice Of Client Agent"
@@ -1648,10 +1685,6 @@ msgstr ""
 msgid "Sentiment"
 msgstr "Sentiment :"
 
-#: templates/dashboard.html:844 templates/dashboard.html:940
-msgid "Date"
-msgstr "Date de fin"
-
 #: templates/dashboard.html:908
 #, fuzzy
 msgid "Search by respondent name or email..."
@@ -1664,10 +1697,6 @@ msgstr "NPS le plus élevé"
 #: templates/dashboard.html:918
 msgid "Lowest NPS"
 msgstr "NPS le plus faible"
-
-#: templates/dashboard.html:941
-msgid "Action"
-msgstr "Durée :"
 
 #: templates/campaigns/responses_list.html:232 templates/dashboard.html:966
 msgid "No Responses Found"

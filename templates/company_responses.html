@@ -50,7 +50,7 @@
                 <div class="card-header bg-white">
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <h5 class="mb-0">
-                            <i class="fas fa-users me-2 text-primary"></i>Campaign Responses
+                            <i class="fas fa-users me-2 text-primary"></i>{{ _('Campaign Responses') }}
                         </h5>
                         <span class="badge bg-primary" id="responseCount">{{ _('Loading...') }}</span>
                     </div>
@@ -61,7 +61,7 @@
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">{{ _('Loading...') }}</span>
                         </div>
-                        <p class="mt-3 text-muted">Loading responses...</p>
+                        <p class="mt-3 text-muted">{{ _('Loading responses...') }}</p>
                     </div>
 
                     <!-- Table Container -->
@@ -71,12 +71,12 @@
                                 <tr>
                                     <th>{{ _('Respondent') }}</th>
                                     <th>NPS</th>
-                                    <th class="d-none d-md-table-cell">Satisfaction</th>
+                                    <th class="d-none d-md-table-cell">{{ _('Satisfaction') }}</th>
                                     <th class="d-none d-lg-table-cell">{{ _('Product Value') }}</th>
-                                    <th class="d-none d-lg-table-cell">Service</th>
+                                    <th class="d-none d-lg-table-cell">{{ _('Service') }}</th>
                                     <th class="d-none d-lg-table-cell">{{ _('Pricing') }}</th>
-                                    <th class="d-none d-md-table-cell">Date</th>
-                                    <th class="text-center">Action</th>
+                                    <th class="d-none d-md-table-cell">{{ _('Date') }}</th>
+                                    <th class="text-center">{{ _('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody id="responsesTableBody">
@@ -96,7 +96,7 @@
                         <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
                         <p class="text-muted">{{ _('Error loading responses') }}</p>
                         <button class="btn btn-outline-primary" onclick="loadResponses()">
-                            <i class="fas fa-retry me-2"></i>Retry
+                            <i class="fas fa-retry me-2"></i>{{ _('Retry') }}
                         </button>
                     </div>
                 </div>
@@ -162,12 +162,12 @@
                 if (responses.length === 0) {
                     // Show empty state
                     document.getElementById('emptyState').style.display = 'block';
-                    document.getElementById('responseCount').textContent = '0 Responses';
+                    document.getElementById('responseCount').textContent = '{{ _("0 Responses") }}';
                 } else {
                     // Show table
                     document.getElementById('tableContainer').style.display = 'block';
                     document.getElementById('paginationContainer').style.display = 'block';
-                    document.getElementById('responseCount').textContent = `${pagination.total_count || responses.length} Responses`;
+                    document.getElementById('responseCount').textContent = `${pagination.total_count || responses.length} {{ _("Responses") }}`;
 
                     // Populate table
                     populateTable(responses);
@@ -192,7 +192,7 @@
 
             // {{ _('Respondent') }} Name
             const nameCell = document.createElement('td');
-            nameCell.textContent = response.respondent_name || 'Anonymous';
+            nameCell.textContent = response.respondent_name || '{{ _("Anonymous") }}';
             row.appendChild(nameCell);
 
             // NPS Score
@@ -244,13 +244,13 @@
             
             if (canView) {
                 actionCell.innerHTML = `
-                    <a href="/survey-response/${response.id}" class="btn btn-sm btn-outline-primary" title="View Full Response">
+                    <a href="/survey-response/${response.id}" class="btn btn-sm btn-outline-primary" title="{{ _('View Full Response') }}">
                         <i class="fas fa-eye"></i>
                     </a>
                 `;
             } else {
                 actionCell.innerHTML = `
-                    <span class="text-muted" title="Authentication required">
+                    <span class="text-muted" title="{{ _('Authentication required') }}">
                         <i class="fas fa-lock"></i>
                     </span>
                 `;
@@ -289,7 +289,7 @@
         // Previous button
         const prevLi = document.createElement('li');
         prevLi.className = `page-item ${!has_prev ? 'disabled' : ''}`;
-        prevLi.innerHTML = `<a class="page-link" href="#" onclick="loadResponses(${page - 1}); return false;">Previous</a>`;
+        prevLi.innerHTML = `<a class="page-link" href="#" onclick="loadResponses(${page - 1}); return false;">{{ _('Previous') }}</a>`;
         controls.appendChild(prevLi);
 
         // Page numbers
@@ -310,7 +310,7 @@
         // Next button
         const nextLi = document.createElement('li');
         nextLi.className = `page-item ${!has_next ? 'disabled' : ''}`;
-        nextLi.innerHTML = `<a class="page-link" href="#" onclick="loadResponses(${page + 1}); return false;">Next</a>`;
+        nextLi.innerHTML = `<a class="page-link" href="#" onclick="loadResponses(${page + 1}); return false;">{{ _('Next') }}</a>`;
         controls.appendChild(nextLi);
     }
 </script>

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-25 02:54+0000\n"
+"POT-Creation-Date: 2025-10-25 02:57+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -576,12 +576,13 @@ msgstr ""
 #: templates/campaign_insights.html:743 templates/campaign_insights.html:781
 #: templates/campaign_insights.html:816 templates/campaign_insights.html:839
 #: templates/campaign_insights.html:982 templates/campaign_insights.html:1126
-#: templates/dashboard.html:72 templates/dashboard.html:400
-#: templates/dashboard.html:796 templates/dashboard.html:801
-#: templates/dashboard.html:817 templates/dashboard.html:879
-#: templates/dashboard.html:893 templates/dashboard.html:931
-#: templates/dashboard.html:989 templates/dashboard.html:1132
-#: templates/executive_summary.html:65 templates/executive_summary.html:285
+#: templates/company_responses.html:170 templates/dashboard.html:72
+#: templates/dashboard.html:400 templates/dashboard.html:796
+#: templates/dashboard.html:801 templates/dashboard.html:817
+#: templates/dashboard.html:879 templates/dashboard.html:893
+#: templates/dashboard.html:931 templates/dashboard.html:989
+#: templates/dashboard.html:1132 templates/executive_summary.html:65
+#: templates/executive_summary.html:285
 msgid "Responses"
 msgstr ""
 
@@ -677,7 +678,8 @@ msgstr ""
 msgid "Oldest First"
 msgstr ""
 
-#: templates/campaign_insights.html:778 templates/dashboard.html:928
+#: templates/campaign_insights.html:778 templates/company_responses.html:64
+#: templates/dashboard.html:928
 msgid "Loading responses..."
 msgstr ""
 
@@ -851,15 +853,17 @@ msgid "Network error loading company data"
 msgstr ""
 
 #: templates/campaign_insights.html:977 templates/campaign_insights.html:1011
-#: templates/dashboard.html:96 templates/dashboard.html:1029
-#: templates/dashboard.html:1127 templates/dashboard.html:1161
+#: templates/company_responses.html:74 templates/dashboard.html:96
+#: templates/dashboard.html:1029 templates/dashboard.html:1127
+#: templates/dashboard.html:1161
 msgid "Satisfaction"
 msgstr ""
 
 #: templates/campaign_insights.html:979 templates/campaign_insights.html:1013
-#: templates/dashboard.html:114 templates/dashboard.html:1059
-#: templates/dashboard.html:1129 templates/dashboard.html:1163
-#: templates/executive_summary.html:107 templates/executive_summary.html:355
+#: templates/company_responses.html:76 templates/dashboard.html:114
+#: templates/dashboard.html:1059 templates/dashboard.html:1129
+#: templates/dashboard.html:1163 templates/executive_summary.html:107
+#: templates/executive_summary.html:355
 msgid "Service"
 msgstr ""
 
@@ -923,14 +927,15 @@ msgstr ""
 msgid "accounts"
 msgstr ""
 
-#: templates/campaign_insights.html:1007 templates/dashboard.html:1157
-#: templates/survey.html:110 templates/survey.html:185
-#: templates/survey.html:205
+#: templates/campaign_insights.html:1007 templates/company_responses.html:292
+#: templates/dashboard.html:1157 templates/survey.html:110
+#: templates/survey.html:185 templates/survey.html:205
 msgid "Previous"
 msgstr ""
 
-#: templates/campaign_insights.html:1008 templates/dashboard.html:1158
-#: templates/survey.html:72 templates/survey.html:111 templates/survey.html:186
+#: templates/campaign_insights.html:1008 templates/company_responses.html:313
+#: templates/dashboard.html:1158 templates/survey.html:72
+#: templates/survey.html:111 templates/survey.html:186
 #: templates/survey.html:241
 msgid "Next"
 msgstr ""
@@ -939,7 +944,8 @@ msgstr ""
 msgid "View Details"
 msgstr ""
 
-#: templates/campaign_insights.html:1010 templates/dashboard.html:1160
+#: templates/campaign_insights.html:1010 templates/company_responses.html:253
+#: templates/dashboard.html:1160
 msgid "Authentication required"
 msgstr ""
 
@@ -947,12 +953,26 @@ msgstr ""
 msgid "Value"
 msgstr ""
 
-#: templates/campaign_insights.html:1015 templates/dashboard.html:1165
+#: templates/campaign_insights.html:1015 templates/company_responses.html:247
+#: templates/dashboard.html:1165
 msgid "View Full Response"
 msgstr ""
 
 #: templates/campaign_insights.html:1218
 msgid "No segmentation data available"
+msgstr ""
+
+#: templates/company_responses.html:53
+msgid "Campaign Responses"
+msgstr ""
+
+#: templates/company_responses.html:78 templates/dashboard.html:844
+#: templates/dashboard.html:940
+msgid "Date"
+msgstr ""
+
+#: templates/company_responses.html:79 templates/dashboard.html:941
+msgid "Action"
 msgstr ""
 
 #: templates/company_responses.html:91
@@ -961,6 +981,18 @@ msgstr ""
 
 #: templates/company_responses.html:97 templates/company_responses.html:180
 msgid "Error loading responses"
+msgstr ""
+
+#: templates/company_responses.html:99
+msgid "Retry"
+msgstr ""
+
+#: templates/company_responses.html:165
+msgid "0 Responses"
+msgstr ""
+
+#: templates/company_responses.html:195
+msgid "Anonymous"
 msgstr ""
 
 #: templates/conversational_survey.html:3
@@ -1572,10 +1604,6 @@ msgstr ""
 msgid "Sentiment"
 msgstr ""
 
-#: templates/dashboard.html:844 templates/dashboard.html:940
-msgid "Date"
-msgstr ""
-
 #: templates/dashboard.html:908
 msgid "Search by respondent name or email..."
 msgstr ""
@@ -1586,10 +1614,6 @@ msgstr ""
 
 #: templates/dashboard.html:918
 msgid "Lowest NPS"
-msgstr ""
-
-#: templates/dashboard.html:941
-msgid "Action"
 msgstr ""
 
 #: templates/campaigns/responses_list.html:232 templates/dashboard.html:966
