@@ -160,16 +160,16 @@
                 </div>
                 <div class="col">
                     <div class="kpi-card kpi-primary">
-                        <div class="kpi-value text-success" id="total{{ _('Responses') }}">0</div>
+                        <div class="kpi-value text-success" id="totalResponses">0</div>
                         <div class="kpi-label">{{ _('Total Responses') }}</div>
-                        <div class="kpi-trend" id="total{{ _('Responses') }}Trend">{{ _('All time feedback collected') }}</div>
+                        <div class="kpi-trend" id="totalResponsesTrend">{{ _('All time feedback collected') }}</div>
                     </div>
                 </div>
                 <div class="col">
                     <div class="kpi-card kpi-info">
-                        <div class="kpi-value text-info" id="recent{{ _('Responses') }}">0</div>
+                        <div class="kpi-value text-info" id="recentResponses">0</div>
                         <div class="kpi-label">{{ _('Recent (30 days)') }}</div>
-                        <div class="kpi-trend" id="recent{{ _('Responses') }}Trend">{{ _('Latest customer feedback') }}</div>
+                        <div class="kpi-trend" id="recentResponsesTrend">{{ _('Latest customer feedback') }}</div>
                     </div>
                 </div>
                 <div class="col">
@@ -244,14 +244,14 @@
                                     <label for="accountIntel{{ _('Search') }}" class="form-label">{{ _('Search') }}</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="fas fa-search"></i></span>
-                                        <input type="text" class="form-control" id="accountIntel{{ _('Search') }}" 
+                                        <input type="text" class="form-control" id="accountIntelSearch" 
                                                placeholder="{{ _('Search') }} company, opportunities, risks..." 
                                                onkeyup="searchAccountIntelligence()">
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <label for="account{{ _('Balance') }}Filter" class="form-label">{{ _('Balance') }}</label>
-                                    <select class="form-select" id="account{{ _('Balance') }}Filter" onchange="searchAccountIntelligence()">
+                                    <select class="form-select" id="accountBalanceFilter" onchange="searchAccountIntelligence()">
                                         <option value="">{{ _('All') }}</option>
                                         <option value="risk_heavy">Risk-Heavy</option>
                                         <option value="balanced">{{ _('Balance') }}d</option>
@@ -400,12 +400,12 @@
                             <div class="row align-items-end mb-3">
                                 <div class="col-md-5">
                                     <label for="company{{ _('Search') }}" class="form-label">{{ _('Search') }}</label>
-                                    <input type="text" class="form-control" id="company{{ _('Search') }}" 
+                                    <input type="text" class="form-control" id="companySearch" 
                                            placeholder="{{ _('Search') }} by company name...">
                                 </div>
                                 <div class="col-md-3">
                                     <label for="companyNpsFilter" class="form-label">{{ _('NPS Category') }}</label>
-                                    <select class="form-select" id="companyNpsFilter" onchange="search{{ _('Company') }}NPS()">
+                                    <select class="form-select" id="companyNpsFilter" onchange="searchCompanyNPS()">
                                         <option value="">{{ _('All') }} Companies</option>
                                         <option value="promoters">{{ _('Promoters (9-10)') }}</option>
                                         <option value="passives">{{ _('Passives (7-8)') }}</option>
@@ -424,7 +424,7 @@
                                 </div>
                             </div>
                             <div class="mb-2">
-                                <small class="text-muted" id="company{{ _('Search') }}Info"></small>
+                                <small class="text-muted" id="companySearchInfo"></small>
                             </div>
                         </div>
                         <div class="p-0">
@@ -563,7 +563,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h5 class="mb-0">{{ _('Recent Survey Responses') }}</h5>
-                            <small class="text-muted" id="responses{{ _('Search') }}Info"></small>
+                            <small class="text-muted" id="responsesSearchInfo"></small>
                         </div>
                     </div>
                 </div>
@@ -572,12 +572,12 @@
                             <div class="row align-items-end mb-3">
                                 <div class="col-md-5">
                                     <label for="responses{{ _('Search') }}" class="form-label">{{ _('Search') }}</label>
-                                    <input type="text" class="form-control" id="responses{{ _('Search') }}" 
+                                    <input type="text" class="form-control" id="responsesSearch" 
                                            placeholder="{{ _('Search') }} by company name, participant name, or email...">
                                 </div>
                                 <div class="col-md-3">
                                     <label for="npsFilter" class="form-label">{{ _('NPS Category') }}</label>
-                                    <select class="form-select" id="npsFilter" onchange="searchSurvey{{ _('Responses') }}()">
+                                    <select class="form-select" id="npsFilter" onchange="searchSurveyResponses()">
                                         <option value="">{{ _('All') }} {{ _('Responses') }}</option>
                                         <option value="promoters">{{ _('Promoters (9-10)') }}</option>
                                         <option value="passives">{{ _('Passives (7-8)') }}</option>
@@ -727,13 +727,13 @@
 <!-- End Dashboard Column -->
 
 <!-- {{ _('Company') }} {{ _('Responses') }} Modal -->
-<div class="modal fade" id="company{{ _('Responses') }}Modal" tabindex="-1" aria-labelledby="company{{ _('Responses') }}ModalLabel" aria-hidden="true">
+<div class="modal fade" id="companyResponsesModal" tabindex="-1" aria-labelledby="companyResponsesModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content" style="background-color: #ffffff; border: 2px solid #2E5090;">
             <div class="modal-header" style="background: linear-gradient(135deg, #2E5090 0%, #1a3560 100%); border-bottom: 2px solid #E13A44;">
                 <div class="w-100">
-                    <h5 class="modal-title text-white mb-2" id="company{{ _('Responses') }}ModalLabel">
-                        <i class="fas fa-building me-2"></i><span id="modal{{ _('Company') }}Name"></span>
+                    <h5 class="modal-title text-white mb-2" id="companyResponsesModalLabel">
+                        <i class="fas fa-building me-2"></i><span id="modalCompanyName"></span>
                     </h5>
                     <div class="d-flex align-items-center gap-2 flex-wrap">
                         <span class="badge bg-light text-dark">
@@ -754,7 +754,7 @@
                             <span class="input-group-text" style="background-color: #ffffff; border-color: #dee2e6;">
                                 <i class="fas fa-search" style="color: #8A8A8A;"></i>
                             </span>
-                            <input type="text" class="form-control" id="companyResponse{{ _('Search') }}" 
+                            <input type="text" class="form-control" id="companyResponseSearch" 
                                    placeholder="{{ _('Search') }} by respondent name or email..."
                                    style="background-color: #ffffff; border-color: #dee2e6; color: #212529;">
                         </div>
@@ -771,7 +771,7 @@
                 </div>
                 
                 <!-- Loading State -->
-                <div id="company{{ _('Responses') }}Loading" class="text-center py-5">
+                <div id="companyResponsesLoading" class="text-center py-5">
                     <div class="spinner-border" style="color: #2E5090;" role="status">
                         <span class="visually-hidden">{{ _('Loading...') }}</span>
                     </div>
@@ -779,7 +779,7 @@
                 </div>
                 
                 <!-- {{ _('Responses') }} Table -->
-                <div id="company{{ _('Responses') }}Content" style="display: none;">
+                <div id="companyResponsesContent" style="display: none;">
                     <div class="table-responsive">
                         <table class="table table-hover" style="background-color: #ffffff;">
                             <thead style="background-color: #2E5090; color: white; position: sticky; top: 0; z-index: 10;">
@@ -791,7 +791,7 @@
                                     <th style="width: 5%; text-align: center;">Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="company{{ _('Responses') }}TableBody">
+                            <tbody id="companyResponsesTableBody">
                                 <!-- Will be populated by JavaScript -->
                             </tbody>
                         </table>
@@ -800,10 +800,10 @@
                     <!-- Pagination -->
                     <div class="d-flex justify-content-between align-items-center mt-3">
                         <div style="color: #8A8A8A;">
-                            <span id="company{{ _('Responses') }}PaginationInfo"></span>
+                            <span id="companyResponsesPaginationInfo"></span>
                         </div>
                         <nav>
-                            <ul class="pagination pagination-sm mb-0" id="company{{ _('Responses') }}Pagination">
+                            <ul class="pagination pagination-sm mb-0" id="companyResponsesPagination">
                                 <!-- Will be populated by JavaScript -->
                             </ul>
                         </nav>
@@ -811,7 +811,7 @@
                 </div>
                 
                 <!-- No Data State -->
-                <div id="company{{ _('Responses') }}NoData" class="text-center py-5" style="display: none;">
+                <div id="companyResponsesNoData" class="text-center py-5" style="display: none;">
                     <i class="fas fa-inbox fa-4x mb-3" style="color: #BDBDBD;"></i>
                     <h5 style="color: #8A8A8A;">No {{ _('Responses') }} Found</h5>
                     <p style="color: #8A8A8A;">{{ _('No survey responses match your search criteria.') }}</p>
