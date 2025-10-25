@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-25 03:28+0000\n"
+"POT-Creation-Date: 2025-10-25 04:03+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -3552,6 +3552,10 @@ msgstr "Mot de passe oublié"
 #, fuzzy
 msgid "Forgot your password?"
 msgstr "Mot de passe oublié ?"
+
+#: templates/business_auth/login.html:87
+msgid "by"
+msgstr "par"
 
 #: templates/business_auth/login.html:101
 #, fuzzy
