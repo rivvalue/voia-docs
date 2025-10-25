@@ -30,14 +30,14 @@ class DatabaseConfig:
         
         if env == "production":
             if optimize_db_pool:
-                # Stage 2: Optimized production settings for high concurrency
+                # Stage 3: Scaled for 100 concurrent users (6 workers × 2 threads + 6 queue workers + buffer)
                 # pool_recycle: 180s (Neon serverless timeout is ~180s, recycle before timeout)
                 return {
                     "pool_recycle": 180,  # Optimized for Neon serverless PostgreSQL timeout
                     "pool_pre_ping": True,
-                    "pool_size": 10,  # Balanced for concurrent requests
+                    "pool_size": 40,  # Scaled for 100 concurrent users (12 web threads + 6 queue workers + buffer)
                     "max_overflow": 20,  # Allow burst traffic
-                    "pool_timeout": 20,  # Reduced timeout for faster failure detection
+                    "pool_timeout": 15,  # Faster timeout for high concurrency
                     "echo": False,  # Disable SQL logging in production
                     "execution_options": {"isolation_level": "READ_COMMITTED"},  # Optimize transaction isolation
                 }
@@ -45,20 +45,20 @@ class DatabaseConfig:
                 return {
                     "pool_recycle": 180,  # Optimized for Neon timeout
                     "pool_pre_ping": True,
-                    "pool_size": 10,
+                    "pool_size": 40,  # Scaled for 100 concurrent users
                     "max_overflow": 20,
-                    "pool_timeout": 30,
+                    "pool_timeout": 15,
                 }
         else:
             if optimize_db_pool:
-                # Stage 2: Optimized demo/development settings
+                # Stage 3: Scaled demo/development settings for 100 concurrent users
                 # pool_recycle: 180s to prevent Neon timeout issues
                 return {
                     "pool_recycle": 180,  # Optimized for Neon serverless PostgreSQL timeout
                     "pool_pre_ping": True,
-                    "pool_size": 10,  # Balanced for development
+                    "pool_size": 40,  # Scaled for 100 concurrent users (12 web threads + 6 queue workers + buffer)
                     "max_overflow": 20,  # Sufficient for burst traffic
-                    "pool_timeout": 20,  # Reduced timeout
+                    "pool_timeout": 15,  # Faster timeout for high concurrency
                     "echo": False,  # Disable SQL logging for performance
                     "execution_options": {"isolation_level": "READ_COMMITTED"},
                 }
@@ -66,9 +66,9 @@ class DatabaseConfig:
                 return {
                     "pool_recycle": 180,  # Optimized for Neon timeout
                     "pool_pre_ping": True,
-                    "pool_size": 10,
+                    "pool_size": 40,  # Scaled for 100 concurrent users
                     "max_overflow": 20,
-                    "pool_timeout": 30,
+                    "pool_timeout": 15,
                 }
     
     def set_environment(self, environment: str):
