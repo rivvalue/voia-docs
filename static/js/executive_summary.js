@@ -27,15 +27,15 @@ function formatDate(dateString) {
 function formatCampaignStatus(status) {
     switch (status) {
         case 'draft':
-            return 'Draft';
+            return translations.draft;
         case 'ready':
-            return 'Ready';
+            return translations.ready;
         case 'active':
-            return 'Active';
+            return translations.active;
         case 'completed':
-            return 'Completed';
+            return translations.completed;
         default:
-            return 'Unknown';
+            return translations.unknown;
     }
 }
 
@@ -103,8 +103,8 @@ function populateComparisonDropdowns() {
     if (!campaign1Select || !campaign2Select) return;
     
     // Clear existing options
-    campaign1Select.innerHTML = '<option value="">Select first campaign</option>';
-    campaign2Select.innerHTML = '<option value="">Select second campaign</option>';
+    campaign1Select.innerHTML = `<option value="">${translations.selectFirstCampaign}</option>`;
+    campaign2Select.innerHTML = `<option value="">${translations.selectSecondCampaign}</option>`;
     
     // Add campaign options to both dropdowns
     comparisonCampaigns.forEach(campaign => {
@@ -145,9 +145,9 @@ async function updateComparison() {
         messageDiv.innerHTML = `
             <div class="text-center">
                 <div class="spinner-border" style="color: #E13A44;" role="status">
-                    <span class="visually-hidden">Loading comparison...</span>
+                    <span class="visually-hidden">${translations.loadingComparison}</span>
                 </div>
-                <p class="text-muted mt-3 mb-0">Loading comparison data...</p>
+                <p class="text-muted mt-3 mb-0">${translations.loadingComparisonData}</p>
             </div>
         `;
         messageDiv.style.display = 'block';
@@ -158,7 +158,7 @@ async function updateComparison() {
         // Fetch comparison data
         const response = await fetch(`/api/campaigns/comparison?campaign1=${campaign1Id}&campaign2=${campaign2Id}`);
         if (!response.ok) {
-            throw new Error('Failed to fetch comparison data');
+            throw new Error(translations.failedToFetchComparisonData);
         }
         
         const comparisonData = await response.json();
@@ -192,8 +192,8 @@ async function updateComparison() {
         if (messageDiv) {
             messageDiv.innerHTML = `
                 <i class="fas fa-exclamation-triangle fa-4x mb-3" style="color: #E13A44;"></i>
-                <h5 style="color: #E13A44;">Error Loading Comparison</h5>
-                <p class="text-muted">Failed to load comparison data. Please try again.</p>
+                <h5 style="color: #E13A44;">${translations.errorLoadingComparison}</h5>
+                <p class="text-muted">${translations.failedToLoadComparisonData}</p>
             `;
             messageDiv.style.display = 'block';
         }
@@ -658,14 +658,14 @@ async function loadKpiOverview() {
         // First, load available campaigns
         const campaignResponse = await fetch('/api/campaigns/filter-options');
         if (!campaignResponse.ok) {
-            throw new Error('Failed to load campaign options');
+            throw new Error(translations.failedToLoadCampaignOptions);
         }
         
         const campaignData = await campaignResponse.json();
         const campaigns = campaignData.campaigns || [];
         
         if (campaigns.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">No campaign data available</td></tr>';
+            tbody.innerHTML = `<tr><td colspan="9" class="text-center text-muted">${translations.noCampaignDataAvailable}</td></tr>`;
             if (loadingElement) loadingElement.classList.add('d-none');
             if (contentElement) contentElement.classList.remove('d-none');
             return;
@@ -762,7 +762,7 @@ async function loadKpiOverview() {
         
     } catch (error) {
         console.error('Error loading KPI overview:', error);
-        tbody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error loading KPI overview data</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center text-danger">${translations.errorLoadingKpiData}</td></tr>`;
         
         // Hide loading, show content even on error
         if (loadingElement) loadingElement.classList.add('d-none');
@@ -877,7 +877,7 @@ function createKpiSparklines(kpiData) {
 // Open the KPI trends modal with full-size charts
 function openTrendsModal() {
     if (!globalKpiData || globalKpiData.length === 0) {
-        alert('No campaign data available to display trends.');
+        alert(translations.noCampaignDataAvailable);
         return;
     }
     

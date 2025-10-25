@@ -104,15 +104,15 @@ function forceRemoveYellowColors() {
 function formatCampaignStatus(status) {
     switch (status) {
         case 'draft':
-            return 'Draft';
+            return translations.draft;
         case 'ready':
-            return 'Ready';
+            return translations.ready;
         case 'active':
-            return 'Active';
+            return translations.active;
         case 'completed':
-            return 'Completed';
+            return translations.completed;
         default:
-            return 'Unknown';
+            return translations.unknown;
     }
 }
 
@@ -294,9 +294,9 @@ function updateGlobalCampaignIndicator() {
         indicator.innerHTML = `
             <div class="campaign-filter-badge">
                 <i class="fas fa-filter me-2"></i>
-                <strong>Filtered by:</strong> ${escapeHtml(campaignName)}
+                <strong>${translations.filteredBy}</strong> ${escapeHtml(campaignName)}
                 <span class="badge bg-light text-dark ms-2">${escapeHtml(campaignDates)}</span>
-                <button class="btn btn-sm btn-link text-danger ms-2 p-0" onclick="clearGlobalCampaignFilter()" title="Clear filter">
+                <button class="btn btn-sm btn-link text-danger ms-2 p-0" onclick="clearGlobalCampaignFilter()" title="${translations.clearFilter}">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -385,25 +385,25 @@ function updateSelectedCampaignInfo() {
             
             if (status === 'Active' && daysRemaining >= 0) {
                 if (daysRemaining > 30) {
-                    daysText.textContent = `${daysRemaining} days left`;
+                    daysText.textContent = `${daysRemaining} ${translations.daysLeft}`;
                     daysLeftSpan.className = 'badge bg-success';
                 } else if (daysRemaining > 7) {
-                    daysText.textContent = `${daysRemaining} days left`;
+                    daysText.textContent = `${daysRemaining} ${translations.daysLeft}`;
                     daysLeftSpan.className = 'badge bg-warning';
                 } else {
-                    daysText.textContent = `${daysRemaining} days left`;
+                    daysText.textContent = `${daysRemaining} ${translations.daysLeft}`;
                     daysLeftSpan.className = 'badge bg-danger';
                 }
                 daysLeftSpan.style.display = '';
             } else if (status === 'Closed' && daysSinceEnded > 0) {
                 if (daysSinceEnded < 30) {
-                    daysText.textContent = `${daysSinceEnded} days ago`;
+                    daysText.textContent = `${daysSinceEnded} ${translations.daysAgo}`;
                 } else if (daysSinceEnded < 365) {
                     const months = Math.floor(daysSinceEnded / 30);
-                    daysText.textContent = `${months} month${months > 1 ? 's' : ''} ago`;
+                    daysText.textContent = `${months} ${months > 1 ? translations.months : translations.month} ${translations.ago}`;
                 } else {
                     const years = Math.floor(daysSinceEnded / 365);
-                    daysText.textContent = `${years} year${years > 1 ? 's' : ''} ago`;
+                    daysText.textContent = `${years} ${years > 1 ? translations.years : translations.year} ${translations.ago}`;
                 }
                 daysLeftSpan.className = 'badge bg-secondary';
                 daysLeftSpan.style.display = '';
@@ -498,8 +498,8 @@ function populateComparisonDropdowns() {
     if (!campaign1Select || !campaign2Select) return;
     
     // Clear existing options
-    campaign1Select.innerHTML = '<option value="">Select first campaign</option>';
-    campaign2Select.innerHTML = '<option value="">Select second campaign</option>';
+    campaign1Select.innerHTML = `<option value="">${translations.selectFirstCampaign}</option>`;
+    campaign2Select.innerHTML = `<option value="">${translations.selectSecondCampaign}</option>`;
     
     // Add campaign options to both dropdowns
     comparisonCampaigns.forEach(campaign => {
@@ -540,9 +540,9 @@ async function updateComparison() {
         messageDiv.innerHTML = `
             <div class="text-center">
                 <div class="spinner-border" style="color: #E13A44;" role="status">
-                    <span class="visually-hidden">Loading comparison...</span>
+                    <span class="visually-hidden">${translations.loadingComparison}</span>
                 </div>
-                <p class="text-muted mt-3 mb-0">Loading comparison data...</p>
+                <p class="text-muted mt-3 mb-0">${translations.loadingComparisonData}</p>
             </div>
         `;
         messageDiv.style.display = 'block';
@@ -553,7 +553,7 @@ async function updateComparison() {
         // Fetch comparison data
         const response = await fetch(`/api/campaigns/comparison?campaign1=${campaign1Id}&campaign2=${campaign2Id}`);
         if (!response.ok) {
-            throw new Error('Failed to fetch comparison data');
+            throw new Error(translations.failedToFetchComparisonData);
         }
         
         const comparisonData = await response.json();
@@ -587,8 +587,8 @@ async function updateComparison() {
         if (messageDiv) {
             messageDiv.innerHTML = `
                 <i class="fas fa-exclamation-triangle fa-4x text-warning mb-3"></i>
-                <h5 class="text-warning">Error Loading Comparison</h5>
-                <p class="text-muted">Failed to load comparison data. Please try again.</p>
+                <h5 class="text-warning">${translations.errorLoadingComparison}</h5>
+                <p class="text-muted">${translations.failedToLoadComparisonData}</p>
             `;
             messageDiv.style.display = 'block';
         }
@@ -767,7 +767,7 @@ function populateCompanyComparison(data, page = 1) {
     
     // Format balance for display
     const formatBalance = (balance) => {
-        if (balance === 'N/A') return 'N/A';
+        if (balance === 'N/A') return translations.na;
         return balance.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
     };
     
@@ -777,11 +777,11 @@ function populateCompanyComparison(data, page = 1) {
         
         // Helper function to display value or N/A
         const displayValue = (value) => {
-            return (value === null || value === undefined) ? 'N/A' : value;
+            return (value === null || value === undefined) ? translations.na : value;
         };
         
         // Determine status - only compare if both campaigns have data
-        let status = 'N/A';
+        let status = translations.na;
         let statusClass = 'text-muted';
         
         if (c1.participated && c2.participated) {
@@ -839,7 +839,7 @@ function populateCompanyComparison(data, page = 1) {
         // Campaign 1 - Balance
         const c1BalanceCell = document.createElement('td');
         c1BalanceCell.className = 'text-center';
-        c1BalanceCell.textContent = c1.balance ? formatBalance(c1.balance) : 'N/A';
+        c1BalanceCell.textContent = c1.balance ? formatBalance(c1.balance) : translations.na;
         
         // Campaign 2 - Risk count
         const c2RiskCell = document.createElement('td');
@@ -854,7 +854,7 @@ function populateCompanyComparison(data, page = 1) {
         // Campaign 2 - Balance
         const c2BalanceCell = document.createElement('td');
         c2BalanceCell.className = 'text-center';
-        c2BalanceCell.textContent = c2.balance ? formatBalance(c2.balance) : 'N/A';
+        c2BalanceCell.textContent = c2.balance ? formatBalance(c2.balance) : translations.na;
         
         // Status column
         const statusCell = document.createElement('td');
@@ -960,7 +960,7 @@ function updateComparisonPaginationInfo(currentPage, totalPages, totalItems) {
     } else {
         const startItem = (currentPage - 1) * comparisonPerPage + 1;
         const endItem = Math.min(currentPage * comparisonPerPage, totalItems);
-        info.textContent = `Showing ${startItem}-${endItem} of ${totalItems} companies`;
+        info.textContent = `${translations.showing} ${startItem}-${endItem} ${translations.of} ${totalItems} ${translations.companies}`;
     }
 }
 
@@ -1112,12 +1112,12 @@ function loadCompanyNpsDataDirect() {
                     
                     // Latest response
                     const responseCell = document.createElement('td');
-                    responseCell.textContent = company.latest_response || 'N/A';
+                    responseCell.textContent = company.latest_response || translations.na;
                     row.appendChild(responseCell);
                     
                     // Latest churn risk
                     const churnCell = document.createElement('td');
-                    churnCell.textContent = company.latest_churn_risk || 'N/A';
+                    churnCell.textContent = company.latest_churn_risk || translations.na;
                     row.appendChild(churnCell);
                     
                     tbody.appendChild(row);
@@ -1205,7 +1205,7 @@ function loadDashboardData() {
                 // Create error element safely using DOM methods
                 const errorDiv = document.createElement('div');
                 errorDiv.className = 'alert alert-danger';
-                errorDiv.textContent = 'Error loading dashboard data: ' + error.message;
+                errorDiv.textContent = translations.errorLoadingDashboardData + error.message;
                 
                 // Clear loading element and append error
                 loadingElement.innerHTML = '';
@@ -1425,7 +1425,7 @@ function createSentimentChart() {
         data: {
             labels: labels,
             datasets: [{
-                label: 'Responses',
+                label: translations.responses,
                 data: data,
                 backgroundColor: colors,
                 borderWidth: 1,
@@ -1493,7 +1493,7 @@ function createRatingsChart() {
         pricing: ratings.pricing
     });
     
-    const labels = ['Satisfaction', 'Product Value', 'Service', 'Pricing'];
+    const labels = [translations.satisfaction, translations.productValue, translations.service, translations.pricing];
     const data = [
         ratings.satisfaction || 0,
         ratings.product_value || 0,
@@ -1512,7 +1512,7 @@ function createRatingsChart() {
         data: {
             labels: labels,
             datasets: [{
-                label: 'Average Rating',
+                label: translations.averageRating,
                 data: data,
                 borderColor: '#E13A44',
                 backgroundColor: 'rgba(225, 58, 68, 0.1)',
@@ -2319,7 +2319,7 @@ function loadAccountIntelligence(page = 1) {
                 renderAccountIntelligence(data.data, data.pagination);
                 updateAccountIntelFiltersUI(data.pagination.total, data.filters_applied);
             } else {
-                container.innerHTML = '<div class="alert alert-danger">Error loading account intelligence</div>';
+                container.innerHTML = `<div class="alert alert-danger">${translations.errorLoadingAccountIntelligence}</div>`;
             }
         })
         .catch(error => {
@@ -2572,7 +2572,7 @@ function updateAccountIntelFiltersUI(total, filtersApplied) {
     const countElement = document.getElementById('accountIntelCount');
     const start = (accountIntelCurrentPage - 1) * 10 + 1;
     const end = Math.min(accountIntelCurrentPage * 10, total);
-    countElement.textContent = `Showing ${start}-${end} of ${total} accounts`;
+    countElement.textContent = `${translations.showing} ${start}-${end} ${translations.of} ${total} ${translations.accounts}`;
     
     // Count active filters
     const activeFilters = Object.values(filtersApplied || {}).filter(v => v).length;
@@ -2795,7 +2795,7 @@ function loadSurveyResponses(page = 1, searchQuery = '', npsFilter = '') {
         .catch(error => {
             console.error('Error loading survey responses:', error);
             document.getElementById('responsesTable').innerHTML = 
-                '<tr><td colspan="8" class="text-center text-danger">Error loading responses.</td></tr>';
+                `<tr><td colspan="8" class="text-center text-danger">${translations.errorLoadingResponses}</td></tr>`;
             updateResponsesPaginationInfo(0, 0, 0);
             updateResponsesPaginationControls(null);
         });
@@ -2838,7 +2838,7 @@ function updateResponsesPaginationInfo(currentPage, totalPages, totalItems) {
     } else {
         const startItem = (currentPage - 1) * responsesPerPage + 1;
         const endItem = Math.min(currentPage * responsesPerPage, totalItems);
-        info.textContent = `Showing ${startItem}-${endItem} of ${totalItems} responses`;
+        info.textContent = `${translations.showing} ${startItem}-${endItem} ${translations.of} ${totalItems} ${translations.responses}`;
     }
 }
 
@@ -2903,7 +2903,7 @@ function updateCompanyPaginationInfo(currentPage, totalPages, totalItems) {
     } else {
         const startItem = (currentPage - 1) * companiesPerPage + 1;
         const endItem = Math.min(currentPage * companiesPerPage, totalItems);
-        info.textContent = `Showing ${startItem}-${endItem} of ${totalItems} companies`;
+        info.textContent = `${translations.showing} ${startItem}-${endItem} ${translations.of} ${totalItems} ${translations.companies}`;
     }
 }
 
@@ -2972,7 +2972,7 @@ function updateTenurePaginationInfo(currentPage, totalPages, totalItems) {
     } else {
         const startItem = (currentPage - 1) * tenureGroupsPerPage + 1;
         const endItem = Math.min(currentPage * tenureGroupsPerPage, totalItems);
-        info.textContent = `Showing ${startItem}-${endItem} of ${totalItems} tenure groups`;
+        info.textContent = `${translations.showing} ${startItem}-${endItem} ${translations.of} ${totalItems} ${translations.tenureGroups}`;
     }
 }
 
@@ -3066,7 +3066,7 @@ function loadTenureNpsData(page = 1) {
         .catch(error => {
             console.error('Error fetching tenure NPS data:', error);
             document.getElementById('tenureNpsTable').innerHTML = 
-                '<tr><td colspan="8" class="text-center text-danger">Network error loading tenure data</td></tr>';
+                `<tr><td colspan="8" class="text-center text-danger">${translations.networkErrorLoadingTenureData}</td></tr>`;
             updateTenurePaginationInfo(0, 0, 0);
             updateTenurePaginationControls(null);
         });
@@ -3083,7 +3083,7 @@ function populateTenureNpsTable(tenureData) {
     
     if (!tenureData || tenureData.length === 0) {
         console.log('No tenure data to display');
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No tenure data available yet</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted">${translations.noTenureDataAvailable}</td></tr>`;
         return;
     }
     
@@ -3169,7 +3169,7 @@ function loadCompanyNpsData(page = 1, searchQuery = '', npsFilter = '') {
         .catch(error => {
             console.error('Error fetching company NPS data:', error);
             document.getElementById('companyNpsTableServerSide').innerHTML = 
-                '<tr><td colspan="8" class="text-center text-danger">Network error loading company data</td></tr>';
+                `<tr><td colspan="8" class="text-center text-danger">${translations.networkErrorLoadingCompanyData}</td></tr>`;
             updateCompanyPaginationInfo(0, 0, 0);
             updateCompanyPaginationControls(null);
         });
@@ -3186,7 +3186,7 @@ function populateCompanyNpsTable(companyData) {
     
     if (!companyData || companyData.length === 0) {
         console.log('No company data to display');
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No company data available yet</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center text-muted">${translations.noCompanyDataAvailable}</td></tr>`;
         return;
     }
     
@@ -3247,14 +3247,14 @@ async function loadKpiOverview() {
         // First, load available campaigns
         const campaignResponse = await fetch('/api/campaigns/filter-options');
         if (!campaignResponse.ok) {
-            throw new Error('Failed to load campaign options');
+            throw new Error(translations.failedToLoadCampaignOptions);
         }
         
         const campaignData = await campaignResponse.json();
         const campaigns = campaignData.campaigns || [];
         
         if (campaigns.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted">No campaign data available</td></tr>';
+            tbody.innerHTML = `<tr><td colspan="9" class="text-center text-muted">${translations.noCampaignDataAvailable}</td></tr>`;
             return;
         }
         
@@ -3349,7 +3349,7 @@ async function loadKpiOverview() {
         
     } catch (error) {
         console.error('Error loading KPI overview:', error);
-        tbody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error loading KPI overview data</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center text-danger">${translations.errorLoadingKpiData}</td></tr>`;
         
         // Hide loading, show content even on error
         if (loadingElement) loadingElement.classList.add('d-none');
@@ -3473,7 +3473,7 @@ function createKpiSparklines(kpiData) {
 // Open the KPI trends modal with full-size charts
 function openTrendsModal() {
     if (!globalKpiData || globalKpiData.length === 0) {
-        alert('No campaign data available to display trends.');
+        alert(translations.noCampaignDataAvailable);
         return;
     }
     

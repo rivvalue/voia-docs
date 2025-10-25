@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-25 01:15+0000\n"
+"POT-Creation-Date: 2025-10-25 01:33+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: en\n"
@@ -40,7 +40,8 @@ msgstr ""
 #: templates/dashboard.html:261 templates/dashboard.html:528
 #: templates/dashboard.html:715 templates/dashboard.html:771
 #: templates/dashboard.html:857 templates/dashboard.html:926
-#: templates/executive_summary.html:254 templates/survey.html:217
+#: templates/dashboard.html:1111 templates/executive_summary.html:254
+#: templates/survey.html:217
 msgid "Loading..."
 msgstr ""
 
@@ -120,7 +121,7 @@ msgstr ""
 #: templates/dashboard.html:49 templates/executive_summary.html:4
 #: templates/executive_summary.html:23 templates/executive_summary.html:44
 #: templates/executive_summary.html:54 templates/executive_summary.html:266
-#: templates/executive_summary.html:374
+#: templates/executive_summary.html:406
 msgid "Executive Summary"
 msgstr ""
 
@@ -237,7 +238,7 @@ msgstr ""
 #: templates/campaign_insights.html:1061
 #: templates/campaigns/responses_list.html:178 templates/dashboard.html:393
 #: templates/dashboard.html:840 templates/dashboard.html:999
-#: templates/executive_summary.html:295
+#: templates/executive_summary.html:295 templates/executive_summary.html:400
 msgid "NPS Score"
 msgstr ""
 
@@ -246,7 +247,7 @@ msgid "Overall satisfaction metric"
 msgstr ""
 
 #: templates/business_auth/admin_panel.html:556
-#: templates/campaign_insights.html:164
+#: templates/campaign_insights.html:164 templates/executive_summary.html:399
 msgid "Total Responses"
 msgstr ""
 
@@ -417,17 +418,17 @@ msgid "NPS Category"
 msgstr ""
 
 #: templates/campaign_insights.html:410 templates/campaign_insights.html:582
-#: templates/dashboard.html:646
+#: templates/dashboard.html:646 templates/dashboard.html:1152
 msgid "Promoters (9-10)"
 msgstr ""
 
 #: templates/campaign_insights.html:411 templates/campaign_insights.html:583
-#: templates/dashboard.html:647
+#: templates/dashboard.html:647 templates/dashboard.html:1153
 msgid "Passives (7-8)"
 msgstr ""
 
 #: templates/campaign_insights.html:412 templates/campaign_insights.html:584
-#: templates/dashboard.html:648
+#: templates/dashboard.html:648 templates/dashboard.html:1154
 msgid "Detractors (0-6)"
 msgstr ""
 
@@ -454,6 +455,7 @@ msgid "Churn Risk"
 msgstr ""
 
 #: templates/campaign_insights.html:470 templates/dashboard.html:706
+#: templates/dashboard.html:1141
 msgid "No company data available yet"
 msgstr ""
 
@@ -491,7 +493,8 @@ msgstr ""
 #: templates/dashboard.html:801 templates/dashboard.html:817
 #: templates/dashboard.html:879 templates/dashboard.html:893
 #: templates/dashboard.html:931 templates/dashboard.html:989
-#: templates/executive_summary.html:65 templates/executive_summary.html:285
+#: templates/dashboard.html:1132 templates/executive_summary.html:65
+#: templates/executive_summary.html:285
 msgid "Responses"
 msgstr ""
 
@@ -601,18 +604,20 @@ msgid "No survey responses match your search criteria."
 msgstr ""
 
 #: templates/campaign_insights.html:859 templates/dashboard.html:1009
+#: templates/executive_summary.html:401
 msgid "Companies Analyzed"
 msgstr ""
 
 #: templates/campaign_insights.html:889 templates/company_responses.html:75
 #: templates/company_responses.html:210 templates/dashboard.html:1039
+#: templates/dashboard.html:1128
 msgid "Product Value"
 msgstr ""
 
 #: templates/campaign_insights.html:899 templates/company_responses.html:77
 #: templates/company_responses.html:222 templates/dashboard.html:108
-#: templates/dashboard.html:1049 templates/executive_summary.html:101
-#: templates/executive_summary.html:345
+#: templates/dashboard.html:1049 templates/dashboard.html:1130
+#: templates/executive_summary.html:101 templates/executive_summary.html:345
 msgid "Pricing"
 msgstr ""
 
@@ -628,7 +633,7 @@ msgstr ""
 msgid "Error loading responses"
 msgstr ""
 
-#: templates/company_responses.html:108
+#: templates/company_responses.html:108 templates/dashboard.html:1144
 msgid "Showing"
 msgstr ""
 
@@ -920,30 +925,35 @@ msgid "Click to view full trends"
 msgstr ""
 
 #: templates/dashboard.html:78 templates/dashboard.html:938
+#: templates/dashboard.html:1133
 msgid "NPS"
 msgstr ""
 
-#: templates/dashboard.html:84 templates/executive_summary.html:77
-#: templates/executive_summary.html:214 templates/executive_summary.html:305
+#: templates/dashboard.html:84 templates/dashboard.html:1134
+#: templates/executive_summary.html:77 templates/executive_summary.html:214
+#: templates/executive_summary.html:305
 msgid "Companies"
 msgstr ""
 
 #: templates/dashboard.html:90 templates/dashboard.html:1019
-#: templates/executive_summary.html:83 templates/executive_summary.html:315
+#: templates/dashboard.html:1135 templates/executive_summary.html:83
+#: templates/executive_summary.html:315
 msgid "Critical Risk"
 msgstr ""
 
 #: templates/dashboard.html:96 templates/dashboard.html:1029
+#: templates/dashboard.html:1127
 msgid "Satisfaction"
 msgstr ""
 
-#: templates/dashboard.html:102 templates/executive_summary.html:95
-#: templates/executive_summary.html:335
+#: templates/dashboard.html:102 templates/dashboard.html:1136
+#: templates/executive_summary.html:95 templates/executive_summary.html:335
 msgid "Product"
 msgstr ""
 
 #: templates/dashboard.html:114 templates/dashboard.html:1059
-#: templates/executive_summary.html:107 templates/executive_summary.html:355
+#: templates/dashboard.html:1129 templates/executive_summary.html:107
+#: templates/executive_summary.html:355
 msgid "Service"
 msgstr ""
 
@@ -965,7 +975,8 @@ msgstr ""
 msgid "Campaign 1"
 msgstr ""
 
-#: templates/dashboard.html:149 templates/executive_summary.html:142
+#: templates/dashboard.html:149 templates/dashboard.html:1096
+#: templates/executive_summary.html:142 templates/executive_summary.html:385
 msgid "Select first campaign"
 msgstr ""
 
@@ -975,7 +986,8 @@ msgstr ""
 msgid "Campaign 2"
 msgstr ""
 
-#: templates/dashboard.html:158 templates/executive_summary.html:151
+#: templates/dashboard.html:158 templates/dashboard.html:1097
+#: templates/executive_summary.html:151 templates/executive_summary.html:386
 msgid "Select second campaign"
 msgstr ""
 
@@ -1179,6 +1191,153 @@ msgstr ""
 msgid "No Responses Found"
 msgstr ""
 
+#: templates/dashboard.html:1087 templates/executive_summary.html:378
+msgid "Draft"
+msgstr ""
+
+#: templates/dashboard.html:1088 templates/executive_summary.html:379
+msgid "Ready"
+msgstr ""
+
+#: templates/business_auth/licenses/overview.html:304
+#: templates/dashboard.html:1089 templates/executive_summary.html:380
+msgid "Active"
+msgstr ""
+
+#: templates/dashboard.html:1090 templates/executive_summary.html:381
+#: templates/participants/campaign_participants.html:40
+#: templates/participants/campaign_participants.html:508
+#: templates/participants/campaign_participants.html:586
+#: templates/participants/campaign_participants.html:612
+msgid "Completed"
+msgstr ""
+
+#: templates/dashboard.html:1091 templates/executive_summary.html:382
+#: templates/participants/list.html:441 templates/participants/list.html:736
+#: templates/participants/list.html:804
+msgid "Unknown"
+msgstr ""
+
+#: templates/dashboard.html:1094
+msgid "Filtered by:"
+msgstr ""
+
+#: templates/dashboard.html:1095
+msgid "Clear filter"
+msgstr ""
+
+#: templates/dashboard.html:1100
+msgid "days left"
+msgstr ""
+
+#: templates/dashboard.html:1101
+msgid "days ago"
+msgstr ""
+
+#: templates/dashboard.html:1102
+msgid "month"
+msgstr ""
+
+#: templates/dashboard.html:1103
+msgid "months"
+msgstr ""
+
+#: templates/dashboard.html:1104
+msgid "ago"
+msgstr ""
+
+#: templates/dashboard.html:1105
+msgid "year"
+msgstr ""
+
+#: templates/dashboard.html:1106
+msgid "years"
+msgstr ""
+
+#: templates/dashboard.html:1109 templates/executive_summary.html:389
+msgid "Loading comparison..."
+msgstr ""
+
+#: templates/dashboard.html:1110 templates/executive_summary.html:390
+msgid "Loading comparison data..."
+msgstr ""
+
+#: templates/dashboard.html:1114 templates/executive_summary.html:393
+msgid "Failed to fetch comparison data"
+msgstr ""
+
+#: templates/dashboard.html:1115 templates/executive_summary.html:391
+msgid "Error Loading Comparison"
+msgstr ""
+
+#: templates/dashboard.html:1116 templates/executive_summary.html:392
+msgid "Failed to load comparison data. Please try again."
+msgstr ""
+
+#: templates/dashboard.html:1117 templates/executive_summary.html:396
+msgid "No campaign data available"
+msgstr ""
+
+#: templates/dashboard.html:1118 templates/executive_summary.html:395
+msgid "Error loading KPI overview data"
+msgstr ""
+
+#: templates/dashboard.html:1119
+msgid "Error loading dashboard data:"
+msgstr ""
+
+#: templates/dashboard.html:1120 templates/executive_summary.html:394
+msgid "Failed to load campaign options"
+msgstr ""
+
+#: templates/dashboard.html:1121
+msgid "Error loading account intelligence"
+msgstr ""
+
+#: templates/dashboard.html:1122
+msgid "Error loading responses."
+msgstr ""
+
+#: templates/dashboard.html:1123
+msgid "Network error loading tenure data"
+msgstr ""
+
+#: templates/dashboard.html:1124
+msgid "Network error loading company data"
+msgstr ""
+
+#: templates/dashboard.html:1131
+msgid "Average Rating"
+msgstr ""
+
+#: templates/dashboard.html:1139
+msgid "N/A"
+msgstr ""
+
+#: templates/dashboard.html:1140
+msgid "No tenure data available yet"
+msgstr ""
+
+#: templates/dashboard.html:1145
+msgid "of"
+msgstr ""
+
+#: templates/dashboard.html:1146
+msgid "tenure groups"
+msgstr ""
+
+#: templates/dashboard.html:1147
+msgid "companies"
+msgstr ""
+
+#: templates/dashboard.html:1148
+msgid "responses"
+msgstr ""
+
+#: templates/dashboard.html:1149
+msgid "accounts"
+msgstr ""
+
 #: templates/demo_intro.html:3 templates/demo_intro.html:15
 msgid "Welcome to Your VO"
 msgstr ""
@@ -1281,6 +1440,10 @@ msgstr ""
 
 #: templates/demo_intro.html:179
 msgid "Continue to Survey"
+msgstr ""
+
+#: templates/executive_summary.html:402
+msgid "Critical Risk Companies"
 msgstr ""
 
 #: templates/index.html:3
@@ -3033,10 +3196,6 @@ msgstr ""
 msgid "Search Accounts"
 msgstr ""
 
-#: templates/business_auth/licenses/overview.html:304
-msgid "Active"
-msgstr ""
-
 #: templates/business_auth/licenses/overview.html:306
 #: templates/business_auth/licenses/overview.html:391
 msgid "Expired"
@@ -3464,13 +3623,6 @@ msgstr ""
 #: templates/participants/campaign_participants.html:36
 #: templates/participants/campaign_participants.html:505
 msgid "Started"
-msgstr ""
-
-#: templates/participants/campaign_participants.html:40
-#: templates/participants/campaign_participants.html:508
-#: templates/participants/campaign_participants.html:586
-#: templates/participants/campaign_participants.html:612
-msgid "Completed"
 msgstr ""
 
 #: templates/participants/campaign_participants.html:65
@@ -3915,11 +4067,6 @@ msgstr ""
 #: templates/participants/list.html:465 templates/participants/list.html:788
 #: templates/participants/list.html:832
 msgid "Created"
-msgstr ""
-
-#: templates/participants/list.html:441 templates/participants/list.html:736
-#: templates/participants/list.html:804
-msgid "Unknown"
 msgstr ""
 
 #: templates/participants/list.html:502
