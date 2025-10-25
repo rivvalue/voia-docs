@@ -32,9 +32,9 @@
 
 <div class="container">
 
-    {{ _('{# Campaign Action Buttons Macro #}
-    {% macro campaign_actions(campaign, view_type=\'table\') %}
-        {% set action_class = \'table-actions\' if view_type == \'table\' else \'campaign-card-actions\' %}') }}
+    {# Campaign Action Buttons Macro #}
+    {% macro campaign_actions(campaign, view_type='table') %}
+        {% set action_class = 'table-actions' if view_type == 'table' else 'campaign-card-actions' %}
         <div class="{{ action_class }}" {% if view_type == 'card' %}onclick="event.stopPropagation();"{% endif %}>
             <a href="{{ url_for('campaigns.view_campaign', campaign_id=campaign.id) }}" 
                class="btn btn-outline-primary btn-sm" title="{{ _('View Details') }}">
