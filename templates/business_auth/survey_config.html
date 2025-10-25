@@ -20,7 +20,7 @@
                 <i class="fas fa-bullseye me-2" aria-hidden="true"></i>
                 Survey Customization
             </h1>
-            <p>{{ _('Configure your personalized survey experience for {{ business_account.name }}') }}</p>
+            <p>{{ _('Configure your personalized survey experience for {}').format(business_account.name) }}</p>
         </div>
     </div>
 
@@ -153,18 +153,18 @@
                         <label class="survey-config-form-check-label" for="goal_satisfaction">{{ _('Overall Satisfaction') }}</label>
                     </div>
                     <div class="survey-config-form-check">
-                        <input class="survey-config-form-check-input" type="checkbox" id="goal_product" name="survey_goals" value="{{ _('Product Feedback') }}" 
-                               {% if '{{ _('Product Feedback') }}' in current_goals %}checked{% endif %}>
+                        <input class="survey-config-form-check-input" type="checkbox" id="goal_product" name="survey_goals" value="Product Feedback" 
+                               {% if 'Product Feedback' in current_goals %}checked{% endif %}>
                         <label class="survey-config-form-check-label" for="goal_product">{{ _('Product Feedback') }}</label>
                     </div>
                     <div class="survey-config-form-check">
-                        <input class="survey-config-form-check-input" type="checkbox" id="goal_support" name="survey_goals" value="{{ _('Support Quality') }}" 
-                               {% if '{{ _('Support Quality') }}' in current_goals %}checked{% endif %}>
+                        <input class="survey-config-form-check-input" type="checkbox" id="goal_support" name="survey_goals" value="Support Quality" 
+                               {% if 'Support Quality' in current_goals %}checked{% endif %}>
                         <label class="survey-config-form-check-label" for="goal_support">{{ _('Support Quality') }}</label>
                     </div>
                     <div class="survey-config-form-check">
-                        <input class="survey-config-form-check-input" type="checkbox" id="goal_pricing" name="survey_goals" value="{{ _('Pricing Perception') }}" 
-                               {% if '{{ _('Pricing Perception') }}' in current_goals %}checked{% endif %}>
+                        <input class="survey-config-form-check-input" type="checkbox" id="goal_pricing" name="survey_goals" value="Pricing Perception" 
+                               {% if 'Pricing Perception' in current_goals %}checked{% endif %}>
                         <label class="survey-config-form-check-label" for="goal_pricing">{{ _('Pricing Perception') }}</label>
                     </div>
                     <div class="survey-config-form-check">
