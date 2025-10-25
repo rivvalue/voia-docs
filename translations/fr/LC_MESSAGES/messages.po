@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-25 02:10+0000\n"
+"POT-Creation-Date: 2025-10-25 02:14+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -1055,9 +1055,10 @@ msgstr "Envoyer le message"
 #: templates/conversational_survey.html:149
 #: templates/conversational_survey_business.html:132
 msgid "Tip: Speak naturally! VOÏA understands conversational responses."
-msgstr "Astuce : Parlez naturellement ! VOÏA comprend les réponses conversationnelles."
-"Conseil : Parlez naturellement ! VOÏA comprend les réponses "
-"conversationnelles."
+msgstr ""
+"Astuce : Parlez naturellement ! VOÏA comprend les réponses "
+"conversationnelles.Conseil : Parlez naturellement ! VOÏA comprend les "
+"réponses conversationnelles."
 
 #: templates/conversational_survey.html:160
 msgid "Processing response"
@@ -1138,9 +1139,9 @@ msgid ""
 msgstr ""
 "Bonjour l'équipe Rivvalue,%0A%0AJe viens de terminer la démonstration de "
 "VOÏA Intelligence et je souhaite en savoir plus sur la mise en œuvre du "
-"service complet Agent Voix du Client pour mon organisation.%0A%0AVeuillez "
-"me contacter pour discuter de la façon dont cela peut bénéficier à notre "
-"stratégie de retours clients.%0A%0AMerci !"
+"service complet Agent Voix du Client pour mon organisation.%0A%0AVeuillez"
+" me contacter pour discuter de la façon dont cela peut bénéficier à notre"
+" stratégie de retours clients.%0A%0AMerci !"
 
 #: templates/conversational_survey.html:209
 msgid "Contact Rivvalue to implement VOÏA for your business"
@@ -1187,13 +1188,17 @@ msgid "Type your response here..."
 msgstr "Saisissez votre réponse ici..."
 
 #: templates/conversational_survey_business.html:156
-#, fuzzy, python-brace-format, python-format
+#, fuzzy, python-brace-format
 msgid "Thank you, {}!"
 msgstr "Merci, %s !"
 
 #: templates/conversational_survey_business.html:159
 msgid "Your feedback for"
 msgstr "Votre retour pour"
+
+#: templates/conversational_survey_business.html:159
+msgid "has been successfully submitted."
+msgstr "a été soumis avec succès."
 
 #: templates/conversational_survey_business.html:170
 msgid ""
