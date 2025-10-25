@@ -16,14 +16,14 @@
                     </div>
                 {% endif %}
                 <h4 class="card-title mb-1">{{ _('Customer Feedback Survey') }}</h4>
-                <small class="text-muted">Help us improve by sharing your experience</small>
+                <small class="text-muted">{{ _('Help us improve by sharing your experience') }}</small>
                 {% if branding and branding.company_name %}
                     <div class="mt-2">
                         <small class="text-muted">Powered by {{ branding.company_name }}</small>
                     </div>
                 {% else %}
                     <div class="mt-2">
-                        <small class="text-muted">Powered by VOÏA - Voice Of Client Agent</small>
+                        <small class="text-muted">{{ _('Powered by VOÏA - Voice Of Client Agent') }}</small>
                     </div>
                 {% endif %}
             </div>
@@ -74,10 +74,10 @@
 
                     <!-- Step 2: NPS Score -->
                     <div class="survey-step d-none" id="step2">
-                        <h5 class="mb-3">Net Promoter Score</h5>
+                        <h5 class="mb-3">{{ _('Net Promoter Score') }}</h5>
                         <p class="mb-3">{{ _('On a scale of 0-10, how likely are you to recommend our services to a friend or colleague?') }}</p>
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <small class="text-muted">Not likely</small>
+                            <small class="text-muted">{{ _('Not likely') }}</small>
                             <div class="nps-scale">
                                 <div class="btn-group" role="group">
                                     <input type="radio" class="btn-check" name="npsScore" id="nps0" value="0">
@@ -104,7 +104,7 @@
                                     <label class="btn btn-outline-success" for="nps10">10</label>
                                 </div>
                             </div>
-                            <small class="text-muted">Extremely likely</small>
+                            <small class="text-muted">{{ _('Extremely likely') }}</small>
                         </div>
                         <div class="d-flex justify-content-between">
                             <button type="button" class="btn btn-secondary" onclick="previousStep(1)">{{ _('Previous') }}</button>
@@ -133,7 +133,7 @@
                                         <option value="2">{{ _('2 - Poor') }}</option>
                                         <option value="3">{{ _('3 - Average') }}</option>
                                         <option value="4">{{ _('4 - Good') }}</option>
-                                        <option value="5">5 - Excellent</option>
+                                        <option value="5">{{ _('5 - Excellent') }}</option>
                                     </select>
                                 </div>
                             </div>
@@ -146,7 +146,7 @@
                                         <option value="2">{{ _('2 - Poor') }}</option>
                                         <option value="3">{{ _('3 - Average') }}</option>
                                         <option value="4">{{ _('4 - Good') }}</option>
-                                        <option value="5">5 - Excellent</option>
+                                        <option value="5">{{ _('5 - Excellent') }}</option>
                                     </select>
                                 </div>
                             </div>
@@ -162,7 +162,7 @@
                                         <option value="2">{{ _('2 - Poor') }}</option>
                                         <option value="3">{{ _('3 - Average') }}</option>
                                         <option value="4">{{ _('4 - Good') }}</option>
-                                        <option value="5">5 - Excellent</option>
+                                        <option value="5">{{ _('5 - Excellent') }}</option>
                                     </select>
                                 </div>
                             </div>
@@ -175,7 +175,7 @@
                                         <option value="2">{{ _('2 - Poor') }}</option>
                                         <option value="3">{{ _('3 - Average') }}</option>
                                         <option value="4">{{ _('4 - Good') }}</option>
-                                        <option value="5">5 - Excellent</option>
+                                        <option value="5">{{ _('5 - Excellent') }}</option>
                                     </select>
                                 </div>
                             </div>
@@ -193,18 +193,18 @@
                         
                         <div class="mb-3">
                             <label for="improvementFeedback" class="form-label">{{ _('What could we improve?') }}</label>
-                            <textarea class="form-control" id="improvementFeedback" rows="3" placeholder="Please share your suggestions for improvement..."></textarea>
+                            <textarea class="form-control" id="improvementFeedback" rows="3" placeholder="{{ _('Please share your suggestions for improvement...') }}"></textarea>
                         </div>
 
                         <div class="mb-3">
                             <label for="additionalComments" class="form-label">{{ _('Any additional comments?') }}</label>
-                            <textarea class="form-control" id="additionalComments" rows="3" placeholder="Feel free to share any other thoughts or feedback..."></textarea>
+                            <textarea class="form-control" id="additionalComments" rows="3" placeholder="{{ _('Feel free to share any other thoughts or feedback...') }}"></textarea>
                         </div>
 
                         <div class="d-flex justify-content-between">
                             <button type="button" class="btn btn-secondary" onclick="previousStep(3)">{{ _('Previous') }}</button>
                             <button type="button" class="btn btn-success" onclick="submitSurvey()">
-                                <i class="fas fa-paper-plane me-2"></i>Submit Survey
+                                <i class="fas fa-paper-plane me-2"></i>{{ _('Submit Survey') }}
                             </button>
                         </div>
                     </div>
@@ -232,7 +232,7 @@
                         <!-- Dashboard Button -->
                         <div class="mb-4">
                             <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">
-                                <i class="fas fa-chart-bar me-2"></i>View Analytics Dashboard
+                                <i class="fas fa-chart-bar me-2"></i>{{ _('View Analytics Dashboard') }}
                             </a>
                         </div>
                         
@@ -240,22 +240,22 @@
                         
                         <!-- {{ _('Next') }} Steps Section -->
                         <div class="border rounded p-4 mb-4" style="background-color: #f8f9fa;">
-                            <h5 class="mb-3"><i class="fas fa-rocket me-2 text-primary"></i>What's {{ _('Next') }}?</h5>
+                            <h5 class="mb-3"><i class="fas fa-rocket me-2 text-primary"></i>{{ _("What's Next?") }}</h5>
                             <p class="text-muted mb-3">{{ _('Experience the full power of Voice of Client Agent for your organization.') }}</p>
                             
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <button onclick="startNewSession()" class="btn btn-outline-primary btn-lg w-100">
-                                        <i class="fas fa-redo me-2"></i>Try Another Session
+                                        <i class="fas fa-redo me-2"></i>{{ _('Try Another Session') }}
                                     </button>
-                                    <small class="text-muted d-block mt-2">Experience VOÏA with different scenarios</small>
+                                    <small class="text-muted d-block mt-2">{{ _('Experience VOÏA with different scenarios') }}</small>
                                 </div>
                                 <div class="col-md-6">
-                                    <a href="mailto:info@rivvalue.com?subject=Voice of Client Agent - Full Service Inquiry&body=Hi Rivvalue team,%0A%0AI just completed the VOÏA Intelligence demonstration and I'm interested in learning more about implementing the full Voice of Client Agent service for my organization.%0A%0APlease contact me to discuss how this can benefit our customer feedback strategy.%0A%0AThank you!" 
+                                    <a href="mailto:info@rivvalue.com?subject={{ _('Voice of Client Agent - Full Service Inquiry') | urlencode }}&body={{ _('Hi Rivvalue team,\n\nI just completed the VOÏA Intelligence demonstration and I am interested in learning more about implementing the full Voice of Client Agent service for my organization.\n\nPlease contact me to discuss how this can benefit our customer feedback strategy.\n\nThank you!') | urlencode }}" 
                                        class="btn btn-primary btn-lg w-100">
-                                        <i class="fas fa-envelope me-2"></i>Contact Rivvalue
+                                        <i class="fas fa-envelope me-2"></i>{{ _('Contact Rivvalue') }}
                                     </a>
-                                    <small class="text-muted d-block mt-2">Implement full VoC Agent for your business</small>
+                                    <small class="text-muted d-block mt-2">{{ _('Implement full VoC Agent for your business') }}</small>
                                 </div>
                             </div>
                         </div>
@@ -263,7 +263,7 @@
                         <!-- Additional Options -->
                         <div class="mt-4">
                             <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
-                                <i class="fas fa-home me-2"></i>Return Home
+                                <i class="fas fa-home me-2"></i>{{ _('Return Home') }}
                             </a>
                         </div>
                     </div>

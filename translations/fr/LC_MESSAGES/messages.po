@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-25 02:27+0000\n"
+"POT-Creation-Date: 2025-10-25 02:33+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -885,7 +885,7 @@ msgstr "Précédent"
 
 #: templates/campaign_insights.html:1008 templates/dashboard.html:1158
 #: templates/survey.html:72 templates/survey.html:111 templates/survey.html:186
-#: templates/survey.html:241 templates/survey.html:243
+#: templates/survey.html:241
 msgid "Next"
 msgstr "Suivant"
 
@@ -1101,7 +1101,7 @@ msgstr ""
 msgid "View analytics dashboard with your feedback results"
 msgstr "Afficher le tableau de bord analytique avec vos résultats de retour"
 
-#: templates/conversational_survey.html:186
+#: templates/conversational_survey.html:186 templates/survey.html:235
 msgid "View Analytics Dashboard"
 msgstr "Afficher les analyses et les informations"
 
@@ -1114,7 +1114,8 @@ msgstr ""
 "Cela conclut votre démonstration des capacités de notre agent Voice of "
 "Client."
 
-#: templates/conversational_survey.html:194 templates/survey_success.html:36
+#: templates/conversational_survey.html:194 templates/survey.html:243
+#: templates/survey_success.html:36
 msgid "What's Next?"
 msgstr "Quelle est la prochaine étape ?"
 
@@ -1129,15 +1130,15 @@ msgstr ""
 msgid "Try another demo session"
 msgstr "Essayer une autre session de démonstration"
 
-#: templates/conversational_survey.html:202
+#: templates/conversational_survey.html:202 templates/survey.html:249
 msgid "Try Another Session"
 msgstr "Essayer une autre session de démonstration"
 
-#: templates/conversational_survey.html:204
+#: templates/conversational_survey.html:204 templates/survey.html:251
 msgid "Experience VOÏA with different scenarios"
 msgstr "Découvrez VOÏA avec différents scénarios"
 
-#: templates/conversational_survey.html:207
+#: templates/conversational_survey.html:207 templates/survey.html:254
 msgid "Voice of Client Agent - Full Service Inquiry"
 msgstr "Agent Voix du Client - Demande de service complet"
 
@@ -1159,11 +1160,11 @@ msgstr ""
 msgid "Contact Rivvalue to implement VOÏA for your business"
 msgstr "Contactez Rivvalue pour mettre en œuvre VOÏA dans votre entreprise"
 
-#: templates/conversational_survey.html:210
+#: templates/conversational_survey.html:210 templates/survey.html:256
 msgid "Contact Rivvalue"
 msgstr "Contacter Rivvalue"
 
-#: templates/conversational_survey.html:212
+#: templates/conversational_survey.html:212 templates/survey.html:258
 msgid "Implement full VoC Agent for your business"
 msgstr "Implémenter l'Agent VdC complet pour votre entreprise"
 
@@ -1171,7 +1172,7 @@ msgstr "Implémenter l'Agent VdC complet pour votre entreprise"
 msgid "Return to home page"
 msgstr "Retour à la page d'accueil"
 
-#: templates/conversational_survey.html:222
+#: templates/conversational_survey.html:222 templates/survey.html:266
 msgid "Return Home"
 msgstr "Retour à la page d'accueil"
 
@@ -1995,6 +1996,14 @@ msgstr "Effacer les résultats"
 msgid "Customer Feedback Survey"
 msgstr "Enquête de retour client"
 
+#: templates/survey.html:19
+msgid "Help us improve by sharing your experience"
+msgstr "Aidez-nous à nous améliorer en partageant votre expérience"
+
+#: templates/survey.html:26 templates/survey_choice.html:25
+msgid "Powered by VOÏA - Voice Of Client Agent"
+msgstr "Propulsé par VOÏA - Agent Voix du Client"
+
 #: templates/survey.html:38 templates/survey.html:40
 msgid "Basic Information"
 msgstr "Informations de base"
@@ -2003,6 +2012,10 @@ msgstr "Informations de base"
 msgid "How long have you been working with Archelo Group?"
 msgstr "Depuis combien de temps travaillez-vous avec Archelo Group ?"
 
+#: templates/survey.html:77
+msgid "Net Promoter Score"
+msgstr "Score Net Promoteur"
+
 #: templates/survey.html:78
 msgid ""
 "On a scale of 0-10, how likely are you to recommend our services to a "
@@ -2010,6 +2023,14 @@ msgid ""
 msgstr ""
 "Sur une échelle de 0 à 10, quelle est la probabilité que vous "
 "recommandiez nos services à un ami ou un collègue ?"
+
+#: templates/survey.html:80
+msgid "Not likely"
+msgstr "Peu probable"
+
+#: templates/survey.html:107
+msgid "Extremely likely"
+msgstr "Extrêmement probable"
 
 #: templates/survey.html:117
 msgid "Tell us more about your experience"
@@ -2048,6 +2069,11 @@ msgstr "3 - Moyen"
 msgid "4 - Good"
 msgstr "4 - Bon"
 
+#: templates/survey.html:136 templates/survey.html:149
+#: templates/survey.html:165 templates/survey.html:178
+msgid "5 - Excellent"
+msgstr "5 - Excellent"
+
 #: templates/survey.html:142
 msgid "Product Value (1-5)"
 msgstr "Valeur du produit (1-5)"
@@ -2068,9 +2094,21 @@ msgstr "Retour d'information supplémentaire"
 msgid "What could we improve?"
 msgstr "Que pourrions-nous améliorer ?"
 
+#: templates/survey.html:196
+msgid "Please share your suggestions for improvement..."
+msgstr "Veuillez partager vos suggestions d'amélioration..."
+
 #: templates/survey.html:200
 msgid "Any additional comments?"
 msgstr "Autres commentaires ?"
+
+#: templates/survey.html:201
+msgid "Feel free to share any other thoughts or feedback..."
+msgstr "N'hésitez pas à partager vos autres commentaires ou retours..."
+
+#: templates/survey.html:207
+msgid "Submit Survey"
+msgstr "Soumettre l'enquête"
 
 #: templates/survey.html:219
 msgid "Processing your feedback..."
@@ -2079,6 +2117,30 @@ msgstr "Traitement de votre retour d'information..."
 #: templates/survey.html:229 templates/survey_success.html:18
 msgid "Thank you for sharing with us your feedback."
 msgstr "Merci de partager votre retour d'information avec nous."
+
+#: templates/survey.html:254
+msgid ""
+"Hi Rivvalue team,\n"
+"\n"
+"I just completed the VOÏA Intelligence demonstration and I am interested "
+"in learning more about implementing the full Voice of Client Agent "
+"service for my organization.\n"
+"\n"
+"Please contact me to discuss how this can benefit our customer feedback "
+"strategy.\n"
+"\n"
+"Thank you!"
+msgstr ""
+"Bonjour l'équipe Rivvalue,\n"
+"\n"
+"Je viens de terminer la démonstration de VOÏA Intelligence et je souhaite "
+"en savoir plus sur la mise en œuvre du service complet Agent Voix du "
+"Client pour mon organisation.\n"
+"\n"
+"Veuillez me contacter pour discuter de la façon dont cela peut bénéficier "
+"à notre stratégie de retours clients.\n"
+"\n"
+"Merci !"
 
 #: templates/survey_choice.html:3
 #, fuzzy
@@ -2094,11 +2156,6 @@ msgstr "Bienvenue sur VOÏA !"
 #, python-brace-format
 msgid "Powered by {}"
 msgstr "Propulsé par {}"
-
-#: templates/survey_choice.html:25
-#, fuzzy
-msgid "Powered by VOÏA - Voice Of Client Agent"
-msgstr "Sondage IA - VOÏA - Agent Voix du Client"
 
 #: templates/survey_choice.html:33 templates/survey_choice.html:38
 msgid "AI Conversational"
