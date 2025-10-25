@@ -1080,6 +1080,81 @@
     window.isBusinessAuthenticated = {{ 'true' if is_business_authenticated else 'false' }};
 </script>
 
+<!-- Translation strings for JavaScript -->
+<script>
+const translations = {
+    // Campaign Status
+    draft: "{{ _('Draft') }}",
+    ready: "{{ _('Ready') }}",
+    active: "{{ _('Active') }}",
+    completed: "{{ _('Completed') }}",
+    unknown: "{{ _('Unknown') }}",
+    
+    // Campaign Filter UI
+    filteredBy: "{{ _('Filtered by:') }}",
+    clearFilter: "{{ _('Clear filter') }}",
+    selectFirstCampaign: "{{ _('Select first campaign') }}",
+    selectSecondCampaign: "{{ _('Select second campaign') }}",
+    
+    // Time/Date Display
+    daysLeft: "{{ _('days left') }}",
+    daysAgo: "{{ _('days ago') }}",
+    month: "{{ _('month') }}",
+    months: "{{ _('months') }}",
+    ago: "{{ _('ago') }}",
+    year: "{{ _('year') }}",
+    years: "{{ _('years') }}",
+    
+    // Loading Messages
+    loadingComparison: "{{ _('Loading comparison...') }}",
+    loadingComparisonData: "{{ _('Loading comparison data...') }}",
+    loading: "{{ _('Loading...') }}",
+    
+    // Error Messages
+    failedToFetchComparisonData: "{{ _('Failed to fetch comparison data') }}",
+    errorLoadingComparison: "{{ _('Error Loading Comparison') }}",
+    failedToLoadComparisonData: "{{ _('Failed to load comparison data. Please try again.') }}",
+    noCampaignDataAvailable: "{{ _('No campaign data available') }}",
+    errorLoadingKpiData: "{{ _('Error loading KPI overview data') }}",
+    errorLoadingDashboardData: "{{ _('Error loading dashboard data:') }}",
+    failedToLoadCampaignOptions: "{{ _('Failed to load campaign options') }}",
+    errorLoadingAccountIntelligence: "{{ _('Error loading account intelligence') }}",
+    errorLoadingResponses: "{{ _('Error loading responses.') }}",
+    networkErrorLoadingTenureData: "{{ _('Network error loading tenure data') }}",
+    networkErrorLoadingCompanyData: "{{ _('Network error loading company data') }}",
+    
+    // Chart Labels & Metrics
+    satisfaction: "{{ _('Satisfaction') }}",
+    productValue: "{{ _('Product Value') }}",
+    service: "{{ _('Service') }}",
+    pricing: "{{ _('Pricing') }}",
+    averageRating: "{{ _('Average Rating') }}",
+    responses: "{{ _('Responses') }}",
+    nps: "{{ _('NPS') }}",
+    companies: "{{ _('Companies') }}",
+    criticalRisk: "{{ _('Critical Risk') }}",
+    product: "{{ _('Product') }}",
+    
+    // Table Content & Empty States
+    na: "{{ _('N/A') }}",
+    noTenureDataAvailable: "{{ _('No tenure data available yet') }}",
+    noCompanyDataAvailable: "{{ _('No company data available yet') }}",
+    
+    // Pagination Text
+    showing: "{{ _('Showing') }}",
+    of: "{{ _('of') }}",
+    tenureGroups: "{{ _('tenure groups') }}",
+    companiesPagination: "{{ _('companies') }}",
+    responsesPagination: "{{ _('responses') }}",
+    accounts: "{{ _('accounts') }}",
+    
+    // NPS Category Labels
+    promoters: "{{ _('Promoters (9-10)') }}",
+    passives: "{{ _('Passives (7-8)') }}",
+    detractors: "{{ _('Detractors (0-6)') }}"
+};
+</script>
+
 <!-- Hash redirect handler for old bookmarks -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {

@@ -371,6 +371,38 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- Translation strings for JavaScript -->
+<script>
+const translations = {
+    // Campaign Status
+    draft: "{{ _('Draft') }}",
+    ready: "{{ _('Ready') }}",
+    active: "{{ _('Active') }}",
+    completed: "{{ _('Completed') }}",
+    unknown: "{{ _('Unknown') }}",
+    
+    // Dropdown Options
+    selectFirstCampaign: "{{ _('Select first campaign') }}",
+    selectSecondCampaign: "{{ _('Select second campaign') }}",
+    
+    // Loading & Error Messages
+    loadingComparison: "{{ _('Loading comparison...') }}",
+    loadingComparisonData: "{{ _('Loading comparison data...') }}",
+    errorLoadingComparison: "{{ _('Error Loading Comparison') }}",
+    failedToLoadComparisonData: "{{ _('Failed to load comparison data. Please try again.') }}",
+    failedToFetchComparisonData: "{{ _('Failed to fetch comparison data') }}",
+    failedToLoadCampaignOptions: "{{ _('Failed to load campaign options') }}",
+    errorLoadingKpiData: "{{ _('Error loading KPI overview data') }}",
+    noCampaignDataAvailable: "{{ _('No campaign data available') }}",
+    
+    // Table Labels
+    totalResponses: "{{ _('Total Responses') }}",
+    npsScore: "{{ _('NPS Score') }}",
+    companiesAnalyzed: "{{ _('Companies Analyzed') }}",
+    criticalRiskCompanies: "{{ _('Critical Risk Companies') }}"
+};
+</script>
+
 <!-- JavaScript for {{ _('Executive Summary') }} -->
 <script src="{{ url_for('static', filename='js/executive_summary.js') }}?v={{ range(1000, 9999) | random }}"></script>
 {% endblock %}
