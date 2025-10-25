@@ -25,7 +25,7 @@
                 <div class="d-flex align-items-center justify-content-center justify-content-md-end gap-3">
                     <!-- Link to Executive Summary -->
                     <a href="{{ url_for('executive_summary') }}" class="btn btn-outline-primary btn-sm">
-                        <i class="fas fa-chart-line me-2"></i>Executive Summary
+                        <i class="fas fa-chart-line me-2"></i>{{ _('Executive Summary') }}
                     </a>
                     
                     <!-- Refresh Icon -->
@@ -50,7 +50,7 @@
                     <div class="row mb-3">
                         <div class="col-12">
                             <h6 class="mb-1"><i class="fas fa-filter me-2" style="color: #E13A44;"></i>{{ _('Campaign Analytics Filter') }}</h6>
-                            <small class="text-muted">Compare KPIs across different campaigns</small>
+                            <small class="text-muted">{{ _('Compare KPIs across different campaigns') }}</small>
                         </div>
                     </div>
                     
@@ -110,7 +110,7 @@
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="survey-insights-tab" data-bs-toggle="tab" data-bs-target="#survey-insights" type="button" role="tab" aria-controls="survey-insights" aria-selected="false">
-                <i class="fas fa-comments me-2" style="color: #E13A44;"></i>Survey Insights
+                <i class="fas fa-comments me-2" style="color: #E13A44;"></i>{{ _('Survey Insights') }}
             </button>
         </li>
         <li class="nav-item" role="presentation">
@@ -141,7 +141,7 @@
                     <div class="alert d-flex align-items-center border rounded" style="background: #fff; border-color: #E13A44 !important; padding: 1rem;">
                         <i class="fas fa-bullhorn me-3" style="color: #E13A44;"></i>
                         <div>
-                            <strong>Survey Insights</strong> - Currently showing data from active campaign: 
+                            <strong>{{ _('Survey Insights') }}</strong> - {{ _('Currently showing data from active campaign:') }} 
                             <span id="activeCampaignName" class="fw-bold">{{ _('Campaign Name') }}</span>
                             <span class="ms-2 text-muted" id="activeCampaignDates">Jan 1 - Dec 31, 2024</span>
                         </div>
@@ -393,7 +393,7 @@
                     <div class="data-table">
                         <div class="table-header">
                             <h5>{{ _('NPS by Client Company') }}</h5>
-                            <small class="text-muted">Strategic account management - NPS scores segregated by company evaluating Archelo Group</small>
+                            <small class="text-muted">{{ _('Strategic account management - NPS scores segregated by company evaluating Archelo Group') }}</small>
                         </div>
                         <div class="p-3">
                             <!-- {{ _('Search') }} and Filter Controls -->
@@ -434,11 +434,11 @@
                                         <tr>
                                             <th>{{ _('Company') }} Name</th>
                                             <th>{{ _('Respondent') }}s</th>
-                                            <th>Avg Individual NPS</th>
+                                            <th>{{ _('Avg Individual NPS') }}</th>
                                             <th>{{ _('Company') }} NPS</th>
                                             <th>Distribution</th>
                                             <th>{{ _('Risk Level') }}</th>
-                                            <th>Latest Response</th>
+                                            <th>{{ _('Latest Response') }}</th>
                                             <th>Latest {{ _('Churn Risk') }}</th>
                                         </tr>
                                     </thead>
@@ -467,7 +467,7 @@
                                             {% endfor %}
                                         {% else %}
                                             <!-- No server-side data found -->
-                                            <tr><td colspan="8" class="text-center text-muted">No company data available yet</td></tr>
+                                            <tr><td colspan="8" class="text-center text-muted">{{ _('No company data available yet') }}</td></tr>
                                         {% endif %}
                                     </tbody>
                                 </table>
@@ -506,7 +506,7 @@
                     <div class="data-table">
                         <div class="table-header">
                             <h5>{{ _('NPS by Customer Tenure') }}</h5>
-                            <small class="text-muted">Customer lifecycle insights - NPS scores segregated by length of business relationship</small>
+                            <small class="text-muted">{{ _('Customer lifecycle insights - NPS scores segregated by length of business relationship') }}</small>
                         </div>
                         <div class="p-0">
                             <div class="table-responsive">
@@ -515,11 +515,11 @@
                                         <tr>
                                             <th>{{ _('Tenure Group') }}</th>
                                             <th>{{ _('Respondent') }}s</th>
-                                            <th>Avg Individual NPS</th>
+                                            <th>{{ _('Avg Individual NPS') }}</th>
                                             <th>{{ _('Tenure NPS') }}</th>
                                             <th>Distribution</th>
                                             <th>{{ _('Risk Level') }}</th>
-                                            <th>Latest Response</th>
+                                            <th>{{ _('Latest Response') }}</th>
                                             <th>Latest {{ _('Churn Risk') }}</th>
                                         </tr>
                                     </thead>
@@ -549,7 +549,7 @@
                                     <span class="badge bg-secondary">{{ _('Medium') }} (-20 to 20)</span>
                                     <span class="badge bg-danger">{{ _('High') }} (≤-20)</span>
                                     <span class="badge bg-dark">{{ _('Critical') }} (≤-50)</span>
-                                    <span class="badge bg-secondary">Insufficient Data (&lt;2 responses)</span>
+                                    <span class="badge bg-secondary">{{ _('Insufficient Data (<2 responses)') }}</span>
                                 </small>
                             </div>
                         </div>
@@ -600,7 +600,7 @@
                                     <thead>
                                         <tr>
                                             <th>{{ _('Company') }}</th>
-                                            <th>Tenure with FC inc</th>
+                                            <th>{{ _('Tenure with FC inc') }}</th>
                                             <th>{{ _('NPS Score') }}</th>
                                             <th>{{ _('Category') }}</th>
                                             <th>Sentiment</th>
@@ -635,7 +635,7 @@
         <div class="tab-pane fade" id="segmentation" role="tabpanel" aria-labelledby="segmentation-tab">
             <div id="segmentationEmptyState" class="alert alert-info" style="display: none;">
                 <i class="fas fa-info-circle me-2"></i>
-                <strong>No Segmentation Data Available</strong> - This campaign was created before segmentation analytics were implemented. Segmentation data is only available for campaigns created after this feature was deployed.
+                <strong>{{ _('No Segmentation Data Available') }}</strong> - {{ _('This campaign was created before segmentation analytics were implemented. Segmentation data is only available for campaigns created after this feature was deployed.') }}
             </div>
             
             <div id="segmentationContent">
@@ -645,7 +645,7 @@
                         <div class="chart-card">
                             <div class="card-header">
                                 <h5><i class="fas fa-user-tie me-2" style="color: #E13A44;"></i>{{ _('NPS by Role') }}</h5>
-                                <small class="text-muted">Net Promoter Score distribution across different participant roles</small>
+                                <small class="text-muted">{{ _('Net Promoter Score distribution across different participant roles') }}</small>
                             </div>
                             <div class="card-body">
                                 <canvas id="npsByRoleChart"></canvas>
@@ -660,7 +660,7 @@
                         <div class="chart-card">
                             <div class="card-header">
                                 <h5><i class="fas fa-globe me-2" style="color: #E13A44;"></i>{{ _('NPS by Region') }}</h5>
-                                <small class="text-muted">Geographic distribution of customer satisfaction</small>
+                                <small class="text-muted">{{ _('Geographic distribution of customer satisfaction') }}</small>
                             </div>
                             <div class="card-body">
                                 <canvas id="npsByRegionChart"></canvas>
@@ -675,7 +675,7 @@
                         <div class="chart-card">
                             <div class="card-header">
                                 <h5><i class="fas fa-layer-group me-2" style="color: #E13A44;"></i>{{ _('NPS by Customer Tier') }}</h5>
-                                <small class="text-muted">Customer satisfaction across different tier levels</small>
+                                <small class="text-muted">{{ _('Customer satisfaction across different tier levels') }}</small>
                             </div>
                             <div class="card-body">
                                 <canvas id="npsByTierChart"></canvas>
@@ -690,7 +690,7 @@
                         <div class="data-table">
                             <div class="table-header">
                                 <h5>{{ _('Satisfaction Ratings by Segment') }}</h5>
-                                <small class="text-muted">Average satisfaction scores across all segmentation dimensions</small>
+                                <small class="text-muted">{{ _('Average satisfaction scores across all segmentation dimensions') }}</small>
                             </div>
                             <div class="p-0">
                                 <div class="table-responsive">
@@ -1129,7 +1129,7 @@ function renderSegmentationTable(segmentationData) {
         `;
     });
     
-    tbody.innerHTML = html || '<tr><td colspan="5" class="text-center text-muted">No segmentation data available</td></tr>';
+    tbody.innerHTML = html || '<tr><td colspan="5" class="text-center text-muted">{{ _('No segmentation data available') }}</td></tr>';
 }
 
 function getNPSBadgeClass(score) {

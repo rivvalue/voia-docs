@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-25 01:09+0000\n"
+"POT-Creation-Date: 2025-10-25 01:15+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -119,10 +119,11 @@ msgstr "Intelligence d'affaires"
 msgid "Overview"
 msgstr "Vue d'ensemble"
 
-#: templates/base.html:61 templates/dashboard.html:49
-#: templates/executive_summary.html:4 templates/executive_summary.html:23
-#: templates/executive_summary.html:44 templates/executive_summary.html:54
-#: templates/executive_summary.html:266 templates/executive_summary.html:374
+#: templates/base.html:61 templates/campaign_insights.html:28
+#: templates/dashboard.html:49 templates/executive_summary.html:4
+#: templates/executive_summary.html:23 templates/executive_summary.html:44
+#: templates/executive_summary.html:54 templates/executive_summary.html:266
+#: templates/executive_summary.html:374
 msgid "Executive Summary"
 msgstr "Résumé exécutif"
 
@@ -184,6 +185,10 @@ msgstr "Actualiser les données"
 msgid "Campaign Analytics Filter"
 msgstr "Filtre d'analyse de campagne"
 
+#: templates/campaign_insights.html:53 templates/dashboard.html:294
+msgid "Compare KPIs across different campaigns"
+msgstr "Comparer les KPI entre différentes campagnes"
+
 #: templates/campaign_insights.html:60
 msgid "Campaign:"
 msgstr "Campagnes :"
@@ -210,10 +215,20 @@ msgstr "Détails"
 msgid "Account Intelligence"
 msgstr "Intelligence de compte"
 
+#: templates/campaign_insights.html:113 templates/campaign_insights.html:144
+#: templates/dashboard.html:354 templates/dashboard.html:380
+msgid "Survey Insights"
+msgstr "Informations sur l'enquête"
+
 #: templates/campaign_insights.html:127 templates/campaign_insights.html:129
 #: templates/dashboard.html:363 templates/dashboard.html:365
 msgid "Loading dashboard data..."
 msgstr "Chargement des données du tableau de bord..."
+
+#: templates/campaign_insights.html:144
+#, fuzzy
+msgid "Currently showing data from active campaign:"
+msgstr "Affichage des données de la campagne active"
 
 #: templates/campaign_insights.html:145 templates/campaigns/create.html:82
 #: templates/campaigns/edit.html:97
@@ -394,6 +409,12 @@ msgstr "Sélectionnez la note"
 msgid "NPS by Client Company"
 msgstr "NPS par entreprise cliente"
 
+#: templates/campaign_insights.html:396 templates/dashboard.html:632
+msgid ""
+"Strategic account management - NPS scores segregated by company "
+"evaluating Archelo Group"
+msgstr ""
+
 #: templates/campaign_insights.html:407 templates/campaign_insights.html:579
 #: templates/dashboard.html:643 templates/dashboard.html:815
 msgid "NPS Category"
@@ -421,10 +442,24 @@ msgstr "Détracteurs (0-6)"
 msgid "Respondent"
 msgstr "Répondant"
 
+#: templates/campaign_insights.html:437 templates/campaign_insights.html:518
+#: templates/dashboard.html:673 templates/dashboard.html:754
+msgid "Avg Individual NPS"
+msgstr "NPS individuel moyen"
+
+#: templates/campaign_insights.html:441 templates/campaign_insights.html:522
+#: templates/dashboard.html:677 templates/dashboard.html:758
+msgid "Latest Response"
+msgstr "Dernière réponse"
+
 #: templates/campaign_insights.html:442 templates/campaign_insights.html:523
 #: templates/campaign_insights.html:607 templates/dashboard.html:843
 msgid "Churn Risk"
 msgstr "Indicateurs de risque de résiliation"
+
+#: templates/campaign_insights.html:470 templates/dashboard.html:706
+msgid "No company data available yet"
+msgstr "Aucune donnée d'entreprise disponible pour le moment"
 
 #: templates/campaign_insights.html:503 templates/campaign_insights.html:519
 #: templates/campaign_insights.html:532 templates/campaign_insights.html:537
@@ -436,9 +471,19 @@ msgstr "NPS par ancienneté"
 msgid "NPS by Customer Tenure"
 msgstr "NPS par ancienneté client"
 
+#: templates/campaign_insights.html:509
+msgid ""
+"Customer lifecycle insights - NPS scores segregated by length of business"
+" relationship"
+msgstr ""
+
 #: templates/campaign_insights.html:516 templates/dashboard.html:752
 msgid "Tenure Group"
 msgstr "Ancienneté :"
+
+#: templates/campaign_insights.html:552
+msgid "Insufficient Data (<2 responses)"
+msgstr "Données insuffisantes (<2 réponses)"
 
 #: templates/campaign_insights.html:560 templates/campaign_insights.html:581
 #: templates/campaign_insights.html:589 templates/campaign_insights.html:592
@@ -458,6 +503,10 @@ msgstr "Réponses"
 msgid "Recent Survey Responses"
 msgstr "Aucune réponse récente"
 
+#: templates/campaign_insights.html:603 templates/dashboard.html:839
+msgid "Tenure with FC inc"
+msgstr "Ancienneté avec FC inc"
+
 #: templates/campaign_insights.html:605 templates/dashboard.html:841
 msgid "Category"
 msgstr "Score NPS"
@@ -466,23 +515,51 @@ msgstr "Score NPS"
 msgid "Survey responses pagination"
 msgstr "Pagination des réponses à l'enquête"
 
+#: templates/campaign_insights.html:638
+#
+msgid "No Segmentation Data Available"
+msgstr "Aucune donnée de segmentation disponible"
+
+#: templates/campaign_insights.html:638
+msgid ""
+"This campaign was created before segmentation analytics were implemented."
+" Segmentation data is only available for campaigns created after this "
+"feature was deployed."
+msgstr ""
+
 #: templates/campaign_insights.html:642 templates/campaign_insights.html:647
 #: templates/campaign_insights.html:974
 msgid "NPS by Role"
 msgstr "Filtrer par rôle"
+
+#: templates/campaign_insights.html:648
+msgid "Net Promoter Score distribution across different participant roles"
+msgstr "Distribution du Net Promoter Score selon les différents rôles des participants"
 
 #: templates/campaign_insights.html:657 templates/campaign_insights.html:662
 #: templates/campaign_insights.html:977
 msgid "NPS by Region"
 msgstr "Filtrer par région"
 
+#: templates/campaign_insights.html:663
+msgid "Geographic distribution of customer satisfaction"
+msgstr "Distribution géographique de la satisfaction client"
+
 #: templates/campaign_insights.html:672 templates/campaign_insights.html:677
 msgid "NPS by Customer Tier"
 msgstr "NPS par ancienneté client"
 
+#: templates/campaign_insights.html:678
+msgid "Customer satisfaction across different tier levels"
+msgstr "Satisfaction client selon les différents niveaux de catégorie"
+
 #: templates/campaign_insights.html:692
 msgid "Satisfaction Ratings by Segment"
-msgstr ""
+msgstr "Évaluations de satisfaction par segment"
+
+#: templates/campaign_insights.html:693
+msgid "Average satisfaction scores across all segmentation dimensions"
+msgstr "Scores de satisfaction moyens sur toutes les dimensions de segmentation"
 
 #: templates/campaign_insights.html:700
 msgid "Segment Type"
@@ -543,6 +620,11 @@ msgstr "Valeur du produit"
 #: templates/executive_summary.html:345
 msgid "Pricing"
 msgstr "Tarification"
+
+#: templates/campaign_insights.html:1132
+#
+msgid "No segmentation data available"
+msgstr "Aucune donnée de segmentation disponible"
 
 #: templates/company_responses.html:91
 msgid "No responses found for this company"
@@ -1016,10 +1098,6 @@ msgstr ""
 "Analyser et comparer les métriques de performance spécifiques aux "
 "campagnes"
 
-#: templates/dashboard.html:294
-msgid "Compare KPIs across different campaigns"
-msgstr "Comparer les KPI entre différentes campagnes"
-
 #: templates/business_auth/admin_panel.html:408
 #: templates/business_auth/admin_panel.html:432
 #: templates/business_auth/admin_panel.html:435
@@ -1027,10 +1105,6 @@ msgstr "Comparer les KPI entre différentes campagnes"
 #: templates/business_auth/admin_panel.html:940 templates/dashboard.html:349
 msgid "Analytics"
 msgstr "Analytique"
-
-#: templates/dashboard.html:354 templates/dashboard.html:380
-msgid "Survey Insights"
-msgstr "Voir les analyses IA"
 
 #: templates/dashboard.html:380
 msgid "Currently showing data from active campaign"
@@ -1080,16 +1154,6 @@ msgstr "Opportunités de croissance"
 msgid "Account Intelligence pagination"
 msgstr "Intelligence de compte"
 
-#: templates/dashboard.html:632
-msgid ""
-"Strategic account management - NPS scores segregated by company "
-"evaluating Archelo Group"
-msgstr ""
-
-#: templates/dashboard.html:673 templates/dashboard.html:754
-msgid "Avg Individual NPS"
-msgstr "NPS Individuel Moyen"
-
 #: templates/dashboard.html:674
 msgid "Company NPS"
 msgstr "Nom de l'entreprise"
@@ -1098,17 +1162,9 @@ msgstr "Nom de l'entreprise"
 msgid "Distribution"
 msgstr "Répartition du NPS"
 
-#: templates/dashboard.html:677 templates/dashboard.html:758
-msgid "Latest Response"
-msgstr "Nombre total de réponses"
-
 #: templates/dashboard.html:678 templates/dashboard.html:759
 msgid "Latest Churn Risk"
 msgstr "Indicateurs de risque de résiliation"
-
-#: templates/dashboard.html:706
-msgid "No company data available yet"
-msgstr "Aucune donnée d'entreprise disponible pour le moment"
 
 #: templates/dashboard.html:717
 msgid "Company NPS pagination"
@@ -1121,10 +1177,6 @@ msgstr "Pagination du NPS par ancienneté"
 #: templates/dashboard.html:812
 msgid "Search by company name, participant name, or email..."
 msgstr "Rechercher par nom d'entreprise, nom du participant ou e-mail..."
-
-#: templates/dashboard.html:839
-msgid "Tenure with FC inc"
-msgstr "Ancienneté avec FC inc"
 
 #: templates/dashboard.html:842
 msgid "Sentiment"
@@ -2830,13 +2882,11 @@ msgid "Maximum Invitations per Campaign"
 msgstr "Nombre maximal d'invitations par campagne"
 
 #: templates/business_auth/licenses/assignment_form.html:304
-#, fuzzy, python-format
+#, no-python-format, python-format
 msgid ""
 "Hard limit on survey invitations (typically 5x responses for ~20% "
 "response rate)"
 msgstr ""
-"Limite stricte d'invitations (généralement 5x les réponses pour un taux "
-"d’environ 20 %%)"
 
 #: templates/business_auth/licenses/assignment_form.html:312
 #: templates/business_auth/licenses/assignment_form.html:317
@@ -3927,9 +3977,9 @@ msgid "Select tier (optional)"
 msgstr "Sélectionnez une catégorie (optionnel)"
 
 #: templates/participants/create.html:145 templates/participants/edit.html:193
-#, fuzzy, python-format
+#, no-python-format, python-format
 msgid "T1: Strategic (Top 5–10% clients)"
-msgstr "T1 : Stratégique (5–10 % des meilleurs clients)"
+msgstr ""
 
 #: templates/participants/create.html:146 templates/participants/edit.html:194
 msgid "T2: Managed (bulk of paying clients)"

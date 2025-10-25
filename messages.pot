@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-25 01:09+0000\n"
+"POT-Creation-Date: 2025-10-25 01:15+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -116,10 +116,11 @@ msgstr ""
 msgid "Overview"
 msgstr ""
 
-#: templates/base.html:61 templates/dashboard.html:49
-#: templates/executive_summary.html:4 templates/executive_summary.html:23
-#: templates/executive_summary.html:44 templates/executive_summary.html:54
-#: templates/executive_summary.html:266 templates/executive_summary.html:374
+#: templates/base.html:61 templates/campaign_insights.html:28
+#: templates/dashboard.html:49 templates/executive_summary.html:4
+#: templates/executive_summary.html:23 templates/executive_summary.html:44
+#: templates/executive_summary.html:54 templates/executive_summary.html:266
+#: templates/executive_summary.html:374
 msgid "Executive Summary"
 msgstr ""
 
@@ -181,6 +182,10 @@ msgstr ""
 msgid "Campaign Analytics Filter"
 msgstr ""
 
+#: templates/campaign_insights.html:53 templates/dashboard.html:294
+msgid "Compare KPIs across different campaigns"
+msgstr ""
+
 #: templates/campaign_insights.html:60
 msgid "Campaign:"
 msgstr ""
@@ -207,9 +212,18 @@ msgstr ""
 msgid "Account Intelligence"
 msgstr ""
 
+#: templates/campaign_insights.html:113 templates/campaign_insights.html:144
+#: templates/dashboard.html:354 templates/dashboard.html:380
+msgid "Survey Insights"
+msgstr ""
+
 #: templates/campaign_insights.html:127 templates/campaign_insights.html:129
 #: templates/dashboard.html:363 templates/dashboard.html:365
 msgid "Loading dashboard data..."
+msgstr ""
+
+#: templates/campaign_insights.html:144
+msgid "Currently showing data from active campaign:"
 msgstr ""
 
 #: templates/campaign_insights.html:145 templates/campaigns/create.html:82
@@ -391,6 +405,12 @@ msgstr ""
 msgid "NPS by Client Company"
 msgstr ""
 
+#: templates/campaign_insights.html:396 templates/dashboard.html:632
+msgid ""
+"Strategic account management - NPS scores segregated by company "
+"evaluating Archelo Group"
+msgstr ""
+
 #: templates/campaign_insights.html:407 templates/campaign_insights.html:579
 #: templates/dashboard.html:643 templates/dashboard.html:815
 msgid "NPS Category"
@@ -418,9 +438,23 @@ msgstr ""
 msgid "Respondent"
 msgstr ""
 
+#: templates/campaign_insights.html:437 templates/campaign_insights.html:518
+#: templates/dashboard.html:673 templates/dashboard.html:754
+msgid "Avg Individual NPS"
+msgstr ""
+
+#: templates/campaign_insights.html:441 templates/campaign_insights.html:522
+#: templates/dashboard.html:677 templates/dashboard.html:758
+msgid "Latest Response"
+msgstr ""
+
 #: templates/campaign_insights.html:442 templates/campaign_insights.html:523
 #: templates/campaign_insights.html:607 templates/dashboard.html:843
 msgid "Churn Risk"
+msgstr ""
+
+#: templates/campaign_insights.html:470 templates/dashboard.html:706
+msgid "No company data available yet"
 msgstr ""
 
 #: templates/campaign_insights.html:503 templates/campaign_insights.html:519
@@ -433,8 +467,18 @@ msgstr ""
 msgid "NPS by Customer Tenure"
 msgstr ""
 
+#: templates/campaign_insights.html:509
+msgid ""
+"Customer lifecycle insights - NPS scores segregated by length of business"
+" relationship"
+msgstr ""
+
 #: templates/campaign_insights.html:516 templates/dashboard.html:752
 msgid "Tenure Group"
+msgstr ""
+
+#: templates/campaign_insights.html:552
+msgid "Insufficient Data (<2 responses)"
 msgstr ""
 
 #: templates/campaign_insights.html:560 templates/campaign_insights.html:581
@@ -455,6 +499,10 @@ msgstr ""
 msgid "Recent Survey Responses"
 msgstr ""
 
+#: templates/campaign_insights.html:603 templates/dashboard.html:839
+msgid "Tenure with FC inc"
+msgstr ""
+
 #: templates/campaign_insights.html:605 templates/dashboard.html:841
 msgid "Category"
 msgstr ""
@@ -463,9 +511,24 @@ msgstr ""
 msgid "Survey responses pagination"
 msgstr ""
 
+#: templates/campaign_insights.html:638
+msgid "No Segmentation Data Available"
+msgstr ""
+
+#: templates/campaign_insights.html:638
+msgid ""
+"This campaign was created before segmentation analytics were implemented."
+" Segmentation data is only available for campaigns created after this "
+"feature was deployed."
+msgstr ""
+
 #: templates/campaign_insights.html:642 templates/campaign_insights.html:647
 #: templates/campaign_insights.html:974
 msgid "NPS by Role"
+msgstr ""
+
+#: templates/campaign_insights.html:648
+msgid "Net Promoter Score distribution across different participant roles"
 msgstr ""
 
 #: templates/campaign_insights.html:657 templates/campaign_insights.html:662
@@ -473,12 +536,24 @@ msgstr ""
 msgid "NPS by Region"
 msgstr ""
 
+#: templates/campaign_insights.html:663
+msgid "Geographic distribution of customer satisfaction"
+msgstr ""
+
 #: templates/campaign_insights.html:672 templates/campaign_insights.html:677
 msgid "NPS by Customer Tier"
 msgstr ""
 
+#: templates/campaign_insights.html:678
+msgid "Customer satisfaction across different tier levels"
+msgstr ""
+
 #: templates/campaign_insights.html:692
 msgid "Satisfaction Ratings by Segment"
+msgstr ""
+
+#: templates/campaign_insights.html:693
+msgid "Average satisfaction scores across all segmentation dimensions"
 msgstr ""
 
 #: templates/campaign_insights.html:700
@@ -539,6 +614,10 @@ msgstr ""
 #: templates/dashboard.html:1049 templates/executive_summary.html:101
 #: templates/executive_summary.html:345
 msgid "Pricing"
+msgstr ""
+
+#: templates/campaign_insights.html:1132
+msgid "No segmentation data available"
 msgstr ""
 
 #: templates/company_responses.html:91
@@ -994,20 +1073,12 @@ msgstr ""
 msgid "Analyze and compare campaign-specific performance metrics"
 msgstr ""
 
-#: templates/dashboard.html:294
-msgid "Compare KPIs across different campaigns"
-msgstr ""
-
 #: templates/business_auth/admin_panel.html:408
 #: templates/business_auth/admin_panel.html:432
 #: templates/business_auth/admin_panel.html:435
 #: templates/business_auth/admin_panel.html:820
 #: templates/business_auth/admin_panel.html:940 templates/dashboard.html:349
 msgid "Analytics"
-msgstr ""
-
-#: templates/dashboard.html:354 templates/dashboard.html:380
-msgid "Survey Insights"
 msgstr ""
 
 #: templates/dashboard.html:380
@@ -1056,16 +1127,6 @@ msgstr ""
 msgid "Account Intelligence pagination"
 msgstr ""
 
-#: templates/dashboard.html:632
-msgid ""
-"Strategic account management - NPS scores segregated by company "
-"evaluating Archelo Group"
-msgstr ""
-
-#: templates/dashboard.html:673 templates/dashboard.html:754
-msgid "Avg Individual NPS"
-msgstr ""
-
 #: templates/dashboard.html:674
 msgid "Company NPS"
 msgstr ""
@@ -1074,16 +1135,8 @@ msgstr ""
 msgid "Distribution"
 msgstr ""
 
-#: templates/dashboard.html:677 templates/dashboard.html:758
-msgid "Latest Response"
-msgstr ""
-
 #: templates/dashboard.html:678 templates/dashboard.html:759
 msgid "Latest Churn Risk"
-msgstr ""
-
-#: templates/dashboard.html:706
-msgid "No company data available yet"
 msgstr ""
 
 #: templates/dashboard.html:717
@@ -1096,10 +1149,6 @@ msgstr ""
 
 #: templates/dashboard.html:812
 msgid "Search by company name, participant name, or email..."
-msgstr ""
-
-#: templates/dashboard.html:839
-msgid "Tenure with FC inc"
 msgstr ""
 
 #: templates/dashboard.html:842
