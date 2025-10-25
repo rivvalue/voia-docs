@@ -85,7 +85,7 @@
                         </div>
                         
                         <div class="mb-3">
-                            <label for="tenureWithFc" class="form-label conv-form-label">{{ _('How long have you been working with') }} {{ branding.company_name if branding and branding.company_name else 'us' }}?</label>
+                            <label for="tenureWithFc" class="form-label conv-form-label">{{ _('How long have you been working with') }} {{ branding.company_name if branding and branding.company_name else _('us') }}?</label>
                             <select class="form-select" id="tenureWithFc" required aria-required="true">
                                 <option value="">{{ _('Select duration...') }}</option>
                                 <option value="Less than 6 months">{{ _('Less than 6 months') }}</option>
@@ -135,8 +135,8 @@
                             <textarea id="userInput" 
                                       class="form-control" 
                                       rows="3" 
-                                      placeholder="{{ _('Type your response') }} here..."
-                                      aria-label="{{ _('Type your response') }} to VOÏA"></textarea>
+                                      placeholder="{{ _('Type your response here...') }}"
+                                      aria-label="{{ _('Type your response to VOÏA') }}"></textarea>
                             <button id="sendButton" 
                                     class="conv-send-btn btn" 
                                     type="button"

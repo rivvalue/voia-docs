@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-25 02:17+0000\n"
+"POT-Creation-Date: 2025-10-25 02:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -941,6 +941,11 @@ msgstr ""
 msgid "How long have you been working with"
 msgstr ""
 
+#: templates/conversational_survey.html:88
+#: templates/conversational_survey_business.html:84
+msgid "us"
+msgstr ""
+
 #: templates/conversational_survey.html:90
 #: templates/conversational_survey_business.html:87 templates/survey.html:62
 msgid "Select duration..."
@@ -1000,9 +1005,16 @@ msgid "Conversation messages"
 msgstr ""
 
 #: templates/conversational_survey.html:134
-#: templates/conversational_survey.html:138
-#: templates/conversational_survey.html:139
 msgid "Type your response"
+msgstr ""
+
+#: templates/conversational_survey.html:138
+#: templates/conversational_survey_business.html:125
+msgid "Type your response here..."
+msgstr ""
+
+#: templates/conversational_survey.html:139
+msgid "Type your response to VOÏA"
 msgstr ""
 
 #: templates/conversational_survey.html:143
@@ -1115,6 +1127,10 @@ msgid "thank you for participating"
 msgstr ""
 
 #: templates/conversational_survey_business.html:44
+msgid "We"
+msgstr ""
+
+#: templates/conversational_survey_business.html:44
 msgid "value your feedback"
 msgstr ""
 
@@ -1124,10 +1140,6 @@ msgstr ""
 
 #: templates/conversational_survey_business.html:58
 msgid "Participating on behalf of"
-msgstr ""
-
-#: templates/conversational_survey_business.html:125
-msgid "Type your response here..."
 msgstr ""
 
 #: templates/conversational_survey_business.html:156

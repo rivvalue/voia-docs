@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-25 02:17+0000\n"
+"POT-Creation-Date: 2025-10-25 02:27+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -984,6 +984,11 @@ msgstr "Entrez votre adresse e-mail"
 msgid "How long have you been working with"
 msgstr "Depuis combien de temps travaillez-vous avec FC inc ?"
 
+#: templates/conversational_survey.html:88
+#: templates/conversational_survey_business.html:84
+msgid "us"
+msgstr "nous"
+
 #: templates/conversational_survey.html:90
 #: templates/conversational_survey_business.html:87 templates/survey.html:62
 msgid "Select duration..."
@@ -1043,10 +1048,17 @@ msgid "Conversation messages"
 msgstr "Messages de la conversation"
 
 #: templates/conversational_survey.html:134
-#: templates/conversational_survey.html:138
-#: templates/conversational_survey.html:139
 msgid "Type your response"
 msgstr "Saisissez votre réponse"
+
+#: templates/conversational_survey.html:138
+#: templates/conversational_survey_business.html:125
+msgid "Type your response here..."
+msgstr "Tapez votre réponse ici..."
+
+#: templates/conversational_survey.html:139
+msgid "Type your response to VOÏA"
+msgstr "Tapez votre réponse à VOÏA"
 
 #: templates/conversational_survey.html:143
 msgid "Send message"
@@ -1172,6 +1184,10 @@ msgid "thank you for participating"
 msgstr "merci de votre participation"
 
 #: templates/conversational_survey_business.html:44
+msgid "We"
+msgstr "Nous"
+
+#: templates/conversational_survey_business.html:44
 msgid "value your feedback"
 msgstr "valorisons vos retours"
 
@@ -1182,10 +1198,6 @@ msgstr "Vos informations"
 #: templates/conversational_survey_business.html:58
 msgid "Participating on behalf of"
 msgstr "Participation au nom de"
-
-#: templates/conversational_survey_business.html:125
-msgid "Type your response here..."
-msgstr "Saisissez votre réponse ici..."
 
 #: templates/conversational_survey_business.html:156
 #, fuzzy, python-brace-format

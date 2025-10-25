@@ -41,7 +41,7 @@
         
         <div class="conv-hero-welcome">
             <h2>{{ _('Hi') }} {{ participant_name }}, {{ _('thank you for participating') }}</h2>
-            <p>{{ branding.company_name if branding and branding.company_name else 'We' }} {{ _('value your feedback') }}</p>
+            <p>{{ branding.company_name if branding and branding.company_name else _('We') }} {{ _('value your feedback') }}</p>
         </div>
     </div>
 </div>
@@ -81,7 +81,7 @@
                         
                         <div class="mb-4">
                             <label for="tenureWithFc" class="form-label">
-                                {{ _('How long have you been working with') }} {{ branding.company_name if branding and branding.company_name else 'us' }}?
+                                {{ _('How long have you been working with') }} {{ branding.company_name if branding and branding.company_name else _('us') }}?
                             </label>
                             <select class="form-select" id="tenureWithFc" required>
                                 <option value="">{{ _('Select duration...') }}</option>
