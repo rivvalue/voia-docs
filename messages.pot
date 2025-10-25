@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-25 03:13+0000\n"
+"POT-Creation-Date: 2025-10-25 03:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3402,6 +3402,161 @@ msgstr ""
 #: templates/business_auth/scheduler_status.html:93
 #: templates/business_auth/scheduler_status.html:98
 msgid "Business Account"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:23
+#, python-brace-format
+msgid "Configure your personalized survey experience for {}"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:36
+msgid "Tell us about your business to personalize the survey conversation"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:41
+msgid "Industry"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:46
+msgid "Select your industry"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:53
+msgid "This helps tailor survey questions to your industry context"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:59
+msgid "Conversation Tone"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:70
+msgid "Choose how the AI should communicate with your survey participants"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:78
+msgid "Company Description"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:89
+msgid ""
+"This context helps the AI understand your business and ask relevant "
+"questions"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:97
+msgid "Product/Service Description"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:108
+msgid "Specific product details enable more targeted feedback collection"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:116
+msgid "Target Customers"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:127
+msgid "Understanding your audience helps frame questions appropriately"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:139
+msgid "What do you want to learn from your survey participants?"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:142
+msgid "Primary Survey Goals (select all that apply)"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:153
+msgid "Overall Satisfaction"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:158
+msgid "Product Feedback"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:163
+msgid "Support Quality"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:168
+msgid "Pricing Perception"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:173
+msgid "Custom Research"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:185
+msgid "Fine-tune the survey experience and conversation pacing"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:190
+msgid "Maximum Questions"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:208
+msgid "Absolute limit to keep surveys concise and engaging"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:214
+msgid "Time Limit (seconds)"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:233
+msgid "Maximum time participants can spend on the survey"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:239
+msgid "Follow-ups per Topic"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:257
+msgid "How deep to explore each topic with follow-up questions"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:269
+msgid ""
+"Control which topics the survey covers first and which are optional if "
+"time runs out"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:274
+msgid "Prioritized Topics (covered first)"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:289
+msgid "These topics will always be covered, in order of importance"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:295
+msgid "Optional Topics (if time allows)"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:310
+msgid "These topics can be skipped if the time/question limit is reached"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:322
+msgid "Personalize the survey experience with custom messages"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:327
+msgid "Custom Completion Message"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:338
+msgid ""
+"This message will be shown to participants when they complete the survey."
+" Leave blank to use the default message"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:362
+msgid "Cancel and return to settings"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:368
+msgid "Save survey configuration"
 msgstr ""
 
 #: templates/business_auth/licenses/assignment_form.html:22
