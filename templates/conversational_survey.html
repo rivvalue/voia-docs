@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}AI Survey - VOÏA - Voice Of Client Agent{% endblock %}
+{% block title %}{{ _('AI Survey - VOÏA - Voice Of Client Agent') }}{% endblock %}
 
 {% block page_class %}page-conversational{% endblock %}
 
@@ -25,7 +25,7 @@
                     <div class="conv-auth-warning alert" role="alert">
                         <h2 id="auth-heading" class="h5">
                             <i class="fas fa-key me-2" aria-hidden="true"></i>
-                            <strong>Authentication Required</strong>
+                            <strong>{{ _('Authentication Required') }}</strong>
                         </h2>
                         <p class="mb-3">{{ _('You need a valid token to participate in this survey.') }}</p>
                         {% if error %}
@@ -42,7 +42,7 @@
             <section id="surveySetup" class="conv-setup-card card" aria-labelledby="setup-heading">
                 <div class="conv-setup-header card-header">
                     <h2 id="setup-heading" class="h5"><i class="fas fa-user-circle me-2" aria-hidden="true"></i>{{ _('Let\'s Get Started') }}</h2>
-                    <small class="text-muted">Authenticated as: {{ email }}</small>
+                    <small class="text-muted">{{ _('Authenticated as:') }} {{ email }}</small>
                 </div>
                 <div class="conv-setup-body card-body">
                     <form id="setupForm" aria-labelledby="setup-heading">
@@ -99,7 +99,7 @@
                         </div>
                         
                         <button type="submit" class="conv-start-btn btn" aria-label="{{ _('Start Conversational Survey') }}">
-                            <i class="fas fa-comments me-2" aria-hidden="true"></i>Start Conversation
+                            <i class="fas fa-comments me-2" aria-hidden="true"></i>{{ _('Start Conversation') }}
                         </button>
                     </form>
                 </div>
@@ -146,7 +146,7 @@
                         </div>
                         <div class="form-text conv-input-tip">
                             <i class="fas fa-lightbulb me-1" aria-hidden="true"></i>
-                            Tip: Speak naturally! VOÏA understands conversational responses.
+                            {{ _('Tip: Speak naturally! VOÏA understands conversational responses.') }}
                         </div>
                     </div>
                 </div>
@@ -183,7 +183,7 @@
                         <a href="{{ url_for('dashboard') }}" 
                            class="conv-dashboard-btn btn"
                            aria-label="{{ _('View analytics dashboard with your feedback results') }}">
-                            <i class="fas fa-chart-bar me-2" aria-hidden="true"></i>View Analytics Dashboard
+                            <i class="fas fa-chart-bar me-2" aria-hidden="true"></i>{{ _('View Analytics Dashboard') }}
                         </a>
                     </div>
                     
@@ -199,17 +199,17 @@
                                 <button onclick="startNewSession()" 
                                         class="conv-action-btn-outline btn"
                                         aria-label="{{ _('Try another demo session') }}">
-                                    <i class="fas fa-redo me-2" aria-hidden="true"></i>Try Another Session
+                                    <i class="fas fa-redo me-2" aria-hidden="true"></i>{{ _('Try Another Session') }}
                                 </button>
-                                <small class="conv-btn-helper-text">Experience VOÏA with different scenarios</small>
+                                <small class="conv-btn-helper-text">{{ _('Experience VOÏA with different scenarios') }}</small>
                             </div>
                             <div class="col-md-6">
-                                <a href="mailto:info@rivvalue.com?subject=Voice of Client Agent - Full Service Inquiry&body=Hi Rivvalue team,%0A%0AI just completed the VOÏA Intelligence demonstration and I'm interested in learning more about implementing the full Voice of Client Agent service for my organization.%0A%0APlease contact me to discuss how this can benefit our customer feedback strategy.%0A%0AThank you!" 
+                                <a href="mailto:info@rivvalue.com?subject={{ _('Voice of Client Agent - Full Service Inquiry') | urlencode }}&body={{ _('Hi Rivvalue team,%0A%0AI just completed the VOÏA Intelligence demonstration and I\'m interested in learning more about implementing the full Voice of Client Agent service for my organization.%0A%0APlease contact me to discuss how this can benefit our customer feedback strategy.%0A%0AThank you!') | urlencode }}" 
                                    class="conv-action-btn-solid btn"
                                    aria-label="{{ _('Contact Rivvalue to implement VOÏA for your business') }}">
-                                    <i class="fas fa-envelope me-2" aria-hidden="true"></i>Contact Rivvalue
+                                    <i class="fas fa-envelope me-2" aria-hidden="true"></i>{{ _('Contact Rivvalue') }}
                                 </a>
-                                <small class="conv-btn-helper-text">Implement full VoC Agent for your business</small>
+                                <small class="conv-btn-helper-text">{{ _('Implement full VoC Agent for your business') }}</small>
                             </div>
                         </div>
                     </div>
@@ -219,7 +219,7 @@
                         <a href="{{ url_for('index') }}" 
                            class="conv-home-btn btn btn-outline-secondary"
                            aria-label="{{ _('Return to home page') }}">
-                            <i class="fas fa-home me-2" aria-hidden="true"></i>Return Home
+                            <i class="fas fa-home me-2" aria-hidden="true"></i>{{ _('Return Home') }}
                         </a>
                     </div>
                 </div>

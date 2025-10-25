@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-25 01:41+0000\n"
+"POT-Creation-Date: 2025-10-25 02:10+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -34,8 +34,8 @@ msgstr "Vous recevrez un jeton sécurisé valable 24 heures"
 #: templates/auth.html:40 templates/campaign_insights.html:292
 #: templates/campaign_insights.html:479 templates/campaign_insights.html:535
 #: templates/campaign_insights.html:621 templates/campaign_insights.html:776
-#: templates/company_responses.html:55 templates/company_responses.html:62
-#: templates/conversational_survey.html:163
+#: templates/campaign_insights.html:961 templates/company_responses.html:55
+#: templates/company_responses.html:62 templates/conversational_survey.html:163
 #: templates/conversational_survey_business.html:142
 #: templates/dashboard.html:261 templates/dashboard.html:528
 #: templates/dashboard.html:715 templates/dashboard.html:771
@@ -174,10 +174,11 @@ msgstr "A Demo"
 
 #: templates/campaign_insights.html:22
 msgid "Campaign-specific performance analytics and survey insights"
-msgstr "Analyses de performance spécifiques aux campagnes et aperçus des sondages"
+msgstr ""
 
 #: templates/campaign_insights.html:34 templates/dashboard.html:36
 #: templates/executive_summary.html:36
+#, fuzzy
 msgid "Refresh data"
 msgstr "Actualiser les données"
 
@@ -191,6 +192,7 @@ msgid "Compare KPIs across different campaigns"
 msgstr "Comparer les KPI entre différentes campagnes"
 
 #: templates/campaign_insights.html:60
+#, fuzzy
 msgid "Campaign:"
 msgstr "Campagnes :"
 
@@ -238,8 +240,8 @@ msgstr "Nom de la campagne"
 
 #: templates/campaign_insights.html:157 templates/campaign_insights.html:604
 #: templates/campaign_insights.html:704 templates/campaign_insights.html:849
-#: templates/campaign_insights.html:1005 templates/campaign_insights.html:1031
-#: templates/campaign_insights.html:1061
+#: templates/campaign_insights.html:1091 templates/campaign_insights.html:1117
+#: templates/campaign_insights.html:1147
 #: templates/campaigns/responses_list.html:178 templates/dashboard.html:393
 #: templates/dashboard.html:840 templates/dashboard.html:999
 #: templates/executive_summary.html:295 templates/executive_summary.html:400
@@ -247,6 +249,7 @@ msgid "NPS Score"
 msgstr "Score NPS"
 
 #: templates/campaign_insights.html:158 templates/dashboard.html:394
+#, fuzzy
 msgid "Overall satisfaction metric"
 msgstr "Satisfaction globale (1-5)"
 
@@ -257,13 +260,14 @@ msgstr "Total des réponses"
 
 #: templates/campaign_insights.html:165 templates/dashboard.html:401
 msgid "All time feedback collected"
-msgstr "Tous les commentaires collectés"
+msgstr ""
 
 #: templates/campaign_insights.html:171
 msgid "Recent (30 days)"
-msgstr "Récent (30 jours)"
+msgstr ""
 
 #: templates/campaign_insights.html:172 templates/dashboard.html:408
+#, fuzzy
 msgid "Latest customer feedback"
 msgstr "Enquête de retour client"
 
@@ -289,15 +293,16 @@ msgstr "Risque critique"
 
 #: templates/campaign_insights.html:183 templates/dashboard.html:419
 msgid "Imminent churn risk (High/Critical)"
-msgstr "Risque de désabonnement imminent (Élevé/Critique)"
+msgstr ""
 
 #: templates/campaign_insights.html:189
+#, fuzzy
 msgid "Growth Potential"
 msgstr "Opportunités de croissance"
 
 #: templates/campaign_insights.html:190 templates/dashboard.html:426
 msgid "Revenue expansion opportunity"
-msgstr "Opportunité d'expansion des revenus"
+msgstr ""
 
 #: templates/campaign_insights.html:195 templates/campaign_insights.html:215
 #: templates/dashboard.html:451
@@ -403,6 +408,7 @@ msgid "NPS-Based Growth Factor Analysis"
 msgstr "Analyse du facteur de croissance basé sur le NPS"
 
 #: templates/campaign_insights.html:371 templates/campaign_insights.html:376
+#, fuzzy
 msgid "Average Ratings"
 msgstr "Sélectionnez la note"
 
@@ -422,17 +428,20 @@ msgid "NPS Category"
 msgstr "Score NPS"
 
 #: templates/campaign_insights.html:410 templates/campaign_insights.html:582
-#: templates/dashboard.html:646 templates/dashboard.html:1152
+#: templates/campaign_insights.html:1002 templates/dashboard.html:646
+#: templates/dashboard.html:1152
 msgid "Promoters (9-10)"
 msgstr "Promoteurs (9-10)"
 
 #: templates/campaign_insights.html:411 templates/campaign_insights.html:583
-#: templates/dashboard.html:647 templates/dashboard.html:1153
+#: templates/campaign_insights.html:1003 templates/dashboard.html:647
+#: templates/dashboard.html:1153
 msgid "Passives (7-8)"
 msgstr "Passifs (7-8)"
 
 #: templates/campaign_insights.html:412 templates/campaign_insights.html:584
-#: templates/dashboard.html:648 templates/dashboard.html:1154
+#: templates/campaign_insights.html:1004 templates/dashboard.html:648
+#: templates/dashboard.html:1154
 msgid "Detractors (0-6)"
 msgstr "Détracteurs (0-6)"
 
@@ -458,8 +467,8 @@ msgstr "Dernière réponse"
 msgid "Churn Risk"
 msgstr "Indicateurs de risque de résiliation"
 
-#: templates/campaign_insights.html:470 templates/dashboard.html:706
-#: templates/dashboard.html:1141
+#: templates/campaign_insights.html:470 templates/campaign_insights.html:991
+#: templates/dashboard.html:706 templates/dashboard.html:1141
 msgid "No company data available yet"
 msgstr "Aucune donnée d'entreprise disponible pour le moment"
 
@@ -485,24 +494,25 @@ msgstr "Ancienneté :"
 
 #: templates/campaign_insights.html:552
 msgid "Insufficient Data (<2 responses)"
-msgstr "Données insuffisantes (<2 réponses)"
+msgstr ""
 
 #: templates/campaign_insights.html:560 templates/campaign_insights.html:581
 #: templates/campaign_insights.html:589 templates/campaign_insights.html:592
 #: templates/campaign_insights.html:702 templates/campaign_insights.html:729
 #: templates/campaign_insights.html:743 templates/campaign_insights.html:781
 #: templates/campaign_insights.html:816 templates/campaign_insights.html:839
-#: templates/campaign_insights.html:1040 templates/dashboard.html:72
-#: templates/dashboard.html:400 templates/dashboard.html:796
-#: templates/dashboard.html:801 templates/dashboard.html:817
-#: templates/dashboard.html:879 templates/dashboard.html:893
-#: templates/dashboard.html:931 templates/dashboard.html:989
-#: templates/dashboard.html:1132 templates/executive_summary.html:65
-#: templates/executive_summary.html:285
+#: templates/campaign_insights.html:982 templates/campaign_insights.html:1126
+#: templates/dashboard.html:72 templates/dashboard.html:400
+#: templates/dashboard.html:796 templates/dashboard.html:801
+#: templates/dashboard.html:817 templates/dashboard.html:879
+#: templates/dashboard.html:893 templates/dashboard.html:931
+#: templates/dashboard.html:989 templates/dashboard.html:1132
+#: templates/executive_summary.html:65 templates/executive_summary.html:285
 msgid "Responses"
 msgstr "Réponses"
 
 #: templates/campaign_insights.html:565
+#, fuzzy
 msgid "Recent Survey Responses"
 msgstr "Aucune réponse récente"
 
@@ -519,8 +529,9 @@ msgid "Survey responses pagination"
 msgstr "Pagination des réponses à l'enquête"
 
 #: templates/campaign_insights.html:638
+#, fuzzy
 msgid "No Segmentation Data Available"
-msgstr "Aucune donnée de segmentation disponible"
+msgstr "Aucune donnée d'entreprise disponible pour le moment"
 
 #: templates/campaign_insights.html:638
 msgid ""
@@ -530,52 +541,56 @@ msgid ""
 msgstr ""
 
 #: templates/campaign_insights.html:642 templates/campaign_insights.html:647
-#: templates/campaign_insights.html:974
+#: templates/campaign_insights.html:1060
+#, fuzzy
 msgid "NPS by Role"
 msgstr "Filtrer par rôle"
 
 #: templates/campaign_insights.html:648
 msgid "Net Promoter Score distribution across different participant roles"
 msgstr ""
-"Distribution du Net Promoter Score selon les différents rôles des "
-"participants"
 
 #: templates/campaign_insights.html:657 templates/campaign_insights.html:662
-#: templates/campaign_insights.html:977
+#: templates/campaign_insights.html:1063
+#, fuzzy
 msgid "NPS by Region"
 msgstr "Filtrer par région"
 
 #: templates/campaign_insights.html:663
 msgid "Geographic distribution of customer satisfaction"
-msgstr "Distribution géographique de la satisfaction client"
+msgstr ""
 
 #: templates/campaign_insights.html:672 templates/campaign_insights.html:677
+#, fuzzy
 msgid "NPS by Customer Tier"
 msgstr "NPS par ancienneté client"
 
 #: templates/campaign_insights.html:678
 msgid "Customer satisfaction across different tier levels"
-msgstr "Satisfaction client selon les différents niveaux de catégorie"
+msgstr ""
 
 #: templates/campaign_insights.html:692
 msgid "Satisfaction Ratings by Segment"
-msgstr "Évaluations de satisfaction par segment"
+msgstr ""
 
 #: templates/campaign_insights.html:693
 msgid "Average satisfaction scores across all segmentation dimensions"
-msgstr "Scores de satisfaction moyens sur toutes les dimensions de segmentation"
+msgstr ""
 
 #: templates/campaign_insights.html:700
+#, fuzzy
 msgid "Segment Type"
 msgstr "Date d'attribution :"
 
 #: templates/campaign_insights.html:701
+#, fuzzy
 msgid "Segment Name"
 msgstr "Gestion de l'engagement"
 
 #: templates/campaign_insights.html:703
+#, fuzzy
 msgid "Avg Satisfaction"
-msgstr "Satisfaction :"
+msgstr "Satisfaction"
 
 #: templates/campaign_insights.html:747 templates/campaign_insights.html:832
 #: templates/campaign_insights.html:919 templates/dashboard.html:897
@@ -614,13 +629,14 @@ msgstr "Aucune réponse d'enquête ne correspond à vos critères de recherche."
 msgid "Companies Analyzed"
 msgstr "Entreprises analysées"
 
-#: templates/campaign_insights.html:889 templates/company_responses.html:75
-#: templates/company_responses.html:210 templates/dashboard.html:1039
-#: templates/dashboard.html:1128
+#: templates/campaign_insights.html:889 templates/campaign_insights.html:978
+#: templates/company_responses.html:75 templates/company_responses.html:210
+#: templates/dashboard.html:1039 templates/dashboard.html:1128
 msgid "Product Value"
 msgstr "Valeur du produit"
 
-#: templates/campaign_insights.html:899 templates/company_responses.html:77
+#: templates/campaign_insights.html:899 templates/campaign_insights.html:980
+#: templates/campaign_insights.html:1014 templates/company_responses.html:77
 #: templates/company_responses.html:222 templates/dashboard.html:108
 #: templates/dashboard.html:1049 templates/dashboard.html:1130
 #: templates/dashboard.html:1164 templates/executive_summary.html:101
@@ -628,9 +644,274 @@ msgstr "Valeur du produit"
 msgid "Pricing"
 msgstr "Tarification"
 
-#: templates/campaign_insights.html:1132
+#: templates/campaign_insights.html:937 templates/dashboard.html:1087
+#: templates/executive_summary.html:378
+#, fuzzy
+msgid "Draft"
+msgstr "Date de fin"
+
+#: templates/campaign_insights.html:938 templates/dashboard.html:1088
+#: templates/executive_summary.html:379
+#, fuzzy
+msgid "Ready"
+msgstr "Créé"
+
+#: templates/business_auth/licenses/overview.html:304
+#: templates/campaign_insights.html:939 templates/dashboard.html:1089
+#: templates/executive_summary.html:380
+msgid "Active"
+msgstr "Actif"
+
+#: templates/campaign_insights.html:940 templates/dashboard.html:1090
+#: templates/executive_summary.html:381
+#: templates/participants/campaign_participants.html:40
+#: templates/participants/campaign_participants.html:508
+#: templates/participants/campaign_participants.html:586
+#: templates/participants/campaign_participants.html:612
+msgid "Completed"
+msgstr "Terminé"
+
+#: templates/campaign_insights.html:941 templates/dashboard.html:1091
+#: templates/executive_summary.html:382 templates/participants/list.html:441
+#: templates/participants/list.html:736 templates/participants/list.html:804
+msgid "Unknown"
+msgstr "Inconnu"
+
+#: templates/campaign_insights.html:944 templates/dashboard.html:1094
+#, fuzzy
+msgid "Filtered by:"
+msgstr "Filtrer par rôle"
+
+#: templates/campaign_insights.html:945 templates/dashboard.html:1095
+#, fuzzy
+msgid "Clear filter"
+msgstr "Effacer le filtre"
+
+#: templates/campaign_insights.html:946 templates/dashboard.html:149
+#: templates/dashboard.html:1096 templates/executive_summary.html:142
+#: templates/executive_summary.html:385
+msgid "Select first campaign"
+msgstr "Sélectionner la première campagne"
+
+#: templates/campaign_insights.html:947 templates/dashboard.html:158
+#: templates/dashboard.html:1097 templates/executive_summary.html:151
+#: templates/executive_summary.html:386
+msgid "Select second campaign"
+msgstr "Sélectionner la deuxième campagne"
+
+#: templates/campaign_insights.html:950 templates/dashboard.html:1100
+msgid "days left"
+msgstr ""
+
+#: templates/campaign_insights.html:951 templates/dashboard.html:1101
+msgid "days ago"
+msgstr ""
+
+#: templates/campaign_insights.html:952 templates/dashboard.html:1102
+#, fuzzy
+msgid "month"
+msgstr "Autre"
+
+#: templates/campaign_insights.html:953 templates/dashboard.html:1103
+msgid "months"
+msgstr ""
+
+#: templates/campaign_insights.html:954 templates/dashboard.html:1104
+msgid "ago"
+msgstr ""
+
+#: templates/campaign_insights.html:955 templates/dashboard.html:1105
+#, fuzzy
+msgid "year"
+msgstr "par an"
+
+#: templates/campaign_insights.html:956 templates/dashboard.html:1106
+#, fuzzy
+msgid "years"
+msgstr "3 à 5 ans"
+
+#: templates/campaign_insights.html:959 templates/dashboard.html:1109
+#: templates/executive_summary.html:389
+#, fuzzy
+msgid "Loading comparison..."
+msgstr "Chargement des réponses..."
+
+#: templates/campaign_insights.html:960 templates/dashboard.html:1110
+#: templates/executive_summary.html:390
+#, fuzzy
+msgid "Loading comparison data..."
+msgstr "Chargement des données du tableau de bord..."
+
+#: templates/campaign_insights.html:964 templates/dashboard.html:1114
+#: templates/executive_summary.html:393
+msgid "Failed to fetch comparison data"
+msgstr ""
+
+#: templates/campaign_insights.html:965 templates/dashboard.html:1115
+#: templates/executive_summary.html:391
+#, fuzzy
+msgid "Error Loading Comparison"
+msgstr "Erreur lors du chargement des réponses"
+
+#: templates/campaign_insights.html:966 templates/dashboard.html:1116
+#: templates/executive_summary.html:392
+msgid "Failed to load comparison data. Please try again."
+msgstr ""
+
+#: templates/campaign_insights.html:967 templates/dashboard.html:1117
+#: templates/executive_summary.html:396
+#, fuzzy
+msgid "No campaign data available"
+msgstr "Aucune donnée d'entreprise disponible pour le moment"
+
+#: templates/campaign_insights.html:968 templates/dashboard.html:1118
+#: templates/executive_summary.html:395
+#, fuzzy
+msgid "Error loading KPI overview data"
+msgstr "Vue d'ensemble des indicateurs de campagne"
+
+#: templates/campaign_insights.html:969 templates/dashboard.html:1119
+#, fuzzy
+msgid "Error loading dashboard data:"
+msgstr "Chargement des données du tableau de bord..."
+
+#: templates/campaign_insights.html:970 templates/dashboard.html:1120
+#: templates/executive_summary.html:394
+msgid "Failed to load campaign options"
+msgstr ""
+
+#: templates/campaign_insights.html:971 templates/dashboard.html:1121
+#, fuzzy
+msgid "Error loading account intelligence"
+msgstr "Intelligence de compte"
+
+#: templates/campaign_insights.html:972 templates/dashboard.html:1122
+#, fuzzy
+msgid "Error loading responses."
+msgstr "Erreur lors du chargement des réponses"
+
+#: templates/campaign_insights.html:973 templates/dashboard.html:1123
+msgid "Network error loading tenure data"
+msgstr ""
+
+#: templates/campaign_insights.html:974 templates/dashboard.html:1124
+msgid "Network error loading company data"
+msgstr ""
+
+#: templates/campaign_insights.html:977 templates/campaign_insights.html:1011
+#: templates/dashboard.html:96 templates/dashboard.html:1029
+#: templates/dashboard.html:1127 templates/dashboard.html:1161
+msgid "Satisfaction"
+msgstr "Satisfaction"
+
+#: templates/campaign_insights.html:979 templates/campaign_insights.html:1013
+#: templates/dashboard.html:114 templates/dashboard.html:1059
+#: templates/dashboard.html:1129 templates/dashboard.html:1163
+#: templates/executive_summary.html:107 templates/executive_summary.html:355
+msgid "Service"
+msgstr "Service"
+
+#: templates/campaign_insights.html:981 templates/dashboard.html:1131
+#, fuzzy
+msgid "Average Rating"
+msgstr "Sélectionnez la note"
+
+#: templates/campaign_insights.html:983 templates/dashboard.html:78
+#: templates/dashboard.html:938 templates/dashboard.html:1133
+msgid "NPS"
+msgstr "NPS"
+
+#: templates/campaign_insights.html:984 templates/dashboard.html:84
+#: templates/dashboard.html:1134 templates/executive_summary.html:77
+#: templates/executive_summary.html:214 templates/executive_summary.html:305
+msgid "Companies"
+msgstr "Entreprises"
+
+#: templates/campaign_insights.html:985 templates/dashboard.html:90
+#: templates/dashboard.html:1019 templates/dashboard.html:1135
+#: templates/executive_summary.html:83 templates/executive_summary.html:315
+msgid "Critical Risk"
+msgstr "Risque critique"
+
+#: templates/campaign_insights.html:986 templates/dashboard.html:102
+#: templates/dashboard.html:1136 templates/executive_summary.html:95
+#: templates/executive_summary.html:335
+msgid "Product"
+msgstr "Produit"
+
+#: templates/campaign_insights.html:989 templates/dashboard.html:1139
+msgid "N/A"
+msgstr ""
+
+#: templates/campaign_insights.html:990 templates/dashboard.html:1140
+#, fuzzy
+msgid "No tenure data available yet"
+msgstr "Aucune donnée d'entreprise disponible pour le moment"
+
+#: templates/campaign_insights.html:994 templates/company_responses.html:108
+#: templates/dashboard.html:1144
+msgid "Showing"
+msgstr "Affichage"
+
+#: templates/campaign_insights.html:995 templates/dashboard.html:1145
+msgid "of"
+msgstr ""
+
+#: templates/campaign_insights.html:996 templates/dashboard.html:1146
+#, fuzzy
+msgid "tenure groups"
+msgstr "Ancienneté :"
+
+#: templates/campaign_insights.html:997 templates/dashboard.html:1147
+#, fuzzy
+msgid "companies"
+msgstr "Entreprises"
+
+#: templates/campaign_insights.html:998 templates/dashboard.html:1148
+#, fuzzy
+msgid "responses"
+msgstr "Réponses"
+
+#: templates/campaign_insights.html:999 templates/dashboard.html:1149
+#, fuzzy
+msgid "accounts"
+msgstr "Moyenne/Compte"
+
+#: templates/campaign_insights.html:1007 templates/dashboard.html:1157
+#: templates/survey.html:110 templates/survey.html:185
+#: templates/survey.html:205
+msgid "Previous"
+msgstr "Précédent"
+
+#: templates/campaign_insights.html:1008 templates/dashboard.html:1158
+#: templates/survey.html:72 templates/survey.html:111 templates/survey.html:186
+#: templates/survey.html:241 templates/survey.html:243
+msgid "Next"
+msgstr "Suivant"
+
+#: templates/campaign_insights.html:1009 templates/dashboard.html:1159
+#, fuzzy
+msgid "View Details"
+msgstr "Détails"
+
+#: templates/campaign_insights.html:1010 templates/dashboard.html:1160
+#, fuzzy
+msgid "Authentication required"
+msgstr "Jeton d'authentification :"
+
+#: templates/campaign_insights.html:1012 templates/dashboard.html:1162
+msgid "Value"
+msgstr ""
+
+#: templates/campaign_insights.html:1015 templates/dashboard.html:1165
+#, fuzzy
+msgid "View Full Response"
+msgstr "Saisissez votre réponse"
+
+#: templates/campaign_insights.html:1218
+#, fuzzy
 msgid "No segmentation data available"
-msgstr "Aucune donnée de segmentation disponible"
+msgstr "Aucune donnée d'entreprise disponible pour le moment"
 
 #: templates/company_responses.html:91
 msgid "No responses found for this company"
@@ -640,13 +921,17 @@ msgstr "Aucune réponse trouvée pour cette entreprise"
 msgid "Error loading responses"
 msgstr "Erreur lors du chargement des réponses"
 
-#: templates/company_responses.html:108 templates/dashboard.html:1144
-msgid "Showing"
-msgstr "Affichage"
+#: templates/conversational_survey.html:3
+msgid "AI Survey - VOÏA - Voice Of Client Agent"
+msgstr "Sondage IA - VOÏA - Agent Voix du Client"
 
 #: templates/conversational_survey.html:18
 msgid "Share your experience"
 msgstr "Partagez votre expérience"
+
+#: templates/conversational_survey.html:28
+msgid "Authentication Required"
+msgstr "Jeton d'authentification :"
 
 #: templates/conversational_survey.html:30
 msgid "You need a valid token to participate in this survey."
@@ -663,6 +948,10 @@ msgstr "Obtenir un jeton d'authentification"
 #: templates/conversational_survey.html:44
 msgid "Let's Get Started"
 msgstr "Commençons"
+
+#: templates/conversational_survey.html:45
+msgid "Authenticated as:"
+msgstr "Jeton d'authentification :"
 
 #: templates/business_auth/activate_account.html:435
 #: templates/business_auth/licenses/overview.html:323
@@ -740,6 +1029,11 @@ msgstr "Plus de 10 ans"
 msgid "Start Conversational Survey"
 msgstr "Démarrer l'enquête conversationnelle"
 
+#: templates/conversational_survey.html:102
+#: templates/conversational_survey_business.html:99
+msgid "Start Conversation"
+msgstr "Démarrer la conversation"
+
 #: templates/conversational_survey.html:115
 msgid "Survey progress"
 msgstr "Progression de l'enquête"
@@ -757,6 +1051,13 @@ msgstr "Saisissez votre réponse"
 #: templates/conversational_survey.html:143
 msgid "Send message"
 msgstr "Envoyer le message"
+
+#: templates/conversational_survey.html:149
+#: templates/conversational_survey_business.html:132
+msgid "Tip: Speak naturally! VOÏA understands conversational responses."
+msgstr "Astuce : Parlez naturellement ! VOÏA comprend les réponses conversationnelles."
+"Conseil : Parlez naturellement ! VOÏA comprend les réponses "
+"conversationnelles."
 
 #: templates/conversational_survey.html:160
 msgid "Processing response"
@@ -787,6 +1088,10 @@ msgstr ""
 msgid "View analytics dashboard with your feedback results"
 msgstr "Afficher le tableau de bord analytique avec vos résultats de retour"
 
+#: templates/conversational_survey.html:186
+msgid "View Analytics Dashboard"
+msgstr "Afficher les analyses et les informations"
+
 #: templates/conversational_survey.html:190 templates/survey.html:239
 #: templates/survey_success.html:32
 msgid ""
@@ -811,12 +1116,50 @@ msgstr ""
 msgid "Try another demo session"
 msgstr "Essayer une autre session de démonstration"
 
+#: templates/conversational_survey.html:202
+msgid "Try Another Session"
+msgstr "Essayer une autre session de démonstration"
+
+#: templates/conversational_survey.html:204
+msgid "Experience VOÏA with different scenarios"
+msgstr "Découvrez VOÏA avec différents scénarios"
+
+#: templates/conversational_survey.html:207
+msgid "Voice of Client Agent - Full Service Inquiry"
+msgstr "Agent Voix du Client - Demande de service complet"
+
+#: templates/conversational_survey.html:207
+msgid ""
+"Hi Rivvalue team,%0A%0AI just completed the VOÏA Intelligence "
+"demonstration and I'm interested in learning more about implementing the "
+"full Voice of Client Agent service for my organization.%0A%0APlease "
+"contact me to discuss how this can benefit our customer feedback "
+"strategy.%0A%0AThank you!"
+msgstr ""
+"Bonjour l'équipe Rivvalue,%0A%0AJe viens de terminer la démonstration de "
+"VOÏA Intelligence et je souhaite en savoir plus sur la mise en œuvre du "
+"service complet Agent Voix du Client pour mon organisation.%0A%0AVeuillez "
+"me contacter pour discuter de la façon dont cela peut bénéficier à notre "
+"stratégie de retours clients.%0A%0AMerci !"
+
 #: templates/conversational_survey.html:209
 msgid "Contact Rivvalue to implement VOÏA for your business"
 msgstr "Contactez Rivvalue pour mettre en œuvre VOÏA dans votre entreprise"
 
+#: templates/conversational_survey.html:210
+msgid "Contact Rivvalue"
+msgstr "Contacter Rivvalue"
+
+#: templates/conversational_survey.html:212
+msgid "Implement full VoC Agent for your business"
+msgstr "Implémenter l'Agent VdC complet pour votre entreprise"
+
 #: templates/conversational_survey.html:221
 msgid "Return to home page"
+msgstr "Retour à la page d'accueil"
+
+#: templates/conversational_survey.html:222
+msgid "Return Home"
 msgstr "Retour à la page d'accueil"
 
 #: templates/conversational_survey_business.html:43
@@ -839,23 +1182,13 @@ msgstr "Vos informations"
 msgid "Participating on behalf of"
 msgstr "Participation au nom de"
 
-#: templates/conversational_survey_business.html:99
-msgid "Start Conversation"
-msgstr "Démarrer la conversation"
-
 #: templates/conversational_survey_business.html:125
 msgid "Type your response here..."
 msgstr "Saisissez votre réponse ici..."
 
-#: templates/conversational_survey_business.html:132
-msgid "Tip: Speak naturally! VOÏA understands conversational responses."
-msgstr ""
-"Conseil : Parlez naturellement ! VOÏA comprend les réponses "
-"conversationnelles."
-
 #: templates/conversational_survey_business.html:156
-#, python-format
-msgid "Thank you, %s!"
+#, fuzzy, python-brace-format, python-format
+msgid "Thank you, {}!"
 msgstr "Merci, %s !"
 
 #: templates/conversational_survey_business.html:159
@@ -919,6 +1252,7 @@ msgstr ""
 
 #: templates/dashboard.html:56 templates/dashboard.html:58
 #: templates/executive_summary.html:49 templates/executive_summary.html:51
+#, fuzzy
 msgid "Loading executive summary..."
 msgstr "Résumé exécutif"
 
@@ -944,48 +1278,16 @@ msgstr "Campagnes"
 #: templates/executive_summary.html:90 templates/executive_summary.html:96
 #: templates/executive_summary.html:102 templates/executive_summary.html:108
 msgid "Click to view full trends"
-msgstr "Cliquez pour voir les tendances complètes"
-
-#: templates/dashboard.html:78 templates/dashboard.html:938
-#: templates/dashboard.html:1133
-msgid "NPS"
-msgstr "NPS"
-
-#: templates/dashboard.html:84 templates/dashboard.html:1134
-#: templates/executive_summary.html:77 templates/executive_summary.html:214
-#: templates/executive_summary.html:305
-msgid "Companies"
-msgstr "Entreprises"
-
-#: templates/dashboard.html:90 templates/dashboard.html:1019
-#: templates/dashboard.html:1135 templates/executive_summary.html:83
-#: templates/executive_summary.html:315
-msgid "Critical Risk"
-msgstr "Risque critique"
-
-#: templates/dashboard.html:96 templates/dashboard.html:1029
-#: templates/dashboard.html:1127 templates/dashboard.html:1161
-msgid "Satisfaction"
-msgstr "Satisfaction"
-
-#: templates/dashboard.html:102 templates/dashboard.html:1136
-#: templates/executive_summary.html:95 templates/executive_summary.html:335
-msgid "Product"
-msgstr "Produit"
-
-#: templates/dashboard.html:114 templates/dashboard.html:1059
-#: templates/dashboard.html:1129 templates/dashboard.html:1163
-#: templates/executive_summary.html:107 templates/executive_summary.html:355
-msgid "Service"
-msgstr "Service"
+msgstr ""
 
 #: templates/dashboard.html:124 templates/executive_summary.html:117
+#, fuzzy
 msgid "Loading KPI overview..."
-msgstr "Chargement de la vue d'ensemble des KPI..."
+msgstr "Vue d'ensemble des indicateurs de campagne"
 
 #: templates/dashboard.html:134 templates/executive_summary.html:127
 msgid "View Trends"
-msgstr "Voir les tendances"
+msgstr ""
 
 #: templates/dashboard.html:141
 msgid "Campaign Comparison"
@@ -997,21 +1299,11 @@ msgstr "Comparaison des campagnes"
 msgid "Campaign 1"
 msgstr "Campagnes"
 
-#: templates/dashboard.html:149 templates/dashboard.html:1096
-#: templates/executive_summary.html:142 templates/executive_summary.html:385
-msgid "Select first campaign"
-msgstr "Sélectionner la première campagne"
-
 #: templates/dashboard.html:156 templates/dashboard.html:181
 #: templates/executive_summary.html:149 templates/executive_summary.html:174
 #: templates/executive_summary.html:200
 msgid "Campaign 2"
 msgstr "Campagnes"
-
-#: templates/dashboard.html:158 templates/dashboard.html:1097
-#: templates/executive_summary.html:151 templates/executive_summary.html:386
-msgid "Select second campaign"
-msgstr "Sélectionner la deuxième campagne"
 
 #: templates/dashboard.html:166 templates/executive_summary.html:159
 msgid "Please select two campaigns above to view comparison results"
@@ -1038,6 +1330,7 @@ msgid "Account-by-Account Analysis"
 msgstr "À propos de l'analyse des transcriptions"
 
 #: templates/dashboard.html:216 templates/dashboard.html:640
+#, fuzzy
 msgid "Search by company name..."
 msgstr "Entrez le nom de votre entreprise"
 
@@ -1126,12 +1419,10 @@ msgstr "Affichage des données de la campagne active"
 #: templates/dashboard.html:417
 msgid "Companies with High or Critical churn risk level based on AI assessment"
 msgstr ""
-"Entreprises avec un niveau de risque de désabonnement Élevé ou Critique "
-"basé sur l'évaluation IA"
 
 #: templates/dashboard.html:438
 msgid "Companies with High or Critical churn risk level"
-msgstr "Entreprises avec un niveau de risque de désabonnement Élevé ou Critique"
+msgstr ""
 
 #: templates/dashboard.html:471
 msgid ""
@@ -1145,7 +1436,7 @@ msgstr "Équilibre Risque vs Opportunité par Entreprise"
 
 #: templates/dashboard.html:484
 msgid "Search company, opportunities, risks..."
-msgstr "Rechercher entreprise, opportunités, risques..."
+msgstr ""
 
 #: templates/dashboard.html:492
 msgid "Risk-Heavy"
@@ -1189,7 +1480,7 @@ msgstr "Pagination du NPS par ancienneté"
 
 #: templates/dashboard.html:812
 msgid "Search by company name, participant name, or email..."
-msgstr "Rechercher par nom d'entreprise, nom du participant ou e-mail..."
+msgstr ""
 
 #: templates/dashboard.html:842
 msgid "Sentiment"
@@ -1200,6 +1491,7 @@ msgid "Date"
 msgstr "Date de fin"
 
 #: templates/dashboard.html:908
+#, fuzzy
 msgid "Search by respondent name or email..."
 msgstr "Rechercher par nom, e-mail ou entreprise..."
 
@@ -1218,183 +1510,6 @@ msgstr "Durée :"
 #: templates/campaigns/responses_list.html:232 templates/dashboard.html:966
 msgid "No Responses Found"
 msgstr "Aucune réponse trouvée"
-
-#: templates/dashboard.html:1087 templates/executive_summary.html:378
-msgid "Draft"
-msgstr "Brouillon"
-
-#: templates/dashboard.html:1088 templates/executive_summary.html:379
-msgid "Ready"
-msgstr "Prêt"
-
-#: templates/business_auth/licenses/overview.html:304
-#: templates/dashboard.html:1089 templates/executive_summary.html:380
-msgid "Active"
-msgstr "Actif"
-
-#: templates/dashboard.html:1090 templates/executive_summary.html:381
-#: templates/participants/campaign_participants.html:40
-#: templates/participants/campaign_participants.html:508
-#: templates/participants/campaign_participants.html:586
-#: templates/participants/campaign_participants.html:612
-msgid "Completed"
-msgstr "Terminé"
-
-#: templates/dashboard.html:1091 templates/executive_summary.html:382
-#: templates/participants/list.html:441 templates/participants/list.html:736
-#: templates/participants/list.html:804
-msgid "Unknown"
-msgstr "Inconnu"
-
-#: templates/dashboard.html:1094
-msgid "Filtered by:"
-msgstr "Filtré par :"
-
-#: templates/dashboard.html:1095
-msgid "Clear filter"
-msgstr "Effacer le filtre"
-
-#: templates/dashboard.html:1100
-msgid "days left"
-msgstr "jours restants"
-
-#: templates/dashboard.html:1101
-msgid "days ago"
-msgstr "il y a {n} jours"
-
-#: templates/dashboard.html:1102
-msgid "month"
-msgstr "mois"
-
-#: templates/dashboard.html:1103
-msgid "months"
-msgstr "mois"
-
-#: templates/dashboard.html:1104
-msgid "ago"
-msgstr "il y a"
-
-#: templates/dashboard.html:1105
-msgid "year"
-msgstr "an"
-
-#: templates/dashboard.html:1106
-msgid "years"
-msgstr "ans"
-
-#: templates/dashboard.html:1109 templates/executive_summary.html:389
-msgid "Loading comparison..."
-msgstr "Chargement de la comparaison..."
-
-#: templates/dashboard.html:1110 templates/executive_summary.html:390
-msgid "Loading comparison data..."
-msgstr "Chargement des données de comparaison..."
-
-#: templates/dashboard.html:1114 templates/executive_summary.html:393
-msgid "Failed to fetch comparison data"
-msgstr "Échec de la récupération des données de comparaison"
-
-#: templates/dashboard.html:1115 templates/executive_summary.html:391
-msgid "Error Loading Comparison"
-msgstr "Erreur de chargement de la comparaison"
-
-#: templates/dashboard.html:1116 templates/executive_summary.html:392
-msgid "Failed to load comparison data. Please try again."
-msgstr "Échec du chargement des données de comparaison. Veuillez réessayer."
-
-#: templates/dashboard.html:1117 templates/executive_summary.html:396
-msgid "No campaign data available"
-msgstr "Aucune donnée de campagne disponible"
-
-#: templates/dashboard.html:1118 templates/executive_summary.html:395
-msgid "Error loading KPI overview data"
-msgstr "Erreur lors du chargement des données KPI"
-
-#: templates/dashboard.html:1119
-msgid "Error loading dashboard data:"
-msgstr "Erreur lors du chargement des données du tableau de bord :"
-
-#: templates/dashboard.html:1120 templates/executive_summary.html:394
-msgid "Failed to load campaign options"
-msgstr "Échec du chargement des options de campagne"
-
-#: templates/dashboard.html:1121
-msgid "Error loading account intelligence"
-msgstr "Erreur lors du chargement de l'intelligence de compte"
-
-#: templates/dashboard.html:1122
-msgid "Error loading responses."
-msgstr "Erreur lors du chargement des réponses."
-
-#: templates/dashboard.html:1123
-msgid "Network error loading tenure data"
-msgstr "Erreur réseau lors du chargement des données d'ancienneté"
-
-#: templates/dashboard.html:1124
-msgid "Network error loading company data"
-msgstr "Erreur réseau lors du chargement des données d'entreprise"
-
-#: templates/dashboard.html:1131
-msgid "Average Rating"
-msgstr "Note moyenne"
-
-#: templates/dashboard.html:1139
-msgid "N/A"
-msgstr "N/A"
-
-#: templates/dashboard.html:1140
-msgid "No tenure data available yet"
-msgstr "Aucune donnée d'ancienneté disponible pour le moment"
-
-#: templates/dashboard.html:1145
-msgid "of"
-msgstr "sur"
-
-#: templates/dashboard.html:1146
-msgid "tenure groups"
-msgstr "groupes d'ancienneté"
-
-#: templates/dashboard.html:1147
-msgid "companies"
-msgstr "entreprises"
-
-#: templates/dashboard.html:1148
-msgid "responses"
-msgstr "réponses"
-
-#: templates/dashboard.html:1149
-msgid "accounts"
-msgstr "comptes"
-
-#: templates/dashboard.html:1157 templates/survey.html:110
-#: templates/survey.html:185 templates/survey.html:205
-msgid "Previous"
-msgstr "Précédent"
-
-#: templates/dashboard.html:1158 templates/survey.html:72
-#: templates/survey.html:111 templates/survey.html:186
-#: templates/survey.html:241 templates/survey.html:243
-msgid "Next"
-msgstr "Suivant"
-
-#: templates/dashboard.html:1159
-#
-msgid "View Details"
-msgstr "Voir les détails"
-
-#: templates/dashboard.html:1160
-#
-msgid "Authentication required"
-msgstr "Authentification requise"
-
-#: templates/dashboard.html:1162
-msgid "Value"
-msgstr "Valeur"
-
-#: templates/dashboard.html:1165
-#
-msgid "View Full Response"
-msgstr "Voir la réponse complète"
 
 #: templates/demo_intro.html:3 templates/demo_intro.html:15
 msgid "Welcome to Your VO"
@@ -1511,38 +1626,39 @@ msgid "Continue to Survey"
 msgstr "Continuer vers l'enquête"
 
 #: templates/executive_summary.html:402
+#, fuzzy
 msgid "Critical Risk Companies"
-msgstr "Entreprises à risque critique"
+msgstr "Risque critique"
 
 #: templates/executive_summary.html:405
-#
+#, fuzzy
 msgid "Risk-Heavy Accounts"
-msgstr "Comptes à risque élevé"
+msgstr "Comptes d'essai"
 
 #: templates/executive_summary.html:406
-#
+#, fuzzy
 msgid "Opportunity-Heavy Accounts"
-msgstr "Comptes à fort potentiel"
+msgstr "Opportunité Élevée"
 
 #: templates/executive_summary.html:407
-#
+#, fuzzy
 msgid "Satisfaction Rating"
-msgstr "Note de satisfaction"
+msgstr "Satisfaction"
 
 #: templates/executive_summary.html:408
-#
+#, fuzzy
 msgid "Product Value Rating"
-msgstr "Note de valeur du produit"
+msgstr "Valeur du produit"
 
 #: templates/executive_summary.html:409
-#
+#, fuzzy
 msgid "Pricing Rating"
-msgstr "Note de tarification"
+msgstr "Tarification"
 
 #: templates/executive_summary.html:410
-#
+#, fuzzy
 msgid "Service Rating"
-msgstr "Note de service"
+msgstr "Sélectionnez la note"
 
 #: templates/index.html:3
 msgid "VOÏA - Experience Demo"
@@ -3481,14 +3597,17 @@ msgid "Your organization's email server settings"
 msgstr ""
 
 #: templates/business_auth/onboarding/smtp.html:290
+#, fuzzy
 msgid "Server Settings"
 msgstr "Paramètres du système"
 
 #: templates/business_auth/onboarding/smtp.html:306
+#, fuzzy
 msgid "Usually 587 for TLS or 465 for SSL"
 msgstr "Généralement 587 (TLS) ou 465 (SSL)"
 
 #: templates/business_auth/onboarding/smtp.html:316
+#, fuzzy
 msgid "Your email address or SMTP username"
 msgstr "Entrez votre adresse e-mail"
 
@@ -3507,12 +3626,14 @@ msgid "Add Team Members"
 msgstr "Ajouter des membres à l'équipe"
 
 #: templates/business_auth/onboarding/users.html:318
+#, fuzzy
 msgid "Invite campaign managers to help create and manage surveys"
 msgstr ""
 "Invitez des responsables de campagne à vous aider à créer et gérer les "
 "enquêtes de retour client"
 
 #: templates/business_auth/onboarding/users.html:346
+#, fuzzy
 msgid "Current Team Members"
 msgstr "Membres de l'équipe"
 
@@ -3525,10 +3646,12 @@ msgid "Can view survey results and analytics but cannot create campaigns"
 msgstr ""
 
 #: templates/business_auth/onboarding/users.html:374
+#, fuzzy
 msgid "Full access to all features and settings"
 msgstr "Actions rapides et paramètres"
 
 #: templates/business_auth/onboarding/users.html:384
+#, fuzzy
 msgid "Add Campaign Manager"
 msgstr "Gestion des campagnes"
 
@@ -4392,16 +4515,16 @@ msgstr "Télécharger le modèle de fichier CSV"
 #~ msgstr "Cliquez pour voir les tendances complètes"
 
 #~ msgid "Search by company name..."
-#~ msgstr "Rechercher par nom d'entreprise..."
+#~ msgstr "Entrez le nom de votre entreprise"
 
 #~ msgid "Companies with High or Critical churn risk level based on AI assessment"
 #~ msgstr ""
-#~ "Entreprises présentant un risque de "
-#~ "résiliation élevé ou critique selon "
-#~ "l'évaluation de l'IA"
+#~ "Entreprises avec un niveau de risque "
+#~ "de désabonnement Élevé ou Critique basé"
+#~ " sur l'évaluation IA"
 
 #~ msgid "Companies with High or Critical churn risk level"
-#~ msgstr "Entreprises présentant un risque de résiliation élevé ou critique"
+#~ msgstr "Entreprises avec un niveau de risque de désabonnement Élevé ou Critique"
 
 #~ msgid ""
 #~ "Shows account health balance: Risk-Heavy"
@@ -4409,18 +4532,298 @@ msgstr "Télécharger le modèle de fichier CSV"
 #~ "Potential (opportunities with minimal risks),"
 #~ " or Balanced"
 #~ msgstr ""
-#~ "Affiche l'équilibre de la santé du "
-#~ "compte : Risque élevé (les risques "
-#~ "dépassent les opportunités), Fort potentiel"
-#~ " (opportunités avec peu de risques) "
-#~ "ou Équilibré"
 
 #~ msgid "Search company, opportunities, risks..."
-#~ msgstr "Rechercher une entreprise, des opportunités ou des risques..."
+#~ msgstr "Rechercher entreprise, opportunités, risques..."
 
 #~ msgid "Search by company name, participant name, or email..."
-#~ msgstr "Rechercher par nom d'entreprise, nom de participant ou e-mail..."
+#~ msgstr "Rechercher par nom d'entreprise, nom du participant ou e-mail..."
 
 #~ msgid "Search by respondent name or email..."
-#~ msgstr "Rechercher par nom ou e-mail du répondant..."
+#~ msgstr "Rechercher par nom, e-mail ou entreprise..."
+
+#~ msgid "Campaign-specific performance analytics and survey insights"
+#~ msgstr ""
+#~ "Analyses de performance spécifiques aux "
+#~ "campagnes et aperçus des sondages"
+
+#~ msgid "Campaign:"
+#~ msgstr "Campagnes :"
+
+#~ msgid "Currently showing data from active campaign:"
+#~ msgstr "Affichage des données de la campagne active"
+
+#~ msgid "Overall satisfaction metric"
+#~ msgstr "Satisfaction globale (1-5)"
+
+#~ msgid "All time feedback collected"
+#~ msgstr "Tous les commentaires collectés"
+
+#~ msgid "Recent (30 days)"
+#~ msgstr "Récent (30 jours)"
+
+#~ msgid "Latest customer feedback"
+#~ msgstr "Enquête de retour client"
+
+#~ msgid "Imminent churn risk (High/Critical)"
+#~ msgstr "Risque de désabonnement imminent (Élevé/Critique)"
+
+#~ msgid "Growth Potential"
+#~ msgstr "Opportunités de croissance"
+
+#~ msgid "Revenue expansion opportunity"
+#~ msgstr "Opportunité d'expansion des revenus"
+
+#~ msgid "Average Ratings"
+#~ msgstr "Sélectionnez la note"
+
+#~ msgid ""
+#~ "Customer lifecycle insights - NPS scores"
+#~ " segregated by length of business "
+#~ "relationship"
+#~ msgstr ""
+
+#~ msgid "Insufficient Data (<2 responses)"
+#~ msgstr "Données insuffisantes (<2 réponses)"
+
+#~ msgid "Recent Survey Responses"
+#~ msgstr "Aucune réponse récente"
+
+#~ msgid "No Segmentation Data Available"
+#~ msgstr "Aucune donnée de segmentation disponible"
+
+#~ msgid ""
+#~ "This campaign was created before "
+#~ "segmentation analytics were implemented. "
+#~ "Segmentation data is only available for"
+#~ " campaigns created after this feature "
+#~ "was deployed."
+#~ msgstr ""
+
+#~ msgid "NPS by Role"
+#~ msgstr "Filtrer par rôle"
+
+#~ msgid "Net Promoter Score distribution across different participant roles"
+#~ msgstr ""
+#~ "Distribution du Net Promoter Score selon"
+#~ " les différents rôles des participants"
+
+#~ msgid "NPS by Region"
+#~ msgstr "Filtrer par région"
+
+#~ msgid "Geographic distribution of customer satisfaction"
+#~ msgstr "Distribution géographique de la satisfaction client"
+
+#~ msgid "NPS by Customer Tier"
+#~ msgstr "NPS par ancienneté client"
+
+#~ msgid "Customer satisfaction across different tier levels"
+#~ msgstr "Satisfaction client selon les différents niveaux de catégorie"
+
+#~ msgid "Satisfaction Ratings by Segment"
+#~ msgstr "Évaluations de satisfaction par segment"
+
+#~ msgid "Average satisfaction scores across all segmentation dimensions"
+#~ msgstr "Scores de satisfaction moyens sur toutes les dimensions de segmentation"
+
+#~ msgid "Segment Type"
+#~ msgstr "Date d'attribution :"
+
+#~ msgid "Segment Name"
+#~ msgstr "Gestion de l'engagement"
+
+#~ msgid "Avg Satisfaction"
+#~ msgstr "Satisfaction :"
+
+#~ msgid "No segmentation data available"
+#~ msgstr "Aucune donnée de segmentation disponible"
+
+#~ msgid "Loading executive summary..."
+#~ msgstr "Résumé exécutif"
+
+#~ msgid "Loading KPI overview..."
+#~ msgstr "Chargement de la vue d'ensemble des KPI..."
+
+#~ msgid "View Trends"
+#~ msgstr "Voir les tendances"
+
+#~ msgid "Draft"
+#~ msgstr "Brouillon"
+
+#~ msgid "Ready"
+#~ msgstr "Prêt"
+
+#~ msgid "Filtered by:"
+#~ msgstr "Filtré par :"
+
+#~ msgid "Clear filter"
+#~ msgstr "Effacer le filtre"
+
+#~ msgid "days left"
+#~ msgstr "jours restants"
+
+#~ msgid "days ago"
+#~ msgstr "il y a {n} jours"
+
+#~ msgid "month"
+#~ msgstr "mois"
+
+#~ msgid "months"
+#~ msgstr "mois"
+
+#~ msgid "ago"
+#~ msgstr "il y a"
+
+#~ msgid "year"
+#~ msgstr "an"
+
+#~ msgid "years"
+#~ msgstr "ans"
+
+#~ msgid "Loading comparison..."
+#~ msgstr "Chargement de la comparaison..."
+
+#~ msgid "Loading comparison data..."
+#~ msgstr "Chargement des données de comparaison..."
+
+#~ msgid "Failed to fetch comparison data"
+#~ msgstr "Échec de la récupération des données de comparaison"
+
+#~ msgid "Error Loading Comparison"
+#~ msgstr "Erreur de chargement de la comparaison"
+
+#~ msgid "Failed to load comparison data. Please try again."
+#~ msgstr "Échec du chargement des données de comparaison. Veuillez réessayer."
+
+#~ msgid "No campaign data available"
+#~ msgstr "Aucune donnée de campagne disponible"
+
+#~ msgid "Error loading KPI overview data"
+#~ msgstr "Erreur lors du chargement des données KPI"
+
+#~ msgid "Error loading dashboard data:"
+#~ msgstr "Erreur lors du chargement des données du tableau de bord :"
+
+#~ msgid "Failed to load campaign options"
+#~ msgstr "Échec du chargement des options de campagne"
+
+#~ msgid "Error loading account intelligence"
+#~ msgstr "Erreur lors du chargement de l'intelligence de compte"
+
+#~ msgid "Error loading responses."
+#~ msgstr "Erreur lors du chargement des réponses."
+
+#~ msgid "Network error loading tenure data"
+#~ msgstr "Erreur réseau lors du chargement des données d'ancienneté"
+
+#~ msgid "Network error loading company data"
+#~ msgstr "Erreur réseau lors du chargement des données d'entreprise"
+
+#~ msgid "Average Rating"
+#~ msgstr "Note moyenne"
+
+#~ msgid "N/A"
+#~ msgstr "N/A"
+
+#~ msgid "No tenure data available yet"
+#~ msgstr "Aucune donnée d'ancienneté disponible pour le moment"
+
+#~ msgid "of"
+#~ msgstr "sur"
+
+#~ msgid "tenure groups"
+#~ msgstr "groupes d'ancienneté"
+
+#~ msgid "companies"
+#~ msgstr "entreprises"
+
+#~ msgid "responses"
+#~ msgstr "réponses"
+
+#~ msgid "accounts"
+#~ msgstr "comptes"
+
+#~ msgid "View Details"
+#~ msgstr "Voir les détails"
+
+#~ msgid "Authentication required"
+#~ msgstr "Authentification requise"
+
+#~ msgid "Value"
+#~ msgstr "Valeur"
+
+#~ msgid "View Full Response"
+#~ msgstr "Voir la réponse complète"
+
+#~ msgid "Critical Risk Companies"
+#~ msgstr "Entreprises à risque critique"
+
+#~ msgid "Risk-Heavy Accounts"
+#~ msgstr "Comptes à risque élevé"
+
+#~ msgid "Opportunity-Heavy Accounts"
+#~ msgstr "Comptes à fort potentiel"
+
+#~ msgid "Satisfaction Rating"
+#~ msgstr "Note de satisfaction"
+
+#~ msgid "Product Value Rating"
+#~ msgstr "Note de valeur du produit"
+
+#~ msgid "Pricing Rating"
+#~ msgstr "Note de tarification"
+
+#~ msgid "Service Rating"
+#~ msgstr "Note de service"
+
+#~ msgid ""
+#~ "To send survey invitations, VOÏA needs"
+#~ " access to your email server. You "
+#~ "can use:"
+#~ msgstr ""
+
+#~ msgid "Your organization's email server settings"
+#~ msgstr ""
+
+#~ msgid "Server Settings"
+#~ msgstr "Paramètres du système"
+
+#~ msgid "Usually 587 for TLS or 465 for SSL"
+#~ msgstr "Généralement 587 (TLS) ou 465 (SSL)"
+
+#~ msgid "Your email address or SMTP username"
+#~ msgstr "Entrez votre adresse e-mail"
+
+#~ msgid "How your name appears to survey recipients"
+#~ msgstr ""
+
+#~ msgid "Send a test email to verify your SMTP settings are working correctly."
+#~ msgstr ""
+
+#~ msgid "Invite campaign managers to help create and manage surveys"
+#~ msgstr ""
+#~ "Invitez des responsables de campagne à"
+#~ " vous aider à créer et gérer "
+#~ "les enquêtes de retour client"
+
+#~ msgid "Current Team Members"
+#~ msgstr "Membres de l'équipe"
+
+#~ msgid "Can create surveys, manage participants, and view analytics"
+#~ msgstr ""
+
+#~ msgid "Can view survey results and analytics but cannot create campaigns"
+#~ msgstr ""
+
+#~ msgid "Full access to all features and settings"
+#~ msgstr "Actions rapides et paramètres"
+
+#~ msgid "Add Campaign Manager"
+#~ msgstr "Gestion des campagnes"
+
+#~ msgid "An invitation will be sent to this email address"
+#~ msgstr ""
+
+#~ msgid "Campaign Manager is recommended for most team members"
+#~ msgstr ""
 
