@@ -240,42 +240,42 @@ function populateExecutiveSummary(data) {
             format: 'number'
         },
         {
-            name: 'Risk-Heavy Accounts',
+            name: translations.riskHeavyAccounts,
             c1: c1.risk_heavy_accounts,
             c2: c2.risk_heavy_accounts,
             change: c2.risk_heavy_accounts - c1.risk_heavy_accounts,
             format: 'number'
         },
         {
-            name: 'Opportunity-Heavy Accounts',
+            name: translations.opportunityHeavyAccounts,
             c1: c1.opportunity_heavy_accounts,
             c2: c2.opportunity_heavy_accounts,
             change: c2.opportunity_heavy_accounts - c1.opportunity_heavy_accounts,
             format: 'number'
         },
         {
-            name: 'Satisfaction Rating',
+            name: translations.satisfactionRating,
             c1: c1.average_ratings?.satisfaction || 0,
             c2: c2.average_ratings?.satisfaction || 0,
             change: (c2.average_ratings?.satisfaction || 0) - (c1.average_ratings?.satisfaction || 0),
             format: 'decimal'
         },
         {
-            name: 'Product Value Rating',
+            name: translations.productValueRating,
             c1: c1.average_ratings?.product_value || 0,
             c2: c2.average_ratings?.product_value || 0,
             change: (c2.average_ratings?.product_value || 0) - (c1.average_ratings?.product_value || 0),
             format: 'decimal'
         },
         {
-            name: 'Pricing Rating',
+            name: translations.pricingRating,
             c1: c1.average_ratings?.pricing || 0,
             c2: c2.average_ratings?.pricing || 0,
             change: (c2.average_ratings?.pricing || 0) - (c1.average_ratings?.pricing || 0),
             format: 'decimal'
         },
         {
-            name: 'Service Rating',
+            name: translations.serviceRating,
             c1: c1.average_ratings?.service || 0,
             c2: c2.average_ratings?.service || 0,
             change: (c2.average_ratings?.service || 0) - (c1.average_ratings?.service || 0),
@@ -294,10 +294,10 @@ function populateExecutiveSummary(data) {
         let changeClass = '';
         if (metric.change > 0) {
             changeDisplay = `+${metric.format === 'decimal' ? metric.change.toFixed(1) : metric.change}`;
-            changeClass = metric.name === 'Critical Risk Companies' || metric.name === 'Risk-Heavy Accounts' ? 'text-danger' : 'text-success';
+            changeClass = metric.name === translations.criticalRiskCompanies || metric.name === translations.riskHeavyAccounts ? 'text-danger' : 'text-success';
         } else if (metric.change < 0) {
             changeDisplay = metric.format === 'decimal' ? metric.change.toFixed(1) : metric.change;
-            changeClass = metric.name === 'Critical Risk Companies' || metric.name === 'Risk-Heavy Accounts' ? 'text-success' : 'text-danger';
+            changeClass = metric.name === translations.criticalRiskCompanies || metric.name === translations.riskHeavyAccounts ? 'text-success' : 'text-danger';
         } else {
             changeDisplay = '0';
             changeClass = 'text-muted';
@@ -992,14 +992,14 @@ function createModalCharts(kpiData) {
     
     // Create modal charts
     const modalChartConfigs = [
-        { id: 'modal-chart-responses', data: metrics.responses, label: 'Responses', yLabel: 'Total Responses' },
-        { id: 'modal-chart-nps', data: metrics.nps_score, label: 'NPS', yLabel: 'NPS Score' },
-        { id: 'modal-chart-companies', data: metrics.companies, label: 'Companies', yLabel: 'Companies Analyzed' },
-        { id: 'modal-chart-critical', data: metrics.critical_risk, label: 'Critical Risk', yLabel: 'Critical Risk Count' },
-        { id: 'modal-chart-satisfaction', data: metrics.satisfaction, label: 'Satisfaction', yLabel: 'Satisfaction Rating' },
-        { id: 'modal-chart-product', data: metrics.product_value, label: 'Product', yLabel: 'Product Value Rating' },
-        { id: 'modal-chart-pricing', data: metrics.pricing, label: 'Pricing', yLabel: 'Pricing Rating' },
-        { id: 'modal-chart-service', data: metrics.service, label: 'Service', yLabel: 'Service Rating' }
+        { id: 'modal-chart-responses', data: metrics.responses, label: 'Responses', yLabel: translations.totalResponses },
+        { id: 'modal-chart-nps', data: metrics.nps_score, label: 'NPS', yLabel: translations.npsScore },
+        { id: 'modal-chart-companies', data: metrics.companies, label: 'Companies', yLabel: translations.companiesAnalyzed },
+        { id: 'modal-chart-critical', data: metrics.critical_risk, label: 'Critical Risk', yLabel: translations.criticalRiskCompanies },
+        { id: 'modal-chart-satisfaction', data: metrics.satisfaction, label: 'Satisfaction', yLabel: translations.satisfactionRating },
+        { id: 'modal-chart-product', data: metrics.product_value, label: 'Product', yLabel: translations.productValueRating },
+        { id: 'modal-chart-pricing', data: metrics.pricing, label: 'Pricing', yLabel: translations.pricingRating },
+        { id: 'modal-chart-service', data: metrics.service, label: 'Service', yLabel: translations.serviceRating }
     ];
     
     modalChartConfigs.forEach(config => {

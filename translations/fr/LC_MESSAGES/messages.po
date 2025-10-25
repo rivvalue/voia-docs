@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-25 01:33+0000\n"
+"POT-Creation-Date: 2025-10-25 01:41+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -124,7 +124,7 @@ msgstr "Vue d'ensemble"
 #: templates/dashboard.html:49 templates/executive_summary.html:4
 #: templates/executive_summary.html:23 templates/executive_summary.html:44
 #: templates/executive_summary.html:54 templates/executive_summary.html:266
-#: templates/executive_summary.html:406
+#: templates/executive_summary.html:414
 msgid "Executive Summary"
 msgstr "Résumé exécutif"
 
@@ -623,7 +623,8 @@ msgstr "Valeur du produit"
 #: templates/campaign_insights.html:899 templates/company_responses.html:77
 #: templates/company_responses.html:222 templates/dashboard.html:108
 #: templates/dashboard.html:1049 templates/dashboard.html:1130
-#: templates/executive_summary.html:101 templates/executive_summary.html:345
+#: templates/dashboard.html:1164 templates/executive_summary.html:101
+#: templates/executive_summary.html:345
 msgid "Pricing"
 msgstr "Tarification"
 
@@ -963,7 +964,7 @@ msgid "Critical Risk"
 msgstr "Risque critique"
 
 #: templates/dashboard.html:96 templates/dashboard.html:1029
-#: templates/dashboard.html:1127
+#: templates/dashboard.html:1127 templates/dashboard.html:1161
 msgid "Satisfaction"
 msgstr "Satisfaction"
 
@@ -973,8 +974,8 @@ msgid "Product"
 msgstr "Produit"
 
 #: templates/dashboard.html:114 templates/dashboard.html:1059
-#: templates/dashboard.html:1129 templates/executive_summary.html:107
-#: templates/executive_summary.html:355
+#: templates/dashboard.html:1129 templates/dashboard.html:1163
+#: templates/executive_summary.html:107 templates/executive_summary.html:355
 msgid "Service"
 msgstr "Service"
 
@@ -1219,12 +1220,10 @@ msgid "No Responses Found"
 msgstr "Aucune réponse trouvée"
 
 #: templates/dashboard.html:1087 templates/executive_summary.html:378
-#
 msgid "Draft"
 msgstr "Brouillon"
 
 #: templates/dashboard.html:1088 templates/executive_summary.html:379
-#
 msgid "Ready"
 msgstr "Prêt"
 
@@ -1248,12 +1247,10 @@ msgid "Unknown"
 msgstr "Inconnu"
 
 #: templates/dashboard.html:1094
-#
 msgid "Filtered by:"
 msgstr "Filtré par :"
 
 #: templates/dashboard.html:1095
-#
 msgid "Clear filter"
 msgstr "Effacer le filtre"
 
@@ -1266,7 +1263,6 @@ msgid "days ago"
 msgstr "il y a {n} jours"
 
 #: templates/dashboard.html:1102
-#
 msgid "month"
 msgstr "mois"
 
@@ -1279,22 +1275,18 @@ msgid "ago"
 msgstr "il y a"
 
 #: templates/dashboard.html:1105
-#
 msgid "year"
 msgstr "an"
 
 #: templates/dashboard.html:1106
-#
 msgid "years"
 msgstr "ans"
 
 #: templates/dashboard.html:1109 templates/executive_summary.html:389
-#
 msgid "Loading comparison..."
 msgstr "Chargement de la comparaison..."
 
 #: templates/dashboard.html:1110 templates/executive_summary.html:390
-#
 msgid "Loading comparison data..."
 msgstr "Chargement des données de comparaison..."
 
@@ -1303,7 +1295,6 @@ msgid "Failed to fetch comparison data"
 msgstr "Échec de la récupération des données de comparaison"
 
 #: templates/dashboard.html:1115 templates/executive_summary.html:391
-#
 msgid "Error Loading Comparison"
 msgstr "Erreur de chargement de la comparaison"
 
@@ -1312,17 +1303,14 @@ msgid "Failed to load comparison data. Please try again."
 msgstr "Échec du chargement des données de comparaison. Veuillez réessayer."
 
 #: templates/dashboard.html:1117 templates/executive_summary.html:396
-#
 msgid "No campaign data available"
 msgstr "Aucune donnée de campagne disponible"
 
 #: templates/dashboard.html:1118 templates/executive_summary.html:395
-#
 msgid "Error loading KPI overview data"
 msgstr "Erreur lors du chargement des données KPI"
 
 #: templates/dashboard.html:1119
-#
 msgid "Error loading dashboard data:"
 msgstr "Erreur lors du chargement des données du tableau de bord :"
 
@@ -1331,12 +1319,10 @@ msgid "Failed to load campaign options"
 msgstr "Échec du chargement des options de campagne"
 
 #: templates/dashboard.html:1121
-#
 msgid "Error loading account intelligence"
 msgstr "Erreur lors du chargement de l'intelligence de compte"
 
 #: templates/dashboard.html:1122
-#
 msgid "Error loading responses."
 msgstr "Erreur lors du chargement des réponses."
 
@@ -1349,7 +1335,6 @@ msgid "Network error loading company data"
 msgstr "Erreur réseau lors du chargement des données d'entreprise"
 
 #: templates/dashboard.html:1131
-#
 msgid "Average Rating"
 msgstr "Note moyenne"
 
@@ -1358,7 +1343,6 @@ msgid "N/A"
 msgstr "N/A"
 
 #: templates/dashboard.html:1140
-#
 msgid "No tenure data available yet"
 msgstr "Aucune donnée d'ancienneté disponible pour le moment"
 
@@ -1367,24 +1351,50 @@ msgid "of"
 msgstr "sur"
 
 #: templates/dashboard.html:1146
-#
 msgid "tenure groups"
 msgstr "groupes d'ancienneté"
 
 #: templates/dashboard.html:1147
-#
 msgid "companies"
 msgstr "entreprises"
 
 #: templates/dashboard.html:1148
-#
 msgid "responses"
 msgstr "réponses"
 
 #: templates/dashboard.html:1149
-#
 msgid "accounts"
 msgstr "comptes"
+
+#: templates/dashboard.html:1157 templates/survey.html:110
+#: templates/survey.html:185 templates/survey.html:205
+msgid "Previous"
+msgstr "Précédent"
+
+#: templates/dashboard.html:1158 templates/survey.html:72
+#: templates/survey.html:111 templates/survey.html:186
+#: templates/survey.html:241 templates/survey.html:243
+msgid "Next"
+msgstr "Suivant"
+
+#: templates/dashboard.html:1159
+#
+msgid "View Details"
+msgstr "Voir les détails"
+
+#: templates/dashboard.html:1160
+#
+msgid "Authentication required"
+msgstr "Authentification requise"
+
+#: templates/dashboard.html:1162
+msgid "Value"
+msgstr "Valeur"
+
+#: templates/dashboard.html:1165
+#
+msgid "View Full Response"
+msgstr "Voir la réponse complète"
 
 #: templates/demo_intro.html:3 templates/demo_intro.html:15
 msgid "Welcome to Your VO"
@@ -1501,9 +1511,38 @@ msgid "Continue to Survey"
 msgstr "Continuer vers l'enquête"
 
 #: templates/executive_summary.html:402
-#
 msgid "Critical Risk Companies"
 msgstr "Entreprises à risque critique"
+
+#: templates/executive_summary.html:405
+#
+msgid "Risk-Heavy Accounts"
+msgstr "Comptes à risque élevé"
+
+#: templates/executive_summary.html:406
+#
+msgid "Opportunity-Heavy Accounts"
+msgstr "Comptes à fort potentiel"
+
+#: templates/executive_summary.html:407
+#
+msgid "Satisfaction Rating"
+msgstr "Note de satisfaction"
+
+#: templates/executive_summary.html:408
+#
+msgid "Product Value Rating"
+msgstr "Note de valeur du produit"
+
+#: templates/executive_summary.html:409
+#
+msgid "Pricing Rating"
+msgstr "Note de tarification"
+
+#: templates/executive_summary.html:410
+#
+msgid "Service Rating"
+msgstr "Note de service"
 
 #: templates/index.html:3
 msgid "VOÏA - Experience Demo"
@@ -1831,11 +1870,6 @@ msgstr "Informations de base"
 msgid "How long have you been working with Archelo Group?"
 msgstr "Depuis combien de temps travaillez-vous avec Archelo Group ?"
 
-#: templates/survey.html:72 templates/survey.html:111 templates/survey.html:186
-#: templates/survey.html:241 templates/survey.html:243
-msgid "Next"
-msgstr "Suivant"
-
 #: templates/survey.html:78
 msgid ""
 "On a scale of 0-10, how likely are you to recommend our services to a "
@@ -1843,11 +1877,6 @@ msgid ""
 msgstr ""
 "Sur une échelle de 0 à 10, quelle est la probabilité que vous "
 "recommandiez nos services à un ami ou un collègue ?"
-
-#: templates/survey.html:110 templates/survey.html:185
-#: templates/survey.html:205
-msgid "Previous"
-msgstr "Précédent"
 
 #: templates/survey.html:117
 msgid "Tell us more about your experience"

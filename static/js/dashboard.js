@@ -2528,7 +2528,7 @@ function renderAccountIntelPagination(pagination) {
     // Previous button
     paginationHtml += `
         <li class="page-item ${!pagination.has_prev ? 'disabled' : ''}">
-            <a class="page-link" href="#" onclick="loadAccountIntelligence(${pagination.page - 1}); return false;" aria-label="Previous">
+            <a class="page-link" href="#" onclick="loadAccountIntelligence(${pagination.page - 1}); return false;" aria-label="${translations.previous}">
                 <span aria-hidden="true">&laquo;</span>
             </a>
         </li>
@@ -2550,7 +2550,7 @@ function renderAccountIntelPagination(pagination) {
     // Next button
     paginationHtml += `
         <li class="page-item ${!pagination.has_next ? 'disabled' : ''}">
-            <a class="page-link" href="#" onclick="loadAccountIntelligence(${pagination.page + 1}); return false;" aria-label="Next">
+            <a class="page-link" href="#" onclick="loadAccountIntelligence(${pagination.page + 1}); return false;" aria-label="${translations.next}">
                 <span aria-hidden="true">&raquo;</span>
             </a>
         </li>
@@ -2756,10 +2756,10 @@ function loadSurveyResponses(page = 1, searchQuery = '', npsFilter = '') {
                 // Use backend-provided can_view flag to determine access
                 const canView = response.can_view !== undefined ? response.can_view : false;
                 const detailsButton = canView ? 
-                    `<a href="/survey-response/${response.id}" class="btn btn-outline-primary btn-sm" title="View Details">
+                    `<a href="/survey-response/${response.id}" class="btn btn-outline-primary btn-sm" title="${translations.viewDetails}">
                         <i class="fas fa-eye"></i>
                     </a>` :
-                    `<span class="text-muted" title="Authentication required">
+                    `<span class="text-muted" title="${translations.authenticationRequired}">
                         <i class="fas fa-lock"></i>
                     </span>`;
                 
@@ -4206,16 +4206,16 @@ function renderCompanyResponsesTable(responses) {
         const ratings = [];
         
         if (response.satisfaction_rating) {
-            ratings.push(`<span class="badge bg-info me-1" title="Satisfaction">S: ${response.satisfaction_rating}/10</span>`);
+            ratings.push(`<span class="badge bg-info me-1" title="${translations.satisfactionBadge}">S: ${response.satisfaction_rating}/10</span>`);
         }
         if (response.product_value_rating) {
-            ratings.push(`<span class="badge bg-info me-1" title="Value">V: ${response.product_value_rating}/10</span>`);
+            ratings.push(`<span class="badge bg-info me-1" title="${translations.valueBadge}">V: ${response.product_value_rating}/10</span>`);
         }
         if (response.service_rating) {
-            ratings.push(`<span class="badge bg-info me-1" title="Service">Svc: ${response.service_rating}/10</span>`);
+            ratings.push(`<span class="badge bg-info me-1" title="${translations.serviceBadge}">Svc: ${response.service_rating}/10</span>`);
         }
         if (response.pricing_rating) {
-            ratings.push(`<span class="badge bg-info me-1" title="Pricing">P: ${response.pricing_rating}/10</span>`);
+            ratings.push(`<span class="badge bg-info me-1" title="${translations.pricingBadge}">P: ${response.pricing_rating}/10</span>`);
         }
         
         ratingsCell.innerHTML = ratings.length > 0 ? ratings.join(' ') : '<span class="text-muted">No ratings</span>';
@@ -4245,14 +4245,14 @@ function renderCompanyResponsesTable(responses) {
         if (canView) {
             // User can view this response
             actionCell.innerHTML = `
-                <a href="/survey-response/${response.id}" class="btn btn-sm btn-outline-primary" title="View Full Response">
+                <a href="/survey-response/${response.id}" class="btn btn-sm btn-outline-primary" title="${translations.viewFullResponse}">
                     <i class="fas fa-eye"></i>
                 </a>
             `;
         } else {
             // User cannot view this response - authentication required
             actionCell.innerHTML = `
-                <span class="text-muted" title="Authentication required">
+                <span class="text-muted" title="${translations.authenticationRequired}">
                     <i class="fas fa-lock"></i>
                 </span>
             `;

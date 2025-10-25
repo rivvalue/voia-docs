@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-25 01:33+0000\n"
+"POT-Creation-Date: 2025-10-25 01:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -121,7 +121,7 @@ msgstr ""
 #: templates/dashboard.html:49 templates/executive_summary.html:4
 #: templates/executive_summary.html:23 templates/executive_summary.html:44
 #: templates/executive_summary.html:54 templates/executive_summary.html:266
-#: templates/executive_summary.html:406
+#: templates/executive_summary.html:414
 msgid "Executive Summary"
 msgstr ""
 
@@ -617,7 +617,8 @@ msgstr ""
 #: templates/campaign_insights.html:899 templates/company_responses.html:77
 #: templates/company_responses.html:222 templates/dashboard.html:108
 #: templates/dashboard.html:1049 templates/dashboard.html:1130
-#: templates/executive_summary.html:101 templates/executive_summary.html:345
+#: templates/dashboard.html:1164 templates/executive_summary.html:101
+#: templates/executive_summary.html:345
 msgid "Pricing"
 msgstr ""
 
@@ -942,7 +943,7 @@ msgid "Critical Risk"
 msgstr ""
 
 #: templates/dashboard.html:96 templates/dashboard.html:1029
-#: templates/dashboard.html:1127
+#: templates/dashboard.html:1127 templates/dashboard.html:1161
 msgid "Satisfaction"
 msgstr ""
 
@@ -952,8 +953,8 @@ msgid "Product"
 msgstr ""
 
 #: templates/dashboard.html:114 templates/dashboard.html:1059
-#: templates/dashboard.html:1129 templates/executive_summary.html:107
-#: templates/executive_summary.html:355
+#: templates/dashboard.html:1129 templates/dashboard.html:1163
+#: templates/executive_summary.html:107 templates/executive_summary.html:355
 msgid "Service"
 msgstr ""
 
@@ -1338,6 +1339,33 @@ msgstr ""
 msgid "accounts"
 msgstr ""
 
+#: templates/dashboard.html:1157 templates/survey.html:110
+#: templates/survey.html:185 templates/survey.html:205
+msgid "Previous"
+msgstr ""
+
+#: templates/dashboard.html:1158 templates/survey.html:72
+#: templates/survey.html:111 templates/survey.html:186
+#: templates/survey.html:241 templates/survey.html:243
+msgid "Next"
+msgstr ""
+
+#: templates/dashboard.html:1159
+msgid "View Details"
+msgstr ""
+
+#: templates/dashboard.html:1160
+msgid "Authentication required"
+msgstr ""
+
+#: templates/dashboard.html:1162
+msgid "Value"
+msgstr ""
+
+#: templates/dashboard.html:1165
+msgid "View Full Response"
+msgstr ""
+
 #: templates/demo_intro.html:3 templates/demo_intro.html:15
 msgid "Welcome to Your VO"
 msgstr ""
@@ -1444,6 +1472,30 @@ msgstr ""
 
 #: templates/executive_summary.html:402
 msgid "Critical Risk Companies"
+msgstr ""
+
+#: templates/executive_summary.html:405
+msgid "Risk-Heavy Accounts"
+msgstr ""
+
+#: templates/executive_summary.html:406
+msgid "Opportunity-Heavy Accounts"
+msgstr ""
+
+#: templates/executive_summary.html:407
+msgid "Satisfaction Rating"
+msgstr ""
+
+#: templates/executive_summary.html:408
+msgid "Product Value Rating"
+msgstr ""
+
+#: templates/executive_summary.html:409
+msgid "Pricing Rating"
+msgstr ""
+
+#: templates/executive_summary.html:410
+msgid "Service Rating"
 msgstr ""
 
 #: templates/index.html:3
@@ -1766,20 +1818,10 @@ msgstr ""
 msgid "How long have you been working with Archelo Group?"
 msgstr ""
 
-#: templates/survey.html:72 templates/survey.html:111 templates/survey.html:186
-#: templates/survey.html:241 templates/survey.html:243
-msgid "Next"
-msgstr ""
-
 #: templates/survey.html:78
 msgid ""
 "On a scale of 0-10, how likely are you to recommend our services to a "
 "friend or colleague?"
-msgstr ""
-
-#: templates/survey.html:110 templates/survey.html:185
-#: templates/survey.html:205
-msgid "Previous"
 msgstr ""
 
 #: templates/survey.html:117
