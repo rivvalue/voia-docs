@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-25 03:05+0000\n"
+"POT-Creation-Date: 2025-10-25 03:13+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -16,6 +16,20 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
+
+#: business_auth_routes.py:2149 business_auth_routes.py:2194
+#: business_auth_routes.py:2244 business_auth_routes.py:2409
+#: business_auth_routes.py:2432 business_auth_routes.py:2819
+#: business_auth_routes.py:2843 business_auth_routes.py:3144
+#: business_auth_routes.py:3183 business_auth_routes.py:4389
+#, fuzzy
+msgid "Business account context not found."
+msgstr "Contexte du compte entreprise introuvable."
+
+#: business_auth_routes.py:3172
+#, fuzzy
+msgid "Failed to load survey configuration."
+msgstr "Échec du chargement de la configuration de l'enquête."
 
 #: templates/auth.html:3
 msgid "Authentication - VOÏA - Voice Of Client Agent"
@@ -30,6 +44,7 @@ msgid "Enter your email to receive an authentication token"
 msgstr "Entrez votre e-mail pour recevoir un jeton d'authentification"
 
 #: templates/auth.html:22 templates/business_auth/activate_account.html:443
+#: templates/business_auth/login.html:50
 #: templates/business_auth/manage_users.html:242
 #: templates/business_auth/manage_users.html:325
 #: templates/conversational_survey.html:76
@@ -2060,10 +2075,11 @@ msgstr "Répondant :"
 msgid "Company:"
 msgstr "Entreprise :"
 
+#: templates/business_auth/login.html:103
 #: templates/campaigns/individual_response.html:320
 #: templates/public_survey_response.html:67
 msgid "Email:"
-msgstr "E-mail :"
+msgstr "E-mail :"
 
 #: templates/campaigns/individual_response.html:328
 #: templates/public_survey_response.html:72
@@ -3435,6 +3451,85 @@ msgstr "Analyses des comptes utilisateurs"
 #: templates/business_auth/license_overview.html:231
 msgid "Detailed License Info"
 msgstr "Informations détaillées sur la licence"
+
+#: templates/business_auth/login.html:3
+#, fuzzy
+msgid "Business Login - VOÏA - Voice Of Client"
+msgstr "Connexion entreprise - VOÏA - Voix du Client"
+
+#: templates/business_auth/login.html:13
+#, fuzzy
+msgid "VOÏA Business Login"
+msgstr "Connexion entreprise VOÏA"
+
+#: templates/business_auth/login.html:16
+#, fuzzy
+msgid "Business Account Login"
+msgstr "Connexion au compte entreprise"
+
+#: templates/business_auth/login.html:17
+msgid "Access your VOÏA platform"
+msgstr "Accédez à votre plateforme VOÏA"
+
+#: templates/business_auth/login.html:36
+#, fuzzy
+msgid "Business login form"
+msgstr "Formulaire de connexion entreprise"
+
+#: templates/business_auth/login.html:44
+msgid "name@example.com"
+msgstr "nom@exemple.com"
+
+#: templates/business_auth/login.html:48
+#, fuzzy
+msgid "Email address"
+msgstr "Adresse e-mail"
+
+#: templates/business_auth/login.html:71
+msgid "Your session will remain active for 7 days"
+msgstr "Votre session restera active pendant 7 jours"
+
+#: templates/business_auth/login.html:74
+#, fuzzy
+msgid "Sign in to business account"
+msgstr "Se connecter au compte entreprise"
+
+#: templates/business_auth/login.html:75
+#, fuzzy
+msgid "Sign In"
+msgstr "Se connecter"
+
+#: templates/business_auth/login.html:80
+#, fuzzy
+msgid "Forgot password"
+msgstr "Mot de passe oublié"
+
+#: templates/business_auth/login.html:81
+#, fuzzy
+msgid "Forgot your password?"
+msgstr "Mot de passe oublié ?"
+
+#: templates/business_auth/login.html:101
+#, fuzzy
+msgid "Demo Account"
+msgstr "Compte démo"
+
+#: templates/business_auth/login.html:104
+msgid "Check server logs for secure temporary password"
+msgstr "Consultez les journaux du serveur pour le mot de passe temporaire sécurisé"
+
+#: templates/business_auth/login.html:105
+msgid "Default credentials for Rivvalue demo account"
+msgstr "Identifiants par défaut pour le compte démo Rivvalue"
+
+#: templates/business_auth/login.html:129
+msgid "Please fill in all required fields."
+msgstr "Veuillez remplir tous les champs requis."
+
+#: templates/business_auth/login.html:134
+#, fuzzy
+msgid "Signing In..."
+msgstr "Connexion en cours..."
 
 #: templates/business_auth/platform_dashboard.html:405
 #: templates/business_auth/platform_dashboard.html:462

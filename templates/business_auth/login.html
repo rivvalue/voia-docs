@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Business Login - VOÏA - Voice Of Client{% endblock %}
+{% block title %}{{ _('Business Login - VOÏA - Voice Of Client') }}{% endblock %}
 
 {% block page_class %}page-business-login{% endblock %}
 
@@ -10,11 +10,11 @@
         <div class="col-lg-5 col-md-7 col-sm-9">
             <div class="business-login-container">
                 <div class="business-login-header">
-                    <div class="business-login-logo" role="img" aria-label="VOÏA Business Login">
+                    <div class="business-login-logo" role="img" aria-label="{{ _('VOÏA Business Login') }}">
                         <i class="fas fa-user-shield" aria-hidden="true"></i>
                     </div>
-                    <h2 class="business-login-title">VO<span class="voia-red-accent">Ï</span>A - Business Account Login</h2>
-                    <p class="business-login-subtitle">Access your VO<span class="voia-red-accent">Ï</span>A platform</p>
+                    <h2 class="business-login-title">VO<span class="voia-red-accent">Ï</span>A - {{ _('Business Account Login') }}</h2>
+                    <p class="business-login-subtitle">{{ _('Access your VOÏA platform') }}</p>
                 </div>
 
                 <!-- Flash Messages -->
@@ -33,7 +33,7 @@
                 <form method="POST" 
                       action="{{ url_for('business_auth.login') }}" 
                       class="business-login-form"
-                      aria-label="Business login form">
+                      aria-label="{{ _('Business login form') }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     
                     <div class="form-floating">
@@ -41,13 +41,13 @@
                                class="form-control" 
                                id="email" 
                                name="email" 
-                               placeholder="name@example.com" 
+                               placeholder="{{ _('name@example.com') }}" 
                                required 
                                autocomplete="email"
                                aria-required="true"
-                               aria-label="Email address">
+                               aria-label="{{ _('Email address') }}">
                         <label for="email">
-                            <i class="fas fa-envelope me-2" aria-hidden="true"></i>Email Address
+                            <i class="fas fa-envelope me-2" aria-hidden="true"></i>{{ _('Email Address') }}
                         </label>
                     </div>
 
@@ -68,17 +68,17 @@
 
                     <div class="text-muted small mb-3" role="status" aria-live="polite">
                         <i class="fas fa-info-circle me-1" aria-hidden="true"></i>
-                        Your session will remain active for 7 days
+                        {{ _('Your session will remain active for 7 days') }}
                     </div>
 
-                    <button type="submit" class="btn btn-primary business-login-btn" aria-label="Sign in to business account">
-                        <i class="fas fa-sign-in-alt me-2" aria-hidden="true"></i>Sign In
+                    <button type="submit" class="btn btn-primary business-login-btn" aria-label="{{ _('Sign in to business account') }}">
+                        <i class="fas fa-sign-in-alt me-2" aria-hidden="true"></i>{{ _('Sign In') }}
                     </button>
                 </form>
 
                 <div class="text-center mt-3 mb-3">
-                    <a href="{{ url_for('business_auth.forgot_password') }}" class="text-muted" aria-label="Forgot password">
-                        <i class="fas fa-question-circle me-1" aria-hidden="true"></i>Forgot your password?
+                    <a href="{{ url_for('business_auth.forgot_password') }}" class="text-muted" aria-label="{{ _('Forgot password') }}">
+                        <i class="fas fa-question-circle me-1" aria-hidden="true"></i>{{ _('Forgot your password?') }}
                     </a>
                 </div>
 
@@ -98,11 +98,11 @@
     <div class="row justify-content-center">
         <div class="col-lg-5 col-md-7 col-sm-9">
             <div class="alert alert-info" role="status">
-                <h6><i class="fas fa-info-circle me-2" aria-hidden="true"></i>Demo Account</h6>
+                <h6><i class="fas fa-info-circle me-2" aria-hidden="true"></i>{{ _('Demo Account') }}</h6>
                 <small>
-                    <strong>Email:</strong> 7amdoulilah@rivvalue.com<br>
-                    <strong>{{ _('Password') }}:</strong> Check server logs for secure temporary password<br>
-                    <em>Default credentials for Rivvalue demo account</em>
+                    <strong>{{ _('Email:') }}</strong> 7amdoulilah@rivvalue.com<br>
+                    <strong>{{ _('Password') }}:</strong> {{ _('Check server logs for secure temporary password') }}<br>
+                    <em>{{ _('Default credentials for Rivvalue demo account') }}</em>
                 </small>
             </div>
         </div>
@@ -126,12 +126,12 @@ document.querySelector('.business-login-form').addEventListener('submit', functi
     
     if (!email || !password) {
         e.preventDefault();
-        alert('Please fill in all required fields.');
+        alert('{{ _("Please fill in all required fields.") }}');
         return;
     }
     
     const submitBtn = this.querySelector('button[type="submit"]');
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2" aria-hidden="true"></i>Signing In...';
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2" aria-hidden="true"></i>{{ _("Signing In...") }}';
     submitBtn.disabled = true;
 });
 </script>

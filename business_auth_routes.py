@@ -2146,7 +2146,7 @@ def force_scheduler_run():
         if not current_account:
             if request.is_json:
                 return jsonify({'error': 'Business account context not found'}), 400
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.admin_panel'))
         
         # Import task queue to access scheduler
@@ -2191,7 +2191,7 @@ def scheduler_status():
         if not current_account:
             if request.is_json:
                 return jsonify({'error': 'Business account context not found'}), 400
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.admin_panel'))
         
         # Import task queue to access scheduler stats
@@ -2241,7 +2241,7 @@ def audit_logs():
     try:
         current_account = get_current_business_account()
         if not current_account:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.admin_panel'))
         
         # Get filter parameters
@@ -2406,7 +2406,7 @@ def email_config():
         current_account = get_current_business_account()
         if not current_account:
             logger.error("No current account found in email config route")
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.admin_panel'))
         
         # Get existing email configuration if any
@@ -2429,7 +2429,7 @@ def save_email_config():
     try:
         current_account = get_current_business_account()
         if not current_account:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.admin_panel'))
         
         # Get form data
@@ -2816,7 +2816,7 @@ def brand_config():
         current_account = get_current_business_account()
         if not current_account:
             logger.error("No current account found in brand config route")
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.admin_panel'))
         
         # Get existing branding configuration if any
@@ -2840,7 +2840,7 @@ def save_brand_config():
     try:
         current_account = get_current_business_account()
         if not current_account:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.admin_panel'))
         
         # Get form data
@@ -3141,7 +3141,7 @@ def survey_config():
         current_account = get_current_business_account()
         if not current_account:
             logger.error("No current account found in survey config route")
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.admin_panel'))
         
         # Allow demo accounts to access survey customization for testing
@@ -3169,7 +3169,7 @@ def survey_config():
     
     except Exception as e:
         logger.error(f"Error loading survey configuration: {e}")
-        flash('Failed to load survey configuration.', 'error')
+        flash(_('Failed to load survey configuration.'), 'error')
         return redirect(url_for('business_auth.admin_panel'))
 
 
@@ -3180,7 +3180,7 @@ def save_survey_config():
     try:
         current_account = get_current_business_account()
         if not current_account:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.admin_panel'))
         
         # Allow demo accounts to save survey customization for testing
@@ -4386,7 +4386,7 @@ def business_analytics():
     try:
         current_account = get_current_business_account()
         if not current_account:
-            flash('Contexte du compte entreprise introuvable.', 'error')
+            flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.login'))
         
         # Get company NPS data - will be filtered by business account in API calls

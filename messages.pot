@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-25 03:05+0000\n"
+"POT-Creation-Date: 2025-10-25 03:13+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,18 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
+
+#: business_auth_routes.py:2149 business_auth_routes.py:2194
+#: business_auth_routes.py:2244 business_auth_routes.py:2409
+#: business_auth_routes.py:2432 business_auth_routes.py:2819
+#: business_auth_routes.py:2843 business_auth_routes.py:3144
+#: business_auth_routes.py:3183 business_auth_routes.py:4389
+msgid "Business account context not found."
+msgstr ""
+
+#: business_auth_routes.py:3172
+msgid "Failed to load survey configuration."
+msgstr ""
 
 #: templates/auth.html:3
 msgid "Authentication - VOÏA - Voice Of Client Agent"
@@ -30,6 +42,7 @@ msgid "Enter your email to receive an authentication token"
 msgstr ""
 
 #: templates/auth.html:22 templates/business_auth/activate_account.html:443
+#: templates/business_auth/login.html:50
 #: templates/business_auth/manage_users.html:242
 #: templates/business_auth/manage_users.html:325
 #: templates/conversational_survey.html:76
@@ -1964,6 +1977,7 @@ msgstr ""
 msgid "Company:"
 msgstr ""
 
+#: templates/business_auth/login.html:103
 #: templates/campaigns/individual_response.html:320
 #: templates/public_survey_response.html:67
 msgid "Email:"
@@ -3251,6 +3265,74 @@ msgstr ""
 
 #: templates/business_auth/license_overview.html:231
 msgid "Detailed License Info"
+msgstr ""
+
+#: templates/business_auth/login.html:3
+msgid "Business Login - VOÏA - Voice Of Client"
+msgstr ""
+
+#: templates/business_auth/login.html:13
+msgid "VOÏA Business Login"
+msgstr ""
+
+#: templates/business_auth/login.html:16
+msgid "Business Account Login"
+msgstr ""
+
+#: templates/business_auth/login.html:17
+msgid "Access your VOÏA platform"
+msgstr ""
+
+#: templates/business_auth/login.html:36
+msgid "Business login form"
+msgstr ""
+
+#: templates/business_auth/login.html:44
+msgid "name@example.com"
+msgstr ""
+
+#: templates/business_auth/login.html:48
+msgid "Email address"
+msgstr ""
+
+#: templates/business_auth/login.html:71
+msgid "Your session will remain active for 7 days"
+msgstr ""
+
+#: templates/business_auth/login.html:74
+msgid "Sign in to business account"
+msgstr ""
+
+#: templates/business_auth/login.html:75
+msgid "Sign In"
+msgstr ""
+
+#: templates/business_auth/login.html:80
+msgid "Forgot password"
+msgstr ""
+
+#: templates/business_auth/login.html:81
+msgid "Forgot your password?"
+msgstr ""
+
+#: templates/business_auth/login.html:101
+msgid "Demo Account"
+msgstr ""
+
+#: templates/business_auth/login.html:104
+msgid "Check server logs for secure temporary password"
+msgstr ""
+
+#: templates/business_auth/login.html:105
+msgid "Default credentials for Rivvalue demo account"
+msgstr ""
+
+#: templates/business_auth/login.html:129
+msgid "Please fill in all required fields."
+msgstr ""
+
+#: templates/business_auth/login.html:134
+msgid "Signing In..."
 msgstr ""
 
 #: templates/business_auth/platform_dashboard.html:405
