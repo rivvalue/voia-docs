@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-25 02:37+0000\n"
+"POT-Creation-Date: 2025-10-25 02:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1054,7 +1054,9 @@ msgstr ""
 msgid "View analytics dashboard with your feedback results"
 msgstr ""
 
-#: templates/conversational_survey.html:186 templates/survey.html:235
+#: templates/conversational_survey.html:186
+#: templates/conversational_survey_completed.html:52 templates/survey.html:235
+#: templates/survey_completed.html:52 templates/survey_success.html:28
 msgid "View Analytics Dashboard"
 msgstr ""
 
@@ -1080,6 +1082,7 @@ msgid "Try another demo session"
 msgstr ""
 
 #: templates/conversational_survey.html:202 templates/survey.html:249
+#: templates/survey_success.html:42
 msgid "Try Another Session"
 msgstr ""
 
@@ -1088,6 +1091,7 @@ msgid "Experience VOÏA with different scenarios"
 msgstr ""
 
 #: templates/conversational_survey.html:207 templates/survey.html:254
+#: templates/survey_success.html:47
 msgid "Voice of Client Agent - Full Service Inquiry"
 msgstr ""
 
@@ -1105,10 +1109,12 @@ msgid "Contact Rivvalue to implement VOÏA for your business"
 msgstr ""
 
 #: templates/conversational_survey.html:210 templates/survey.html:256
+#: templates/survey_success.html:49
 msgid "Contact Rivvalue"
 msgstr ""
 
 #: templates/conversational_survey.html:212 templates/survey.html:258
+#: templates/survey_success.html:51
 msgid "Implement full VoC Agent for your business"
 msgstr ""
 
@@ -1117,6 +1123,7 @@ msgid "Return to home page"
 msgstr ""
 
 #: templates/conversational_survey.html:222 templates/survey.html:266
+#: templates/survey_success.html:72
 msgid "Return Home"
 msgstr ""
 
@@ -1192,9 +1199,51 @@ msgstr ""
 msgid "Thank you! You have already submitted your conversational feedback on"
 msgstr ""
 
-#: templates/conversational_survey_completed.html:33
-#: templates/survey_completed.html:33
+#: templates/conversational_survey_completed.html:26
+msgid ""
+"Your AI-powered conversation responses have been analyzed to provide "
+"valuable insights for business improvement and customer satisfaction "
+"enhancement."
+msgstr ""
+
+#: templates/conversational_survey_completed.html:32
+#: templates/survey_completed.html:32
 msgid "What would you like to do next?"
+msgstr ""
+
+#: templates/conversational_survey_completed.html:38
+msgid "Try Our Traditional Survey"
+msgstr ""
+
+#: templates/conversational_survey_completed.html:39
+msgid "Experience structured form-based feedback"
+msgstr ""
+
+#: templates/conversational_survey_completed.html:45
+#: templates/survey_completed.html:45
+msgid "Contact Rivvalue for Full Service"
+msgstr ""
+
+#: templates/conversational_survey_completed.html:46
+#: templates/survey_completed.html:46
+msgid "Implement complete Voice of Client solution"
+msgstr ""
+
+#: templates/conversational_survey_completed.html:53
+#: templates/survey_completed.html:53
+msgid "See customer feedback insights"
+msgstr ""
+
+#: templates/conversational_survey_completed.html:63
+#: templates/survey_completed.html:63
+msgid ""
+"For data integrity, each email address can only submit one response per "
+"survey type."
+msgstr ""
+
+#: templates/conversational_survey_completed.html:70
+#: templates/survey_completed.html:70
+msgid "Return to Home"
 msgstr ""
 
 #: templates/dashboard.html:21
@@ -2195,6 +2244,60 @@ msgstr ""
 
 #: templates/survey_completed.html:19
 msgid "Thank you! You have already submitted your feedback on"
+msgstr ""
+
+#: templates/survey_completed.html:26
+msgid ""
+"Your feedback is being analyzed by our AI system to provide valuable "
+"insights for business improvement and customer satisfaction enhancement."
+msgstr ""
+
+#: templates/survey_completed.html:38
+msgid "Try Our Conversational Survey"
+msgstr ""
+
+#: templates/survey_completed.html:39
+msgid "Experience AI-powered natural conversation"
+msgstr ""
+
+#: templates/survey_success.html:20
+#, python-brace-format
+msgid "Your feedback has been successfully analyzed by {} Intelligence."
+msgstr ""
+
+#: templates/survey_success.html:44
+msgid "Experience traditional survey with different scenarios"
+msgstr ""
+
+#: templates/survey_success.html:47
+msgid ""
+"Hi Rivvalue team,\n"
+"\n"
+"I just completed the traditional survey demonstration and I'm interested "
+"in learning more about implementing the full Voice of Client Agent "
+"service for my organization.\n"
+"\n"
+"Please contact me to discuss how this can benefit our customer feedback "
+"strategy.\n"
+"\n"
+"Thank you!"
+msgstr ""
+
+#: templates/survey_success.html:57
+msgid "Want to try our AI-powered conversational survey?"
+msgstr ""
+
+#: templates/survey_success.html:59
+msgid "Try Conversational Survey"
+msgstr ""
+
+#: templates/survey_success.html:62
+#, python-brace-format
+msgid "Experience natural conversation with {} Intelligence"
+msgstr ""
+
+#: templates/survey_success.html:64
+msgid "Experience natural conversation with VOÏA Intelligence"
 msgstr ""
 
 #: templates/test_token.html:6 templates/test_token.html:17
