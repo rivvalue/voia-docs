@@ -85,9 +85,5 @@ externalPort = 8008
 localPort = 44161
 externalPort = 8081
 
-[[ports]]
-localPort = 46427
-externalPort = 8099
-
 [agent]
 integrations = ["python_openai==1.0.0", "styling_replit==1.0.0", "python_database==1.0.0", "python_log_in_with_replit==1.0.0"]
