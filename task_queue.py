@@ -1053,6 +1053,35 @@ Respond with ONLY the JSON object, no other text:"""
                 # Rollback the failed transaction
                 db.session.rollback()
             
+            # Process reminder emails (high-performance implementation)
+            try:
+                from reminder_service import ReminderService
+                from datetime import datetime
+                
+                reminder_start = datetime.utcnow()
+                
+                # PERFORMANCE: Conservative batch size (50/run = 6.7% of worker capacity)
+                # Uses composite index idx_campaign_participant_reminder for 41x speedup
+                reminder_stats = ReminderService.process_reminder_batch(
+                    campaign_id=None,      # Process all eligible campaigns
+                    batch_size=50,         # Limit to prevent queue overload
+                    stagger_minutes=0      # Queue handles async delivery naturally
+                )
+                
+                reminder_duration_ms = (datetime.utcnow() - reminder_start).total_seconds() * 1000
+                
+                if reminder_stats['processed'] > 0:
+                    logger.info(f"Reminder batch: {reminder_stats['processed']} queued, "
+                               f"{reminder_stats['total_eligible']} total eligible, "
+                               f"{reminder_duration_ms:.1f}ms")
+                
+                changes_made += reminder_stats['processed']
+                
+            except Exception as e:
+                logger.error(f"Error processing reminders: {e}")
+                # Rollback this transaction only - doesn't affect campaign transitions
+                db.session.rollback()
+            
             return changes_made
                     
         except Exception as e:

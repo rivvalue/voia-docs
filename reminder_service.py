@@ -88,10 +88,10 @@ class ReminderService:
             filters.append(Campaign.id == campaign_id)
         
         # Add SQL-based time filter using PostgreSQL interval arithmetic
-        # Uses typed SQLAlchemy expression: invited_at <= NOW() - INTERVAL 'X days'
-        # This is more optimizer-friendly and avoids brittle text() predicates
+        # Uses text() to construct: invited_at <= NOW() - INTERVAL 'X days'
+        # where X is the campaign's reminder_delay_days value
         filters.append(
-            CampaignParticipant.invited_at <= func.now() - func.make_interval(days=Campaign.reminder_delay_days)
+            text("campaign_participants.invited_at <= NOW() - (campaigns.reminder_delay_days || ' days')::INTERVAL")
         )
         
         query = query.filter(and_(*filters))
@@ -196,7 +196,7 @@ class ReminderService:
                 CampaignParticipant.invited_at.isnot(None),
                 SurveyResponse.id.is_(None),
                 EmailDelivery.id.is_(None),
-                CampaignParticipant.invited_at <= func.now() - func.make_interval(days=Campaign.reminder_delay_days),
+                text("campaign_participants.invited_at <= NOW() - (campaigns.reminder_delay_days || ' days')::INTERVAL"),
                 *([Campaign.id == campaign_id] if campaign_id else [])
             )
         ).scalar() or 0
@@ -263,7 +263,8 @@ class ReminderService:
                 logger.info("No eligible participants found for reminder processing")
                 return stats
             
-            # Process each participant
+            # Process each participant with isolated transactions
+            # This ensures that if participant #N fails, participants #1 to #N-1 are still committed
             for idx, cp in enumerate(eligible_participants):
                 try:
                     # Get participant and campaign data
@@ -298,7 +299,6 @@ class ReminderService:
                     
                     # Queue the reminder email via TaskQueue
                     task_data = {
-                        'task_type': 'send_reminder_email',
                         'email_delivery_id': email_delivery.id,
                         'participant_email': participant.email,
                         'participant_name': participant.name,
@@ -309,26 +309,29 @@ class ReminderService:
                         'campaign_id': campaign.id
                     }
                     
-                    task_queue.add_task(task_data)
+                    task_queue.add_task(
+                        task_type='send_reminder_email',
+                        priority=1,
+                        task_data=task_data
+                    )
+                    
+                    # CRITICAL: Commit immediately after queuing to isolate transactions
+                    # This ensures that if participant #N+1 fails, this participant's
+                    # EmailDelivery record is already committed and won't be rolled back
+                    db.session.commit()
                     
                     stats['processed'] += 1
                     logger.debug(f"Queued reminder for {participant.email} (campaign: {campaign.name})")
-                    
-                    # Batch commit every 100 records
-                    if (idx + 1) % 100 == 0:
-                        db.session.commit()
-                        logger.info(f"Committed batch of 100 reminder records (total: {idx + 1})")
                     
                 except Exception as e:
                     error_msg = f"Failed to process reminder for CampaignParticipant {cp.id}: {str(e)}"
                     logger.error(error_msg)
                     stats['failed'] += 1
                     stats['errors'].append(error_msg)
+                    # Rollback only affects the current participant (already isolated)
                     db.session.rollback()
                     continue
             
-            # Final commit for any remaining records
-            db.session.commit()
             logger.info(f"Reminder batch processing complete: {stats['processed']} queued, {stats['failed']} failed")
             
         except Exception as e:
