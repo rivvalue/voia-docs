@@ -1,0 +1,139 @@
+I'll have the architect assess this alternative approach - a dedicated company-centric metrics table populated by a post-campaign-completion task. This is a great architectural question about separation of concerns.
+
+Recommended company analytics architectural approach
+
+Decided on data storage approach
+Assessment: Dedicated Company-Centric Metrics Table (Your Proposed Approach)
+Excellent architectural intuition! The architect strongly recommends your approach of a dedicated, separate table. Here's the comprehensive assessment:
+
+RECOMMENDATION: PPROACH B - Dedicated Company Metrics Table
+Your proposed approach is superior for this use case. Create a separate CompanyTrendSnapshot table populated by a post-campaign-completion task, independent from CampaignKPISnapshot.
+
+PROS vs CONS COMPARISON
+
+
+WHY YOUR APPROACH WINS
+1. Separation of Concerns (Strongest Argument)
+Campaign-level KPIs and company-level trends serve different use cases
+Keeping them separate allows independent evolution
+CampaignKPISnapshot stays focused and lean
+2. Query Performance for Your Use Case
+Company trend queries need: "Get all metrics for Company X across campaigns"
+Dedicated table: Simple WHERE company_name = 'Acme Corp' ORDER BY campaign_date
+Extended snapshot: Must scan all campaigns or parse JSON arrays
+3. Schema Evolution
+Want to add new company-specific metrics later (e.g., "customer health score", "engagement trend")?
+Dedicated table: Just add columns
+Extended snapshot: Risk breaking existing campaign reports
+4. Scalability
+1000 companies × 100 campaigns = 100,000 company-metric records
+Dedicated table: Indexed, partitionable, manageable
+JSON in snapshots: Bloated, slow to query
+
+RECOMMENDED SCHEMA
+CompanyTrendSnapshot (New Table):
+├── id (PK)
+├── campaign_id (FK to Campaign) - Links to source campaign
+├── campaign_kpi_snapshot_id (FK) - Optional: link to parent snapshot
+├── company_name (normalized, indexed) - "Acme Corporation"
+├── campaign_completion_date - For trend ordering
+├── snapshot_version - For recomputation tracking
+│
+├── Participation Metrics:
+│ ├── total_invitations
+│ ├── total_responses
+│ ├── participation_rate (calculated)
+│
+├── NPS Metrics:
+│ ├── nps_score
+│ ├── promoters_count
+│ ├── passives_count
+│ ├── detractors_count
+│
+├── Rating Metrics:
+│ ├── avg_satisfaction_rating
+│ ├── avg_pricing_rating
+│ ├── avg_service_rating
+│ ├── avg_product_value_rating
+│
+├── Sentiment Distribution:
+│ ├── sentiment_positive_pct
+│ ├── sentiment_negative_pct
+│ ├── sentiment_neutral_pct
+│
+├── Churn Risk Distribution:
+│ ├── churn_risk_high_pct
+│ ├── churn_risk_medium_pct
+│ ├── churn_risk_low_pct
+│ ├── churn_risk_minimal_pct
+│
+├── Metadata:
+│ ├── created_at
+│ └── business_account_id (for multi-tenancy)
+│
+└── Unique constraint: (campaign_id, company_name)
+
+
+BACKGROUND TASK WORKFLOW
+Triggered by: Campaign status transition to completed
+Task Steps:
+Extract all responses for the campaign grouped by normalized company name
+For each company, calculate:
+Participation: COUNT(invitations), COUNT(responses)
+NPS: AVG(nps_score), COUNT by category
+Ratings: AVG for each dimension
+Sentiment: Percentage distribution
+Churn Risk: Percentage by risk level
+Insert into CompanyTrendSnapshot table
+Handle duplicates (upsert if campaign regenerated)
+Idempotency: Use ON CONFLICT (campaign_id, company_name) DO UPDATE to allow recomputation
+
+KEY RISKS & MITIGATION
+
+
+ORCHESTRATION INTEGRATION
+You already have campaign lifecycle management with automatic snapshot generation. Extend it:
+Current Flow:
+Campaign → Status: Completed → Generate CampaignKPISnapshot
+
+Enhanced Flow:
+Campaign → Status: Completed
+↓
+1. Generate CampaignKPISnapshot
+↓
+2. Queue Task: Generate CompanyTrendSnapshots
+↓
+3. Background Worker: Extract company metrics → Insert into table
+
+
+HYBRID OPTION (Best of Both Worlds)
+The architect also suggested this middle ground:
+Keep Both Tables Minimal:
+CampaignKPISnapshot: Campaign-level aggregates only (as-is)
+CompanyTrendSnapshot: Company-level aggregates only (new, dedicated)
+SQL Views: Create materialized views for mixed queries (executive dashboards that need both)
+Benefits:
+Each table optimized for its use case
+Mixed queries use pre-joined views
+Delta recomputes only affect changed companies
+Best performance for all scenarios
+
+IMPLEMENTATION COMPLEXITY COMPARISON
+
+
+FINAL RECOMMENDATION
+Go with your proposed approach (Approach B):
+Better separation of concerns
+Optimized for company trend queries
+Easier to evolve and maintain
+Better scalability
+Lower risk to existing features
+Actually slightly faster to implement
+Only Consideration: Ensure robust orchestration of the background task (which you already have via the PostgreSQL task queue).
+
+NEXT STEPS (If Approved)
+Schema Design: Finalize CompanyTrendSnapshot table structure
+Task Workflow: Design idempotent background job logic
+Integration Points: Hook into campaign completion lifecycle
+Backfill Strategy: Plan for historical campaign data
+Query API: Design endpoints for Company Trends page
