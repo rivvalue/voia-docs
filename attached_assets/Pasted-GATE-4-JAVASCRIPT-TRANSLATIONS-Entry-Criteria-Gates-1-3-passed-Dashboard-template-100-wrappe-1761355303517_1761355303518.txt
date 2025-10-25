@@ -1,0 +1,64 @@
+GATE 4: JAVASCRIPT TRANSLATIONS
+Entry Criteria
+	•	Gates 1-3 passed
+	•	Dashboard template 100% wrapped
+	•	Research completed on JS translation approach
+Work Scope
+Translate 77 JavaScript strings:
+	•	dashboard.js: 53 strings
+	•	executive_summary.js: 19 strings
+	•	survey.js: 5 strings
+Validation Steps
+V4.1: Approach Validation Review implementation approach:
+	•	Translation variables block added to template
+	•	No hardcoded strings in JS files
+	•	All strings reference translation object
+V4.2: Code Review - Template Variables
+# Check translation block exists
+grep -A 20 "const translations = {" templates/dashboard.html
+
+Expected: JSON object with 53+ translated strings
+V4.3: Code Review - JS Files
+# Verify no hardcoded English (common patterns)
+grep -n '"Loading' static/js/dashboard.js
+grep -n '"No data' static/js/dashboard.js
+grep -n '"Search' static/js/dashboard.js
+
+Expected: Should find references to translations.loading, not "Loading"
+V4.4: Functional Testing - Dynamic Content Test JavaScript-generated content:
+	•	Load dashboard - KPI values update (not 0)
+	•	Executive summary loads with data
+	•	Company NPS table populates
+	•	Charts render with labels
+	•	Modal opens and populates
+V4.5: Functional Testing - French Critical: Test all dynamic content in French
+	•	Switch to French
+	•	KPI values still update correctly
+	•	"No data" messages in French
+	•	"Loading..." messages in French
+	•	Chart tooltips in French
+	•	Modal content in French
+	•	Pagination text in French ("Showing X of Y")
+V4.6: Browser Console Validation
+	•	No JavaScript errors
+	•	No "undefined" in UI
+	•	No translations.xyz is undefined
+	•	Check Network tab: no failed requests
+V4.7: Interaction Testing Test user interactions that trigger JS:
+	•	Search companies - results update
+	•	Filter by NPS - table filters
+	•	Click pagination - page changes
+	•	Open company modal - data loads
+	•	Sort columns - order changes
+Success Criteria
+	•	All 77 JS strings translatable
+	•	Dynamic content works in both languages
+	•	No console errors
+	•	No undefined strings in UI
+	•	All interactions functional
+Rollback Plan
+git checkout static/js/
+git checkout templates/dashboard.html
+
+Sign-off
+YOU: Gate 4 validation complete. Dashboard fully bilingual? (yes/no)
