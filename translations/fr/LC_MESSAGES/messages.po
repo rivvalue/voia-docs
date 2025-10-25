@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-25 00:54+0000\n"
+"POT-Creation-Date: 2025-10-25 01:09+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -40,7 +40,7 @@ msgstr "Vous recevrez un jeton sécurisé valable 24 heures"
 #: templates/dashboard.html:261 templates/dashboard.html:528
 #: templates/dashboard.html:715 templates/dashboard.html:771
 #: templates/dashboard.html:857 templates/dashboard.html:926
-#: templates/survey.html:217
+#: templates/executive_summary.html:254 templates/survey.html:217
 msgid "Loading..."
 msgstr "Chargement..."
 
@@ -176,23 +176,19 @@ msgstr "Analyses de performance spécifiques aux campagnes et aperçus des sonda
 
 #: templates/campaign_insights.html:34 templates/dashboard.html:36
 #: templates/executive_summary.html:36
-#
 msgid "Refresh data"
 msgstr "Actualiser les données"
 
 #: templates/campaign_insights.html:45 templates/campaign_insights.html:52
 #: templates/dashboard.html:293
-#
 msgid "Campaign Analytics Filter"
 msgstr "Filtre d'analyse de campagne"
 
 #: templates/campaign_insights.html:60
-#
 msgid "Campaign:"
 msgstr "Campagnes :"
 
 #: templates/campaign_insights.html:65 templates/dashboard.html:306
-#
 msgid "Select Campaign"
 msgstr "Sélectionner une campagne"
 
@@ -211,7 +207,6 @@ msgstr "Détails"
 #: templates/campaign_insights.html:229 templates/campaign_insights.html:233
 #: templates/campaign_insights.html:306 templates/dashboard.html:344
 #: templates/dashboard.html:469
-#
 msgid "Account Intelligence"
 msgstr "Intelligence de compte"
 
@@ -236,7 +231,6 @@ msgid "NPS Score"
 msgstr "Score NPS"
 
 #: templates/campaign_insights.html:158 templates/dashboard.html:394
-#
 msgid "Overall satisfaction metric"
 msgstr "Satisfaction globale (1-5)"
 
@@ -254,7 +248,6 @@ msgid "Recent (30 days)"
 msgstr "Récent (30 jours)"
 
 #: templates/campaign_insights.html:172 templates/dashboard.html:408
-#
 msgid "Latest customer feedback"
 msgstr "Enquête de retour client"
 
@@ -275,7 +268,6 @@ msgstr "Élevé"
 #: templates/campaign_insights.html:265 templates/campaign_insights.html:495
 #: templates/campaign_insights.html:551 templates/campaign_insights.html:869
 #: templates/dashboard.html:501
-#
 msgid "Critical"
 msgstr "Risque critique"
 
@@ -284,7 +276,6 @@ msgid "Imminent churn risk (High/Critical)"
 msgstr "Risque de désabonnement imminent (Élevé/Critique)"
 
 #: templates/campaign_insights.html:189
-#
 msgid "Growth Potential"
 msgstr "Opportunités de croissance"
 
@@ -300,7 +291,6 @@ msgstr "Thèmes clés"
 #: templates/campaign_insights.html:235 templates/campaign_insights.html:238
 #: templates/campaign_insights.html:253 templates/campaign_insights.html:257
 #: templates/dashboard.html:489
-#
 msgid "Balance"
 msgstr "Équilibre"
 
@@ -337,7 +327,6 @@ msgstr "Entreprise"
 #: templates/executive_summary.html:204 templates/executive_summary.html:207
 #: templates/executive_summary.html:208 templates/executive_summary.html:209
 #: templates/executive_summary.html:223 templates/executive_summary.html:225
-#
 msgid "Search"
 msgstr "Rechercher"
 
@@ -369,7 +358,6 @@ msgstr "Faible"
 
 #: templates/campaign_insights.html:272 templates/campaign_insights.html:275
 #: templates/campaign_insights.html:276 templates/dashboard.html:508
-#
 msgid "Opportunities"
 msgstr "Opportunités de croissance"
 
@@ -399,7 +387,6 @@ msgid "NPS-Based Growth Factor Analysis"
 msgstr "Analyse du facteur de croissance basé sur le NPS"
 
 #: templates/campaign_insights.html:371 templates/campaign_insights.html:376
-#
 msgid "Average Ratings"
 msgstr "Sélectionnez la note"
 
@@ -409,7 +396,6 @@ msgstr "NPS par entreprise cliente"
 
 #: templates/campaign_insights.html:407 templates/campaign_insights.html:579
 #: templates/dashboard.html:643 templates/dashboard.html:815
-#
 msgid "NPS Category"
 msgstr "Score NPS"
 
@@ -437,14 +423,12 @@ msgstr "Répondant"
 
 #: templates/campaign_insights.html:442 templates/campaign_insights.html:523
 #: templates/campaign_insights.html:607 templates/dashboard.html:843
-#
 msgid "Churn Risk"
 msgstr "Indicateurs de risque de résiliation"
 
 #: templates/campaign_insights.html:503 templates/campaign_insights.html:519
 #: templates/campaign_insights.html:532 templates/campaign_insights.html:537
 #: templates/campaign_insights.html:546 templates/dashboard.html:755
-#
 msgid "Tenure NPS"
 msgstr "NPS par ancienneté"
 
@@ -453,7 +437,6 @@ msgid "NPS by Customer Tenure"
 msgstr "NPS par ancienneté client"
 
 #: templates/campaign_insights.html:516 templates/dashboard.html:752
-#
 msgid "Tenure Group"
 msgstr "Ancienneté :"
 
@@ -472,12 +455,10 @@ msgid "Responses"
 msgstr "Réponses"
 
 #: templates/campaign_insights.html:565
-#
 msgid "Recent Survey Responses"
 msgstr "Aucune réponse récente"
 
 #: templates/campaign_insights.html:605 templates/dashboard.html:841
-#
 msgid "Category"
 msgstr "Score NPS"
 
@@ -487,18 +468,15 @@ msgstr "Pagination des réponses à l'enquête"
 
 #: templates/campaign_insights.html:642 templates/campaign_insights.html:647
 #: templates/campaign_insights.html:974
-#
 msgid "NPS by Role"
 msgstr "Filtrer par rôle"
 
 #: templates/campaign_insights.html:657 templates/campaign_insights.html:662
 #: templates/campaign_insights.html:977
-#
 msgid "NPS by Region"
 msgstr "Filtrer par région"
 
 #: templates/campaign_insights.html:672 templates/campaign_insights.html:677
-#
 msgid "NPS by Customer Tier"
 msgstr "NPS par ancienneté client"
 
@@ -507,17 +485,14 @@ msgid "Satisfaction Ratings by Segment"
 msgstr ""
 
 #: templates/campaign_insights.html:700
-#
 msgid "Segment Type"
 msgstr "Date d'attribution :"
 
 #: templates/campaign_insights.html:701
-#
 msgid "Segment Name"
 msgstr "Gestion de l'engagement"
 
 #: templates/campaign_insights.html:703
-#
 msgid "Avg Satisfaction"
 msgstr "Satisfaction :"
 
@@ -629,7 +604,6 @@ msgstr "Entrez votre adresse e-mail"
 
 #: templates/conversational_survey.html:88
 #: templates/conversational_survey_business.html:84
-#
 msgid "How long have you been working with"
 msgstr "Depuis combien de temps travaillez-vous avec FC inc ?"
 
@@ -758,17 +732,14 @@ msgid "Return to home page"
 msgstr "Retour à la page d'accueil"
 
 #: templates/conversational_survey_business.html:43
-#
 msgid "Hi"
 msgstr "Bonjour"
 
 #: templates/conversational_survey_business.html:43
-#
 msgid "thank you for participating"
 msgstr "merci de votre participation"
 
 #: templates/conversational_survey_business.html:44
-#
 msgid "value your feedback"
 msgstr "valorisons vos retours"
 
@@ -860,7 +831,6 @@ msgstr ""
 
 #: templates/dashboard.html:56 templates/dashboard.html:58
 #: templates/executive_summary.html:49 templates/executive_summary.html:51
-#
 msgid "Loading executive summary..."
 msgstr "Résumé exécutif"
 
@@ -874,7 +844,6 @@ msgstr "Vue d'ensemble des indicateurs de campagne"
 #: templates/executive_summary.html:134 templates/executive_summary.html:136
 #: templates/executive_summary.html:194 templates/executive_summary.html:197
 #: templates/executive_summary.html:200 templates/executive_summary.html:276
-#
 msgid "Campaign"
 msgstr "Campagnes"
 
@@ -895,7 +864,6 @@ msgstr "NPS"
 
 #: templates/dashboard.html:84 templates/executive_summary.html:77
 #: templates/executive_summary.html:214 templates/executive_summary.html:305
-#
 msgid "Companies"
 msgstr "Nombre total de campagnes"
 
@@ -905,29 +873,26 @@ msgid "Critical Risk"
 msgstr "Risque critique"
 
 #: templates/dashboard.html:96 templates/dashboard.html:1029
-#
 msgid "Satisfaction"
 msgstr "Satisfaction :"
 
 #: templates/dashboard.html:102 templates/executive_summary.html:95
 #: templates/executive_summary.html:335
-#
 msgid "Product"
 msgstr "Valeur du produit"
 
 #: templates/dashboard.html:114 templates/dashboard.html:1059
-#
+#: templates/executive_summary.html:107 templates/executive_summary.html:355
 msgid "Service"
-msgstr "Vue d'ensemble"
+msgstr "Service"
 
-#: templates/dashboard.html:124
-#
+#: templates/dashboard.html:124 templates/executive_summary.html:117
 msgid "Loading KPI overview..."
-msgstr "Vue d'ensemble des indicateurs de campagne"
+msgstr "Chargement de la vue d'ensemble des KPI..."
 
-#: templates/dashboard.html:134
+#: templates/dashboard.html:134 templates/executive_summary.html:127
 msgid "View Trends"
-msgstr ""
+msgstr "Voir les tendances"
 
 #: templates/dashboard.html:141
 msgid "Campaign Comparison"
@@ -936,24 +901,20 @@ msgstr "Comparaison des campagnes"
 #: templates/dashboard.html:147 templates/dashboard.html:180
 #: templates/executive_summary.html:140 templates/executive_summary.html:173
 #: templates/executive_summary.html:197
-#
 msgid "Campaign 1"
 msgstr "Campagnes"
 
 #: templates/dashboard.html:149 templates/executive_summary.html:142
-#
 msgid "Select first campaign"
 msgstr "Créez votre première campagne"
 
 #: templates/dashboard.html:156 templates/dashboard.html:181
 #: templates/executive_summary.html:149 templates/executive_summary.html:174
 #: templates/executive_summary.html:200
-#
 msgid "Campaign 2"
 msgstr "Campagnes"
 
 #: templates/dashboard.html:158 templates/executive_summary.html:151
-#
 msgid "Select second campaign"
 msgstr "Campagnes actives"
 
@@ -965,7 +926,6 @@ msgstr ""
 
 #: templates/dashboard.html:174 templates/executive_summary.html:165
 #: templates/executive_summary.html:167
-#
 msgid "Metrics Comparison"
 msgstr "Comparaison des campagnes"
 
@@ -974,28 +934,23 @@ msgid "Metric"
 msgstr "Métrique"
 
 #: templates/dashboard.html:182 templates/executive_summary.html:175
-#
 msgid "Change"
 msgstr "Gérer"
 
 #: templates/dashboard.html:196 templates/executive_summary.html:185
 #: templates/executive_summary.html:189
-#
 msgid "Account-by-Account Analysis"
 msgstr "À propos de l'analyse des transcriptions"
 
 #: templates/dashboard.html:216 templates/dashboard.html:640
-#
 msgid "Search by company name..."
 msgstr "Entrez le nom de votre entreprise"
 
 #: templates/dashboard.html:219 templates/executive_summary.html:212
-#
 msgid "Balance Status"
 msgstr "Statut"
 
 #: templates/dashboard.html:221 templates/dashboard.html:645
-#
 msgid "All Companies"
 msgstr "Nombre total de campagnes"
 
@@ -1013,9 +968,9 @@ msgid "Risk Heavy"
 msgstr "Risque Élevé"
 
 #: templates/dashboard.html:233 templates/dashboard.html:657
-#
+#: templates/executive_summary.html:226
 msgid "Clear"
-msgstr "Fermer"
+msgstr "Effacer"
 
 #: templates/dashboard.html:243 templates/executive_summary.html:236
 msgid "C1 Risks"
@@ -1026,7 +981,6 @@ msgid "C1 Opps"
 msgstr "Opps C1"
 
 #: templates/dashboard.html:245 templates/executive_summary.html:238
-#
 msgid "C1 Balance"
 msgstr "Annuler"
 
@@ -1039,7 +993,6 @@ msgid "C2 Opps"
 msgstr "Opps C2"
 
 #: templates/dashboard.html:248 templates/executive_summary.html:241
-#
 msgid "C2 Balance"
 msgstr "Annuler"
 
@@ -1076,7 +1029,6 @@ msgid "Analytics"
 msgstr "Analytique"
 
 #: templates/dashboard.html:354 templates/dashboard.html:380
-#
 msgid "Survey Insights"
 msgstr "Voir les analyses IA"
 
@@ -1086,7 +1038,9 @@ msgstr "Affichage des données de la campagne active"
 
 #: templates/dashboard.html:417
 msgid "Companies with High or Critical churn risk level based on AI assessment"
-msgstr "Entreprises avec un niveau de risque de désabonnement Élevé ou Critique basé sur l'évaluation IA"
+msgstr ""
+"Entreprises avec un niveau de risque de désabonnement Élevé ou Critique "
+"basé sur l'évaluation IA"
 
 #: templates/dashboard.html:438
 msgid "Companies with High or Critical churn risk level"
@@ -1115,12 +1069,10 @@ msgid "High Potential"
 msgstr ""
 
 #: templates/dashboard.html:511
-#
 msgid "Has Opportunities"
 msgstr "Opportunités de croissance"
 
 #: templates/dashboard.html:512
-#
 msgid "No Opportunities"
 msgstr "Opportunités de croissance"
 
@@ -1139,22 +1091,18 @@ msgid "Avg Individual NPS"
 msgstr "NPS Individuel Moyen"
 
 #: templates/dashboard.html:674
-#
 msgid "Company NPS"
 msgstr "Nom de l'entreprise"
 
 #: templates/dashboard.html:675 templates/dashboard.html:756
-#
 msgid "Distribution"
 msgstr "Répartition du NPS"
 
 #: templates/dashboard.html:677 templates/dashboard.html:758
-#
 msgid "Latest Response"
 msgstr "Nombre total de réponses"
 
 #: templates/dashboard.html:678 templates/dashboard.html:759
-#
 msgid "Latest Churn Risk"
 msgstr "Indicateurs de risque de résiliation"
 
@@ -1179,17 +1127,14 @@ msgid "Tenure with FC inc"
 msgstr "Ancienneté avec FC inc"
 
 #: templates/dashboard.html:842
-#
 msgid "Sentiment"
 msgstr "Sentiment :"
 
 #: templates/dashboard.html:844 templates/dashboard.html:940
-#
 msgid "Date"
 msgstr "Date de fin"
 
 #: templates/dashboard.html:908
-#
 msgid "Search by respondent name or email..."
 msgstr "Rechercher par nom, e-mail ou entreprise..."
 
@@ -1202,7 +1147,6 @@ msgid "Lowest NPS"
 msgstr "NPS le plus faible"
 
 #: templates/dashboard.html:941
-#
 msgid "Action"
 msgstr "Durée :"
 
@@ -1402,7 +1346,6 @@ msgid "Proven Results from Campaign-Based Intelligence"
 msgstr "Résultats prouvés issus de l'intelligence basée sur les campagnes"
 
 #: templates/index.html:76
-#
 msgid "10x speed improvement"
 msgstr "Amélioration de la vitesse par 10"
 
@@ -1411,7 +1354,6 @@ msgid "Speed-to-Insight"
 msgstr "Délai d'accès aux informations"
 
 #: templates/index.html:80
-#
 msgid "4x more actionable insights"
 msgstr "Analyses plus exploitables"
 
@@ -1420,7 +1362,6 @@ msgid "More actionable insights"
 msgstr "Analyses plus exploitables"
 
 #: templates/index.html:84
-#
 msgid "98% accuracy"
 msgstr "Précision"
 
@@ -2889,9 +2830,9 @@ msgid "Maximum Invitations per Campaign"
 msgstr "Nombre maximal d'invitations par campagne"
 
 #: templates/business_auth/licenses/assignment_form.html:304
-#, python-format
+#, fuzzy, python-format
 msgid ""
-"Hard limit on survey invitations (typically 5x responses for ~20%% "
+"Hard limit on survey invitations (typically 5x responses for ~20% "
 "response rate)"
 msgstr ""
 "Limite stricte d'invitations (généralement 5x les réponses pour un taux "
@@ -3280,17 +3221,14 @@ msgid "Your organization's email server settings"
 msgstr ""
 
 #: templates/business_auth/onboarding/smtp.html:290
-#
 msgid "Server Settings"
 msgstr "Paramètres du système"
 
 #: templates/business_auth/onboarding/smtp.html:306
-#
 msgid "Usually 587 for TLS or 465 for SSL"
 msgstr "Généralement 587 (TLS) ou 465 (SSL)"
 
 #: templates/business_auth/onboarding/smtp.html:316
-#
 msgid "Your email address or SMTP username"
 msgstr "Entrez votre adresse e-mail"
 
@@ -3309,14 +3247,12 @@ msgid "Add Team Members"
 msgstr "Ajouter des membres à l'équipe"
 
 #: templates/business_auth/onboarding/users.html:318
-#
 msgid "Invite campaign managers to help create and manage surveys"
 msgstr ""
 "Invitez des responsables de campagne à vous aider à créer et gérer les "
 "enquêtes de retour client"
 
 #: templates/business_auth/onboarding/users.html:346
-#
 msgid "Current Team Members"
 msgstr "Membres de l'équipe"
 
@@ -3329,12 +3265,10 @@ msgid "Can view survey results and analytics but cannot create campaigns"
 msgstr ""
 
 #: templates/business_auth/onboarding/users.html:374
-#
 msgid "Full access to all features and settings"
 msgstr "Actions rapides et paramètres"
 
 #: templates/business_auth/onboarding/users.html:384
-#
 msgid "Add Campaign Manager"
 msgstr "Gestion des campagnes"
 
@@ -3993,8 +3927,8 @@ msgid "Select tier (optional)"
 msgstr "Sélectionnez une catégorie (optionnel)"
 
 #: templates/participants/create.html:145 templates/participants/edit.html:193
-#, python-format
-msgid "T1: Strategic (Top 5–10%% clients)"
+#, fuzzy, python-format
+msgid "T1: Strategic (Top 5–10% clients)"
 msgstr "T1 : Stratégique (5–10 % des meilleurs clients)"
 
 #: templates/participants/create.html:146 templates/participants/edit.html:194

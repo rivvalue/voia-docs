@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-25 00:54+0000\n"
+"POT-Creation-Date: 2025-10-25 01:09+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: en\n"
@@ -40,7 +40,7 @@ msgstr ""
 #: templates/dashboard.html:261 templates/dashboard.html:528
 #: templates/dashboard.html:715 templates/dashboard.html:771
 #: templates/dashboard.html:857 templates/dashboard.html:926
-#: templates/survey.html:217
+#: templates/executive_summary.html:254 templates/survey.html:217
 msgid "Loading..."
 msgstr ""
 
@@ -864,14 +864,15 @@ msgid "Product"
 msgstr ""
 
 #: templates/dashboard.html:114 templates/dashboard.html:1059
+#: templates/executive_summary.html:107 templates/executive_summary.html:355
 msgid "Service"
 msgstr ""
 
-#: templates/dashboard.html:124
+#: templates/dashboard.html:124 templates/executive_summary.html:117
 msgid "Loading KPI overview..."
 msgstr ""
 
-#: templates/dashboard.html:134
+#: templates/dashboard.html:134 templates/executive_summary.html:127
 msgid "View Trends"
 msgstr ""
 
@@ -947,6 +948,7 @@ msgid "Risk Heavy"
 msgstr ""
 
 #: templates/dashboard.html:233 templates/dashboard.html:657
+#: templates/executive_summary.html:226
 msgid "Clear"
 msgstr ""
 
