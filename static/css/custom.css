@@ -272,6 +272,23 @@ p, .text-body {
     display: none;
 }
 
+/* Fixed language toggle position for business auth pages */
+.language-toggle-wrapper {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.5rem;
+    z-index: 1000;
+}
+
+/* Mobile breakpoint: move language toggle below logo */
+@media (max-width: 768px) {
+    .language-toggle-wrapper {
+        top: auto;
+        bottom: 1rem;
+        right: 1rem;
+    }
+}
+
 .navbar-brand:hover {
     color: var(--primary-red) !important;
     transform: translateY(-1px);
