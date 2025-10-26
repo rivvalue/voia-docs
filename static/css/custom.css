@@ -280,7 +280,10 @@ p, .text-body {
 
 /* Fixed width for language dropdown to prevent shifting */
 .navbar #languageDropdown {
-    min-width: 140px;
+    width: 140px;
+    flex: 0 0 140px;
+    text-align: center;
+    justify-content: center;
 }
 
 .navbar-brand:hover {
