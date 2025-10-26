@@ -13,6 +13,137 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// Initialize global translations object and load executive summary translations
+window.translations = window.translations || {};
+
+// Helper function to convert string keys to camelCase property names
+function toCamelCase(str) {
+    // Special cases for common patterns
+    const specialCases = {
+        // Status keys - matching exact grep results
+        'Draft': 'draft',
+        'Ready': 'ready',
+        'Active': 'active',
+        'Completed': 'completed',
+        'Unknown': 'unknown',
+        // Campaign selection
+        'Select first campaign': 'selectFirstCampaign',
+        'Select second campaign': 'selectSecondCampaign',
+        // Loading states
+        'Loading comparison...': 'loadingComparison',
+        'Loading comparison data...': 'loadingComparisonData',
+        // Error messages - matching exact property names
+        'Error Loading Comparison': 'errorLoadingComparison',
+        'Error loading KPI overview data': 'errorLoadingKpiData',  // FIXED: was errorLoadingKpiOverviewData
+        'Failed to fetch comparison data': 'failedToFetchComparisonData',
+        'Failed to load comparison data. Please try again.': 'failedToLoadComparisonData',
+        'Failed to load campaign options': 'failedToLoadCampaignOptions',
+        // No data messages
+        'No campaign data available': 'noCampaignDataAvailable',
+        // Metric names - matching exact grep results
+        'Risk-Heavy Accounts': 'riskHeavyAccounts',
+        'Opportunity-Heavy Accounts': 'opportunityHeavyAccounts',
+        'Satisfaction': 'satisfactionRating',
+        'Product Value': 'productValueRating',
+        'Pricing': 'pricingRating',
+        'Service': 'serviceRating',
+        'Critical Risk': 'criticalRiskCompanies',
+        // Chart labels
+        'Total Responses': 'totalResponses',
+        'NPS Score': 'npsScore',
+        'Companies Analyzed': 'companiesAnalyzed'
+    };
+    
+    if (specialCases[str]) return specialCases[str];
+    
+    // Generic camelCase conversion
+    return str
+        // Remove all non-alphanumeric chars except spaces
+        .replace(/[^a-zA-Z0-9 ]/g, '')
+        // Split into words
+        .split(/\s+/)
+        // Capitalize each word except the first
+        .map((word, index) => {
+            word = word.toLowerCase();
+            return index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1);
+        })
+        .join('');
+}
+
+// Load translations immediately when script loads
+(async function() {
+    // Define fallback translations that cover ALL possible property accesses
+    const fallbackTranslations = {
+        // Status keys
+        draft: 'Draft',
+        ready: 'Ready',
+        active: 'Active',
+        completed: 'Completed',
+        unknown: 'Unknown',
+        // Campaign selection
+        selectFirstCampaign: 'Select first campaign',
+        selectSecondCampaign: 'Select second campaign',
+        // Comparison keys
+        loadingComparison: 'Loading comparison...',
+        loadingComparisonData: 'Loading comparison data...',
+        failedToFetchComparisonData: 'Failed to fetch comparison data',
+        failedToLoadComparisonData: 'Failed to load comparison data. Please try again.',
+        errorLoadingComparison: 'Error Loading Comparison',
+        // Metric names used in executive summary
+        riskHeavyAccounts: 'Risk-Heavy Accounts',
+        opportunityHeavyAccounts: 'Opportunity-Heavy Accounts',
+        satisfactionRating: 'Satisfaction',
+        productValueRating: 'Product Value',
+        pricingRating: 'Pricing',
+        serviceRating: 'Service',
+        criticalRiskCompanies: 'Critical Risk',
+        // Chart labels
+        totalResponses: 'Total Responses',
+        npsScore: 'NPS Score',
+        companiesAnalyzed: 'Companies Analyzed',
+        // Error messages
+        errorLoadingKpiData: 'Error loading KPI overview data',
+        failedToLoadCampaignOptions: 'Failed to load campaign options',
+        // No data messages
+        noCampaignDataAvailable: 'No campaign data available'
+    };
+    
+    try {
+        const dashboardTranslations = await window.translationLoader.load('dashboard');
+        
+        // First, populate with loaded translations
+        Object.assign(window.translations, dashboardTranslations);
+        
+        // Create camelCase aliases for ALL loaded keys
+        for (const [key, value] of Object.entries(dashboardTranslations)) {
+            const camelKey = toCamelCase(key);
+            if (camelKey && camelKey !== key) {
+                window.translations[camelKey] = value;
+            }
+        }
+        
+        // CRITICAL: Merge fallback for any keys still missing
+        // This ensures NO undefined values even in success path
+        for (const [key, value] of Object.entries(fallbackTranslations)) {
+            if (window.translations[key] === undefined) {
+                window.translations[key] = value;
+            }
+        }
+        
+        console.log('✅ Executive Summary translations loaded:', Object.keys(window.translations).length, 'keys');
+        
+        // Fire translationsLoaded event
+        window.dispatchEvent(new Event('translationsLoaded'));
+    } catch (error) {
+        console.error('❌ Failed to load executive summary translations:', error);
+        // Apply all fallback translations on fetch failure
+        Object.assign(window.translations, fallbackTranslations);
+        
+        // Fire event anyway to unblock UI
+        window.dispatchEvent(new Event('translationsLoaded'));
+    }
+})();
+
 // Utility functions
 function formatDate(dateString) {
     if (!dateString) return '-';

@@ -15,6 +15,202 @@ let availableCampaigns = [];
 let selectedCampaignId = null;
 let kpiOverviewData = null;
 
+// Initialize global translations object and load dashboard translations
+window.translations = window.translations || {};
+
+// Helper function to convert string keys to camelCase property names
+function toCamelCase(str) {
+    // Special cases for common patterns
+    const specialCases = {
+        // Status keys - matching exact grep results
+        'N/A': 'na',
+        'Draft': 'draft',
+        'Ready': 'ready',
+        'Active': 'active',
+        'Completed': 'completed',
+        'Unknown': 'unknown',
+        // Time keys
+        'days left': 'daysLeft',
+        'days ago': 'daysAgo',
+        'month': 'month',
+        'months': 'months',
+        'year': 'year',
+        'years': 'years',
+        'ago': 'ago',
+        // Filter and campaign selection
+        'Filtered by:': 'filteredBy',
+        'Clear filter': 'clearFilter',
+        'Select first campaign': 'selectFirstCampaign',
+        'Select second campaign': 'selectSecondCampaign',
+        // Loading states
+        'Loading...': 'loading',
+        'Loading comparison...': 'loadingComparison',
+        'Loading comparison data...': 'loadingComparisonData',
+        // Error messages - matching exact property names
+        'Error Loading Comparison': 'errorLoadingComparison',
+        'Error loading comparison data': 'errorLoadingComparisonData',
+        'Error loading dashboard data:': 'errorLoadingDashboardData',
+        'Error loading KPI overview data': 'errorLoadingKpiData',  // FIXED: was errorLoadingKpiOverviewData
+        'Error loading responses.': 'errorLoadingResponses',
+        'Error loading account intelligence': 'errorLoadingAccountIntelligence',
+        'Failed to fetch comparison data': 'failedToFetchComparisonData',
+        'Failed to load comparison data. Please try again.': 'failedToLoadComparisonData',
+        'Failed to load campaign options': 'failedToLoadCampaignOptions',
+        'Network error loading tenure data': 'networkErrorLoadingTenureData',
+        'Network error loading company data': 'networkErrorLoadingCompanyData',
+        // No data messages
+        'No campaign data available': 'noCampaignDataAvailable',
+        'No tenure data available yet': 'noTenureDataAvailable',
+        'No company data available yet': 'noCompanyDataAvailable',
+        // Ratings and metrics
+        'Satisfaction': 'satisfaction',
+        'Product Value': 'productValue',
+        'Service': 'service',
+        'Pricing': 'pricing',
+        'Average Rating': 'averageRating',
+        'Critical Risk': 'criticalRisk',
+        // Pagination and display
+        'Showing': 'showing',
+        'of': 'of',
+        'Previous': 'previous',
+        'Next': 'next',
+        // Actions
+        'View Details': 'viewDetails',
+        'View Full Response': 'viewFullResponse',
+        'Close': 'close',
+        'Authentication required': 'authenticationRequired',
+        // Collections
+        'companies': 'companies',
+        'accounts': 'accounts',
+        'responses': 'responses',
+        'tenure groups': 'tenureGroups'
+    };
+    
+    if (specialCases[str]) return specialCases[str];
+    
+    // Generic camelCase conversion
+    return str
+        // Remove all non-alphanumeric chars except spaces
+        .replace(/[^a-zA-Z0-9 ]/g, '')
+        // Split into words
+        .split(/\s+/)
+        // Capitalize each word except the first
+        .map((word, index) => {
+            word = word.toLowerCase();
+            return index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1);
+        })
+        .join('');
+}
+
+// Load translations immediately when script loads
+(async function() {
+    // Define fallback translations that cover ALL possible property accesses
+    const fallbackTranslations = {
+        // Status keys
+        draft: 'Draft',
+        ready: 'Ready',
+        active: 'Active',
+        completed: 'Completed',
+        unknown: 'Unknown',
+        // Time keys
+        daysLeft: 'days left',
+        daysAgo: 'days ago',
+        month: 'month',
+        months: 'months',
+        year: 'year',
+        years: 'years',
+        ago: 'ago',
+        // Campaign filter keys
+        filteredBy: 'Filtered by:',
+        clearFilter: 'Clear filter',
+        selectFirstCampaign: 'Select first campaign',
+        selectSecondCampaign: 'Select second campaign',
+        // Comparison keys
+        loading: 'Loading...',
+        loadingComparison: 'Loading comparison...',
+        loadingComparisonData: 'Loading comparison data...',
+        failedToFetchComparisonData: 'Failed to fetch comparison data',
+        failedToLoadComparisonData: 'Failed to load comparison data. Please try again.',
+        errorLoadingComparison: 'Error Loading Comparison',
+        errorLoadingComparisonData: 'Error loading comparison data',
+        // Pagination keys
+        previous: 'Previous',
+        next: 'Next',
+        showing: 'Showing',
+        of: 'of',
+        // Collection type keys
+        companies: 'companies',
+        accounts: 'accounts',
+        responses: 'responses',
+        tenureGroups: 'tenure groups',
+        // Action keys
+        viewDetails: 'View Details',
+        close: 'Close',
+        authenticationRequired: 'Authentication required',
+        viewFullResponse: 'View Full Response',
+        // Chart/Rating keys
+        satisfaction: 'Satisfaction',
+        productValue: 'Product Value',
+        service: 'Service',
+        pricing: 'Pricing',
+        averageRating: 'Average Rating',
+        // Badge tooltips (may not be in JSON)
+        satisfactionBadge: 'Satisfaction Rating',
+        valueBadge: 'Product Value Rating',
+        serviceBadge: 'Service Rating',
+        pricingBadge: 'Pricing Rating',
+        // Error messages
+        errorLoadingDashboardData: 'Error loading dashboard data: ',
+        errorLoadingAccountIntelligence: 'Error loading account intelligence',
+        errorLoadingResponses: 'Error loading responses.',
+        networkErrorLoadingTenureData: 'Network error loading tenure data',
+        networkErrorLoadingCompanyData: 'Network error loading company data',
+        errorLoadingKpiData: 'Error loading KPI overview data',
+        failedToLoadCampaignOptions: 'Failed to load campaign options',
+        // No data messages
+        noCampaignDataAvailable: 'No campaign data available',
+        noTenureDataAvailable: 'No tenure data available yet',
+        noCompanyDataAvailable: 'No company data available yet',
+        // Other
+        na: 'N/A'
+    };
+    
+    try {
+        const dashboardTranslations = await window.translationLoader.load('dashboard');
+        
+        // First, populate with loaded translations
+        Object.assign(window.translations, dashboardTranslations);
+        
+        // Create camelCase aliases for ALL loaded keys
+        for (const [key, value] of Object.entries(dashboardTranslations)) {
+            const camelKey = toCamelCase(key);
+            if (camelKey && camelKey !== key) {
+                window.translations[camelKey] = value;
+            }
+        }
+        
+        // CRITICAL: Merge fallback for any keys still missing (e.g., badge tooltips not in JSON)
+        // This ensures NO undefined values even in success path
+        for (const [key, value] of Object.entries(fallbackTranslations)) {
+            if (window.translations[key] === undefined) {
+                window.translations[key] = value;
+            }
+        }
+        
+        console.log('✅ Dashboard translations loaded:', Object.keys(window.translations).length, 'keys');
+        
+        // Fire translationsLoaded event
+        window.dispatchEvent(new Event('translationsLoaded'));
+    } catch (error) {
+        console.error('❌ Failed to load dashboard translations:', error);
+        // Apply all fallback translations on fetch failure
+        Object.assign(window.translations, fallbackTranslations);
+        
+        // Fire event anyway to unblock UI
+        window.dispatchEvent(new Event('translationsLoaded'));
+    }
+})();
+
 // Mobile detection and responsive configuration
 function isMobile() {
     return window.innerWidth <= 768;
