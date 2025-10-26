@@ -97,34 +97,34 @@
     <!-- Top Navbar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <!-- Persistent flex wrapper for content - always present to anchor ms-auto -->
-            <div class="navbar-content flex-fill d-flex align-items-center">
+            <!-- Persistent flex wrapper - always uses full width and right-aligns content -->
+            <div class="navbar-content flex-fill d-flex align-items-center justify-content-end">
                 <!-- Demo Logo for Trial Users (not authenticated) - Hidden on demo intro page -->
                 {% if not is_business_authenticated and branding_context and branding_context.logo_url and request.endpoint != 'demo_intro' %}
-                <div class="navbar-brand d-flex align-items-center">
+                <div class="navbar-brand d-flex align-items-center me-auto">
                     <img src="{{ branding_context.logo_url }}" alt="{{ branding_context.company_name }}" height="40" class="navbar-logo">
                 </div>
                 {% endif %}
                 
                 <!-- Centered Welcome Text (for unauthenticated users, but NOT on business auth pages) -->
                 {% if not is_business_authenticated and request.endpoint and 'business_auth' not in request.endpoint %}
-                <div class="d-flex justify-content-center flex-grow-1" style="max-width: 60%;">
+                <div class="d-flex justify-content-center position-absolute start-50 translate-middle-x" style="max-width: 60%;">
                     <a class="navbar-brand text-nowrap navbar-welcome-text" href="{{ url_for('index') }}">
                         {{ _('Welcome to VO') }}<span style="color: #E13A44;">Ï</span>{{ _('A Demo') }}
                     </a>
                 </div>
                 {% endif %}
-            </div>
-            
-            <!-- Right-aligned utility cluster: Language + User actions -->
-            <div class="d-flex align-items-center gap-3 ms-auto">
-                {% include 'components/language_selector.html' %}
                 
-                {% if is_business_authenticated %}
-                <span class="navbar-text text-white">
-                    <i class="fas fa-user-circle me-2"></i>{{ business_user_name }}
-                </span>
-                {% endif %}
+                <!-- Right-aligned utility cluster: Language + User actions -->
+                <div class="d-flex align-items-center gap-3">
+                    {% include 'components/language_selector.html' %}
+                    
+                    {% if is_business_authenticated %}
+                    <span class="navbar-text text-white">
+                        <i class="fas fa-user-circle me-2"></i>{{ business_user_name }}
+                    </span>
+                    {% endif %}
+                </div>
             </div>
             
             <div class="collapse navbar-collapse" id="navbarNav">
