@@ -108,8 +108,10 @@ function populateComparisonDropdowns() {
     
     // Add campaign options to both dropdowns
     comparisonCampaigns.forEach(campaign => {
-        const status = formatCampaignStatus(campaign.status);
-        const optionText = `${campaign.name} (${formatDate(campaign.start_date)} - ${formatDate(campaign.end_date)}) - ${status}`;
+        // Normalize status to lowercase for consistent logic
+        const rawStatus = (campaign.status || '').toLowerCase();
+        const displayStatus = formatCampaignStatus(rawStatus);
+        const optionText = `${campaign.name} (${formatDate(campaign.start_date)} - ${formatDate(campaign.end_date)}) - ${displayStatus}`;
         
         // Campaign 1 dropdown
         const option1 = document.createElement('option');

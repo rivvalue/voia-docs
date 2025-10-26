@@ -186,15 +186,17 @@ function populateCampaignFilterDropdown() {
         const option = document.createElement('option');
         option.value = campaign.id;
         
-        // Determine status
-        const status = formatCampaignStatus(campaign.status);
+        // Normalize status to lowercase for consistent logic
+        const rawStatus = (campaign.status || '').toLowerCase();
+        const displayStatus = formatCampaignStatus(rawStatus);
         
         // Format option text with status
-        option.textContent = `${campaign.name} (${formatDate(campaign.start_date)} - ${formatDate(campaign.end_date)}) - ${status}`;
+        option.textContent = `${campaign.name} (${formatDate(campaign.start_date)} - ${formatDate(campaign.end_date)}) - ${displayStatus}`;
         option.setAttribute('data-name', campaign.name);
         option.setAttribute('data-start', campaign.start_date);
         option.setAttribute('data-end', campaign.end_date);
-        option.setAttribute('data-status', status);
+        option.setAttribute('data-status', rawStatus);  // Store raw status for logic
+        option.setAttribute('data-status-display', displayStatus);  // Store translated for display
         option.setAttribute('data-description', campaign.description || '');
         
         // Set as selected if this is the default campaign
@@ -349,7 +351,8 @@ function updateSelectedCampaignInfo() {
         const option = select.selectedOptions[0];
         const startDate = option.getAttribute('data-start');
         const endDate = option.getAttribute('data-end');
-        const status = option.getAttribute('data-status');
+        const rawStatus = option.getAttribute('data-status');  // Get raw status for logic
+        const displayStatus = option.getAttribute('data-status-display');  // Get display status for UI
         
         // Update dates badge text (inline, no container refresh)
         const datesText = document.querySelector('.campaign-dates-text');
@@ -361,8 +364,8 @@ function updateSelectedCampaignInfo() {
         const statusBadge = document.getElementById('selectedCampaignStatus');
         const statusText = document.querySelector('.campaign-status-text');
         if (statusBadge && statusText) {
-            statusText.textContent = status;
-            if (status === 'Active') {
+            statusText.textContent = displayStatus;  // Use display status for UI
+            if (rawStatus === 'active') {  // Use raw status for logic
                 statusBadge.style.backgroundColor = '#28a745';
                 statusBadge.style.color = 'white';
             } else {
@@ -380,10 +383,10 @@ function updateSelectedCampaignInfo() {
             const diffTime = campaignEndDate - today;
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             
-            const daysRemaining = status === 'Active' ? Math.max(0, diffDays) : 0;
-            const daysSinceEnded = status === 'Closed' ? Math.max(0, -diffDays) : 0;
+            const daysRemaining = rawStatus === 'active' ? Math.max(0, diffDays) : 0;  // Use raw status
+            const daysSinceEnded = rawStatus === 'completed' ? Math.max(0, -diffDays) : 0;  // Use raw status
             
-            if (status === 'Active' && daysRemaining >= 0) {
+            if (rawStatus === 'active' && daysRemaining >= 0) {  // Use raw status
                 if (daysRemaining > 30) {
                     daysText.textContent = `${daysRemaining} ${translations.daysLeft}`;
                     daysLeftSpan.className = 'badge bg-success';
@@ -395,7 +398,7 @@ function updateSelectedCampaignInfo() {
                     daysLeftSpan.className = 'badge bg-danger';
                 }
                 daysLeftSpan.style.display = '';
-            } else if (status === 'Closed' && daysSinceEnded > 0) {
+            } else if (rawStatus === 'completed' && daysSinceEnded > 0) {  // Use raw status
                 if (daysSinceEnded < 30) {
                     daysText.textContent = `${daysSinceEnded} ${translations.daysAgo}`;
                 } else if (daysSinceEnded < 365) {
