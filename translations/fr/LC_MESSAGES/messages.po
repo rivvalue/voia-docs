@@ -3507,7 +3507,7 @@ msgid "VOÏA Business Login"
 msgstr "Connexion entreprise VOÏA"
 
 #: templates/business_auth/login.html:16
-#, fuzzy
+
 msgid "Business Account Login"
 msgstr "Connexion au compte entreprise"
 
@@ -3549,7 +3549,7 @@ msgid "Forgot password"
 msgstr "Mot de passe oublié"
 
 #: templates/business_auth/login.html:81
-#, fuzzy
+
 msgid "Forgot your password?"
 msgstr "Mot de passe oublié ?"
 
@@ -5308,54 +5308,6 @@ msgstr "Télécharger le modèle de fichier CSV"
 #~ msgstr "4 fois plus d'analyses"
 
 
-#: templates/business_auth/forgot_password.html:2
-msgid "Forgot Password - VOÏA - Voice Of Client"
-msgstr "Mot de passe oublié - VOÏA - Voice Of Client"
-
-#: templates/business_auth/forgot_password.html:12
-msgid "VOÏA Password Reset"
-msgstr "Réinitialisation du mot de passe VOÏA"
-
 #: templates/business_auth/forgot_password.html:15
 msgid "Reset Your Password"
 msgstr "Réinitialisez votre mot de passe"
-
-#: templates/business_auth/forgot_password.html:16
-msgid "Enter your email address and we'll send you a password reset link"
-msgstr "Entrez votre adresse e-mail et nous vous enverrons un lien de réinitialisation"
-
-#: templates/business_auth/forgot_password.html:39
-msgid "Password reset request form"
-msgstr "Formulaire de demande de réinitialisation du mot de passe"
-
-#: templates/business_auth/forgot_password.html:51
-msgid "Email address"
-msgstr "Adresse e-mail"
-
-#: templates/business_auth/forgot_password.html:59
-msgid "We'll send a password reset link to this email address"
-msgstr "Nous enverrons un lien de réinitialisation à cette adresse e-mail"
-
-#: templates/business_auth/forgot_password.html:63
-msgid "Send Reset Link"
-msgstr "Envoyer le lien"
-
-#: templates/business_auth/forgot_password.html:62
-msgid "Send password reset email"
-msgstr "Envoyer l'e-mail de réinitialisation"
-
-#: templates/business_auth/forgot_password.html:69
-msgid "Back to Login"
-msgstr "Retour à la connexion"
-
-#: templates/business_auth/forgot_password.html:68
-msgid "Return to login page"
-msgstr "Retour à la page de connexion"
-
-#: templates/business_auth/forgot_password.html:92
-msgid "Please enter your email address."
-msgstr "Veuillez entrer votre adresse e-mail."
-
-#: templates/business_auth/forgot_password.html:97
-msgid "Sending..."
-msgstr "Envoi en cours..."
