@@ -272,6 +272,17 @@ p, .text-body {
     display: none;
 }
 
+/* Navbar flex layout stabilization */
+.navbar .navbar-content {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* Fixed width for language dropdown to prevent shifting */
+.navbar #languageDropdown {
+    min-width: 140px;
+}
+
 .navbar-brand:hover {
     color: var(--primary-red) !important;
     transform: translateY(-1px);

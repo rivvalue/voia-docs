@@ -4198,3 +4198,55 @@ msgstr ""
 #~ msgid "Thank you, {{ participant_name }}!"
 #~ msgstr ""
 
+
+#: templates/business_auth/forgot_password.html:2
+msgid "Forgot Password - VOÏA - Voice Of Client"
+msgstr "Forgot Password - VOÏA - Voice Of Client"
+
+#: templates/business_auth/forgot_password.html:12
+msgid "VOÏA Password Reset"
+msgstr "VOÏA Password Reset"
+
+#: templates/business_auth/forgot_password.html:15
+msgid "Reset Your Password"
+msgstr "Reset Your Password"
+
+#: templates/business_auth/forgot_password.html:16
+msgid "Enter your email address and we'll send you a password reset link"
+msgstr "Enter your email address and we'll send you a password reset link"
+
+#: templates/business_auth/forgot_password.html:39
+msgid "Password reset request form"
+msgstr "Password reset request form"
+
+#: templates/business_auth/forgot_password.html:51
+msgid "Email address"
+msgstr "Email address"
+
+#: templates/business_auth/forgot_password.html:59
+msgid "We'll send a password reset link to this email address"
+msgstr "We'll send a password reset link to this email address"
+
+#: templates/business_auth/forgot_password.html:63
+msgid "Send Reset Link"
+msgstr "Send Reset Link"
+
+#: templates/business_auth/forgot_password.html:62
+msgid "Send password reset email"
+msgstr "Send password reset email"
+
+#: templates/business_auth/forgot_password.html:69
+msgid "Back to Login"
+msgstr "Back to Login"
+
+#: templates/business_auth/forgot_password.html:68
+msgid "Return to login page"
+msgstr "Return to login page"
+
+#: templates/business_auth/forgot_password.html:92
+msgid "Please enter your email address."
+msgstr "Please enter your email address."
+
+#: templates/business_auth/forgot_password.html:97
+msgid "Sending..."
+msgstr "Sending..."
