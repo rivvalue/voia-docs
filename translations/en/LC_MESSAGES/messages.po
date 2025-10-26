@@ -4198,34 +4198,3 @@ msgstr ""
 #~ msgid "Thank you, {{ participant_name }}!"
 #~ msgstr ""
 
-#~ msgid "Refresh data"
-#~ msgstr ""
-
-#~ msgid "Click to view full trends"
-#~ msgstr ""
-
-#~ msgid "Search by company name..."
-#~ msgstr ""
-
-#~ msgid "Companies with High or Critical churn risk level based on AI assessment"
-#~ msgstr ""
-
-#~ msgid "Companies with High or Critical churn risk level"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Shows account health balance: Risk-Heavy"
-#~ " (risks outweigh opportunities), High "
-#~ "Potential (opportunities with minimal risks),"
-#~ " or Balanced"
-#~ msgstr ""
-
-#~ msgid "Search company, opportunities, risks..."
-#~ msgstr ""
-
-#~ msgid "Search by company name, participant name, or email..."
-#~ msgstr ""
-
-#~ msgid "Search by respondent name or email..."
-#~ msgstr ""
-

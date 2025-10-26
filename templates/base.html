@@ -104,8 +104,8 @@
             </div>
             {% endif %}
             
-            <!-- Centered Welcome Text (for unauthenticated users) -->
-            {% if not is_business_authenticated %}
+            <!-- Centered Welcome Text (for unauthenticated users, but NOT on business auth pages) -->
+            {% if not is_business_authenticated and request.endpoint and 'business_auth' not in request.endpoint %}
             <div class="d-flex justify-content-center flex-grow-1" style="max-width: 60%;">
                 <a class="navbar-brand text-nowrap navbar-welcome-text" href="{{ url_for('index') }}">
                     {{ _('Welcome to VO') }}<span style="color: #E13A44;">Ï</span>{{ _('A Demo') }}
