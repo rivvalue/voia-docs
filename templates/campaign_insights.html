@@ -932,35 +932,6 @@
 
 <!-- Translation Loader - Async JSON files for better performance -->
 <script src="{{ url_for('static', filename='js/translation-loader.js') }}"></script>
-<script>
-// Translation object - populated asynchronously from JSON files
-const translations = {};
-
-// Load translations asynchronously
-(async function initializeTranslations() {
-    try {
-        // Load campaign-insights and common translations in parallel
-        const [campaignInsights, common] = await Promise.all([
-            window.translationLoader.load('campaign-insights'),
-            window.translationLoader.load('common')
-        ]);
-        
-        // Merge translations into global object for backward compatibility
-        Object.assign(translations, campaignInsights, common);
-        
-        // Dispatch event to notify that translations are ready
-        window.dispatchEvent(new CustomEvent('translationsLoaded', {
-            detail: { namespaces: ['campaign-insights', 'common'] }
-        }));
-        
-        console.log('✅ Campaign Insights translations loaded');
-        
-    } catch (error) {
-        console.error('❌ Translation loading failed:', error);
-        // Campaign Insights will use English fallbacks via translation keys
-    }
-})();
-</script>
 
 <!-- Hash redirect handler for old bookmarks -->
 <script>
