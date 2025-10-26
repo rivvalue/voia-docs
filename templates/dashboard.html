@@ -1082,35 +1082,7 @@
 
 <!-- Translation Loader - Async JSON files for better performance -->
 <script src="{{ url_for('static', filename='js/translation-loader.js') }}"></script>
-<script>
-// Translation object - populated asynchronously from JSON files
-const translations = {};
-
-// Load translations asynchronously
-(async function initializeTranslations() {
-    try {
-        // Load dashboard and common translations in parallel
-        const [dashboard, common] = await Promise.all([
-            window.translationLoader.load('dashboard'),
-            window.translationLoader.load('common')
-        ]);
-        
-        // Merge translations into global object for backward compatibility
-        Object.assign(translations, dashboard, common);
-        
-        // Dispatch event to notify that translations are ready
-        window.dispatchEvent(new CustomEvent('translationsLoaded', {
-            detail: { namespaces: ['dashboard', 'common'] }
-        }));
-        
-        console.log('✅ Dashboard translations loaded');
-        
-    } catch (error) {
-        console.error('❌ Translation loading failed:', error);
-        // Dashboard will use English fallbacks via translation keys
-    }
-})();
-</script>
+<!-- Translation loading handled by dashboard.js to avoid race conditions -->
 
 <!-- Hash redirect handler for old bookmarks -->
 <script>
