@@ -450,21 +450,44 @@ document.addEventListener('DOMContentLoaded', function() {
         loadCompanyNpsDataDirect();
     }, 1000);
     
-    // Load campaign filter options first, then initial dashboard data
-    loadCampaignFilterOptions().then(() => {
-        // Update global campaign indicator after filter is populated
-        updateGlobalCampaignIndicator();
-        
-        // Only load dashboard data if no default campaign was auto-selected
-        if (!selectedCampaignId) {
-            loadDashboardData().catch(error => {
-                console.error('Initial dashboard load failed:', error);
-            });
+    // CRITICAL: Wait for translations to load before initializing campaigns
+    // This prevents formatCampaignStatus() from returning undefined
+    let campaignsInitialized = false;
+    function initializeCampaigns() {
+        if (campaignsInitialized) {
+            console.log('⚠️ Campaigns already initialized, skipping duplicate call');
+            return;
         }
-    });
+        campaignsInitialized = true;
+        console.log('🌍 Translations ready, initializing campaigns...');
+        
+        // Load campaign filter options first, then initial dashboard data
+        loadCampaignFilterOptions().then(() => {
+            // Update global campaign indicator after filter is populated
+            updateGlobalCampaignIndicator();
+            
+            // Only load dashboard data if no default campaign was auto-selected
+            if (!selectedCampaignId) {
+                loadDashboardData().catch(error => {
+                    console.error('Initial dashboard load failed:', error);
+                });
+            }
+        });
+        
+        // Load campaign comparison options
+        loadComparisonCampaignOptions();
+    }
     
-    // Load campaign comparison options
-    loadComparisonCampaignOptions();
+    // Listen for translations loaded event
+    window.addEventListener('translationsLoaded', initializeCampaigns);
+    
+    // Fallback: If translations already loaded (race condition), initialize immediately
+    setTimeout(function() {
+        if (Object.keys(translations).length > 0 && !campaignsInitialized) {
+            console.log('🌍 Translations already loaded (fallback check)');
+            initializeCampaigns();
+        }
+    }, 100);
     
     // Business authentication is handled server-side
     
@@ -3797,15 +3820,8 @@ function businessLogout() {
     window.location.href = '/business/logout';
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Only run dashboard JavaScript on dashboard pages
-    if (!document.body.classList.contains('page-dashboard') && 
-        !window.location.pathname.includes('/dashboard')) {
-        return;
-    }
-    
-    loadCampaignFilterOptions();
-});
+// Removed duplicate DOMContentLoaded listener - campaign initialization
+// is now handled in the main DOMContentLoaded at line ~431 after translations load
 
 
 
