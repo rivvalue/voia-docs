@@ -1911,12 +1911,19 @@ function createThemesChart() {
 
 function createTenureChart() {
     let chartElement = document.getElementById('tenureChart');
-    const container = chartElement ? chartElement.parentNode : document.querySelector('.chart-container');
     
     // If canvas was destroyed by previous "no data" message, recreate it
-    if (!chartElement && container) {
-        container.innerHTML = '<canvas id="tenureChart"></canvas>';
-        chartElement = document.getElementById('tenureChart');
+    if (!chartElement) {
+        // Find all chart containers and look for one that doesn't have a canvas
+        const chartContainers = document.querySelectorAll('.chart-container');
+        for (const container of chartContainers) {
+            // Check if this container has the alert message instead of canvas
+            if (container.querySelector('.alert-info') && container.textContent.includes('tenure data')) {
+                container.innerHTML = '<canvas id="tenureChart"></canvas>';
+                chartElement = document.getElementById('tenureChart');
+                break;
+            }
+        }
     }
     
     if (!chartElement) {
@@ -1981,12 +1988,19 @@ function createTenureChart() {
 
 function createGrowthFactorChart() {
     let chartElement = document.getElementById('growthFactorChart');
-    const container = chartElement ? chartElement.parentNode : document.querySelector('.chart-container');
     
     // If canvas was destroyed by previous "no data" message, recreate it
-    if (!chartElement && container) {
-        container.innerHTML = '<canvas id="growthFactorChart"></canvas>';
-        chartElement = document.getElementById('growthFactorChart');
+    if (!chartElement) {
+        // Find all chart containers and look for one that doesn't have a canvas
+        const chartContainers = document.querySelectorAll('.chart-container');
+        for (const container of chartContainers) {
+            // Check if this container has the alert message instead of canvas
+            if (container.querySelector('.alert-info') && container.textContent.includes('growth factor data')) {
+                container.innerHTML = '<canvas id="growthFactorChart"></canvas>';
+                chartElement = document.getElementById('growthFactorChart');
+                break;
+            }
+        }
     }
     
     if (!chartElement) {
