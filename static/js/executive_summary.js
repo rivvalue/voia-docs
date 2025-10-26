@@ -190,11 +190,28 @@ async function updateComparison() {
         console.error('Error loading comparison data:', error);
         // Show error message or fallback
         if (messageDiv) {
-            messageDiv.innerHTML = `
-                <i class="fas fa-exclamation-triangle fa-4x mb-3" style="color: #E13A44;"></i>
-                <h5 style="color: #E13A44;">${translations.errorLoadingComparison}</h5>
-                <p class="text-muted">${translations.failedToLoadComparisonData}</p>
-            `;
+            // Clear existing content
+            messageDiv.textContent = '';
+            
+            // Create icon
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-exclamation-triangle fa-4x mb-3';
+            icon.style.color = '#E13A44';
+            
+            // Create heading
+            const heading = document.createElement('h5');
+            heading.style.color = '#E13A44';
+            heading.textContent = translations.errorLoadingComparison;
+            
+            // Create paragraph
+            const paragraph = document.createElement('p');
+            paragraph.className = 'text-muted';
+            paragraph.textContent = translations.failedToLoadComparisonData;
+            
+            // Append all elements
+            messageDiv.appendChild(icon);
+            messageDiv.appendChild(heading);
+            messageDiv.appendChild(paragraph);
             messageDiv.style.display = 'block';
         }
         if (resultsDiv) resultsDiv.style.display = 'none';
