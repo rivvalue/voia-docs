@@ -4244,18 +4244,23 @@ function renderCompanyResponsesTable(responses) {
         
         if (canView) {
             // User can view this response
-            actionCell.innerHTML = `
-                <a href="/survey-response/${response.id}" class="btn btn-sm btn-outline-primary" title="${translations.viewFullResponse}">
-                    <i class="fas fa-eye"></i>
-                </a>
-            `;
+            const link = document.createElement('a');
+            link.href = `/survey-response/${encodeURIComponent(response.id)}`;
+            link.className = 'btn btn-sm btn-outline-primary';
+            link.title = translations.viewFullResponse || '';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-eye';
+            link.appendChild(icon);
+            actionCell.appendChild(link);
         } else {
             // User cannot view this response - authentication required
-            actionCell.innerHTML = `
-                <span class="text-muted" title="${translations.authenticationRequired}">
-                    <i class="fas fa-lock"></i>
-                </span>
-            `;
+            const span = document.createElement('span');
+            span.className = 'text-muted';
+            span.title = translations.authenticationRequired || '';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-lock';
+            span.appendChild(icon);
+            actionCell.appendChild(span);
         }
         
         row.appendChild(actionCell);
