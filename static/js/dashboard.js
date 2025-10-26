@@ -18,6 +18,9 @@ let kpiOverviewData = null;
 // Initialize global translations object and load dashboard translations
 window.translations = window.translations || {};
 
+// Campaign initialization flag (must be global to prevent race conditions)
+let campaignsInitialized = false;
+
 // Helper function to convert string keys to camelCase property names
 function toCamelCase(str) {
     // Special cases for common patterns
@@ -101,6 +104,39 @@ function toCamelCase(str) {
         })
         .join('');
 }
+
+// ============================================================================
+// CRITICAL: Campaign initialization function (must be defined BEFORE IIFE)
+// ============================================================================
+function initializeCampaigns() {
+    if (campaignsInitialized) {
+        console.log('⚠️ Campaigns already initialized, skipping duplicate call');
+        return;
+    }
+    campaignsInitialized = true;
+    console.log('🌍 Translations ready, initializing campaigns...');
+    
+    // Load campaign filter options first, then initial dashboard data
+    loadCampaignFilterOptions().then(() => {
+        // Update global campaign indicator after filter is populated
+        updateGlobalCampaignIndicator();
+        
+        // Only load dashboard data if no default campaign was auto-selected
+        if (!selectedCampaignId) {
+            loadDashboardData().catch(error => {
+                console.error('Initial dashboard load failed:', error);
+            });
+        }
+    });
+    
+    // Load campaign comparison options
+    loadComparisonCampaignOptions();
+}
+
+// ============================================================================
+// CRITICAL: Register event listener BEFORE IIFE to prevent race condition
+// ============================================================================
+window.addEventListener('translationsLoaded', initializeCampaigns);
 
 // Load translations immediately when script loads
 (async function() {
@@ -645,47 +681,6 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Fallback: Loading company NPS data directly');
         loadCompanyNpsDataDirect();
     }, 1000);
-    
-    // CRITICAL: Wait for translations to load before initializing campaigns
-    // This prevents formatCampaignStatus() from returning undefined
-    let campaignsInitialized = false;
-    function initializeCampaigns() {
-        if (campaignsInitialized) {
-            console.log('⚠️ Campaigns already initialized, skipping duplicate call');
-            return;
-        }
-        campaignsInitialized = true;
-        console.log('🌍 Translations ready, initializing campaigns...');
-        
-        // Load campaign filter options first, then initial dashboard data
-        loadCampaignFilterOptions().then(() => {
-            // Update global campaign indicator after filter is populated
-            updateGlobalCampaignIndicator();
-            
-            // Only load dashboard data if no default campaign was auto-selected
-            if (!selectedCampaignId) {
-                loadDashboardData().catch(error => {
-                    console.error('Initial dashboard load failed:', error);
-                });
-            }
-        });
-        
-        // Load campaign comparison options
-        loadComparisonCampaignOptions();
-    }
-    
-    // Listen for translations loaded event
-    window.addEventListener('translationsLoaded', initializeCampaigns);
-    
-    // Fallback: If translations already loaded (race condition), initialize immediately
-    setTimeout(function() {
-        if (Object.keys(translations).length > 0 && !campaignsInitialized) {
-            console.log('🌍 Translations already loaded (fallback check)');
-            initializeCampaigns();
-        }
-    }, 100);
-    
-    // Business authentication is handled server-side
     
     // Setup tab event listeners
     setupTabEventListeners();
