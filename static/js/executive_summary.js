@@ -665,7 +665,15 @@ async function loadKpiOverview() {
         const campaigns = campaignData.campaigns || [];
         
         if (campaigns.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="9" class="text-center text-muted">${translations.noCampaignDataAvailable}</td></tr>`;
+            // Use safe DOM methods instead of innerHTML
+            tbody.textContent = '';
+            const tr = document.createElement('tr');
+            const td = document.createElement('td');
+            td.setAttribute('colspan', '9');
+            td.className = 'text-center text-muted';
+            td.textContent = translations.noCampaignDataAvailable;
+            tr.appendChild(td);
+            tbody.appendChild(tr);
             if (loadingElement) loadingElement.classList.add('d-none');
             if (contentElement) contentElement.classList.remove('d-none');
             return;
