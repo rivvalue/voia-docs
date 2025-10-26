@@ -1910,7 +1910,15 @@ function createThemesChart() {
 }
 
 function createTenureChart() {
-    const chartElement = document.getElementById('tenureChart');
+    let chartElement = document.getElementById('tenureChart');
+    const container = chartElement ? chartElement.parentNode : document.querySelector('.chart-container');
+    
+    // If canvas was destroyed by previous "no data" message, recreate it
+    if (!chartElement && container) {
+        container.innerHTML = '<canvas id="tenureChart"></canvas>';
+        chartElement = document.getElementById('tenureChart');
+    }
+    
     if (!chartElement) {
         console.warn('Tenure chart element not found');
         return;
@@ -1972,7 +1980,15 @@ function createTenureChart() {
 }
 
 function createGrowthFactorChart() {
-    const chartElement = document.getElementById('growthFactorChart');
+    let chartElement = document.getElementById('growthFactorChart');
+    const container = chartElement ? chartElement.parentNode : document.querySelector('.chart-container');
+    
+    // If canvas was destroyed by previous "no data" message, recreate it
+    if (!chartElement && container) {
+        container.innerHTML = '<canvas id="growthFactorChart"></canvas>';
+        chartElement = document.getElementById('growthFactorChart');
+    }
+    
     if (!chartElement) {
         console.warn('Growth factor chart element not found');
         return;
