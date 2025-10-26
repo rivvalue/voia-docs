@@ -762,7 +762,16 @@ async function loadKpiOverview() {
         
     } catch (error) {
         console.error('Error loading KPI overview:', error);
-        tbody.innerHTML = `<tr><td colspan="9" class="text-center text-danger">${translations.errorLoadingKpiData}</td></tr>`;
+        
+        // Create error row using safe DOM methods
+        tbody.innerHTML = '';
+        const errorRow = document.createElement('tr');
+        const errorCell = document.createElement('td');
+        errorCell.setAttribute('colspan', '9');
+        errorCell.className = 'text-center text-danger';
+        errorCell.textContent = translations.errorLoadingKpiData;
+        errorRow.appendChild(errorCell);
+        tbody.appendChild(errorRow);
         
         // Hide loading, show content even on error
         if (loadingElement) loadingElement.classList.add('d-none');
