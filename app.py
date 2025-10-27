@@ -222,8 +222,17 @@ try:
     # Add performance monitoring to requests
     @app.before_request
     def before_request():
-        from flask import g
+        from flask import g, render_template
         import time
+        
+        # MAINTENANCE MODE: Redirect all pages except /business/login to maintenance page
+        maintenance_mode = os.environ.get('MAINTENANCE_MODE', 'false').lower() == 'true'
+        if maintenance_mode:
+            # Allow access to login page, static files, and the maintenance page itself
+            allowed_paths = ['/business/login', '/static/', '/language/']
+            if not any(request.path.startswith(path) for path in allowed_paths):
+                return render_template('maintenance.html'), 503
+        
         g.start_time = time.time()
         
         # CRITICAL: Set up task queue in request context for async processing
