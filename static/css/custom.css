@@ -278,10 +278,15 @@ p, .text-body {
     min-width: 0;
 }
 
-/* Fixed width for language dropdown to prevent shifting */
-.navbar #languageDropdown {
+/* Fixed width for language dropdown wrapper to prevent shifting */
+.navbar .dropdown {
     width: 140px;
     flex: 0 0 140px;
+}
+
+/* Fixed width for language dropdown button */
+.navbar #languageDropdown {
+    width: 100%;
     text-align: center;
     justify-content: center;
 }
