@@ -36,6 +36,7 @@ The system is a Flask web application with a multi-tiered architecture. The fron
 -   **Segmentation Analytics**: Comprehensive analytics system displaying NPS and satisfaction metrics segmented by participant attributes, including a dedicated Segmentation Insights tab in Campaign Insights with interactive Chart.js visualizations.
 -   **Demo Data Generation**: High-volume test data scripts capable of generating realistic test data for development and staging.
 -   **JavaScript Translation Optimization**: Externalized translation payloads from inline JavaScript objects to cacheable static JSON files to eliminate mobile performance degradation. Uses async translation loader with retry logic, browser caching, and graceful English fallbacks.
+-   **Maintenance Mode**: Environment variable-controlled feature (MAINTENANCE_MODE=true) that restricts all pages except /business/login to a professional "coming soon" page with V2 design guidelines. The maintenance page features the VOÏA branding and a CTA linking to www.rivvalue.com/voia#demo for demo requests.
 
 # External Dependencies
 -   **OpenAI API**: For advanced AI functionalities including sentiment analysis, theme extraction, and conversational surveys.
