@@ -280,15 +280,18 @@ p, .text-body {
 
 /* Fixed width for language dropdown wrapper to prevent shifting */
 .navbar .dropdown {
-    width: 140px;
-    flex: 0 0 140px;
+    width: 160px;
+    flex: 0 0 160px;
 }
 
-/* Fixed width for language dropdown button */
+/* Fixed width for language dropdown button - override global btn styles */
 .navbar #languageDropdown {
     width: 100%;
     text-align: center;
     justify-content: center;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+    white-space: nowrap;
 }
 
 .navbar-brand:hover {
