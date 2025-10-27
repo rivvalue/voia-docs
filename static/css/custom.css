@@ -280,23 +280,31 @@ p, .text-body {
 
 /* Three-column navbar layout to prevent shifting */
 .navbar-left {
-    flex: 0 0 auto;
+    flex: 0 0 auto !important;
     min-width: 0;
 }
 
 .navbar-center {
-    flex: 1 1 auto;
+    flex: 1 1 auto !important;
     display: flex;
     justify-content: center;
     align-items: center;
     min-width: 0;
+    text-align: center;
 }
 
 .navbar-right {
-    flex: 0 0 auto;
+    flex: 0 0 180px !important;
+    min-width: 180px !important;
+    max-width: 180px !important;
     margin-left: auto;
-    min-width: 180px;
-    max-width: 180px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Override Bootstrap gap utility to use fixed gap */
+.navbar-right .d-flex.gap-3 {
+    gap: 1rem !important;
 }
 
 /* Fixed width for language dropdown wrapper to prevent shifting */
