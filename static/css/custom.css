@@ -294,9 +294,8 @@ p, .text-body {
 }
 
 .navbar-right {
-    flex: 0 0 180px !important;
+    flex: 0 0 auto !important;
     min-width: 180px !important;
-    max-width: 180px !important;
     margin-left: auto;
     display: flex;
     justify-content: flex-end;
