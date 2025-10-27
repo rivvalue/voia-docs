@@ -278,26 +278,20 @@ p, .text-body {
     min-width: 0;
 }
 
-/* Fixed width for language dropdown wrapper to prevent shifting - ABSOLUTE POSITION */
+/* Fixed width for language dropdown wrapper to prevent shifting */
 .navbar .dropdown {
-    position: absolute !important;
-    right: 1rem !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
+    width: 160px;
+    flex: 0 0 160px;
 }
 
 /* Fixed width for language dropdown button - override global btn styles */
 .navbar #languageDropdown {
-    width: 140px !important;
-    min-width: 140px !important;
-    max-width: 140px !important;
-    text-align: center !important;
-    justify-content: center !important;
+    width: 100%;
+    text-align: center;
+    justify-content: center;
     text-transform: none !important;
-    letter-spacing: 0 !important;
-    white-space: nowrap !important;
-    padding-left: 0.5rem !important;
-    padding-right: 0.5rem !important;
+    letter-spacing: normal !important;
+    white-space: nowrap;
 }
 
 .navbar-brand:hover {
