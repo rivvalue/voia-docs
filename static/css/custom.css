@@ -278,6 +278,15 @@ p, .text-body {
     min-width: 0;
 }
 
+/* Fixed-width utilities container to prevent language toggle shifting */
+.navbar-utilities-container {
+    flex: 0 0 auto;
+    min-width: 180px;
+    max-width: 180px;
+    display: flex;
+    justify-content: flex-end;
+}
+
 /* Fixed width for language dropdown wrapper to prevent shifting */
 .navbar .dropdown {
     width: 160px;
@@ -287,6 +296,8 @@ p, .text-body {
 /* Fixed width for language dropdown button - override global btn styles */
 .navbar #languageDropdown {
     width: 100%;
+    min-width: 160px;
+    max-width: 160px;
     text-align: center;
     justify-content: center;
     text-transform: none !important;
