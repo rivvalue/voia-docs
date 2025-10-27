@@ -1,31 +1,33 @@
 <!-- Language Selector Component -->
-<div class="dropdown">
-    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
-            type="button" 
-            id="languageDropdown" 
-            data-bs-toggle="dropdown" 
-            aria-expanded="false"
-            aria-label="{{ _('Select language') }}">
-        {% if session.get('language') == 'fr' %}
-            <i class="fas fa-globe me-1"></i> Français
-        {% else %}
-            <i class="fas fa-globe me-1"></i> English
-        {% endif %}
-    </button>
-    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
-        <li>
-            <a class="dropdown-item {% if session.get('language', 'en') == 'en' %}active{% endif %}" 
-               href="{{ url_for('language.set_language', lang='en') }}">
-                <i class="fas fa-check me-2 {% if session.get('language', 'en') != 'en' %}invisible{% endif %}"></i>
-                English
-            </a>
-        </li>
-        <li>
-            <a class="dropdown-item {% if session.get('language') == 'fr' %}active{% endif %}" 
-               href="{{ url_for('language.set_language', lang='fr') }}">
-                <i class="fas fa-check me-2 {% if session.get('language') != 'fr' %}invisible{% endif %}"></i>
-                Français
-            </a>
-        </li>
-    </ul>
+<div class="language-selector-wrapper">
+    <div class="dropdown">
+        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                type="button" 
+                id="languageDropdown" 
+                data-bs-toggle="dropdown" 
+                aria-expanded="false"
+                aria-label="{{ _('Select language') }}">
+            {% if session.get('language') == 'fr' %}
+                <i class="fas fa-globe me-1"></i> Français
+            {% else %}
+                <i class="fas fa-globe me-1"></i> English
+            {% endif %}
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+            <li>
+                <a class="dropdown-item {% if session.get('language', 'en') == 'en' %}active{% endif %}" 
+                   href="{{ url_for('language.set_language', lang='en') }}">
+                    <i class="fas fa-check me-2 {% if session.get('language', 'en') != 'en' %}invisible{% endif %}"></i>
+                    English
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item {% if session.get('language') == 'fr' %}active{% endif %}" 
+                   href="{{ url_for('language.set_language', lang='fr') }}">
+                    <i class="fas fa-check me-2 {% if session.get('language') != 'fr' %}invisible{% endif %}"></i>
+                    Français
+                </a>
+            </li>
+        </ul>
+    </div>
 </div>

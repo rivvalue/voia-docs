@@ -7,6 +7,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Karla:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* Hide language selector on maintenance page */
+.language-selector-wrapper {
+    display: none !important;
+}
+</style>
 {% endblock %}
 
 {% block content %}
@@ -18,54 +25,6 @@
                 <h1 class="index-hero-title">VO<span class="index-hero-accent">Ï</span>A</h1>
                 <p class="index-hero-subtitle">Turning voices into value</p>
             </header>
-
-            <!-- Coming Soon Message -->
-            <section class="text-center" aria-labelledby="coming-soon-heading">
-                <h2 id="coming-soon-heading" class="visually-hidden">Coming Soon</h2>
-                <div class="index-cta-banner">
-                    <p class="index-cta-text">
-                        We're preparing something exceptional.<br>
-                        The VOÏA platform is being refined to deliver even more powerful customer intelligence.
-                    </p>
-                </div>
-            </section>
-
-            <!-- Features Preview -->
-            <section class="index-features-section text-center section-spacing" aria-labelledby="features-heading">
-                <h2 id="features-heading" class="index-features-title">What's Coming</h2>
-                <div class="row g-4">
-                    <div class="col-md-4">
-                        <div class="index-feature-tile">
-                            <p class="index-feature-text">AI-powered conversational surveys</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="index-feature-tile">
-                            <p class="index-feature-text">Real-time sentiment analysis</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="index-feature-tile">
-                            <p class="index-feature-text">Executive-level insights</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="index-feature-tile">
-                            <p class="index-feature-text">Campaign management</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="index-feature-tile">
-                            <p class="index-feature-text">Multi-tenant architecture</p>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="index-feature-tile">
-                            <p class="index-feature-text">Advanced analytics</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
 
             <!-- CTA Section -->
             <section class="text-center section-spacing" aria-labelledby="cta-heading">
