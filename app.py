@@ -228,8 +228,8 @@ try:
         # MAINTENANCE MODE: Redirect all pages except /business/login to maintenance page
         maintenance_mode = os.environ.get('MAINTENANCE_MODE', 'false').lower() == 'true'
         if maintenance_mode:
-            # Allow access to login page, static files, and the maintenance page itself
-            allowed_paths = ['/business/login', '/static/', '/language/']
+            # Allow access to login page, forgot password, static files, and language toggle
+            allowed_paths = ['/business/login', '/business/forgot-password', '/static/', '/language/']
             if not any(request.path.startswith(path) for path in allowed_paths):
                 # Return 200 for health checks (deployment requires it)
                 return render_template('maintenance.html'), 200
