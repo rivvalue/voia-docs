@@ -31,7 +31,7 @@ The system is a Flask web application with a multi-tiered architecture. The fron
 -   **Hybrid Survey Customization**: Campaign-specific survey personalization with business account defaults.
 -   **License Management System**: Enterprise-ready license management with usage tracking and enforcement.
 -   **Business Account User Management**: Multi-tenant user management with professional UI, license-aware counters, and comprehensive user workflows.
--   **Mandatory Onboarding System**: Extensible guided setup workflow for business account administrators.
+-   **Mandatory Onboarding System**: Self-assessment based setup workflow for Core/Plus license holders (admin users only). Simplified 3-step process: SMTP Configuration (required) → Brand Configuration (optional) → Team Members (required). Users navigate to existing admin pages for configuration, then manually mark steps complete on a centralized progress dashboard. No automatic validation - purely user-driven completion tracking.
 -   **Feature Flag System**: Production-ready infrastructure for UI version toggling, including a PostgreSQL-backed task queue.
 -   **Segmentation Analytics**: Comprehensive analytics system displaying NPS and satisfaction metrics segmented by participant attributes, including a dedicated Segmentation Insights tab in Campaign Insights with interactive Chart.js visualizations.
 -   **Demo Data Generation**: High-volume test data scripts capable of generating realistic test data for development and staging.
