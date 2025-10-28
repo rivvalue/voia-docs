@@ -623,9 +623,15 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show progress
             showProgress();
             
+            // Get CSRF token
+            const csrfToken = '{{ csrf_token() }}';
+            
             // Upload transcript
             fetch(`/business/api/campaigns/{{ campaign.id }}/transcripts/upload`, {
                 method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken
+                },
                 body: formData
             })
             .then(response => response.json())
