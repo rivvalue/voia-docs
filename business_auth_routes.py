@@ -779,6 +779,23 @@ def create_business_account_with_admin():
         db.session.add(admin_user)
         db.session.commit()
         
+        # Audit log the creation IMMEDIATELY after commit (regardless of email outcome)
+        try:
+            from audit_utils import queue_audit_log
+            queue_audit_log(
+                business_account_id=business_account.id,
+                action_type='business_account_created',
+                resource_type='business_account',
+                details={
+                    'business_name': business_name,
+                    'admin_email': admin_email,
+                    'license_template': license_template_id,
+                    'created_by': session.get('business_user_id')
+                }
+            )
+        except Exception as audit_error:
+            logger.error(f"Failed to log business account creation audit: {audit_error}")
+        
         # Send invitation email using platform owner's email service
         # NOTE: Use platform_owner business account's SMTP config
         # because the newly created business account doesn't have email config yet
@@ -801,23 +818,6 @@ def create_business_account_with_admin():
         if email_result.get('success'):
             logger.info(f"Business account '{business_name}' created successfully with admin user {admin_email}")
             flash(f'Business account "{business_name}" created successfully! Invitation email sent to {admin_email}.', 'success')
-            
-            # Audit log the creation
-            try:
-                from audit_utils import queue_audit_log
-                queue_audit_log(
-                    business_account_id=business_account.id,
-                    action_type='business_account_created',
-                    resource_type='business_account',
-                    details={
-                        'business_name': business_name,
-                        'admin_email': admin_email,
-                        'license_template': license_template_id,
-                        'created_by': session.get('business_user_id')
-                    }
-                )
-            except Exception as audit_error:
-                logger.error(f"Failed to log business account creation audit: {audit_error}")
         else:
             logger.warning(f"Business account created but invitation email failed: {email_result.get('error')}")
             flash(f'Business account "{business_name}" created successfully, but invitation email failed. Please manually send invitation to {admin_email}.', 'warning')
