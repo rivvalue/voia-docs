@@ -10,6 +10,7 @@ from rate_limiter import rate_limit
 from license_service import LicenseService
 from feature_flags import feature_flags
 from audit_utils import queue_audit_log
+from flask_babel import gettext as _
 import logging
 from datetime import datetime, timedelta, date
 import json
