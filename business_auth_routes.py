@@ -979,8 +979,9 @@ def onboarding_update_progress():
         if not current_user.onboarding_progress:
             current_user.initialize_onboarding()
         
-        # Get current progress
-        progress = current_user.get_onboarding_progress()
+        # Get current progress - make a deep copy to avoid mutation issues
+        import copy
+        progress = copy.deepcopy(current_user.get_onboarding_progress())
         if 'steps' not in progress:
             progress['steps'] = {}
         
