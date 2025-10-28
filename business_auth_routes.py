@@ -3614,7 +3614,7 @@ def admin_licenses():
             # Check if there's an unactivated admin user
             unactivated_admin = BusinessAccountUser.query.filter_by(
                 business_account_id=account.id,
-                is_admin=True,
+                role='admin',
                 email_verified=False
             ).first()
             
