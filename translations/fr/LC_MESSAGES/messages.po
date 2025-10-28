@@ -5190,8 +5190,8 @@ msgid "Email locked - survey history exists"
 msgstr "E-mail verrouillé - historique d'enquête existant"
 
 #: templates/participants/list.html:151
-msgid "Manage campaign participants for {{ business_account.name }}"
-msgstr "Gérez les participants à la campagne pour {{ business_account.name }}"
+msgid "Manage campaign participants for %(name)s"
+msgstr "Gérez les participants à la campagne pour %(name)s"
 
 #: templates/participants/list.html:347
 msgid "Search by name, email, or company..."
