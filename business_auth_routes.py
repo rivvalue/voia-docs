@@ -3857,54 +3857,9 @@ def process_license_assignment():
             flash('Business account validation failed. Please try again.', 'error')
             return redirect(url_for('business_auth.admin_licenses'))
         
-        # Handle transcript analysis add-on configuration
+        # Transcript upload is now universally available to all license tiers
+        # No add-on configuration needed - usage bounded by participant response limits
         transcript_addon_config = None
-        transcript_addon_enabled = request.form.get('transcript_analysis_addon') is not None
-        if transcript_addon_enabled:
-            transcript_addon_config = {'enabled': True}
-            
-            # Get and validate transcript analysis add-on fields
-            transcript_start_date = request.form.get('transcript_start_date', '').strip()
-            transcript_end_date = request.form.get('transcript_end_date', '').strip()
-            transcript_price = request.form.get('transcript_price', '').strip()
-            
-            if transcript_start_date:
-                from datetime import datetime
-                try:
-                    start_date = datetime.strptime(transcript_start_date, '%Y-%m-%d').date()
-                    transcript_addon_config['start_date'] = start_date
-                except ValueError:
-                    flash('Invalid transcript analysis start date format.', 'error')
-                    return redirect(url_for('business_auth.license_assignment_form', business_id=business_id))
-            
-            if transcript_end_date:
-                try:
-                    end_date = datetime.strptime(transcript_end_date, '%Y-%m-%d').date()
-                    transcript_addon_config['end_date'] = end_date
-                except ValueError:
-                    flash('Invalid transcript analysis end date format.', 'error')
-                    return redirect(url_for('business_auth.license_assignment_form', business_id=business_id))
-            
-            if transcript_price:
-                try:
-                    # Guard against NaN injection
-                    if transcript_price.lower().strip() in ('nan', 'inf', '-inf', '+inf'):
-                        flash('Invalid transcript analysis price format.', 'error')
-                        return redirect(url_for('business_auth.license_assignment_form', business_id=business_id))
-                    price = float(transcript_price)
-                    if price < 0:
-                        flash('Transcript analysis price must be non-negative.', 'error')
-                        return redirect(url_for('business_auth.license_assignment_form', business_id=business_id))
-                    transcript_addon_config['price'] = price
-                except ValueError:
-                    flash('Invalid transcript analysis price format.', 'error')
-                    return redirect(url_for('business_auth.license_assignment_form', business_id=business_id))
-            
-            # Validate date range if both dates are provided
-            if 'start_date' in transcript_addon_config and 'end_date' in transcript_addon_config:
-                if transcript_addon_config['start_date'] >= transcript_addon_config['end_date']:
-                    flash('Transcript analysis end date must be after start date.', 'error')
-                    return redirect(url_for('business_auth.license_assignment_form', business_id=business_id))
         
         # Log the assignment attempt for audit
         logger.info(f"Platform admin {current_user.email} attempting to assign {license_type} license to business_id {business_id} ({business_account.name})")
@@ -4447,14 +4402,6 @@ def upload_transcript(campaign_id):
         user = BusinessAccountUser.query.get(business_user_id)
         if not user or user.role != 'admin':
             return jsonify({'error': 'Admin permission required'}), 403
-        
-        # Check license for transcript analysis feature
-        from license_service import LicenseService
-        if not LicenseService.can_use_transcript_analysis(current_account.id):
-            return jsonify({
-                'success': False, 
-                'error': 'Transcript analysis feature requires a specific add-on license. Please contact support to upgrade your plan.'
-            }), 403
         
         # Verify campaign belongs to current business account
         from models import Campaign

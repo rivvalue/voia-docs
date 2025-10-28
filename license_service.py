@@ -358,57 +358,33 @@ class LicenseService:
     @staticmethod
     def can_use_transcript_analysis(business_account_id: int) -> bool:
         """
-        Check if business account has access to transcript analysis add-on feature.
-        Platform administrators have unlimited access.
+        Check if business account can use transcript upload feature.
         
-        Uses date-based access control: checks if today falls within the
-        transcript_analysis_start_date and transcript_analysis_end_date range.
-        Falls back to has_transcript_analysis boolean for legacy compatibility.
+        Transcript upload is now universally available to all license tiers.
+        Usage is bounded by the participant/response limits of each license tier,
+        as transcript uploads create CampaignParticipant and SurveyResponse records
+        that count against the license quota.
         
         Args:
             business_account_id: Business account ID to check
             
         Returns:
-            bool: True if account can use transcript analysis, False otherwise
+            bool: True if account has an active license (all tiers have access)
         """
         try:
-            # Check if current user is a platform admin (unlimited access)
-            from flask import session
-            current_user_id = session.get('business_user_id')
-            if current_user_id:
-                from models import BusinessAccountUser
-                current_user = BusinessAccountUser.query.get(current_user_id)
-                if current_user and current_user.is_platform_admin():
-                    logger.debug(f"Platform admin {current_user.email} bypassing transcript analysis access check")
-                    return True
-            from datetime import date
-            
-            # Get current license
+            # Get current license to verify account has valid license
             current_license = LicenseService.get_current_license(business_account_id)
             
             if not current_license:
                 logger.warning(f"No active license found for business_account_id {business_account_id}")
                 return False
             
-            # New date-based access control
-            if current_license.transcript_analysis_start_date and current_license.transcript_analysis_end_date:
-                today = date.today()
-                has_date_access = (current_license.transcript_analysis_start_date <= today <= 
-                                 current_license.transcript_analysis_end_date)
-                
-                logger.debug(f"Transcript analysis date check for business_account_id {business_account_id}: "
-                            f"today={today}, start={current_license.transcript_analysis_start_date}, "
-                            f"end={current_license.transcript_analysis_end_date}, has_access={has_date_access}")
-                
-                return has_date_access
+            # Transcript upload is universally available to all license tiers
+            # Usage is controlled by participant response limits
+            logger.debug(f"Transcript upload available for business_account_id {business_account_id} "
+                        f"with license type {current_license.license_type}")
             
-            # Legacy fallback to boolean field
-            has_legacy_access = current_license.has_transcript_analysis
-            
-            logger.debug(f"Transcript analysis legacy check for business_account_id {business_account_id}: "
-                        f"license_type={current_license.license_type}, has_transcript_analysis={has_legacy_access}")
-            
-            return has_legacy_access
+            return True
             
         except Exception as e:
             logger.error(f"Failed to check transcript analysis permission for business_account_id {business_account_id}: {e}")
