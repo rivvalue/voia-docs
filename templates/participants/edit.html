@@ -153,10 +153,10 @@
                             <option value="">{{ _('Select role (optional)') }}</option>
                             <option value="C-Level" {% if participant.role == "C-Level" %}selected{% endif %}>{{ _('C-Level Executive') }}</option>
                             <option value="VP" {% if participant.role == "VP" %}selected{% endif %}>{{ _('VP / Director') }}</option>
-                            <option value="{{ _('Manager') }}" {% if participant.role == "{{ _('Manager') }}" %}selected{% endif %}>{{ _('Manager') }}</option>
-                            <option value="{{ _('Team Lead') }}" {% if participant.role == "{{ _('Team Lead') }}" %}selected{% endif %}>{{ _('Team Lead') }}</option>
-                            <option value="{{ _('End User') }}" {% if participant.role == "{{ _('End User') }}" %}selected{% endif %}>{{ _('End User') }}</option>
-                            <option value="{{ _('Other') }}" {% if participant.role == "{{ _('Other') }}" %}selected{% endif %}>{{ _('Other') }}</option>
+                            <option value="Manager" {% if participant.role == "Manager" %}selected{% endif %}>{{ _('Manager') }}</option>
+                            <option value="Team Lead" {% if participant.role == "Team Lead" %}selected{% endif %}>{{ _('Team Lead') }}</option>
+                            <option value="End User" {% if participant.role == "End User" %}selected{% endif %}>{{ _('End User') }}</option>
+                            <option value="Other" {% if participant.role == "Other" %}selected{% endif %}>{{ _('Other') }}</option>
                         </select>
                         <div class="participant-help-text" id="role_help">{{ _('Participant\'s role for role-based survey personalization') }}</div>
                     </div>
@@ -170,11 +170,11 @@
                                 name="region"
                                 aria-describedby="region_help">
                             <option value="">{{ _('Select region (optional)') }}</option>
-                            <option value="{{ _('North America') }}" {% if participant.region == "{{ _('North America') }}" %}selected{% endif %}>{{ _('North America') }}</option>
+                            <option value="North America" {% if participant.region == "North America" %}selected{% endif %}>{{ _('North America') }}</option>
                             <option value="LATAM" {% if participant.region == "LATAM" %}selected{% endif %}>{{ _('Latin America (LATAM)') }}</option>
                             <option value="EMEA" {% if participant.region == "EMEA" %}selected{% endif %}>{{ _('Europe, Middle East & Africa (EMEA)') }}</option>
                             <option value="APAC" {% if participant.region == "APAC" %}selected{% endif %}>{{ _('Asia Pacific (APAC)') }}</option>
-                            <option value="{{ _('Other') }}" {% if participant.region == "{{ _('Other') }}" %}selected{% endif %}>{{ _('Other') }}</option>
+                            <option value="Other" {% if participant.region == "Other" %}selected{% endif %}>{{ _('Other') }}</option>
                         </select>
                         <div class="participant-help-text" id="region_help">{{ _('Geographic region for regional insights') }}</div>
                     </div>
@@ -190,9 +190,9 @@
                                 name="customer_tier"
                                 aria-describedby="customer_tier_help">
                             <option value="">{{ _('Select tier (optional)') }}</option>
-                            <option value="{{ _('T1: Strategic (Top 5–10% clients)') }}" {% if participant.customer_tier == "{{ _('T1: Strategic (Top 5–10% clients)') }}" %}selected{% endif %}>{{ _('T1: Strategic (Top 5–10% clients)') }}</option>
-                            <option value="{{ _('T2: Managed (bulk of paying clients)') }}" {% if participant.customer_tier == "{{ _('T2: Managed (bulk of paying clients)') }}" %}selected{% endif %}>{{ _('T2: Managed (bulk of paying clients)') }}</option>
-                            <option value="{{ _('T3: Self-serve or small') }}" {% if participant.customer_tier == "{{ _('T3: Self-serve or small') }}" %}selected{% endif %}>{{ _('T3: Self-serve or small') }}</option>
+                            <option value="T1: Strategic (Top 5–10% clients)" {% if participant.customer_tier == "T1: Strategic (Top 5–10% clients)" %}selected{% endif %}>{{ _('T1: Strategic (Top 5–10% clients)') }}</option>
+                            <option value="T2: Managed (bulk of paying clients)" {% if participant.customer_tier == "T2: Managed (bulk of paying clients)" %}selected{% endif %}>{{ _('T2: Managed (bulk of paying clients)') }}</option>
+                            <option value="T3: Self-serve or small" {% if participant.customer_tier == "T3: Self-serve or small" %}selected{% endif %}>{{ _('T3: Self-serve or small') }}</option>
                         </select>
                         <div class="participant-help-text" id="customer_tier_help">{{ _('Customer segment for tier-based analysis') }}</div>
                     </div>
