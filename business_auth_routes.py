@@ -854,6 +854,98 @@ def onboarding_redirect():
         return redirect(url_for('business_auth.admin_panel'))
 
 
+@business_auth_bp.route('/onboarding/progress')
+@require_business_auth
+def onboarding_progress():
+    """Display onboarding progress dashboard"""
+    try:
+        business_user_id = session.get('business_user_id')
+        current_user = BusinessAccountUser.query.get(business_user_id)
+        
+        if not current_user:
+            flash('Authentication required.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Check if user is admin (only admins have onboarding)
+        if current_user.role not in ['admin', 'business_account_admin']:
+            flash('Access denied. This feature is for administrators only.', 'error')
+            return redirect(url_for('business_auth.admin_panel'))
+        
+        # Get license type for flow configuration
+        from license_service import LicenseService
+        license_info = LicenseService.get_license_info(current_user.business_account_id)
+        license_type = license_info.get('license_type', 'core')
+        
+        # Import onboarding configuration
+        from onboarding_config import OnboardingFlowManager
+        
+        # Initialize onboarding if needed
+        if not current_user.onboarding_progress:
+            current_user.initialize_onboarding()
+            db.session.commit()
+        
+        # Get all steps for this license
+        all_steps = OnboardingFlowManager.get_steps_for_license(license_type)
+        
+        # Get progress data
+        progress = current_user.get_onboarding_progress()
+        progress_percentage = OnboardingFlowManager.get_progress_percentage(progress, license_type)
+        current_step = current_user.get_current_onboarding_step()
+        
+        # Build step status list with detailed information
+        step_statuses = []
+        for i, step_def in enumerate(all_steps):
+            step_data = progress.get('steps', {}).get(step_def.step_id, {})
+            is_completed = step_data.get('completed', False)
+            is_current = (step_def.step_id == current_step)
+            
+            # Determine status
+            if is_completed:
+                status = 'completed'
+                status_label = _('Completed')
+                status_icon = 'fa-check-circle'
+                status_class = 'status-completed'
+            elif is_current:
+                status = 'in_progress'
+                status_label = _('In Progress')
+                status_icon = 'fa-play-circle'
+                status_class = 'status-in-progress'
+            else:
+                status = 'not_started'
+                status_label = _('Not Started')
+                status_icon = 'fa-circle'
+                status_class = 'status-not-started'
+            
+            step_statuses.append({
+                'step_id': step_def.step_id,
+                'name': step_def.name,
+                'description': step_def.description,
+                'required': step_def.required,
+                'status': status,
+                'status_label': status_label,
+                'status_icon': status_icon,
+                'status_class': status_class,
+                'is_completed': is_completed,
+                'is_current': is_current,
+                'step_number': i + 1,
+                'completed_at': step_data.get('completed_at')
+            })
+        
+        return render_template('business_auth/onboarding_progress.html',
+                             current_user=current_user,
+                             business_account=current_user.business_account,
+                             all_steps=step_statuses,
+                             progress_percentage=progress_percentage,
+                             current_step=current_step,
+                             is_onboarding_completed=current_user.onboarding_completed,
+                             total_steps=len(all_steps))
+        
+    except Exception as e:
+        logger.error(f"Error displaying onboarding progress: {e}")
+        flash('Error loading onboarding progress. Please try again.', 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+
 @business_auth_bp.route('/onboarding/<step>')
 @require_business_auth
 def onboarding_step(step):
