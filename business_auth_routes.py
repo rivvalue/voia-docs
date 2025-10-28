@@ -3,7 +3,7 @@ Phase 2: Business Account Authentication Routes
 Provides login/logout routes for business account users without affecting public survey access
 """
 
-from flask import Blueprint, request, render_template, redirect, url_for, session, flash, jsonify
+from flask import Blueprint, request, render_template, redirect, url_for, session, flash, jsonify, send_file
 from werkzeug.security import check_password_hash, generate_password_hash
 from models import BusinessAccountUser, UserSession, BusinessAccount, EmailConfiguration, LicenseHistory, db
 from rate_limiter import rate_limit
@@ -4605,7 +4605,6 @@ def translation_review_tool():
     """Translation string review tool for platform administrators"""
     try:
         # Serve the review tool HTML
-        from flask import send_file
         return send_file('review_tool.html')
     except Exception as e:
         logger.error(f"Error loading translation review tool: {e}")
