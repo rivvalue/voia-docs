@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Review Decisions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 400px;
+            font-family: monospace;
+            padding: 10px;
+            border: 2px solid #2563eb;
+            border-radius: 8px;
+        }
+        button {
+            background: #2563eb;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #1e40af;
+        }
+        .success {
+            background: #10b981;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>📋 Upload Review Decisions</h1>
+    <p>Paste the JSON content from your downloaded file below:</p>
+    
+    <textarea id="jsonContent" placeholder='Paste your JSON here, e.g.:
+{
+  "templates/file.html:123": {
+    "action": "wrap",
+    "notes": "Safe to wrap",
+    ...
+  }
+}'></textarea>
+    
+    <button onclick="uploadDecisions()">Upload Decisions</button>
+    
+    <div class="success" id="successMsg">
+        ✅ Decisions uploaded successfully! Close this page and tell the agent "uploaded".
+    </div>
+    
+    <script>
+        async function uploadDecisions() {
+            const content = document.getElementById('jsonContent').value.trim();
+            
+            if (!content) {
+                alert('Please paste your JSON content first!');
+                return;
+            }
+            
+            // Validate JSON
+            try {
+                JSON.parse(content);
+            } catch (e) {
+                alert('Invalid JSON format! Please check your content.');
+                return;
+            }
+            
+            // Send to backend
+            try {
+                const response = await fetch('/business/translation-review/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: content
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('successMsg').style.display = 'block';
+                    document.getElementById('jsonContent').value = '';
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Upload failed: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

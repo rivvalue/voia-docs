@@ -4653,3 +4653,14 @@ def save_translation_decisions():
     except Exception as e:
         logger.error(f"Error saving translation decisions: {e}")
         return jsonify({'error': str(e)}), 500
+
+
+@business_auth_bp.route('/translation-review/upload')
+@require_platform_admin
+def upload_decisions_form():
+    """Upload form for review decisions"""
+    try:
+        return send_file('upload_decisions.html')
+    except Exception as e:
+        logger.error(f"Error loading upload form: {e}")
+        return jsonify({'error': str(e)}), 500
