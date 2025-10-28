@@ -12,416 +12,6 @@
 ] %}
 {% include 'components/breadcrumb.html' %}
 
-<style>
-/* V2-Compliant Onboarding Progress Dashboard */
-.progress-dashboard-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: var(--spacing-xl) var(--spacing-lg);
-}
-
-/* V2 Header with Red Gradient */
-.dashboard-header {
-    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
-    color: var(--primary-white);
-    padding: var(--spacing-2xl) var(--spacing-xl);
-    border-radius: var(--radius-2xl);
-    margin-bottom: var(--spacing-2xl);
-    text-align: center;
-    box-shadow: var(--shadow-xl);
-    position: relative;
-    overflow: hidden;
-}
-
-.dashboard-header::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 100%;
-    background: linear-gradient(135deg, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
-    pointer-events: none;
-}
-
-.header-content {
-    position: relative;
-    z-index: 1;
-}
-
-.header-icon {
-    width: 80px;
-    height: 80px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto var(--spacing-lg);
-    font-size: 2.5rem;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-}
-
-.header-title {
-    font-size: var(--font-size-4xl);
-    font-weight: 700;
-    margin-bottom: var(--spacing-sm);
-    font-family: var(--font-family-headings);
-    color: var(--primary-white);
-}
-
-.header-subtitle {
-    font-size: var(--font-size-lg);
-    opacity: 0.95;
-    font-weight: 400;
-}
-
-/* Progress Overview Card */
-.progress-overview {
-    background: var(--primary-white);
-    border-radius: var(--radius-xl);
-    padding: var(--spacing-2xl);
-    margin-bottom: var(--spacing-2xl);
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--light-gray);
-}
-
-.progress-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: var(--spacing-xl);
-    margin-bottom: var(--spacing-2xl);
-}
-
-.stat-card {
-    text-align: center;
-    padding: var(--spacing-lg);
-    background: rgba(var(--primary-red-rgb, 225, 58, 68), 0.05);
-    border-radius: var(--radius-lg);
-    border: 1px solid rgba(var(--primary-red-rgb, 225, 58, 68), 0.15);
-}
-
-.stat-value {
-    font-size: var(--font-size-4xl);
-    font-weight: 700;
-    color: var(--primary-red);
-    margin-bottom: var(--spacing-xs);
-}
-
-.stat-label {
-    font-size: var(--font-size-sm);
-    color: var(--gray-dark);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.progress-bar-container {
-    margin: var(--spacing-xl) 0;
-}
-
-.progress-bar-label {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-md);
-}
-
-.progress-bar-label h3 {
-    font-size: var(--font-size-xl);
-    font-weight: 600;
-    color: var(--primary-black);
-    margin: 0;
-}
-
-.progress-percentage {
-    font-size: var(--font-size-2xl);
-    font-weight: 700;
-    color: var(--primary-red);
-}
-
-.progress-bar {
-    width: 100%;
-    height: 16px;
-    background-color: var(--light-gray);
-    border-radius: var(--radius-full);
-    overflow: hidden;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--primary-red), var(--red-hover));
-    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 0 10px rgba(var(--primary-red-rgb, 225, 58, 68), 0.4);
-}
-
-/* Steps List */
-.steps-container {
-    background: var(--primary-white);
-    border-radius: var(--radius-xl);
-    padding: var(--spacing-2xl);
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--light-gray);
-    margin-bottom: var(--spacing-2xl);
-}
-
-.steps-header {
-    margin-bottom: var(--spacing-2xl);
-    padding-bottom: var(--spacing-lg);
-    border-bottom: 2px solid var(--light-gray);
-}
-
-.steps-header h2 {
-    font-size: var(--font-size-2xl);
-    font-weight: 700;
-    color: var(--primary-black);
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-md);
-}
-
-.steps-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-lg);
-}
-
-.step-card {
-    background: var(--primary-white);
-    border: 2px solid var(--light-gray);
-    border-radius: var(--radius-xl);
-    padding: var(--spacing-xl);
-    transition: all 0.3s ease;
-    position: relative;
-}
-
-.step-card:hover {
-    border-color: var(--primary-red);
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-}
-
-.step-card.status-completed {
-    background: rgba(34, 197, 94, 0.03);
-    border-color: rgb(34, 197, 94);
-}
-
-.step-card.status-in-progress {
-    background: rgba(var(--primary-red-rgb, 225, 58, 68), 0.03);
-    border-color: var(--primary-red);
-    box-shadow: 0 0 0 3px rgba(var(--primary-red-rgb, 225, 58, 68), 0.1);
-}
-
-.step-card.status-not-started {
-    opacity: 0.7;
-}
-
-.step-header {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-lg);
-    margin-bottom: var(--spacing-md);
-}
-
-.step-number {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: var(--font-size-xl);
-    flex-shrink: 0;
-}
-
-.status-completed .step-number {
-    background: linear-gradient(135deg, rgb(34, 197, 94), rgb(21, 128, 61));
-    color: var(--primary-white);
-}
-
-.status-in-progress .step-number {
-    background: linear-gradient(135deg, var(--primary-red), var(--red-hover));
-    color: var(--primary-white);
-}
-
-.status-not-started .step-number {
-    background: var(--light-gray);
-    color: var(--gray-dark);
-}
-
-.step-info {
-    flex: 1;
-}
-
-.step-title {
-    font-size: var(--font-size-xl);
-    font-weight: 600;
-    color: var(--primary-black);
-    margin-bottom: var(--spacing-xs);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-}
-
-.step-description {
-    color: var(--gray-dark);
-    font-size: var(--font-size-sm);
-    line-height: 1.5;
-}
-
-.step-status-badge {
-    padding: var(--spacing-xs) var(--spacing-md);
-    border-radius: var(--radius-full);
-    font-size: var(--font-size-xs);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-}
-
-.status-badge-completed {
-    background: rgba(34, 197, 94, 0.15);
-    color: rgb(21, 128, 61);
-}
-
-.status-badge-in-progress {
-    background: rgba(var(--primary-red-rgb, 225, 58, 68), 0.15);
-    color: var(--red-hover);
-}
-
-.status-badge-not-started {
-    background: var(--light-gray);
-    color: var(--gray-dark);
-}
-
-.optional-label {
-    background: rgba(59, 130, 246, 0.1);
-    color: rgb(37, 99, 235);
-    padding: var(--spacing-xs) var(--spacing-sm);
-    border-radius: var(--radius-full);
-    font-size: var(--font-size-xs);
-    font-weight: 500;
-    margin-left: var(--spacing-sm);
-}
-
-/* Action Buttons */
-.action-section {
-    background: var(--primary-white);
-    border-radius: var(--radius-xl);
-    padding: var(--spacing-2xl);
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--light-gray);
-    text-align: center;
-}
-
-.completion-message {
-    background: rgba(34, 197, 94, 0.1);
-    border: 2px solid rgb(34, 197, 94);
-    border-radius: var(--radius-xl);
-    padding: var(--spacing-2xl);
-    margin-bottom: var(--spacing-xl);
-}
-
-.completion-icon {
-    font-size: 4rem;
-    color: rgb(34, 197, 94);
-    margin-bottom: var(--spacing-lg);
-}
-
-.completion-message h3 {
-    font-size: var(--font-size-2xl);
-    font-weight: 700;
-    color: var(--primary-black);
-    margin-bottom: var(--spacing-sm);
-}
-
-.completion-message p {
-    color: var(--gray-dark);
-    font-size: var(--font-size-base);
-    margin: 0;
-}
-
-.btn-primary-action {
-    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
-    color: var(--primary-white);
-    border: none;
-    padding: var(--spacing-lg) var(--spacing-2xl);
-    border-radius: var(--radius-lg);
-    font-size: var(--font-size-lg);
-    font-weight: 600;
-    transition: all 0.3s ease;
-    box-shadow: var(--shadow-lg);
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-}
-
-.btn-primary-action:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-xl);
-    color: var(--primary-white);
-}
-
-.btn-secondary-action {
-    background: transparent;
-    color: var(--primary-red);
-    border: 2px solid var(--primary-red);
-    padding: var(--spacing-md) var(--spacing-xl);
-    border-radius: var(--radius-lg);
-    font-size: var(--font-size-base);
-    font-weight: 500;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    margin-left: var(--spacing-md);
-}
-
-.btn-secondary-action:hover {
-    background: var(--primary-red);
-    color: var(--primary-white);
-}
-
-/* ARIA and Accessibility */
-[role="progressbar"] {
-    position: relative;
-}
-
-/* Mobile Responsive */
-@media (max-width: 768px) {
-    .progress-stats {
-        grid-template-columns: 1fr;
-    }
-    
-    .header-title {
-        font-size: var(--font-size-2xl);
-    }
-    
-    .step-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .step-number {
-        width: 40px;
-        height: 40px;
-        font-size: var(--font-size-lg);
-    }
-    
-    .btn-secondary-action {
-        margin-left: 0;
-        margin-top: var(--spacing-md);
-    }
-}
-</style>
-
 <div class="progress-dashboard-container">
     <!-- Header -->
     <div class="dashboard-header" role="banner">
@@ -430,7 +20,7 @@
                 <i class="fas fa-tasks" aria-hidden="true"></i>
             </div>
             <h1 class="header-title">{{ _('Setup Progress') }}</h1>
-            <p class="header-subtitle">{{ _('Track your VOÏA platform configuration') }}</p>
+            <p class="header-subtitle">{{ _('Complete these steps to configure your VOÏA platform') }}</p>
         </div>
     </div>
 
@@ -461,7 +51,7 @@
                  aria-valuemin="0" 
                  aria-valuemax="100"
                  aria-label="{{ _('Setup completion progress: %(percent)d percent', percent=progress_percentage|int) }}">
-                <div class="progress-fill" style="width: {{ progress_percentage }}%"></div>
+                <div class="progress-fill"></div>
             </div>
         </div>
     </div>
@@ -472,61 +62,62 @@
             <h2><i class="fas fa-list-check" aria-hidden="true"></i>{{ _('Setup Steps') }}</h2>
         </div>
 
-        <div class="steps-list">
-            {% for step in all_steps %}
-            <div class="step-card {{ step.status_class }}" 
-                 role="article" 
-                 aria-label="{{ _('Step %(num)d: %(name)s', num=step.step_number, name=step.name) }}">
-                <div class="step-header">
-                    <div class="step-number" aria-hidden="true">{{ step.step_number }}</div>
-                    <div class="step-info">
-                        <div class="step-title">
-                            {{ _(step.name) }}
-                            {% if not step.required %}
-                            <span class="optional-label">{{ _('Optional') }}</span>
+        <form method="POST" action="{{ url_for('business_auth.onboarding_update_progress') }}" id="progressForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            
+            <div class="steps-list">
+                {% for step in all_steps %}
+                <div class="step-card {{ step.status_class }}" 
+                     role="article" 
+                     aria-label="{{ _('Step %(num)d: %(name)s', num=step.step_number, name=step.name) }}">
+                    <div class="step-header">
+                        <div class="step-number" aria-hidden="true">{{ step.step_number }}</div>
+                        <div class="step-info">
+                            <div class="step-title">
+                                {{ _(step.name) }}
+                                {% if not step.required %}
+                                <span class="optional-label">{{ _('Optional') }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="step-description">{{ _(step.description) }}</div>
+                        </div>
+                        <div class="step-status-badge status-badge-{{ step.status }}">
+                            <i class="fas {{ step.status_icon }}" aria-hidden="true"></i>
+                            {{ step.status_label }}
+                        </div>
+                    </div>
+                    
+                    <!-- Step Actions -->
+                    <div class="step-actions">
+                        <div class="step-actions-left">
+                            <a href="{{ step.target_link }}" 
+                               class="btn-go-to-settings"
+                               aria-label="{{ _('Configure %(name)s', name=step.name) }}">
+                                <i class="fas fa-cog"></i>
+                                {{ _('Go to Settings') }}
+                            </a>
+                            {% if step.is_completed and step.completed_at %}
+                            <span class="completion-date">
+                                <i class="fas fa-check-circle"></i>
+                                {{ _('Completed on') }} {{ step.completed_at[:10] }}
+                            </span>
                             {% endif %}
                         </div>
-                        <div class="step-description">{{ _(step.description) }}</div>
-                    </div>
-                    <div class="step-status-badge status-badge-{{ step.status }}">
-                        <i class="fas {{ step.status_icon }}" aria-hidden="true"></i>
-                        {{ step.status_label }}
+                        <div class="step-actions-right">
+                            <label class="completion-checkbox">
+                                <input type="checkbox" 
+                                       name="step_{{ step.step_id }}"
+                                       value="1"
+                                       {% if step.is_completed %}checked{% endif %}
+                                       onchange="this.form.submit()">
+                                <span class="checkbox-label">{{ _('Mark as Complete') }}</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
-                
-                <!-- Step Action Buttons -->
-                <div style="margin-top: var(--spacing-lg); padding-top: var(--spacing-lg); border-top: 1px solid var(--light-gray); display: flex; justify-content: flex-end; align-items: center; gap: var(--spacing-md);">
-                    {% if step.is_completed %}
-                        {% if step.completed_at %}
-                        <span style="color: var(--gray-dark); font-size: var(--font-size-sm);">
-                            <i class="fas fa-check-circle" style="color: rgb(34, 197, 94);"></i>
-                            {{ _('Completed on') }} {{ step.completed_at[:10] }}
-                        </span>
-                        {% endif %}
-                        <a href="{{ url_for('business_auth.onboarding_step', step=step.step_id) }}" 
-                           style="color: var(--primary-red); text-decoration: none; font-size: var(--font-size-sm); font-weight: 500; display: inline-flex; align-items: center; gap: var(--spacing-xs); padding: var(--spacing-sm) var(--spacing-md); border-radius: var(--radius-md); transition: all 0.2s ease;"
-                           onmouseover="this.style.background='rgba(var(--primary-red-rgb, 225, 58, 68), 0.1)'"
-                           onmouseout="this.style.background='transparent'">
-                            <i class="fas fa-eye"></i>
-                            {{ _('Review') }}
-                        </a>
-                    {% elif step.is_current %}
-                        <a href="{{ url_for('business_auth.onboarding_step', step=step.step_id) }}" 
-                           style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%); color: var(--primary-white); text-decoration: none; padding: var(--spacing-md) var(--spacing-xl); border-radius: var(--radius-lg); font-weight: 600; font-size: var(--font-size-base); display: inline-flex; align-items: center; gap: var(--spacing-sm); transition: all 0.3s ease; box-shadow: var(--shadow-md);"
-                           onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--shadow-lg)'"
-                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow-md)'">
-                            <i class="fas fa-play-circle"></i>
-                            {{ _('Continue Step') }}
-                        </a>
-                    {% else %}
-                        <span style="color: var(--gray-dark); font-size: var(--font-size-sm); font-style: italic;">
-                            {{ _('Complete previous steps first') }}
-                        </span>
-                    {% endif %}
-                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>
+        </form>
     </div>
 
     <!-- Action Section -->
@@ -544,18 +135,8 @@
             {{ _('Go to Dashboard') }}
         </a>
         {% else %}
-        <h3 style="margin-bottom: var(--spacing-lg); color: var(--primary-black);">{{ _('Ready to continue?') }}</h3>
-        <p style="color: var(--gray-dark); margin-bottom: var(--spacing-xl);">
-            {{ _('Complete the remaining steps to unlock all VOÏA features and start collecting customer feedback.') }}
-        </p>
-        <a href="{{ url_for('business_auth.onboarding_step', step=current_step) }}" class="btn-primary-action">
-            <i class="fas fa-play-circle" aria-hidden="true"></i>
-            {{ _('Continue Setup') }}
-        </a>
-        <a href="{{ url_for('business_auth.admin_panel') }}" class="btn-secondary-action">
-            <i class="fas fa-times-circle" aria-hidden="true"></i>
-            {{ _('Complete Later') }}
-        </a>
+        <h3>{{ _('Need Help?') }}</h3>
+        <p>{{ _('Click "Go to Settings" for each step to configure your platform. When finished, mark the step as complete.') }}</p>
         {% endif %}
     </div>
 </div>
