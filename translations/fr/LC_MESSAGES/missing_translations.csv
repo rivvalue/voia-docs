@@ -1,0 +1,83 @@
+Line,Type,Original English,Current Translation,Status
+216,Untranslated,"VOÏA - Voice Of Client","VOÏA - Voice Of Client",Untranslated
+258,Untranslated,"Participants","Participants",Untranslated
+278,Untranslated,"A Demo","A Demo",Untranslated
+282,Untranslated,"Campaign-specific performance analytics and survey insights","",Untranslated
+383,Untranslated,"All time feedback collected","",Untranslated
+387,Untranslated,"Recent (30 days)","",Untranslated
+417,Untranslated,"Imminent churn risk (High/Critical)","",Untranslated
+426,Untranslated,"Revenue expansion opportunity","",Untranslated
+543,Untranslated,"Strategic account management - NPS scores segregated by company evaluating Archelo Group","",Untranslated
+621,Untranslated,"Customer lifecycle insights - NPS scores segregated by length of business relationship","",Untranslated
+631,Untranslated,"Insufficient Data (<2 responses)","",Untranslated
+667,Untranslated,"Date","Date",Untranslated
+682,Untranslated,"This campaign was created before segmentation analytics were implemented. Segmentation data is only available for campaigns created after this feature was deployed.","",Untranslated
+695,Untranslated,"Net Promoter Score distribution across different participant roles","",Untranslated
+705,Untranslated,"Geographic distribution of customer satisfaction","",Untranslated
+714,Untranslated,"Customer satisfaction across different tier levels","",Untranslated
+718,Untranslated,"Satisfaction Ratings by Segment","",Untranslated
+722,Untranslated,"Average satisfaction scores across all segmentation dimensions","",Untranslated
+772,Untranslated,"Action","Action",Untranslated
+790,Untranslated,"Satisfaction","Satisfaction",Untranslated
+807,Untranslated,"Service","Service",Untranslated
+1296,Untranslated,"Click to view full trends","",Untranslated
+1307,Untranslated,"NPS","NPS",Untranslated
+1331,Untranslated,"View Trends","",Untranslated
+1462,Untranslated,"Companies with High or Critical churn risk level based on AI assessment","",Untranslated
+1466,Untranslated,"Companies with High or Critical churn risk level","",Untranslated
+1470,Untranslated,"Shows account health balance: Risk-Heavy (risks outweigh opportunities), High Potential (opportunities with minimal risks), or Balanced","",Untranslated
+1480,Untranslated,"Search company, opportunities, risks...","",Untranslated
+1488,Untranslated,"High Potential","",Untranslated
+1521,Untranslated,"Low (>20)","",Untranslated
+1525,Untranslated,"Medium (-20 to 20)","",Untranslated
+1529,Untranslated,"High (≤-20)","",Untranslated
+1542,Untranslated,"Search by company name, participant name, or email...","",Untranslated
+1697,Untranslated,"Choose between a classic survey or an AI-driven conversational flow, then explore the live dashboard with NPS scoring, sentiment, themes, and growth signals.","",Untranslated
+1712,Untranslated,"You'll take part in a live simulated campaign, where VO","",Untranslated
+1716,Untranslated,"A engages you in a natural dialogue. It's the same authentic conversational flow your own clients would experience.","",Untranslated
+1734,Untranslated,"Once the dialogue is complete, VO","",Untranslated
+1738,Untranslated,"A automatically analyzes the responses. It extracts structured insights — NPS, satisfaction, ratings, feedback, sentiment, churn and growth signals — in just minutes, without any manual work. See how AI turns unstructured conversations into clarity.","",Untranslated
+2209,Untranslated,"5 - Excellent","5 - Excellent",Untranslated
+2350,Untranslated,"Both options provide the same valuable insights. Choose what feels most comfortable for you.","",Untranslated
+3222,Untranslated,"VOÏA Password Reset","",Untranslated
+3230,Untranslated,"Enter your email address and we'll send you a password reset link","",Untranslated
+3234,Untranslated,"Password reset request form","",Untranslated
+3249,Untranslated,"We'll send a password reset link to this email address","",Untranslated
+3478,Untranslated,"Tell us about your business to personalize the survey conversation","",Untranslated
+3492,Untranslated,"This helps tailor survey questions to your industry context","",Untranslated
+3501,Untranslated,"Choose how the AI should communicate with your survey participants","",Untranslated
+3510,Untranslated,"This context helps the AI understand your business and ask relevant questions","",Untranslated
+3516,Untranslated,"Product/Service Description","",Untranslated
+3520,Untranslated,"Specific product details enable more targeted feedback collection","",Untranslated
+3529,Untranslated,"Understanding your audience helps frame questions appropriately","",Untranslated
+3533,Untranslated,"What do you want to learn from your survey participants?","",Untranslated
+3537,Untranslated,"Primary Survey Goals (select all that apply)","",Untranslated
+3561,Untranslated,"Custom Research","",Untranslated
+3575,Untranslated,"Absolute limit to keep surveys concise and engaging","",Untranslated
+3579,Untranslated,"Time Limit (seconds)","",Untranslated
+3583,Untranslated,"Maximum time participants can spend on the survey","",Untranslated
+3587,Untranslated,"Follow-ups per Topic","",Untranslated
+3591,Untranslated,"How deep to explore each topic with follow-up questions","",Untranslated
+3595,Untranslated,"Control which topics the survey covers first and which are optional if time runs out","",Untranslated
+3601,Untranslated,"Prioritized Topics (covered first)","",Untranslated
+3605,Untranslated,"These topics will always be covered, in order of importance","",Untranslated
+3609,Untranslated,"Optional Topics (if time allows)","",Untranslated
+3613,Untranslated,"These topics can be skipped if the time/question limit is reached","",Untranslated
+3617,Untranslated,"Personalize the survey experience with custom messages","",Untranslated
+3626,Untranslated,"This message will be shown to participants when they complete the survey. Leave blank to use the default message","",Untranslated
+3820,Untranslated,"Hard limit on survey invitations (typically 5x responses for ~20% response rate)","",Untranslated
+4200,Untranslated,"To send survey invitations, VOÏA needs access to your email server. You can use:","",Untranslated
+4206,Untranslated,"Your organization's email server settings","",Untranslated
+4225,Untranslated,"How your name appears to survey recipients","",Untranslated
+4229,Untranslated,"Send a test email to verify your SMTP settings are working correctly.","",Untranslated
+4251,Untranslated,"Can create surveys, manage participants, and view analytics","",Untranslated
+4255,Untranslated,"Can view survey results and analytics but cannot create campaigns","",Untranslated
+4269,Untranslated,"An invitation will be sent to this email address","",Untranslated
+4273,Untranslated,"Campaign Manager is recommended for most team members","",Untranslated
+4461,Untranslated,"Create your first campaign to start collecting customer feedback and understanding their experience. Campaigns help you organize survey participants, send invitations, and analyze results.","",Untranslated
+4483,Untranslated,"An error occurred while exporting your data.","",Untranslated
+5038,Untranslated,"T1: Strategic (Top 5–10% clients)","",Untranslated
+5464,Untranslated,"Actions","Actions",Untranslated
+5422,Duplicate,"Setup Complete!","","Duplicate"
+5383,Duplicate,"Completed","","Duplicate"
+5398,Duplicate,"Optional","","Duplicate"
