@@ -5373,3 +5373,94 @@ msgstr "Télécharger le modèle de fichier CSV"
 #~ "campaign.completed_at[:10] if campaign.completed_at "
 #~ "else campaign.end_date }}"
 
+
+# Onboarding Progress Dashboard
+msgid "Setup Progress"
+msgstr "Progression de la configuration"
+
+msgid "Track your VOÏA platform configuration"
+msgstr "Suivez la configuration de votre plateforme VOÏA"
+
+msgid "Completed"
+msgstr "Terminé"
+
+msgid "Remaining"
+msgstr "Restant"
+
+msgid "Overall Progress"
+msgstr "Progression globale"
+
+msgid "Setup steps"
+msgstr "Étapes de configuration"
+
+msgid "Setup Steps"
+msgstr "Étapes de configuration"
+
+msgid "Optional"
+msgstr "Optionnel"
+
+msgid "In Progress"
+msgstr "En cours"
+
+msgid "Not Started"
+msgstr "Pas commencé"
+
+msgid "Go to"
+msgstr "Aller à"
+
+msgid "Configure %(name)s"
+msgstr "Configurer %(name)s"
+
+msgid "Completed on"
+msgstr "Terminé le"
+
+msgid "Mark as Complete"
+msgstr "Marquer comme terminé"
+
+msgid "Save Progress"
+msgstr "Enregistrer la progression"
+
+msgid "Setup Complete!"
+msgstr "Configuration terminée !"
+
+msgid "Your VOÏA platform is ready to use. You can now start creating campaigns and collecting valuable customer feedback."
+msgstr "Votre plateforme VOÏA est prête à être utilisée. Vous pouvez maintenant commencer à créer des campagnes et à collecter des commentaires précieux de vos clients."
+
+msgid "Go to Dashboard"
+msgstr "Aller au tableau de bord"
+
+msgid "Need Help?"
+msgstr "Besoin d'aide ?"
+
+msgid "Click the button for each step to configure your platform. When finished, mark the step as complete and click Save Progress."
+msgstr "Cliquez sur le bouton pour chaque étape pour configurer votre plateforme. Une fois terminé, marquez l'étape comme terminée et cliquez sur Enregistrer la progression."
+
+msgid "Configure SMTP settings for survey invitations"
+msgstr "Configurer les paramètres SMTP pour les invitations aux sondages"
+
+msgid "Customize your logo and brand colors"
+msgstr "Personnalisez votre logo et vos couleurs de marque"
+
+msgid "Add campaign managers to your team"
+msgstr "Ajoutez des gestionnaires de campagne à votre équipe"
+
+msgid "Onboarding progress updated."
+msgstr "Progression de l'intégration mise à jour."
+
+msgid "Congratulations! You have completed all required onboarding steps."
+msgstr "Félicitations ! Vous avez terminé toutes les étapes d'intégration requises."
+
+msgid "Error updating progress. Please try again."
+msgstr "Erreur lors de la mise à jour de la progression. Veuillez réessayer."
+
+msgid "Setup completion progress: %(percent)d percent"
+msgstr "Progression de la configuration : %(percent)d pourcent"
+
+msgid "Step %(num)d: %(name)s"
+msgstr "Étape %(num)d : %(name)s"
+
+msgid "Complete previous steps first"
+msgstr "Complétez d'abord les étapes précédentes"
+
+msgid "Actions"
+msgstr "Actions"

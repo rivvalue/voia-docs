@@ -1006,8 +1006,10 @@ def onboarding_update_progress():
                 if 'completed_at' in progress['steps'][step_id]:
                     del progress['steps'][step_id]['completed_at']
         
-        # Save progress
+        # Save progress - flag as modified for SQLAlchemy JSON column
         current_user.onboarding_progress = progress
+        from sqlalchemy.orm.attributes import flag_modified
+        flag_modified(current_user, 'onboarding_progress')
         
         # Check if all required steps are complete
         all_required_complete = all(
