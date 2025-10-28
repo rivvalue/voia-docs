@@ -221,7 +221,7 @@
                     <textarea class="form-control" id="product_description" name="product_description" rows="3" 
                               placeholder={{ _("Describe your main products or services (e.g., 'Cloud-based accounting software for small businesses')") }}
                               {% if is_readonly %}disabled{% endif %}>{{ campaign.product_description or '' }}</textarea>
-                    <div class="form-text">Help the AI understand what you offer to ask better questions</div>
+                    <div class="form-text">{{ _('Help the AI understand what you offer to ask better questions') }}</div>
                 </div>
                 
                 <div class="mb-3">
@@ -229,7 +229,7 @@
                     <textarea class="form-control" id="target_clients_description" name="target_clients_description" rows="2" 
                               placeholder={{ _("Describe your ideal customers (e.g., 'Small business owners, CFOs, accounting firms')") }}
                               {% if is_readonly %}disabled{% endif %}>{{ campaign.target_clients_description or '' }}</textarea>
-                    <div class="form-text">Who are you primarily serving? This helps tailor conversation tone and questions</div>
+                    <div class="form-text">{{ _('Who are you primarily serving? This helps tailor conversation tone and questions') }}</div>
                 </div>
             </div>
 
@@ -253,7 +253,7 @@
                     </div>
                     {% endfor %}
                 </div>
-                <div class="form-text mt-2">NPS is recommended for all campaigns to track customer loyalty</div>
+                <div class="form-text mt-2">{{ _('NPS is recommended for all campaigns to track customer loyalty') }}</div>
             </div>
 
             <!-- Survey Controls Section -->
@@ -275,7 +275,7 @@
                                        {% if is_readonly %}disabled{% endif %}>
                                 <span class="range-info">(3-15)</span>
                             </div>
-                            <div class="form-text">Hard limit on conversation length</div>
+                            <div class="form-text">{{ _('Hard limit on conversation length') }}</div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -287,7 +287,7 @@
                                        {% if is_readonly %}disabled{% endif %}>
                                 <span class="range-info">(60-300)</span>
                             </div>
-                            <div class="form-text">Time limit for entire conversation</div>
+                            <div class="form-text">{{ _('Time limit for entire conversation') }}</div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -299,7 +299,7 @@
                                        {% if is_readonly %}disabled{% endif %}>
                                 <span class="range-info">(1-3)</span>
                             </div>
-                            <div class="form-text">Control topic depth exploration</div>
+                            <div class="form-text">{{ _('Control topic depth exploration') }}</div>
                         </div>
                     </div>
                 </div>
@@ -329,7 +329,7 @@
                                 </div>
                                 {% endfor %}
                             </div>
-                            <div class="form-text">These topics will be covered first and are most important</div>
+                            <div class="form-text">{{ _('These topics will be covered first and are most important') }}</div>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -345,7 +345,7 @@
                                 </div>
                                 {% endfor %}
                             </div>
-                            <div class="form-text">These topics will be skipped if time/questions run out</div>
+                            <div class="form-text">{{ _('These topics will be skipped if time/questions run out') }}</div>
                         </div>
                     </div>
                 </div>
@@ -358,7 +358,7 @@
                     <textarea class="form-control" id="custom_end_message" name="custom_end_message" rows="3" 
                               placeholder={{ _('Optional custom thank you message for survey completion') }}
                               {% if is_readonly %}disabled{% endif %}>{{ campaign.custom_end_message or '' }}</textarea>
-                    <div class="form-text">Personalized message shown when participants complete the survey</div>
+                    <div class="form-text">{{ _('Personalized message shown when participants complete the survey') }}</div>
                     {% if campaign.custom_end_message %}
                     <div class="preview-container" id="end_message_preview">
                         "{{ campaign.custom_end_message }}"

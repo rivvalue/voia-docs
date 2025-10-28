@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translation String Review Tool - VOÏA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --voia-primary: #2563eb;
+            --voia-success: #10b981;
+            --voia-warning: #f59e0b;
+            --voia-danger: #ef4444;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        
+        .review-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .review-header {
+            background: linear-gradient(135deg, var(--voia-primary) 0%, #1e40af 100%);
+            color: white;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .review-header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .progress-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .review-body {
+            padding: 40px;
+        }
+        
+        .item-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .file-badge {
+            display: inline-block;
+            background: #f3f4f6;
+            color: #374151;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .line-number {
+            display: inline-block;
+            background: #fef3c7;
+            color: #92400e;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-left: 10px;
+        }
+        
+        .pattern-badge {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        
+        .text-highlight {
+            background: #fef08a;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #854d0e;
+            font-weight: 600;
+        }
+        
+        .risk-warning {
+            background: #fef3c7;
+            border-left: 4px solid var(--voia-warning);
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        
+        .decision-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        .decision-btn {
+            padding: 18px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .decision-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .decision-btn.active {
+            border-width: 3px;
+        }
+        
+        .decision-btn.wrap {
+            border-color: var(--voia-success);
+            background: #f0fdf4;
+            color: var(--voia-success);
+        }
+        
+        .decision-btn.skip {
+            border-color: var(--voia-danger);
+            background: #fef2f2;
+            color: var(--voia-danger);
+        }
+        
+        .decision-btn.split {
+            border-color: var(--voia-primary);
+            background: #eff6ff;
+            color: var(--voia-primary);
+        }
+        
+        .notes-section {
+            margin: 20px 0;
+        }
+        
+        .notes-section textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .navigation {
+            display: flex;
+            gap: 15px;
+            justify-content: space-between;
+            padding-top: 20px;
+            border-top: 2px solid #e5e7eb;
+        }
+        
+        .nav-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .nav-btn.primary {
+            background: var(--voia-primary);
+            color: white;
+        }
+        
+        .nav-btn.primary:not(:disabled):hover {
+            background: #1e40af;
+            transform: translateY(-1px);
+        }
+        
+        .nav-btn.secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        
+        .stats-summary {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            text-align: center;
+        }
+        
+        .stat-box {
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--voia-primary);
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 5px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .completion-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .completion-card {
+            background: white;
+            padding: 50px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 600px;
+        }
+        
+        .completion-icon {
+            font-size: 80px;
+            color: var(--voia-success);
+            margin-bottom: 20px;
+        }
+        
+        .keyboard-hint {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="review-container">
+        <div class="review-header">
+            <div>
+                <h1><i class="fas fa-clipboard-check"></i> Translation Review Tool</h1>
+                <div style="opacity: 0.9; font-size: 14px; margin-top: 5px;">
+                    VOÏA Platform - Manual String Classification
+                </div>
+            </div>
+            <div class="progress-badge">
+                <span id="current-index">0</span> / <span id="total-items">0</span>
+            </div>
+        </div>
+        
+        <div class="review-body">
+            <div class="stats-summary">
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div class="stat-number" id="stat-wrap">0</div>
+                        <div class="stat-label">✅ Wrap</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" id="stat-skip">0</div>
+                        <div class="stat-label">⏭️ Skip</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" id="stat-split">0</div>
+                        <div class="stat-label">🔀 Split</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" id="stat-remaining">0</div>
+                        <div class="stat-label">⏳ Remaining</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="review-item" class="item-card">
+                <!-- Dynamically populated -->
+            </div>
+            
+            <div class="navigation">
+                <button class="nav-btn secondary" id="prev-btn" onclick="navigate(-1)">
+                    <i class="fas fa-arrow-left"></i> Previous
+                </button>
+                <div>
+                    <button class="nav-btn secondary" onclick="saveProgress()" style="margin-right: 10px;">
+                        <i class="fas fa-save"></i> Save Progress
+                    </button>
+                    <button class="nav-btn primary" id="next-btn" onclick="navigate(1)">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="completion-modal" id="completion-modal">
+        <div class="completion-card">
+            <div class="completion-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>Review Complete!</h2>
+            <p style="color: #6b7280; margin: 20px 0;">
+                You've reviewed all <span id="completion-total">0</span> items.
+            </p>
+            <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <div style="font-size: 14px; color: #6b7280; margin-bottom: 10px;">Final Decisions:</div>
+                <div style="display: flex; justify-content: space-around; font-weight: 600;">
+                    <div>✅ <span id="final-wrap">0</span> Wrap</div>
+                    <div>⏭️ <span id="final-skip">0</span> Skip</div>
+                    <div>🔀 <span id="final-split">0</span> Split</div>
+                </div>
+            </div>
+            <button class="nav-btn primary" onclick="downloadDecisions()">
+                <i class="fas fa-download"></i> Download Decisions JSON
+            </button>
+        </div>
+    </div>
+    
+    <div class="keyboard-hint">
+        ⌨️ Keyboard: 1=Wrap | 2=Skip | 3=Split | ←→ Navigate
+    </div>
+
+    <script>
+        let items = [];
+        let currentIndex = 0;
+        let decisions = {};
+        
+        // Load items from JSON file
+        async function loadItems() {
+            try {
+                const response = await fetch('yellow_review_queue.json');
+                items = await response.json();
+                document.getElementById('total-items').textContent = items.length;
+                updateStats();
+                renderItem();
+            } catch (error) {
+                alert('Error loading review items: ' + error.message);
+            }
+        }
+        
+        function renderItem() {
+            if (items.length === 0) return;
+            
+            const item = items[currentIndex];
+            const itemId = `${item.file}:${item.line}`;
+            const existingDecision = decisions[itemId] || { action: null, notes: '' };
+            
+            document.getElementById('current-index').textContent = currentIndex + 1;
+            
+            const html = `
+                <div>
+                    <span class="file-badge">
+                        <i class="fas fa-file-code"></i> ${item.file.replace('templates/', '')}
+                    </span>
+                    <span class="line-number">Line ${item.line}</span>
+                    <span class="pattern-badge">${item.pattern}</span>
+                </div>
+                
+                <div class="risk-warning">
+                    <strong><i class="fas fa-exclamation-triangle"></i> Risk Reason:</strong> ${item.reason}
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <strong style="display: block; margin-bottom: 10px; color: #374151;">
+                        Unwrapped Text:
+                    </strong>
+                    <div style="background: #fef3c7; padding: 12px; border-radius: 6px; border-left: 4px solid #f59e0b;">
+                        <span class="text-highlight">"${escapeHtml(item.text)}"</span>
+                    </div>
+                </div>
+                
+                <div>
+                    <strong style="display: block; margin-bottom: 10px; color: #374151;">
+                        HTML Context:
+                    </strong>
+                    <div class="code-block">
+                        ${highlightText(escapeHtml(item.context), escapeHtml(item.text))}
+                    </div>
+                </div>
+                
+                <div class="decision-buttons">
+                    <button class="decision-btn wrap ${existingDecision.action === 'wrap' ? 'active' : ''}" 
+                            onclick="makeDecision('wrap')">
+                        <div style="font-size: 32px; margin-bottom: 8px;">✅</div>
+                        <div>WRAP</div>
+                        <div style="font-size: 11px; opacity: 0.7; margin-top: 4px;">Safe for translation</div>
+                    </button>
+                    
+                    <button class="decision-btn skip ${existingDecision.action === 'skip' ? 'active' : ''}"
+                            onclick="makeDecision('skip')">
+                        <div style="font-size: 32px; margin-bottom: 8px;">⏭️</div>
+                        <div>SKIP</div>
+                        <div style="font-size: 11px; opacity: 0.7; margin-top: 4px;">Technical value</div>
+                    </button>
+                    
+                    <button class="decision-btn split ${existingDecision.action === 'split' ? 'active' : ''}"
+                            onclick="makeDecision('split')">
+                        <div style="font-size: 32px; margin-bottom: 8px;">🔀</div>
+                        <div>SPLIT</div>
+                        <div style="font-size: 11px; opacity: 0.7; margin-top: 4px;">Separate value/display</div>
+                    </button>
+                </div>
+                
+                <div class="notes-section">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151;">
+                        <i class="fas fa-sticky-note"></i> Notes / Reason:
+                    </label>
+                    <textarea id="decision-notes" placeholder="Add notes about your decision (optional)...">${existingDecision.notes}</textarea>
+                </div>
+            `;
+            
+            document.getElementById('review-item').innerHTML = html;
+            
+            // Update navigation buttons
+            document.getElementById('prev-btn').disabled = currentIndex === 0;
+            document.getElementById('next-btn').disabled = false;
+            
+            if (currentIndex === items.length - 1) {
+                document.getElementById('next-btn').innerHTML = 'Complete Review <i class="fas fa-check"></i>';
+            } else {
+                document.getElementById('next-btn').innerHTML = 'Next <i class="fas fa-arrow-right"></i>';
+            }
+        }
+        
+        function makeDecision(action) {
+            const item = items[currentIndex];
+            const itemId = `${item.file}:${item.line}`;
+            const notes = document.getElementById('decision-notes').value;
+            
+            decisions[itemId] = {
+                action: action,
+                notes: notes,
+                file: item.file,
+                line: item.line,
+                pattern: item.pattern,
+                text: item.text,
+                context: item.context
+            };
+            
+            updateStats();
+            
+            // Auto-advance to next item
+            if (currentIndex < items.length - 1) {
+                setTimeout(() => navigate(1), 200);
+            }
+        }
+        
+        function navigate(direction) {
+            // Save current notes before navigating
+            const item = items[currentIndex];
+            const itemId = `${item.file}:${item.line}`;
+            const notes = document.getElementById('decision-notes')?.value || '';
+            
+            if (decisions[itemId]) {
+                decisions[itemId].notes = notes;
+            }
+            
+            if (direction === 1 && currentIndex === items.length - 1) {
+                // Completed review
+                showCompletionModal();
+                return;
+            }
+            
+            currentIndex += direction;
+            if (currentIndex < 0) currentIndex = 0;
+            if (currentIndex >= items.length) currentIndex = items.length - 1;
+            
+            renderItem();
+        }
+        
+        function updateStats() {
+            const stats = {
+                wrap: 0,
+                skip: 0,
+                split: 0
+            };
+            
+            Object.values(decisions).forEach(d => {
+                if (d.action) stats[d.action]++;
+            });
+            
+            document.getElementById('stat-wrap').textContent = stats.wrap;
+            document.getElementById('stat-skip').textContent = stats.skip;
+            document.getElementById('stat-split').textContent = stats.split;
+            document.getElementById('stat-remaining').textContent = items.length - Object.keys(decisions).length;
+        }
+        
+        function showCompletionModal() {
+            const stats = {
+                wrap: 0,
+                skip: 0,
+                split: 0
+            };
+            
+            Object.values(decisions).forEach(d => {
+                if (d.action) stats[d.action]++;
+            });
+            
+            document.getElementById('completion-total').textContent = items.length;
+            document.getElementById('final-wrap').textContent = stats.wrap;
+            document.getElementById('final-skip').textContent = stats.skip;
+            document.getElementById('final-split').textContent = stats.split;
+            
+            document.getElementById('completion-modal').style.display = 'flex';
+        }
+        
+        function saveProgress() {
+            const dataStr = JSON.stringify(decisions, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const fileName = `review_progress_${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', fileName);
+            linkElement.click();
+            
+            alert('Progress saved! You can resume later by uploading this file.');
+        }
+        
+        function downloadDecisions() {
+            const dataStr = JSON.stringify(decisions, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const fileName = 'manual_review_decisions.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', fileName);
+            linkElement.click();
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function highlightText(html, searchText) {
+            if (!searchText) return html;
+            const regex = new RegExp(`(${searchText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            return html.replace(regex, '<span style="background: #fef08a; color: #854d0e; font-weight: 700;">$1</span>');
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'TEXTAREA') return; // Don't interfere with typing in notes
+            
+            switch(e.key) {
+                case '1':
+                    makeDecision('wrap');
+                    break;
+                case '2':
+                    makeDecision('skip');
+                    break;
+                case '3':
+                    makeDecision('split');
+                    break;
+                case 'ArrowLeft':
+                    navigate(-1);
+                    break;
+                case 'ArrowRight':
+                    navigate(1);
+                    break;
+            }
+        });
+        
+        // Load items on page load
+        window.onload = loadItems;
+    </script>
+</body>
+</html>

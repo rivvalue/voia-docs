@@ -178,7 +178,7 @@
                         <label for="custom_subject_template" class="form-label">{{ _('Email Subject') }}</label>
                         <input type="text" class="form-control" id="custom_subject_template" name="custom_subject_template" 
                                maxlength="500" placeholder={{ _('Your feedback is requested: {campaign_name}') }}>
-                        <div class="form-text">Available variables: {participant_name}, {campaign_name}, {business_account_name}</div>
+                        <div class="form-text">{{ _('Available variables: {participant_name}, {campaign_name}, {business_account_name}') }}</div>
                     </div>
 
                     <div class="mb-3">
@@ -186,7 +186,7 @@
                         <textarea class="form-control" id="custom_intro_message" name="custom_intro_message" 
                                   rows="3" maxlength="2000" 
                                   placeholder={{ _('{business_account_name} is requesting your valuable feedback through our Voice of Client system.') }}></textarea>
-                        <div class="form-text">Opens the email body. Available variables: {participant_name}, {campaign_name}, {business_account_name}</div>
+                        <div class="form-text">{{ _('Opens the email body. Available variables: {participant_name}, {campaign_name}, {business_account_name}') }}</div>
                     </div>
 
                     <div class="mb-3">
@@ -203,7 +203,7 @@
                                   placeholder="Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.
 
 Thank you for your time and valuable insights!"></textarea>
-                        <div class="form-text">Message before sign-off. Available variables: {participant_name}, {campaign_name}, {business_account_name}</div>
+                        <div class="form-text">{{ _('Message before sign-off. Available variables: {participant_name}, {campaign_name}, {business_account_name}') }}</div>
                     </div>
 
                     <div class="mb-3">

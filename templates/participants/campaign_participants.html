@@ -56,7 +56,7 @@
                 </h6>
             </div>
             <div class="collapse show" id="filterCollapse">
-                <form method="GET" action="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" id="filterForm" aria-label="Filter participants form">
+                <form method="GET" action="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" id="filterForm" aria-label={{ _('Filter participants form') }}>
                     <div class="row g-3 mb-3">
                         <!-- {{ _('Company') }} Filter -->
                         <div class="col-md-4">
@@ -140,7 +140,7 @@
                     </div>
                     
                     <div class="filter-actions">
-                        <button type="submit" class="btn btn-voïa-red" aria-label="Apply filters">
+                        <button type="submit" class="btn btn-voïa-red" aria-label={{ _('Apply filters') }}>
                             <i class="fas fa-check me-2" aria-hidden="true"></i>Apply Filters
                         </button>
                         <button type="button" class="btn btn-outline-secondary" id="clearFiltersBtn" aria-label="{{ _('Clear all filters') }}">

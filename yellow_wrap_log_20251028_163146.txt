@@ -1,0 +1,704 @@
+================================================================================
+YELLOW DECISIONS MODIFICATION LOG
+Generated: 2025-10-28 16:31:46
+================================================================================
+
+SUMMARY:
+  Files modified: 23
+  Strings wrapped: 115
+  Strings skipped: 7
+
+================================================================================
+DETAILED MODIFICATIONS:
+================================================================================
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/admin_licenses.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 156 [Spans]:
+  Text: "No expiration"
+  BEFORE: <span class="text-muted">No expiration</span>
+  AFTER:  <span class="text-muted">{{ _('No expiration') }}</span>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/admin_panel_v2.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 710 [Divs with text]:
+  Text: "Max Participants"
+  BEFORE: <div class="settings-stat-label">Max Participants</div>
+  AFTER:  <div class="settings-stat-label">{{ _('Max Participants') }}</div>
+
+Line 706 [Divs with text]:
+  Text: "Users"
+  BEFORE: <div class="settings-stat-label">Users</div>
+  AFTER:  <div class="settings-stat-label">{{ _('Users') }}</div>
+
+Line 702 [Divs with text]:
+  Text: "Campaigns"
+  BEFORE: <div class="settings-stat-label">Campaigns</div>
+  AFTER:  <div class="settings-stat-label">{{ _('Campaigns') }}</div>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/audit_logs.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 189 [ARIA labels]:
+  Text: "Go to next page"
+  BEFORE: aria-label="Go to next page">
+  AFTER:  aria-label={{ _('Go to next page') }}>
+
+Line 173 [ARIA labels]:
+  Text: "Go to previous page"
+  BEFORE: aria-label="Go to previous page">
+  AFTER:  aria-label={{ _('Go to previous page') }}>
+
+Line 169 [ARIA labels]:
+  Text: "Pagination"
+  BEFORE: <div class="audit-pagination" role="navigation" aria-label="Pagination">
+  AFTER:  <div class="audit-pagination" role="navigation" aria-label={{ _('Pagination') }}>
+
+Line 96 [ARIA labels]:
+  Text: "Audit logs table"
+  BEFORE: <table class="audit-table" role="table" aria-label="Audit logs table">
+  AFTER:  <table class="audit-table" role="table" aria-label={{ _('Audit logs table') }}>
+
+Line 84 [ARIA labels]:
+  Text: "Apply filters"
+  BEFORE: <button type="submit" class="audit-filter-btn" aria-label="Apply filters">
+  AFTER:  <button type="submit" class="audit-filter-btn" aria-label={{ _('Apply filters') }}>
+
+Line 75 [ARIA labels]:
+  Text: "Filter by time period"
+  BEFORE: <select id="days_back" name="days_back" class="form-select" aria-label="Filter by time period">
+  AFTER:  <select id="days_back" name="days_back" class="form-select" aria-label={{ _('Filter by time period') }}>
+
+Line 62 [ARIA labels]:
+  Text: "Filter by user"
+  BEFORE: <select id="user_email" name="user_email" class="form-select" aria-label="Filter by user">
+  AFTER:  <select id="user_email" name="user_email" class="form-select" aria-label={{ _('Filter by user') }}>
+
+Line 49 [ARIA labels]:
+  Text: "Filter by activity type"
+  BEFORE: <select id="action_type" name="action_type" class="form-select" aria-label="Filter by activity type">
+  AFTER:  <select id="action_type" name="action_type" class="form-select" aria-label={{ _('Filter by activity type') }}>
+
+Line 40 [Divs with text]:
+  Text: "Days Shown"
+  BEFORE: <div class="audit-stat-label">Days Shown</div>
+  AFTER:  <div class="audit-stat-label">{{ _('Days Shown') }}</div>
+
+Line 36 [Divs with text]:
+  Text: "Active Users"
+  BEFORE: <div class="audit-stat-label">Active Users</div>
+  AFTER:  <div class="audit-stat-label">{{ _('Active Users') }}</div>
+
+Line 32 [Divs with text]:
+  Text: "Activity Types"
+  BEFORE: <div class="audit-stat-label">Activity Types</div>
+  AFTER:  <div class="audit-stat-label">{{ _('Activity Types') }}</div>
+
+Line 28 [Divs with text]:
+  Text: "Total Activities"
+  BEFORE: <div class="audit-stat-label">Total Activities</div>
+  AFTER:  <div class="audit-stat-label">{{ _('Total Activities') }}</div>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/brand_config.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 250 [ARIA labels]:
+  Text: "Save brand settings"
+  BEFORE: aria-label="Save brand settings">
+  AFTER:  aria-label={{ _('Save brand settings') }}>
+
+Line 231 [ARIA labels]:
+  Text: "Upload requirements"
+  BEFORE: <div class="brand-upload-constraints" role="region" aria-label="Upload requirements">
+  AFTER:  <div class="brand-upload-constraints" role="region" aria-label={{ _('Upload requirements') }}>
+
+Line 190 [ARIA labels]:
+  Text: "Color palette preview"
+  BEFORE: <div class="brand-color-preview" role="img" aria-label="Color palette preview">
+  AFTER:  <div class="brand-color-preview" role="img" aria-label={{ _('Color palette preview') }}>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/business_account_onboarding.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 157 [Divs with text]:
+  Text: "The administrator will receive an invitation email at this address"
+  BEFORE: <div class="form-text">The administrator will receive an invitation email at this address</div>
+  AFTER:  <div class="form-text">{{ _('The administrator will receive an invitation email at this address') }}</div>
+
+Line 102 [Divs with text]:
+  Text: "Choose the license tier that best fits the business needs"
+  BEFORE: <div class="form-text">Choose the license tier that best fits the business needs</div>
+  AFTER:  <div class="form-text">{{ _('Choose the license tier that best fits the business needs') }}</div>
+
+Line 78 [Divs with text]:
+  Text: "This will be displayed throughout the platform and in communications"
+  BEFORE: <div class="form-text">This will be displayed throughout the platform and in communications</div>
+  AFTER:  <div class="form-text">{{ _('This will be displayed throughout the platform and in communications') }}</div>
+
+Line 33 [ARIA labels]:
+  Text: "Close"
+  BEFORE: <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  AFTER:  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label={{ _('Close') }}></button>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/email_config.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 71 [Divs with text]:
+  Text: "Choose your email delivery provider"
+  BEFORE: <div class="email-help-text" id="email_provider_help">Choose your email delivery provider</div>
+  AFTER:  <div class="email-help-text" id="email_provider_help">{{ _('Choose your email delivery provider') }}</div>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/forgot_password.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 27 [ARIA labels]:
+  Text: "Close"
+  BEFORE: <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  AFTER:  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label={{ _('Close') }}></button>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/license_info.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 343 [Divs with text]:
+  Text: "Add-on Not Purchased"
+  BEFORE: <div class="license-date-value">Add-on Not Purchased</div>
+  AFTER:  <div class="license-date-value">{{ _('Add-on Not Purchased') }}</div>
+
+Line 342 [Divs with text]:
+  Text: "Transcript Analysis Not Configured"
+  BEFORE: <div class="license-date-label">Transcript Analysis Not Configured</div>
+  AFTER:  <div class="license-date-label">{{ _('Transcript Analysis Not Configured') }}</div>
+
+Line 325 [Divs with text]:
+  Text: "Add-on Duration"
+  BEFORE: <div class="license-info-label">Add-on Duration</div>
+  AFTER:  <div class="license-info-label">{{ _('Add-on Duration') }}</div>
+
+Line 309 [Divs with text]:
+  Text: "Add-on Period"
+  BEFORE: <div class="license-info-label">Add-on Period</div>
+  AFTER:  <div class="license-info-label">{{ _('Add-on Period') }}</div>
+
+Line 303 [ARIA labels]:
+  Text: "Add-on period details"
+  BEFORE: <div class="license-info-grid" role="region" aria-label="Add-on period details">
+  AFTER:  <div class="license-info-grid" role="region" aria-label={{ _('Add-on period details') }}>
+
+Line 276 [Divs with text]:
+  Text: "Add-on End Date"
+  BEFORE: <div class="license-date-label">Add-on End Date</div>
+  AFTER:  <div class="license-date-label">{{ _('Add-on End Date') }}</div>
+
+Line 251 [Divs with text]:
+  Text: "Add-on Start Date"
+  BEFORE: <div class="license-date-label">Add-on Start Date</div>
+  AFTER:  <div class="license-date-label">{{ _('Add-on Start Date') }}</div>
+
+Line 180 [ARIA labels]:
+  Text: "Users count out of limit"
+  BEFORE: <div class="license-usage-count" aria-label="Users count out of limit">{{ users_used }}/{{ users_limit }}</div>
+  AFTER:  <div class="license-usage-count" aria-label={{ _('Users count out of limit') }}>{{ users_used }}/{{ users_limit }}</div>
+
+Line 156 [ARIA labels]:
+  Text: "Campaigns used out of limit"
+  BEFORE: <div class="license-usage-count" aria-label="Campaigns used out of limit">{{ campaigns_used }}/{{ campaigns_limit }}</div>
+  AFTER:  <div class="license-usage-count" aria-label={{ _('Campaigns used out of limit') }}>{{ campaigns_used }}/{{ campaigns_limit }}</div>
+
+Line 130 [Divs with text]:
+  Text: "License Duration"
+  BEFORE: <div class="license-info-label">License Duration</div>
+  AFTER:  <div class="license-info-label">{{ _('License Duration') }}</div>
+
+Line 120 [Divs with text]:
+  Text: "License Period"
+  BEFORE: <div class="license-info-label">License Period</div>
+  AFTER:  <div class="license-info-label">{{ _('License Period') }}</div>
+
+Line 114 [ARIA labels]:
+  Text: "License period details"
+  BEFORE: <div class="license-info-grid" role="region" aria-label="License period details">
+  AFTER:  <div class="license-info-grid" role="region" aria-label={{ _('License period details') }}>
+
+Line 87 [Divs with text]:
+  Text: "License Expiry Date"
+  BEFORE: <div class="license-date-label">License Expiry Date</div>
+  AFTER:  <div class="license-date-label">{{ _('License Expiry Date') }}</div>
+
+Line 64 [Divs with text]:
+  Text: "License Purchase Date"
+  BEFORE: <div class="license-date-label">License Purchase Date</div>
+  AFTER:  <div class="license-date-label">{{ _('License Purchase Date') }}</div>
+
+Line 27 [ARIA labels]:
+  Text: "Account type"
+  BEFORE: <div class="license-account-badge {{ 'demo' if business_account.account_type == 'demo' else ('admin' if license_type == 'platform_admin' else 'customer') }}" role="status" aria-label="Account type">
+  AFTER:  <div class="license-account-badge {{ 'demo' if business_account.account_type == 'demo' else ('admin' if license_type == 'platform_admin' else 'customer') }}" role="status" aria-label={{ _('Account type') }}>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/licenses/assignment_form.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 355 [Divs with text]:
+  Text: "Custom pricing for this add-on period"
+  BEFORE: <div class="form-text">Custom pricing for this add-on period</div>
+  AFTER:  <div class="form-text">{{ _('Custom pricing for this add-on period') }}</div>
+
+Line 345 [Divs with text]:
+  Text: "When transcript analysis access expires"
+  BEFORE: <div class="form-text">When transcript analysis access expires</div>
+  AFTER:  <div class="form-text">{{ _('When transcript analysis access expires') }}</div>
+
+Line 339 [Divs with text]:
+  Text: "When transcript analysis access begins"
+  BEFORE: <div class="form-text">When transcript analysis access begins</div>
+  AFTER:  <div class="form-text">{{ _('When transcript analysis access begins') }}</div>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/licenses/assignment_result.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 342 [Spans]:
+  Text: "Email:"
+  BEFORE: <span class="detail-label">Email:</span>
+  AFTER:  <span class="detail-label">{{ _('Email:') }}</span>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/licenses/history.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 486 [Spans]:
+  Text: "Expiration"
+  BEFORE: <span class="detail-label">Expiration</span>
+  AFTER:  <span class="detail-label">{{ _('Expiration') }}</span>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/login.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 87 [Links (a tags)]:
+  Text: "RIVVALUE inc."
+  BEFORE: VO<span class="voia-red-accent">Ï</span>A, {{ _('by') }} <a href="https://www.rivvalue.com" target="_blank" rel="noopener noreferrer" class="text-muted">RIVVALUE inc.</a>
+  AFTER:  VO<span class="voia-red-accent">Ï</span>A, {{ _('by') }} <a href="https://www.rivvalue.com" target="_blank" rel="noopener noreferrer" class="text-muted">{{ _('RIVVALUE inc.') }}</a>
+
+Line 27 [ARIA labels]:
+  Text: "Close"
+  BEFORE: <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  AFTER:  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label={{ _('Close') }}></button>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/manage_users.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 350 [ARIA labels]:
+  Text: "Save changes"
+  BEFORE: <button type="submit" class="btn btn-primary" aria-label="Save changes">
+  AFTER:  <button type="submit" class="btn btn-primary" aria-label={{ _('Save changes') }}>
+
+Line 325 [ARIA labels]:
+  Text: "required"
+  BEFORE: <label for="edit_email" class="form-label">{{ _('Email Address') }} <span class="text-danger" aria-label="required">*</span></label>
+  AFTER:  <label for="edit_email" class="form-label">{{ _('Email Address') }} <span class="text-danger" aria-label={{ _('required') }}>*</span></label>
+
+Line 312 [ARIA labels]:
+  Text: "required"
+  BEFORE: <label for="edit_last_name" class="form-label">Last Name <span class="text-danger" aria-label="required">*</span></label>
+  AFTER:  <label for="edit_last_name" class="form-label">Last Name <span class="text-danger" aria-label={{ _('required') }}>*</span></label>
+
+Line 300 [ARIA labels]:
+  Text: "required"
+  BEFORE: <label for="edit_first_name" class="form-label">First Name <span class="text-danger" aria-label="required">*</span></label>
+  AFTER:  <label for="edit_first_name" class="form-label">First Name <span class="text-danger" aria-label={{ _('required') }}>*</span></label>
+
+Line 294 [ARIA labels]:
+  Text: "Close"
+  BEFORE: <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  AFTER:  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label={{ _('Close') }}></button>
+
+Line 275 [ARIA labels]:
+  Text: "Confirm add user"
+  BEFORE: <button type="submit" class="btn btn-primary" aria-label="Confirm add user">
+  AFTER:  <button type="submit" class="btn btn-primary" aria-label={{ _('Confirm add user') }}>
+
+Line 252 [Divs with text]:
+  Text: "The user will receive an invitation email to activate their account."
+  BEFORE: <div class="form-text" id="email_help">The user will receive an invitation email to activate their account.</div>
+  AFTER:  <div class="form-text" id="email_help">{{ _('The user will receive an invitation email to activate their account.') }}</div>
+
+Line 242 [ARIA labels]:
+  Text: "required"
+  BEFORE: <label for="email" class="form-label">{{ _('Email Address') }} <span class="text-danger" aria-label="required">*</span></label>
+  AFTER:  <label for="email" class="form-label">{{ _('Email Address') }} <span class="text-danger" aria-label={{ _('required') }}>*</span></label>
+
+Line 229 [ARIA labels]:
+  Text: "required"
+  BEFORE: <label for="last_name" class="form-label">Last Name <span class="text-danger" aria-label="required">*</span></label>
+  AFTER:  <label for="last_name" class="form-label">Last Name <span class="text-danger" aria-label={{ _('required') }}>*</span></label>
+
+Line 217 [ARIA labels]:
+  Text: "required"
+  BEFORE: <label for="first_name" class="form-label">First Name <span class="text-danger" aria-label="required">*</span></label>
+  AFTER:  <label for="first_name" class="form-label">First Name <span class="text-danger" aria-label={{ _('required') }}>*</span></label>
+
+Line 211 [ARIA labels]:
+  Text: "Close"
+  BEFORE: <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  AFTER:  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label={{ _('Close') }}></button>
+
+Line 126 [ARIA labels]:
+  Text: "User status"
+  BEFORE: <span class="users-status-badge {{ 'active' if user.is_active_user else 'inactive' }}" role="status" aria-label="User status">
+  AFTER:  <span class="users-status-badge {{ 'active' if user.is_active_user else 'inactive' }}" role="status" aria-label={{ _('User status') }}>
+
+Line 120 [ARIA labels]:
+  Text: "User role"
+  BEFORE: <span class="users-role-badge {{ role_class }}" role="status" aria-label="User role">
+  AFTER:  <span class="users-role-badge {{ role_class }}" role="status" aria-label={{ _('User role') }}>
+
+Line 68 [ARIA labels]:
+  Text: "Add user button disabled - license limit reached"
+  BEFORE: aria-label="Add user button disabled - license limit reached"
+  AFTER:  aria-label={{ _('Add user button disabled - license limit reached') }}
+
+Line 60 [ARIA labels]:
+  Text: "Add new user"
+  BEFORE: aria-label="Add new user">
+  AFTER:  aria-label={{ _('Add new user') }}>
+
+Line 49 [ARIA labels]:
+  Text: "User limit usage"
+  BEFORE: <div class="users-progress-bar-container" role="progressbar" aria-valuenow="{{ usage_percent }}" aria-valuemin="0" aria-valuemax="100" aria-label="User limit usage">
+  AFTER:  <div class="users-progress-bar-container" role="progressbar" aria-valuenow="{{ usage_percent }}" aria-valuemin="0" aria-valuemax="100" aria-label={{ _('User limit usage') }}>
+
+Line 32 [ARIA labels]:
+  Text: "Close"
+  BEFORE: <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  AFTER:  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label={{ _('Close') }}></button>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/onboarding/complete.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 356 [Divs with text]:
+  Text: "Platform Security"
+  BEFORE: <div class="summary-title">Platform Security</div>
+  AFTER:  <div class="summary-title">{{ _('Platform Security') }}</div>
+
+Line 346 [Divs with text]:
+  Text: "Team Members Added"
+  BEFORE: <div class="summary-title">Team Members Added</div>
+  AFTER:  <div class="summary-title">{{ _('Team Members Added') }}</div>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/reset_password.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 84 [ARIA labels]:
+  Text: "Return to login page"
+  BEFORE: <a href="{{ url_for('business_auth.login') }}" aria-label="Return to login page">
+  AFTER:  <a href="{{ url_for('business_auth.login') }}" aria-label={{ _('Return to login page') }}>
+
+Line 78 [ARIA labels]:
+  Text: "Reset password"
+  BEFORE: <button type="submit" class="btn btn-primary business-login-btn" aria-label="Reset password">
+  AFTER:  <button type="submit" class="btn btn-primary business-login-btn" aria-label={{ _('Reset password') }}>
+
+Line 67 [ARIA labels]:
+  Text: "Confirm new password"
+  BEFORE: aria-label="Confirm new password">
+  AFTER:  aria-label={{ _('Confirm new password') }}>
+
+Line 51 [ARIA labels]:
+  Text: "New password"
+  BEFORE: aria-label="New password">
+  AFTER:  aria-label={{ _('New password') }}>
+
+Line 36 [ARIA labels]:
+  Text: "Password reset form"
+  BEFORE: aria-label="Password reset form"
+  AFTER:  aria-label={{ _('Password reset form') }}
+
+Line 27 [ARIA labels]:
+  Text: "Close"
+  BEFORE: <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  AFTER:  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label={{ _('Close') }}></button>
+
+Line 13 [ARIA labels]:
+  Text: "VOÏA Password Reset"
+  BEFORE: <div class="business-login-logo" role="img" aria-label="VOÏA Password Reset">
+  AFTER:  <div class="business-login-logo" role="img" aria-label={{ _('VOÏA Password Reset') }}>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/campaign_insights.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 1126 [Spans]:
+  Text: "Tier"
+  BEFORE: <td><span class="badge bg-warning text-dark">Tier</span></td>
+  AFTER:  <td><span class="badge bg-warning text-dark">{{ _('Tier') }}</span></td>
+
+Line 1109 [Spans]:
+  Text: "Region"
+  BEFORE: <td><span class="badge bg-info">Region</span></td>
+  AFTER:  <td><span class="badge bg-info">{{ _('Region') }}</span></td>
+
+Line 1092 [Spans]:
+  Text: "Role"
+  BEFORE: <td><span class="badge bg-primary">Role</span></td>
+  AFTER:  <td><span class="badge bg-primary">{{ _('Role') }}</span></td>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/campaigns/create.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 206 [Divs with text]:
+  Text: "Message before sign-off. Available variables: {participant_name}, {campaign_name}, {business_account_name}"
+  BEFORE: <div class="form-text">Message before sign-off. Available variables: {participant_name}, {campaign_name}, {business_account_name}</div>
+  AFTER:  <div class="form-text">{{ _('Message before sign-off. Available variables: {participant_name}, {campaign_name}, {business_account_name}') }}</div>
+
+Line 189 [Divs with text]:
+  Text: "Opens the email body. Available variables: {participant_name}, {campaign_name}, {business_account_name}"
+  BEFORE: <div class="form-text">Opens the email body. Available variables: {participant_name}, {campaign_name}, {business_account_name}</div>
+  AFTER:  <div class="form-text">{{ _('Opens the email body. Available variables: {participant_name}, {campaign_name}, {business_account_name}') }}</div>
+
+Line 181 [Divs with text]:
+  Text: "Available variables: {participant_name}, {campaign_name}, {business_account_name}"
+  BEFORE: <div class="form-text">Available variables: {participant_name}, {campaign_name}, {business_account_name}</div>
+  AFTER:  <div class="form-text">{{ _('Available variables: {participant_name}, {campaign_name}, {business_account_name}') }}</div>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/campaigns/individual_response.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 466 [Spans]:
+  Text: "Additional Comments:"
+  BEFORE: <span class="data-label d-block">Additional Comments:</span>
+  AFTER:  <span class="data-label d-block">{{ _('Additional Comments:') }}</span>
+
+Line 460 [Spans]:
+  Text: "Recommendation Reason:"
+  BEFORE: <span class="data-label d-block">Recommendation Reason:</span>
+  AFTER:  <span class="data-label d-block">{{ _('Recommendation Reason:') }}</span>
+
+Line 454 [Spans]:
+  Text: "Improvement Feedback:"
+  BEFORE: <span class="data-label d-block">Improvement Feedback:</span>
+  AFTER:  <span class="data-label d-block">{{ _('Improvement Feedback:') }}</span>
+
+Line 440 [Spans]:
+  Text: "Commercial Value:"
+  BEFORE: <span class="data-label">Commercial Value:</span>
+  AFTER:  <span class="data-label">{{ _('Commercial Value:') }}</span>
+
+Line 435 [Spans]:
+  Text: "Campaign:"
+  BEFORE: <span class="data-label">Campaign:</span>
+  AFTER:  <span class="data-label">{{ _('Campaign:') }}</span>
+
+Line 419 [Spans]:
+  Text: "Submitted:"
+  BEFORE: <span class="data-label">Submitted:</span>
+  AFTER:  <span class="data-label">{{ _('Submitted:') }}</span>
+
+Line 403 [Spans]:
+  Text: "Key Themes:"
+  BEFORE: <span class="data-label d-block mb-2">Key Themes:</span>
+  AFTER:  <span class="data-label d-block mb-2">{{ _('Key Themes:') }}</span>
+
+Line 394 [Spans]:
+  Text: "Churn Risk:"
+  BEFORE: <span class="data-label">Churn Risk:</span>
+  AFTER:  <span class="data-label">{{ _('Churn Risk:') }}</span>
+
+Line 377 [Spans]:
+  Text: "Sentiment:"
+  BEFORE: <span class="data-label">Sentiment:</span>
+  AFTER:  <span class="data-label">{{ _('Sentiment:') }}</span>
+
+Line 364 [Spans]:
+  Text: "Pricing:"
+  BEFORE: <span class="data-label">Pricing:</span>
+  AFTER:  <span class="data-label">{{ _('Pricing:') }}</span>
+
+Line 358 [Spans]:
+  Text: "Service Quality:"
+  BEFORE: <span class="data-label">Service Quality:</span>
+  AFTER:  <span class="data-label">{{ _('Service Quality:') }}</span>
+
+Line 352 [Spans]:
+  Text: "Product Value:"
+  BEFORE: <span class="data-label">Product Value:</span>
+  AFTER:  <span class="data-label">{{ _('Product Value:') }}</span>
+
+Line 339 [Spans]:
+  Text: "NPS Score:"
+  BEFORE: <span class="data-label">NPS Score:</span>
+  AFTER:  <span class="data-label">{{ _('NPS Score:') }}</span>
+
+Line 324 [Spans]:
+  Text: "Company:"
+  BEFORE: <span class="data-label">Company:</span>
+  AFTER:  <span class="data-label">{{ _('Company:') }}</span>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/campaigns/survey_config.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 361 [Divs with text]:
+  Text: "Personalized message shown when participants complete the survey"
+  BEFORE: <div class="form-text">Personalized message shown when participants complete the survey</div>
+  AFTER:  <div class="form-text">{{ _('Personalized message shown when participants complete the survey') }}</div>
+
+Line 348 [Divs with text]:
+  Text: "These topics will be skipped if time/questions run out"
+  BEFORE: <div class="form-text">These topics will be skipped if time/questions run out</div>
+  AFTER:  <div class="form-text">{{ _('These topics will be skipped if time/questions run out') }}</div>
+
+Line 332 [Divs with text]:
+  Text: "These topics will be covered first and are most important"
+  BEFORE: <div class="form-text">These topics will be covered first and are most important</div>
+  AFTER:  <div class="form-text">{{ _('These topics will be covered first and are most important') }}</div>
+
+Line 302 [Divs with text]:
+  Text: "Control topic depth exploration"
+  BEFORE: <div class="form-text">Control topic depth exploration</div>
+  AFTER:  <div class="form-text">{{ _('Control topic depth exploration') }}</div>
+
+Line 290 [Divs with text]:
+  Text: "Time limit for entire conversation"
+  BEFORE: <div class="form-text">Time limit for entire conversation</div>
+  AFTER:  <div class="form-text">{{ _('Time limit for entire conversation') }}</div>
+
+Line 278 [Divs with text]:
+  Text: "Hard limit on conversation length"
+  BEFORE: <div class="form-text">Hard limit on conversation length</div>
+  AFTER:  <div class="form-text">{{ _('Hard limit on conversation length') }}</div>
+
+Line 256 [Divs with text]:
+  Text: "NPS is recommended for all campaigns to track customer loyalty"
+  BEFORE: <div class="form-text mt-2">NPS is recommended for all campaigns to track customer loyalty</div>
+  AFTER:  <div class="form-text mt-2">{{ _('NPS is recommended for all campaigns to track customer loyalty') }}</div>
+
+Line 232 [Divs with text]:
+  Text: "Who are you primarily serving? This helps tailor conversation tone and questions"
+  BEFORE: <div class="form-text">Who are you primarily serving? This helps tailor conversation tone and questions</div>
+  AFTER:  <div class="form-text">{{ _('Who are you primarily serving? This helps tailor conversation tone and questions') }}</div>
+
+Line 224 [Divs with text]:
+  Text: "Help the AI understand what you offer to ask better questions"
+  BEFORE: <div class="form-text">Help the AI understand what you offer to ask better questions</div>
+  AFTER:  <div class="form-text">{{ _('Help the AI understand what you offer to ask better questions') }}</div>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/campaigns/view.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 50 [Divs with text]:
+  Text: "End Date"
+  BEFORE: <div class="info-label">End Date</div>
+  AFTER:  <div class="info-label">{{ _('End Date') }}</div>
+
+Line 46 [Divs with text]:
+  Text: "Start Date"
+  BEFORE: <div class="info-label">Start Date</div>
+  AFTER:  <div class="info-label">{{ _('Start Date') }}</div>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/maintenance.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 36 [ARIA labels]:
+  Text: "Get your demo access"
+  BEFORE: aria-label="Get your demo access">
+  AFTER:  aria-label={{ _('Get your demo access') }}>
+
+Line 20 [ARIA labels]:
+  Text: "VOÏA coming soon page"
+  BEFORE: <main role="main" aria-label="VOÏA coming soon page">
+  AFTER:  <main role="main" aria-label={{ _('VOÏA coming soon page') }}>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/participants/campaign_participants.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 143 [ARIA labels]:
+  Text: "Apply filters"
+  BEFORE: <button type="submit" class="btn btn-voïa-red" aria-label="Apply filters">
+  AFTER:  <button type="submit" class="btn btn-voïa-red" aria-label={{ _('Apply filters') }}>
+
+Line 59 [ARIA labels]:
+  Text: "Filter participants form"
+  BEFORE: <form method="GET" action="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" id="filterForm" aria-label="Filter participants form">
+  AFTER:  <form method="GET" action="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" id="filterForm" aria-label={{ _('Filter participants form') }}>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/participants/list.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 928 [ARIA labels]:
+  Text: "Next"
+  BEFORE: <a class="page-link" href="#" onclick="if(${pagination.has_next}) { applyFilters(${pagination.next_page}); return false; }" aria-label="Next">
+  AFTER:  <a class="page-link" href="#" onclick="if(${pagination.has_next}) { applyFilters(${pagination.next_page}); return false; }" aria-label={{ _('Next') }}>
+
+Line 911 [ARIA labels]:
+  Text: "Previous"
+  BEFORE: <a class="page-link" href="#" onclick="if(${pagination.has_prev}) { applyFilters(${pagination.prev_page}); return false; }" aria-label="Previous">
+  AFTER:  <a class="page-link" href="#" onclick="if(${pagination.has_prev}) { applyFilters(${pagination.prev_page}); return false; }" aria-label={{ _('Previous') }}>
+
+Line 907 [ARIA labels]:
+  Text: "Participant pagination"
+  BEFORE: let html = '<nav aria-label="Participant pagination"><ul class="pagination justify-content-center mb-0">';
+  AFTER:  let html = '<nav aria-label={{ _('Participant pagination') }}><ul class="pagination justify-content-center mb-0">';
+
+Line 848 [ARIA labels]:
+  Text: "Delete ${p.name}"
+  BEFORE: aria-label="Delete ${p.name}">
+  AFTER:  aria-label={{ _('Delete ${p.name}') }}>
+
+Line 840 [ARIA labels]:
+  Text: "Edit ${p.name}"
+  BEFORE: aria-label="Edit ${p.name}">
+  AFTER:  aria-label={{ _('Edit ${p.name}') }}>
+
+Line 836 [ARIA labels]:
+  Text: "Participant actions"
+  BEFORE: <div class="btn-group btn-group-sm" role="group" aria-label="Participant actions">
+  AFTER:  <div class="btn-group btn-group-sm" role="group" aria-label={{ _('Participant actions') }}>
+
+Line 475 [ARIA labels]:
+  Text: "Participant actions"
+  BEFORE: <div class="btn-group btn-group-sm" role="group" aria-label="Participant actions">
+  AFTER:  <div class="btn-group btn-group-sm" role="group" aria-label={{ _('Participant actions') }}>
+

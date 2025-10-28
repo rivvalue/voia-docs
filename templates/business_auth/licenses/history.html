@@ -483,7 +483,7 @@
                             {% endif %}
                             {% if record.expires_at %}
                             <div class="detail-item">
-                                <span class="detail-label">Expiration</span>
+                                <span class="detail-label">{{ _('Expiration') }}</span>
                                 <span class="detail-value">{{ record.expires_at.strftime('%B %d, %Y') }}</span>
                             </div>
                             {% endif %}

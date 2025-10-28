@@ -1,0 +1,872 @@
+{
+  "templates/business_auth/business_account_onboarding.html:168": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Span element - verify not used by JavaScript",
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "168",
+    "pattern": "Spans",
+    "text": "the administrator",
+    "context": "<span id=\"email-preview\">the administrator</span>"
+  },
+  "templates/business_auth/business_account_onboarding.html:169": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Span element - verify not used by JavaScript",
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "169",
+    "pattern": "Spans",
+    "text": "business name",
+    "context": "<span id=\"business-preview\">business name</span>"
+  },
+  "templates/business_auth/licenses/assignment_form.html:227": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "227",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "pro",
+    "context": "value=\"pro\""
+  },
+  "templates/business_auth/licenses/assignment_form.html:242": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Short div content - verify not dynamic",
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "242",
+    "pattern": "Divs with text",
+    "text": "Custom",
+    "context": "<div style=\"font-size: var(--font-size-xl); font-weight: 600; color: var(--primary-red);\">Custom</di"
+  },
+  "templates/business_auth/licenses/assignment_form.html:243": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Short div content - verify not dynamic",
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "243",
+    "pattern": "Divs with text",
+    "text": "pricing",
+    "context": "<div class=\"text-muted\" style=\"font-size: var(--font-size-xs);\">pricing</div>"
+  },
+  "templates/business_auth/licenses/overview.html:296": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/business_auth/licenses/overview.html",
+    "line": "296",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "pro",
+    "context": "value=\"pro\""
+  },
+  "templates/business_auth/licenses/overview.html:305": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/business_auth/licenses/overview.html",
+    "line": "305",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "expiring",
+    "context": "value=\"expiring\""
+  },
+  "templates/business_auth/licenses/overview.html:306": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/business_auth/licenses/overview.html",
+    "line": "306",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "expired",
+    "context": "value=\"expired\""
+  },
+  "templates/business_auth/licenses/overview.html:377": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Span element - verify not used by JavaScript",
+    "file": "templates/business_auth/licenses/overview.html",
+    "line": "377",
+    "pattern": "Spans",
+    "text": "Unlimited",
+    "context": "<span class=\"text-muted\">Unlimited</span>"
+  },
+  "templates/business_auth/manage_users.html:135": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Span element - verify not used by JavaScript",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "135",
+    "pattern": "Spans",
+    "text": "Never",
+    "context": "<span class=\"text-muted\">Never</span>"
+  },
+  "templates/business_auth/manage_users.html:183": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Span element - verify not used by JavaScript",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "183",
+    "pattern": "Spans",
+    "text": "Current User",
+    "context": "<span class=\"text-muted small\">Current User</span>"
+  },
+  "templates/business_auth/manage_users.html:258": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "258",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "manager",
+    "context": "value=\"manager\""
+  },
+  "templates/business_auth/manage_users.html:259": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "259",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "viewer",
+    "context": "value=\"viewer\""
+  },
+  "templates/business_auth/manage_users.html:260": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "260",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "admin",
+    "context": "value=\"admin\""
+  },
+  "templates/business_auth/manage_users.html:338": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "338",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "manager",
+    "context": "value=\"manager\""
+  },
+  "templates/business_auth/manage_users.html:339": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "339",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "viewer",
+    "context": "value=\"viewer\""
+  },
+  "templates/business_auth/manage_users.html:340": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "340",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "admin",
+    "context": "value=\"admin\""
+  },
+  "templates/business_auth/onboarding/users.html:411": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/business_auth/onboarding/users.html",
+    "line": "411",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "manager",
+    "context": "value=\"manager\""
+  },
+  "templates/business_auth/onboarding/users.html:412": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/business_auth/onboarding/users.html",
+    "line": "412",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "admin",
+    "context": "value=\"admin\""
+  },
+  "templates/business_auth/onboarding/users.html:413": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/business_auth/onboarding/users.html",
+    "line": "413",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "viewer",
+    "context": "value=\"viewer\""
+  },
+  "templates/business_auth/survey_config.html:146": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/business_auth/survey_config.html",
+    "line": "146",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "NPS",
+    "context": "value=\"NPS\""
+  },
+  "templates/business_auth/survey_config.html:151": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/business_auth/survey_config.html",
+    "line": "151",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Satisfaction",
+    "context": "value=\"Satisfaction\""
+  },
+  "templates/business_auth/survey_config.html:156": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/business_auth/survey_config.html",
+    "line": "156",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Product Feedback",
+    "context": "value=\"Product Feedback\""
+  },
+  "templates/business_auth/survey_config.html:161": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/business_auth/survey_config.html",
+    "line": "161",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Support Quality",
+    "context": "value=\"Support Quality\""
+  },
+  "templates/business_auth/survey_config.html:166": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/business_auth/survey_config.html",
+    "line": "166",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Pricing Perception",
+    "context": "value=\"Pricing Perception\""
+  },
+  "templates/business_auth/survey_config.html:171": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/business_auth/survey_config.html",
+    "line": "171",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Custom",
+    "context": "value=\"Custom\""
+  },
+  "templates/business_auth/survey_config.html:230": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Span element - verify not used by JavaScript",
+    "file": "templates/business_auth/survey_config.html",
+    "line": "230",
+    "pattern": "Spans",
+    "text": "1min",
+    "context": "<span>1min</span>"
+  },
+  "templates/business_auth/survey_config.html:231": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Span element - verify not used by JavaScript",
+    "file": "templates/business_auth/survey_config.html",
+    "line": "231",
+    "pattern": "Spans",
+    "text": "5min",
+    "context": "<span>5min</span>"
+  },
+  "templates/campaign_insights.html:146": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Span element - verify not used by JavaScript",
+    "file": "templates/campaign_insights.html",
+    "line": "146",
+    "pattern": "Spans",
+    "text": "Jan 1 - Dec 31, 2024",
+    "context": "<span class=\"ms-2 text-muted\" id=\"activeCampaignDates\">Jan 1 - Dec 31, 2024</span>"
+  },
+  "templates/campaign_insights.html:257": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/campaign_insights.html",
+    "line": "257",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "balanced",
+    "context": "value=\"balanced\""
+  },
+  "templates/campaign_insights.html:265": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/campaign_insights.html",
+    "line": "265",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "critical",
+    "context": "value=\"critical\""
+  },
+  "templates/campaign_insights.html:266": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/campaign_insights.html",
+    "line": "266",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "high",
+    "context": "value=\"high\""
+  },
+  "templates/campaign_insights.html:267": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/campaign_insights.html",
+    "line": "267",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "medium",
+    "context": "value=\"medium\""
+  },
+  "templates/campaign_insights.html:268": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/campaign_insights.html",
+    "line": "268",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "low",
+    "context": "value=\"low\""
+  },
+  "templates/campaign_insights.html:410": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/campaign_insights.html",
+    "line": "410",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "promoters",
+    "context": "value=\"promoters\""
+  },
+  "templates/campaign_insights.html:411": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/campaign_insights.html",
+    "line": "411",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "passives",
+    "context": "value=\"passives\""
+  },
+  "templates/campaign_insights.html:412": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/campaign_insights.html",
+    "line": "412",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "detractors",
+    "context": "value=\"detractors\""
+  },
+  "templates/campaign_insights.html:582": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/campaign_insights.html",
+    "line": "582",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "promoters",
+    "context": "value=\"promoters\""
+  },
+  "templates/campaign_insights.html:583": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/campaign_insights.html",
+    "line": "583",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "passives",
+    "context": "value=\"passives\""
+  },
+  "templates/campaign_insights.html:584": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/campaign_insights.html",
+    "line": "584",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "detractors",
+    "context": "value=\"detractors\""
+  },
+  "templates/campaigns/individual_response.html:424": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Span element - verify not used by JavaScript",
+    "file": "templates/campaigns/individual_response.html",
+    "line": "424",
+    "pattern": "Spans",
+    "text": "(updated)",
+    "context": "<span style=\"color: #666; font-size: 0.9em;\">(updated)</span>"
+  },
+  "templates/campaigns/list.html:106": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Div content - verify usage",
+    "file": "templates/campaigns/list.html",
+    "line": "106",
+    "pattern": "Divs with text",
+    "text": "Participants",
+    "context": "<div class=\"small text-muted\">Participants</div>"
+  },
+  "templates/conversational_survey.html:133": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/conversational_survey.html",
+    "line": "133",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Less than 6 months",
+    "context": "value=\"Less than 6 months\""
+  },
+  "templates/conversational_survey.html:134": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/conversational_survey.html",
+    "line": "134",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "6 months - 1 year",
+    "context": "value=\"6 months - 1 year\""
+  },
+  "templates/conversational_survey.html:135": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/conversational_survey.html",
+    "line": "135",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "1-2 years",
+    "context": "value=\"1-2 years\""
+  },
+  "templates/conversational_survey.html:136": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/conversational_survey.html",
+    "line": "136",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "2-3 years",
+    "context": "value=\"2-3 years\""
+  },
+  "templates/conversational_survey.html:137": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/conversational_survey.html",
+    "line": "137",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "3-5 years",
+    "context": "value=\"3-5 years\""
+  },
+  "templates/conversational_survey.html:138": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/conversational_survey.html",
+    "line": "138",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "5-10 years",
+    "context": "value=\"5-10 years\""
+  },
+  "templates/conversational_survey.html:139": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/conversational_survey.html",
+    "line": "139",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "More than 10 years",
+    "context": "value=\"More than 10 years\""
+  },
+  "templates/conversational_survey_business.html:112": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/conversational_survey_business.html",
+    "line": "112",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Less than 6 months",
+    "context": "value=\"Less than 6 months\""
+  },
+  "templates/conversational_survey_business.html:113": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/conversational_survey_business.html",
+    "line": "113",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "6 months - 1 year",
+    "context": "value=\"6 months - 1 year\""
+  },
+  "templates/conversational_survey_business.html:114": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/conversational_survey_business.html",
+    "line": "114",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "1-2 years",
+    "context": "value=\"1-2 years\""
+  },
+  "templates/conversational_survey_business.html:115": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/conversational_survey_business.html",
+    "line": "115",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "2-3 years",
+    "context": "value=\"2-3 years\""
+  },
+  "templates/conversational_survey_business.html:116": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/conversational_survey_business.html",
+    "line": "116",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "3-5 years",
+    "context": "value=\"3-5 years\""
+  },
+  "templates/conversational_survey_business.html:117": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/conversational_survey_business.html",
+    "line": "117",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "5-10 years",
+    "context": "value=\"5-10 years\""
+  },
+  "templates/conversational_survey_business.html:118": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/conversational_survey_business.html",
+    "line": "118",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "More than 10 years",
+    "context": "value=\"More than 10 years\""
+  },
+  "templates/dashboard.html:223": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/dashboard.html",
+    "line": "223",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "balanced",
+    "context": "value=\"balanced\""
+  },
+  "templates/dashboard.html:381": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Span element - verify not used by JavaScript",
+    "file": "templates/dashboard.html",
+    "line": "381",
+    "pattern": "Spans",
+    "text": "Campaign Name",
+    "context": "<span id=\"activeCampaignName\" class=\"fw-bold\">Campaign Name</span>"
+  },
+  "templates/dashboard.html:382": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Span element - verify not used by JavaScript",
+    "file": "templates/dashboard.html",
+    "line": "382",
+    "pattern": "Spans",
+    "text": "Jan 1 - Dec 31, 2024",
+    "context": "<span class=\"ms-2 text-muted\" id=\"activeCampaignDates\">Jan 1 - Dec 31, 2024</span>"
+  },
+  "templates/dashboard.html:493": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/dashboard.html",
+    "line": "493",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "balanced",
+    "context": "value=\"balanced\""
+  },
+  "templates/dashboard.html:501": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/dashboard.html",
+    "line": "501",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "critical",
+    "context": "value=\"critical\""
+  },
+  "templates/dashboard.html:502": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/dashboard.html",
+    "line": "502",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "high",
+    "context": "value=\"high\""
+  },
+  "templates/dashboard.html:503": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/dashboard.html",
+    "line": "503",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "medium",
+    "context": "value=\"medium\""
+  },
+  "templates/dashboard.html:504": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/dashboard.html",
+    "line": "504",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "low",
+    "context": "value=\"low\""
+  },
+  "templates/dashboard.html:646": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/dashboard.html",
+    "line": "646",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "promoters",
+    "context": "value=\"promoters\""
+  },
+  "templates/dashboard.html:647": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/dashboard.html",
+    "line": "647",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "passives",
+    "context": "value=\"passives\""
+  },
+  "templates/dashboard.html:648": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/dashboard.html",
+    "line": "648",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "detractors",
+    "context": "value=\"detractors\""
+  },
+  "templates/dashboard.html:818": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/dashboard.html",
+    "line": "818",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "promoters",
+    "context": "value=\"promoters\""
+  },
+  "templates/dashboard.html:819": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/dashboard.html",
+    "line": "819",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "passives",
+    "context": "value=\"passives\""
+  },
+  "templates/dashboard.html:820": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/dashboard.html",
+    "line": "820",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "detractors",
+    "context": "value=\"detractors\""
+  },
+  "templates/executive_summary.html:216": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/executive_summary.html",
+    "line": "216",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "balanced",
+    "context": "value=\"balanced\""
+  },
+  "templates/participants/create.html:126": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/participants/create.html",
+    "line": "126",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "LATAM",
+    "context": "value=\"LATAM\""
+  },
+  "templates/participants/create.html:127": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/participants/create.html",
+    "line": "127",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "EMEA",
+    "context": "value=\"EMEA\""
+  },
+  "templates/participants/create.html:128": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/participants/create.html",
+    "line": "128",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "APAC",
+    "context": "value=\"APAC\""
+  },
+  "templates/participants/create.html:167": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/participants/create.html",
+    "line": "167",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "other",
+    "context": "value=\"other\""
+  },
+  "templates/participants/edit.html:174": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/participants/edit.html",
+    "line": "174",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "LATAM",
+    "context": "value=\"LATAM\""
+  },
+  "templates/participants/edit.html:175": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/participants/edit.html",
+    "line": "175",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "EMEA",
+    "context": "value=\"EMEA\""
+  },
+  "templates/participants/edit.html:176": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/participants/edit.html",
+    "line": "176",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "APAC",
+    "context": "value=\"APAC\""
+  },
+  "templates/participants/edit.html:215": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/participants/edit.html",
+    "line": "215",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "other",
+    "context": "value=\"other\""
+  },
+  "templates/participants/list.html:582": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/participants/list.html",
+    "line": "582",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Premium",
+    "context": "value=\"Premium\""
+  },
+  "templates/participants/list.html:583": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/participants/list.html",
+    "line": "583",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Standard",
+    "context": "value=\"Standard\""
+  },
+  "templates/participants/list.html:584": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/participants/list.html",
+    "line": "584",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Basic",
+    "context": "value=\"Basic\""
+  },
+  "templates/participants/list.html:680": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Span element - verify not used by JavaScript",
+    "file": "templates/participants/list.html",
+    "line": "680",
+    "pattern": "Spans",
+    "text": "Loading...",
+    "context": "<span class=\"visually-hidden\">Loading...</span>"
+  },
+  "templates/participants/list.html:912": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Span element - verify not used by JavaScript",
+    "file": "templates/participants/list.html",
+    "line": "912",
+    "pattern": "Spans",
+    "text": "&laquo;",
+    "context": "<span aria-hidden=\"true\">&laquo;</span>"
+  },
+  "templates/participants/list.html:929": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Span element - verify not used by JavaScript",
+    "file": "templates/participants/list.html",
+    "line": "929",
+    "pattern": "Spans",
+    "text": "&raquo;",
+    "context": "<span aria-hidden=\"true\">&raquo;</span>"
+  },
+  "templates/simple_auth.html:16": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/simple_auth.html",
+    "line": "16",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "test@example.com",
+    "context": "value=\"test@example.com\""
+  },
+  "templates/test_token.html:20": {
+    "action": null,
+    "suggested_action": "skip",
+    "reason": "Value attribute - verify backend dependency",
+    "file": "templates/test_token.html",
+    "line": "20",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "test@example.com",
+    "context": "value=\"test@example.com\""
+  }
+}
