@@ -409,7 +409,7 @@
                                     <i class="fas fa-flag-checkered me-2"></i>
                                     <div>
                                         <strong>Campaign Completed</strong>
-                                        <p class="mb-0">{{ _('This campaign finished on {{ campaign.completed_at[:10] if campaign.completed_at else campaign.end_date }}') }}</p>
+                                        <p class="mb-0">{{ _('This campaign finished on %(date)s', date=(campaign.completed_at[:10] if campaign.completed_at else campaign.end_date)) }}</p>
                                     </div>
                                 </div>
                             </div>
