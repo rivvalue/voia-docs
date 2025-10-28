@@ -832,6 +832,78 @@ def create_business_account_with_admin():
         return redirect(url_for('business_auth.business_account_onboarding'))
 
 
+@business_auth_bp.route('/admin/onboarding/<int:user_id>/resend-invitation', methods=['POST'])
+@require_platform_admin
+def resend_business_account_invitation(user_id):
+    """Resend activation invitation to a business account administrator"""
+    try:
+        # Get the user
+        user = BusinessAccountUser.query.get(user_id)
+        if not user:
+            flash('User not found.', 'error')
+            return redirect(url_for('business_auth.business_account_onboarding'))
+        
+        # Check if user is already activated
+        if user.email_verified:
+            flash(f'User {user.email} is already activated.', 'warning')
+            return redirect(url_for('business_auth.business_account_onboarding'))
+        
+        # Get business account
+        business_account = BusinessAccount.query.get(user.business_account_id)
+        if not business_account:
+            flash('Business account not found.', 'error')
+            return redirect(url_for('business_auth.business_account_onboarding'))
+        
+        # Generate new invitation token
+        invitation_token = user.generate_invitation_token()
+        db.session.commit()
+        
+        # Send invitation email using platform owner's SMTP
+        from email_service import EmailService
+        email_service = EmailService()
+        
+        platform_owner = BusinessAccount.query.filter_by(account_type='platform_owner').first()
+        platform_business_account_id = platform_owner.id if platform_owner else None
+        
+        email_result = email_service.send_business_account_invitation(
+            user_email=user.email,
+            user_first_name=user.first_name,
+            user_last_name=user.last_name,
+            business_account_name=business_account.name,
+            invitation_token=invitation_token,
+            business_account_id=platform_business_account_id
+        )
+        
+        # Log the resend attempt
+        from audit_utils import queue_audit_log
+        queue_audit_log(
+            business_account_id=business_account.id,
+            action_type='invitation_resent',
+            resource_type='business_account_user',
+            details={
+                'user_email': user.email,
+                'user_id': user.id,
+                'resent_by': session.get('business_user_id'),
+                'email_success': email_result.get('success')
+            }
+        )
+        
+        if email_result.get('success'):
+            logger.info(f"Invitation resent successfully to {user.email} for business account {business_account.name}")
+            flash(f'Invitation email resent successfully to {user.email}.', 'success')
+        else:
+            logger.warning(f"Failed to resend invitation to {user.email}: {email_result.get('error')}")
+            flash(f'Failed to resend invitation email: {email_result.get("error")}', 'error')
+        
+        return redirect(url_for('business_auth.business_account_onboarding'))
+        
+    except Exception as e:
+        logger.error(f"Error resending business account invitation: {e}")
+        db.session.rollback()
+        flash('Failed to resend invitation. Please try again.', 'error')
+        return redirect(url_for('business_auth.business_account_onboarding'))
+
+
 # ==== BUSINESS ACCOUNT ADMIN ONBOARDING FLOW ====
 
 @business_auth_bp.route('/onboarding')

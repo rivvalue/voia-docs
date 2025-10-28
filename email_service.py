@@ -389,16 +389,20 @@ class EmailService:
                 # Use SSL connection
                 logger.info(f"Using SSL connection to {email_config['smtp_server']}:{smtp_port}")
                 with smtplib.SMTP_SSL(str(email_config['smtp_server']), smtp_port, context=context) as server:
+                    server.set_debuglevel(1)  # Enable SMTP protocol debugging
                     server.login(str(email_config['smtp_username']), str(email_config['smtp_password']))
-                    server.send_message(msg)
+                    send_result = server.send_message(msg)
+                    logger.info(f"SMTP send_message() returned: {send_result}")
             else:
                 # Use TLS connection (default)
                 logger.info(f"Using TLS connection to {email_config['smtp_server']}:{smtp_port}")
                 with smtplib.SMTP(str(email_config['smtp_server']), smtp_port) as server:
+                    server.set_debuglevel(1)  # Enable SMTP protocol debugging
                     if email_config.get('use_tls', True):
                         server.starttls(context=context)
                     server.login(str(email_config['smtp_username']), str(email_config['smtp_password']))
-                    server.send_message(msg)
+                    send_result = server.send_message(msg)
+                    logger.info(f"SMTP send_message() returned: {send_result}")
             
             # Mark as successfully sent if we have a delivery record
             if email_delivery:
