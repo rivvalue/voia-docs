@@ -81,15 +81,15 @@
                 <div class="mb-3">
                     <label for="name" class="form-label">{{ _('Campaign Name') }} <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="name" name="name" 
-                           placeholder="e.g., Q2 2025 Product Satisfaction Survey" 
+                           placeholder={{ _('e.g., Q2 2025 Product Satisfaction Survey') }} 
                            required maxlength="200">
                     <div class="form-text">{{ _('A clear, descriptive name for your campaign') }}</div>
                 </div>
                 
                 <div class="mb-3">
-                    <label for="description" class="form-label">Description</label>
+                    <label for="description" class="form-label">{{ _('Description') }}</label>
                     <textarea class="form-control" id="description" name="description" rows="3" 
-                              placeholder="Optional description of campaign goals, focus areas, or target audience"></textarea>
+                              placeholder={{ _('Optional description of campaign goals, focus areas, or target audience') }}></textarea>
                     <div class="form-text">{{ _('Optional details about this campaign\'s purpose and scope') }}</div>
                 </div>
             </div>
@@ -177,7 +177,7 @@
                     <div class="mb-3">
                         <label for="custom_subject_template" class="form-label">{{ _('Email Subject') }}</label>
                         <input type="text" class="form-control" id="custom_subject_template" name="custom_subject_template" 
-                               maxlength="500" placeholder="Your feedback is requested: {campaign_name}">
+                               maxlength="500" placeholder={{ _('Your feedback is requested: {campaign_name}') }}>
                         <div class="form-text">Available variables: {participant_name}, {campaign_name}, {business_account_name}</div>
                     </div>
 
@@ -185,14 +185,14 @@
                         <label for="custom_intro_message" class="form-label">{{ _('Introduction Message') }}</label>
                         <textarea class="form-control" id="custom_intro_message" name="custom_intro_message" 
                                   rows="3" maxlength="2000" 
-                                  placeholder="{business_account_name} is requesting your valuable feedback through our Voice of Client system."></textarea>
+                                  placeholder={{ _('{business_account_name} is requesting your valuable feedback through our Voice of Client system.') }}></textarea>
                         <div class="form-text">Opens the email body. Available variables: {participant_name}, {campaign_name}, {business_account_name}</div>
                     </div>
 
                     <div class="mb-3">
                         <label for="custom_cta_text" class="form-label">{{ _('Call-to-Action Button Text') }}</label>
                         <input type="text" class="form-control" id="custom_cta_text" name="custom_cta_text" 
-                               maxlength="100" placeholder="Complete Your Survey">
+                               maxlength="100" placeholder={{ _('Complete Your Survey') }}>
                         <div class="form-text">{{ _('Text displayed on the survey button') }}</div>
                     </div>
 
@@ -210,7 +210,7 @@ Thank you for your time and valuable insights!"></textarea>
                         <label for="custom_footer_note" class="form-label">{{ _('Footer Note') }}</label>
                         <textarea class="form-control" id="custom_footer_note" name="custom_footer_note" 
                                   rows="2" maxlength="1000" 
-                                  placeholder="This is an automated message. If you have any questions, please contact the organization that sent this survey."></textarea>
+                                  placeholder={{ _('This is an automated message. If you have any questions, please contact the organization that sent this survey.') }}></textarea>
                         <div class="form-text">{{ _('Small print at the bottom of the email') }}</div>
                     </div>
 

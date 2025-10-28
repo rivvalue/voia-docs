@@ -255,7 +255,7 @@
             <i class="fas fa-envelope"></i>
         </div>
         <h1 style="font-size: var(--font-size-3xl); font-weight: 700; margin-bottom: var(--spacing-sm);">{{ _('Email Configuration') }}</h1>
-        <p style="font-size: var(--font-size-lg); color: var(--gray-dark); margin: 0;">Configure SMTP settings to send survey invitations</p>
+        <p style="font-size: var(--font-size-lg); color: var(--gray-dark); margin: 0;">{{ _('Configure SMTP settings to send survey invitations') }}</p>
     </div>
 
     <!-- Progress Bar -->
@@ -292,14 +292,14 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label" for="smtp_server">SMTP Server *</label>
+                        <label class="form-label" for="smtp_server">{{ _('SMTP Server *') }}</label>
                         <input type="text" class="form-control" id="smtp_server" name="smtp_server" 
                                value="{{ email_config.smtp_server if email_config else '' }}" 
-                               placeholder="smtp.gmail.com" required>
+                               placeholder={{ _('smtp.gmail.com') }} required>
                         <div class="form-text">{{ _('Your email provider\'s SMTP server address') }}</div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="smtp_port">Port *</label>
+                        <label class="form-label" for="smtp_port">{{ _('Port *') }}</label>
                         <input type="number" class="form-control" id="smtp_port" name="smtp_port" 
                                value="{{ email_config.smtp_port if email_config else 587 }}" 
                                placeholder="587" required>
@@ -309,14 +309,14 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label" for="smtp_username">Username *</label>
+                        <label class="form-label" for="smtp_username">{{ _('Username *') }}</label>
                         <input type="email" class="form-control" id="smtp_username" name="smtp_username" 
                                value="{{ email_config.smtp_username if email_config else '' }}" 
-                               placeholder="your-email@company.com" required>
+                               placeholder={{ _('your-email@company.com') }} required>
                         <div class="form-text">{{ _('Your email address or SMTP username') }}</div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label" for="smtp_password">Password *</label>
+                        <label class="form-label" for="smtp_password">{{ _('Password *') }}</label>
                         <input type="password" class="form-control" id="smtp_password" name="smtp_password" 
                                placeholder="{% if email_config %}••••••••{% else %}Enter password{% endif %}" required>
                         <div class="form-text">{% if email_config %}Leave blank to keep existing password{% else %}Use App Password for Gmail{% endif %}</div>
@@ -324,7 +324,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="from_name">Sender Name *</label>
+                    <label class="form-label" for="from_name">{{ _('Sender Name *') }}</label>
                     <input type="text" class="form-control" id="from_name" name="from_name" 
                            value="{{ email_config.from_name if email_config else business_account.name }}" 
                            placeholder="{{ business_account.name }}" required>
@@ -341,9 +341,9 @@
                     {{ _('Send a test email to verify your SMTP settings are working correctly.') }}
                 </p>
                 <div class="form-group">
-                    <label class="form-label" for="test_email">Test Email Address *</label>
+                    <label class="form-label" for="test_email">{{ _('Test Email Address *') }}</label>
                     <input type="email" class="form-control" id="test_email" name="test_email" 
-                           value="{{ current_user.email }}" placeholder="test@example.com" required>
+                           value="{{ current_user.email }}" placeholder={{ _('test@example.com') }} required>
                 </div>
                 <button type="button" class="btn-test" id="testEmailBtn">
                     <i class="fas fa-paper-plane me-2"></i>Send Test Email

@@ -18,7 +18,7 @@
             <i class="fas fa-clipboard-list me-2" aria-hidden="true"></i>
             Account Activity Trail
         </h1>
-        <p>Track all activities and changes in your VOÏA account</p>
+        <p>{{ _('Track all activities and changes in your VOÏA account') }}</p>
     </div>
 
     <!-- Statistics -->
@@ -45,7 +45,7 @@
     <div class="audit-filters">
         <form method="GET" class="audit-filters-grid">
             <div class="audit-filter-group">
-                <label for="action_type">Activity Type</label>
+                <label for="action_type">{{ _('Activity Type') }}</label>
                 <select id="action_type" name="action_type" class="form-select" aria-label="Filter by activity type">
                     <option value="">All Activities</option>
                     {% for action in available_actions %}
@@ -58,7 +58,7 @@
             </div>
             
             <div class="audit-filter-group">
-                <label for="user_email">User</label>
+                <label for="user_email">{{ _('User') }}</label>
                 <select id="user_email" name="user_email" class="form-select" aria-label="Filter by user">
                     <option value="">All Users</option>
                     {% for user in available_users %}
@@ -71,7 +71,7 @@
             </div>
             
             <div class="audit-filter-group">
-                <label for="days_back">Time Period</label>
+                <label for="days_back">{{ _('Time Period') }}</label>
                 <select id="days_back" name="days_back" class="form-select" aria-label="Filter by time period">
                     <option value="7" {% if current_filters.days_back == 7 %}selected{% endif %}>Last 7 days</option>
                     <option value="30" {% if current_filters.days_back == 30 %}selected{% endif %}>Last 30 days</option>
@@ -96,11 +96,11 @@
                 <table class="audit-table" role="table" aria-label="Audit logs table">
                     <thead>
                         <tr>
-                            <th scope="col">Time</th>
-                            <th scope="col">User</th>
-                            <th scope="col">Activity</th>
-                            <th scope="col">Description</th>
-                            <th scope="col">Resource</th>
+                            <th scope="col">{{ _('Time') }}</th>
+                            <th scope="col">{{ _('User') }}</th>
+                            <th scope="col">{{ _('Activity') }}</th>
+                            <th scope="col">{{ _('Description') }}</th>
+                            <th scope="col">{{ _('Resource') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -158,8 +158,8 @@
                 <div class="audit-empty-icon">
                     <i class="fas fa-clipboard-list" aria-hidden="true"></i>
                 </div>
-                <h3>No Activity Yet</h3>
-                <p>No audit logs found for the selected filters. Try adjusting your filters or create some test data to get started.</p>
+                <h3>{{ _('No Activity Yet') }}</h3>
+                <p>{{ _('No audit logs found for the selected filters. Try adjusting your filters or create some test data to get started.') }}</p>
             </div>
         {% endif %}
     </div>

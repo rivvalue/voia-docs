@@ -114,7 +114,7 @@
                         
                         <!-- Language Filter -->
                         <div class="col-md-4">
-                            <label for="filter_language" class="form-label">Language</label>
+                            <label for="filter_language" class="form-label">{{ _('Language') }}</label>
                             <select class="form-select filter-select" id="filter_language" name="filter_language" multiple 
                                     aria-label="{{ _('Filter by language') }}">
                                 {% for language in filter_options.languages %}

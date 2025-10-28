@@ -720,10 +720,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="text-end">
                         <small class="text-muted d-block">${new Date(transcript.analyzed_at).toLocaleDateString()}</small>
                         <div class="btn-group btn-group-sm mt-1">
-                            <button class="btn btn-outline-info btn-sm" onclick="downloadTranscript(${transcript.id})" title="Download transcript">
+                            <button class="btn btn-outline-info btn-sm" onclick="downloadTranscript(${transcript.id})" title={{ _('Download transcript') }}>
                                 <i class="fas fa-download"></i>
                             </button>
-                            <button class="btn btn-outline-primary btn-sm" onclick="viewResponse(${transcript.id})" title="View analysis results">
+                            <button class="btn btn-outline-primary btn-sm" onclick="viewResponse(${transcript.id})" title={{ _('View analysis results') }}>
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>

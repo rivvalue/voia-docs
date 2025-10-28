@@ -191,15 +191,15 @@
                             <div class="brand-color-preview-item" 
                                  id="preview-primary" 
                                  style="background: {{ branding_config.primary_color if branding_config.primary_color else '#dc3545' }};"
-                                 title="Primary color"></div>
+                                 title={{ _('Primary color') }}></div>
                             <div class="brand-color-preview-item" 
                                  id="preview-secondary" 
                                  style="background: {{ branding_config.secondary_color if branding_config.secondary_color else '#6c757d' }};"
-                                 title="Secondary color"></div>
+                                 title={{ _('Secondary color') }}></div>
                             <div class="brand-color-preview-item" 
                                  id="preview-accent" 
                                  style="background: {{ branding_config.accent_color if branding_config.accent_color else '#28a745' }};"
-                                 title="Accent color"></div>
+                                 title={{ _('Accent color') }}></div>
                         </div>
                         <div class="brand-help-text">
                             {{ _('Live preview of your color palette.') }}

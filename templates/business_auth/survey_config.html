@@ -81,7 +81,7 @@
                                   name="company_description" 
                                   rows="3" 
                                   maxlength="500" 
-                                  placeholder="Briefly describe what your company does and your mission..."
+                                  placeholder={{ _('Briefly describe what your company does and your mission...') }}
                                   aria-describedby="company_description_help">{{ business_account.company_description or '' }}</textarea>
                         <div class="survey-config-character-counter" id="company_description_counter">
                             {{ (business_account.company_description or '')|length }}/500 characters
@@ -100,7 +100,7 @@
                                   name="product_description" 
                                   rows="3" 
                                   maxlength="500" 
-                                  placeholder="Describe your main products or services in detail..."
+                                  placeholder={{ _('Describe your main products or services in detail...') }}
                                   aria-describedby="product_description_help">{{ business_account.product_description or '' }}</textarea>
                         <div class="survey-config-character-counter" id="product_description_counter">
                             {{ (business_account.product_description or '')|length }}/500 characters
@@ -119,7 +119,7 @@
                                   name="target_clients_description" 
                                   rows="2" 
                                   maxlength="300" 
-                                  placeholder="Describe your typical customers (e.g., small business owners, CFOs, healthcare providers...)"
+                                  placeholder={{ _('Describe your typical customers (e.g., small business owners, CFOs, healthcare providers...)') }}
                                   aria-describedby="target_clients_description_help">{{ business_account.target_clients_description or '' }}</textarea>
                         <div class="survey-config-character-counter" id="target_clients_description_counter">
                             {{ (business_account.target_clients_description or '')|length }}/300 characters
@@ -145,7 +145,7 @@
                     <div class="survey-config-form-check">
                         <input class="survey-config-form-check-input" type="checkbox" id="goal_nps" name="survey_goals" value="NPS" 
                                {% if 'NPS' in current_goals %}checked{% endif %}>
-                        <label class="survey-config-form-check-label" for="goal_nps">Net Promoter Score</label>
+                        <label class="survey-config-form-check-label" for="goal_nps">{{ _('Net Promoter Score') }}</label>
                     </div>
                     <div class="survey-config-form-check">
                         <input class="survey-config-form-check-input" type="checkbox" id="goal_satisfaction" name="survey_goals" value="Satisfaction" 
@@ -330,7 +330,7 @@
                                   name="custom_end_message" 
                                   rows="3" 
                                   maxlength="1000" 
-                                  placeholder="Thank you for your valuable feedback! We truly appreciate the time you've taken to help us improve..."
+                                  placeholder={{ _("Thank you for your valuable feedback! We truly appreciate the time you've taken to help us improve...") }}
                                   aria-describedby="custom_end_message_help">{{ business_account.custom_end_message or '' }}</textarea>
                         <div class="survey-config-character-counter" id="custom_end_message_counter">
                             {{ (business_account.custom_end_message or '')|length }}/1000 characters

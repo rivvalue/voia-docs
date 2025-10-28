@@ -387,26 +387,26 @@
         <form id="addUserForm">
             <div class="form-row">
                 <div class="form-group">
-                    <label class="form-label" for="first_name">First Name *</label>
+                    <label class="form-label" for="first_name">{{ _('First Name *') }}</label>
                     <input type="text" class="form-control" id="first_name" name="first_name" 
-                           placeholder="John" required>
+                           placeholder={{ _('John') }} required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="last_name">Last Name *</label>
+                    <label class="form-label" for="last_name">{{ _('Last Name *') }}</label>
                     <input type="text" class="form-control" id="last_name" name="last_name" 
-                           placeholder="Smith" required>
+                           placeholder={{ _('Smith') }} required>
                 </div>
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="email">Email Address *</label>
+                <label class="form-label" for="email">{{ _('Email Address *') }}</label>
                 <input type="email" class="form-control" id="email" name="email" 
-                       placeholder="john.smith@company.com" required>
+                       placeholder={{ _('john.smith@company.com') }} required>
                 <div class="form-text">{{ _('An invitation will be sent to this email address') }}</div>
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="role">Role *</label>
+                <label class="form-label" for="role">{{ _('Role *') }}</label>
                 <select class="form-control" id="role" name="role" required>
                     <option value="manager">Campaign Manager</option>
                     <option value="admin">Administrator</option>

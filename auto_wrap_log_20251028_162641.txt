@@ -1,0 +1,1015 @@
+================================================================================
+AUTO-WRAPPER MODIFICATION LOG
+Generated: 2025-10-28 16:26:41
+================================================================================
+
+SUMMARY:
+  Files modified: 30
+  Strings wrapped: 170
+  Skipped: 9
+  Errors: 0
+
+================================================================================
+DETAILED MODIFICATIONS:
+================================================================================
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/account_status.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 12 [Headings (h1-h6)]:
+  Text: "Vocsa"
+  BEFORE: <h2 class="fw-bold text-primary">Vocsa</h2>
+  AFTER:  <h2 class="fw-bold text-primary">{{ _('Vocsa') }}</h2>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/admin_licenses.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 180 [Paragraphs]:
+  Text: "No business accounts match the current filter criteria."
+  BEFORE: <p class="text-muted">No business accounts match the current filter criteria.</p>
+  AFTER:  <p class="text-muted">{{ _('No business accounts match the current filter criteria.') }}</p>
+
+Line 179 [Headings (h1-h6)]:
+  Text: "No accounts found"
+  BEFORE: <h4>No accounts found</h4>
+  AFTER:  <h4>{{ _('No accounts found') }}</h4>
+
+Line 166 [Title attributes]:
+  Text: "View History"
+  BEFORE: class="btn btn-sm btn-outline-info" title="View History">
+  AFTER:  class="btn btn-sm btn-outline-info" title={{ _('View History') }}>
+
+Line 162 [Title attributes]:
+  Text: "Manage License"
+  BEFORE: class="btn btn-sm btn-outline-primary" title="Manage License">
+  AFTER:  class="btn btn-sm btn-outline-primary" title={{ _('Manage License') }}>
+
+Line 77 [Table headers (th)]:
+  Text: "Actions"
+  BEFORE: <th>Actions</th>
+  AFTER:  <th>{{ _('Actions') }}</th>
+
+Line 76 [Table headers (th)]:
+  Text: "Expiration"
+  BEFORE: <th>Expiration</th>
+  AFTER:  <th>{{ _('Expiration') }}</th>
+
+Line 75 [Table headers (th)]:
+  Text: "Invitations"
+  BEFORE: <th>Invitations</th>
+  AFTER:  <th>{{ _('Invitations') }}</th>
+
+Line 74 [Table headers (th)]:
+  Text: "Respondents"
+  BEFORE: <th>Respondents</th>
+  AFTER:  <th>{{ _('Respondents') }}</th>
+
+Line 73 [Table headers (th)]:
+  Text: "Users"
+  BEFORE: <th>Users</th>
+  AFTER:  <th>{{ _('Users') }}</th>
+
+Line 72 [Table headers (th)]:
+  Text: "Campaigns"
+  BEFORE: <th>Campaigns</th>
+  AFTER:  <th>{{ _('Campaigns') }}</th>
+
+Line 71 [Table headers (th)]:
+  Text: "Status"
+  BEFORE: <th>Status</th>
+  AFTER:  <th>{{ _('Status') }}</th>
+
+Line 70 [Table headers (th)]:
+  Text: "License Type"
+  BEFORE: <th>License Type</th>
+  AFTER:  <th>{{ _('License Type') }}</th>
+
+Line 69 [Table headers (th)]:
+  Text: "Business Account"
+  BEFORE: <th>Business Account</th>
+  AFTER:  <th>{{ _('Business Account') }}</th>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/audit_logs.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 162 [Paragraphs]:
+  Text: "No audit logs found for the selected filters. Try adjusting your filters or create some test data to get started."
+  BEFORE: <p>No audit logs found for the selected filters. Try adjusting your filters or create some test data to get started.</p>
+  AFTER:  <p>{{ _('No audit logs found for the selected filters. Try adjusting your filters or create some test data to get started.') }}</p>
+
+Line 161 [Headings (h1-h6)]:
+  Text: "No Activity Yet"
+  BEFORE: <h3>No Activity Yet</h3>
+  AFTER:  <h3>{{ _('No Activity Yet') }}</h3>
+
+Line 103 [Table headers (th)]:
+  Text: "Resource"
+  BEFORE: <th scope="col">Resource</th>
+  AFTER:  <th scope="col">{{ _('Resource') }}</th>
+
+Line 102 [Table headers (th)]:
+  Text: "Description"
+  BEFORE: <th scope="col">Description</th>
+  AFTER:  <th scope="col">{{ _('Description') }}</th>
+
+Line 101 [Table headers (th)]:
+  Text: "Activity"
+  BEFORE: <th scope="col">Activity</th>
+  AFTER:  <th scope="col">{{ _('Activity') }}</th>
+
+Line 100 [Table headers (th)]:
+  Text: "User"
+  BEFORE: <th scope="col">User</th>
+  AFTER:  <th scope="col">{{ _('User') }}</th>
+
+Line 99 [Table headers (th)]:
+  Text: "Time"
+  BEFORE: <th scope="col">Time</th>
+  AFTER:  <th scope="col">{{ _('Time') }}</th>
+
+Line 74 [Labels]:
+  Text: "Time Period"
+  BEFORE: <label for="days_back">Time Period</label>
+  AFTER:  <label for="days_back">{{ _('Time Period') }}</label>
+
+Line 61 [Labels]:
+  Text: "User"
+  BEFORE: <label for="user_email">User</label>
+  AFTER:  <label for="user_email">{{ _('User') }}</label>
+
+Line 48 [Labels]:
+  Text: "Activity Type"
+  BEFORE: <label for="action_type">Activity Type</label>
+  AFTER:  <label for="action_type">{{ _('Activity Type') }}</label>
+
+Line 21 [Paragraphs]:
+  Text: "Track all activities and changes in your VOÏA account"
+  BEFORE: <p>Track all activities and changes in your VOÏA account</p>
+  AFTER:  <p>{{ _('Track all activities and changes in your VOÏA account') }}</p>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/brand_config.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 202 [Title attributes]:
+  Text: "Accent color"
+  BEFORE: title="Accent color"></div>
+  AFTER:  title={{ _('Accent color') }}></div>
+
+Line 198 [Title attributes]:
+  Text: "Secondary color"
+  BEFORE: title="Secondary color"></div>
+  AFTER:  title={{ _('Secondary color') }}></div>
+
+Line 194 [Title attributes]:
+  Text: "Primary color"
+  BEFORE: title="Primary color"></div>
+  AFTER:  title={{ _('Primary color') }}></div>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/business_account_onboarding.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 153 [Placeholder attributes]:
+  Text: "admin@company.com"
+  BEFORE: placeholder="admin@company.com"
+  AFTER:  placeholder={{ _('admin@company.com') }}
+
+Line 138 [Placeholder attributes]:
+  Text: "Administrator's last name"
+  BEFORE: placeholder="Administrator's last name"
+  AFTER:  placeholder={{ _("Administrator's last name") }}
+
+Line 124 [Placeholder attributes]:
+  Text: "Administrator's first name"
+  BEFORE: placeholder="Administrator's first name"
+  AFTER:  placeholder={{ _("Administrator's first name") }}
+
+Line 112 [Headings (h1-h6)]:
+  Text: "Account Administrator Information"
+  BEFORE: <h3 class="section-title">Account Administrator Information</h3>
+  AFTER:  <h3 class="section-title">{{ _('Account Administrator Information') }}</h3>
+
+Line 74 [Placeholder attributes]:
+  Text: "Enter the complete business name"
+  BEFORE: placeholder="Enter the complete business name"
+  AFTER:  placeholder={{ _('Enter the complete business name') }}
+
+Line 63 [Headings (h1-h6)]:
+  Text: "Business Account Information"
+  BEFORE: <h3 class="section-title">Business Account Information</h3>
+  AFTER:  <h3 class="section-title">{{ _('Business Account Information') }}</h3>
+
+Line 22 [Paragraphs]:
+  Text: "Create a new business account and invite the account administrator"
+  BEFORE: <p class="onboarding-header-subtitle">Create a new business account and invite the account administrator</p>
+  AFTER:  <p class="onboarding-header-subtitle">{{ _('Create a new business account and invite the account administrator') }}</p>
+
+Line 21 [Headings (h1-h6)]:
+  Text: "Business Account Onboarding"
+  BEFORE: <h1 class="onboarding-header-title">Business Account Onboarding</h1>
+  AFTER:  <h1 class="onboarding-header-title">{{ _('Business Account Onboarding') }}</h1>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/email_config.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 622 [Paragraphs]:
+  Text: "Network error: ' + error.message + '"
+  BEFORE: previewContent.innerHTML = '<p style="color: #dc3545;">Network error: ' + error.message + '</p>';
+  AFTER:  previewContent.innerHTML = '<p style="color: #dc3545;">{{ _("Network error: ' + error.message + '") }}</p>';
+
+Line 618 [Paragraphs]:
+  Text: "Preview failed: ' + (data.error || 'Unknown error') + '"
+  BEFORE: previewContent.innerHTML = '<p style="color: #dc3545;">Preview failed: ' + (data.error || 'Unknown error') + '</p>';
+  AFTER:  previewContent.innerHTML = '<p style="color: #dc3545;">{{ _("Preview failed: ' + (data.error || 'Unknown error') + '") }}</p>';
+
+Line 486 [Placeholder attributes]:
+  Text: "test@example.com"
+  BEFORE: placeholder="test@example.com"
+  AFTER:  placeholder={{ _('test@example.com') }}
+
+Line 394 [Placeholder attributes]:
+  Text: "This is an automated message. If you have any questions, please contact the organization that sent this survey."
+  BEFORE: placeholder="This is an automated message. If you have any questions, please contact the organization that sent this survey."
+  AFTER:  placeholder={{ _('This is an automated message. If you have any questions, please contact the organization that sent this survey.') }}
+
+Line 380 [Placeholder attributes]:
+  Text: "Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.&#10;&#10;Thank you for your time and valuable insights!"
+  BEFORE: placeholder="Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.&#10;&#10;Thank you for your time and valuable insights!"
+  AFTER:  placeholder={{ _('Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.&#10;&#10;Thank you for your time and valuable insights!') }}
+
+Line 365 [Placeholder attributes]:
+  Text: "Complete Your Survey"
+  BEFORE: placeholder="Complete Your Survey"
+  AFTER:  placeholder={{ _('Complete Your Survey') }}
+
+Line 347 [Placeholder attributes]:
+  Text: "{business_account_name} is requesting your valuable feedback through our Voice of Client system."
+  BEFORE: placeholder="{business_account_name} is requesting your valuable feedback through our Voice of Client system."
+  AFTER:  placeholder={{ _('{business_account_name} is requesting your valuable feedback through our Voice of Client system.') }}
+
+Line 332 [Placeholder attributes]:
+  Text: "Your feedback is requested: {campaign_name}"
+  BEFORE: placeholder="Your feedback is requested: {campaign_name}"
+  AFTER:  placeholder={{ _('Your feedback is requested: {campaign_name}') }}
+
+Line 289 [Placeholder attributes]:
+  Text: "admin@yourcompany.com, manager@yourcompany.com"
+  BEFORE: placeholder="admin@yourcompany.com, manager@yourcompany.com"
+  AFTER:  placeholder={{ _('admin@yourcompany.com, manager@yourcompany.com') }}
+
+Line 269 [Placeholder attributes]:
+  Text: "support@yourcompany.com"
+  BEFORE: placeholder="support@yourcompany.com"
+  AFTER:  placeholder={{ _('support@yourcompany.com') }}
+
+Line 253 [Placeholder attributes]:
+  Text: "noreply@yourcompany.com"
+  BEFORE: placeholder="noreply@yourcompany.com"
+  AFTER:  placeholder={{ _('noreply@yourcompany.com') }}
+
+Line 238 [Placeholder attributes]:
+  Text: "Your Company Name"
+  BEFORE: placeholder="Your Company Name"
+  AFTER:  placeholder={{ _('Your Company Name') }}
+
+Line 184 [Placeholder attributes]:
+  Text: "Enter SMTP password"
+  BEFORE: placeholder="Enter SMTP password"
+  AFTER:  placeholder={{ _('Enter SMTP password') }}
+
+Line 168 [Placeholder attributes]:
+  Text: "your-email@domain.com"
+  BEFORE: placeholder="your-email@domain.com"
+  AFTER:  placeholder={{ _('your-email@domain.com') }}
+
+Line 141 [Labels]:
+  Text: "Port *"
+  BEFORE: <label class="email-form-label" for="smtp_port">Port *</label>
+  AFTER:  <label class="email-form-label" for="smtp_port">{{ _('Port *') }}</label>
+
+Line 123 [Placeholder attributes]:
+  Text: "smtp.gmail.com"
+  BEFORE: placeholder="smtp.gmail.com"
+  AFTER:  placeholder={{ _('smtp.gmail.com') }}
+
+Line 78 [Labels]:
+  Text: "AWS Region *"
+  BEFORE: <label class="email-form-label" for="aws_region">AWS Region *</label>
+  AFTER:  <label class="email-form-label" for="aws_region">{{ _('AWS Region *') }}</label>
+
+Line 60 [Labels]:
+  Text: "Email Provider *"
+  BEFORE: <label class="email-form-label" for="email_provider">Email Provider *</label>
+  AFTER:  <label class="email-form-label" for="email_provider">{{ _('Email Provider *') }}</label>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/licenses/assignment_form.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 376 [Labels]:
+  Text: "Notes (Optional)"
+  BEFORE: <label for="notes" class="form-label">Notes (Optional)</label>
+  AFTER:  <label for="notes" class="form-label">{{ _('Notes (Optional)') }}</label>
+
+Line 238 [Headings (h1-h6)]:
+  Text: "Pro License"
+  BEFORE: <h4 class="mb-1" style="font-weight: 600;">Pro License</h4>
+  AFTER:  <h4 class="mb-1" style="font-weight: 600;">{{ _('Pro License') }}</h4>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/licenses/overview.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 330 [Table headers (th)]:
+  Text: "Actions"
+  BEFORE: <th>Actions</th>
+  AFTER:  <th>{{ _('Actions') }}</th>
+
+Line 329 [Table headers (th)]:
+  Text: "Expiration"
+  BEFORE: <th>Expiration</th>
+  AFTER:  <th>{{ _('Expiration') }}</th>
+
+Line 287 [Placeholder attributes]:
+  Text: "Search by business name or email..."
+  BEFORE: placeholder="Search by business name or email..."
+  AFTER:  placeholder={{ _('Search by business name or email...') }}
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/manage_users.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 349 [Buttons]:
+  Text: "Cancel"
+  BEFORE: <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+  AFTER:  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+
+Line 274 [Buttons]:
+  Text: "Cancel"
+  BEFORE: <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+  AFTER:  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+
+Line 249 [Placeholder attributes]:
+  Text: "user@company.com"
+  BEFORE: placeholder="user@company.com"
+  AFTER:  placeholder={{ _('user@company.com') }}
+
+Line 195 [Paragraphs]:
+  Text: "Start building your team by adding the first user."
+  BEFORE: <p>Start building your team by adding the first user.</p>
+  AFTER:  <p>{{ _('Start building your team by adding the first user.') }}</p>
+
+Line 194 [Headings (h1-h6)]:
+  Text: "No users found"
+  BEFORE: <h4>No users found</h4>
+  AFTER:  <h4>{{ _('No users found') }}</h4>
+
+Line 175 [Title attributes]:
+  Text: "Activate User"
+  BEFORE: title="Activate User"
+  AFTER:  title={{ _('Activate User') }}
+
+Line 168 [Title attributes]:
+  Text: "Deactivate User"
+  BEFORE: title="Deactivate User"
+  AFTER:  title={{ _('Deactivate User') }}
+
+Line 155 [Title attributes]:
+  Text: "Reset Password"
+  BEFORE: title="Reset Password"
+  AFTER:  title={{ _('Reset Password') }}
+
+Line 143 [Title attributes]:
+  Text: "Edit User"
+  BEFORE: title="Edit User"
+  AFTER:  title={{ _('Edit User') }}
+
+Line 100 [Table headers (th)]:
+  Text: "Actions"
+  BEFORE: <th scope="col">Actions</th>
+  AFTER:  <th scope="col">{{ _('Actions') }}</th>
+
+Line 99 [Table headers (th)]:
+  Text: "Last Login"
+  BEFORE: <th scope="col">Last Login</th>
+  AFTER:  <th scope="col">{{ _('Last Login') }}</th>
+
+Line 98 [Table headers (th)]:
+  Text: "Status"
+  BEFORE: <th scope="col">Status</th>
+  AFTER:  <th scope="col">{{ _('Status') }}</th>
+
+Line 96 [Table headers (th)]:
+  Text: "User"
+  BEFORE: <th scope="col">User</th>
+  AFTER:  <th scope="col">{{ _('User') }}</th>
+
+Line 69 [Title attributes]:
+  Text: "License limit reached"
+  BEFORE: title="License limit reached">
+  AFTER:  title={{ _('License limit reached') }}>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/onboarding/smtp.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 346 [Placeholder attributes]:
+  Text: "test@example.com"
+  BEFORE: value="{{ current_user.email }}" placeholder="test@example.com" required>
+  AFTER:  value="{{ current_user.email }}" placeholder={{ _('test@example.com') }} required>
+
+Line 344 [Labels]:
+  Text: "Test Email Address *"
+  BEFORE: <label class="form-label" for="test_email">Test Email Address *</label>
+  AFTER:  <label class="form-label" for="test_email">{{ _('Test Email Address *') }}</label>
+
+Line 327 [Labels]:
+  Text: "Sender Name *"
+  BEFORE: <label class="form-label" for="from_name">Sender Name *</label>
+  AFTER:  <label class="form-label" for="from_name">{{ _('Sender Name *') }}</label>
+
+Line 319 [Labels]:
+  Text: "Password *"
+  BEFORE: <label class="form-label" for="smtp_password">Password *</label>
+  AFTER:  <label class="form-label" for="smtp_password">{{ _('Password *') }}</label>
+
+Line 315 [Placeholder attributes]:
+  Text: "your-email@company.com"
+  BEFORE: placeholder="your-email@company.com" required>
+  AFTER:  placeholder={{ _('your-email@company.com') }} required>
+
+Line 312 [Labels]:
+  Text: "Username *"
+  BEFORE: <label class="form-label" for="smtp_username">Username *</label>
+  AFTER:  <label class="form-label" for="smtp_username">{{ _('Username *') }}</label>
+
+Line 302 [Labels]:
+  Text: "Port *"
+  BEFORE: <label class="form-label" for="smtp_port">Port *</label>
+  AFTER:  <label class="form-label" for="smtp_port">{{ _('Port *') }}</label>
+
+Line 298 [Placeholder attributes]:
+  Text: "smtp.gmail.com"
+  BEFORE: placeholder="smtp.gmail.com" required>
+  AFTER:  placeholder={{ _('smtp.gmail.com') }} required>
+
+Line 295 [Labels]:
+  Text: "SMTP Server *"
+  BEFORE: <label class="form-label" for="smtp_server">SMTP Server *</label>
+  AFTER:  <label class="form-label" for="smtp_server">{{ _('SMTP Server *') }}</label>
+
+Line 258 [Paragraphs]:
+  Text: "Configure SMTP settings to send survey invitations"
+  BEFORE: <p style="font-size: var(--font-size-lg); color: var(--gray-dark); margin: 0;">Configure SMTP settings to send survey invitations</p>
+  AFTER:  <p style="font-size: var(--font-size-lg); color: var(--gray-dark); margin: 0;">{{ _('Configure SMTP settings to send survey invitations') }}</p>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/onboarding/users.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 409 [Labels]:
+  Text: "Role *"
+  BEFORE: <label class="form-label" for="role">Role *</label>
+  AFTER:  <label class="form-label" for="role">{{ _('Role *') }}</label>
+
+Line 404 [Placeholder attributes]:
+  Text: "john.smith@company.com"
+  BEFORE: placeholder="john.smith@company.com" required>
+  AFTER:  placeholder={{ _('john.smith@company.com') }} required>
+
+Line 402 [Labels]:
+  Text: "Email Address *"
+  BEFORE: <label class="form-label" for="email">Email Address *</label>
+  AFTER:  <label class="form-label" for="email">{{ _('Email Address *') }}</label>
+
+Line 397 [Placeholder attributes]:
+  Text: "Smith"
+  BEFORE: placeholder="Smith" required>
+  AFTER:  placeholder={{ _('Smith') }} required>
+
+Line 395 [Labels]:
+  Text: "Last Name *"
+  BEFORE: <label class="form-label" for="last_name">Last Name *</label>
+  AFTER:  <label class="form-label" for="last_name">{{ _('Last Name *') }}</label>
+
+Line 392 [Placeholder attributes]:
+  Text: "John"
+  BEFORE: placeholder="John" required>
+  AFTER:  placeholder={{ _('John') }} required>
+
+Line 390 [Labels]:
+  Text: "First Name *"
+  BEFORE: <label class="form-label" for="first_name">First Name *</label>
+  AFTER:  <label class="form-label" for="first_name">{{ _('First Name *') }}</label>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/platform_dashboard.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 691 [Table headers (th)]:
+  Text: "Nom"
+  BEFORE: <th>Nom</th>
+  AFTER:  <th>{{ _('Nom') }}</th>
+
+Line 401 [Paragraphs]:
+  Text: "Total Users"
+  BEFORE: <p class="metric-label">Total Users</p>
+  AFTER:  <p class="metric-label">{{ _('Total Users') }}</p>
+
+Line 384 [Paragraphs]:
+  Text: "Survey submissions"
+  BEFORE: <p class="metric-sublabel">Survey submissions</p>
+  AFTER:  <p class="metric-sublabel">{{ _('Survey submissions') }}</p>
+
+Line 383 [Paragraphs]:
+  Text: "Responses This Month"
+  BEFORE: <p class="metric-label">Responses This Month</p>
+  AFTER:  <p class="metric-label">{{ _('Responses This Month') }}</p>
+
+Line 373 [Paragraphs]:
+  Text: "Campaigns This Month"
+  BEFORE: <p class="metric-label">Campaigns This Month</p>
+  AFTER:  <p class="metric-label">{{ _('Campaigns This Month') }}</p>
+
+Line 363 [Paragraphs]:
+  Text: "Total Active Users"
+  BEFORE: <p class="metric-label">Total Active Users</p>
+  AFTER:  <p class="metric-label">{{ _('Total Active Users') }}</p>
+
+Line 349 [Paragraphs]:
+  Text: "Total Business Accounts"
+  BEFORE: <p class="metric-label">Total Business Accounts</p>
+  AFTER:  <p class="metric-label">{{ _('Total Business Accounts') }}</p>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/reset_password.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 62 [Placeholder attributes]:
+  Text: "Confirm New Password"
+  BEFORE: placeholder="Confirm New Password"
+  AFTER:  placeholder={{ _('Confirm New Password') }}
+
+Line 45 [Placeholder attributes]:
+  Text: "New Password"
+  BEFORE: placeholder="New Password"
+  AFTER:  placeholder={{ _('New Password') }}
+
+Line 17 [Paragraphs]:
+  Text: "Choose a strong password for your account"
+  BEFORE: <p class="business-login-subtitle">Choose a strong password for your account</p>
+  AFTER:  <p class="business-login-subtitle">{{ _('Choose a strong password for your account') }}</p>
+
+Line 16 [Headings (h1-h6)]:
+  Text: "Set New Password"
+  BEFORE: <h2 class="business-login-title">Set New Password</h2>
+  AFTER:  <h2 class="business-login-title">{{ _('Set New Password') }}</h2>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/business_auth/survey_config.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 333 [Placeholder attributes]:
+  Text: "Thank you for your valuable feedback! We truly appreciate the time you've taken to help us improve..."
+  BEFORE: placeholder="Thank you for your valuable feedback! We truly appreciate the time you've taken to help us improve..."
+  AFTER:  placeholder={{ _("Thank you for your valuable feedback! We truly appreciate the time you've taken to help us improve...") }}
+
+Line 148 [Labels]:
+  Text: "Net Promoter Score"
+  BEFORE: <label class="survey-config-form-check-label" for="goal_nps">Net Promoter Score</label>
+  AFTER:  <label class="survey-config-form-check-label" for="goal_nps">{{ _('Net Promoter Score') }}</label>
+
+Line 122 [Placeholder attributes]:
+  Text: "Describe your typical customers (e.g., small business owners, CFOs, healthcare providers...)"
+  BEFORE: placeholder="Describe your typical customers (e.g., small business owners, CFOs, healthcare providers...)"
+  AFTER:  placeholder={{ _('Describe your typical customers (e.g., small business owners, CFOs, healthcare providers...)') }}
+
+Line 103 [Placeholder attributes]:
+  Text: "Describe your main products or services in detail..."
+  BEFORE: placeholder="Describe your main products or services in detail..."
+  AFTER:  placeholder={{ _('Describe your main products or services in detail...') }}
+
+Line 84 [Placeholder attributes]:
+  Text: "Briefly describe what your company does and your mission..."
+  BEFORE: placeholder="Briefly describe what your company does and your mission..."
+  AFTER:  placeholder={{ _('Briefly describe what your company does and your mission...') }}
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/campaign_insights.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 788 [Table headers (th)]:
+  Text: "NPS"
+  BEFORE: <th style="width: 10%; text-align: center;">NPS</th>
+  AFTER:  <th style="width: 10%; text-align: center;">{{ _('NPS') }}</th>
+
+Line 520 [Table headers (th)]:
+  Text: "Distribution"
+  BEFORE: <th>Distribution</th>
+  AFTER:  <th>{{ _('Distribution') }}</th>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/campaigns/create.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 213 [Placeholder attributes]:
+  Text: "This is an automated message. If you have any questions, please contact the organization that sent this survey."
+  BEFORE: placeholder="This is an automated message. If you have any questions, please contact the organization that sent this survey."></textarea>
+  AFTER:  placeholder={{ _('This is an automated message. If you have any questions, please contact the organization that sent this survey.') }}></textarea>
+
+Line 195 [Placeholder attributes]:
+  Text: "Complete Your Survey"
+  BEFORE: maxlength="100" placeholder="Complete Your Survey">
+  AFTER:  maxlength="100" placeholder={{ _('Complete Your Survey') }}>
+
+Line 188 [Placeholder attributes]:
+  Text: "{business_account_name} is requesting your valuable feedback through our Voice of Client system."
+  BEFORE: placeholder="{business_account_name} is requesting your valuable feedback through our Voice of Client system."></textarea>
+  AFTER:  placeholder={{ _('{business_account_name} is requesting your valuable feedback through our Voice of Client system.') }}></textarea>
+
+Line 180 [Placeholder attributes]:
+  Text: "Your feedback is requested: {campaign_name}"
+  BEFORE: maxlength="500" placeholder="Your feedback is requested: {campaign_name}">
+  AFTER:  maxlength="500" placeholder={{ _('Your feedback is requested: {campaign_name}') }}>
+
+Line 92 [Placeholder attributes]:
+  Text: "Optional description of campaign goals, focus areas, or target audience"
+  BEFORE: placeholder="Optional description of campaign goals, focus areas, or target audience"></textarea>
+  AFTER:  placeholder={{ _('Optional description of campaign goals, focus areas, or target audience') }}></textarea>
+
+Line 90 [Labels]:
+  Text: "Description"
+  BEFORE: <label for="description" class="form-label">Description</label>
+  AFTER:  <label for="description" class="form-label">{{ _('Description') }}</label>
+
+Line 84 [Placeholder attributes]:
+  Text: "e.g., Q2 2025 Product Satisfaction Survey"
+  BEFORE: placeholder="e.g., Q2 2025 Product Satisfaction Survey"
+  AFTER:  placeholder={{ _('e.g., Q2 2025 Product Satisfaction Survey') }}
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/campaigns/edit.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 108 [Placeholder attributes]:
+  Text: "Optional description of campaign goals, focus areas, or target audience"
+  BEFORE: placeholder="Optional description of campaign goals, focus areas, or target audience">{{ campaign.description or '' }}</textarea>
+  AFTER:  placeholder={{ _('Optional description of campaign goals, focus areas, or target audience') }}>{{ campaign.description or '' }}</textarea>
+
+Line 106 [Labels]:
+  Text: "Description"
+  BEFORE: <label for="description" class="form-label">Description</label>
+  AFTER:  <label for="description" class="form-label">{{ _('Description') }}</label>
+
+Line 100 [Placeholder attributes]:
+  Text: "e.g., Q2 2025 Product Satisfaction Survey"
+  BEFORE: placeholder="e.g., Q2 2025 Product Satisfaction Survey"
+  AFTER:  placeholder={{ _('e.g., Q2 2025 Product Satisfaction Survey') }}
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/campaigns/individual_response.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 515 [Paragraphs]:
+  Text: "This response doesn't contain conversational transcript data."
+  BEFORE: <p class="text-muted">This response doesn't contain conversational transcript data.</p>
+  AFTER:  <p class="text-muted">{{ _("This response doesn't contain conversational transcript data.") }}</p>
+
+Line 514 [Headings (h1-h6)]:
+  Text: "No Conversation History"
+  BEFORE: <h5 class="text-muted">No Conversation History</h5>
+  AFTER:  <h5 class="text-muted">{{ _('No Conversation History') }}</h5>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/campaigns/list.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 174 [Table headers (th)]:
+  Text: "Actions"
+  BEFORE: <th class="text-center">Actions</th>
+  AFTER:  <th class="text-center">{{ _('Actions') }}</th>
+
+Line 172 [Table headers (th)]:
+  Text: "Participants"
+  BEFORE: <th class="text-center">Participants</th>
+  AFTER:  <th class="text-center">{{ _('Participants') }}</th>
+
+Line 171 [Table headers (th)]:
+  Text: "Fin Date"
+  BEFORE: <th class="hide-on-tablet">Fin Date</th>
+  AFTER:  <th class="hide-on-tablet">{{ _('Fin Date') }}</th>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/campaigns/responses_list.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 181 [Table headers (th)]:
+  Text: "Actions"
+  BEFORE: <th class="text-end">Actions</th>
+  AFTER:  <th class="text-end">{{ _('Actions') }}</th>
+
+Line 176 [Table headers (th)]:
+  Text: "Participant"
+  BEFORE: <th>Participant</th>
+  AFTER:  <th>{{ _('Participant') }}</th>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/campaigns/survey_config.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 385 [Placeholder attributes]:
+  Text: "Optional: Override the default AI system prompt with custom instructions"
+  BEFORE: placeholder="Optional: Override the default AI system prompt with custom instructions"
+  AFTER:  placeholder={{ _('Optional: Override the default AI system prompt with custom instructions') }}
+
+Line 383 [Labels]:
+  Text: "Custom System Prompt"
+  BEFORE: <label for="custom_system_prompt" class="form-label">Custom System Prompt</label>
+  AFTER:  <label for="custom_system_prompt" class="form-label">{{ _('Custom System Prompt') }}</label>
+
+Line 359 [Placeholder attributes]:
+  Text: "Optional custom thank you message for survey completion"
+  BEFORE: placeholder="Optional custom thank you message for survey completion"
+  AFTER:  placeholder={{ _('Optional custom thank you message for survey completion') }}
+
+Line 357 [Labels]:
+  Text: "Custom End Message"
+  BEFORE: <label for="custom_end_message" class="form-label">Custom End Message</label>
+  AFTER:  <label for="custom_end_message" class="form-label">{{ _('Custom End Message') }}</label>
+
+Line 337 [Labels]:
+  Text: "Optional Topics (can be skipped)"
+  BEFORE: <label class="form-label">Optional Topics (can be skipped)</label>
+  AFTER:  <label class="form-label">{{ _('Optional Topics (can be skipped)') }}</label>
+
+Line 320 [Labels]:
+  Text: "Prioritized Topics (cover first)"
+  BEFORE: <label class="form-label">Prioritized Topics (cover first)</label>
+  AFTER:  <label class="form-label">{{ _('Prioritized Topics (cover first)') }}</label>
+
+Line 295 [Labels]:
+  Text: "Max Follow-ups per Topic"
+  BEFORE: <label for="max_follow_ups_per_topic" class="form-label">Max Follow-ups per Topic</label>
+  AFTER:  <label for="max_follow_ups_per_topic" class="form-label">{{ _('Max Follow-ups per Topic') }}</label>
+
+Line 283 [Labels]:
+  Text: "Max Duration (seconds)"
+  BEFORE: <label for="max_duration_seconds" class="form-label">Max Duration (seconds)</label>
+  AFTER:  <label for="max_duration_seconds" class="form-label">{{ _('Max Duration (seconds)') }}</label>
+
+Line 271 [Labels]:
+  Text: "Max Questions"
+  BEFORE: <label for="max_questions" class="form-label">Max Questions</label>
+  AFTER:  <label for="max_questions" class="form-label">{{ _('Max Questions') }}</label>
+
+Line 230 [Placeholder attributes]:
+  Text: "Describe your ideal customers (e.g., 'Small business owners, CFOs, accounting firms')"
+  BEFORE: placeholder="Describe your ideal customers (e.g., 'Small business owners, CFOs, accounting firms')"
+  AFTER:  placeholder={{ _("Describe your ideal customers (e.g., 'Small business owners, CFOs, accounting firms')") }}
+
+Line 228 [Labels]:
+  Text: "Target Clients"
+  BEFORE: <label for="target_clients_description" class="form-label">Target Clients</label>
+  AFTER:  <label for="target_clients_description" class="form-label">{{ _('Target Clients') }}</label>
+
+Line 222 [Placeholder attributes]:
+  Text: "Describe your main products or services (e.g., 'Cloud-based accounting software for small businesses')"
+  BEFORE: placeholder="Describe your main products or services (e.g., 'Cloud-based accounting software for small businesses')"
+  AFTER:  placeholder={{ _("Describe your main products or services (e.g., 'Cloud-based accounting software for small businesses')") }}
+
+Line 220 [Labels]:
+  Text: "Product/Service Description"
+  BEFORE: <label for="product_description" class="form-label">Product/Service Description</label>
+  AFTER:  <label for="product_description" class="form-label">{{ _('Product/Service Description') }}</label>
+
+Line 179 [Headings (h1-h6)]:
+  Text: "Survey Configuration"
+  BEFORE: <h1 class="mb-1">Survey Configuration</h1>
+  AFTER:  <h1 class="mb-1">{{ _('Survey Configuration') }}</h1>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/campaigns/view.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 726 [Title attributes]:
+  Text: "View analysis results"
+  BEFORE: <button class="btn btn-outline-primary btn-sm" onclick="viewResponse(${transcript.id})" title="View analysis results">
+  AFTER:  <button class="btn btn-outline-primary btn-sm" onclick="viewResponse(${transcript.id})" title={{ _('View analysis results') }}>
+
+Line 723 [Title attributes]:
+  Text: "Download transcript"
+  BEFORE: <button class="btn btn-outline-info btn-sm" onclick="downloadTranscript(${transcript.id})" title="Download transcript">
+  AFTER:  <button class="btn btn-outline-info btn-sm" onclick="downloadTranscript(${transcript.id})" title={{ _('Download transcript') }}>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/company_responses.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 73 [Table headers (th)]:
+  Text: "NPS"
+  BEFORE: <th>NPS</th>
+  AFTER:  <th>{{ _('NPS') }}</th>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/demo_intro.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 29 [Alt attributes]:
+  Text: "Archelo Group Logo"
+  BEFORE: <img src="{{ url_for('static', filename='images/archelo-logo.png') }}" alt="Archelo Group Logo" class="demo-logo">
+  AFTER:  <img src="{{ url_for('static', filename='images/archelo-logo.png') }}" alt={{ _('Archelo Group Logo') }} class="demo-logo">
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/executive_summary.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 325 [Headings (h1-h6)]:
+  Text: "Satisfaction"
+  BEFORE: <h6 class="mb-0">Satisfaction</h6>
+  AFTER:  <h6 class="mb-0">{{ _('Satisfaction') }}</h6>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/maintenance.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 31 [Headings (h1-h6)]:
+  Text: "Request Demo"
+  BEFORE: <h2 id="cta-heading" class="visually-hidden">Request Demo</h2>
+  AFTER:  <h2 id="cta-heading" class="visually-hidden">{{ _('Request Demo') }}</h2>
+
+Line 26 [Paragraphs]:
+  Text: "Turning voices into value"
+  BEFORE: <p class="index-hero-subtitle">Turning voices into value</p>
+  AFTER:  <p class="index-hero-subtitle">{{ _('Turning voices into value') }}</p>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/participants/campaign_participants.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 117 [Labels]:
+  Text: "Language"
+  BEFORE: <label for="filter_language" class="form-label">Language</label>
+  AFTER:  <label for="filter_language" class="form-label">{{ _('Language') }}</label>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/participants/create.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 78 [Placeholder attributes]:
+  Text: "Acme Corporation"
+  BEFORE: placeholder="Acme Corporation"
+  AFTER:  placeholder={{ _('Acme Corporation') }}
+
+Line 63 [Placeholder attributes]:
+  Text: "John Doe"
+  BEFORE: placeholder="John Doe"
+  AFTER:  placeholder={{ _('John Doe') }}
+
+Line 46 [Placeholder attributes]:
+  Text: "participant@example.com"
+  BEFORE: placeholder="participant@example.com"
+  AFTER:  placeholder={{ _('participant@example.com') }}
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/participants/edit.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 143 [Paragraphs]:
+  Text: "Update segmentation data for personalized surveys and advanced analytics"
+  BEFORE: <p class="participant-help-text mb-3">Update segmentation data for personalized surveys and advanced analytics</p>
+  AFTER:  <p class="participant-help-text mb-3">{{ _('Update segmentation data for personalized surveys and advanced analytics') }}</p>
+
+Line 126 [Placeholder attributes]:
+  Text: "Acme Corporation"
+  BEFORE: placeholder="Acme Corporation"
+  AFTER:  placeholder={{ _('Acme Corporation') }}
+
+Line 110 [Placeholder attributes]:
+  Text: "John Doe"
+  BEFORE: placeholder="John Doe"
+  AFTER:  placeholder={{ _('John Doe') }}
+
+Line 85 [Placeholder attributes]:
+  Text: "participant@example.com"
+  BEFORE: placeholder="participant@example.com"
+  AFTER:  placeholder={{ _('participant@example.com') }}
+
+Line 47 [Headings (h1-h6)]:
+  Text: "Email Address Locked"
+  BEFORE: <h5 class="alert-heading mb-1">Email Address Locked</h5>
+  AFTER:  <h5 class="alert-heading mb-1">{{ _('Email Address Locked') }}</h5>
+
+
+────────────────────────────────────────────────────────────────────────────────
+FILE: templates/participants/list.html
+────────────────────────────────────────────────────────────────────────────────
+
+Line 847 [Title attributes]:
+  Text: "Delete participant"
+  BEFORE: title="Delete participant"
+  AFTER:  title={{ _('Delete participant') }}
+
+Line 839 [Title attributes]:
+  Text: "Edit participant"
+  BEFORE: title="Edit participant"
+  AFTER:  title={{ _('Edit participant') }}
+
+Line 766 [Paragraphs]:
+  Text: "Try adjusting your filter criteria."
+  BEFORE: <p class="text-muted">Try adjusting your filter criteria.</p>
+  AFTER:  <p class="text-muted">{{ _('Try adjusting your filter criteria.') }}</p>
+
+Line 765 [Headings (h1-h6)]:
+  Text: "No participants match your filters"
+  BEFORE: <h3>No participants match your filters</h3>
+  AFTER:  <h3>{{ _('No participants match your filters') }}</h3>
+
+Line 745 [Paragraphs]:
+  Text: "Error loading participants. Please try again."
+  BEFORE: <p class="text-danger">Error loading participants. Please try again.</p>
+  AFTER:  <p class="text-danger">{{ _('Error loading participants. Please try again.') }}</p>
+
+Line 682 [Paragraphs]:
+  Text: "Filtering participants..."
+  BEFORE: <p class="mt-2 text-muted">Filtering participants...</p>
+  AFTER:  <p class="mt-2 text-muted">{{ _('Filtering participants...') }}</p>
+
+Line 597 [Placeholder attributes]:
+  Text: "e.g., English, Spanish"
+  BEFORE: <input type="text" class="form-control" id="language" disabled placeholder="e.g., English, Spanish">
+  AFTER:  <input type="text" class="form-control" id="language" disabled placeholder={{ _('e.g., English, Spanish') }}>
+
+Line 568 [Placeholder attributes]:
+  Text: "e.g., North America, EMEA"
+  BEFORE: <input type="text" class="form-control" id="region" disabled placeholder="e.g., North America, EMEA">
+  AFTER:  <input type="text" class="form-control" id="region" disabled placeholder={{ _('e.g., North America, EMEA') }}>
+
+Line 557 [Placeholder attributes]:
+  Text: "e.g., Manager, Director"
+  BEFORE: <input type="text" class="form-control" id="role" disabled placeholder="e.g., Manager, Director">
+  AFTER:  <input type="text" class="form-control" id="role" disabled placeholder={{ _('e.g., Manager, Director') }}>
+
+Line 486 [Title attributes]:
+  Text: "Delete participant"
+  BEFORE: title="Delete participant"
+  AFTER:  title={{ _('Delete participant') }}
+
+Line 478 [Title attributes]:
+  Text: "Edit participant"
+  BEFORE: title="Edit participant"
+  AFTER:  title={{ _('Edit participant') }}
+
+Line 407 [Table headers (th)]:
+  Text: "Actions"
+  BEFORE: <th class="text-end">Actions</th>
+  AFTER:  <th class="text-end">{{ _('Actions') }}</th>
+
+Line 405 [Table headers (th)]:
+  Text: "Status"
+  BEFORE: <th>Status</th>
+  AFTER:  <th>{{ _('Status') }}</th>
+
+Line 401 [Table headers (th)]:
+  Text: "Nom"
+  BEFORE: <th>Nom</th>
+  AFTER:  <th>{{ _('Nom') }}</th>
+
+Line 296 [Labels]:
+  Text: "Language"
+  BEFORE: <label for="filter_language" class="form-label">Language</label>
+  AFTER:  <label for="filter_language" class="form-label">{{ _('Language') }}</label>
+

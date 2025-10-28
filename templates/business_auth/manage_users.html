@@ -66,7 +66,7 @@
                     class="users-btn-add" 
                     disabled 
                     aria-label="Add user button disabled - license limit reached"
-                    title="License limit reached">
+                    title={{ _('License limit reached') }}>
                 <i class="fas fa-ban" aria-hidden="true"></i>
                 Limit Reached
             </button>
@@ -93,11 +93,11 @@
         <table class="table table-striped mb-0">
             <thead>
                 <tr>
-                    <th scope="col">User</th>
+                    <th scope="col">{{ _('User') }}</th>
                     <th scope="col">{{ _('Role') }}</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Last Login</th>
-                    <th scope="col">Actions</th>
+                    <th scope="col">{{ _('Status') }}</th>
+                    <th scope="col">{{ _('Last Login') }}</th>
+                    <th scope="col">{{ _('Actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -140,7 +140,7 @@
                             {% if user.id != current_user.id %}
                             <button type="button" 
                                     class="users-action-btn primary" 
-                                    title="Edit User" 
+                                    title={{ _('Edit User') }} 
                                     onclick="editUser({{ user.id }}, '{{ user.first_name }}', '{{ user.last_name }}', '{{ user.email }}', '{{ user.role }}')"
                                     aria-label="Edit {{ user.get_full_name() }}">
                                 <i class="fas fa-edit" aria-hidden="true"></i>
@@ -152,7 +152,7 @@
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                 <button type="submit" 
                                         class="users-action-btn secondary" 
-                                        title="Reset Password"
+                                        title={{ _('Reset Password') }}
                                         aria-label="Reset password for {{ user.get_full_name() }}">
                                     <i class="fas fa-key" aria-hidden="true"></i>
                                 </button>
@@ -165,14 +165,14 @@
                                 {% if user.is_active_user %}
                                 <button type="submit" 
                                         class="users-action-btn secondary" 
-                                        title="Deactivate User"
+                                        title={{ _('Deactivate User') }}
                                         aria-label="Deactivate {{ user.get_full_name() }}">
                                     <i class="fas fa-user-times" aria-hidden="true"></i>
                                 </button>
                                 {% else %}
                                 <button type="submit" 
                                         class="users-action-btn primary" 
-                                        title="Activate User"
+                                        title={{ _('Activate User') }}
                                         aria-label="Activate {{ user.get_full_name() }}">
                                     <i class="fas fa-user-check" aria-hidden="true"></i>
                                 </button>
@@ -191,8 +191,8 @@
         {% else %}
         <div class="users-empty-state">
             <i class="fas fa-users" aria-hidden="true"></i>
-            <h4>No users found</h4>
-            <p>Start building your team by adding the first user.</p>
+            <h4>{{ _('No users found') }}</h4>
+            <p>{{ _('Start building your team by adding the first user.') }}</p>
         </div>
         {% endif %}
     </div>
@@ -246,7 +246,7 @@
                                name="email" 
                                required 
                                maxlength="200" 
-                               placeholder="user@company.com"
+                               placeholder={{ _('user@company.com') }}
                                aria-required="true"
                                aria-describedby="email_help">
                         <div class="form-text" id="email_help">The user will receive an invitation email to activate their account.</div>
@@ -271,7 +271,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
                     <button type="submit" class="btn btn-primary" aria-label="Confirm add user">
                         <i class="fas fa-plus me-2" aria-hidden="true"></i>Add User
                     </button>
@@ -346,7 +346,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
                     <button type="submit" class="btn btn-primary" aria-label="Save changes">
                         <i class="fas fa-save me-2" aria-hidden="true"></i>Save Changes
                     </button>

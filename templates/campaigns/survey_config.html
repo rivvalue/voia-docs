@@ -176,7 +176,7 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h1 class="mb-1">Survey Configuration</h1>
+                    <h1 class="mb-1">{{ _('Survey Configuration') }}</h1>
                     <p class="mb-0 opacity-75">Customize survey behavior for "{{ campaign.name }}"</p>
                 </div>
                 <div class="col-md-4 text-end">
@@ -217,17 +217,17 @@
                 </p>
                 
                 <div class="mb-3">
-                    <label for="product_description" class="form-label">Product/Service Description</label>
+                    <label for="product_description" class="form-label">{{ _('Product/Service Description') }}</label>
                     <textarea class="form-control" id="product_description" name="product_description" rows="3" 
-                              placeholder="Describe your main products or services (e.g., 'Cloud-based accounting software for small businesses')"
+                              placeholder={{ _("Describe your main products or services (e.g., 'Cloud-based accounting software for small businesses')") }}
                               {% if is_readonly %}disabled{% endif %}>{{ campaign.product_description or '' }}</textarea>
                     <div class="form-text">Help the AI understand what you offer to ask better questions</div>
                 </div>
                 
                 <div class="mb-3">
-                    <label for="target_clients_description" class="form-label">Target Clients</label>
+                    <label for="target_clients_description" class="form-label">{{ _('Target Clients') }}</label>
                     <textarea class="form-control" id="target_clients_description" name="target_clients_description" rows="2" 
-                              placeholder="Describe your ideal customers (e.g., 'Small business owners, CFOs, accounting firms')"
+                              placeholder={{ _("Describe your ideal customers (e.g., 'Small business owners, CFOs, accounting firms')") }}
                               {% if is_readonly %}disabled{% endif %}>{{ campaign.target_clients_description or '' }}</textarea>
                     <div class="form-text">Who are you primarily serving? This helps tailor conversation tone and questions</div>
                 </div>
@@ -268,7 +268,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         <div class="mb-3">
-                            <label for="max_questions" class="form-label">Max Questions</label>
+                            <label for="max_questions" class="form-label">{{ _('Max Questions') }}</label>
                             <div class="form-group-inline">
                                 <input type="number" class="form-control" id="max_questions" name="max_questions" 
                                        value="{{ campaign.max_questions or 8 }}" min="3" max="15"
@@ -280,7 +280,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="mb-3">
-                            <label for="max_duration_seconds" class="form-label">Max Duration (seconds)</label>
+                            <label for="max_duration_seconds" class="form-label">{{ _('Max Duration (seconds)') }}</label>
                             <div class="form-group-inline">
                                 <input type="number" class="form-control" id="max_duration_seconds" name="max_duration_seconds" 
                                        value="{{ campaign.max_duration_seconds or 120 }}" min="60" max="300"
@@ -292,7 +292,7 @@
                     </div>
                     <div class="col-md-4">
                         <div class="mb-3">
-                            <label for="max_follow_ups_per_topic" class="form-label">Max Follow-ups per Topic</label>
+                            <label for="max_follow_ups_per_topic" class="form-label">{{ _('Max Follow-ups per Topic') }}</label>
                             <div class="form-group-inline">
                                 <input type="number" class="form-control" id="max_follow_ups_per_topic" name="max_follow_ups_per_topic" 
                                        value="{{ campaign.max_follow_ups_per_topic or 2 }}" min="1" max="3"
@@ -317,7 +317,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label">Prioritized Topics (cover first)</label>
+                            <label class="form-label">{{ _('Prioritized Topics (cover first)') }}</label>
                             <div class="multi-select-container">
                                 {% for topic in ['NPS Score', 'Product Quality', 'Support Experience', 'Service Rating', 'Pricing Value', 'User Experience', 'Feature Requests', 'Improvement Suggestions'] %}
                                 <div class="multi-select-item">
@@ -334,7 +334,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label class="form-label">Optional Topics (can be skipped)</label>
+                            <label class="form-label">{{ _('Optional Topics (can be skipped)') }}</label>
                             <div class="multi-select-container">
                                 {% for topic in ['Pricing Value', 'Additional Comments', 'Feature Requests', 'Competitor Comparison', 'Usage Frequency', 'Referral Likelihood'] %}
                                 <div class="multi-select-item">
@@ -354,9 +354,9 @@
             <!-- Customization Section -->
             <div class="form-section">
                 <div class="mb-3">
-                    <label for="custom_end_message" class="form-label">Custom End Message</label>
+                    <label for="custom_end_message" class="form-label">{{ _('Custom End Message') }}</label>
                     <textarea class="form-control" id="custom_end_message" name="custom_end_message" rows="3" 
-                              placeholder="Optional custom thank you message for survey completion"
+                              placeholder={{ _('Optional custom thank you message for survey completion') }}
                               {% if is_readonly %}disabled{% endif %}>{{ campaign.custom_end_message or '' }}</textarea>
                     <div class="form-text">Personalized message shown when participants complete the survey</div>
                     {% if campaign.custom_end_message %}
@@ -380,9 +380,9 @@
                     </p>
                     
                     <div class="mb-3">
-                        <label for="custom_system_prompt" class="form-label">Custom System Prompt</label>
+                        <label for="custom_system_prompt" class="form-label">{{ _('Custom System Prompt') }}</label>
                         <textarea class="form-control" id="custom_system_prompt" name="custom_system_prompt" rows="5" 
-                                  placeholder="Optional: Override the default AI system prompt with custom instructions"
+                                  placeholder={{ _('Optional: Override the default AI system prompt with custom instructions') }}
                                   {% if is_readonly %}disabled{% endif %}>{{ campaign.custom_system_prompt or '' }}</textarea>
                         <div class="form-text">
                             Advanced: Custom instructions for the AI conversation engine. Leave blank to use intelligent defaults.

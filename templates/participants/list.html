@@ -293,7 +293,7 @@
                                 
                                 <!-- Language Filter -->
                                 <div class="col-md-4">
-                                    <label for="filter_language" class="form-label">Language</label>
+                                    <label for="filter_language" class="form-label">{{ _('Language') }}</label>
                                     <select class="form-select filter-select" id="filter_language" name="filter_language" multiple 
                                             aria-label="{{ _('Filter by language') }}">
                                         {% for language in filter_options.languages %}
@@ -398,13 +398,13 @@
                                     <th style="width: 40px;">
                                         <input type="checkbox" class="participant-checkbox" id="selectAll" onchange="toggleSelectAll(this)">
                                     </th>
-                                    <th>Nom</th>
+                                    <th>{{ _('Nom') }}</th>
                                     <th>{{ _('Email') }}</th>
                                     <th>{{ _('Company') }}</th>
                                     <th class="hide-on-tablet">{{ _('Origin') }}e</th>
-                                    <th>Status</th>
+                                    <th>{{ _('Status') }}</th>
                                     <th class="hide-on-tablet">{{ _('Created') }}</th>
-                                    <th class="text-end">Actions</th>
+                                    <th class="text-end">{{ _('Actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody id="participantTableBody">
@@ -475,7 +475,7 @@
                                         <div class="btn-group btn-group-sm" role="group" aria-label="Participant actions">
                                             <a href="{{ url_for('participants.edit_participant', participant_id=participant.id) }}" 
                                                class="btn btn-outline-primary"
-                                               title="Edit participant"
+                                               title={{ _('Edit participant') }}
                                                aria-label="Edit {{ participant.name }}">
                                                 <i class="fas fa-edit"></i>
                                             </a>
@@ -483,7 +483,7 @@
                                                     class="btn btn-outline-danger delete-participant-btn"
                                                     data-participant-id="{{ participant.id }}"
                                                     data-participant-name="{{ participant.name }}"
-                                                    title="Delete participant"
+                                                    title={{ _('Delete participant') }}
                                                     aria-label="Delete {{ participant.name }}">
                                                 <i class="fas fa-trash"></i>
                                             </button>
@@ -554,7 +554,7 @@
                                     Update {{ _('Role') }}
                                 </label>
                             </div>
-                            <input type="text" class="form-control" id="role" disabled placeholder="e.g., Manager, Director">
+                            <input type="text" class="form-control" id="role" disabled placeholder={{ _('e.g., Manager, Director') }}>
                         </div>
 
                         <!-- {{ _('Region') }} -->
@@ -565,7 +565,7 @@
                                     Update {{ _('Region') }}
                                 </label>
                             </div>
-                            <input type="text" class="form-control" id="region" disabled placeholder="e.g., North America, EMEA">
+                            <input type="text" class="form-control" id="region" disabled placeholder={{ _('e.g., North America, EMEA') }}>
                         </div>
 
                         <!-- {{ _('Customer Tier') }} -->
@@ -594,7 +594,7 @@
                                     Update Language
                                 </label>
                             </div>
-                            <input type="text" class="form-control" id="language" disabled placeholder="e.g., English, Spanish">
+                            <input type="text" class="form-control" id="language" disabled placeholder={{ _('e.g., English, Spanish') }}>
                         </div>
 
                         <!-- Tenure -->
@@ -679,7 +679,7 @@ function applyFilters(page = 1) {
                 <div class="spinner-border text-voia-primary" role="status">
                     <span class="visually-hidden">Loading...</span>
                 </div>
-                <p class="mt-2 text-muted">Filtering participants...</p>
+                <p class="mt-2 text-muted">{{ _('Filtering participants...') }}</p>
             </td>
         </tr>
     `;
@@ -742,7 +742,7 @@ function applyFilters(page = 1) {
                 <tr>
                     <td colspan="8" class="text-center py-5">
                         <i class="fas fa-exclamation-triangle text-danger fa-2x mb-2"></i>
-                        <p class="text-danger">Error loading participants. Please try again.</p>
+                        <p class="text-danger">{{ _('Error loading participants. Please try again.') }}</p>
                     </td>
                 </tr>
             `;
@@ -762,8 +762,8 @@ function updateParticipantTable(participants, pagination) {
                     <div class="empty-state-icon">
                         <i class="fas fa-filter"></i>
                     </div>
-                    <h3>No participants match your filters</h3>
-                    <p class="text-muted">Try adjusting your filter criteria.</p>
+                    <h3>{{ _('No participants match your filters') }}</h3>
+                    <p class="text-muted">{{ _('Try adjusting your filter criteria.') }}</p>
                 </td>
             </tr>
         `;
@@ -836,7 +836,7 @@ function updateParticipantTable(participants, pagination) {
                     <div class="btn-group btn-group-sm" role="group" aria-label="Participant actions">
                         <a href="/business/participants/${p.id}/edit" 
                            class="btn btn-outline-primary"
-                           title="Edit participant"
+                           title={{ _('Edit participant') }}
                            aria-label="Edit ${p.name}">
                             <i class="fas fa-edit"></i>
                         </a>
@@ -844,7 +844,7 @@ function updateParticipantTable(participants, pagination) {
                                 class="btn btn-outline-danger delete-participant-btn"
                                 data-participant-id="${p.id}"
                                 data-participant-name="${p.name}"
-                                title="Delete participant"
+                                title={{ _('Delete participant') }}
                                 aria-label="Delete ${p.name}">
                             <i class="fas fa-trash"></i>
                         </button>

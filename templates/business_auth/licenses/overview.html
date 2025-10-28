@@ -284,7 +284,7 @@
                 <div>
                     <label for="search" class="form-label">{{ _('Search Accounts') }}</label>
                     <input type="text" class="form-control" id="search" name="search" 
-                           placeholder="Search by business name or email..." 
+                           placeholder={{ _('Search by business name or email...') }} 
                            value="{{ request.args.get('search', '') }}">
                 </div>
                 <div>
@@ -326,8 +326,8 @@
                         <th>{{ _('Users') }}</th>
                         <th>{{ _('Campaigns') }}</th>
                         <th>{{ _('Usage') }}</th>
-                        <th>Expiration</th>
-                        <th>Actions</th>
+                        <th>{{ _('Expiration') }}</th>
+                        <th>{{ _('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
