@@ -16,8 +16,9 @@ class OnboardingStep:
     step_id: str
     name: str
     description: str
-    template: str
+    target_link: str  # Link to the admin page for this configuration
     required: bool = True
+    template: Optional[str] = None  # Deprecated - kept for backward compatibility
     validation_method: Optional[str] = None
     next_step: Optional[str] = None
     license_types: Optional[List[str]] = None  # If None, applies to all licenses
@@ -28,46 +29,25 @@ class OnboardingFlowManager:
     
     # Step definitions - extensible configuration
     STEP_DEFINITIONS = {
-        'welcome': OnboardingStep(
-            step_id='welcome',
-            name='Welcome to VOÏA',
-            description='Introduction to your VOÏA platform setup',
-            template='onboarding/welcome.html',
-            required=True,
-            validation_method='validate_welcome_step'
-        ),
         'smtp': OnboardingStep(
             step_id='smtp',
             name='Email Configuration',
             description='Configure SMTP settings for survey invitations',
-            template='onboarding/smtp.html',
-            required=True,
-            validation_method='validate_smtp_configuration',
-            next_step='brand'
+            target_link='/business/admin/email-config',
+            required=True
         ),
         'brand': OnboardingStep(
             step_id='brand',
             name='Brand Configuration',
-            description='Customize your logo and brand colors (optional)',
-            template='onboarding/brand.html',
-            required=False,
-            validation_method='validate_brand_configuration',
-            next_step='users'
+            description='Customize your logo and brand colors',
+            target_link='/business/admin/brand-config',
+            required=False
         ),
         'users': OnboardingStep(
             step_id='users',
-            name='Add Team Members',
+            name='Team Members',
             description='Add campaign managers to your team',
-            template='onboarding/users.html',
-            required=True,
-            validation_method='validate_user_creation',
-            next_step='complete'
-        ),
-        'complete': OnboardingStep(
-            step_id='complete',
-            name='Setup Complete',
-            description='Your VOÏA platform is ready to use',
-            template='onboarding/complete.html',
+            target_link='/business/users',
             required=True
         )
     }
@@ -75,12 +55,12 @@ class OnboardingFlowManager:
     # License-specific flow configurations
     ONBOARDING_FLOWS = {
         'core': {
-            'steps': ['welcome', 'smtp', 'brand', 'users', 'complete'],
+            'steps': ['smtp', 'brand', 'users'],
             'mandatory': True,
             'description': 'Essential setup for Core license holders'
         },
         'plus': {
-            'steps': ['welcome', 'smtp', 'brand', 'users', 'complete'],
+            'steps': ['smtp', 'brand', 'users'],
             'mandatory': True,
             'description': 'Enhanced setup for Plus license holders'
         },
@@ -90,7 +70,7 @@ class OnboardingFlowManager:
             'description': 'Pro license holders have optional onboarding'
         },
         'trial': {
-            'steps': ['welcome', 'smtp', 'brand', 'users', 'complete'],
+            'steps': ['smtp', 'brand', 'users'],
             'mandatory': True,
             'description': 'Trial setup to explore VOÏA features'
         }
