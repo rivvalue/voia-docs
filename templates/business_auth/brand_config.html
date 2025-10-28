@@ -57,7 +57,7 @@
                 <div class="brand-preview-details">
                     <div class="brand-preview-label">{{ _('Company Logo') }}</div>
                     <p class="brand-preview-value {{ 'empty' if not branding_config.logo_filename else '' }}">
-                        {{ branding_config.logo_filename if branding_config.logo_filename else '{{ _('No logo') }} uploaded' }}
+                        {{ branding_config.logo_filename if branding_config.logo_filename else _('No logo') ~ ' uploaded' }}
                     </p>
                 </div>
             </div>
