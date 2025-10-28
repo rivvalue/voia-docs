@@ -336,7 +336,7 @@
         <div class="current-license-summary">
             <div class="row">
                 <div class="col-md-8">
-                    <h4><i class="fas fa-certificate me-2"></i>{{ _('Current License: {{ current_license.type|title }}') }}</h4>
+                    <h4><i class="fas fa-certificate me-2"></i>{{ _('Current License: %(type)s', type=current_license.type|title) }}</h4>
                     <div class="license-details-grid mt-3">
                         {% if current_license.max_users %}
                         <div class="detail-item">

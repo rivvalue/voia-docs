@@ -11,7 +11,7 @@
                 <h1 class="admin-title">
                     <i class="fas fa-certificate me-3"></i>{{ page_title }}
                 </h1>
-                <p class="admin-subtitle">{{ _('License details and usage information for {{ account_data.name }}') }}</p>
+                <p class="admin-subtitle">{{ _('License details and usage information for %(name)s', name=account_data.name) }}</p>
             </div>
             <div class="col-md-6 text-end">
                 <a href="{{ url_for('business_auth.license_dashboard') }}" class="btn btn-outline-primary me-2">

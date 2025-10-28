@@ -395,8 +395,8 @@
                             <i class="fas fa-user-shield"></i>
                         </div>
                         <div>
-                            <h2 class="page-title mb-1">{{ _('Welcome {{ current_user.get_full_name() }}') }}</h2>
-                            <p class="page-subtitle mb-0">{{ business_account.name }}, {% if current_user.role == 'platform_admin' %}Platform Administrator{% elif current_user.role == 'business_account_admin' %}Administrator{% elif current_user.role == 'manager' %}{{ _('Manage') }}r{% elif current_user.role == 'viewer' %}Viewer{% else %}{{ current_user.role|title }}{% endif %}</p>
+                            <h2 class="page-title mb-1">{{ _('Welcome %(name)s', name=current_user.get_full_name()) }}</h2>
+                            <p class="page-subtitle mb-0">{{ business_account.name }}, {% if current_user.role == 'platform_admin' %}Platform Administrator{% elif current_user.role == 'business_account_admin' %}Administrator{% elif current_user.role == 'manager' %}{{ _('Manager') }}{% elif current_user.role == 'viewer' %}Viewer{% else %}{{ current_user.role|title }}{% endif %}</p>
                         </div>
                     </div>
                 </div>
@@ -527,7 +527,7 @@
                     <i class="fas fa-user-plus me-2"></i>{{ _('Manage') }} Users
                 </a>
             </div>
-            <p class="text-muted mb-0">{{ _('Add and manage team members for your business account. Current usage: {{ admin_data.license_info.users_used if admin_data.license_info else 1 }}/{{ admin_data.license_info.users_limit if admin_data.license_info else 5 }} users.') }}</p>
+            <p class="text-muted mb-0">{{ _('Add and manage team members for your business account. Current usage: %(used)d/%(limit)d users.', used=admin_data.license_info.users_used if admin_data.license_info else 1, limit=admin_data.license_info.users_limit if admin_data.license_info else 5) }}</p>
         </div>
         {% endif %}
 

@@ -19,7 +19,7 @@
                 <h1 class="admin-title">
                     <i class="fas fa-certificate me-3"></i>Assign License
                 </h1>
-                <p class="admin-subtitle">{{ _('Configure license for {{ business_account.name }}') }}</p>
+                <p class="admin-subtitle">{{ _('Configure license for %(name)s', name=business_account.name) }}</p>
             </div>
             <div class="col-md-6 text-end">
                 <a href="{{ url_for('business_auth.license_history', business_id=business_account.id) }}" class="btn btn-outline-primary me-2">

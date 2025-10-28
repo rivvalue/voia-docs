@@ -408,7 +408,7 @@
             <i class="fas fa-user-shield"></i>
         </div>
         <h1 class="welcome-title">{{ _('Welcome to VOÏA!') }}</h1>
-        <p class="welcome-subtitle">{{ _('You\'re invited to join {{ business_account.name }}') }}</p>
+        <p class="welcome-subtitle">{{ _('You\'re invited to join %(name)s', name=business_account.name) }}</p>
     </div>
 
     <!-- Flash Messages -->

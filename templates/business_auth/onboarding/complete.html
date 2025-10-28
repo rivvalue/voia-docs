@@ -303,7 +303,7 @@
     <!-- Business Account Info -->
     <div class="business-info">
         <h4><i class="fas fa-building"></i> {{ business_account.name }}</h4>
-        <p>{{ _('Congratulations, {{ current_user.get_full_name() }}! Your team is ready to start collecting valuable customer feedback.') }}</p>
+        <p>{{ _('Congratulations, %(name)s! Your team is ready to start collecting valuable customer feedback.', name=current_user.get_full_name()) }}</p>
     </div>
 
     <!-- Celebration Message -->

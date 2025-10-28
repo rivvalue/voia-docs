@@ -509,10 +509,10 @@ function toggleProviderFields() {
     const smtpServerInput = document.getElementById('smtp_server');
     const awsSesServerInfo = document.getElementById('aws_ses_server_info');
     const sesServerDisplay = document.getElementById('ses_server_display');
-    const smtp{{ _('Username') }}Help = document.getElementById('smtp_username_help');
-    const smtp{{ _('Password') }}Help = document.getElementById('smtp_password_help');
-    const smtp{{ _('Username') }}Label = document.getElementById('smtp_username_label');
-    const smtp{{ _('Password') }}Label = document.getElementById('smtp_password_label');
+    const smtpUsernameHelp = document.getElementById('smtp_username_help');
+    const smtpPasswordHelp = document.getElementById('smtp_password_help');
+    const smtpUsernameLabel = document.getElementById('smtp_username_label');
+    const smtpPasswordLabel = document.getElementById('smtp_password_label');
     
     if (provider === 'aws_ses') {
         // Show AWS SES fields
@@ -527,10 +527,10 @@ function toggleProviderFields() {
         awsSesServerInfo.style.display = 'block';
         
         // Update help text for AWS SES
-        smtp{{ _('Username') }}Label.textContent = 'AWS SES SMTP {{ _('Username') }}';
-        smtp{{ _('Password') }}Label.textContent = 'AWS SES SMTP {{ _('Password') }}';
-        smtp{{ _('Username') }}Help.textContent = 'SMTP username from AWS SES Console > SMTP Settings';
-        smtp{{ _('Password') }}Help.textContent = 'SMTP password from AWS SES Console (not your AWS password)';
+        smtpUsernameLabel.textContent = '{{ _("AWS SES SMTP Username") }}';
+        smtpPasswordLabel.textContent = '{{ _("AWS SES SMTP Password") }}';
+        smtpUsernameHelp.textContent = '{{ _("SMTP username from AWS SES Console > SMTP Settings") }}';
+        smtpPasswordHelp.textContent = '{{ _("SMTP password from AWS SES Console (not your AWS password)") }}';
         
         // Update SES server display based on region
         const region = awsRegionSelect.value;
@@ -550,10 +550,10 @@ function toggleProviderFields() {
         awsSesServerInfo.style.display = 'none';
         
         // Reset help text for standard SMTP
-        smtp{{ _('Username') }}Label.textContent = '{{ _('Username') }}';
-        smtp{{ _('Password') }}Label.textContent = '{{ _('Password') }}';
-        smtp{{ _('Username') }}Help.textContent = '{{ _('Usually your email address') }}';
-        smtp{{ _('Password') }}Help.textContent = '{{ _('Your email password or app-specific password') }}';
+        smtpUsernameLabel.textContent = '{{ _("Username") }}';
+        smtpPasswordLabel.textContent = '{{ _("Password") }}';
+        smtpUsernameHelp.textContent = '{{ _("Usually your email address") }}';
+        smtpPasswordHelp.textContent = '{{ _("Your email password or app-specific password") }}';
     }
 }
 
