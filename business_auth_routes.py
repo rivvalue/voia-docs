@@ -3611,11 +3611,11 @@ def admin_licenses():
             account = data['account']
             license_info = data['license_info']
             
-            # Check if there's an unactivated admin user
-            unactivated_admin = BusinessAccountUser.query.filter_by(
-                business_account_id=account.id,
-                role='admin',
-                email_verified=False
+            # Check if there's an unactivated admin user (check both 'admin' and legacy 'business_account_admin')
+            unactivated_admin = BusinessAccountUser.query.filter(
+                BusinessAccountUser.business_account_id == account.id,
+                BusinessAccountUser.role.in_(['admin', 'business_account_admin']),
+                BusinessAccountUser.email_verified == False
             ).first()
             
             account_data = {
