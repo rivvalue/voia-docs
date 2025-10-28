@@ -699,15 +699,15 @@
                     <div class="settings-stats">
                         <div class="settings-stat">
                             <div class="settings-stat-number">{{ admin_data.license_info.campaigns_used }}/{{ admin_data.license_info.campaigns_limit }}</div>
-                            <div class="settings-stat-label">Campaigns</div>
+                            <div class="settings-stat-label">{{ _('Campaigns') }}</div>
                         </div>
                         <div class="settings-stat">
                             <div class="settings-stat-number">{{ admin_data.license_info.users_used }}/{{ admin_data.license_info.users_limit }}</div>
-                            <div class="settings-stat-label">Users</div>
+                            <div class="settings-stat-label">{{ _('Users') }}</div>
                         </div>
                         <div class="settings-stat">
                             <div class="settings-stat-number">{{ admin_data.license_info.participants_per_campaign_limit }}</div>
-                            <div class="settings-stat-label">Max Participants</div>
+                            <div class="settings-stat-label">{{ _('Max Participants') }}</div>
                         </div>
                     </div>
                     {% endif %}

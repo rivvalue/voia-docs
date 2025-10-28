@@ -1,0 +1,266 @@
+🎯 Phase 4: Applying 176 Manual Review Wraps
+============================================================
+
+📝 templates/business_auth/admin_licenses.html (1 wraps)
+  ✅ Line 156: Wrapped between tags
+  💾 Saved 1 changes
+
+📝 templates/business_auth/admin_panel_v2.html (3 wraps)
+  ✅ Line 710: Wrapped between tags
+  ✅ Line 706: Wrapped between tags
+  ✅ Line 702: Wrapped between tags
+  💾 Saved 3 changes
+
+📝 templates/business_auth/audit_logs.html (5 wraps)
+  ✅ Line 84: Wrapped in quotes
+  ✅ Line 40: Wrapped between tags
+  ✅ Line 36: Wrapped between tags
+  ✅ Line 32: Wrapped between tags
+  ✅ Line 28: Wrapped between tags
+  💾 Saved 5 changes
+
+📝 templates/business_auth/business_account_onboarding.html (5 wraps)
+  ✅ Line 169: Wrapped between tags
+  ✅ Line 168: Wrapped between tags
+  ✅ Line 157: Wrapped between tags
+  ✅ Line 102: Wrapped between tags
+  ✅ Line 78: Wrapped between tags
+  💾 Saved 5 changes
+
+📝 templates/business_auth/email_config.html (1 wraps)
+  ✅ Line 71: Wrapped between tags
+  💾 Saved 1 changes
+
+📝 templates/business_auth/license_info.html (11 wraps)
+  ⚠️  Line 344: Context not found in file
+  ✅ Line 343: Wrapped between tags
+  ✅ Line 342: Wrapped between tags
+  ✅ Line 325: Wrapped between tags
+  ✅ Line 309: Wrapped between tags
+  ✅ Line 276: Wrapped between tags
+  ✅ Line 251: Wrapped between tags
+  ✅ Line 130: Wrapped between tags
+  ✅ Line 120: Wrapped between tags
+  ✅ Line 87: Wrapped between tags
+  ✅ Line 64: Wrapped between tags
+  💾 Saved 10 changes
+
+📝 templates/business_auth/licenses/assignment_form.html (5 wraps)
+  ✅ Line 355: Wrapped between tags
+  ✅ Line 345: Wrapped between tags
+  ✅ Line 339: Wrapped between tags
+  ✅ Line 243: Wrapped between tags
+  ✅ Line 242: Wrapped between tags
+  💾 Saved 5 changes
+
+📝 templates/business_auth/licenses/assignment_result.html (1 wraps)
+  ✅ Line 342: Wrapped between tags
+  💾 Saved 1 changes
+
+📝 templates/business_auth/licenses/history.html (1 wraps)
+  ✅ Line 486: Wrapped between tags
+  💾 Saved 1 changes
+
+📝 templates/business_auth/licenses/overview.html (1 wraps)
+  ✅ Line 377: Wrapped between tags
+  💾 Saved 1 changes
+
+📝 templates/business_auth/manage_users.html (15 wraps)
+  ✅ Line 350: Wrapped in quotes
+  ⚠️  Line 342: Context found but no safe pattern matched
+  ⚠️  Line 340: Context found but no safe pattern matched
+  ⚠️  Line 339: Context found but no safe pattern matched
+  ⚠️  Line 338: Context found but no safe pattern matched
+  ✅ Line 325: Wrapped in quotes
+  ⏭️  Line 312: Already wrapped
+  ⏭️  Line 300: Already wrapped
+  ⚠️  Line 262: Context found but no safe pattern matched
+  ⚠️  Line 260: Context found but no safe pattern matched
+  ⚠️  Line 259: Context found but no safe pattern matched
+  ⚠️  Line 258: Context found but no safe pattern matched
+  ⚠️  Line 252: Context found but no safe pattern matched
+  ✅ Line 183: Wrapped between tags
+  ✅ Line 135: Wrapped between tags
+  💾 Saved 4 changes
+
+📝 templates/business_auth/onboarding/complete.html (2 wraps)
+  ✅ Line 356: Wrapped between tags
+  ✅ Line 346: Wrapped between tags
+  💾 Saved 2 changes
+
+📝 templates/business_auth/onboarding/users.html (3 wraps)
+  ⚠️  Line 413: Context found but no safe pattern matched
+  ⚠️  Line 412: Context found but no safe pattern matched
+  ⚠️  Line 411: Context found but no safe pattern matched
+
+📝 templates/business_auth/reset_password.html (7 wraps)
+  ✅ Line 84: Wrapped in quotes
+  ✅ Line 78: Wrapped in quotes
+  ✅ Line 67: Wrapped in quotes
+  ✅ Line 51: Wrapped in quotes
+  ✅ Line 36: Wrapped in quotes
+  ✅ Line 27: Wrapped in quotes
+  ✅ Line 13: Wrapped in quotes
+  💾 Saved 7 changes
+
+📝 templates/business_auth/survey_config.html (8 wraps)
+  ✅ Line 231: Wrapped between tags
+  ✅ Line 230: Wrapped between tags
+  ⚠️  Line 171: Context found but no safe pattern matched
+  ⏭️  Line 166: Already wrapped
+  ⏭️  Line 161: Already wrapped
+  ⏭️  Line 156: Already wrapped
+  ⚠️  Line 151: Context found but no safe pattern matched
+  ⚠️  Line 146: Context found but no safe pattern matched
+  💾 Saved 2 changes
+
+📝 templates/campaign_insights.html (22 wraps)
+  ✅ Line 1126: Wrapped between tags
+  ✅ Line 1109: Wrapped between tags
+  ✅ Line 1092: Wrapped between tags
+  ⚠️  Line 768: Context found but no safe pattern matched
+  ⚠️  Line 767: Context found but no safe pattern matched
+  ⚠️  Line 766: Context found but no safe pattern matched
+  ⚠️  Line 765: Context found but no safe pattern matched
+  ⚠️  Line 584: Context found but no safe pattern matched
+  ⚠️  Line 583: Context found but no safe pattern matched
+  ⚠️  Line 582: Context found but no safe pattern matched
+  ⚠️  Line 412: Context found but no safe pattern matched
+  ⚠️  Line 411: Context found but no safe pattern matched
+  ⚠️  Line 410: Context found but no safe pattern matched
+  ⚠️  Line 283: Context found but no safe pattern matched
+  ⚠️  Line 275: Context found but no safe pattern matched
+  ⚠️  Line 268: Context found but no safe pattern matched
+  ⚠️  Line 267: Context found but no safe pattern matched
+  ⚠️  Line 266: Context found but no safe pattern matched
+  ⚠️  Line 265: Context found but no safe pattern matched
+  ⚠️  Line 258: Context found but no safe pattern matched
+  ⚠️  Line 257: Context found but no safe pattern matched
+  ⚠️  Line 256: Context found but no safe pattern matched
+  💾 Saved 3 changes
+
+📝 templates/campaigns/create.html (3 wraps)
+  ⚠️  Line 237: Context not found in file
+  ⚠️  Line 171: Context not found in file
+  ⚠️  Line 144: Context not found in file
+
+📝 templates/campaigns/edit.html (1 wraps)
+  ⚠️  Line 159: Context not found in file
+
+📝 templates/campaigns/individual_response.html (14 wraps)
+  ✅ Line 466: Wrapped between tags
+  ✅ Line 460: Wrapped between tags
+  ✅ Line 454: Wrapped between tags
+  ✅ Line 440: Wrapped between tags
+  ✅ Line 435: Wrapped between tags
+  ✅ Line 419: Wrapped between tags
+  ✅ Line 403: Wrapped between tags
+  ✅ Line 394: Wrapped between tags
+  ✅ Line 377: Wrapped between tags
+  ✅ Line 364: Wrapped between tags
+  ✅ Line 358: Wrapped between tags
+  ✅ Line 352: Wrapped between tags
+  ✅ Line 339: Wrapped between tags
+  ✅ Line 324: Wrapped between tags
+  💾 Saved 14 changes
+
+📝 templates/campaigns/list.html (1 wraps)
+  ⏭️  Line 106: Already wrapped
+
+📝 templates/campaigns/survey_config.html (10 wraps)
+  ⚠️  Line 387: Context not found in file
+  ✅ Line 361: Wrapped between tags
+  ✅ Line 348: Wrapped between tags
+  ✅ Line 332: Wrapped between tags
+  ✅ Line 302: Wrapped between tags
+  ✅ Line 290: Wrapped between tags
+  ✅ Line 278: Wrapped between tags
+  ✅ Line 256: Wrapped between tags
+  ⚠️  Line 232: Context found but no safe pattern matched
+  ✅ Line 224: Wrapped between tags
+  💾 Saved 8 changes
+
+📝 templates/campaigns/view.html (2 wraps)
+  ✅ Line 50: Wrapped between tags
+  ✅ Line 46: Wrapped between tags
+  💾 Saved 2 changes
+
+📝 templates/conversational_survey.html (7 wraps)
+  ⏭️  Line 139: Already wrapped
+  ⏭️  Line 138: Already wrapped
+  ⏭️  Line 137: Already wrapped
+  ⏭️  Line 136: Already wrapped
+  ⏭️  Line 135: Already wrapped
+  ⏭️  Line 134: Already wrapped
+  ⏭️  Line 133: Already wrapped
+
+📝 templates/conversational_survey_business.html (7 wraps)
+  ⏭️  Line 118: Already wrapped
+  ⏭️  Line 117: Already wrapped
+  ⏭️  Line 116: Already wrapped
+  ⏭️  Line 115: Already wrapped
+  ⏭️  Line 114: Already wrapped
+  ⏭️  Line 113: Already wrapped
+  ⏭️  Line 112: Already wrapped
+
+📝 templates/dashboard.html (23 wraps)
+  ⚠️  Line 918: Context found but no safe pattern matched
+  ⚠️  Line 917: Context found but no safe pattern matched
+  ⚠️  Line 916: Context found but no safe pattern matched
+  ⚠️  Line 915: Context found but no safe pattern matched
+  ⚠️  Line 820: Context found but no safe pattern matched
+  ⚠️  Line 819: Context found but no safe pattern matched
+  ⚠️  Line 818: Context found but no safe pattern matched
+  ⚠️  Line 648: Context found but no safe pattern matched
+  ⚠️  Line 647: Context found but no safe pattern matched
+  ⚠️  Line 646: Context found but no safe pattern matched
+  ⚠️  Line 519: Context found but no safe pattern matched
+  ⚠️  Line 511: Context found but no safe pattern matched
+  ⚠️  Line 504: Context found but no safe pattern matched
+  ⚠️  Line 503: Context found but no safe pattern matched
+  ⚠️  Line 502: Context found but no safe pattern matched
+  ⚠️  Line 501: Context found but no safe pattern matched
+  ⚠️  Line 494: Context found but no safe pattern matched
+  ⚠️  Line 493: Context found but no safe pattern matched
+  ⚠️  Line 492: Context found but no safe pattern matched
+  ✅ Line 381: Wrapped between tags
+  ⚠️  Line 224: Context found but no safe pattern matched
+  ⚠️  Line 223: Context found but no safe pattern matched
+  ⚠️  Line 222: Context found but no safe pattern matched
+  💾 Saved 1 changes
+
+📝 templates/executive_summary.html (3 wraps)
+  ⚠️  Line 217: Context found but no safe pattern matched
+  ⚠️  Line 216: Context found but no safe pattern matched
+  ⚠️  Line 215: Context found but no safe pattern matched
+
+📝 templates/participants/create.html (5 wraps)
+  ⚠️  Line 167: Context found but no safe pattern matched
+  ⚠️  Line 128: Context found but no safe pattern matched
+  ⚠️  Line 127: Context found but no safe pattern matched
+  ⚠️  Line 126: Context found but no safe pattern matched
+  ⚠️  Line 106: Context found but no safe pattern matched
+
+📝 templates/participants/edit.html (5 wraps)
+  ⚠️  Line 215: Context found but no safe pattern matched
+  ⚠️  Line 176: Context found but no safe pattern matched
+  ⚠️  Line 175: Context found but no safe pattern matched
+  ⚠️  Line 174: Context found but no safe pattern matched
+  ⚠️  Line 154: Context found but no safe pattern matched
+
+📝 templates/participants/list.html (4 wraps)
+  ✅ Line 680: Wrapped between tags
+  ⚠️  Line 584: Context found but no safe pattern matched
+  ⚠️  Line 583: Context found but no safe pattern matched
+  ⚠️  Line 582: Context found but no safe pattern matched
+  💾 Saved 1 changes
+
+============================================================
+📊 PHASE 4 SUMMARY
+============================================================
+✅ Files modified:    20
+✅ Wraps applied:     77
+❌ Errors:            0
+📄 Log file:          phase4_manual_log_20251028_173737.txt
+
+✅ Phase 4 complete! Manual review wraps applied.

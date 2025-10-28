@@ -1089,7 +1089,7 @@ function renderSegmentationTable(segmentationData) {
         const satisfaction = roleSatisfaction[role];
         html += `
             <tr>
-                <td><span class="badge bg-primary">Role</span></td>
+                <td><span class="badge bg-primary">{{ _('Role') }}</span></td>
                 <td>${role}</td>
                 <td>${metrics.total_responses || 0}</td>
                 <td>${satisfaction !== null && satisfaction !== undefined ? satisfaction.toFixed(2) : 'N/A'}</td>
@@ -1106,7 +1106,7 @@ function renderSegmentationTable(segmentationData) {
         const satisfaction = regionSatisfaction[region];
         html += `
             <tr>
-                <td><span class="badge bg-info">Region</span></td>
+                <td><span class="badge bg-info">{{ _('Region') }}</span></td>
                 <td>${region}</td>
                 <td>${metrics.total_responses || 0}</td>
                 <td>${satisfaction !== null && satisfaction !== undefined ? satisfaction.toFixed(2) : 'N/A'}</td>
@@ -1123,7 +1123,7 @@ function renderSegmentationTable(segmentationData) {
         const satisfaction = tierSatisfaction[tier];
         html += `
             <tr>
-                <td><span class="badge bg-warning text-dark">Tier</span></td>
+                <td><span class="badge bg-warning text-dark">{{ _('Tier') }}</span></td>
                 <td>${tier}</td>
                 <td>${metrics.total_responses || 0}</td>
                 <td>${satisfaction !== null && satisfaction !== undefined ? satisfaction.toFixed(2) : 'N/A'}</td>

@@ -61,7 +61,7 @@
                     <div class="license-date-icon" aria-hidden="true">
                         <i class="fas fa-calendar-plus"></i>
                     </div>
-                    <div class="license-date-label">License Purchase Date</div>
+                    <div class="license-date-label">{{ _('License Purchase Date') }}</div>
                     <div class="license-date-value">
                         {% if license_start %}
                             {{ license_start.strftime('%B %d, %Y') }}
@@ -84,7 +84,7 @@
                     <div class="license-date-icon" aria-hidden="true">
                         <i class="fas fa-calendar-times"></i>
                     </div>
-                    <div class="license-date-label">License Expiry Date</div>
+                    <div class="license-date-label">{{ _('License Expiry Date') }}</div>
                     <div class="license-date-value">
                         {% if license_end %}
                             {{ license_end.strftime('%B %d, %Y') }}
@@ -117,7 +117,7 @@
                     <i class="fas fa-calendar-alt"></i>
                 </div>
                 <div class="license-info-content">
-                    <div class="license-info-label">License Period</div>
+                    <div class="license-info-label">{{ _('License Period') }}</div>
                     <div class="license-info-value">{{ license_start.strftime('%b %d, %Y') }} - {{ license_end.strftime('%b %d, %Y') }}</div>
                 </div>
             </div>
@@ -127,7 +127,7 @@
                     <i class="fas fa-hourglass-half"></i>
                 </div>
                 <div class="license-info-content">
-                    <div class="license-info-label">License Duration</div>
+                    <div class="license-info-label">{{ _('License Duration') }}</div>
                     <div class="license-info-value">{{ ((license_end - license_start).days // 30) }} months ({{ (license_end - license_start).days }} days)</div>
                 </div>
             </div>
@@ -248,7 +248,7 @@
                     <div class="license-date-icon" aria-hidden="true">
                         <i class="fas fa-play-circle"></i>
                     </div>
-                    <div class="license-date-label">Add-on Start Date</div>
+                    <div class="license-date-label">{{ _('Add-on Start Date') }}</div>
                     <div class="license-date-value">
                         {% if transcript_analysis.start_date %}
                             {{ transcript_analysis.start_date.strftime('%B %d, %Y') if transcript_analysis.start_date is string == false else transcript_analysis.start_date }}
@@ -273,7 +273,7 @@
                     <div class="license-date-icon" aria-hidden="true">
                         <i class="fas fa-stop-circle"></i>
                     </div>
-                    <div class="license-date-label">Add-on End Date</div>
+                    <div class="license-date-label">{{ _('Add-on End Date') }}</div>
                     <div class="license-date-value">
                         {% if transcript_analysis.end_date %}
                             {{ transcript_analysis.end_date.strftime('%B %d, %Y') if transcript_analysis.end_date is string == false else transcript_analysis.end_date }}
@@ -306,7 +306,7 @@
                     <i class="fas fa-calendar-check"></i>
                 </div>
                 <div class="license-info-content">
-                    <div class="license-info-label">Add-on Period</div>
+                    <div class="license-info-label">{{ _('Add-on Period') }}</div>
                     <div class="license-info-value">
                         {% if transcript_analysis.start_date is string == false and transcript_analysis.end_date is string == false %}
                             {{ transcript_analysis.start_date.strftime('%b %d, %Y') }} - {{ transcript_analysis.end_date.strftime('%b %d, %Y') }}
@@ -322,7 +322,7 @@
                     <i class="fas fa-stopwatch"></i>
                 </div>
                 <div class="license-info-content">
-                    <div class="license-info-label">Add-on Duration</div>
+                    <div class="license-info-label">{{ _('Add-on Duration') }}</div>
                     <div class="license-info-value">
                         {% if transcript_analysis.start_date is string == false and transcript_analysis.end_date is string == false %}
                             {{ ((transcript_analysis.end_date - transcript_analysis.start_date).days // 30) }} months ({{ (transcript_analysis.end_date - transcript_analysis.start_date).days }} days)
@@ -339,8 +339,8 @@
             <div class="license-date-icon" aria-hidden="true">
                 <i class="fas fa-info-circle"></i>
             </div>
-            <div class="license-date-label">Transcript Analysis Not Configured</div>
-            <div class="license-date-value">Add-on Not Purchased</div>
+            <div class="license-date-label">{{ _('Transcript Analysis Not Configured') }}</div>
+            <div class="license-date-value">{{ _('Add-on Not Purchased') }}</div>
             <div class="license-date-meta">
                 Contact your administrator to enable transcript analysis capabilities.
             </div>

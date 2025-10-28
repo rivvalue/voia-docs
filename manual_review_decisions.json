@@ -1,0 +1,2252 @@
+{
+  "templates/business_auth/activate_account.html:547": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/activate_account.html",
+    "line": "547",
+    "pattern": "Links (a tags)",
+    "text": "support@voia.com",
+    "context": "<a href=\"mailto:support@voia.com\">support@voia.com</a>"
+  },
+  "templates/business_auth/admin_licenses.html:156": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/admin_licenses.html",
+    "line": "156",
+    "pattern": "Spans",
+    "text": "No expiration",
+    "context": "<span class=\"text-muted\">No expiration</span>"
+  },
+  "templates/business_auth/admin_panel_v2.html:702": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/admin_panel_v2.html",
+    "line": "702",
+    "pattern": "Divs with text",
+    "text": "Campaigns",
+    "context": "<div class=\"settings-stat-label\">Campaigns</div>"
+  },
+  "templates/business_auth/admin_panel_v2.html:706": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/admin_panel_v2.html",
+    "line": "706",
+    "pattern": "Divs with text",
+    "text": "Users",
+    "context": "<div class=\"settings-stat-label\">Users</div>"
+  },
+  "templates/business_auth/admin_panel_v2.html:710": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/admin_panel_v2.html",
+    "line": "710",
+    "pattern": "Divs with text",
+    "text": "Max Participants",
+    "context": "<div class=\"settings-stat-label\">Max Participants</div>"
+  },
+  "templates/business_auth/audit_logs.html:28": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "28",
+    "pattern": "Divs with text",
+    "text": "Total Activities",
+    "context": "<div class=\"audit-stat-label\">Total Activities</div>"
+  },
+  "templates/business_auth/audit_logs.html:32": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "32",
+    "pattern": "Divs with text",
+    "text": "Activity Types",
+    "context": "<div class=\"audit-stat-label\">Activity Types</div>"
+  },
+  "templates/business_auth/audit_logs.html:36": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "36",
+    "pattern": "Divs with text",
+    "text": "Active Users",
+    "context": "<div class=\"audit-stat-label\">Active Users</div>"
+  },
+  "templates/business_auth/audit_logs.html:40": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "40",
+    "pattern": "Divs with text",
+    "text": "Days Shown",
+    "context": "<div class=\"audit-stat-label\">Days Shown</div>"
+  },
+  "templates/business_auth/audit_logs.html:49": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "49",
+    "pattern": "ARIA labels",
+    "text": "Filter by activity type",
+    "context": "aria-label=\"Filter by activity type\""
+  },
+  "templates/business_auth/audit_logs.html:62": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "62",
+    "pattern": "ARIA labels",
+    "text": "Filter by user",
+    "context": "aria-label=\"Filter by user\""
+  },
+  "templates/business_auth/audit_logs.html:75": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "75",
+    "pattern": "ARIA labels",
+    "text": "Filter by time period",
+    "context": "aria-label=\"Filter by time period\""
+  },
+  "templates/business_auth/audit_logs.html:84": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "84",
+    "pattern": "ARIA labels",
+    "text": "Apply filters",
+    "context": "aria-label=\"Apply filters\""
+  },
+  "templates/business_auth/audit_logs.html:96": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "96",
+    "pattern": "ARIA labels",
+    "text": "Audit logs table",
+    "context": "aria-label=\"Audit logs table\""
+  },
+  "templates/business_auth/audit_logs.html:169": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "169",
+    "pattern": "ARIA labels",
+    "text": "Pagination",
+    "context": "aria-label=\"Pagination\""
+  },
+  "templates/business_auth/audit_logs.html:173": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "173",
+    "pattern": "ARIA labels",
+    "text": "Go to previous page",
+    "context": "aria-label=\"Go to previous page\""
+  },
+  "templates/business_auth/audit_logs.html:189": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "189",
+    "pattern": "ARIA labels",
+    "text": "Go to next page",
+    "context": "aria-label=\"Go to next page\""
+  },
+  "templates/business_auth/brand_config.html:190": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/brand_config.html",
+    "line": "190",
+    "pattern": "ARIA labels",
+    "text": "Color palette preview",
+    "context": "aria-label=\"Color palette preview\""
+  },
+  "templates/business_auth/brand_config.html:231": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/brand_config.html",
+    "line": "231",
+    "pattern": "ARIA labels",
+    "text": "Upload requirements",
+    "context": "aria-label=\"Upload requirements\""
+  },
+  "templates/business_auth/brand_config.html:250": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/brand_config.html",
+    "line": "250",
+    "pattern": "ARIA labels",
+    "text": "Save brand settings",
+    "context": "aria-label=\"Save brand settings\""
+  },
+  "templates/business_auth/business_account_onboarding.html:33": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "33",
+    "pattern": "ARIA labels",
+    "text": "Close",
+    "context": "aria-label=\"Close\""
+  },
+  "templates/business_auth/business_account_onboarding.html:78": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "78",
+    "pattern": "Divs with text",
+    "text": "This will be displayed throughout the platform and in communications",
+    "context": "<div class=\"form-text\">This will be displayed throughout the platform and in communications</div>"
+  },
+  "templates/business_auth/business_account_onboarding.html:102": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "102",
+    "pattern": "Divs with text",
+    "text": "Choose the license tier that best fits the business needs",
+    "context": "<div class=\"form-text\">Choose the license tier that best fits the business needs</div>"
+  },
+  "templates/business_auth/business_account_onboarding.html:157": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "157",
+    "pattern": "Divs with text",
+    "text": "The administrator will receive an invitation email at this address",
+    "context": "<div class=\"form-text\">The administrator will receive an invitation email at this address</div>"
+  },
+  "templates/business_auth/business_account_onboarding.html:168": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "168",
+    "pattern": "Spans",
+    "text": "the administrator",
+    "context": "<span id=\"email-preview\">the administrator</span>"
+  },
+  "templates/business_auth/business_account_onboarding.html:169": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "169",
+    "pattern": "Spans",
+    "text": "business name",
+    "context": "<span id=\"business-preview\">business name</span>"
+  },
+  "templates/business_auth/email_config.html:69": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/email_config.html",
+    "line": "69",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "aws_ses",
+    "context": "value=\"aws_ses\""
+  },
+  "templates/business_auth/email_config.html:71": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/email_config.html",
+    "line": "71",
+    "pattern": "Divs with text",
+    "text": "Choose your email delivery provider",
+    "context": "<div class=\"email-help-text\" id=\"email_provider_help\">Choose your email delivery provider</div>"
+  },
+  "templates/business_auth/email_config.html:84": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/email_config.html",
+    "line": "84",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "us-east-1",
+    "context": "value=\"us-east-1\""
+  },
+  "templates/business_auth/email_config.html:85": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/email_config.html",
+    "line": "85",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "us-east-2",
+    "context": "value=\"us-east-2\""
+  },
+  "templates/business_auth/email_config.html:86": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/email_config.html",
+    "line": "86",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "us-west-1",
+    "context": "value=\"us-west-1\""
+  },
+  "templates/business_auth/email_config.html:87": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/email_config.html",
+    "line": "87",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "us-west-2",
+    "context": "value=\"us-west-2\""
+  },
+  "templates/business_auth/email_config.html:88": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/email_config.html",
+    "line": "88",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "ca-central-1",
+    "context": "value=\"ca-central-1\""
+  },
+  "templates/business_auth/email_config.html:89": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/email_config.html",
+    "line": "89",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "eu-west-1",
+    "context": "value=\"eu-west-1\""
+  },
+  "templates/business_auth/email_config.html:90": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/email_config.html",
+    "line": "90",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "eu-west-2",
+    "context": "value=\"eu-west-2\""
+  },
+  "templates/business_auth/email_config.html:91": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/email_config.html",
+    "line": "91",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "eu-west-3",
+    "context": "value=\"eu-west-3\""
+  },
+  "templates/business_auth/email_config.html:92": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/email_config.html",
+    "line": "92",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "eu-central-1",
+    "context": "value=\"eu-central-1\""
+  },
+  "templates/business_auth/email_config.html:93": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/email_config.html",
+    "line": "93",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "ap-south-1",
+    "context": "value=\"ap-south-1\""
+  },
+  "templates/business_auth/email_config.html:94": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/email_config.html",
+    "line": "94",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "ap-northeast-1",
+    "context": "value=\"ap-northeast-1\""
+  },
+  "templates/business_auth/email_config.html:95": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/email_config.html",
+    "line": "95",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "ap-northeast-2",
+    "context": "value=\"ap-northeast-2\""
+  },
+  "templates/business_auth/email_config.html:96": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/email_config.html",
+    "line": "96",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "ap-southeast-1",
+    "context": "value=\"ap-southeast-1\""
+  },
+  "templates/business_auth/email_config.html:97": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/email_config.html",
+    "line": "97",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "ap-southeast-2",
+    "context": "value=\"ap-southeast-2\""
+  },
+  "templates/business_auth/email_config.html:98": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/email_config.html",
+    "line": "98",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "sa-east-1",
+    "context": "value=\"sa-east-1\""
+  },
+  "templates/business_auth/forgot_password.html:27": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/forgot_password.html",
+    "line": "27",
+    "pattern": "ARIA labels",
+    "text": "Close",
+    "context": "aria-label=\"Close\""
+  },
+  "templates/business_auth/license_info.html:27": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/license_info.html",
+    "line": "27",
+    "pattern": "ARIA labels",
+    "text": "Account type",
+    "context": "aria-label=\"Account type\""
+  },
+  "templates/business_auth/license_info.html:64": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/license_info.html",
+    "line": "64",
+    "pattern": "Divs with text",
+    "text": "License Purchase Date",
+    "context": "<div class=\"license-date-label\">License Purchase Date</div>"
+  },
+  "templates/business_auth/license_info.html:87": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/license_info.html",
+    "line": "87",
+    "pattern": "Divs with text",
+    "text": "License Expiry Date",
+    "context": "<div class=\"license-date-label\">License Expiry Date</div>"
+  },
+  "templates/business_auth/license_info.html:114": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/license_info.html",
+    "line": "114",
+    "pattern": "ARIA labels",
+    "text": "License period details",
+    "context": "aria-label=\"License period details\""
+  },
+  "templates/business_auth/license_info.html:120": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/license_info.html",
+    "line": "120",
+    "pattern": "Divs with text",
+    "text": "License Period",
+    "context": "<div class=\"license-info-label\">License Period</div>"
+  },
+  "templates/business_auth/license_info.html:130": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/license_info.html",
+    "line": "130",
+    "pattern": "Divs with text",
+    "text": "License Duration",
+    "context": "<div class=\"license-info-label\">License Duration</div>"
+  },
+  "templates/business_auth/license_info.html:156": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/license_info.html",
+    "line": "156",
+    "pattern": "ARIA labels",
+    "text": "Campaigns used out of limit",
+    "context": "aria-label=\"Campaigns used out of limit\""
+  },
+  "templates/business_auth/license_info.html:180": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/license_info.html",
+    "line": "180",
+    "pattern": "ARIA labels",
+    "text": "Users count out of limit",
+    "context": "aria-label=\"Users count out of limit\""
+  },
+  "templates/business_auth/license_info.html:251": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/license_info.html",
+    "line": "251",
+    "pattern": "Divs with text",
+    "text": "Add-on Start Date",
+    "context": "<div class=\"license-date-label\">Add-on Start Date</div>"
+  },
+  "templates/business_auth/license_info.html:276": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/license_info.html",
+    "line": "276",
+    "pattern": "Divs with text",
+    "text": "Add-on End Date",
+    "context": "<div class=\"license-date-label\">Add-on End Date</div>"
+  },
+  "templates/business_auth/license_info.html:303": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/license_info.html",
+    "line": "303",
+    "pattern": "ARIA labels",
+    "text": "Add-on period details",
+    "context": "aria-label=\"Add-on period details\""
+  },
+  "templates/business_auth/license_info.html:309": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/license_info.html",
+    "line": "309",
+    "pattern": "Divs with text",
+    "text": "Add-on Period",
+    "context": "<div class=\"license-info-label\">Add-on Period</div>"
+  },
+  "templates/business_auth/license_info.html:325": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/license_info.html",
+    "line": "325",
+    "pattern": "Divs with text",
+    "text": "Add-on Duration",
+    "context": "<div class=\"license-info-label\">Add-on Duration</div>"
+  },
+  "templates/business_auth/license_info.html:342": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/license_info.html",
+    "line": "342",
+    "pattern": "Divs with text",
+    "text": "Transcript Analysis Not Configured",
+    "context": "<div class=\"license-date-label\">Transcript Analysis Not Configured</div>"
+  },
+  "templates/business_auth/license_info.html:343": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/license_info.html",
+    "line": "343",
+    "pattern": "Divs with text",
+    "text": "Add-on Not Purchased",
+    "context": "<div class=\"license-date-value\">Add-on Not Purchased</div>"
+  },
+  "templates/business_auth/license_info.html:344": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/license_info.html",
+    "line": "344",
+    "pattern": "Divs with text",
+    "text": "Contact your administrator to enable transcript analysis capabilities.",
+    "context": "<div class=\"license-date-meta\">                 Contact your administrator to enable transcript anal"
+  },
+  "templates/business_auth/licenses/assignment_form.html:227": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "227",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "pro",
+    "context": "value=\"pro\""
+  },
+  "templates/business_auth/licenses/assignment_form.html:242": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "242",
+    "pattern": "Divs with text",
+    "text": "Custom",
+    "context": "<div style=\"font-size: var(--font-size-xl); font-weight: 600; color: var(--primary-red);\">Custom</di"
+  },
+  "templates/business_auth/licenses/assignment_form.html:243": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "243",
+    "pattern": "Divs with text",
+    "text": "pricing",
+    "context": "<div class=\"text-muted\" style=\"font-size: var(--font-size-xs);\">pricing</div>"
+  },
+  "templates/business_auth/licenses/assignment_form.html:339": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "339",
+    "pattern": "Divs with text",
+    "text": "When transcript analysis access begins",
+    "context": "<div class=\"form-text\">When transcript analysis access begins</div>"
+  },
+  "templates/business_auth/licenses/assignment_form.html:345": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "345",
+    "pattern": "Divs with text",
+    "text": "When transcript analysis access expires",
+    "context": "<div class=\"form-text\">When transcript analysis access expires</div>"
+  },
+  "templates/business_auth/licenses/assignment_form.html:355": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "355",
+    "pattern": "Divs with text",
+    "text": "Custom pricing for this add-on period",
+    "context": "<div class=\"form-text\">Custom pricing for this add-on period</div>"
+  },
+  "templates/business_auth/licenses/assignment_result.html:342": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/licenses/assignment_result.html",
+    "line": "342",
+    "pattern": "Spans",
+    "text": "Email:",
+    "context": "<span class=\"detail-label\">Email:</span>"
+  },
+  "templates/business_auth/licenses/history.html:486": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/licenses/history.html",
+    "line": "486",
+    "pattern": "Spans",
+    "text": "Expiration",
+    "context": "<span class=\"detail-label\">Expiration</span>"
+  },
+  "templates/business_auth/licenses/overview.html:296": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/licenses/overview.html",
+    "line": "296",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "pro",
+    "context": "value=\"pro\""
+  },
+  "templates/business_auth/licenses/overview.html:305": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/licenses/overview.html",
+    "line": "305",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "expiring",
+    "context": "value=\"expiring\""
+  },
+  "templates/business_auth/licenses/overview.html:306": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/licenses/overview.html",
+    "line": "306",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "expired",
+    "context": "value=\"expired\""
+  },
+  "templates/business_auth/licenses/overview.html:377": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/licenses/overview.html",
+    "line": "377",
+    "pattern": "Spans",
+    "text": "Unlimited",
+    "context": "<span class=\"text-muted\">Unlimited</span>"
+  },
+  "templates/business_auth/login.html:27": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/login.html",
+    "line": "27",
+    "pattern": "ARIA labels",
+    "text": "Close",
+    "context": "aria-label=\"Close\""
+  },
+  "templates/business_auth/login.html:87": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/login.html",
+    "line": "87",
+    "pattern": "Links (a tags)",
+    "text": "RIVVALUE inc.",
+    "context": "<a href=\"https://www.rivvalue.com\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-muted\">RIVV"
+  },
+  "templates/business_auth/manage_users.html:32": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "32",
+    "pattern": "ARIA labels",
+    "text": "Close",
+    "context": "aria-label=\"Close\""
+  },
+  "templates/business_auth/manage_users.html:49": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "49",
+    "pattern": "ARIA labels",
+    "text": "User limit usage",
+    "context": "aria-label=\"User limit usage\""
+  },
+  "templates/business_auth/manage_users.html:60": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "60",
+    "pattern": "ARIA labels",
+    "text": "Add new user",
+    "context": "aria-label=\"Add new user\""
+  },
+  "templates/business_auth/manage_users.html:68": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "68",
+    "pattern": "ARIA labels",
+    "text": "Add user button disabled - license limit reached",
+    "context": "aria-label=\"Add user button disabled - license limit reached\""
+  },
+  "templates/business_auth/manage_users.html:120": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "120",
+    "pattern": "ARIA labels",
+    "text": "User role",
+    "context": "aria-label=\"User role\""
+  },
+  "templates/business_auth/manage_users.html:126": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "126",
+    "pattern": "ARIA labels",
+    "text": "User status",
+    "context": "aria-label=\"User status\""
+  },
+  "templates/business_auth/manage_users.html:135": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "135",
+    "pattern": "Spans",
+    "text": "Never",
+    "context": "<span class=\"text-muted\">Never</span>"
+  },
+  "templates/business_auth/manage_users.html:183": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "183",
+    "pattern": "Spans",
+    "text": "Current User",
+    "context": "<span class=\"text-muted small\">Current User</span>"
+  },
+  "templates/business_auth/manage_users.html:211": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "211",
+    "pattern": "ARIA labels",
+    "text": "Close",
+    "context": "aria-label=\"Close\""
+  },
+  "templates/business_auth/manage_users.html:217": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "217",
+    "pattern": "ARIA labels",
+    "text": "required",
+    "context": "aria-label=\"required\""
+  },
+  "templates/business_auth/manage_users.html:229": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "229",
+    "pattern": "ARIA labels",
+    "text": "required",
+    "context": "aria-label=\"required\""
+  },
+  "templates/business_auth/manage_users.html:242": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "242",
+    "pattern": "ARIA labels",
+    "text": "required",
+    "context": "aria-label=\"required\""
+  },
+  "templates/business_auth/manage_users.html:252": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "252",
+    "pattern": "Divs with text",
+    "text": "The user will receive an invitation email to activate their account.",
+    "context": "<div class=\"form-text\" id=\"email_help\">The user will receive an invitation email to activate their a"
+  },
+  "templates/business_auth/manage_users.html:258": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "258",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "manager",
+    "context": "value=\"manager\""
+  },
+  "templates/business_auth/manage_users.html:259": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "259",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "viewer",
+    "context": "value=\"viewer\""
+  },
+  "templates/business_auth/manage_users.html:260": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "260",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "admin",
+    "context": "value=\"admin\""
+  },
+  "templates/business_auth/manage_users.html:262": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "262",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "platform_admin",
+    "context": "value=\"platform_admin\""
+  },
+  "templates/business_auth/manage_users.html:275": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "275",
+    "pattern": "ARIA labels",
+    "text": "Confirm add user",
+    "context": "aria-label=\"Confirm add user\""
+  },
+  "templates/business_auth/manage_users.html:294": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "294",
+    "pattern": "ARIA labels",
+    "text": "Close",
+    "context": "aria-label=\"Close\""
+  },
+  "templates/business_auth/manage_users.html:300": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "300",
+    "pattern": "ARIA labels",
+    "text": "required",
+    "context": "aria-label=\"required\""
+  },
+  "templates/business_auth/manage_users.html:312": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "312",
+    "pattern": "ARIA labels",
+    "text": "required",
+    "context": "aria-label=\"required\""
+  },
+  "templates/business_auth/manage_users.html:325": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "325",
+    "pattern": "ARIA labels",
+    "text": "required",
+    "context": "aria-label=\"required\""
+  },
+  "templates/business_auth/manage_users.html:338": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "338",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "manager",
+    "context": "value=\"manager\""
+  },
+  "templates/business_auth/manage_users.html:339": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "339",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "viewer",
+    "context": "value=\"viewer\""
+  },
+  "templates/business_auth/manage_users.html:340": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "340",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "admin",
+    "context": "value=\"admin\""
+  },
+  "templates/business_auth/manage_users.html:342": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "342",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "platform_admin",
+    "context": "value=\"platform_admin\""
+  },
+  "templates/business_auth/manage_users.html:350": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/manage_users.html",
+    "line": "350",
+    "pattern": "ARIA labels",
+    "text": "Save changes",
+    "context": "aria-label=\"Save changes\""
+  },
+  "templates/business_auth/onboarding/complete.html:346": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/onboarding/complete.html",
+    "line": "346",
+    "pattern": "Divs with text",
+    "text": "Team Members Added",
+    "context": "<div class=\"summary-title\">Team Members Added</div>"
+  },
+  "templates/business_auth/onboarding/complete.html:356": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/onboarding/complete.html",
+    "line": "356",
+    "pattern": "Divs with text",
+    "text": "Platform Security",
+    "context": "<div class=\"summary-title\">Platform Security</div>"
+  },
+  "templates/business_auth/onboarding/users.html:411": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/onboarding/users.html",
+    "line": "411",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "manager",
+    "context": "value=\"manager\""
+  },
+  "templates/business_auth/onboarding/users.html:412": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/onboarding/users.html",
+    "line": "412",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "admin",
+    "context": "value=\"admin\""
+  },
+  "templates/business_auth/onboarding/users.html:413": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/onboarding/users.html",
+    "line": "413",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "viewer",
+    "context": "value=\"viewer\""
+  },
+  "templates/business_auth/reset_password.html:13": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/reset_password.html",
+    "line": "13",
+    "pattern": "ARIA labels",
+    "text": "VOÏA Password Reset",
+    "context": "aria-label=\"VOÏA Password Reset\""
+  },
+  "templates/business_auth/reset_password.html:27": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/reset_password.html",
+    "line": "27",
+    "pattern": "ARIA labels",
+    "text": "Close",
+    "context": "aria-label=\"Close\""
+  },
+  "templates/business_auth/reset_password.html:36": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/reset_password.html",
+    "line": "36",
+    "pattern": "ARIA labels",
+    "text": "Password reset form",
+    "context": "aria-label=\"Password reset form\""
+  },
+  "templates/business_auth/reset_password.html:51": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/reset_password.html",
+    "line": "51",
+    "pattern": "ARIA labels",
+    "text": "New password",
+    "context": "aria-label=\"New password\""
+  },
+  "templates/business_auth/reset_password.html:67": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/reset_password.html",
+    "line": "67",
+    "pattern": "ARIA labels",
+    "text": "Confirm new password",
+    "context": "aria-label=\"Confirm new password\""
+  },
+  "templates/business_auth/reset_password.html:78": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/reset_password.html",
+    "line": "78",
+    "pattern": "ARIA labels",
+    "text": "Reset password",
+    "context": "aria-label=\"Reset password\""
+  },
+  "templates/business_auth/reset_password.html:84": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/reset_password.html",
+    "line": "84",
+    "pattern": "ARIA labels",
+    "text": "Return to login page",
+    "context": "aria-label=\"Return to login page\""
+  },
+  "templates/business_auth/survey_config.html:146": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/survey_config.html",
+    "line": "146",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "NPS",
+    "context": "value=\"NPS\""
+  },
+  "templates/business_auth/survey_config.html:151": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/survey_config.html",
+    "line": "151",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Satisfaction",
+    "context": "value=\"Satisfaction\""
+  },
+  "templates/business_auth/survey_config.html:156": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/survey_config.html",
+    "line": "156",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Product Feedback",
+    "context": "value=\"Product Feedback\""
+  },
+  "templates/business_auth/survey_config.html:161": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/survey_config.html",
+    "line": "161",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Support Quality",
+    "context": "value=\"Support Quality\""
+  },
+  "templates/business_auth/survey_config.html:166": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/survey_config.html",
+    "line": "166",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Pricing Perception",
+    "context": "value=\"Pricing Perception\""
+  },
+  "templates/business_auth/survey_config.html:171": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/survey_config.html",
+    "line": "171",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Custom",
+    "context": "value=\"Custom\""
+  },
+  "templates/business_auth/survey_config.html:230": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/survey_config.html",
+    "line": "230",
+    "pattern": "Spans",
+    "text": "1min",
+    "context": "<span>1min</span>"
+  },
+  "templates/business_auth/survey_config.html:231": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/business_auth/survey_config.html",
+    "line": "231",
+    "pattern": "Spans",
+    "text": "5min",
+    "context": "<span>5min</span>"
+  },
+  "templates/campaign_insights.html:146": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/campaign_insights.html",
+    "line": "146",
+    "pattern": "Spans",
+    "text": "Jan 1 - Dec 31, 2024",
+    "context": "<span class=\"ms-2 text-muted\" id=\"activeCampaignDates\">Jan 1 - Dec 31, 2024</span>"
+  },
+  "templates/campaign_insights.html:256": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaign_insights.html",
+    "line": "256",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "risk_heavy",
+    "context": "value=\"risk_heavy\""
+  },
+  "templates/campaign_insights.html:257": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaign_insights.html",
+    "line": "257",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "balanced",
+    "context": "value=\"balanced\""
+  },
+  "templates/campaign_insights.html:258": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaign_insights.html",
+    "line": "258",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "opportunity_heavy",
+    "context": "value=\"opportunity_heavy\""
+  },
+  "templates/campaign_insights.html:265": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaign_insights.html",
+    "line": "265",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "critical",
+    "context": "value=\"critical\""
+  },
+  "templates/campaign_insights.html:266": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaign_insights.html",
+    "line": "266",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "high",
+    "context": "value=\"high\""
+  },
+  "templates/campaign_insights.html:267": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaign_insights.html",
+    "line": "267",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "medium",
+    "context": "value=\"medium\""
+  },
+  "templates/campaign_insights.html:268": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaign_insights.html",
+    "line": "268",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "low",
+    "context": "value=\"low\""
+  },
+  "templates/campaign_insights.html:275": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaign_insights.html",
+    "line": "275",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "yes",
+    "context": "value=\"yes\""
+  },
+  "templates/campaign_insights.html:283": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaign_insights.html",
+    "line": "283",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "yes",
+    "context": "value=\"yes\""
+  },
+  "templates/campaign_insights.html:410": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaign_insights.html",
+    "line": "410",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "promoters",
+    "context": "value=\"promoters\""
+  },
+  "templates/campaign_insights.html:411": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaign_insights.html",
+    "line": "411",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "passives",
+    "context": "value=\"passives\""
+  },
+  "templates/campaign_insights.html:412": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaign_insights.html",
+    "line": "412",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "detractors",
+    "context": "value=\"detractors\""
+  },
+  "templates/campaign_insights.html:582": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaign_insights.html",
+    "line": "582",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "promoters",
+    "context": "value=\"promoters\""
+  },
+  "templates/campaign_insights.html:583": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaign_insights.html",
+    "line": "583",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "passives",
+    "context": "value=\"passives\""
+  },
+  "templates/campaign_insights.html:584": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaign_insights.html",
+    "line": "584",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "detractors",
+    "context": "value=\"detractors\""
+  },
+  "templates/campaign_insights.html:765": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaign_insights.html",
+    "line": "765",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "created_at_desc",
+    "context": "value=\"created_at_desc\""
+  },
+  "templates/campaign_insights.html:766": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaign_insights.html",
+    "line": "766",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "created_at_asc",
+    "context": "value=\"created_at_asc\""
+  },
+  "templates/campaign_insights.html:767": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaign_insights.html",
+    "line": "767",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "nps_score_desc",
+    "context": "value=\"nps_score_desc\""
+  },
+  "templates/campaign_insights.html:768": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaign_insights.html",
+    "line": "768",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "nps_score_asc",
+    "context": "value=\"nps_score_asc\""
+  },
+  "templates/campaign_insights.html:1092": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaign_insights.html",
+    "line": "1092",
+    "pattern": "Spans",
+    "text": "Role",
+    "context": "<span class=\"badge bg-primary\">Role</span>"
+  },
+  "templates/campaign_insights.html:1109": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaign_insights.html",
+    "line": "1109",
+    "pattern": "Spans",
+    "text": "Region",
+    "context": "<span class=\"badge bg-info\">Region</span>"
+  },
+  "templates/campaign_insights.html:1126": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaign_insights.html",
+    "line": "1126",
+    "pattern": "Spans",
+    "text": "Tier",
+    "context": "<span class=\"badge bg-warning text-dark\">Tier</span>"
+  },
+  "templates/campaigns/create.html:144": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/create.html",
+    "line": "144",
+    "pattern": "Divs with text",
+    "text": "When enabled, participant names and company names will be anonymized using secure hashing. \n                        Anonymized participants will appear as \"Participant-{hash}\" in reports and analytics. \n                        This cannot be changed after campaign creation.",
+    "context": "<div class=\"form-text\">                         When enabled, participant names and company names wi"
+  },
+  "templates/campaigns/create.html:171": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/create.html",
+    "line": "171",
+    "pattern": "Divs with text",
+    "text": "When enabled, customize the email sent to participants. Leave unchecked to use your account's default email templates.",
+    "context": "<div class=\"form-text\" style=\"margin-left: 2.5rem; margin-top: 0.5rem;\">                         Whe"
+  },
+  "templates/campaigns/create.html:181": {
+    "action": "split",
+    "notes": "",
+    "file": "templates/campaigns/create.html",
+    "line": "181",
+    "pattern": "Divs with text",
+    "text": "Available variables: {participant_name}, {campaign_name}, {business_account_name}",
+    "context": "<div class=\"form-text\">Available variables: {participant_name}, {campaign_name}, {business_account_n"
+  },
+  "templates/campaigns/create.html:189": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/campaigns/create.html",
+    "line": "189",
+    "pattern": "Divs with text",
+    "text": "Opens the email body. Available variables: {participant_name}, {campaign_name}, {business_account_name}",
+    "context": "<div class=\"form-text\">Opens the email body. Available variables: {participant_name}, {campaign_name"
+  },
+  "templates/campaigns/create.html:206": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/campaigns/create.html",
+    "line": "206",
+    "pattern": "Divs with text",
+    "text": "Message before sign-off. Available variables: {participant_name}, {campaign_name}, {business_account_name}",
+    "context": "<div class=\"form-text\">Message before sign-off. Available variables: {participant_name}, {campaign_n"
+  },
+  "templates/campaigns/create.html:237": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/create.html",
+    "line": "237",
+    "pattern": "Divs with text",
+    "text": "Automatically send a follow-up email to participants who haven't completed the survey",
+    "context": "<div class=\"form-text\" style=\"margin-left: 2.5rem; margin-top: 0.5rem;\">                         Aut"
+  },
+  "templates/campaigns/edit.html:159": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/edit.html",
+    "line": "159",
+    "pattern": "Divs with text",
+    "text": "Automatically send a follow-up email to participants who haven't completed the survey",
+    "context": "<div class=\"form-text\" style=\"margin-left: 2.5rem; margin-top: 0.5rem;\">                         Aut"
+  },
+  "templates/campaigns/individual_response.html:324": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/individual_response.html",
+    "line": "324",
+    "pattern": "Spans",
+    "text": "Company:",
+    "context": "<span class=\"data-label\">Company:</span>"
+  },
+  "templates/campaigns/individual_response.html:339": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/individual_response.html",
+    "line": "339",
+    "pattern": "Spans",
+    "text": "NPS Score:",
+    "context": "<span class=\"data-label\">NPS Score:</span>"
+  },
+  "templates/campaigns/individual_response.html:352": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/individual_response.html",
+    "line": "352",
+    "pattern": "Spans",
+    "text": "Product Value:",
+    "context": "<span class=\"data-label\">Product Value:</span>"
+  },
+  "templates/campaigns/individual_response.html:358": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/individual_response.html",
+    "line": "358",
+    "pattern": "Spans",
+    "text": "Service Quality:",
+    "context": "<span class=\"data-label\">Service Quality:</span>"
+  },
+  "templates/campaigns/individual_response.html:364": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/individual_response.html",
+    "line": "364",
+    "pattern": "Spans",
+    "text": "Pricing:",
+    "context": "<span class=\"data-label\">Pricing:</span>"
+  },
+  "templates/campaigns/individual_response.html:377": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/individual_response.html",
+    "line": "377",
+    "pattern": "Spans",
+    "text": "Sentiment:",
+    "context": "<span class=\"data-label\">Sentiment:</span>"
+  },
+  "templates/campaigns/individual_response.html:394": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/individual_response.html",
+    "line": "394",
+    "pattern": "Spans",
+    "text": "Churn Risk:",
+    "context": "<span class=\"data-label\">Churn Risk:</span>"
+  },
+  "templates/campaigns/individual_response.html:403": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/individual_response.html",
+    "line": "403",
+    "pattern": "Spans",
+    "text": "Key Themes:",
+    "context": "<span class=\"data-label d-block mb-2\">Key Themes:</span>"
+  },
+  "templates/campaigns/individual_response.html:419": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/individual_response.html",
+    "line": "419",
+    "pattern": "Spans",
+    "text": "Submitted:",
+    "context": "<span class=\"data-label\">Submitted:</span>"
+  },
+  "templates/campaigns/individual_response.html:424": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/campaigns/individual_response.html",
+    "line": "424",
+    "pattern": "Spans",
+    "text": "(updated)",
+    "context": "<span style=\"color: #666; font-size: 0.9em;\">(updated)</span>"
+  },
+  "templates/campaigns/individual_response.html:435": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/individual_response.html",
+    "line": "435",
+    "pattern": "Spans",
+    "text": "Campaign:",
+    "context": "<span class=\"data-label\">Campaign:</span>"
+  },
+  "templates/campaigns/individual_response.html:440": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/individual_response.html",
+    "line": "440",
+    "pattern": "Spans",
+    "text": "Commercial Value:",
+    "context": "<span class=\"data-label\">Commercial Value:</span>"
+  },
+  "templates/campaigns/individual_response.html:454": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/individual_response.html",
+    "line": "454",
+    "pattern": "Spans",
+    "text": "Improvement Feedback:",
+    "context": "<span class=\"data-label d-block\">Improvement Feedback:</span>"
+  },
+  "templates/campaigns/individual_response.html:460": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/individual_response.html",
+    "line": "460",
+    "pattern": "Spans",
+    "text": "Recommendation Reason:",
+    "context": "<span class=\"data-label d-block\">Recommendation Reason:</span>"
+  },
+  "templates/campaigns/individual_response.html:466": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/individual_response.html",
+    "line": "466",
+    "pattern": "Spans",
+    "text": "Additional Comments:",
+    "context": "<span class=\"data-label d-block\">Additional Comments:</span>"
+  },
+  "templates/campaigns/list.html:106": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/list.html",
+    "line": "106",
+    "pattern": "Divs with text",
+    "text": "Participants",
+    "context": "<div class=\"small text-muted\">Participants</div>"
+  },
+  "templates/campaigns/survey_config.html:224": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/survey_config.html",
+    "line": "224",
+    "pattern": "Divs with text",
+    "text": "Help the AI understand what you offer to ask better questions",
+    "context": "<div class=\"form-text\">Help the AI understand what you offer to ask better questions</div>"
+  },
+  "templates/campaigns/survey_config.html:232": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/survey_config.html",
+    "line": "232",
+    "pattern": "Divs with text",
+    "text": "Who are you primarily serving? This helps tailor conversation tone and questions",
+    "context": "<div class=\"form-text\">Who are you primarily serving? This helps tailor conversation tone and questi"
+  },
+  "templates/campaigns/survey_config.html:256": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/survey_config.html",
+    "line": "256",
+    "pattern": "Divs with text",
+    "text": "NPS is recommended for all campaigns to track customer loyalty",
+    "context": "<div class=\"form-text mt-2\">NPS is recommended for all campaigns to track customer loyalty</div>"
+  },
+  "templates/campaigns/survey_config.html:278": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/survey_config.html",
+    "line": "278",
+    "pattern": "Divs with text",
+    "text": "Hard limit on conversation length",
+    "context": "<div class=\"form-text\">Hard limit on conversation length</div>"
+  },
+  "templates/campaigns/survey_config.html:290": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/survey_config.html",
+    "line": "290",
+    "pattern": "Divs with text",
+    "text": "Time limit for entire conversation",
+    "context": "<div class=\"form-text\">Time limit for entire conversation</div>"
+  },
+  "templates/campaigns/survey_config.html:302": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/survey_config.html",
+    "line": "302",
+    "pattern": "Divs with text",
+    "text": "Control topic depth exploration",
+    "context": "<div class=\"form-text\">Control topic depth exploration</div>"
+  },
+  "templates/campaigns/survey_config.html:332": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/survey_config.html",
+    "line": "332",
+    "pattern": "Divs with text",
+    "text": "These topics will be covered first and are most important",
+    "context": "<div class=\"form-text\">These topics will be covered first and are most important</div>"
+  },
+  "templates/campaigns/survey_config.html:348": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/survey_config.html",
+    "line": "348",
+    "pattern": "Divs with text",
+    "text": "These topics will be skipped if time/questions run out",
+    "context": "<div class=\"form-text\">These topics will be skipped if time/questions run out</div>"
+  },
+  "templates/campaigns/survey_config.html:361": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/survey_config.html",
+    "line": "361",
+    "pattern": "Divs with text",
+    "text": "Personalized message shown when participants complete the survey",
+    "context": "<div class=\"form-text\">Personalized message shown when participants complete the survey</div>"
+  },
+  "templates/campaigns/survey_config.html:387": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/survey_config.html",
+    "line": "387",
+    "pattern": "Divs with text",
+    "text": "Advanced: Custom instructions for the AI conversation engine. Leave blank to use intelligent defaults.",
+    "context": "<div class=\"form-text\">                             Advanced: Custom instructions for the AI convers"
+  },
+  "templates/campaigns/view.html:46": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/view.html",
+    "line": "46",
+    "pattern": "Divs with text",
+    "text": "Start Date",
+    "context": "<div class=\"info-label\">Start Date</div>"
+  },
+  "templates/campaigns/view.html:50": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/campaigns/view.html",
+    "line": "50",
+    "pattern": "Divs with text",
+    "text": "End Date",
+    "context": "<div class=\"info-label\">End Date</div>"
+  },
+  "templates/campaigns/view.html:734": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/campaigns/view.html",
+    "line": "734",
+    "pattern": "Spans",
+    "text": "= 9 ? 'success' : transcript.nps_score >= 7 ? 'warning' : 'danger'}\">\n                            NPS: ${transcript.nps_score}/10",
+    "context": "<span class=\"badge bg-${transcript.nps_score >= 9 ? 'success' : transcript.nps_score >= 7 ? 'warning"
+  },
+  "templates/conversational_survey.html:133": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/conversational_survey.html",
+    "line": "133",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Less than 6 months",
+    "context": "value=\"Less than 6 months\""
+  },
+  "templates/conversational_survey.html:134": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/conversational_survey.html",
+    "line": "134",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "6 months - 1 year",
+    "context": "value=\"6 months - 1 year\""
+  },
+  "templates/conversational_survey.html:135": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/conversational_survey.html",
+    "line": "135",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "1-2 years",
+    "context": "value=\"1-2 years\""
+  },
+  "templates/conversational_survey.html:136": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/conversational_survey.html",
+    "line": "136",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "2-3 years",
+    "context": "value=\"2-3 years\""
+  },
+  "templates/conversational_survey.html:137": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/conversational_survey.html",
+    "line": "137",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "3-5 years",
+    "context": "value=\"3-5 years\""
+  },
+  "templates/conversational_survey.html:138": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/conversational_survey.html",
+    "line": "138",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "5-10 years",
+    "context": "value=\"5-10 years\""
+  },
+  "templates/conversational_survey.html:139": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/conversational_survey.html",
+    "line": "139",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "More than 10 years",
+    "context": "value=\"More than 10 years\""
+  },
+  "templates/conversational_survey_business.html:112": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/conversational_survey_business.html",
+    "line": "112",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Less than 6 months",
+    "context": "value=\"Less than 6 months\""
+  },
+  "templates/conversational_survey_business.html:113": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/conversational_survey_business.html",
+    "line": "113",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "6 months - 1 year",
+    "context": "value=\"6 months - 1 year\""
+  },
+  "templates/conversational_survey_business.html:114": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/conversational_survey_business.html",
+    "line": "114",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "1-2 years",
+    "context": "value=\"1-2 years\""
+  },
+  "templates/conversational_survey_business.html:115": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/conversational_survey_business.html",
+    "line": "115",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "2-3 years",
+    "context": "value=\"2-3 years\""
+  },
+  "templates/conversational_survey_business.html:116": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/conversational_survey_business.html",
+    "line": "116",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "3-5 years",
+    "context": "value=\"3-5 years\""
+  },
+  "templates/conversational_survey_business.html:117": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/conversational_survey_business.html",
+    "line": "117",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "5-10 years",
+    "context": "value=\"5-10 years\""
+  },
+  "templates/conversational_survey_business.html:118": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/conversational_survey_business.html",
+    "line": "118",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "More than 10 years",
+    "context": "value=\"More than 10 years\""
+  },
+  "templates/dashboard.html:222": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "222",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "opportunity_heavy",
+    "context": "value=\"opportunity_heavy\""
+  },
+  "templates/dashboard.html:223": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "223",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "balanced",
+    "context": "value=\"balanced\""
+  },
+  "templates/dashboard.html:224": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "224",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "risk_heavy",
+    "context": "value=\"risk_heavy\""
+  },
+  "templates/dashboard.html:381": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "381",
+    "pattern": "Spans",
+    "text": "Campaign Name",
+    "context": "<span id=\"activeCampaignName\" class=\"fw-bold\">Campaign Name</span>"
+  },
+  "templates/dashboard.html:382": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "382",
+    "pattern": "Spans",
+    "text": "Jan 1 - Dec 31, 2024",
+    "context": "<span class=\"ms-2 text-muted\" id=\"activeCampaignDates\">Jan 1 - Dec 31, 2024</span>"
+  },
+  "templates/dashboard.html:492": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "492",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "risk_heavy",
+    "context": "value=\"risk_heavy\""
+  },
+  "templates/dashboard.html:493": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "493",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "balanced",
+    "context": "value=\"balanced\""
+  },
+  "templates/dashboard.html:494": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "494",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "opportunity_heavy",
+    "context": "value=\"opportunity_heavy\""
+  },
+  "templates/dashboard.html:501": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "501",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "critical",
+    "context": "value=\"critical\""
+  },
+  "templates/dashboard.html:502": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "502",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "high",
+    "context": "value=\"high\""
+  },
+  "templates/dashboard.html:503": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "503",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "medium",
+    "context": "value=\"medium\""
+  },
+  "templates/dashboard.html:504": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "504",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "low",
+    "context": "value=\"low\""
+  },
+  "templates/dashboard.html:511": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "511",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "yes",
+    "context": "value=\"yes\""
+  },
+  "templates/dashboard.html:519": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "519",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "yes",
+    "context": "value=\"yes\""
+  },
+  "templates/dashboard.html:646": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "646",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "promoters",
+    "context": "value=\"promoters\""
+  },
+  "templates/dashboard.html:647": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "647",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "passives",
+    "context": "value=\"passives\""
+  },
+  "templates/dashboard.html:648": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "648",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "detractors",
+    "context": "value=\"detractors\""
+  },
+  "templates/dashboard.html:818": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "818",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "promoters",
+    "context": "value=\"promoters\""
+  },
+  "templates/dashboard.html:819": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "819",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "passives",
+    "context": "value=\"passives\""
+  },
+  "templates/dashboard.html:820": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "820",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "detractors",
+    "context": "value=\"detractors\""
+  },
+  "templates/dashboard.html:915": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "915",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "created_at_desc",
+    "context": "value=\"created_at_desc\""
+  },
+  "templates/dashboard.html:916": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "916",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "created_at_asc",
+    "context": "value=\"created_at_asc\""
+  },
+  "templates/dashboard.html:917": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "917",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "nps_score_desc",
+    "context": "value=\"nps_score_desc\""
+  },
+  "templates/dashboard.html:918": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/dashboard.html",
+    "line": "918",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "nps_score_asc",
+    "context": "value=\"nps_score_asc\""
+  },
+  "templates/executive_summary.html:215": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/executive_summary.html",
+    "line": "215",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "opportunity_heavy",
+    "context": "value=\"opportunity_heavy\""
+  },
+  "templates/executive_summary.html:216": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/executive_summary.html",
+    "line": "216",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "balanced",
+    "context": "value=\"balanced\""
+  },
+  "templates/executive_summary.html:217": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/executive_summary.html",
+    "line": "217",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "risk_heavy",
+    "context": "value=\"risk_heavy\""
+  },
+  "templates/maintenance.html:20": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/maintenance.html",
+    "line": "20",
+    "pattern": "ARIA labels",
+    "text": "VOÏA coming soon page",
+    "context": "aria-label=\"VOÏA coming soon page\""
+  },
+  "templates/maintenance.html:36": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/maintenance.html",
+    "line": "36",
+    "pattern": "ARIA labels",
+    "text": "Get your demo access",
+    "context": "aria-label=\"Get your demo access\""
+  },
+  "templates/participants/campaign_participants.html:59": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/participants/campaign_participants.html",
+    "line": "59",
+    "pattern": "ARIA labels",
+    "text": "Filter participants form",
+    "context": "aria-label=\"Filter participants form\""
+  },
+  "templates/participants/campaign_participants.html:143": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/participants/campaign_participants.html",
+    "line": "143",
+    "pattern": "ARIA labels",
+    "text": "Apply filters",
+    "context": "aria-label=\"Apply filters\""
+  },
+  "templates/participants/create.html:106": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/participants/create.html",
+    "line": "106",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "C-Level",
+    "context": "value=\"C-Level\""
+  },
+  "templates/participants/create.html:126": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/participants/create.html",
+    "line": "126",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "LATAM",
+    "context": "value=\"LATAM\""
+  },
+  "templates/participants/create.html:127": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/participants/create.html",
+    "line": "127",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "EMEA",
+    "context": "value=\"EMEA\""
+  },
+  "templates/participants/create.html:128": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/participants/create.html",
+    "line": "128",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "APAC",
+    "context": "value=\"APAC\""
+  },
+  "templates/participants/create.html:167": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/participants/create.html",
+    "line": "167",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "other",
+    "context": "value=\"other\""
+  },
+  "templates/participants/edit.html:154": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/participants/edit.html",
+    "line": "154",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "C-Level",
+    "context": "value=\"C-Level\""
+  },
+  "templates/participants/edit.html:174": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/participants/edit.html",
+    "line": "174",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "LATAM",
+    "context": "value=\"LATAM\""
+  },
+  "templates/participants/edit.html:175": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/participants/edit.html",
+    "line": "175",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "EMEA",
+    "context": "value=\"EMEA\""
+  },
+  "templates/participants/edit.html:176": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/participants/edit.html",
+    "line": "176",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "APAC",
+    "context": "value=\"APAC\""
+  },
+  "templates/participants/edit.html:215": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/participants/edit.html",
+    "line": "215",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "other",
+    "context": "value=\"other\""
+  },
+  "templates/participants/list.html:475": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/participants/list.html",
+    "line": "475",
+    "pattern": "ARIA labels",
+    "text": "Participant actions",
+    "context": "aria-label=\"Participant actions\""
+  },
+  "templates/participants/list.html:582": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/participants/list.html",
+    "line": "582",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Premium",
+    "context": "value=\"Premium\""
+  },
+  "templates/participants/list.html:583": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/participants/list.html",
+    "line": "583",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Standard",
+    "context": "value=\"Standard\""
+  },
+  "templates/participants/list.html:584": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/participants/list.html",
+    "line": "584",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Basic",
+    "context": "value=\"Basic\""
+  },
+  "templates/participants/list.html:680": {
+    "action": "wrap",
+    "notes": "",
+    "file": "templates/participants/list.html",
+    "line": "680",
+    "pattern": "Spans",
+    "text": "Loading...",
+    "context": "<span class=\"visually-hidden\">Loading...</span>"
+  },
+  "templates/participants/list.html:836": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/participants/list.html",
+    "line": "836",
+    "pattern": "ARIA labels",
+    "text": "Participant actions",
+    "context": "aria-label=\"Participant actions\""
+  },
+  "templates/participants/list.html:840": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/participants/list.html",
+    "line": "840",
+    "pattern": "ARIA labels",
+    "text": "Edit ${p.name}",
+    "context": "aria-label=\"Edit ${p.name}\""
+  },
+  "templates/participants/list.html:848": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/participants/list.html",
+    "line": "848",
+    "pattern": "ARIA labels",
+    "text": "Delete ${p.name}",
+    "context": "aria-label=\"Delete ${p.name}\""
+  },
+  "templates/participants/list.html:907": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/participants/list.html",
+    "line": "907",
+    "pattern": "ARIA labels",
+    "text": "Participant pagination",
+    "context": "aria-label=\"Participant pagination\""
+  },
+  "templates/participants/list.html:911": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/participants/list.html",
+    "line": "911",
+    "pattern": "ARIA labels",
+    "text": "Previous",
+    "context": "aria-label=\"Previous\""
+  },
+  "templates/participants/list.html:912": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/participants/list.html",
+    "line": "912",
+    "pattern": "Spans",
+    "text": "&laquo;",
+    "context": "<span aria-hidden=\"true\">&laquo;</span>"
+  },
+  "templates/participants/list.html:928": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/participants/list.html",
+    "line": "928",
+    "pattern": "ARIA labels",
+    "text": "Next",
+    "context": "aria-label=\"Next\""
+  },
+  "templates/participants/list.html:929": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/participants/list.html",
+    "line": "929",
+    "pattern": "Spans",
+    "text": "&raquo;",
+    "context": "<span aria-hidden=\"true\">&raquo;</span>"
+  },
+  "templates/simple_auth.html:16": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/simple_auth.html",
+    "line": "16",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "test@example.com",
+    "context": "value=\"test@example.com\""
+  },
+  "templates/test_token.html:20": {
+    "action": "skip",
+    "notes": "",
+    "file": "templates/test_token.html",
+    "line": "20",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "test@example.com",
+    "context": "value=\"test@example.com\""
+  }
+}

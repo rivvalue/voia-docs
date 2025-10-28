@@ -25,19 +25,19 @@
     <div class="audit-stats-grid">
         <div class="audit-stat-card">
             <div class="audit-stat-number">{{ audit_stats.total_actions or 0 }}</div>
-            <div class="audit-stat-label">Total Activities</div>
+            <div class="audit-stat-label">{{ _('Total Activities') }}</div>
         </div>
         <div class="audit-stat-card">
             <div class="audit-stat-number">{{ audit_stats.action_counts.keys()|length or 0 }}</div>
-            <div class="audit-stat-label">Activity Types</div>
+            <div class="audit-stat-label">{{ _('Activity Types') }}</div>
         </div>
         <div class="audit-stat-card">
             <div class="audit-stat-number">{{ audit_stats.user_counts.keys()|length or 0 }}</div>
-            <div class="audit-stat-label">Active Users</div>
+            <div class="audit-stat-label">{{ _('Active Users') }}</div>
         </div>
         <div class="audit-stat-card">
             <div class="audit-stat-number">{{ audit_stats.date_range_days or 30 }}</div>
-            <div class="audit-stat-label">Days Shown</div>
+            <div class="audit-stat-label">{{ _('Days Shown') }}</div>
         </div>
     </div>
 
@@ -81,7 +81,7 @@
             </div>
             
             <div class="audit-filter-group">
-                <button type="submit" class="audit-filter-btn" aria-label="Apply filters">
+                <button type="submit" class="audit-filter-btn" aria-label="{{ _('Apply filters') }}">
                     <i class="fas fa-filter" aria-hidden="true"></i>
                     Apply Filters
                 </button>
