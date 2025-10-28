@@ -3997,10 +3997,12 @@ def license_dashboard():
                 accounts_processed += 1
                 
                 # PERFORMANCE: Pass account object to avoid duplicate query
+                # Use bypass_admin_override=True to get actual license data for analytics
                 try:
                     license_info = LicenseService.get_license_info(
                         account.id, 
-                        business_account=account
+                        business_account=account,
+                        bypass_admin_override=True
                     )
                     license_type = license_info.get('license_type', 'trial')
                     license_status = license_info.get('license_status', 'trial')

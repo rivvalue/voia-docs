@@ -417,7 +417,7 @@ class LicenseService:
     # ==== LICENSE INFORMATION AND STATUS ====
     
     @staticmethod
-    def get_license_info(business_account_id: int, business_account=None, is_platform_admin: bool = False) -> Dict[str, Any]:
+    def get_license_info(business_account_id: int, business_account=None, is_platform_admin: bool = False, bypass_admin_override: bool = False) -> Dict[str, Any]:
         """
         Get comprehensive license information for admin UI display.
         
@@ -431,6 +431,7 @@ class LicenseService:
             business_account_id: Business account ID to get info for
             business_account: Optional BusinessAccount object to avoid duplicate query
             is_platform_admin: Optional flag to skip platform admin check query
+            bypass_admin_override: If True, return actual license data even for platform admins (for analytics)
             
         Returns:
             dict: Comprehensive license information including:
@@ -453,18 +454,20 @@ class LicenseService:
         """
         try:
             # OPTIMIZATION: Check platform admin status without database query if flag provided
-            if not is_platform_admin:
-                from flask import session
-                current_user_id = session.get('business_user_id')
-                if current_user_id:
-                    from models import BusinessAccountUser
-                    current_user = BusinessAccountUser.query.get(current_user_id)
-                    if current_user and current_user.is_platform_admin():
-                        logger.debug(f"Platform admin {current_user.email} accessing license info - showing unlimited access")
-                        return LicenseService._get_platform_admin_license_info(business_account_id)
-            elif is_platform_admin:
-                logger.debug(f"Platform admin accessing license info for business_account_id {business_account_id} - showing unlimited access")
-                return LicenseService._get_platform_admin_license_info(business_account_id)
+            # Skip this check if bypass_admin_override is True (used for analytics dashboards)
+            if not bypass_admin_override:
+                if not is_platform_admin:
+                    from flask import session
+                    current_user_id = session.get('business_user_id')
+                    if current_user_id:
+                        from models import BusinessAccountUser
+                        current_user = BusinessAccountUser.query.get(current_user_id)
+                        if current_user and current_user.is_platform_admin():
+                            logger.debug(f"Platform admin {current_user.email} accessing license info - showing unlimited access")
+                            return LicenseService._get_platform_admin_license_info(business_account_id)
+                elif is_platform_admin:
+                    logger.debug(f"Platform admin accessing license info for business_account_id {business_account_id} - showing unlimited access")
+                    return LicenseService._get_platform_admin_license_info(business_account_id)
             
             # Get current license
             current_license = LicenseService.get_current_license(business_account_id)
