@@ -4000,8 +4000,7 @@ def license_dashboard():
                 try:
                     license_info = LicenseService.get_license_info(
                         account.id, 
-                        business_account=account,
-                        is_platform_admin=True
+                        business_account=account
                     )
                     license_type = license_info.get('license_type', 'trial')
                     license_status = license_info.get('license_status', 'trial')
