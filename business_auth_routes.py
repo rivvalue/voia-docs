@@ -4596,3 +4596,61 @@ def business_analytics():
         logger.error(f"Error loading business analytics for account {current_account.id if current_account else 'unknown'}: {e}")
         flash('Error loading analytics dashboard.', 'error')
         return redirect(url_for('business_auth.admin_panel'))
+
+# ==== TRANSLATION REVIEW TOOL ROUTES ====
+
+@business_auth_bp.route('/translation-review')
+@require_platform_admin
+def translation_review_tool():
+    """Translation string review tool for platform administrators"""
+    try:
+        # Serve the review tool HTML
+        from flask import send_file
+        return send_file('review_tool.html')
+    except Exception as e:
+        logger.error(f"Error loading translation review tool: {e}")
+        flash('Error loading review tool.', 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+
+@business_auth_bp.route('/translation-review/data')
+@require_platform_admin
+def translation_review_data():
+    """Serve the review queue JSON data"""
+    try:
+        import os
+        if os.path.exists('yellow_review_queue.json'):
+            return send_file('yellow_review_queue.json', mimetype='application/json')
+        else:
+            return jsonify({'error': 'Review queue not found'}), 404
+    except Exception as e:
+        logger.error(f"Error loading review data: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@business_auth_bp.route('/translation-review/save', methods=['POST'])
+@require_platform_admin
+def save_translation_decisions():
+    """Save manual review decisions"""
+    try:
+        decisions = request.get_json()
+        
+        if not decisions:
+            return jsonify({'error': 'No decisions provided'}), 400
+        
+        # Save to file
+        import json
+        with open('manual_review_decisions.json', 'w', encoding='utf-8') as f:
+            json.dump(decisions, f, indent=2)
+        
+        logger.info(f"Saved {len(decisions)} translation review decisions")
+        
+        return jsonify({
+            'success': True,
+            'message': f'Saved {len(decisions)} decisions',
+            'count': len(decisions)
+        })
+        
+    except Exception as e:
+        logger.error(f"Error saving translation decisions: {e}")
+        return jsonify({'error': str(e)}), 500

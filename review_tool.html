@@ -381,16 +381,20 @@
         let currentIndex = 0;
         let decisions = {};
         
-        // Load items from JSON file
+        // Load items from Flask backend
         async function loadItems() {
             try {
-                const response = await fetch('yellow_review_queue.json');
+                const response = await fetch('/business/translation-review/data');
+                if (!response.ok) {
+                    throw new Error('Failed to load review data');
+                }
                 items = await response.json();
                 document.getElementById('total-items').textContent = items.length;
                 updateStats();
                 renderItem();
             } catch (error) {
                 alert('Error loading review items: ' + error.message);
+                console.error('Load error:', error);
             }
         }
         
