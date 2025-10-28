@@ -94,7 +94,7 @@
                                class="btn-go-to-settings"
                                aria-label="{{ _('Configure %(name)s', name=step.name) }}">
                                 <i class="fas fa-cog"></i>
-                                {{ _('Go to Settings') }}
+                                {{ _('Go to') }} {{ _(step.name) }}
                             </a>
                             {% if step.is_completed and step.completed_at %}
                             <span class="completion-date">
@@ -108,14 +108,21 @@
                                 <input type="checkbox" 
                                        name="step_{{ step.step_id }}"
                                        value="1"
-                                       {% if step.is_completed %}checked{% endif %}
-                                       onchange="this.form.submit()">
+                                       {% if step.is_completed %}checked{% endif %}>
                                 <span class="checkbox-label">{{ _('Mark as Complete') }}</span>
                             </label>
                         </div>
                     </div>
                 </div>
                 {% endfor %}
+            </div>
+            
+            <!-- Save Progress Button -->
+            <div style="margin-top: var(--spacing-2xl); text-align: center; padding-top: var(--spacing-xl); border-top: 2px solid var(--light-gray);">
+                <button type="submit" class="btn-primary-action">
+                    <i class="fas fa-save"></i>
+                    {{ _('Save Progress') }}
+                </button>
             </div>
         </form>
     </div>
