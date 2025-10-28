@@ -127,7 +127,7 @@ def require_business_auth(f):
         if (current_user and 
             current_user.requires_onboarding() and 
             not request.endpoint.startswith('business_auth.onboarding') and
-            request.endpoint not in ['business_auth.logout', 'business_auth.session_status']):
+            request.endpoint not in ['business_auth.logout', 'business_auth.session_status', 'business_auth.brand_config', 'business_auth.save_brand_config']):
             
             # Initialize onboarding progress if not set
             if not current_user.onboarding_progress:
