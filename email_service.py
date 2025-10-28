@@ -69,19 +69,23 @@ class EmailService:
             'source': 'system_default'
         }
         
+        logger.info(f"_get_email_config called with business_account_id={business_account_id}")
+        
         # Try to get business account specific configuration
         if business_account_id:
             try:
                 email_config = EmailConfiguration.get_for_business_account(business_account_id)
-                logger.debug(f"EmailConfiguration.get_for_business_account({business_account_id}) returned: {email_config is not None}")
+                logger.info(f"EmailConfiguration.get_for_business_account({business_account_id}) returned: {email_config is not None}")
                 
                 if email_config:
                     # Test is_valid() step by step
                     validation_errors = email_config.validate_configuration()
+                    logger.info(f"Validation errors for business_account_id {business_account_id}: {validation_errors}")
                     
                     if len(validation_errors) == 0:
                         decrypted_password = email_config.get_smtp_password()
                         is_valid_result = email_config.is_valid()
+                        logger.info(f"is_valid() result for business_account_id {business_account_id}: {is_valid_result}")
                     else:
                         logger.error(f"CRITICAL: Basic validation failed for business_account_id {business_account_id}: {validation_errors}")
                         is_valid_result = False
