@@ -132,7 +132,7 @@
                                 <div class="user-dropdown-email">{{ business_user_email }}</div>
                             </div>
                             <div class="user-dropdown-divider"></div>
-                            {% if current_user and current_user.role in ['admin', 'business_account_admin'] and not current_user.onboarding_completed %}
+                            {% if current_user and current_user.role in ['admin', 'business_account_admin'] %}
                             <a href="{{ url_for('business_auth.onboarding_progress') }}" class="user-dropdown-item">
                                 <i class="fas fa-tasks"></i>
                                 <div class="user-dropdown-item-content">
