@@ -779,11 +779,15 @@ def create_business_account_with_admin():
         db.session.add(admin_user)
         db.session.commit()
         
-        # Send invitation email using platform-level email service
-        # NOTE: Pass None for business_account_id to use platform SMTP config
+        # Send invitation email using platform owner's email service
+        # NOTE: Use platform_owner business account's SMTP config
         # because the newly created business account doesn't have email config yet
         from email_service import EmailService
         email_service = EmailService()
+        
+        # Get platform owner business account for SMTP configuration
+        platform_owner = BusinessAccount.query.filter_by(account_type='platform_owner').first()
+        platform_business_account_id = platform_owner.id if platform_owner else None
         
         email_result = email_service.send_business_account_invitation(
             user_email=admin_email,
@@ -791,7 +795,7 @@ def create_business_account_with_admin():
             user_last_name=admin_last_name,
             business_account_name=business_name,
             invitation_token=invitation_token,
-            business_account_id=None  # Use platform-level SMTP, not the new tenant's (non-existent) config
+            business_account_id=platform_business_account_id  # Use platform owner's SMTP config
         )
         
         if email_result.get('success'):
