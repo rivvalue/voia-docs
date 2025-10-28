@@ -921,6 +921,7 @@ def onboarding_progress():
                 'step_id': step_def.step_id,
                 'name': step_def.name,
                 'description': step_def.description,
+                'target_link': step_def.target_link,
                 'required': step_def.required,
                 'status': status,
                 'status_label': status_label,
@@ -945,6 +946,92 @@ def onboarding_progress():
         logger.error(f"Error displaying onboarding progress: {e}")
         flash('Error loading onboarding progress. Please try again.', 'error')
         return redirect(url_for('business_auth.admin_panel'))
+
+
+@business_auth_bp.route('/onboarding/progress/update', methods=['POST'])
+@require_business_auth
+def onboarding_update_progress():
+    """Update onboarding progress based on user self-assessment"""
+    try:
+        business_user_id = session.get('business_user_id')
+        current_user = BusinessAccountUser.query.get(business_user_id)
+        
+        if not current_user:
+            flash('Authentication required.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Check if user is admin (only admins have onboarding)
+        if current_user.role not in ['admin', 'business_account_admin']:
+            flash('Access denied. This feature is for administrators only.', 'error')
+            return redirect(url_for('business_auth.admin_panel'))
+        
+        # Get license type for flow configuration
+        from license_service import LicenseService
+        license_info = LicenseService.get_license_info(current_user.business_account_id)
+        license_type = license_info.get('license_type', 'core')
+        
+        # Import onboarding configuration
+        from onboarding_config import OnboardingFlowManager
+        
+        # Get all steps for this license
+        all_steps = OnboardingFlowManager.get_steps_for_license(license_type)
+        
+        # Initialize onboarding if needed
+        if not current_user.onboarding_progress:
+            current_user.initialize_onboarding()
+        
+        # Get current progress
+        progress = current_user.get_onboarding_progress()
+        if 'steps' not in progress:
+            progress['steps'] = {}
+        
+        # Update each step based on checkbox values
+        from datetime import datetime
+        for step_def in all_steps:
+            step_id = step_def.step_id
+            checkbox_name = f'step_{step_id}'
+            is_checked = request.form.get(checkbox_name) == '1'
+            
+            # Initialize step if not exists
+            if step_id not in progress['steps']:
+                progress['steps'][step_id] = {}
+            
+            # Update completion status
+            if is_checked and not progress['steps'][step_id].get('completed', False):
+                # User just marked it complete
+                progress['steps'][step_id]['completed'] = True
+                progress['steps'][step_id]['completed_at'] = datetime.utcnow().isoformat()
+            elif not is_checked and progress['steps'][step_id].get('completed', False):
+                # User unchecked it
+                progress['steps'][step_id]['completed'] = False
+                if 'completed_at' in progress['steps'][step_id]:
+                    del progress['steps'][step_id]['completed_at']
+        
+        # Save progress
+        current_user.onboarding_progress = progress
+        
+        # Check if all required steps are complete
+        all_required_complete = all(
+            progress['steps'].get(s.step_id, {}).get('completed', False)
+            for s in all_steps if s.required
+        )
+        
+        if all_required_complete and not current_user.onboarding_completed:
+            current_user.onboarding_completed = True
+            flash('Congratulations! You have completed all required onboarding steps.', 'success')
+        elif not all_required_complete and current_user.onboarding_completed:
+            current_user.onboarding_completed = False
+        
+        db.session.commit()
+        
+        flash('Onboarding progress updated.', 'success')
+        return redirect(url_for('business_auth.onboarding_progress'))
+        
+    except Exception as e:
+        logger.error(f"Error updating onboarding progress: {e}")
+        db.session.rollback()
+        flash('Error updating progress. Please try again.', 'error')
+        return redirect(url_for('business_auth.onboarding_progress'))
 
 
 @business_auth_bp.route('/onboarding/<step>')
