@@ -412,7 +412,8 @@ p, .text-body {
     transition: transform 0.3s ease;
 }
 
-.user-dropdown:hover .user-dropdown-arrow {
+.user-dropdown:hover .user-dropdown-arrow,
+.user-dropdown.user-dropdown-active .user-dropdown-arrow {
     transform: rotate(180deg);
 }
 
@@ -433,7 +434,8 @@ p, .text-body {
     overflow: hidden;
 }
 
-.user-dropdown:hover .user-dropdown-menu {
+.user-dropdown:hover .user-dropdown-menu,
+.user-dropdown.user-dropdown-active .user-dropdown-menu {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);

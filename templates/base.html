@@ -266,6 +266,44 @@
     </script>
     {% endif %}
     
+    <!-- User Dropdown Enhancement Script -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const userDropdown = document.querySelector('.user-dropdown');
+        const userDropdownTrigger = document.querySelector('.user-dropdown-trigger');
+        const userDropdownMenu = document.querySelector('.user-dropdown-menu');
+        
+        if (userDropdown && userDropdownTrigger && userDropdownMenu) {
+            let isOpen = false;
+            
+            // Toggle on click
+            userDropdownTrigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                isOpen = !isOpen;
+                userDropdown.classList.toggle('user-dropdown-active', isOpen);
+            });
+            
+            // Close when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!userDropdown.contains(e.target)) {
+                    isOpen = false;
+                    userDropdown.classList.remove('user-dropdown-active');
+                }
+            });
+            
+            // Prevent dropdown from closing when clicking inside
+            userDropdownMenu.addEventListener('click', function(e) {
+                // Allow links to navigate
+                if (e.target.tagName === 'A' || e.target.closest('a')) {
+                    // Link will navigate, no need to prevent default
+                    return;
+                }
+                e.stopPropagation();
+            });
+        }
+    });
+    </script>
+    
     {% block scripts %}{% endblock %}
 </body>
 </html>
