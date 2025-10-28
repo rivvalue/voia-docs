@@ -277,6 +277,7 @@ def view_campaign(campaign_id):
         participant_stats = db.session.query(
             func.count(CampaignParticipant.id).label('total'),
             func.count(case((CampaignParticipant.status == 'completed', 1))).label('completed'),
+            func.count(case((CampaignParticipant.status == 'started', 1))).label('started'),
             func.count(case((CampaignParticipant.status == 'invited', 1))).label('invited'),
             func.count(case((CampaignParticipant.status == 'pending', 1))).label('pending')
         ).filter(
@@ -288,6 +289,7 @@ def view_campaign(campaign_id):
         campaign_participant_stats = {
             'total': participant_stats.total if participant_stats else 0,
             'completed': participant_stats.completed if participant_stats else 0,
+            'started': participant_stats.started if participant_stats else 0,
             'invited': participant_stats.invited if participant_stats else 0,
             'pending': participant_stats.pending if participant_stats else 0
         }
