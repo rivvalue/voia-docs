@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-25 01:41+0000\n"
+"POT-Creation-Date: 2025-10-28 19:38+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: en\n"
@@ -17,36 +17,113 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
+#: business_auth_routes.py:905
+#: templates/business_auth/onboarding_progress.html:36
+#: templates/campaigns/list.html:118 templates/campaigns/list.html:155
+#: templates/campaigns/view.html:232
+#: templates/participants/campaign_participants.html:40
+#: templates/participants/campaign_participants.html:508
+#: templates/participants/campaign_participants.html:586
+#: templates/participants/campaign_participants.html:612
+msgid "Completed"
+msgstr ""
+
+#: business_auth_routes.py:910
+msgid "In Progress"
+msgstr ""
+
+#: business_auth_routes.py:915
+msgid "Not Started"
+msgstr ""
+
+#: business_auth_routes.py:2331 business_auth_routes.py:2376
+#: business_auth_routes.py:2426 business_auth_routes.py:2591
+#: business_auth_routes.py:2614 business_auth_routes.py:3001
+#: business_auth_routes.py:3025 business_auth_routes.py:3326
+#: business_auth_routes.py:3365 business_auth_routes.py:4571
+msgid "Business account context not found."
+msgstr ""
+
+#: business_auth_routes.py:3354
+msgid "Failed to load survey configuration."
+msgstr ""
+
+#: test_translation_fallback.py:27
+msgid "Dashboard"
+msgstr ""
+
+#: templates/business_auth/licenses/overview.html:304
+#: templates/campaigns/list.html:152 test_translation_fallback.py:75
+msgid "Active"
+msgstr ""
+
+#: test_translation_fallback.py:86
+msgid "Some Text That Definitely Has No Translation"
+msgstr ""
+
+#: templates/base.html:6 templates/base_minimal.html:6
+#: test_translation_fallback.py:97
+#, fuzzy
+msgid "VOÏA - Voice Of Client"
+msgstr "Forgot Password - VOÏA - Voice Of Client"
+
+#: templates/auth.html:3
+#, fuzzy
+msgid "Authentication - VOÏA - Voice Of Client Agent"
+msgstr "Forgot Password - VOÏA - Voice Of Client"
+
+#: templates/auth.html:14
+msgid "Get Access Token"
+msgstr ""
+
+#: templates/auth.html:16
+msgid "Enter your email to receive an authentication token"
+msgstr ""
+
 #: templates/auth.html:22 templates/business_auth/activate_account.html:443
+#: templates/business_auth/forgot_password.html:50
+#: templates/business_auth/login.html:50
 #: templates/business_auth/manage_users.html:242
 #: templates/business_auth/manage_users.html:325
-#: templates/conversational_survey.html:76
-#: templates/conversational_survey_business.html:77
+#: templates/conversational_survey.html:118
+#: templates/conversational_survey_business.html:101
 #: templates/server_auth.html:38 templates/simple_auth.html:15
 #: templates/survey.html:54
 msgid "Email Address"
+msgstr ""
+
+#: templates/auth.html:24
+msgid "your.email@company.com"
 msgstr ""
 
 #: templates/auth.html:26
 msgid "You'll receive a secure token valid for 24 hours"
 msgstr ""
 
+#: templates/auth.html:32
+msgid "Request Token"
+msgstr ""
+
 #: templates/auth.html:40 templates/campaign_insights.html:292
 #: templates/campaign_insights.html:479 templates/campaign_insights.html:535
 #: templates/campaign_insights.html:621 templates/campaign_insights.html:776
 #: templates/company_responses.html:55 templates/company_responses.html:62
-#: templates/conversational_survey.html:163
-#: templates/conversational_survey_business.html:142
+#: templates/conversational_survey.html:205
+#: templates/conversational_survey_business.html:166
 #: templates/dashboard.html:261 templates/dashboard.html:528
 #: templates/dashboard.html:715 templates/dashboard.html:771
 #: templates/dashboard.html:857 templates/dashboard.html:926
-#: templates/dashboard.html:1111 templates/executive_summary.html:254
+#: templates/executive_summary.html:254 templates/participants/list.html:680
 #: templates/survey.html:217
 msgid "Loading..."
 msgstr ""
 
 #: templates/auth.html:42
 msgid "Generating your authentication token..."
+msgstr ""
+
+#: templates/auth.html:49 templates/server_auth.html:120
+msgid "Token Generated Successfully!"
 msgstr ""
 
 #: templates/auth.html:51
@@ -57,6 +134,10 @@ msgstr ""
 msgid "Authentication Token:"
 msgstr ""
 
+#: templates/auth.html:63
+msgid "This token expires in 24 hours. Keep it secure and don't share it."
+msgstr ""
+
 #: templates/auth.html:69
 msgid "Choose Survey Experience:"
 msgstr ""
@@ -65,8 +146,40 @@ msgstr ""
 msgid "Survey type selection"
 msgstr ""
 
+#: templates/auth.html:73
+msgid "Conversational (AI)"
+msgstr ""
+
+#: templates/auth.html:78 templates/survey_choice.html:65
+msgid "Traditional Form"
+msgstr ""
+
+#: templates/auth.html:82
+msgid "Conversational:"
+msgstr ""
+
+#: templates/auth.html:82
+msgid "Chat with VOÏA AI for a natural feedback experience"
+msgstr ""
+
+#: templates/auth.html:83
+msgid "Traditional:"
+msgstr ""
+
+#: templates/auth.html:83
+msgid "Standard form-based survey"
+msgstr ""
+
+#: templates/auth.html:89
+msgid "Start Survey"
+msgstr ""
+
 #: templates/auth.html:92
 msgid "Generate Another Token"
+msgstr ""
+
+#: templates/auth.html:102
+msgid "Error"
 msgstr ""
 
 #: templates/auth.html:104
@@ -75,6 +188,10 @@ msgstr ""
 
 #: templates/auth.html:106
 msgid "Try Again"
+msgstr ""
+
+#: templates/auth.html:117
+msgid "Security Information"
 msgstr ""
 
 #: templates/auth.html:123
@@ -109,11 +226,34 @@ msgstr ""
 msgid "Rate limiting prevents abuse"
 msgstr ""
 
-#: templates/base.html:53 templates/base.html:170 templates/dashboard.html:20
+#: templates/auth.html:152
+#, fuzzy
+msgid "Please enter your email address"
+msgstr "Please enter your email address."
+
+#: templates/auth.html:159
+#, fuzzy
+msgid "Please enter a valid email address"
+msgstr "Please enter your email address."
+
+#: templates/auth.html:230
+msgid "Failed to generate token"
+msgstr ""
+
+#: templates/auth.html:236
+msgid "Network error:"
+msgstr ""
+
+#: templates/auth.html:236
+msgid "Please check your connection and try again."
+msgstr ""
+
+#: templates/base.html:53 templates/base.html:193 templates/dashboard.html:20
 msgid "Business Intelligence"
 msgstr ""
 
-#: templates/base.html:58 templates/dashboard.html:339
+#: templates/base.html:58 templates/campaign_insights.html:98
+#: templates/dashboard.html:339
 msgid "Overview"
 msgstr ""
 
@@ -121,17 +261,20 @@ msgstr ""
 #: templates/dashboard.html:49 templates/executive_summary.html:4
 #: templates/executive_summary.html:23 templates/executive_summary.html:44
 #: templates/executive_summary.html:54 templates/executive_summary.html:266
-#: templates/executive_summary.html:414
+#: templates/executive_summary.html:377
 msgid "Executive Summary"
 msgstr ""
 
 #: templates/base.html:64 templates/campaign_insights.html:4
 #: templates/campaign_insights.html:21 templates/campaign_insights.html:42
-#: templates/campaign_insights.html:723 templates/dashboard.html:281
+#: templates/campaign_insights.html:723 templates/campaigns/list.html:45
+#: templates/dashboard.html:281
 msgid "Campaign Insights"
 msgstr ""
 
-#: templates/base.html:69 templates/business_auth/license_overview.html:85
+#: templates/base.html:69 templates/business_auth/admin_licenses.html:72
+#: templates/business_auth/admin_panel_v2.html:702
+#: templates/business_auth/license_overview.html:85
 #: templates/business_auth/license_overview.html:236
 #: templates/business_auth/licenses/assignment_form.html:106
 #: templates/business_auth/licenses/assignment_form.html:289
@@ -145,15 +288,16 @@ msgstr ""
 msgid "Campaigns"
 msgstr ""
 
-#: templates/base.html:73
+#: templates/base.html:73 templates/campaigns/list.html:172
 msgid "Participants"
 msgstr ""
 
 #: templates/base.html:77 templates/business_auth/license_overview.html:246
+#: templates/business_auth/onboarding_progress.html:10
 msgid "Settings"
 msgstr ""
 
-#: templates/base.html:83
+#: templates/base.html:83 templates/base.html:147
 msgid "Logout"
 msgstr ""
 
@@ -161,12 +305,16 @@ msgstr ""
 msgid "Toggle sidebar"
 msgstr ""
 
-#: templates/base.html:111
+#: templates/base.html:113
 msgid "Welcome to VO"
 msgstr ""
 
-#: templates/base.html:111
+#: templates/base.html:113
 msgid "A Demo"
+msgstr ""
+
+#: templates/base.html:139 templates/business_auth/onboarding_progress.html:22
+msgid "Setup Progress"
 msgstr ""
 
 #: templates/campaign_insights.html:22
@@ -188,6 +336,9 @@ msgid "Compare KPIs across different campaigns"
 msgstr ""
 
 #: templates/campaign_insights.html:60
+#: templates/campaigns/individual_response.html:435
+#: templates/conversational_survey.html:35
+#: templates/conversational_survey_business.html:44
 msgid "Campaign:"
 msgstr ""
 
@@ -213,9 +364,22 @@ msgstr ""
 msgid "Account Intelligence"
 msgstr ""
 
+#: templates/business_auth/admin_panel.html:408
+#: templates/business_auth/admin_panel.html:432
+#: templates/business_auth/admin_panel.html:435
+#: templates/business_auth/admin_panel.html:820
+#: templates/business_auth/admin_panel.html:940
+#: templates/campaign_insights.html:108 templates/dashboard.html:349
+msgid "Analytics"
+msgstr ""
+
 #: templates/campaign_insights.html:113 templates/campaign_insights.html:144
 #: templates/dashboard.html:354 templates/dashboard.html:380
 msgid "Survey Insights"
+msgstr ""
+
+#: templates/campaign_insights.html:118
+msgid "Segmentation Insights"
 msgstr ""
 
 #: templates/campaign_insights.html:127 templates/campaign_insights.html:129
@@ -228,17 +392,18 @@ msgid "Currently showing data from active campaign:"
 msgstr ""
 
 #: templates/campaign_insights.html:145 templates/campaigns/create.html:82
-#: templates/campaigns/edit.html:97
+#: templates/campaigns/edit.html:97 templates/campaigns/list.html:168
+#: templates/campaigns/list.html:258 templates/dashboard.html:381
 msgid "Campaign Name"
 msgstr ""
 
 #: templates/campaign_insights.html:157 templates/campaign_insights.html:604
 #: templates/campaign_insights.html:704 templates/campaign_insights.html:849
-#: templates/campaign_insights.html:1005 templates/campaign_insights.html:1031
-#: templates/campaign_insights.html:1061
+#: templates/campaign_insights.html:1008 templates/campaign_insights.html:1034
+#: templates/campaign_insights.html:1064
 #: templates/campaigns/responses_list.html:178 templates/dashboard.html:393
 #: templates/dashboard.html:840 templates/dashboard.html:999
-#: templates/executive_summary.html:295 templates/executive_summary.html:400
+#: templates/executive_summary.html:295
 msgid "NPS Score"
 msgstr ""
 
@@ -247,7 +412,7 @@ msgid "Overall satisfaction metric"
 msgstr ""
 
 #: templates/business_auth/admin_panel.html:556
-#: templates/campaign_insights.html:164 templates/executive_summary.html:399
+#: templates/campaign_insights.html:164
 msgid "Total Responses"
 msgstr ""
 
@@ -255,7 +420,7 @@ msgstr ""
 msgid "All time feedback collected"
 msgstr ""
 
-#: templates/campaign_insights.html:171
+#: templates/campaign_insights.html:171 templates/dashboard.html:407
 msgid "Recent (30 days)"
 msgstr ""
 
@@ -264,7 +429,8 @@ msgid "Latest customer feedback"
 msgstr ""
 
 #: templates/campaign_insights.html:179 templates/campaign_insights.html:195
-#: templates/campaign_insights.html:200 templates/dashboard.html:436
+#: templates/campaign_insights.html:200 templates/dashboard.html:415
+#: templates/dashboard.html:436
 msgid "High Churn Risk Accounts"
 msgstr ""
 
@@ -287,7 +453,7 @@ msgstr ""
 msgid "Imminent churn risk (High/Critical)"
 msgstr ""
 
-#: templates/campaign_insights.html:189
+#: templates/campaign_insights.html:189 templates/dashboard.html:425
 msgid "Growth Potential"
 msgstr ""
 
@@ -296,7 +462,7 @@ msgid "Revenue expansion opportunity"
 msgstr ""
 
 #: templates/campaign_insights.html:195 templates/campaign_insights.html:215
-#: templates/dashboard.html:451
+#: templates/dashboard.html:451 templates/public_survey_response.html:154
 msgid "Key Themes"
 msgstr ""
 
@@ -345,8 +511,9 @@ msgstr ""
 #: templates/campaign_insights.html:255 templates/campaign_insights.html:264
 #: templates/campaign_insights.html:274 templates/campaign_insights.html:282
 #: templates/campaign_insights.html:409 templates/campaign_insights.html:581
-#: templates/dashboard.html:491 templates/dashboard.html:500
-#: templates/dashboard.html:510 templates/dashboard.html:518
+#: templates/campaigns/list.html:146 templates/dashboard.html:491
+#: templates/dashboard.html:500 templates/dashboard.html:510
+#: templates/dashboard.html:518
 msgid "All"
 msgstr ""
 
@@ -418,18 +585,24 @@ msgid "NPS Category"
 msgstr ""
 
 #: templates/campaign_insights.html:410 templates/campaign_insights.html:582
-#: templates/dashboard.html:646 templates/dashboard.html:1152
+#: templates/dashboard.html:646
 msgid "Promoters (9-10)"
 msgstr ""
 
 #: templates/campaign_insights.html:411 templates/campaign_insights.html:583
-#: templates/dashboard.html:647 templates/dashboard.html:1153
+#: templates/dashboard.html:647
 msgid "Passives (7-8)"
 msgstr ""
 
 #: templates/campaign_insights.html:412 templates/campaign_insights.html:584
-#: templates/dashboard.html:648 templates/dashboard.html:1154
+#: templates/dashboard.html:648
 msgid "Detractors (0-6)"
+msgstr ""
+
+#: templates/campaign_insights.html:421 templates/campaign_insights.html:593
+#: templates/dashboard.html:233 templates/dashboard.html:657
+#: templates/executive_summary.html:226
+msgid "Clear"
 msgstr ""
 
 #: templates/campaign_insights.html:436 templates/campaign_insights.html:517
@@ -444,9 +617,18 @@ msgstr ""
 msgid "Avg Individual NPS"
 msgstr ""
 
+#: templates/campaign_insights.html:439 templates/campaign_insights.html:520
+#: templates/dashboard.html:675 templates/dashboard.html:756
+msgid "Distribution"
+msgstr ""
+
 #: templates/campaign_insights.html:441 templates/campaign_insights.html:522
 #: templates/dashboard.html:677 templates/dashboard.html:758
 msgid "Latest Response"
+msgstr ""
+
+#: templates/campaign_insights.html:442
+msgid "Latest"
 msgstr ""
 
 #: templates/campaign_insights.html:442 templates/campaign_insights.html:523
@@ -455,7 +637,6 @@ msgid "Churn Risk"
 msgstr ""
 
 #: templates/campaign_insights.html:470 templates/dashboard.html:706
-#: templates/dashboard.html:1141
 msgid "No company data available yet"
 msgstr ""
 
@@ -479,7 +660,7 @@ msgstr ""
 msgid "Tenure Group"
 msgstr ""
 
-#: templates/campaign_insights.html:552
+#: templates/campaign_insights.html:552 templates/dashboard.html:788
 msgid "Insufficient Data (<2 responses)"
 msgstr ""
 
@@ -488,13 +669,13 @@ msgstr ""
 #: templates/campaign_insights.html:702 templates/campaign_insights.html:729
 #: templates/campaign_insights.html:743 templates/campaign_insights.html:781
 #: templates/campaign_insights.html:816 templates/campaign_insights.html:839
-#: templates/campaign_insights.html:1040 templates/dashboard.html:72
+#: templates/campaign_insights.html:1043 templates/company_responses.html:3
+#: templates/company_responses.html:170 templates/dashboard.html:72
 #: templates/dashboard.html:400 templates/dashboard.html:796
 #: templates/dashboard.html:801 templates/dashboard.html:817
 #: templates/dashboard.html:879 templates/dashboard.html:893
 #: templates/dashboard.html:931 templates/dashboard.html:989
-#: templates/dashboard.html:1132 templates/executive_summary.html:65
-#: templates/executive_summary.html:285
+#: templates/executive_summary.html:65 templates/executive_summary.html:285
 msgid "Responses"
 msgstr ""
 
@@ -508,6 +689,16 @@ msgstr ""
 
 #: templates/campaign_insights.html:605 templates/dashboard.html:841
 msgid "Category"
+msgstr ""
+
+#: templates/campaign_insights.html:606 templates/dashboard.html:842
+msgid "Sentiment"
+msgstr ""
+
+#: templates/campaign_insights.html:608 templates/campaign_insights.html:790
+#: templates/company_responses.html:78 templates/dashboard.html:844
+#: templates/dashboard.html:940
+msgid "Date"
 msgstr ""
 
 #: templates/campaign_insights.html:623 templates/dashboard.html:859
@@ -526,7 +717,7 @@ msgid ""
 msgstr ""
 
 #: templates/campaign_insights.html:642 templates/campaign_insights.html:647
-#: templates/campaign_insights.html:974
+#: templates/campaign_insights.html:977
 msgid "NPS by Role"
 msgstr ""
 
@@ -535,7 +726,7 @@ msgid "Net Promoter Score distribution across different participant roles"
 msgstr ""
 
 #: templates/campaign_insights.html:657 templates/campaign_insights.html:662
-#: templates/campaign_insights.html:977
+#: templates/campaign_insights.html:980
 msgid "NPS by Region"
 msgstr ""
 
@@ -571,10 +762,13 @@ msgstr ""
 msgid "Avg Satisfaction"
 msgstr ""
 
+#: templates/business_auth/reset_password.html:27
 #: templates/campaign_insights.html:747 templates/campaign_insights.html:832
-#: templates/campaign_insights.html:919 templates/dashboard.html:897
-#: templates/dashboard.html:982 templates/dashboard.html:1069
-#: templates/executive_summary.html:278 templates/executive_summary.html:365
+#: templates/campaign_insights.html:919 templates/campaigns/list.html:253
+#: templates/campaigns/list.html:289 templates/campaigns/list.html:415
+#: templates/dashboard.html:897 templates/dashboard.html:982
+#: templates/dashboard.html:1069 templates/executive_summary.html:278
+#: templates/executive_summary.html:365
 #: templates/participants/campaign_participants.html:904
 #: templates/participants/campaign_participants.html:935
 #: templates/participants/edit.html:24 templates/participants/list.html:538
@@ -590,8 +784,14 @@ msgstr ""
 msgid "Oldest First"
 msgstr ""
 
-#: templates/campaign_insights.html:778 templates/dashboard.html:928
+#: templates/campaign_insights.html:778 templates/company_responses.html:64
+#: templates/dashboard.html:928
 msgid "Loading responses..."
+msgstr ""
+
+#: templates/campaign_insights.html:788 templates/company_responses.html:73
+#: templates/dashboard.html:78 templates/dashboard.html:938
+msgid "NPS"
 msgstr ""
 
 #: templates/campaign_insights.html:789 templates/dashboard.html:607
@@ -599,31 +799,90 @@ msgstr ""
 msgid "Ratings"
 msgstr ""
 
+#: templates/campaign_insights.html:791 templates/company_responses.html:79
+#: templates/dashboard.html:941
+msgid "Action"
+msgstr ""
+
 #: templates/campaign_insights.html:817 templates/dashboard.html:967
 msgid "No survey responses match your search criteria."
 msgstr ""
 
+#: templates/campaign_insights.html:830
+msgid "Campaign KPI Trends"
+msgstr ""
+
 #: templates/campaign_insights.html:859 templates/dashboard.html:1009
-#: templates/executive_summary.html:401
 msgid "Companies Analyzed"
+msgstr ""
+
+#: templates/campaign_insights.html:879 templates/company_responses.html:74
+#: templates/dashboard.html:96 templates/dashboard.html:1029
+#: templates/executive_summary.html:325
+msgid "Satisfaction"
 msgstr ""
 
 #: templates/campaign_insights.html:889 templates/company_responses.html:75
 #: templates/company_responses.html:210 templates/dashboard.html:1039
-#: templates/dashboard.html:1128
 msgid "Product Value"
 msgstr ""
 
 #: templates/campaign_insights.html:899 templates/company_responses.html:77
 #: templates/company_responses.html:222 templates/dashboard.html:108
-#: templates/dashboard.html:1049 templates/dashboard.html:1130
-#: templates/dashboard.html:1164 templates/executive_summary.html:101
+#: templates/dashboard.html:1049 templates/executive_summary.html:101
 #: templates/executive_summary.html:345
 msgid "Pricing"
 msgstr ""
 
-#: templates/campaign_insights.html:1132
+#: templates/campaign_insights.html:909 templates/company_responses.html:76
+#: templates/dashboard.html:114 templates/dashboard.html:1059
+#: templates/executive_summary.html:107 templates/executive_summary.html:355
+msgid "Service"
+msgstr ""
+
+#: templates/business_auth/activate_account.html:447
+#: templates/business_auth/manage_users.html:97
+#: templates/business_auth/manage_users.html:256
+#: templates/business_auth/manage_users.html:265
+#: templates/business_auth/manage_users.html:336
+#: templates/business_auth/manage_users.html:345
+#: templates/business_auth/platform_dashboard.html:693
+#: templates/campaign_insights.html:1092
+#: templates/participants/campaign_participants.html:74
+#: templates/participants/campaign_participants.html:76
+#: templates/participants/campaign_participants.html:186
+#: templates/participants/create.html:100 templates/participants/edit.html:148
+#: templates/participants/list.html:253 templates/participants/list.html:255
+#: templates/participants/list.html:549 templates/participants/list.html:552
+#: templates/participants/list.html:553 templates/participants/list.html:554
+#: templates/participants/list.html:1163 templates/participants/list.html:1192
+#: templates/participants/list.html:1245
+msgid "Role"
+msgstr ""
+
+#: templates/campaign_insights.html:1109
+#: templates/participants/campaign_participants.html:87
+#: templates/participants/campaign_participants.html:89
+#: templates/participants/campaign_participants.html:201
+#: templates/participants/create.html:119 templates/participants/edit.html:167
+#: templates/participants/list.html:266 templates/participants/list.html:268
+#: templates/participants/list.html:560 templates/participants/list.html:563
+#: templates/participants/list.html:564 templates/participants/list.html:565
+#: templates/participants/list.html:1164 templates/participants/list.html:1196
+#: templates/participants/list.html:1249
+msgid "Region"
+msgstr ""
+
+#: templates/campaign_insights.html:1126
+msgid "Tier"
+msgstr ""
+
+#: templates/campaign_insights.html:1135
 msgid "No segmentation data available"
+msgstr ""
+
+#: templates/company_responses.html:53
+msgid "Campaign Responses"
 msgstr ""
 
 #: templates/company_responses.html:91
@@ -634,243 +893,382 @@ msgstr ""
 msgid "Error loading responses"
 msgstr ""
 
-#: templates/company_responses.html:108 templates/dashboard.html:1144
+#: templates/company_responses.html:99
+msgid "Retry"
+msgstr ""
+
+#: templates/company_responses.html:108
 msgid "Showing"
 msgstr ""
 
-#: templates/conversational_survey.html:18
-msgid "Share your experience"
+#: templates/company_responses.html:152
+msgid "Failed to load responses"
 msgstr ""
 
-#: templates/conversational_survey.html:30
+#: templates/company_responses.html:165
+msgid "0 Responses"
+msgstr ""
+
+#: templates/company_responses.html:195
+msgid "Anonymous"
+msgstr ""
+
+#: templates/company_responses.html:247
+msgid "View Full Response"
+msgstr ""
+
+#: templates/company_responses.html:253
+msgid "Authentication required"
+msgstr ""
+
+#: templates/company_responses.html:292 templates/survey.html:110
+#: templates/survey.html:185 templates/survey.html:205
+msgid "Previous"
+msgstr ""
+
+#: templates/company_responses.html:313 templates/survey.html:72
+#: templates/survey.html:111 templates/survey.html:186
+#: templates/survey.html:241
+msgid "Next"
+msgstr ""
+
+#: templates/conversational_survey.html:3
+#, fuzzy
+msgid "AI Survey - VOÏA - Voice Of Client Agent"
+msgstr "Forgot Password - VOÏA - Voice Of Client"
+
+#: templates/conversational_survey.html:15
+#: templates/conversational_survey_business.html:20
+msgid "Survey information"
+msgstr ""
+
+#: templates/conversational_survey.html:31
+#: templates/conversational_survey_business.html:40
+msgid "Campaign details"
+msgstr ""
+
+#: templates/conversational_survey.html:41
+#: templates/conversational_survey_business.html:50
+msgid "Objective:"
+msgstr ""
+
+#: templates/conversational_survey.html:47
+#: templates/conversational_survey_business.html:56
+msgid "Please respond by:"
+msgstr ""
+
+#: templates/conversational_survey.html:56
+#: templates/conversational_survey_business.html:65
+msgid "Platform information"
+msgstr ""
+
+#: templates/conversational_survey.html:57
+#: templates/conversational_survey_business.html:66
+msgid "Powered by"
+msgstr ""
+
+#: templates/conversational_survey.html:59
+#: templates/conversational_survey_business.html:68
+msgid "Voice Of Client"
+msgstr ""
+
+#: templates/conversational_survey.html:70
+msgid "Authentication Required"
+msgstr ""
+
+#: templates/conversational_survey.html:72
 msgid "You need a valid token to participate in this survey."
 msgstr ""
 
-#: templates/conversational_survey.html:34
+#: templates/conversational_survey.html:76
 msgid "Get authentication token to start survey"
 msgstr ""
 
-#: templates/conversational_survey.html:34
+#: templates/conversational_survey.html:76
 msgid "Get Authentication Token"
 msgstr ""
 
-#: templates/conversational_survey.html:44
+#: templates/conversational_survey.html:86
 msgid "Let's Get Started"
+msgstr ""
+
+#: templates/conversational_survey.html:87
+msgid "Authenticated as:"
 msgstr ""
 
 #: templates/business_auth/activate_account.html:435
 #: templates/business_auth/licenses/overview.html:323
-#: templates/campaigns/view.html:491 templates/conversational_survey.html:52
-#: templates/conversational_survey_business.html:65
+#: templates/campaigns/view.html:508 templates/conversational_survey.html:94
+#: templates/conversational_survey_business.html:89
 #: templates/dashboard.html:671 templates/survey.html:42
 msgid "Company Name"
 msgstr ""
 
-#: templates/conversational_survey.html:60
+#: templates/conversational_survey.html:102
 msgid "Enter your company name"
 msgstr ""
 
 #: templates/business_auth/activate_account.html:439
-#: templates/conversational_survey.html:64
-#: templates/conversational_survey_business.html:71 templates/survey.html:48
+#: templates/conversational_survey.html:106
+#: templates/conversational_survey_business.html:95 templates/survey.html:48
 msgid "Your Name"
 msgstr ""
 
-#: templates/conversational_survey.html:72
+#: templates/conversational_survey.html:114
 msgid "Enter your full name"
 msgstr ""
 
-#: templates/conversational_survey.html:84 templates/server_auth.html:45
+#: templates/conversational_survey.html:126 templates/server_auth.html:45
 msgid "Enter your email address"
 msgstr ""
 
-#: templates/conversational_survey.html:88
-#: templates/conversational_survey_business.html:84
+#: templates/conversational_survey.html:130
+#: templates/conversational_survey_business.html:108
 msgid "How long have you been working with"
 msgstr ""
 
-#: templates/conversational_survey.html:90
-#: templates/conversational_survey_business.html:87 templates/survey.html:62
+#: templates/conversational_survey.html:130
+#: templates/conversational_survey_business.html:108
+msgid "us"
+msgstr ""
+
+#: templates/conversational_survey.html:132
+#: templates/conversational_survey_business.html:111 templates/survey.html:62
 msgid "Select duration..."
 msgstr ""
 
-#: templates/conversational_survey.html:91
-#: templates/conversational_survey_business.html:88 templates/survey.html:63
+#: templates/conversational_survey.html:133
+#: templates/conversational_survey_business.html:112 templates/survey.html:63
 msgid "Less than 6 months"
 msgstr ""
 
-#: templates/conversational_survey.html:92
-#: templates/conversational_survey_business.html:89 templates/survey.html:64
+#: templates/conversational_survey.html:134
+#: templates/conversational_survey_business.html:113 templates/survey.html:64
 msgid "6 months - 1 year"
 msgstr ""
 
-#: templates/conversational_survey.html:93
-#: templates/conversational_survey_business.html:90 templates/survey.html:65
+#: templates/conversational_survey.html:135
+#: templates/conversational_survey_business.html:114 templates/survey.html:65
 msgid "1-2 years"
 msgstr ""
 
-#: templates/conversational_survey.html:94
-#: templates/conversational_survey_business.html:91 templates/survey.html:66
+#: templates/conversational_survey.html:136
+#: templates/conversational_survey_business.html:115 templates/survey.html:66
 msgid "2-3 years"
 msgstr ""
 
-#: templates/conversational_survey.html:95
-#: templates/conversational_survey_business.html:92 templates/survey.html:67
+#: templates/conversational_survey.html:137
+#: templates/conversational_survey_business.html:116 templates/survey.html:67
 msgid "3-5 years"
 msgstr ""
 
-#: templates/conversational_survey.html:96
-#: templates/conversational_survey_business.html:93 templates/survey.html:68
+#: templates/conversational_survey.html:138
+#: templates/conversational_survey_business.html:117 templates/survey.html:68
 msgid "5-10 years"
 msgstr ""
 
-#: templates/conversational_survey.html:97
-#: templates/conversational_survey_business.html:94 templates/survey.html:69
+#: templates/conversational_survey.html:139
+#: templates/conversational_survey_business.html:118 templates/survey.html:69
 msgid "More than 10 years"
 msgstr ""
 
-#: templates/conversational_survey.html:101 templates/server_auth.html:133
+#: templates/conversational_survey.html:143 templates/server_auth.html:133
 #: templates/server_auth.html:188
 msgid "Start Conversational Survey"
 msgstr ""
 
-#: templates/conversational_survey.html:115
+#: templates/conversational_survey.html:144
+#: templates/conversational_survey_business.html:123
+msgid "Start Conversation"
+msgstr ""
+
+#: templates/conversational_survey.html:157
 msgid "Survey progress"
 msgstr ""
 
-#: templates/conversational_survey.html:125
+#: templates/conversational_survey.html:167
 msgid "Conversation messages"
 msgstr ""
 
-#: templates/conversational_survey.html:134
-#: templates/conversational_survey.html:138
-#: templates/conversational_survey.html:139
+#: templates/conversational_survey.html:176
 msgid "Type your response"
 msgstr ""
 
-#: templates/conversational_survey.html:143
+#: templates/conversational_survey.html:180
+#: templates/conversational_survey_business.html:149
+msgid "Type your response here..."
+msgstr ""
+
+#: templates/conversational_survey.html:181
+msgid "Type your response to VOÏA"
+msgstr ""
+
+#: templates/conversational_survey.html:185
 msgid "Send message"
 msgstr ""
 
-#: templates/conversational_survey.html:160
+#: templates/conversational_survey.html:191
+#: templates/conversational_survey_business.html:156
+msgid "Tip: Speak naturally! VOÏA understands conversational responses."
+msgstr ""
+
+#: templates/conversational_survey.html:202
 msgid "Processing response"
 msgstr ""
 
-#: templates/conversational_survey.html:165
-#: templates/conversational_survey_business.html:144
+#: templates/conversational_survey.html:207
+#: templates/conversational_survey_business.html:168
 msgid "VOÏA is processing your response..."
 msgstr ""
 
-#: templates/conversational_survey.html:166
-#: templates/conversational_survey_business.html:145
+#: templates/conversational_survey.html:208
+#: templates/conversational_survey_business.html:169
 msgid "Please wait while VOÏA analyzes your feedback"
 msgstr ""
 
-#: templates/conversational_survey.html:178
+#: templates/conversational_survey.html:220
 msgid "Thank you for sharing your feedback."
 msgstr ""
 
-#: templates/conversational_survey.html:179 templates/survey.html:230
+#: templates/conversational_survey.html:221 templates/survey.html:230
 #: templates/survey_success.html:22
 msgid "Your feedback has been successfully analyzed by VOÏA Intelligence."
 msgstr ""
 
-#: templates/conversational_survey.html:185
+#: templates/conversational_survey.html:227
 msgid "View analytics dashboard with your feedback results"
 msgstr ""
 
-#: templates/conversational_survey.html:190 templates/survey.html:239
+#: templates/conversational_survey.html:228
+#: templates/conversational_survey_completed.html:52 templates/survey.html:235
+#: templates/survey_completed.html:52 templates/survey_success.html:28
+msgid "View Analytics Dashboard"
+msgstr ""
+
+#: templates/conversational_survey.html:232 templates/survey.html:239
 #: templates/survey_success.html:32
 msgid ""
 "This completes your demonstration of our Voice of Client Agent "
 "capabilities."
 msgstr ""
 
-#: templates/conversational_survey.html:194 templates/survey_success.html:36
+#: templates/conversational_survey.html:236 templates/survey.html:243
+#: templates/survey_success.html:36
 msgid "What's Next?"
 msgstr ""
 
-#: templates/conversational_survey.html:195 templates/survey.html:244
+#: templates/conversational_survey.html:237 templates/survey.html:244
 #: templates/survey_success.html:37
 msgid "Experience the full power of Voice of Client Agent for your organization."
 msgstr ""
 
-#: templates/conversational_survey.html:201
+#: templates/conversational_survey.html:243
 msgid "Try another demo session"
 msgstr ""
 
-#: templates/conversational_survey.html:209
+#: templates/conversational_survey.html:244 templates/survey.html:249
+#: templates/survey_success.html:42
+msgid "Try Another Session"
+msgstr ""
+
+#: templates/conversational_survey.html:246 templates/survey.html:251
+msgid "Experience VOÏA with different scenarios"
+msgstr ""
+
+#: templates/conversational_survey.html:249 templates/survey.html:254
+#: templates/survey_success.html:47
+msgid "Voice of Client Agent - Full Service Inquiry"
+msgstr ""
+
+#: templates/conversational_survey.html:249
+msgid ""
+"Hi Rivvalue team,%0A%0AI just completed the VOÏA Intelligence "
+"demonstration and I'm interested in learning more about implementing the "
+"full Voice of Client Agent service for my organization.%0A%0APlease "
+"contact me to discuss how this can benefit our customer feedback "
+"strategy.%0A%0AThank you!"
+msgstr ""
+
+#: templates/conversational_survey.html:251
 msgid "Contact Rivvalue to implement VOÏA for your business"
 msgstr ""
 
-#: templates/conversational_survey.html:221
+#: templates/conversational_survey.html:252 templates/survey.html:256
+#: templates/survey_success.html:49
+msgid "Contact Rivvalue"
+msgstr ""
+
+#: templates/conversational_survey.html:254 templates/survey.html:258
+#: templates/survey_success.html:51
+msgid "Implement full VoC Agent for your business"
+msgstr ""
+
+#: templates/conversational_survey.html:263
 msgid "Return to home page"
 msgstr ""
 
-#: templates/conversational_survey_business.html:43
+#: templates/conversational_survey.html:264 templates/survey.html:266
+#: templates/survey_success.html:72
+msgid "Return Home"
+msgstr ""
+
+#: templates/conversational_survey_business.html:4
+#, python-brace-format
+msgid "{}  - VOÏA Survey"
+msgstr ""
+
+#: templates/conversational_survey_business.html:36
 msgid "Hi"
 msgstr ""
 
-#: templates/conversational_survey_business.html:43
+#: templates/conversational_survey_business.html:36
 msgid "thank you for participating"
 msgstr ""
 
-#: templates/conversational_survey_business.html:44
-msgid "value your feedback"
-msgstr ""
-
-#: templates/conversational_survey_business.html:56
+#: templates/conversational_survey_business.html:80
 msgid "Your Information"
 msgstr ""
 
-#: templates/conversational_survey_business.html:58
+#: templates/conversational_survey_business.html:82
 msgid "Participating on behalf of"
 msgstr ""
 
-#: templates/conversational_survey_business.html:99
-msgid "Start Conversation"
+#: templates/conversational_survey_business.html:180
+#, python-brace-format
+msgid "Thank you, {}!"
 msgstr ""
 
-#: templates/conversational_survey_business.html:125
-msgid "Type your response here..."
-msgstr ""
-
-#: templates/conversational_survey_business.html:132
-msgid "Tip: Speak naturally! VOÏA understands conversational responses."
-msgstr ""
-
-#: templates/conversational_survey_business.html:156
-#, python-format
-msgid "Thank you, %s!"
-msgstr ""
-
-#: templates/conversational_survey_business.html:159
+#: templates/conversational_survey_business.html:183
 msgid "Your feedback for"
 msgstr ""
 
-#: templates/conversational_survey_business.html:170
+#: templates/conversational_survey_business.html:183
+msgid "has been successfully submitted."
+msgstr ""
+
+#: templates/conversational_survey_business.html:194
 msgid ""
 "Your insights help us continuously improve our services. Thank you for "
 "taking the time to share your experience."
 msgstr ""
 
-#: templates/conversational_survey_business.html:177
+#: templates/conversational_survey_business.html:201
 msgid "What Happens Next?"
 msgstr ""
 
-#: templates/conversational_survey_business.html:182
+#: templates/conversational_survey_business.html:206
 msgid "Our AI analyzes your feedback to extract key insights"
 msgstr ""
 
-#: templates/conversational_survey_business.html:186
+#: templates/conversational_survey_business.html:210
 msgid "Your responses contribute to comprehensive analytics"
 msgstr ""
 
-#: templates/conversational_survey_business.html:190
+#: templates/conversational_survey_business.html:214
 msgid "We use your input to improve our services and client experience"
 msgstr ""
 
-#: templates/conversational_survey_business.html:195
+#: templates/conversational_survey_business.html:219
 msgid "You can now close this window."
 msgstr ""
 
@@ -883,10 +1281,53 @@ msgstr ""
 msgid "Thank you! You have already submitted your conversational feedback on"
 msgstr ""
 
-#: templates/conversational_survey_completed.html:33
-#: templates/survey_completed.html:33
+#: templates/conversational_survey_completed.html:26
+msgid ""
+"Your AI-powered conversation responses have been analyzed to provide "
+"valuable insights for business improvement and customer satisfaction "
+"enhancement."
+msgstr ""
+
+#: templates/conversational_survey_completed.html:32
+#: templates/survey_completed.html:32
 msgid "What would you like to do next?"
 msgstr ""
+
+#: templates/conversational_survey_completed.html:38
+msgid "Try Our Traditional Survey"
+msgstr ""
+
+#: templates/conversational_survey_completed.html:39
+msgid "Experience structured form-based feedback"
+msgstr ""
+
+#: templates/conversational_survey_completed.html:45
+#: templates/survey_completed.html:45
+msgid "Contact Rivvalue for Full Service"
+msgstr ""
+
+#: templates/conversational_survey_completed.html:46
+#: templates/survey_completed.html:46
+msgid "Implement complete Voice of Client solution"
+msgstr ""
+
+#: templates/conversational_survey_completed.html:53
+#: templates/survey_completed.html:53
+msgid "See customer feedback insights"
+msgstr ""
+
+#: templates/conversational_survey_completed.html:63
+#: templates/survey_completed.html:63
+msgid ""
+"For data integrity, each email address can only submit one response per "
+"survey type."
+msgstr ""
+
+#: templates/conversational_survey_completed.html:70
+#: templates/survey_completed.html:70
+#, fuzzy
+msgid "Return to Home"
+msgstr "Return to login page"
 
 #: templates/dashboard.html:21
 msgid "Comprehensive customer feedback insights and analysis"
@@ -925,37 +1366,19 @@ msgstr ""
 msgid "Click to view full trends"
 msgstr ""
 
-#: templates/dashboard.html:78 templates/dashboard.html:938
-#: templates/dashboard.html:1133
-msgid "NPS"
-msgstr ""
-
-#: templates/dashboard.html:84 templates/dashboard.html:1134
-#: templates/executive_summary.html:77 templates/executive_summary.html:214
-#: templates/executive_summary.html:305
+#: templates/dashboard.html:84 templates/executive_summary.html:77
+#: templates/executive_summary.html:214 templates/executive_summary.html:305
 msgid "Companies"
 msgstr ""
 
 #: templates/dashboard.html:90 templates/dashboard.html:1019
-#: templates/dashboard.html:1135 templates/executive_summary.html:83
-#: templates/executive_summary.html:315
+#: templates/executive_summary.html:83 templates/executive_summary.html:315
 msgid "Critical Risk"
 msgstr ""
 
-#: templates/dashboard.html:96 templates/dashboard.html:1029
-#: templates/dashboard.html:1127 templates/dashboard.html:1161
-msgid "Satisfaction"
-msgstr ""
-
-#: templates/dashboard.html:102 templates/dashboard.html:1136
-#: templates/executive_summary.html:95 templates/executive_summary.html:335
+#: templates/dashboard.html:102 templates/executive_summary.html:95
+#: templates/executive_summary.html:335
 msgid "Product"
-msgstr ""
-
-#: templates/dashboard.html:114 templates/dashboard.html:1059
-#: templates/dashboard.html:1129 templates/dashboard.html:1163
-#: templates/executive_summary.html:107 templates/executive_summary.html:355
-msgid "Service"
 msgstr ""
 
 #: templates/dashboard.html:124 templates/executive_summary.html:117
@@ -976,8 +1399,7 @@ msgstr ""
 msgid "Campaign 1"
 msgstr ""
 
-#: templates/dashboard.html:149 templates/dashboard.html:1096
-#: templates/executive_summary.html:142 templates/executive_summary.html:385
+#: templates/dashboard.html:149 templates/executive_summary.html:142
 msgid "Select first campaign"
 msgstr ""
 
@@ -987,8 +1409,7 @@ msgstr ""
 msgid "Campaign 2"
 msgstr ""
 
-#: templates/dashboard.html:158 templates/dashboard.html:1097
-#: templates/executive_summary.html:151 templates/executive_summary.html:386
+#: templates/dashboard.html:158 templates/executive_summary.html:151
 msgid "Select second campaign"
 msgstr ""
 
@@ -1039,11 +1460,6 @@ msgstr ""
 msgid "Risk Heavy"
 msgstr ""
 
-#: templates/dashboard.html:233 templates/dashboard.html:657
-#: templates/executive_summary.html:226
-msgid "Clear"
-msgstr ""
-
 #: templates/dashboard.html:243 templates/executive_summary.html:236
 msgid "C1 Risks"
 msgstr ""
@@ -1068,13 +1484,20 @@ msgstr ""
 msgid "C2 Balance"
 msgstr ""
 
+#: templates/business_auth/admin_licenses.html:71
 #: templates/business_auth/licenses/overview.html:301
 #: templates/business_auth/licenses/overview.html:303
 #: templates/business_auth/licenses/overview.html:325
+#: templates/business_auth/manage_users.html:98
 #: templates/business_auth/platform_dashboard.html:421
 #: templates/business_auth/platform_dashboard.html:694
+#: templates/campaigns/list.html:169 templates/campaigns/list.html:188
+#: templates/campaigns/list.html:268 templates/campaigns/list.html:334
+#: templates/campaigns/list.html:346 templates/campaigns/list.html:393
+#: templates/campaigns/list.html:455 templates/campaigns/list.html:480
+#: templates/campaigns/list.html:619 templates/campaigns/list.html:730
 #: templates/campaigns/responses_list.html:179 templates/dashboard.html:249
-#: templates/executive_summary.html:242
+#: templates/executive_summary.html:242 templates/participants/list.html:405
 msgid "Status"
 msgstr ""
 
@@ -1084,14 +1507,6 @@ msgstr ""
 
 #: templates/dashboard.html:282
 msgid "Analyze and compare campaign-specific performance metrics"
-msgstr ""
-
-#: templates/business_auth/admin_panel.html:408
-#: templates/business_auth/admin_panel.html:432
-#: templates/business_auth/admin_panel.html:435
-#: templates/business_auth/admin_panel.html:820
-#: templates/business_auth/admin_panel.html:940 templates/dashboard.html:349
-msgid "Analytics"
 msgstr ""
 
 #: templates/dashboard.html:380
@@ -1144,10 +1559,6 @@ msgstr ""
 msgid "Company NPS"
 msgstr ""
 
-#: templates/dashboard.html:675 templates/dashboard.html:756
-msgid "Distribution"
-msgstr ""
-
 #: templates/dashboard.html:678 templates/dashboard.html:759
 msgid "Latest Churn Risk"
 msgstr ""
@@ -1156,20 +1567,32 @@ msgstr ""
 msgid "Company NPS pagination"
 msgstr ""
 
+#: templates/dashboard.html:727 templates/dashboard.html:783
+msgid "Risk Levels:"
+msgstr ""
+
+#: templates/dashboard.html:728 templates/dashboard.html:784
+msgid "Low (>20)"
+msgstr ""
+
+#: templates/dashboard.html:729 templates/dashboard.html:785
+msgid "Medium (-20 to 20)"
+msgstr ""
+
+#: templates/dashboard.html:730 templates/dashboard.html:786
+msgid "High (≤-20)"
+msgstr ""
+
+#: templates/dashboard.html:731 templates/dashboard.html:787
+msgid "Critical (≤-50)"
+msgstr ""
+
 #: templates/dashboard.html:773
 msgid "Tenure NPS pagination"
 msgstr ""
 
 #: templates/dashboard.html:812
 msgid "Search by company name, participant name, or email..."
-msgstr ""
-
-#: templates/dashboard.html:842
-msgid "Sentiment"
-msgstr ""
-
-#: templates/dashboard.html:844 templates/dashboard.html:940
-msgid "Date"
 msgstr ""
 
 #: templates/dashboard.html:908
@@ -1184,186 +1607,8 @@ msgstr ""
 msgid "Lowest NPS"
 msgstr ""
 
-#: templates/dashboard.html:941
-msgid "Action"
-msgstr ""
-
 #: templates/campaigns/responses_list.html:232 templates/dashboard.html:966
 msgid "No Responses Found"
-msgstr ""
-
-#: templates/dashboard.html:1087 templates/executive_summary.html:378
-msgid "Draft"
-msgstr ""
-
-#: templates/dashboard.html:1088 templates/executive_summary.html:379
-msgid "Ready"
-msgstr ""
-
-#: templates/business_auth/licenses/overview.html:304
-#: templates/dashboard.html:1089 templates/executive_summary.html:380
-msgid "Active"
-msgstr ""
-
-#: templates/dashboard.html:1090 templates/executive_summary.html:381
-#: templates/participants/campaign_participants.html:40
-#: templates/participants/campaign_participants.html:508
-#: templates/participants/campaign_participants.html:586
-#: templates/participants/campaign_participants.html:612
-msgid "Completed"
-msgstr ""
-
-#: templates/dashboard.html:1091 templates/executive_summary.html:382
-#: templates/participants/list.html:441 templates/participants/list.html:736
-#: templates/participants/list.html:804
-msgid "Unknown"
-msgstr ""
-
-#: templates/dashboard.html:1094
-msgid "Filtered by:"
-msgstr ""
-
-#: templates/dashboard.html:1095
-msgid "Clear filter"
-msgstr ""
-
-#: templates/dashboard.html:1100
-msgid "days left"
-msgstr ""
-
-#: templates/dashboard.html:1101
-msgid "days ago"
-msgstr ""
-
-#: templates/dashboard.html:1102
-msgid "month"
-msgstr ""
-
-#: templates/dashboard.html:1103
-msgid "months"
-msgstr ""
-
-#: templates/dashboard.html:1104
-msgid "ago"
-msgstr ""
-
-#: templates/dashboard.html:1105
-msgid "year"
-msgstr ""
-
-#: templates/dashboard.html:1106
-msgid "years"
-msgstr ""
-
-#: templates/dashboard.html:1109 templates/executive_summary.html:389
-msgid "Loading comparison..."
-msgstr ""
-
-#: templates/dashboard.html:1110 templates/executive_summary.html:390
-msgid "Loading comparison data..."
-msgstr ""
-
-#: templates/dashboard.html:1114 templates/executive_summary.html:393
-msgid "Failed to fetch comparison data"
-msgstr ""
-
-#: templates/dashboard.html:1115 templates/executive_summary.html:391
-msgid "Error Loading Comparison"
-msgstr ""
-
-#: templates/dashboard.html:1116 templates/executive_summary.html:392
-msgid "Failed to load comparison data. Please try again."
-msgstr ""
-
-#: templates/dashboard.html:1117 templates/executive_summary.html:396
-msgid "No campaign data available"
-msgstr ""
-
-#: templates/dashboard.html:1118 templates/executive_summary.html:395
-msgid "Error loading KPI overview data"
-msgstr ""
-
-#: templates/dashboard.html:1119
-msgid "Error loading dashboard data:"
-msgstr ""
-
-#: templates/dashboard.html:1120 templates/executive_summary.html:394
-msgid "Failed to load campaign options"
-msgstr ""
-
-#: templates/dashboard.html:1121
-msgid "Error loading account intelligence"
-msgstr ""
-
-#: templates/dashboard.html:1122
-msgid "Error loading responses."
-msgstr ""
-
-#: templates/dashboard.html:1123
-msgid "Network error loading tenure data"
-msgstr ""
-
-#: templates/dashboard.html:1124
-msgid "Network error loading company data"
-msgstr ""
-
-#: templates/dashboard.html:1131
-msgid "Average Rating"
-msgstr ""
-
-#: templates/dashboard.html:1139
-msgid "N/A"
-msgstr ""
-
-#: templates/dashboard.html:1140
-msgid "No tenure data available yet"
-msgstr ""
-
-#: templates/dashboard.html:1145
-msgid "of"
-msgstr ""
-
-#: templates/dashboard.html:1146
-msgid "tenure groups"
-msgstr ""
-
-#: templates/dashboard.html:1147
-msgid "companies"
-msgstr ""
-
-#: templates/dashboard.html:1148
-msgid "responses"
-msgstr ""
-
-#: templates/dashboard.html:1149
-msgid "accounts"
-msgstr ""
-
-#: templates/dashboard.html:1157 templates/survey.html:110
-#: templates/survey.html:185 templates/survey.html:205
-msgid "Previous"
-msgstr ""
-
-#: templates/dashboard.html:1158 templates/survey.html:72
-#: templates/survey.html:111 templates/survey.html:186
-#: templates/survey.html:241 templates/survey.html:243
-msgid "Next"
-msgstr ""
-
-#: templates/dashboard.html:1159
-msgid "View Details"
-msgstr ""
-
-#: templates/dashboard.html:1160
-msgid "Authentication required"
-msgstr ""
-
-#: templates/dashboard.html:1162
-msgid "Value"
-msgstr ""
-
-#: templates/dashboard.html:1165
-msgid "View Full Response"
 msgstr ""
 
 #: templates/demo_intro.html:3 templates/demo_intro.html:15
@@ -1376,6 +1621,10 @@ msgstr ""
 
 #: templates/demo_intro.html:25
 msgid "In this simulation, you'll step into the role of a customer invited by"
+msgstr ""
+
+#: templates/demo_intro.html:29
+msgid "Archelo Group Logo"
 msgstr ""
 
 #: templates/demo_intro.html:40
@@ -1470,34 +1719,6 @@ msgstr ""
 msgid "Continue to Survey"
 msgstr ""
 
-#: templates/executive_summary.html:402
-msgid "Critical Risk Companies"
-msgstr ""
-
-#: templates/executive_summary.html:405
-msgid "Risk-Heavy Accounts"
-msgstr ""
-
-#: templates/executive_summary.html:406
-msgid "Opportunity-Heavy Accounts"
-msgstr ""
-
-#: templates/executive_summary.html:407
-msgid "Satisfaction Rating"
-msgstr ""
-
-#: templates/executive_summary.html:408
-msgid "Product Value Rating"
-msgstr ""
-
-#: templates/executive_summary.html:409
-msgid "Pricing Rating"
-msgstr ""
-
-#: templates/executive_summary.html:410
-msgid "Service Rating"
-msgstr ""
-
 #: templates/index.html:3
 msgid "VOÏA - Experience Demo"
 msgstr ""
@@ -1506,7 +1727,7 @@ msgstr ""
 msgid "VOÏA demo home page"
 msgstr ""
 
-#: templates/index.html:19
+#: templates/index.html:19 templates/maintenance.html:26
 msgid "Turning voices into value"
 msgstr ""
 
@@ -1592,7 +1813,8 @@ msgid "More actionable insights"
 msgstr ""
 
 #: templates/index.html:84
-msgid "98% accuracy"
+#, python-format
+msgid "98%% accuracy"
 msgstr ""
 
 #: templates/index.html:85
@@ -1627,6 +1849,7 @@ msgstr ""
 msgid "Participant Management"
 msgstr ""
 
+#: templates/campaigns/list.html:3 templates/campaigns/list.html:19
 #: templates/index.html:128
 msgid "Campaign Management"
 msgstr ""
@@ -1664,22 +1887,57 @@ msgstr ""
 msgid "Get Started Today"
 msgstr ""
 
+#: templates/maintenance.html:31
+msgid "Request Demo"
+msgstr ""
+
+#: templates/public_survey_response.html:3
+msgid "Survey Response Details - VOÏA"
+msgstr ""
+
 #: templates/public_survey_response.html:25
 msgid "Survey response details"
+msgstr ""
+
+#: templates/public_survey_response.html:33
+#, python-brace-format
+msgid "Net Promoter Score: {} out of 10, {}"
+msgstr ""
+
+#: templates/public_survey_response.html:34
+#, python-brace-format
+msgid "NPS: {}/10"
+msgstr ""
+
+#: templates/public_survey_response.html:38
+msgid "updated"
+msgstr ""
+
+#: templates/participants/list.html:441 templates/participants/list.html:736
+#: templates/participants/list.html:804
+#: templates/public_survey_response.html:42
+msgid "Unknown"
 msgstr ""
 
 #: templates/public_survey_response.html:51
 msgid "Survey response analysis data"
 msgstr ""
 
+#: templates/public_survey_response.html:56
+msgid "Response Information"
+msgstr ""
+
 #: templates/public_survey_response.html:59
 msgid "Respondent:"
 msgstr ""
 
+#: templates/campaigns/individual_response.html:324
 #: templates/public_survey_response.html:63
 msgid "Company:"
 msgstr ""
 
+#: templates/business_auth/licenses/assignment_result.html:342
+#: templates/business_auth/login.html:103
 #: templates/campaigns/individual_response.html:320
 #: templates/public_survey_response.html:67
 msgid "Email:"
@@ -1690,6 +1948,11 @@ msgstr ""
 msgid "Tenure:"
 msgstr ""
 
+#: templates/public_survey_response.html:82
+msgid "Ratings & Scores"
+msgstr ""
+
+#: templates/campaigns/individual_response.html:339
 #: templates/public_survey_response.html:85
 msgid "NPS Score:"
 msgstr ""
@@ -1699,14 +1962,26 @@ msgstr ""
 msgid "Satisfaction:"
 msgstr ""
 
+#: templates/campaigns/individual_response.html:352
 #: templates/public_survey_response.html:100
 msgid "Product Value:"
 msgstr ""
 
+#: templates/campaigns/individual_response.html:358
 #: templates/public_survey_response.html:106
 msgid "Service Quality:"
 msgstr ""
 
+#: templates/campaigns/individual_response.html:364
+#: templates/public_survey_response.html:112
+msgid "Pricing:"
+msgstr ""
+
+#: templates/public_survey_response.html:123
+msgid "AI Analysis"
+msgstr ""
+
+#: templates/campaigns/individual_response.html:377
 #: templates/public_survey_response.html:126
 #: templates/public_survey_response.html:128
 msgid "Sentiment:"
@@ -1720,12 +1995,61 @@ msgstr ""
 msgid "Key themes identified"
 msgstr ""
 
+#: templates/public_survey_response.html:169
+msgid "Growth Opportunities"
+msgstr ""
+
 #: templates/public_survey_response.html:171
 msgid "Growth opportunities identified"
 msgstr ""
 
+#: templates/public_survey_response.html:184
+msgid "Conversation Transcript"
+msgstr ""
+
 #: templates/public_survey_response.html:188
 msgid "Conversation history"
+msgstr ""
+
+#: templates/public_survey_response.html:190
+msgid "AI message"
+msgstr ""
+
+#: templates/public_survey_response.html:190
+msgid "User message"
+msgstr ""
+
+#: templates/public_survey_response.html:193
+msgid "AI"
+msgstr ""
+
+#: templates/public_survey_response.html:212
+msgid "No conversation transcript available for this response."
+msgstr ""
+
+#: templates/public_survey_response.html:225 templates/survey.html:190
+#: templates/survey.html:192
+msgid "Additional Feedback"
+msgstr ""
+
+#: templates/public_survey_response.html:231
+msgid "Improvement Suggestions:"
+msgstr ""
+
+#: templates/campaigns/individual_response.html:460
+#: templates/public_survey_response.html:238
+msgid "Recommendation Reason:"
+msgstr ""
+
+#: templates/campaigns/individual_response.html:466
+#: templates/public_survey_response.html:245
+msgid "Additional Comments:"
+msgstr ""
+
+#: templates/public_survey_response.html:261
+msgid ""
+"This is a public view of a trial survey response. Business survey "
+"responses require authentication to access."
 msgstr ""
 
 #: templates/server_auth.html:12
@@ -1782,16 +2106,16 @@ msgstr ""
 msgid "Generate secure authentication token"
 msgstr ""
 
-#: templates/server_auth.html:120
-msgid "Token Generated Successfully!"
-msgstr ""
-
 #: templates/server_auth.html:131
 msgid "Start selected survey type"
 msgstr ""
 
 #: templates/server_auth.html:139
 msgid "Token Generation Failed"
+msgstr ""
+
+#: templates/simple_auth.html:3
+msgid "Simple Authentication Test"
 msgstr ""
 
 #: templates/simple_auth.html:11
@@ -1806,9 +2130,61 @@ msgstr ""
 msgid "Clear Results"
 msgstr ""
 
+#: templates/simple_auth.html:42
+#, fuzzy
+msgid "Please enter an email address"
+msgstr "Please enter your email address."
+
+#: templates/simple_auth.html:46
+msgid "Generating token..."
+msgstr ""
+
+#: templates/simple_auth.html:52
+msgid "SUCCESS: Token generated for"
+msgstr ""
+
+#: templates/simple_auth.html:53
+msgid "Token:"
+msgstr ""
+
+#: templates/simple_auth.html:59
+msgid "Token saved to localStorage"
+msgstr ""
+
+#: templates/simple_auth.html:61
+msgid "ERROR:"
+msgstr ""
+
+#: templates/simple_auth.html:61
+msgid "Unknown error"
+msgstr ""
+
+#: templates/simple_auth.html:64
+msgid "FAILED:"
+msgstr ""
+
+#: templates/survey.html:3
+#, fuzzy
+msgid "Customer Survey - VOÏA - Voice Of Client Agent"
+msgstr "Forgot Password - VOÏA - Voice Of Client"
+
 #: templates/survey.html:18
 msgid "Customer Feedback Survey"
 msgstr ""
+
+#: templates/survey.html:19
+msgid "Help us improve by sharing your experience"
+msgstr ""
+
+#: templates/survey.html:22 templates/survey_choice.html:21
+#, python-brace-format
+msgid "Powered by {}"
+msgstr ""
+
+#: templates/survey.html:26 templates/survey_choice.html:25
+#, fuzzy
+msgid "Powered by VOÏA - Voice Of Client Agent"
+msgstr "Forgot Password - VOÏA - Voice Of Client"
 
 #: templates/survey.html:38 templates/survey.html:40
 msgid "Basic Information"
@@ -1818,10 +2194,22 @@ msgstr ""
 msgid "How long have you been working with Archelo Group?"
 msgstr ""
 
+#: templates/business_auth/survey_config.html:148 templates/survey.html:77
+msgid "Net Promoter Score"
+msgstr ""
+
 #: templates/survey.html:78
 msgid ""
 "On a scale of 0-10, how likely are you to recommend our services to a "
 "friend or colleague?"
+msgstr ""
+
+#: templates/survey.html:80
+msgid "Not likely"
+msgstr ""
+
+#: templates/survey.html:107
+msgid "Extremely likely"
 msgstr ""
 
 #: templates/survey.html:117
@@ -1861,6 +2249,11 @@ msgstr ""
 msgid "4 - Good"
 msgstr ""
 
+#: templates/survey.html:136 templates/survey.html:149
+#: templates/survey.html:165 templates/survey.html:178
+msgid "5 - Excellent"
+msgstr ""
+
 #: templates/survey.html:142
 msgid "Product Value (1-5)"
 msgstr ""
@@ -1873,16 +2266,24 @@ msgstr ""
 msgid "Pricing (1-5)"
 msgstr ""
 
-#: templates/survey.html:190 templates/survey.html:192
-msgid "Additional Feedback"
-msgstr ""
-
 #: templates/survey.html:195
 msgid "What could we improve?"
 msgstr ""
 
+#: templates/survey.html:196
+msgid "Please share your suggestions for improvement..."
+msgstr ""
+
 #: templates/survey.html:200
 msgid "Any additional comments?"
+msgstr ""
+
+#: templates/survey.html:201
+msgid "Feel free to share any other thoughts or feedback..."
+msgstr ""
+
+#: templates/survey.html:207
+msgid "Submit Survey"
 msgstr ""
 
 #: templates/survey.html:219
@@ -1893,8 +2294,28 @@ msgstr ""
 msgid "Thank you for sharing with us your feedback."
 msgstr ""
 
+#: templates/survey.html:254
+msgid ""
+"Hi Rivvalue team,\n"
+"\n"
+"I just completed the VOÏA Intelligence demonstration and I am interested "
+"in learning more about implementing the full Voice of Client Agent "
+"service for my organization.\n"
+"\n"
+"Please contact me to discuss how this can benefit our customer feedback "
+"strategy.\n"
+"\n"
+"Thank you!"
+msgstr ""
+
+#: templates/survey_choice.html:3
+#, fuzzy
+msgid "Choose Survey Type - VOÏA - Voice Of Client Agent"
+msgstr "Forgot Password - VOÏA - Voice Of Client"
+
 #: templates/survey_choice.html:17
-msgid "Welcome, {{ participant_name }}"
+#, python-brace-format
+msgid "Welcome, {}!"
 msgstr ""
 
 #: templates/survey_choice.html:33 templates/survey_choice.html:38
@@ -1923,8 +2344,8 @@ msgstr ""
 msgid "5-7 minutes"
 msgstr ""
 
-#: templates/survey_choice.html:65
-msgid "Traditional Form"
+#: templates/survey_choice.html:53
+msgid "Start AI Conversation"
 msgstr ""
 
 #: templates/survey_choice.html:67
@@ -1949,6 +2370,16 @@ msgstr ""
 msgid "3-5 minutes"
 msgstr ""
 
+#: templates/survey_choice.html:80
+msgid "Start Form Survey"
+msgstr ""
+
+#: templates/survey_choice.html:90
+msgid ""
+"Both options provide the same valuable insights. Choose what feels most "
+"comfortable for you."
+msgstr ""
+
 #: templates/survey_completed.html:3 templates/survey_completed.html:17
 msgid "Survey Already Completed"
 msgstr ""
@@ -1957,12 +2388,70 @@ msgstr ""
 msgid "Thank you! You have already submitted your feedback on"
 msgstr ""
 
+#: templates/survey_completed.html:26
+msgid ""
+"Your feedback is being analyzed by our AI system to provide valuable "
+"insights for business improvement and customer satisfaction enhancement."
+msgstr ""
+
+#: templates/survey_completed.html:38
+msgid "Try Our Conversational Survey"
+msgstr ""
+
+#: templates/survey_completed.html:39
+msgid "Experience AI-powered natural conversation"
+msgstr ""
+
+#: templates/survey_success.html:20
+#, python-brace-format
+msgid "Your feedback has been successfully analyzed by {} Intelligence."
+msgstr ""
+
+#: templates/survey_success.html:44
+msgid "Experience traditional survey with different scenarios"
+msgstr ""
+
+#: templates/survey_success.html:47
+msgid ""
+"Hi Rivvalue team,\n"
+"\n"
+"I just completed the traditional survey demonstration and I'm interested "
+"in learning more about implementing the full Voice of Client Agent "
+"service for my organization.\n"
+"\n"
+"Please contact me to discuss how this can benefit our customer feedback "
+"strategy.\n"
+"\n"
+"Thank you!"
+msgstr ""
+
+#: templates/survey_success.html:57
+msgid "Want to try our AI-powered conversational survey?"
+msgstr ""
+
+#: templates/survey_success.html:59
+msgid "Try Conversational Survey"
+msgstr ""
+
+#: templates/survey_success.html:62
+#, python-brace-format
+msgid "Experience natural conversation with {} Intelligence"
+msgstr ""
+
+#: templates/survey_success.html:64
+msgid "Experience natural conversation with VOÏA Intelligence"
+msgstr ""
+
 #: templates/test_token.html:6 templates/test_token.html:17
 msgid "Token Generation Test"
 msgstr ""
 
 #: templates/test_token.html:20
 msgid "Enter email address"
+msgstr ""
+
+#: templates/business_auth/account_status.html:12
+msgid "Vocsa"
 msgstr ""
 
 #: templates/business_auth/account_status.html:13
@@ -1996,7 +2485,8 @@ msgid ""
 msgstr ""
 
 #: templates/business_auth/account_status.html:37
-msgid "Account Status: {{ account_status|title }}"
+#, python-format
+msgid "Account Status: %(status)s"
 msgstr ""
 
 #: templates/business_auth/account_status.html:38
@@ -2009,26 +2499,8 @@ msgid "Welcome to VOÏA!"
 msgstr ""
 
 #: templates/business_auth/activate_account.html:411
-msgid "You're invited to join {{ business_account.name }}"
-msgstr ""
-
-#: templates/business_auth/activate_account.html:447
-#: templates/business_auth/manage_users.html:97
-#: templates/business_auth/manage_users.html:256
-#: templates/business_auth/manage_users.html:265
-#: templates/business_auth/manage_users.html:336
-#: templates/business_auth/manage_users.html:345
-#: templates/business_auth/platform_dashboard.html:693
-#: templates/participants/campaign_participants.html:74
-#: templates/participants/campaign_participants.html:76
-#: templates/participants/campaign_participants.html:186
-#: templates/participants/create.html:100 templates/participants/edit.html:148
-#: templates/participants/list.html:253 templates/participants/list.html:255
-#: templates/participants/list.html:549 templates/participants/list.html:552
-#: templates/participants/list.html:553 templates/participants/list.html:554
-#: templates/participants/list.html:1163 templates/participants/list.html:1192
-#: templates/participants/list.html:1245
-msgid "Role"
+#, python-format
+msgid "You're invited to join %(name)s"
 msgstr ""
 
 #: templates/business_auth/activate_account.html:448
@@ -2062,31 +2534,93 @@ msgstr ""
 msgid "← Return to VOÏA Home"
 msgstr ""
 
+#: templates/business_auth/admin_licenses.html:69
+#: templates/business_auth/scheduler_status.html:93
+#: templates/business_auth/scheduler_status.html:98
+msgid "Business Account"
+msgstr ""
+
+#: templates/business_auth/admin_licenses.html:70
+#: templates/business_auth/admin_panel.html:653
+#: templates/business_auth/admin_panel.html:668
+#: templates/business_auth/licenses/history.html:463
+#: templates/business_auth/licenses/overview.html:291
+#: templates/business_auth/licenses/overview.html:293
+#: templates/business_auth/licenses/overview.html:324
+msgid "License Type"
+msgstr ""
+
+#: templates/business_auth/admin_licenses.html:73
+#: templates/business_auth/admin_panel_v2.html:706
+#: templates/business_auth/license_overview.html:107
+#: templates/business_auth/license_overview.html:241
+#: templates/business_auth/licenses/assignment_form.html:96
+#: templates/business_auth/licenses/assignment_form.html:283
+#: templates/business_auth/licenses/assignment_form.html:417
+#: templates/business_auth/licenses/assignment_form.html:419
+#: templates/business_auth/licenses/assignment_form.html:609
+#: templates/business_auth/licenses/assignment_form.html:614
+#: templates/business_auth/licenses/assignment_form.html:633
+#: templates/business_auth/licenses/assignment_form.html:636
+#: templates/business_auth/licenses/overview.html:326
+msgid "Users"
+msgstr ""
+
+#: templates/business_auth/admin_licenses.html:74
+msgid "Respondents"
+msgstr ""
+
+#: templates/business_auth/admin_licenses.html:75
+msgid "Invitations"
+msgstr ""
+
+#: templates/business_auth/admin_licenses.html:76
+#: templates/business_auth/licenses/history.html:486
+#: templates/business_auth/licenses/overview.html:329
+msgid "Expiration"
+msgstr ""
+
+#: templates/business_auth/admin_licenses.html:77
+#: templates/business_auth/licenses/overview.html:330
+#: templates/business_auth/manage_users.html:100
+#: templates/business_auth/onboarding_progress.html:131
+#: templates/campaigns/list.html:174
+#: templates/campaigns/responses_list.html:181
+#: templates/participants/list.html:407
+msgid "Actions"
+msgstr ""
+
+#: templates/business_auth/admin_licenses.html:156
+#: templates/business_auth/licenses/overview.html:397
+msgid "No expiration"
+msgstr ""
+
+#: templates/business_auth/admin_licenses.html:162
+msgid "Manage License"
+msgstr ""
+
+#: templates/business_auth/admin_licenses.html:166
+#: templates/business_auth/licenses/overview.html:407
+msgid "View History"
+msgstr ""
+
+#: templates/business_auth/admin_licenses.html:179
+#: templates/business_auth/licenses/overview.html:419
+msgid "No accounts found"
+msgstr ""
+
+#: templates/business_auth/admin_licenses.html:180
+msgid "No business accounts match the current filter criteria."
+msgstr ""
+
 #: templates/business_auth/admin_panel.html:398
-msgid "Welcome {{ current_user.get_full_name() }}"
+#, python-format
+msgid "Welcome %(name)s"
 msgstr ""
 
 #: templates/business_auth/admin_panel.html:399
-#: templates/business_auth/admin_panel.html:419
-#: templates/business_auth/admin_panel.html:420
-#: templates/business_auth/admin_panel.html:422
-#: templates/business_auth/admin_panel.html:423
-#: templates/business_auth/admin_panel.html:460
-#: templates/business_auth/admin_panel.html:463
-#: templates/business_auth/admin_panel.html:464
-#: templates/business_auth/admin_panel.html:476
-#: templates/business_auth/admin_panel.html:518
-#: templates/business_auth/admin_panel.html:524
-#: templates/business_auth/admin_panel.html:527
-#: templates/business_auth/admin_panel.html:534
-#: templates/business_auth/admin_panel.html:539
-#: templates/business_auth/admin_panel.html:542
-#: templates/business_auth/admin_panel.html:745
-#: templates/business_auth/admin_panel.html:756
-#: templates/business_auth/admin_panel.html:823
-#: templates/business_auth/admin_panel.html:961
-#: templates/business_auth/admin_panel.html:966
-msgid "Manage"
+#: templates/participants/create.html:108 templates/participants/edit.html:156
+msgid "Manager"
 msgstr ""
 
 #: templates/business_auth/admin_panel.html:407
@@ -2118,6 +2652,28 @@ msgstr ""
 #: templates/business_auth/admin_panel.html:413
 #: templates/business_auth/admin_panel.html:485
 msgid "License management dashboard and overview"
+msgstr ""
+
+#: templates/business_auth/admin_panel.html:419
+#: templates/business_auth/admin_panel.html:420
+#: templates/business_auth/admin_panel.html:422
+#: templates/business_auth/admin_panel.html:423
+#: templates/business_auth/admin_panel.html:460
+#: templates/business_auth/admin_panel.html:463
+#: templates/business_auth/admin_panel.html:464
+#: templates/business_auth/admin_panel.html:476
+#: templates/business_auth/admin_panel.html:518
+#: templates/business_auth/admin_panel.html:524
+#: templates/business_auth/admin_panel.html:527
+#: templates/business_auth/admin_panel.html:534
+#: templates/business_auth/admin_panel.html:539
+#: templates/business_auth/admin_panel.html:542
+#: templates/business_auth/admin_panel.html:745
+#: templates/business_auth/admin_panel.html:756
+#: templates/business_auth/admin_panel.html:823
+#: templates/business_auth/admin_panel.html:961
+#: templates/business_auth/admin_panel.html:966
+msgid "Manage"
 msgstr ""
 
 #: templates/business_auth/admin_panel.html:428
@@ -2153,11 +2709,10 @@ msgid "View account activity trail"
 msgstr ""
 
 #: templates/business_auth/admin_panel.html:530
+#, python-format
 msgid ""
-"Add and manage team members for your business account. Current usage: {{ "
-"admin_data.license_info.users_used if admin_data.license_info else 1 "
-"}}/{{ admin_data.license_info.users_limit if admin_data.license_info else"
-" 5 }} users."
+"Add and manage team members for your business account. Current usage: "
+"%(used)d/%(limit)d users."
 msgstr ""
 
 #: templates/business_auth/admin_panel.html:545
@@ -2194,15 +2749,6 @@ msgstr ""
 msgid "Total Invitations"
 msgstr ""
 
-#: templates/business_auth/admin_panel.html:653
-#: templates/business_auth/admin_panel.html:668
-#: templates/business_auth/licenses/history.html:463
-#: templates/business_auth/licenses/overview.html:291
-#: templates/business_auth/licenses/overview.html:293
-#: templates/business_auth/licenses/overview.html:324
-msgid "License Type"
-msgstr ""
-
 #: templates/business_auth/admin_panel.html:695
 msgid "Campaigns Used"
 msgstr ""
@@ -2214,6 +2760,7 @@ msgid "Team Members"
 msgstr ""
 
 #: templates/business_auth/admin_panel.html:722
+#: templates/business_auth/admin_panel_v2.html:710
 msgid "Max Participants"
 msgstr ""
 
@@ -2337,6 +2884,9 @@ msgstr ""
 
 #: templates/business_auth/admin_panel_v2.html:492
 #: templates/business_auth/admin_panel_v2.html:499
+#: templates/business_auth/onboarding/brand.html:3
+#: templates/business_auth/onboarding/brand.html:263
+#: templates/business_auth/onboarding/welcome.html:288
 msgid "Brand Configuration"
 msgstr ""
 
@@ -2375,6 +2925,7 @@ msgid "Data Management"
 msgstr ""
 
 #: templates/business_auth/admin_panel_v2.html:617
+#: templates/campaigns/list.html:56
 msgid "Export Data"
 msgstr ""
 
@@ -2462,6 +3013,258 @@ msgstr ""
 msgid "Manage cross-tenant administrator accounts and permissions"
 msgstr ""
 
+#: templates/business_auth/audit_logs.html:21
+msgid "Track all activities and changes in your VOÏA account"
+msgstr ""
+
+#: templates/business_auth/audit_logs.html:28
+msgid "Total Activities"
+msgstr ""
+
+#: templates/business_auth/audit_logs.html:32
+msgid "Activity Types"
+msgstr ""
+
+#: templates/business_auth/audit_logs.html:36
+msgid "Active Users"
+msgstr ""
+
+#: templates/business_auth/audit_logs.html:40
+msgid "Days Shown"
+msgstr ""
+
+#: templates/business_auth/audit_logs.html:48
+msgid "Activity Type"
+msgstr ""
+
+#: templates/business_auth/audit_logs.html:61
+#: templates/business_auth/audit_logs.html:100
+#: templates/business_auth/manage_users.html:96
+msgid "User"
+msgstr ""
+
+#: templates/business_auth/audit_logs.html:74
+msgid "Time Period"
+msgstr ""
+
+#: templates/business_auth/audit_logs.html:84
+msgid "Apply filters"
+msgstr ""
+
+#: templates/business_auth/audit_logs.html:99
+msgid "Time"
+msgstr ""
+
+#: templates/business_auth/audit_logs.html:101
+msgid "Activity"
+msgstr ""
+
+#: templates/business_auth/audit_logs.html:102
+#: templates/campaigns/create.html:90 templates/campaigns/edit.html:106
+msgid "Description"
+msgstr ""
+
+#: templates/business_auth/audit_logs.html:103
+msgid "Resource"
+msgstr ""
+
+#: templates/business_auth/audit_logs.html:161
+msgid "No Activity Yet"
+msgstr ""
+
+#: templates/business_auth/audit_logs.html:162
+msgid ""
+"No audit logs found for the selected filters. Try adjusting your filters "
+"or create some test data to get started."
+msgstr ""
+
+#: templates/business_auth/brand_config.html:22
+#, python-format
+msgid "Customize your brand identity for %(name)s"
+msgstr ""
+
+#: templates/business_auth/brand_config.html:50
+#: templates/business_auth/brand_config.html:58
+#: templates/business_auth/brand_config.html:216
+msgid "Company Logo"
+msgstr ""
+
+#: templates/business_auth/brand_config.html:53
+#: templates/business_auth/brand_config.html:54
+#: templates/business_auth/brand_config.html:60
+msgid "No logo"
+msgstr ""
+
+#: templates/business_auth/brand_config.html:67
+#: templates/business_auth/brand_config.html:89
+msgid "Company Display Name"
+msgstr ""
+
+#: templates/business_auth/brand_config.html:98
+#, python-format
+msgid ""
+"This name will be displayed in surveys and emails. Leave blank to use "
+"\"%(name)s\"."
+msgstr ""
+
+#: templates/business_auth/brand_config.html:113
+msgid "Primary Color"
+msgstr ""
+
+#: templates/business_auth/brand_config.html:121
+msgid "Main brand color used for headers, buttons, and accents."
+msgstr ""
+
+#: templates/business_auth/brand_config.html:127
+msgid "Secondary Color"
+msgstr ""
+
+#: templates/business_auth/brand_config.html:135
+msgid "Supporting color for borders and subtle elements."
+msgstr ""
+
+#: templates/business_auth/brand_config.html:144
+msgid "Accent Color"
+msgstr ""
+
+#: templates/business_auth/brand_config.html:152
+msgid "Highlight color for success states and call-to-action elements."
+msgstr ""
+
+#: templates/business_auth/brand_config.html:158
+msgid "Text Color"
+msgstr ""
+
+#: templates/business_auth/brand_config.html:166
+msgid "Primary text color for readability."
+msgstr ""
+
+#: templates/business_auth/brand_config.html:175
+msgid "Background Color"
+msgstr ""
+
+#: templates/business_auth/brand_config.html:183
+msgid "Background color for documents and reports."
+msgstr ""
+
+#: templates/business_auth/brand_config.html:189
+msgid "Color Preview"
+msgstr ""
+
+#: templates/business_auth/brand_config.html:194
+msgid "Primary color"
+msgstr ""
+
+#: templates/business_auth/brand_config.html:198
+msgid "Secondary color"
+msgstr ""
+
+#: templates/business_auth/brand_config.html:202
+msgid "Accent color"
+msgstr ""
+
+#: templates/business_auth/brand_config.html:205
+msgid "Live preview of your color palette."
+msgstr ""
+
+#: templates/business_auth/brand_config.html:220
+msgid "Upload Logo"
+msgstr ""
+
+#: templates/business_auth/brand_config.html:228
+msgid ""
+"Upload your company logo to personalize surveys and communications. "
+"Supported formats: PNG, JPG, JPEG, GIF, WEBP (max 5MB)."
+msgstr ""
+
+#: templates/business_auth/brand_config.html:234
+msgid "Supported formats: PNG, JPG, JPEG, GIF, WEBP"
+msgstr ""
+
+#: templates/business_auth/brand_config.html:235
+msgid "Maximum file size: 5MB"
+msgstr ""
+
+#: templates/business_auth/brand_config.html:236
+msgid "Recommended dimensions: 400x200 pixels or similar ratio"
+msgstr ""
+
+#: templates/business_auth/brand_config.html:237
+msgid "Transparent background recommended for PNG files"
+msgstr ""
+
+#: templates/business_auth/brand_config.html:238
+msgid "PNG format recommended for logos with transparency"
+msgstr ""
+
+#: templates/business_auth/brand_config.html:256
+msgid "Changes will take effect immediately after saving."
+msgstr ""
+
+#: templates/business_auth/business_account_onboarding.html:21
+msgid "Business Account Onboarding"
+msgstr ""
+
+#: templates/business_auth/business_account_onboarding.html:22
+msgid "Create a new business account and invite the account administrator"
+msgstr ""
+
+#: templates/business_auth/business_account_onboarding.html:63
+msgid "Business Account Information"
+msgstr ""
+
+#: templates/business_auth/business_account_onboarding.html:74
+msgid "Enter the complete business name"
+msgstr ""
+
+#: templates/business_auth/business_account_onboarding.html:78
+msgid "This will be displayed throughout the platform and in communications"
+msgstr ""
+
+#: templates/business_auth/business_account_onboarding.html:102
+msgid "Choose the license tier that best fits the business needs"
+msgstr ""
+
+#: templates/business_auth/business_account_onboarding.html:112
+msgid "Account Administrator Information"
+msgstr ""
+
+#: templates/business_auth/business_account_onboarding.html:124
+msgid "Administrator's first name"
+msgstr ""
+
+#: templates/business_auth/business_account_onboarding.html:138
+msgid "Administrator's last name"
+msgstr ""
+
+#: templates/business_auth/business_account_onboarding.html:153
+msgid "admin@company.com"
+msgstr ""
+
+#: templates/business_auth/business_account_onboarding.html:157
+msgid "The administrator will receive an invitation email at this address"
+msgstr ""
+
+#: templates/business_auth/business_account_onboarding.html:168
+msgid "the administrator"
+msgstr ""
+
+#: templates/business_auth/business_account_onboarding.html:169
+msgid "business name"
+msgstr ""
+
+#: templates/business_auth/email_config.html:60
+msgid "Email Provider *"
+msgstr ""
+
+#: templates/business_auth/email_config.html:71
+msgid "Choose your email delivery provider"
+msgstr ""
+
+#: templates/business_auth/email_config.html:78
+msgid "AWS Region *"
+msgstr ""
+
 #: templates/business_auth/email_config.html:85
 msgid "US East (Ohio)"
 msgstr ""
@@ -2525,7 +3328,13 @@ msgid "SMTP Server"
 msgstr ""
 
 #: templates/business_auth/email_config.html:117
+#: templates/business_auth/onboarding/smtp.html:295
 msgid "SMTP Server *"
+msgstr ""
+
+#: templates/business_auth/email_config.html:123
+#: templates/business_auth/onboarding/smtp.html:298
+msgid "smtp.gmail.com"
 msgstr ""
 
 #: templates/business_auth/email_config.html:125
@@ -2541,18 +3350,22 @@ msgstr ""
 msgid "AWS SES SMTP server is automatically set based on your region"
 msgstr ""
 
+#: templates/business_auth/email_config.html:141
+#: templates/business_auth/onboarding/smtp.html:302
+msgid "Port *"
+msgstr ""
+
 #: templates/business_auth/email_config.html:152
 msgid "Usually 587 (TLS) or 465 (SSL)"
 msgstr ""
 
 #: templates/business_auth/email_config.html:161
-#: templates/business_auth/email_config.html:512
-#: templates/business_auth/email_config.html:514
-#: templates/business_auth/email_config.html:530
-#: templates/business_auth/email_config.html:532
 #: templates/business_auth/email_config.html:553
-#: templates/business_auth/email_config.html:555
 msgid "Username"
+msgstr ""
+
+#: templates/business_auth/email_config.html:168
+msgid "your-email@domain.com"
 msgstr ""
 
 #: templates/business_auth/email_config.html:172
@@ -2561,16 +3374,16 @@ msgid "Usually your email address"
 msgstr ""
 
 #: templates/business_auth/email_config.html:178
-#: templates/business_auth/email_config.html:513
-#: templates/business_auth/email_config.html:515
-#: templates/business_auth/email_config.html:531
-#: templates/business_auth/email_config.html:533
 #: templates/business_auth/email_config.html:554
-#: templates/business_auth/email_config.html:556
 #: templates/business_auth/login.html:59 templates/business_auth/login.html:63
 #: templates/business_auth/login.html:65 templates/business_auth/login.html:104
 msgid "Password"
 msgstr ""
+
+#: templates/business_auth/email_config.html:184
+#, fuzzy
+msgid "Enter SMTP password"
+msgstr "Reset Your Password"
 
 #: templates/business_auth/email_config.html:187
 #: templates/business_auth/email_config.html:556
@@ -2586,7 +3399,12 @@ msgid "Use SSL (for port 465)"
 msgstr ""
 
 #: templates/business_auth/email_config.html:232
+#: templates/business_auth/onboarding/smtp.html:327
 msgid "Sender Name *"
+msgstr ""
+
+#: templates/business_auth/email_config.html:238
+msgid "Your Company Name"
 msgstr ""
 
 #: templates/business_auth/email_config.html:242
@@ -2597,6 +3415,10 @@ msgstr ""
 msgid "Sender Email *"
 msgstr ""
 
+#: templates/business_auth/email_config.html:253
+msgid "noreply@yourcompany.com"
+msgstr ""
+
 #: templates/business_auth/email_config.html:257
 msgid "Email address that appears in the \"From\" field"
 msgstr ""
@@ -2605,12 +3427,20 @@ msgstr ""
 msgid "Reply-To Email (optional)"
 msgstr ""
 
+#: templates/business_auth/email_config.html:269
+msgid "support@yourcompany.com"
+msgstr ""
+
 #: templates/business_auth/email_config.html:271
 msgid "Where replies should be sent (if different from sender)"
 msgstr ""
 
 #: templates/business_auth/email_config.html:283
 msgid "Admin Email Addresses"
+msgstr ""
+
+#: templates/business_auth/email_config.html:289
+msgid "admin@yourcompany.com, manager@yourcompany.com"
 msgstr ""
 
 #: templates/business_auth/email_config.html:291
@@ -2632,6 +3462,12 @@ msgstr ""
 msgid "(Max 200 characters)"
 msgstr ""
 
+#: templates/business_auth/email_config.html:332
+#: templates/campaigns/create.html:180
+#, python-brace-format
+msgid "Your feedback is requested: {campaign_name}"
+msgstr ""
+
 #: templates/business_auth/email_config.html:337
 msgid "Variables:"
 msgstr ""
@@ -2639,6 +3475,14 @@ msgstr ""
 #: templates/business_auth/email_config.html:342
 #: templates/campaigns/create.html:185
 msgid "Introduction Message"
+msgstr ""
+
+#: templates/business_auth/email_config.html:347
+#: templates/campaigns/create.html:188
+#, python-brace-format
+msgid ""
+"{business_account_name} is requesting your valuable feedback through our "
+"Voice of Client system."
 msgstr ""
 
 #: templates/business_auth/email_config.html:351
@@ -2653,6 +3497,11 @@ msgstr ""
 msgid "(Max 50 characters)"
 msgstr ""
 
+#: templates/business_auth/email_config.html:365
+#: templates/campaigns/create.html:195
+msgid "Complete Your Survey"
+msgstr ""
+
 #: templates/business_auth/email_config.html:370
 #: templates/campaigns/create.html:196
 msgid "Text displayed on the survey button"
@@ -2663,12 +3512,26 @@ msgstr ""
 msgid "Closing Message"
 msgstr ""
 
+#: templates/business_auth/email_config.html:380
+msgid ""
+"Your feedback helps improve services and experiences. The survey should "
+"take just a few minutes to complete.&#10;&#10;Thank you for your time and"
+" valuable insights!"
+msgstr ""
+
 #: templates/business_auth/email_config.html:384
 msgid "Message before the signature"
 msgstr ""
 
 #: templates/business_auth/email_config.html:389
 msgid "Footer Disclaimer"
+msgstr ""
+
+#: templates/business_auth/email_config.html:394
+#: templates/campaigns/create.html:213
+msgid ""
+"This is an automated message. If you have any questions, please contact "
+"the organization that sent this survey."
 msgstr ""
 
 #: templates/business_auth/email_config.html:398
@@ -2702,12 +3565,143 @@ msgstr ""
 msgid "Test Email Address"
 msgstr ""
 
+#: templates/business_auth/email_config.html:486
+#: templates/business_auth/onboarding/smtp.html:346
+msgid "test@example.com"
+msgstr ""
+
 #: templates/business_auth/email_config.html:487
 msgid "Enter test email address"
 msgstr ""
 
+#: templates/business_auth/email_config.html:530
+msgid "AWS SES SMTP Username"
+msgstr ""
+
+#: templates/business_auth/email_config.html:531
+#, fuzzy
+msgid "AWS SES SMTP Password"
+msgstr "Reset Your Password"
+
+#: templates/business_auth/email_config.html:532
+msgid "SMTP username from AWS SES Console > SMTP Settings"
+msgstr ""
+
+#: templates/business_auth/email_config.html:533
+msgid "SMTP password from AWS SES Console (not your AWS password)"
+msgstr ""
+
+#: templates/business_auth/email_config.html:618
+msgid "Preview failed: ' + (data.error || 'Unknown error') + '"
+msgstr ""
+
+#: templates/business_auth/email_config.html:622
+msgid "Network error: ' + error.message + '"
+msgstr ""
+
+#: templates/business_auth/forgot_password.html:3
+msgid "Forgot Password - VOÏA - Voice Of Client"
+msgstr "Forgot Password - VOÏA - Voice Of Client"
+
+#: templates/business_auth/forgot_password.html:13
+#: templates/business_auth/reset_password.html:13
+msgid "VOÏA Password Reset"
+msgstr "VOÏA Password Reset"
+
+#: templates/business_auth/forgot_password.html:16
+msgid "Reset Your Password"
+msgstr "Reset Your Password"
+
+#: templates/business_auth/forgot_password.html:17
+msgid "Enter your email address and we'll send you a password reset link"
+msgstr "Enter your email address and we'll send you a password reset link"
+
+#: templates/business_auth/forgot_password.html:36
+msgid "Password reset request form"
+msgstr "Password reset request form"
+
+#: templates/business_auth/forgot_password.html:44
+#: templates/business_auth/login.html:44
+msgid "name@example.com"
+msgstr ""
+
+#: templates/business_auth/forgot_password.html:48
+#: templates/business_auth/login.html:48
+msgid "Email address"
+msgstr "Email address"
+
+#: templates/business_auth/forgot_password.html:56
+msgid "We'll send a password reset link to this email address"
+msgstr "We'll send a password reset link to this email address"
+
+#: templates/business_auth/forgot_password.html:59
+msgid "Send password reset email"
+msgstr "Send password reset email"
+
+#: templates/business_auth/forgot_password.html:60
+msgid "Send Reset Link"
+msgstr "Send Reset Link"
+
+#: templates/business_auth/forgot_password.html:65
+#: templates/business_auth/reset_password.html:84
+msgid "Return to login page"
+msgstr "Return to login page"
+
+#: templates/business_auth/forgot_password.html:66
+msgid "Back to Login"
+msgstr "Back to Login"
+
+#: templates/business_auth/forgot_password.html:89
+msgid "Please enter your email address."
+msgstr "Please enter your email address."
+
+#: templates/business_auth/forgot_password.html:94
+msgid "Sending..."
+msgstr "Sending..."
+
+#: templates/business_auth/license_info.html:64
+msgid "License Purchase Date"
+msgstr ""
+
+#: templates/business_auth/license_info.html:87
+msgid "License Expiry Date"
+msgstr ""
+
+#: templates/business_auth/license_info.html:120
+msgid "License Period"
+msgstr ""
+
+#: templates/business_auth/license_info.html:130
+msgid "License Duration"
+msgstr ""
+
+#: templates/business_auth/license_info.html:251
+msgid "Add-on Start Date"
+msgstr ""
+
+#: templates/business_auth/license_info.html:276
+msgid "Add-on End Date"
+msgstr ""
+
+#: templates/business_auth/license_info.html:309
+msgid "Add-on Period"
+msgstr ""
+
+#: templates/business_auth/license_info.html:325
+msgid "Add-on Duration"
+msgstr ""
+
+#: templates/business_auth/license_info.html:342
+msgid "Transcript Analysis Not Configured"
+msgstr ""
+
+#: templates/business_auth/license_info.html:343
+msgid "Add-on Not Purchased"
+msgstr ""
+
 #: templates/business_auth/license_overview.html:14
-msgid "License details and usage information for {{ account_data.name }}"
+#, python-format
+msgid "License details and usage information for %(name)s"
 msgstr ""
 
 #: templates/business_auth/license_overview.html:40
@@ -2727,20 +3721,6 @@ msgstr ""
 msgid "Account Type:"
 msgstr ""
 
-#: templates/business_auth/license_overview.html:107
-#: templates/business_auth/license_overview.html:241
-#: templates/business_auth/licenses/assignment_form.html:96
-#: templates/business_auth/licenses/assignment_form.html:283
-#: templates/business_auth/licenses/assignment_form.html:417
-#: templates/business_auth/licenses/assignment_form.html:419
-#: templates/business_auth/licenses/assignment_form.html:609
-#: templates/business_auth/licenses/assignment_form.html:614
-#: templates/business_auth/licenses/assignment_form.html:633
-#: templates/business_auth/licenses/assignment_form.html:636
-#: templates/business_auth/licenses/overview.html:326
-msgid "Users"
-msgstr ""
-
 #: templates/business_auth/license_overview.html:142
 msgid "Campaign Usage Insights"
 msgstr ""
@@ -2751,6 +3731,256 @@ msgstr ""
 
 #: templates/business_auth/license_overview.html:231
 msgid "Detailed License Info"
+msgstr ""
+
+#: templates/business_auth/login.html:3
+#, fuzzy
+msgid "Business Login - VOÏA - Voice Of Client"
+msgstr "Forgot Password - VOÏA - Voice Of Client"
+
+#: templates/business_auth/login.html:13
+msgid "VOÏA Business Login"
+msgstr ""
+
+#: templates/business_auth/login.html:16
+msgid "Business Account Login"
+msgstr ""
+
+#: templates/business_auth/login.html:17
+msgid "Access your VOÏA platform"
+msgstr ""
+
+#: templates/business_auth/login.html:36
+msgid "Business login form"
+msgstr ""
+
+#: templates/business_auth/login.html:71
+msgid "Your session will remain active for 7 days"
+msgstr ""
+
+#: templates/business_auth/login.html:74
+msgid "Sign in to business account"
+msgstr ""
+
+#: templates/business_auth/login.html:75
+msgid "Sign In"
+msgstr ""
+
+#: templates/business_auth/login.html:80
+#, fuzzy
+msgid "Forgot password"
+msgstr "Reset Your Password"
+
+#: templates/business_auth/login.html:81
+#, fuzzy
+msgid "Forgot your password?"
+msgstr "Reset Your Password"
+
+#: templates/business_auth/login.html:87
+msgid "by"
+msgstr ""
+
+#: templates/business_auth/login.html:101
+msgid "Demo Account"
+msgstr ""
+
+#: templates/business_auth/login.html:104
+msgid "Check server logs for secure temporary password"
+msgstr ""
+
+#: templates/business_auth/login.html:105
+msgid "Default credentials for Rivvalue demo account"
+msgstr ""
+
+#: templates/business_auth/login.html:129
+msgid "Please fill in all required fields."
+msgstr ""
+
+#: templates/business_auth/login.html:134
+#, fuzzy
+msgid "Signing In..."
+msgstr "Sending..."
+
+#: templates/business_auth/manage_users.html:69
+msgid "License limit reached"
+msgstr ""
+
+#: templates/business_auth/manage_users.html:99
+#: templates/business_auth/platform_dashboard.html:695
+msgid "Last Login"
+msgstr ""
+
+#: templates/business_auth/manage_users.html:135
+msgid "Never"
+msgstr ""
+
+#: templates/business_auth/manage_users.html:143
+msgid "Edit User"
+msgstr ""
+
+#: templates/business_auth/manage_users.html:155
+#, fuzzy
+msgid "Reset Password"
+msgstr "Reset Your Password"
+
+#: templates/business_auth/manage_users.html:168
+msgid "Deactivate User"
+msgstr ""
+
+#: templates/business_auth/manage_users.html:175
+msgid "Activate User"
+msgstr ""
+
+#: templates/business_auth/manage_users.html:183
+msgid "Current User"
+msgstr ""
+
+#: templates/business_auth/manage_users.html:194
+msgid "No users found"
+msgstr ""
+
+#: templates/business_auth/manage_users.html:195
+msgid "Start building your team by adding the first user."
+msgstr ""
+
+#: templates/business_auth/manage_users.html:217
+msgid "required"
+msgstr ""
+
+#: templates/business_auth/manage_users.html:249
+msgid "user@company.com"
+msgstr ""
+
+#: templates/business_auth/manage_users.html:274
+#: templates/business_auth/manage_users.html:349
+#: templates/participants/campaign_participants.html:951
+#: templates/participants/list.html:632
+msgid "Cancel"
+msgstr ""
+
+#: templates/business_auth/manage_users.html:350
+msgid "Save changes"
+msgstr ""
+
+#: templates/business_auth/onboarding_progress.html:3
+#: templates/business_auth/onboarding_progress.html:11
+msgid "Onboarding Progress"
+msgstr ""
+
+#: templates/business_auth/onboarding_progress.html:23
+msgid "Complete these steps to configure your VOÏA platform"
+msgstr ""
+
+#: templates/business_auth/onboarding_progress.html:28
+msgid "Setup progress overview"
+msgstr ""
+
+#: templates/business_auth/onboarding_progress.html:32
+msgid "Total Steps"
+msgstr ""
+
+#: templates/business_auth/onboarding_progress.html:40
+msgid "Remaining"
+msgstr ""
+
+#: templates/business_auth/onboarding_progress.html:46
+msgid "Overall Progress"
+msgstr ""
+
+#: templates/business_auth/onboarding_progress.html:53
+#, python-format
+msgid "Setup completion progress: %(percent)d percent"
+msgstr ""
+
+#: templates/business_auth/onboarding_progress.html:60
+msgid "Setup steps"
+msgstr ""
+
+#: templates/business_auth/onboarding_progress.html:62
+msgid "Setup Steps"
+msgstr ""
+
+#: templates/business_auth/onboarding_progress.html:72
+#, python-format
+msgid "Step %(num)d: %(name)s"
+msgstr ""
+
+#: templates/business_auth/onboarding/brand.html:264
+#: templates/business_auth/onboarding/welcome.html:288
+#: templates/business_auth/onboarding_progress.html:79
+#: templates/participants/create.html:88 templates/participants/create.html:93
+#: templates/participants/edit.html:136 templates/participants/edit.html:141
+msgid "Optional"
+msgstr ""
+
+#: templates/business_auth/onboarding_progress.html:95
+#, python-format
+msgid "Configure %(name)s"
+msgstr ""
+
+#: templates/business_auth/onboarding_progress.html:97
+msgid "Go to"
+msgstr ""
+
+#: templates/business_auth/onboarding_progress.html:102
+msgid "Completed on"
+msgstr ""
+
+#: templates/business_auth/onboarding_progress.html:112
+msgid "Mark as Complete"
+msgstr ""
+
+#: templates/business_auth/onboarding_progress.html:124
+msgid "Save Progress"
+msgstr ""
+
+#: templates/business_auth/onboarding/complete.html:299
+#: templates/business_auth/onboarding_progress.html:137
+msgid "Setup Complete!"
+msgstr ""
+
+#: templates/business_auth/onboarding_progress.html:138
+msgid ""
+"Your VOÏA platform is ready to use. You can now start creating campaigns "
+"and collecting valuable customer feedback."
+msgstr ""
+
+#: templates/business_auth/onboarding_progress.html:142
+msgid "Go to Dashboard"
+msgstr ""
+
+#: templates/business_auth/onboarding_progress.html:145
+msgid "Need Help?"
+msgstr ""
+
+#: templates/business_auth/onboarding_progress.html:146
+msgid ""
+"Click the button for each step to configure your platform. When finished,"
+" mark the step as complete and click Save Progress."
+msgstr ""
+
+#: templates/business_auth/platform_dashboard.html:349
+msgid "Total Business Accounts"
+msgstr ""
+
+#: templates/business_auth/platform_dashboard.html:363
+msgid "Total Active Users"
+msgstr ""
+
+#: templates/business_auth/platform_dashboard.html:373
+msgid "Campaigns This Month"
+msgstr ""
+
+#: templates/business_auth/platform_dashboard.html:383
+msgid "Responses This Month"
+msgstr ""
+
+#: templates/business_auth/platform_dashboard.html:384
+msgid "Survey submissions"
+msgstr ""
+
+#: templates/business_auth/platform_dashboard.html:401
+msgid "Total Users"
 msgstr ""
 
 #: templates/business_auth/platform_dashboard.html:405
@@ -2786,6 +4016,11 @@ msgstr ""
 msgid "Campaigns:"
 msgstr ""
 
+#: templates/business_auth/platform_dashboard.html:691
+#: templates/participants/list.html:401
+msgid "Nom"
+msgstr ""
+
 #: templates/business_auth/platform_dashboard.html:692
 #: templates/participants/campaign_participants.html:463
 #: templates/participants/campaign_participants.html:483
@@ -2794,13 +4029,46 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
-#: templates/business_auth/platform_dashboard.html:695
-msgid "Last Login"
-msgstr ""
-
 #: templates/business_auth/platform_dashboard.html:730
 msgid "No users in this account"
 msgstr ""
+
+#: templates/business_auth/reset_password.html:16
+#, fuzzy
+msgid "Set New Password"
+msgstr "Reset Your Password"
+
+#: templates/business_auth/reset_password.html:17
+msgid "Choose a strong password for your account"
+msgstr ""
+
+#: templates/business_auth/reset_password.html:36
+#, fuzzy
+msgid "Password reset form"
+msgstr "Password reset request form"
+
+#: templates/business_auth/reset_password.html:45
+#, fuzzy
+msgid "New Password"
+msgstr "Reset Your Password"
+
+#: templates/business_auth/reset_password.html:51
+#, fuzzy
+msgid "New password"
+msgstr "Reset Your Password"
+
+#: templates/business_auth/reset_password.html:62
+msgid "Confirm New Password"
+msgstr ""
+
+#: templates/business_auth/reset_password.html:67
+msgid "Confirm new password"
+msgstr ""
+
+#: templates/business_auth/reset_password.html:78
+#, fuzzy
+msgid "Reset password"
+msgstr "Reset Your Password"
 
 #: templates/business_auth/scheduler_status.html:6
 #: templates/business_auth/scheduler_status.html:32
@@ -2817,19 +4085,200 @@ msgstr ""
 msgid "Campaign Counts"
 msgstr ""
 
-#: templates/business_auth/scheduler_status.html:93
-#: templates/business_auth/scheduler_status.html:98
-msgid "Business Account"
+#: templates/business_auth/survey_config.html:23
+#, python-brace-format
+msgid "Configure your personalized survey experience for {}"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:36
+msgid "Tell us about your business to personalize the survey conversation"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:41
+msgid "Industry"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:46
+msgid "Select your industry"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:53
+msgid "This helps tailor survey questions to your industry context"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:59
+msgid "Conversation Tone"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:70
+msgid "Choose how the AI should communicate with your survey participants"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:78
+msgid "Company Description"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:84
+msgid "Briefly describe what your company does and your mission..."
+msgstr ""
+
+#: templates/business_auth/survey_config.html:89
+msgid ""
+"This context helps the AI understand your business and ask relevant "
+"questions"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:97
+#: templates/campaigns/survey_config.html:220
+msgid "Product/Service Description"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:103
+msgid "Describe your main products or services in detail..."
+msgstr ""
+
+#: templates/business_auth/survey_config.html:108
+msgid "Specific product details enable more targeted feedback collection"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:116
+msgid "Target Customers"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:122
+msgid ""
+"Describe your typical customers (e.g., small business owners, CFOs, "
+"healthcare providers...)"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:127
+msgid "Understanding your audience helps frame questions appropriately"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:139
+msgid "What do you want to learn from your survey participants?"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:142
+msgid "Primary Survey Goals (select all that apply)"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:153
+msgid "Overall Satisfaction"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:158
+msgid "Product Feedback"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:163
+msgid "Support Quality"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:168
+msgid "Pricing Perception"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:173
+msgid "Custom Research"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:185
+msgid "Fine-tune the survey experience and conversation pacing"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:190
+msgid "Maximum Questions"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:208
+msgid "Absolute limit to keep surveys concise and engaging"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:214
+msgid "Time Limit (seconds)"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:230
+msgid "1min"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:231
+msgid "5min"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:233
+msgid "Maximum time participants can spend on the survey"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:239
+msgid "Follow-ups per Topic"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:257
+msgid "How deep to explore each topic with follow-up questions"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:269
+msgid ""
+"Control which topics the survey covers first and which are optional if "
+"time runs out"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:274
+msgid "Prioritized Topics (covered first)"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:289
+msgid "These topics will always be covered, in order of importance"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:295
+msgid "Optional Topics (if time allows)"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:310
+msgid "These topics can be skipped if the time/question limit is reached"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:322
+msgid "Personalize the survey experience with custom messages"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:327
+msgid "Custom Completion Message"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:333
+msgid ""
+"Thank you for your valuable feedback! We truly appreciate the time you've"
+" taken to help us improve..."
+msgstr ""
+
+#: templates/business_auth/survey_config.html:338
+msgid ""
+"This message will be shown to participants when they complete the survey."
+" Leave blank to use the default message"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:362
+msgid "Cancel and return to settings"
+msgstr ""
+
+#: templates/business_auth/survey_config.html:368
+msgid "Save survey configuration"
 msgstr ""
 
 #: templates/business_auth/licenses/assignment_form.html:22
-msgid "Configure license for {{ business_account.name }}"
+#, python-format
+msgid "Configure license for %(name)s"
 msgstr ""
 
 #: templates/business_auth/licenses/assignment_form.html:47
 #: templates/business_auth/licenses/assignment_form.html:52
 #: templates/business_auth/licenses/assignment_form.html:406
 #: templates/business_auth/licenses/assignment_form.html:560
+#: templates/components/ui_version_toggle.html:26
 msgid "Current"
 msgstr ""
 
@@ -2930,8 +4379,20 @@ msgstr ""
 msgid "Custom Templates"
 msgstr ""
 
+#: templates/business_auth/licenses/assignment_form.html:238
+msgid "Pro License"
+msgstr ""
+
 #: templates/business_auth/licenses/assignment_form.html:239
 msgid "Custom limits for enterprise needs"
+msgstr ""
+
+#: templates/business_auth/licenses/assignment_form.html:242
+msgid "Custom"
+msgstr ""
+
+#: templates/business_auth/licenses/assignment_form.html:243
+msgid "pricing"
 msgstr ""
 
 #: templates/business_auth/licenses/assignment_form.html:249
@@ -3018,16 +4479,34 @@ msgstr ""
 
 #: templates/business_auth/licenses/assignment_form.html:336
 #: templates/campaigns/create.html:106 templates/campaigns/edit.html:122
+#: templates/campaigns/view.html:46
 msgid "Start Date"
+msgstr ""
+
+#: templates/business_auth/licenses/assignment_form.html:339
+msgid "When transcript analysis access begins"
 msgstr ""
 
 #: templates/business_auth/licenses/assignment_form.html:342
 #: templates/campaigns/create.html:113 templates/campaigns/edit.html:130
+#: templates/campaigns/view.html:50
 msgid "End Date"
+msgstr ""
+
+#: templates/business_auth/licenses/assignment_form.html:345
+msgid "When transcript analysis access expires"
 msgstr ""
 
 #: templates/business_auth/licenses/assignment_form.html:348
 msgid "Add-on Price (USD)"
+msgstr ""
+
+#: templates/business_auth/licenses/assignment_form.html:355
+msgid "Custom pricing for this add-on period"
+msgstr ""
+
+#: templates/business_auth/licenses/assignment_form.html:376
+msgid "Notes (Optional)"
 msgstr ""
 
 #: templates/business_auth/licenses/assignment_form.html:378
@@ -3182,7 +4661,8 @@ msgid "License History"
 msgstr ""
 
 #: templates/business_auth/licenses/history.html:339
-msgid "Current License: {{ current_license.type|title }}"
+#, python-format
+msgid "Current License: %(type)s"
 msgstr ""
 
 #: templates/business_auth/licenses/history.html:343
@@ -3238,6 +4718,10 @@ msgstr ""
 msgid "Search Accounts"
 msgstr ""
 
+#: templates/business_auth/licenses/overview.html:287
+msgid "Search by business name or email..."
+msgstr ""
+
 #: templates/business_auth/licenses/overview.html:306
 #: templates/business_auth/licenses/overview.html:391
 msgid "Expired"
@@ -3247,28 +4731,98 @@ msgstr ""
 msgid "Usage"
 msgstr ""
 
-#: templates/business_auth/licenses/overview.html:397
-msgid "No expiration"
+#: templates/business_auth/licenses/overview.html:377
+msgid "Unlimited"
 msgstr ""
 
 #: templates/business_auth/licenses/overview.html:403
 msgid "Assign License"
 msgstr ""
 
-#: templates/business_auth/licenses/overview.html:407
-msgid "View History"
-msgstr ""
-
-#: templates/business_auth/licenses/overview.html:419
-msgid "No accounts found"
-msgstr ""
-
 #: templates/business_auth/licenses/overview.html:420
 msgid "Try adjusting your search criteria or filters."
 msgstr ""
 
-#: templates/business_auth/onboarding/complete.html:299
-msgid "Setup Complete!"
+#: templates/business_auth/onboarding/brand.html:267
+msgid "Personalize your survey experience"
+msgstr ""
+
+#: templates/business_auth/onboarding/brand.html:277
+#, python-format
+msgid "Step %(current)d of %(total)d"
+msgstr ""
+
+#: templates/business_auth/onboarding/brand.html:283
+msgid "Why customize your brand?"
+msgstr ""
+
+#: templates/business_auth/onboarding/brand.html:285
+msgid ""
+"When you add your logo and brand colors, survey participants will see "
+"YOUR brand instead of VOÏA's default branding. This creates a more "
+"professional, personalized experience and increases trust and response "
+"rates."
+msgstr ""
+
+#: templates/business_auth/onboarding/brand.html:292
+msgid "Customize Your Branding"
+msgstr ""
+
+#: templates/business_auth/onboarding/brand.html:299
+msgid "Open Brand Configuration Settings"
+msgstr ""
+
+#: templates/business_auth/onboarding/brand.html:305
+msgid ""
+"Click the link above to configure your logo, primary color, and accent "
+"color. Once you're done, come back here and confirm you've completed the "
+"setup."
+msgstr ""
+
+#: templates/business_auth/onboarding/brand.html:310
+msgid "What participants will see"
+msgstr ""
+
+#: templates/business_auth/onboarding/brand.html:312
+msgid "With your branding:"
+msgstr ""
+
+#: templates/business_auth/onboarding/brand.html:312
+msgid "Your logo prominently displayed with \"Powered by VOÏA\" attribution below"
+msgstr ""
+
+#: templates/business_auth/onboarding/brand.html:313
+msgid "Without branding:"
+msgstr ""
+
+#: templates/business_auth/onboarding/brand.html:313
+msgid "Default VOÏA logo and colors"
+msgstr ""
+
+#: templates/business_auth/onboarding/brand.html:322
+msgid "I've configured my brand settings"
+msgstr ""
+
+#: templates/business_auth/onboarding/brand.html:324
+msgid ""
+"Check this box to confirm you've uploaded your logo and set your brand "
+"colors, or check it to skip this step for now."
+msgstr ""
+
+#: templates/business_auth/onboarding/brand.html:336
+msgid "Skip for Now"
+msgstr ""
+
+#: templates/business_auth/onboarding/brand.html:339
+msgid "Continue to Team Setup"
+msgstr ""
+
+#: templates/business_auth/onboarding/brand.html:388
+msgid "Failed to proceed. Please try again."
+msgstr ""
+
+#: templates/business_auth/onboarding/brand.html:393
+msgid "An error occurred. Please try again."
 msgstr ""
 
 #: templates/business_auth/onboarding/complete.html:300
@@ -3276,9 +4830,10 @@ msgid "Your VOÏA platform is ready for action"
 msgstr ""
 
 #: templates/business_auth/onboarding/complete.html:306
+#, python-format
 msgid ""
-"Congratulations, {{ current_user.get_full_name() }}! Your team is ready "
-"to start collecting valuable customer feedback."
+"Congratulations, %(name)s! Your team is ready to start collecting "
+"valuable customer feedback."
 msgstr ""
 
 #: templates/business_auth/onboarding/complete.html:317
@@ -3297,10 +4852,18 @@ msgid ""
 "invitations to participants."
 msgstr ""
 
+#: templates/business_auth/onboarding/complete.html:346
+msgid "Team Members Added"
+msgstr ""
+
 #: templates/business_auth/onboarding/complete.html:347
 msgid ""
 "Your campaign managers have been invited and can help create and manage "
 "customer feedback surveys."
+msgstr ""
+
+#: templates/business_auth/onboarding/complete.html:356
+msgid "Platform Security"
 msgstr ""
 
 #: templates/business_auth/onboarding/complete.html:357
@@ -3343,6 +4906,10 @@ msgstr ""
 msgid "Quick Start Guide"
 msgstr ""
 
+#: templates/business_auth/onboarding/smtp.html:258
+msgid "Configure SMTP settings to send survey invitations"
+msgstr ""
+
 #: templates/business_auth/onboarding/smtp.html:274
 msgid ""
 "To send survey invitations, VOÏA needs access to your email server. You "
@@ -3361,9 +4928,22 @@ msgstr ""
 msgid "Usually 587 for TLS or 465 for SSL"
 msgstr ""
 
+#: templates/business_auth/onboarding/smtp.html:312
+msgid "Username *"
+msgstr ""
+
+#: templates/business_auth/onboarding/smtp.html:315
+msgid "your-email@company.com"
+msgstr ""
+
 #: templates/business_auth/onboarding/smtp.html:316
 msgid "Your email address or SMTP username"
 msgstr ""
+
+#: templates/business_auth/onboarding/smtp.html:319
+#, fuzzy
+msgid "Password *"
+msgstr "VOÏA Password Reset"
 
 #: templates/business_auth/onboarding/smtp.html:331
 msgid "How your name appears to survey recipients"
@@ -3373,9 +4953,14 @@ msgstr ""
 msgid "Send a test email to verify your SMTP settings are working correctly."
 msgstr ""
 
+#: templates/business_auth/onboarding/smtp.html:344
+#, fuzzy
+msgid "Test Email Address *"
+msgstr "Email address"
+
 #: templates/business_auth/onboarding/users.html:3
 #: templates/business_auth/onboarding/users.html:317
-#: templates/business_auth/onboarding/welcome.html:288
+#: templates/business_auth/onboarding/welcome.html:295
 msgid "Add Team Members"
 msgstr ""
 
@@ -3403,12 +4988,51 @@ msgstr ""
 msgid "Add Campaign Manager"
 msgstr ""
 
+#: templates/business_auth/onboarding/users.html:390
+msgid "First Name *"
+msgstr ""
+
+#: templates/business_auth/onboarding/users.html:392
+msgid "John"
+msgstr ""
+
+#: templates/business_auth/onboarding/users.html:395
+msgid "Last Name *"
+msgstr ""
+
+#: templates/business_auth/onboarding/users.html:397
+msgid "Smith"
+msgstr ""
+
+#: templates/business_auth/onboarding/users.html:402
+#: templates/participants/create.html:41
+msgid "Email Address *"
+msgstr ""
+
+#: templates/business_auth/onboarding/users.html:404
+msgid "john.smith@company.com"
+msgstr ""
+
 #: templates/business_auth/onboarding/users.html:405
 msgid "An invitation will be sent to this email address"
 msgstr ""
 
+#: templates/business_auth/onboarding/users.html:409
+msgid "Role *"
+msgstr ""
+
 #: templates/business_auth/onboarding/users.html:415
 msgid "Campaign Manager is recommended for most team members"
+msgstr ""
+
+#: templates/business_auth/onboarding/users.html:434
+msgid "I've added my team members"
+msgstr ""
+
+#: templates/business_auth/onboarding/users.html:436
+msgid ""
+"Check this box to confirm you've invited the team members who will help "
+"manage customer feedback campaigns."
 msgstr ""
 
 #: templates/business_auth/onboarding/welcome.html:244
@@ -3416,9 +5040,8 @@ msgid "Let's set up your platform for success"
 msgstr ""
 
 #: templates/business_auth/onboarding/welcome.html:260
-msgid ""
-"Welcome, {{ current_user.get_full_name() }}! You're setting up VOÏA for "
-"your team."
+#, python-format
+msgid "Welcome, %(name)s! You're setting up VOÏA for your team."
 msgstr ""
 
 #: templates/business_auth/onboarding/welcome.html:268
@@ -3433,11 +5056,21 @@ msgstr ""
 
 #: templates/business_auth/onboarding/welcome.html:289
 msgid ""
+"Customize your logo and brand colors to create a personalized experience "
+"for survey participants"
+msgstr ""
+
+#: templates/business_auth/onboarding/welcome.html:296
+msgid ""
 "Invite campaign managers to help you create and manage customer feedback "
 "surveys"
 msgstr ""
 
-#: templates/business_auth/onboarding/welcome.html:296
+#: templates/business_auth/onboarding/welcome.html:302
+msgid "Start Collecting Feedback"
+msgstr ""
+
+#: templates/business_auth/onboarding/welcome.html:303
 msgid "Launch your first campaign and begin gathering valuable customer insights"
 msgstr ""
 
@@ -3446,11 +5079,20 @@ msgid "Create New Campaign"
 msgstr ""
 
 #: templates/campaigns/create.html:64
-msgid "Set up a new survey campaign for {{ business_account.name }}"
+#, python-format
+msgid "Set up a new survey campaign for %(name)s"
+msgstr ""
+
+#: templates/campaigns/create.html:84 templates/campaigns/edit.html:100
+msgid "e.g., Q2 2025 Product Satisfaction Survey"
 msgstr ""
 
 #: templates/campaigns/create.html:86 templates/campaigns/edit.html:102
 msgid "A clear, descriptive name for your campaign"
+msgstr ""
+
+#: templates/campaigns/create.html:92 templates/campaigns/edit.html:108
+msgid "Optional description of campaign goals, focus areas, or target audience"
 msgstr ""
 
 #: templates/campaigns/create.html:93 templates/campaigns/edit.html:109
@@ -3510,7 +5152,8 @@ msgid "Edit Campaign"
 msgstr ""
 
 #: templates/campaigns/edit.html:79
-msgid "Update campaign details for {{ business_account.name }}"
+#, python-format
+msgid "Update campaign details for %(name)s"
 msgstr ""
 
 #: templates/campaigns/individual_response.html:297
@@ -3519,6 +5162,104 @@ msgstr ""
 
 #: templates/campaigns/individual_response.html:316
 msgid "Name:"
+msgstr ""
+
+#: templates/campaigns/individual_response.html:394
+msgid "Churn Risk:"
+msgstr ""
+
+#: templates/campaigns/individual_response.html:403
+msgid "Key Themes:"
+msgstr ""
+
+#: templates/campaigns/individual_response.html:419
+msgid "Submitted:"
+msgstr ""
+
+#: templates/campaigns/individual_response.html:440
+msgid "Commercial Value:"
+msgstr ""
+
+#: templates/campaigns/individual_response.html:454
+msgid "Improvement Feedback:"
+msgstr ""
+
+#: templates/campaigns/individual_response.html:514
+msgid "No Conversation History"
+msgstr ""
+
+#: templates/campaigns/individual_response.html:515
+msgid "This response doesn't contain conversational transcript data."
+msgstr ""
+
+#: templates/campaigns/list.html:20
+#, python-format
+msgid "Manage survey campaigns for %(name)s"
+msgstr ""
+
+#: templates/campaigns/list.html:40
+msgid "View Details"
+msgstr ""
+
+#: templates/campaigns/list.html:50
+msgid "Manage Participants"
+msgstr ""
+
+#: templates/campaigns/list.html:64 templates/campaigns/list.html:437
+#: templates/campaigns/list.html:441 templates/campaigns/list.html:623
+#: templates/campaigns/list.html:631
+msgid "Executive Report"
+msgstr ""
+
+#: templates/campaigns/list.html:98 templates/campaigns/list.html:170
+#: templates/campaigns/list.html:193 templates/campaigns/list.html:269
+#: templates/campaigns/list.html:311 templates/campaigns/list.html:318
+#: templates/campaigns/list.html:332 templates/campaigns/list.html:485
+#: templates/campaigns/list.html:542 templates/campaigns/list.html:580
+msgid "Start"
+msgstr ""
+
+#: templates/campaigns/list.html:114
+msgid "Sent"
+msgstr ""
+
+#: templates/campaigns/list.html:149
+msgid "Draft"
+msgstr ""
+
+#: templates/campaigns/list.html:171
+msgid "Fin Date"
+msgstr ""
+
+#: templates/campaigns/list.html:173 templates/campaigns/list.html:202
+msgid "Sent/Completed"
+msgstr ""
+
+#: templates/campaigns/list.html:233
+msgid "Ready to gather insights?"
+msgstr ""
+
+#: templates/campaigns/list.html:234
+msgid ""
+"Create your first campaign to start collecting customer feedback and "
+"understanding their experience. Campaigns help you organize survey "
+"participants, send invitations, and analyze results."
+msgstr ""
+
+#: templates/campaigns/list.html:276
+msgid "Export Complete!"
+msgstr ""
+
+#: templates/campaigns/list.html:277
+msgid "Your campaign data has been successfully exported."
+msgstr ""
+
+#: templates/campaigns/list.html:287
+msgid "Export Failed"
+msgstr ""
+
+#: templates/campaigns/list.html:288
+msgid "An error occurred while exporting your data."
 msgstr ""
 
 #: templates/campaigns/responses_list.html:112
@@ -3534,6 +5275,10 @@ msgstr ""
 msgid "Search participants, companies, or conversation content..."
 msgstr ""
 
+#: templates/campaigns/responses_list.html:176
+msgid "Participant"
+msgstr ""
+
 #: templates/campaigns/responses_list.html:180
 msgid "Response Date"
 msgstr ""
@@ -3542,93 +5287,208 @@ msgstr ""
 msgid "Response pagination"
 msgstr ""
 
+#: templates/campaigns/survey_config.html:179
+msgid "Survey Configuration"
+msgstr ""
+
+#: templates/campaigns/survey_config.html:222
+msgid ""
+"Describe your main products or services (e.g., 'Cloud-based accounting "
+"software for small businesses')"
+msgstr ""
+
+#: templates/campaigns/survey_config.html:224
+msgid "Help the AI understand what you offer to ask better questions"
+msgstr ""
+
+#: templates/campaigns/survey_config.html:228
+msgid "Target Clients"
+msgstr ""
+
+#: templates/campaigns/survey_config.html:230
+msgid ""
+"Describe your ideal customers (e.g., 'Small business owners, CFOs, "
+"accounting firms')"
+msgstr ""
+
+#: templates/campaigns/survey_config.html:256
+msgid "NPS is recommended for all campaigns to track customer loyalty"
+msgstr ""
+
+#: templates/campaigns/survey_config.html:271
+msgid "Max Questions"
+msgstr ""
+
+#: templates/campaigns/survey_config.html:278
+msgid "Hard limit on conversation length"
+msgstr ""
+
+#: templates/campaigns/survey_config.html:283
+msgid "Max Duration (seconds)"
+msgstr ""
+
+#: templates/campaigns/survey_config.html:290
+msgid "Time limit for entire conversation"
+msgstr ""
+
+#: templates/campaigns/survey_config.html:295
+msgid "Max Follow-ups per Topic"
+msgstr ""
+
+#: templates/campaigns/survey_config.html:302
+msgid "Control topic depth exploration"
+msgstr ""
+
+#: templates/campaigns/survey_config.html:320
+msgid "Prioritized Topics (cover first)"
+msgstr ""
+
+#: templates/campaigns/survey_config.html:332
+msgid "These topics will be covered first and are most important"
+msgstr ""
+
+#: templates/campaigns/survey_config.html:337
+msgid "Optional Topics (can be skipped)"
+msgstr ""
+
+#: templates/campaigns/survey_config.html:348
+msgid "These topics will be skipped if time/questions run out"
+msgstr ""
+
+#: templates/campaigns/survey_config.html:357
+msgid "Custom End Message"
+msgstr ""
+
+#: templates/campaigns/survey_config.html:359
+msgid "Optional custom thank you message for survey completion"
+msgstr ""
+
+#: templates/campaigns/survey_config.html:361
+msgid "Personalized message shown when participants complete the survey"
+msgstr ""
+
+#: templates/campaigns/survey_config.html:383
+msgid "Custom System Prompt"
+msgstr ""
+
+#: templates/campaigns/survey_config.html:385
+msgid "Optional: Override the default AI system prompt with custom instructions"
+msgstr ""
+
+#: templates/campaigns/view.html:237
+msgid ""
+"Participants who have successfully completed and submitted their survey "
+"response."
+msgstr ""
+
+#: templates/campaigns/view.html:250
+#: templates/participants/campaign_participants.html:36
+#: templates/participants/campaign_participants.html:505
+msgid "Started"
+msgstr ""
+
+#: templates/campaigns/view.html:255
+msgid "Participants who have started the survey but have not yet completed it."
+msgstr ""
+
 #: templates/campaigns/view.html:268
+#: templates/participants/campaign_participants.html:32
+#: templates/participants/campaign_participants.html:502
+msgid "Invited"
+msgstr ""
+
+#: templates/campaigns/view.html:273
+msgid ""
+"Participants who have received an invitation email but have not yet "
+"started the survey."
+msgstr ""
+
+#: templates/campaigns/view.html:286
 msgid "Pending"
 msgstr ""
 
-#: templates/campaigns/view.html:309 templates/campaigns/view.html:311
+#: templates/campaigns/view.html:291
+msgid ""
+"Participants not yet invited to the campaign. They are associated with "
+"the campaign but have not received invitations."
+msgstr ""
+
+#: templates/campaigns/view.html:327 templates/campaigns/view.html:329
 msgid "Campaign Actions"
 msgstr ""
 
-#: templates/campaigns/view.html:341
+#: templates/campaigns/view.html:359
 msgid ""
 "Campaign needs description and at least one participant to be marked "
 "ready."
 msgstr ""
 
-#: templates/campaigns/view.html:344
+#: templates/campaigns/view.html:362
 msgid ""
 "Draft campaigns can be freely edited or deleted. Once marked ready, "
 "campaign details become locked."
 msgstr ""
 
-#: templates/campaigns/view.html:364
+#: templates/campaigns/view.html:382
 msgid "Campaign is ready for activation"
 msgstr ""
 
-#: templates/campaigns/view.html:377
-msgid ""
-"This will only send invitations to participants who haven't been invited "
-"yet."
-msgstr ""
-
-#: templates/campaigns/view.html:401
+#: templates/campaigns/view.html:391
 msgid "Campaign is currently active and collecting responses"
 msgstr ""
 
-#: templates/campaigns/view.html:412
-msgid ""
-"This campaign finished on {{ campaign.completed_at[:10] if "
-"campaign.completed_at else campaign.end_date }}"
+#: templates/campaigns/view.html:429
+#, python-format
+msgid "This campaign finished on %(date)s"
 msgstr ""
 
-#: templates/campaigns/view.html:425
+#: templates/campaigns/view.html:442
 msgid "Individual Response Viewer"
 msgstr ""
 
-#: templates/campaigns/view.html:426
+#: templates/campaigns/view.html:443
 msgid ""
 "View and analyze individual participant responses and conversation "
 "transcripts."
 msgstr ""
 
-#: templates/campaigns/view.html:475
+#: templates/campaigns/view.html:492
 msgid "Select Transcript (.txt files only)"
 msgstr ""
 
-#: templates/campaigns/view.html:477
+#: templates/campaigns/view.html:494
 msgid "Upload meeting transcripts to extract survey insights automatically."
 msgstr ""
 
-#: templates/campaigns/view.html:481
+#: templates/campaigns/view.html:498
 msgid "Participant Name"
 msgstr ""
 
-#: templates/campaigns/view.html:482
+#: templates/campaigns/view.html:499
 msgid "Enter participant's full name"
 msgstr ""
 
-#: templates/campaigns/view.html:486
+#: templates/campaigns/view.html:503
 msgid "Participant Email"
 msgstr ""
 
-#: templates/campaigns/view.html:487
+#: templates/campaigns/view.html:504
 msgid "participant@company.com"
 msgstr ""
 
-#: templates/campaigns/view.html:492
+#: templates/campaigns/view.html:509
 msgid "Enter company name"
 msgstr ""
 
-#: templates/campaigns/view.html:528 templates/campaigns/view.html:688
+#: templates/campaigns/view.html:545 templates/campaigns/view.html:705
 msgid "No transcripts processed yet"
 msgstr ""
 
-#: templates/campaigns/view.html:546
+#: templates/campaigns/view.html:563
 msgid "About Transcript Analysis"
 msgstr ""
 
-#: templates/campaigns/view.html:547
+#: templates/campaigns/view.html:564
 msgid ""
 "VOÏA analyzes meeting transcripts to extract NPS scores, sentiment, "
 "themes, and actionable insights. Upload .txt files from phone calls, "
@@ -3636,35 +5496,46 @@ msgid ""
 "survey responses and integrate them with your campaign analytics."
 msgstr ""
 
+#: templates/campaigns/view.html:723
+msgid "Download transcript"
+msgstr ""
+
+#: templates/campaigns/view.html:726
+msgid "View analysis results"
+msgstr ""
+
 #: templates/components/breadcrumb.html:14
 msgid "Breadcrumb navigation"
 msgstr ""
 
 #: templates/components/breadcrumb.html:24
-msgid "Navigate to {{ item.label }}"
+msgid "Navigate to"
+msgstr ""
+
+#: templates/components/language_selector.html:9
+msgid "Select language"
 msgstr ""
 
 #: templates/components/ui_version_toggle.html:13
-msgid "UI: {{ ui_version|upper }}"
+#, python-brace-format
+msgid "UI: {}"
 msgstr ""
 
 #: templates/components/ui_version_toggle.html:26
+#, python-brace-format
+msgid "Switch to {}"
+msgstr ""
+
+#: templates/components/ui_version_toggle.html:26
+msgid "New Sidebar"
+msgstr ""
+
 #: templates/components/ui_version_toggle.html:28
 msgid "Switch"
 msgstr ""
 
 #: templates/participants/campaign_participants.html:21
 msgid "Manage participants for this campaign"
-msgstr ""
-
-#: templates/participants/campaign_participants.html:32
-#: templates/participants/campaign_participants.html:502
-msgid "Invited"
-msgstr ""
-
-#: templates/participants/campaign_participants.html:36
-#: templates/participants/campaign_participants.html:505
-msgid "Started"
 msgstr ""
 
 #: templates/participants/campaign_participants.html:65
@@ -3675,18 +5546,6 @@ msgstr ""
 #: templates/participants/campaign_participants.html:78
 #: templates/participants/list.html:257
 msgid "Filter by role"
-msgstr ""
-
-#: templates/participants/campaign_participants.html:87
-#: templates/participants/campaign_participants.html:89
-#: templates/participants/campaign_participants.html:201
-#: templates/participants/create.html:119 templates/participants/edit.html:167
-#: templates/participants/list.html:266 templates/participants/list.html:268
-#: templates/participants/list.html:560 templates/participants/list.html:563
-#: templates/participants/list.html:564 templates/participants/list.html:565
-#: templates/participants/list.html:1164 templates/participants/list.html:1196
-#: templates/participants/list.html:1249
-msgid "Region"
 msgstr ""
 
 #: templates/participants/campaign_participants.html:91
@@ -3705,6 +5564,11 @@ msgstr ""
 #: templates/participants/campaign_participants.html:106
 #: templates/participants/list.html:285
 msgid "Filter by customer tier"
+msgstr ""
+
+#: templates/participants/campaign_participants.html:117
+#: templates/participants/list.html:296
+msgid "Language"
 msgstr ""
 
 #: templates/participants/campaign_participants.html:119
@@ -3781,6 +5645,7 @@ msgid "Select {{ participant.name }}"
 msgstr ""
 
 #: templates/participants/campaign_participants.html:345
+#: templates/participants/list.html:502
 msgid "No participants match your search"
 msgstr ""
 
@@ -3895,17 +5760,13 @@ msgid ""
 "permanently locked to maintain historical accuracy."
 msgstr ""
 
-#: templates/participants/campaign_participants.html:951
-#: templates/participants/list.html:632
-msgid "Cancel"
-msgstr ""
-
 #: templates/participants/create.html:23
-msgid "Add a new participant to {{ business_account.name }}"
+#, python-format
+msgid "Add a new participant to %(name)s"
 msgstr ""
 
-#: templates/participants/create.html:41
-msgid "Email Address *"
+#: templates/participants/create.html:46 templates/participants/edit.html:85
+msgid "participant@example.com"
 msgstr ""
 
 #: templates/participants/create.html:50
@@ -3916,6 +5777,10 @@ msgstr ""
 msgid "Full Name *"
 msgstr ""
 
+#: templates/participants/create.html:63 templates/participants/edit.html:110
+msgid "John Doe"
+msgstr ""
+
 #: templates/participants/create.html:67 templates/participants/edit.html:114
 msgid "Participant's full name"
 msgstr ""
@@ -3924,13 +5789,12 @@ msgstr ""
 msgid "Company Name *"
 msgstr ""
 
-#: templates/participants/create.html:82 templates/participants/edit.html:130
-msgid "Participant's company or organization"
+#: templates/participants/create.html:78 templates/participants/edit.html:126
+msgid "Acme Corporation"
 msgstr ""
 
-#: templates/participants/create.html:88 templates/participants/create.html:93
-#: templates/participants/edit.html:136 templates/participants/edit.html:141
-msgid "Optional"
+#: templates/participants/create.html:82 templates/participants/edit.html:130
+msgid "Participant's company or organization"
 msgstr ""
 
 #: templates/participants/create.html:95
@@ -3947,10 +5811,6 @@ msgstr ""
 
 #: templates/participants/create.html:107 templates/participants/edit.html:155
 msgid "VP / Director"
-msgstr ""
-
-#: templates/participants/create.html:108 templates/participants/edit.html:156
-msgid "Manager"
 msgstr ""
 
 #: templates/participants/create.html:109 templates/participants/edit.html:157
@@ -4002,7 +5862,7 @@ msgstr ""
 
 #: templates/participants/create.html:145 templates/participants/edit.html:193
 #, python-format
-msgid "T1: Strategic (Top 5–10% clients)"
+msgid "T1: Strategic (Top 5–10%% clients)"
 msgstr ""
 
 #: templates/participants/create.html:146 templates/participants/edit.html:194
@@ -4076,16 +5936,26 @@ msgstr ""
 msgid "Add participant to active campaigns"
 msgstr ""
 
-#: templates/participants/edit.html:38 templates/participants/edit.html:281
-msgid "Update participant"
+#: templates/participants/edit.html:38
+#, python-format
+msgid "Update participant information for %(name)s"
 msgstr ""
+
+#: templates/participants/edit.html:47
+#, fuzzy
+msgid "Email Address Locked"
+msgstr "Email address"
 
 #: templates/participants/edit.html:77
 msgid "Email locked - survey history exists"
 msgstr ""
 
-#: templates/participants/list.html:151
-msgid "Manage campaign participants for {{ business_account.name }}"
+#: templates/participants/edit.html:143
+msgid "Update segmentation data for personalized surveys and advanced analytics"
+msgstr ""
+
+#: templates/participants/edit.html:281
+msgid "Update participant"
 msgstr ""
 
 #: templates/participants/list.html:347
@@ -4111,11 +5981,16 @@ msgstr ""
 msgid "Created"
 msgstr ""
 
+#: templates/participants/list.html:478 templates/participants/list.html:839
+msgid "Edit participant"
+msgstr ""
+
+#: templates/participants/list.html:486 templates/participants/list.html:847
+msgid "Delete participant"
+msgstr ""
+
 #: templates/participants/list.html:502
-#, python-brace-format, python-format
-msgid ""
-"No participants {% if search_query %}match your search{% else %}yet{% "
-"endif %}"
+msgid "No participants yet"
 msgstr ""
 
 #: templates/participants/list.html:504
@@ -4129,8 +6004,37 @@ msgid ""
 "collection."
 msgstr ""
 
+#: templates/participants/list.html:557
+msgid "e.g., Manager, Director"
+msgstr ""
+
+#: templates/participants/list.html:568
+msgid "e.g., North America, EMEA"
+msgstr ""
+
+#: templates/participants/list.html:597
+msgid "e.g., English, Spanish"
+msgstr ""
+
+#: templates/participants/list.html:682
+msgid "Filtering participants..."
+msgstr ""
+
+#: templates/participants/list.html:745
+msgid "Error loading participants. Please try again."
+msgstr ""
+
+#: templates/participants/list.html:765
+msgid "No participants match your filters"
+msgstr ""
+
+#: templates/participants/list.html:766
+msgid "Try adjusting your filter criteria."
+msgstr ""
+
 #: templates/participants/upload.html:23
-msgid "Upload multiple participants to {{ business_account.name }} via CSV file"
+#, python-format
+msgid "Upload multiple participants to %(name)s via CSV file"
 msgstr ""
 
 #: templates/participants/upload.html:55
@@ -4198,55 +6102,218 @@ msgstr ""
 #~ msgid "Thank you, {{ participant_name }}!"
 #~ msgstr ""
 
+#~ msgid "Share your experience"
+#~ msgstr ""
 
-#: templates/business_auth/forgot_password.html:2
-msgid "Forgot Password - VOÏA - Voice Of Client"
-msgstr "Forgot Password - VOÏA - Voice Of Client"
+#~ msgid "value your feedback"
+#~ msgstr ""
 
-#: templates/business_auth/forgot_password.html:12
-msgid "VOÏA Password Reset"
-msgstr "VOÏA Password Reset"
+#~ msgid "Thank you, %s!"
+#~ msgstr ""
 
-#: templates/business_auth/forgot_password.html:15
-msgid "Reset Your Password"
-msgstr "Reset Your Password"
+#~ msgid "Ready"
+#~ msgstr ""
 
-#: templates/business_auth/forgot_password.html:16
-msgid "Enter your email address and we'll send you a password reset link"
-msgstr "Enter your email address and we'll send you a password reset link"
+#~ msgid "Filtered by:"
+#~ msgstr ""
 
-#: templates/business_auth/forgot_password.html:39
-msgid "Password reset request form"
-msgstr "Password reset request form"
+#~ msgid "Clear filter"
+#~ msgstr ""
 
-#: templates/business_auth/forgot_password.html:51
-msgid "Email address"
-msgstr "Email address"
+#~ msgid "days left"
+#~ msgstr ""
 
-#: templates/business_auth/forgot_password.html:59
-msgid "We'll send a password reset link to this email address"
-msgstr "We'll send a password reset link to this email address"
+#~ msgid "days ago"
+#~ msgstr ""
 
-#: templates/business_auth/forgot_password.html:63
-msgid "Send Reset Link"
-msgstr "Send Reset Link"
+#~ msgid "month"
+#~ msgstr ""
 
-#: templates/business_auth/forgot_password.html:62
-msgid "Send password reset email"
-msgstr "Send password reset email"
+#~ msgid "months"
+#~ msgstr ""
 
-#: templates/business_auth/forgot_password.html:69
-msgid "Back to Login"
-msgstr "Back to Login"
+#~ msgid "ago"
+#~ msgstr ""
 
-#: templates/business_auth/forgot_password.html:68
-msgid "Return to login page"
-msgstr "Return to login page"
+#~ msgid "year"
+#~ msgstr ""
 
-#: templates/business_auth/forgot_password.html:92
-msgid "Please enter your email address."
-msgstr "Please enter your email address."
+#~ msgid "years"
+#~ msgstr ""
 
-#: templates/business_auth/forgot_password.html:97
-msgid "Sending..."
-msgstr "Sending..."
+#~ msgid "Loading comparison..."
+#~ msgstr ""
+
+#~ msgid "Loading comparison data..."
+#~ msgstr ""
+
+#~ msgid "Failed to fetch comparison data"
+#~ msgstr ""
+
+#~ msgid "Error Loading Comparison"
+#~ msgstr ""
+
+#~ msgid "Failed to load comparison data. Please try again."
+#~ msgstr ""
+
+#~ msgid "No campaign data available"
+#~ msgstr ""
+
+#~ msgid "Error loading KPI overview data"
+#~ msgstr ""
+
+#~ msgid "Error loading dashboard data:"
+#~ msgstr ""
+
+#~ msgid "Failed to load campaign options"
+#~ msgstr ""
+
+#~ msgid "Error loading account intelligence"
+#~ msgstr ""
+
+#~ msgid "Error loading responses."
+#~ msgstr ""
+
+#~ msgid "Network error loading tenure data"
+#~ msgstr ""
+
+#~ msgid "Network error loading company data"
+#~ msgstr ""
+
+#~ msgid "Average Rating"
+#~ msgstr ""
+
+#~ msgid "N/A"
+#~ msgstr ""
+
+#~ msgid "No tenure data available yet"
+#~ msgstr ""
+
+#~ msgid "of"
+#~ msgstr ""
+
+#~ msgid "tenure groups"
+#~ msgstr ""
+
+#~ msgid "companies"
+#~ msgstr ""
+
+#~ msgid "responses"
+#~ msgstr ""
+
+#~ msgid "accounts"
+#~ msgstr ""
+
+#~ msgid "Value"
+#~ msgstr ""
+
+#~ msgid "Critical Risk Companies"
+#~ msgstr ""
+
+#~ msgid "Risk-Heavy Accounts"
+#~ msgstr ""
+
+#~ msgid "Opportunity-Heavy Accounts"
+#~ msgstr ""
+
+#~ msgid "Satisfaction Rating"
+#~ msgstr ""
+
+#~ msgid "Product Value Rating"
+#~ msgstr ""
+
+#~ msgid "Pricing Rating"
+#~ msgstr ""
+
+#~ msgid "Service Rating"
+#~ msgstr ""
+
+#~ msgid "98% accuracy"
+#~ msgstr ""
+
+#~ msgid "Welcome, {{ participant_name }}"
+#~ msgstr ""
+
+#~ msgid "Account Status: {{ account_status|title }}"
+#~ msgstr ""
+
+#~ msgid "You're invited to join {{ business_account.name }}"
+#~ msgstr ""
+
+#~ msgid "Welcome {{ current_user.get_full_name() }}"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Add and manage team members for "
+#~ "your business account. Current usage: {{"
+#~ " admin_data.license_info.users_used if "
+#~ "admin_data.license_info else 1 }}/{{ "
+#~ "admin_data.license_info.users_limit if "
+#~ "admin_data.license_info else 5 }} users."
+#~ msgstr ""
+
+#~ msgid "License details and usage information for {{ account_data.name }}"
+#~ msgstr ""
+
+#~ msgid "Configure license for {{ business_account.name }}"
+#~ msgstr ""
+
+#~ msgid "Current License: {{ current_license.type|title }}"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Congratulations, {{ current_user.get_full_name() }}!"
+#~ " Your team is ready to start "
+#~ "collecting valuable customer feedback."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Welcome, {{ current_user.get_full_name() }}! "
+#~ "You're setting up VOÏA for your "
+#~ "team."
+#~ msgstr ""
+
+#~ msgid "Set up a new survey campaign for {{ business_account.name }}"
+#~ msgstr ""
+
+#~ msgid "Update campaign details for {{ business_account.name }}"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This will only send invitations to "
+#~ "participants who haven't been invited "
+#~ "yet."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "This campaign finished on {{ "
+#~ "campaign.completed_at[:10] if campaign.completed_at "
+#~ "else campaign.end_date }}"
+#~ msgstr ""
+
+#~ msgid "Navigate to {{ item.label }}"
+#~ msgstr ""
+
+#~ msgid "UI: {{ ui_version|upper }}"
+#~ msgstr ""
+
+#~ msgid "Add a new participant to {{ business_account.name }}"
+#~ msgstr ""
+
+#~ msgid "T1: Strategic (Top 5–10% clients)"
+#~ msgstr ""
+
+#~ msgid "Manage campaign participants for {{ business_account.name }}"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "No participants {% if search_query "
+#~ "%}match your search{% else %}yet{% endif"
+#~ " %}"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Upload multiple participants to {{ "
+#~ "business_account.name }} via CSV file"
+#~ msgstr ""
+

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-28 17:58+0000\n"
+"POT-Creation-Date: 2025-10-28 19:38+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -62,7 +62,7 @@ msgstr "Actif"
 
 #: test_translation_fallback.py:86
 msgid "Some Text That Definitely Has No Translation"
-msgstr "Un texte qui n'a définitivement aucune traduction""
+msgstr "Un texte qui n'a définitivement aucune traduction\""
 
 #: templates/base.html:6 templates/base_minimal.html:6
 #: test_translation_fallback.py:97
@@ -137,9 +137,10 @@ msgstr "Jeton d'authentification :"
 
 #: templates/auth.html:63
 msgid "This token expires in 24 hours. Keep it secure and don't share it."
-msgstr "Ce jeton expire dans 24 heures. Gardez-le sécurisé et ne le partagez pas.""
-"Ce jeton expire dans 24 heures. Gardez-le en sécurité et ne le partagez "
-"pas."
+msgstr ""
+"Ce jeton expire dans 24 heures. Gardez-le sécurisé et ne le partagez "
+"pas.\"Ce jeton expire dans 24 heures. Gardez-le en sécurité et ne le "
+"partagez pas."
 
 #: templates/auth.html:69
 msgid "Choose Survey Experience:"
@@ -324,7 +325,7 @@ msgstr "Progression de la configuration"
 
 #: templates/campaign_insights.html:22
 msgid "Campaign-specific performance analytics and survey insights"
-msgstr "Analytiques de performance et insights spécifiques à la campagne""
+msgstr "Analytiques de performance et insights spécifiques à la campagne\""
 
 #: templates/campaign_insights.html:34 templates/dashboard.html:36
 #: templates/executive_summary.html:36
@@ -388,7 +389,7 @@ msgstr "Informations sur l'enquête"
 #: templates/campaign_insights.html:118
 #, fuzzy
 msgid "Segmentation Insights"
-msgstr "Insights de segmentation"Voir les analyses IA"
+msgstr "Insights de segmentation\"Voir les analyses IA"
 
 #: templates/campaign_insights.html:127 templates/campaign_insights.html:129
 #: templates/dashboard.html:363 templates/dashboard.html:365
@@ -428,7 +429,7 @@ msgstr "Total des réponses"
 
 #: templates/campaign_insights.html:165 templates/dashboard.html:401
 msgid "All time feedback collected"
-msgstr "Tous les retours collectés""
+msgstr "Tous les retours collectés\""
 
 #: templates/campaign_insights.html:171 templates/dashboard.html:407
 msgid "Recent (30 days)"
@@ -471,7 +472,7 @@ msgstr "Opportunités de croissance"
 
 #: templates/campaign_insights.html:190 templates/dashboard.html:426
 msgid "Revenue expansion opportunity"
-msgstr "Opportunité d'expansion de revenus""
+msgstr "Opportunité d'expansion de revenus\""
 
 #: templates/campaign_insights.html:195 templates/campaign_insights.html:215
 #: templates/dashboard.html:451 templates/public_survey_response.html:154
@@ -740,7 +741,9 @@ msgstr "Filtrer par rôle"
 
 #: templates/campaign_insights.html:648
 msgid "Net Promoter Score distribution across different participant roles"
-msgstr "Distribution du score Net Promoter selon les différents rôles des participants""
+msgstr ""
+"Distribution du score Net Promoter selon les différents rôles des "
+"participants\""
 
 #: templates/campaign_insights.html:657 templates/campaign_insights.html:662
 #: templates/campaign_insights.html:980
@@ -750,7 +753,7 @@ msgstr "Filtrer par région"
 
 #: templates/campaign_insights.html:663
 msgid "Geographic distribution of customer satisfaction"
-msgstr "Distribution géographique de la satisfaction client""
+msgstr "Distribution géographique de la satisfaction client\""
 
 #: templates/campaign_insights.html:672 templates/campaign_insights.html:677
 #, fuzzy
@@ -759,15 +762,17 @@ msgstr "NPS par ancienneté client"
 
 #: templates/campaign_insights.html:678
 msgid "Customer satisfaction across different tier levels"
-msgstr "Satisfaction client selon les différents niveaux""
+msgstr "Satisfaction client selon les différents niveaux\""
 
 #: templates/campaign_insights.html:692
 msgid "Satisfaction Ratings by Segment"
-msgstr "Évaluations de satisfaction par segment""
+msgstr "Évaluations de satisfaction par segment\""
 
 #: templates/campaign_insights.html:693
 msgid "Average satisfaction scores across all segmentation dimensions"
-msgstr "Scores de satisfaction moyens selon toutes les dimensions de segmentation""
+msgstr ""
+"Scores de satisfaction moyens selon toutes les dimensions de "
+"segmentation\""
 
 #: templates/campaign_insights.html:700
 #, fuzzy
@@ -995,7 +1000,7 @@ msgstr "Administration de la plateforme"
 
 #: templates/conversational_survey.html:57
 #: templates/conversational_survey_business.html:66
-#, fuzzy, python-brace-format
+#, fuzzy
 msgid "Powered by"
 msgstr "Propulsé par {}"
 
@@ -1143,10 +1148,11 @@ msgstr "Envoyer le message"
 #: templates/conversational_survey.html:191
 #: templates/conversational_survey_business.html:156
 msgid "Tip: Speak naturally! VOÏA understands conversational responses."
-msgstr "Conseil : Parlez naturellement ! VOÏA comprend les réponses conversationnelles.""
-"Astuce : Parlez naturellement ! VOÏA comprend les réponses "
-"conversationnelles.Conseil : Parlez naturellement ! VOÏA comprend les "
-"réponses conversationnelles."
+msgstr ""
+"Conseil : Parlez naturellement ! VOÏA comprend les réponses "
+"conversationnelles.\"Astuce : Parlez naturellement ! VOÏA comprend les "
+"réponses conversationnelles.Conseil : Parlez naturellement ! VOÏA "
+"comprend les réponses conversationnelles."
 
 #: templates/conversational_survey.html:202
 msgid "Processing response"
@@ -1169,9 +1175,9 @@ msgstr "Merci d'avoir partagé votre retour d'information."
 #: templates/conversational_survey.html:221 templates/survey.html:230
 #: templates/survey_success.html:22
 msgid "Your feedback has been successfully analyzed by VOÏA Intelligence."
-msgstr "Vos retours ont été analysés avec succès par VOÏA Intelligence.""
-"Votre retour d'information a été analysé avec succès par VOÏA "
-"Intelligence."
+msgstr ""
+"Vos retours ont été analysés avec succès par VOÏA Intelligence.\"Votre "
+"retour d'information a été analysé avec succès par VOÏA Intelligence."
 
 #: templates/conversational_survey.html:227
 msgid "View analytics dashboard with your feedback results"
@@ -1200,9 +1206,10 @@ msgstr "Quelle est la prochaine étape ?"
 #: templates/conversational_survey.html:237 templates/survey.html:244
 #: templates/survey_success.html:37
 msgid "Experience the full power of Voice of Client Agent for your organization."
-msgstr "Découvrez toute la puissance de Voice of Client Agent pour votre organisation.""
-"Découvrez toute la puissance de l'agent Voice of Client pour votre "
-"organisation."
+msgstr ""
+"Découvrez toute la puissance de Voice of Client Agent pour votre "
+"organisation.\"Découvrez toute la puissance de l'agent Voice of Client "
+"pour votre organisation."
 
 #: templates/conversational_survey.html:243
 msgid "Try another demo session"
@@ -1315,8 +1322,9 @@ msgstr "Vos réponses contribuent à des analyses complètes"
 
 #: templates/conversational_survey_business.html:214
 msgid "We use your input to improve our services and client experience"
-msgstr "Nous utilisons vos retours pour améliorer nos services et l'expérience client""
-"Nous utilisons vos commentaires pour améliorer nos services et "
+msgstr ""
+"Nous utilisons vos retours pour améliorer nos services et l'expérience "
+"client\"Nous utilisons vos commentaires pour améliorer nos services et "
 "l'expérience client"
 
 #: templates/conversational_survey_business.html:219
@@ -1390,10 +1398,11 @@ msgstr "Insights et analyses complètes des retours clients"
 
 #: templates/dashboard.html:50 templates/executive_summary.html:24
 msgid "High-level overview of key performance indicators across all campaigns"
-msgstr "Vue d'ensemble des indicateurs clés de performance pour toutes les campagnes""
-"Vue d'ensemble de haut niveau des indicateurs clés de performance de "
-"toutes les campagnesVue d'ensemble des principaux indicateurs de "
-"performance sur l'ensemble des campagnes"
+msgstr ""
+"Vue d'ensemble des indicateurs clés de performance pour toutes les "
+"campagnes\"Vue d'ensemble de haut niveau des indicateurs clés de "
+"performance de toutes les campagnesVue d'ensemble des principaux "
+"indicateurs de performance sur l'ensemble des campagnes"
 
 #: templates/dashboard.html:56 templates/dashboard.html:58
 #: templates/executive_summary.html:49 templates/executive_summary.html:51
@@ -1423,7 +1432,7 @@ msgstr "Campagnes"
 #: templates/executive_summary.html:90 templates/executive_summary.html:96
 #: templates/executive_summary.html:102 templates/executive_summary.html:108
 msgid "Click to view full trends"
-msgstr "Cliquez pour voir les tendances complètes""
+msgstr "Cliquez pour voir les tendances complètes\""
 
 #: templates/dashboard.html:84 templates/executive_summary.html:77
 #: templates/executive_summary.html:214 templates/executive_summary.html:305
@@ -1447,7 +1456,7 @@ msgstr "Vue d'ensemble des indicateurs de campagne"
 
 #: templates/dashboard.html:134 templates/executive_summary.html:127
 msgid "View Trends"
-msgstr "Voir les tendances""
+msgstr "Voir les tendances\""
 
 #: templates/dashboard.html:141
 msgid "Campaign Comparison"
@@ -1475,9 +1484,10 @@ msgstr "Sélectionner la deuxième campagne"
 
 #: templates/dashboard.html:166 templates/executive_summary.html:159
 msgid "Please select two campaigns above to view comparison results"
-msgstr "Veuillez sélectionner deux campagnes ci-dessus pour voir les résultats comparatifs""
-"Veuillez sélectionner deux campagnes ci-dessus pour voir les résultats de"
-" la comparaison"
+msgstr ""
+"Veuillez sélectionner deux campagnes ci-dessus pour voir les résultats "
+"comparatifs\"Veuillez sélectionner deux campagnes ci-dessus pour voir les"
+" résultats de la comparaison"
 
 #: templates/dashboard.html:174 templates/executive_summary.html:165
 #: templates/executive_summary.html:167
@@ -1570,9 +1580,9 @@ msgstr "Pagination du tableau comparatif"
 
 #: templates/dashboard.html:282
 msgid "Analyze and compare campaign-specific performance metrics"
-msgstr "Analyser et comparer les métriques de performance par campagne""
-"Analyser et comparer les métriques de performance spécifiques aux "
-"campagnes"
+msgstr ""
+"Analyser et comparer les métriques de performance par campagne\"Analyser "
+"et comparer les métriques de performance spécifiques aux campagnes"
 
 #: templates/dashboard.html:380
 msgid "Currently showing data from active campaign"
@@ -1580,11 +1590,13 @@ msgstr "Affichage des données de la campagne active"
 
 #: templates/dashboard.html:417
 msgid "Companies with High or Critical churn risk level based on AI assessment"
-msgstr "Entreprises avec niveau de risque de départ élevé ou critique selon l'évaluation IA""
+msgstr ""
+"Entreprises avec niveau de risque de départ élevé ou critique selon "
+"l'évaluation IA\""
 
 #: templates/dashboard.html:438
 msgid "Companies with High or Critical churn risk level"
-msgstr "Entreprises avec niveau de risque de départ élevé ou critique""
+msgstr "Entreprises avec niveau de risque de départ élevé ou critique\""
 
 #: templates/dashboard.html:471
 msgid ""
@@ -1598,7 +1610,7 @@ msgstr "Équilibre Risque vs Opportunité par Entreprise"
 
 #: templates/dashboard.html:484
 msgid "Search company, opportunities, risks..."
-msgstr "Rechercher entreprise, opportunités, risques...""
+msgstr "Rechercher entreprise, opportunités, risques...\""
 
 #: templates/dashboard.html:492
 msgid "Risk-Heavy"
@@ -1606,7 +1618,7 @@ msgstr "Risque Élevé"
 
 #: templates/dashboard.html:494
 msgid "High Potential"
-msgstr "Fort potentiel""
+msgstr "Fort potentiel\""
 
 #: templates/dashboard.html:511
 msgid "Has Opportunities"
@@ -1660,7 +1672,7 @@ msgstr "Pagination du NPS par ancienneté"
 
 #: templates/dashboard.html:812
 msgid "Search by company name, participant name, or email..."
-msgstr "Rechercher par nom d'entreprise, nom de participant ou courriel...""
+msgstr "Rechercher par nom d'entreprise, nom de participant ou courriel...\""
 
 #: templates/dashboard.html:908
 #, fuzzy
@@ -1710,9 +1722,10 @@ msgstr "Ce que vous allez faire"
 
 #: templates/demo_intro.html:63
 msgid "Simple steps to experience the power of AI-driven feedback collection."
-msgstr "Étapes simples pour découvrir la puissance de la collecte de retours pilotée par IA.""
+msgstr ""
 "Étapes simples pour découvrir la puissance de la collecte de retours "
-"alimentée par l'IA."
+"pilotée par IA.\"Étapes simples pour découvrir la puissance de la "
+"collecte de retours alimentée par l'IA."
 
 #: templates/demo_intro.html:69
 msgid ""
@@ -1728,9 +1741,10 @@ msgstr "Répondez à quelques questions rapides, comme le ferait un véritable c
 
 #: templates/demo_intro.html:79
 msgid "Explore the live insights dashboard, instantly generated from your input"
-msgstr "Explorez le tableau de bord des insights en direct, généré instantanément à partir de vos réponses""
-"Explorez le tableau de bord en direct, généré instantanément à partir de "
-"vos réponses"
+msgstr ""
+"Explorez le tableau de bord des insights en direct, généré instantanément"
+" à partir de vos réponses\"Explorez le tableau de bord en direct, généré "
+"instantanément à partir de vos réponses"
 
 #: templates/demo_intro.html:91
 msgid "What You'll See, in Real-time"
@@ -1778,9 +1792,10 @@ msgstr "Aucune connexion, aucun spam, aucune configuration"
 
 #: templates/demo_intro.html:159
 msgid "All responses are anonymized and used only for demonstration"
-msgstr "Toutes les réponses sont anonymisées et utilisées uniquement pour la démonstration""
-"Toutes les réponses sont anonymisées et utilisées uniquement à des fins "
-"de démonstration"
+msgstr ""
+"Toutes les réponses sont anonymisées et utilisées uniquement pour la "
+"démonstration\"Toutes les réponses sont anonymisées et utilisées "
+"uniquement à des fins de démonstration"
 
 #: templates/demo_intro.html:174
 msgid "Ready to Begin?"
@@ -1835,7 +1850,7 @@ msgstr "Rejoindre une campagne en direct"
 
 #: templates/index.html:43
 msgid "You'll take part in a live simulated campaign, where VO"
-msgstr "Vous participerez à une campagne simulée en direct, où VO""
+msgstr "Vous participerez à une campagne simulée en direct, où VO\""
 
 #: templates/index.html:43
 msgid ""
@@ -1857,7 +1872,7 @@ msgstr "Analyses IA"
 
 #: templates/index.html:59
 msgid "Once the dialogue is complete, VO"
-msgstr "Une fois le dialogue terminé, VO""
+msgstr "Une fois le dialogue terminé, VO\""
 
 #: templates/index.html:59
 msgid ""
@@ -1892,7 +1907,8 @@ msgid "More actionable insights"
 msgstr "Analyses plus exploitables"
 
 #: templates/index.html:84
-msgid "98% accuracy"
+#, fuzzy, python-format
+msgid "98%% accuracy"
 msgstr "Précision"
 
 #: templates/index.html:85
@@ -2576,7 +2592,7 @@ msgstr "Saisissez l'adresse e-mail"
 
 #: templates/business_auth/account_status.html:12
 msgid "Vocsa"
-msgstr "Vocsa""
+msgstr "Vocsa\""
 
 #: templates/business_auth/account_status.html:13
 msgid "Voice Of Client Intelligence"
@@ -2588,9 +2604,10 @@ msgstr "Compte suspendu"
 
 #: templates/business_auth/account_status.html:20
 msgid "Your account has been suspended. Please contact support for assistance."
-msgstr "Votre compte a été suspendu. Veuillez contacter le support pour assistance.""
-"Votre compte a été suspendu. Veuillez contacter le support pour obtenir "
-"de l'aide."
+msgstr ""
+"Votre compte a été suspendu. Veuillez contacter le support pour "
+"assistance.\"Votre compte a été suspendu. Veuillez contacter le support "
+"pour obtenir de l'aide."
 
 #: templates/business_auth/account_status.html:25
 msgid "Account Inactive"
@@ -2598,9 +2615,10 @@ msgstr "Compte inactif"
 
 #: templates/business_auth/account_status.html:26
 msgid "Your account is currently inactive. Please contact support to reactivate."
-msgstr "Votre compte est actuellement inactif. Veuillez contacter le support pour le réactiver.""
+msgstr ""
 "Votre compte est actuellement inactif. Veuillez contacter le support pour"
-" le réactiver."
+" le réactiver.\"Votre compte est actuellement inactif. Veuillez contacter"
+" le support pour le réactiver."
 
 #: templates/business_auth/account_status.html:31
 msgid "Account Closed"
@@ -2615,14 +2633,16 @@ msgstr ""
 "d'une erreur."
 
 #: templates/business_auth/account_status.html:37
-msgid "Account Status: {{ account_status|title }}"
+#, fuzzy, python-format
+msgid "Account Status: %(status)s"
 msgstr "Statut du compte : {{ account_status|title }}"
 
 #: templates/business_auth/account_status.html:38
 msgid "Please contact support for assistance with your account."
-msgstr "Veuillez contacter le support pour assistance avec votre compte.""
-"Veuillez contacter le support pour obtenir de l'aide concernant votre "
-"compte."
+msgstr ""
+"Veuillez contacter le support pour assistance avec votre "
+"compte.\"Veuillez contacter le support pour obtenir de l'aide concernant "
+"votre compte."
 
 #: templates/business_auth/activate_account.html:410
 #: templates/business_auth/onboarding/welcome.html:243
@@ -2630,7 +2650,8 @@ msgid "Welcome to VOÏA!"
 msgstr "Bienvenue sur VOÏA !"
 
 #: templates/business_auth/activate_account.html:411
-msgid "You're invited to join {{ business_account.name }}"
+#, fuzzy, python-format
+msgid "You're invited to join %(name)s"
 msgstr "Vous êtes invité à rejoindre {{ business_account.name }}"
 
 #: templates/business_auth/activate_account.html:448
@@ -2649,9 +2670,10 @@ msgstr ""
 
 #: templates/business_auth/activate_account.html:472
 msgid "Complete your account setup by creating a secure password"
-msgstr "Complétez la configuration de votre compte en créant un mot de passe sécurisé""
-"Finalisez la configuration de votre compte en créant un mot de passe "
-"sécurisé"
+msgstr ""
+"Complétez la configuration de votre compte en créant un mot de passe "
+"sécurisé\"Finalisez la configuration de votre compte en créant un mot de "
+"passe sécurisé"
 
 #: templates/business_auth/activate_account.html:488
 msgid "Enter your new password"
@@ -2731,7 +2753,7 @@ msgstr "Actions"
 #: templates/business_auth/admin_licenses.html:156
 #: templates/business_auth/licenses/overview.html:397
 msgid "No expiration"
-msgstr "Sans expiration"Pas d'expiration"
+msgstr "Sans expiration\"Pas d'expiration"
 
 #: templates/business_auth/admin_licenses.html:162
 #, fuzzy
@@ -2754,37 +2776,21 @@ msgid "No business accounts match the current filter criteria."
 msgstr "Aucune réponse d'enquête ne correspond à vos critères de recherche."
 
 #: templates/business_auth/admin_panel.html:398
-msgid "Welcome {{ current_user.get_full_name() }}"
-msgstr "Bienvenue {{ current_user.get_full_name() }}"
+#, fuzzy, python-format
+msgid "Welcome %(name)s"
+msgstr "Configurer %(name)s"
 
 #: templates/business_auth/admin_panel.html:399
-#: templates/business_auth/admin_panel.html:419
-#: templates/business_auth/admin_panel.html:420
-#: templates/business_auth/admin_panel.html:422
-#: templates/business_auth/admin_panel.html:423
-#: templates/business_auth/admin_panel.html:460
-#: templates/business_auth/admin_panel.html:463
-#: templates/business_auth/admin_panel.html:464
-#: templates/business_auth/admin_panel.html:476
-#: templates/business_auth/admin_panel.html:518
-#: templates/business_auth/admin_panel.html:524
-#: templates/business_auth/admin_panel.html:527
-#: templates/business_auth/admin_panel.html:534
-#: templates/business_auth/admin_panel.html:539
-#: templates/business_auth/admin_panel.html:542
-#: templates/business_auth/admin_panel.html:745
-#: templates/business_auth/admin_panel.html:756
-#: templates/business_auth/admin_panel.html:823
-#: templates/business_auth/admin_panel.html:961
-#: templates/business_auth/admin_panel.html:966
-msgid "Manage"
-msgstr "Gérer"
+#: templates/participants/create.html:108 templates/participants/edit.html:156
+msgid "Manager"
+msgstr "Gestionnaire"
 
 #: templates/business_auth/admin_panel.html:407
 msgid "Business analytics hub with comprehensive platform intelligence"
-msgstr "Centre d'analytiques d'affaires avec intelligence de plateforme complète""
-"Centre d'analytique d'entreprise avec une intelligence complète de la "
-"plateforme"
+msgstr ""
+"Centre d'analytiques d'affaires avec intelligence de plateforme "
+"complète\"Centre d'analytique d'entreprise avec une intelligence complète"
+" de la plateforme"
 
 #: templates/business_auth/admin_panel.html:408
 #: templates/business_auth/admin_panel_v2.html:771
@@ -2812,6 +2818,28 @@ msgstr "Intégrer"
 #: templates/business_auth/admin_panel.html:485
 msgid "License management dashboard and overview"
 msgstr "Tableau de bord et aperçu de la gestion des licences"
+
+#: templates/business_auth/admin_panel.html:419
+#: templates/business_auth/admin_panel.html:420
+#: templates/business_auth/admin_panel.html:422
+#: templates/business_auth/admin_panel.html:423
+#: templates/business_auth/admin_panel.html:460
+#: templates/business_auth/admin_panel.html:463
+#: templates/business_auth/admin_panel.html:464
+#: templates/business_auth/admin_panel.html:476
+#: templates/business_auth/admin_panel.html:518
+#: templates/business_auth/admin_panel.html:524
+#: templates/business_auth/admin_panel.html:527
+#: templates/business_auth/admin_panel.html:534
+#: templates/business_auth/admin_panel.html:539
+#: templates/business_auth/admin_panel.html:542
+#: templates/business_auth/admin_panel.html:745
+#: templates/business_auth/admin_panel.html:756
+#: templates/business_auth/admin_panel.html:823
+#: templates/business_auth/admin_panel.html:961
+#: templates/business_auth/admin_panel.html:966
+msgid "Manage"
+msgstr "Gérer"
 
 #: templates/business_auth/admin_panel.html:428
 msgid "Quick actions and settings"
@@ -2846,17 +2874,11 @@ msgid "View account activity trail"
 msgstr "Afficher l'historique des activités du compte"
 
 #: templates/business_auth/admin_panel.html:530
+#, fuzzy, python-format
 msgid ""
-"Add and manage team members for your business account. Current usage: {{ "
-"admin_data.license_info.users_used if admin_data.license_info else 1 "
-"}}/{{ admin_data.license_info.users_limit if admin_data.license_info else"
-" 5 }} users."
-msgstr ""
-"Ajoutez et gérez les membres de votre équipe pour votre compte "
-"entreprise. Utilisation actuelle : {{ admin_data.license_info.users_used "
-"if admin_data.license_info else 1 }}/{{ "
-"admin_data.license_info.users_limit if admin_data.license_info else 5 }} "
-"utilisateurs."
+"Add and manage team members for your business account. Current usage: "
+"%(used)d/%(limit)d users."
+msgstr "Ajoutez et gérez les membres de votre équipe pour votre compte entreprise"
 
 #: templates/business_auth/admin_panel.html:545
 msgid "Create and manage survey campaigns for your business account."
@@ -3094,9 +3116,10 @@ msgstr "Santé de la base de données"
 
 #: templates/business_auth/admin_panel_v2.html:650
 msgid "Monitor database connection and performance status"
-msgstr "Surveiller la connexion à la base de données et l'état des performances""
-"Surveillez l'état de la connexion et les performances de la base de "
-"données"
+msgstr ""
+"Surveiller la connexion à la base de données et l'état des "
+"performances\"Surveillez l'état de la connexion et les performances de la"
+" base de données"
 
 #: templates/business_auth/admin_panel_v2.html:661
 #: templates/business_auth/admin_panel_v2.html:673
@@ -3141,9 +3164,10 @@ msgstr "Intégrer un compte entreprise"
 
 #: templates/business_auth/admin_panel_v2.html:795
 msgid "Create and configure new business accounts with license assignment"
-msgstr "Créer et configurer de nouveaux comptes d'entreprise avec attribution de licences""
-"Créez et configurez de nouveaux comptes d'entreprise avec attribution de "
-"licence"
+msgstr ""
+"Créer et configurer de nouveaux comptes d'entreprise avec attribution de "
+"licences\"Créez et configurez de nouveaux comptes d'entreprise avec "
+"attribution de licence"
 
 #: templates/business_auth/admin_panel_v2.html:810
 msgid "License Management"
@@ -3151,9 +3175,10 @@ msgstr "Gestion des licences"
 
 #: templates/business_auth/admin_panel_v2.html:811
 msgid "Cross-tenant license usage, trends, and compliance monitoring"
-msgstr "Utilisation des licences multi-locataires, tendances et surveillance de la conformité""
-"Utilisation des licences inter-locataires, tendances et suivi de "
-"conformité"
+msgstr ""
+"Utilisation des licences multi-locataires, tendances et surveillance de "
+"la conformité\"Utilisation des licences inter-locataires, tendances et "
+"suivi de conformité"
 
 #: templates/business_auth/admin_panel_v2.html:819
 #: templates/business_auth/admin_panel_v2.html:826
@@ -3166,7 +3191,7 @@ msgstr "Gérez les comptes et autorisations des administrateurs inter-locataires
 
 #: templates/business_auth/audit_logs.html:21
 msgid "Track all activities and changes in your VOÏA account"
-msgstr "Suivre toutes les activités et changements dans votre compte VOÏA""
+msgstr "Suivre toutes les activités et changements dans votre compte VOÏA\""
 
 #: templates/business_auth/audit_logs.html:28
 #, fuzzy
@@ -3185,7 +3210,7 @@ msgstr "Actif"
 
 #: templates/business_auth/audit_logs.html:40
 msgid "Days Shown"
-msgstr "Jours affichés""
+msgstr "Jours affichés\""
 
 #: templates/business_auth/audit_logs.html:48
 #, fuzzy
@@ -3227,11 +3252,11 @@ msgstr "Description :"
 
 #: templates/business_auth/audit_logs.html:103
 msgid "Resource"
-msgstr "Ressource""
+msgstr "Ressource\""
 
 #: templates/business_auth/audit_logs.html:161
 msgid "No Activity Yet"
-msgstr "Aucune activité pour le moment""
+msgstr "Aucune activité pour le moment\""
 
 #: templates/business_auth/audit_logs.html:162
 msgid ""
@@ -3240,8 +3265,8 @@ msgid ""
 msgstr ""
 
 #: templates/business_auth/brand_config.html:22
-#, fuzzy
-msgid "Customize your brand identity for {{ business_account.name }}"
+#, fuzzy, python-format
+msgid "Customize your brand identity for %(name)s"
 msgstr "Configurer la licence pour {{ business_account.name }}"
 
 #: templates/business_auth/brand_config.html:50
@@ -3265,26 +3290,29 @@ msgid "Company Display Name"
 msgstr "Nom de l'entreprise"
 
 #: templates/business_auth/brand_config.html:98
+#, python-format
 msgid ""
 "This name will be displayed in surveys and emails. Leave blank to use "
-"\"{{ business_account.name }}\"."
+"\"%(name)s\"."
 msgstr ""
 
 #: templates/business_auth/brand_config.html:113
 msgid "Primary Color"
-msgstr "Couleur principale""
+msgstr "Couleur principale\""
 
 #: templates/business_auth/brand_config.html:121
 msgid "Main brand color used for headers, buttons, and accents."
-msgstr "Couleur de marque principale utilisée pour les en-têtes, boutons et accents.""
+msgstr ""
+"Couleur de marque principale utilisée pour les en-têtes, boutons et "
+"accents.\""
 
 #: templates/business_auth/brand_config.html:127
 msgid "Secondary Color"
-msgstr "Couleur secondaire""
+msgstr "Couleur secondaire\""
 
 #: templates/business_auth/brand_config.html:135
 msgid "Supporting color for borders and subtle elements."
-msgstr "Couleur de support pour les bordures et éléments subtils.""
+msgstr "Couleur de support pour les bordures et éléments subtils.\""
 
 #: templates/business_auth/brand_config.html:144
 #, fuzzy
@@ -3293,15 +3321,17 @@ msgstr "Compte fermé"
 
 #: templates/business_auth/brand_config.html:152
 msgid "Highlight color for success states and call-to-action elements."
-msgstr "Couleur de surbrillance pour les états de succès et éléments d'appel à l'action.""
+msgstr ""
+"Couleur de surbrillance pour les états de succès et éléments d'appel à "
+"l'action.\""
 
 #: templates/business_auth/brand_config.html:158
 msgid "Text Color"
-msgstr "Couleur du texte""
+msgstr "Couleur du texte\""
 
 #: templates/business_auth/brand_config.html:166
 msgid "Primary text color for readability."
-msgstr "Couleur de texte principale pour la lisibilité.""
+msgstr "Couleur de texte principale pour la lisibilité.\""
 
 #: templates/business_auth/brand_config.html:175
 #, fuzzy
@@ -3310,7 +3340,7 @@ msgstr "Compte fermé"
 
 #: templates/business_auth/brand_config.html:183
 msgid "Background color for documents and reports."
-msgstr "Couleur de fond pour les documents et rapports.""
+msgstr "Couleur de fond pour les documents et rapports.\""
 
 #: templates/business_auth/brand_config.html:189
 #, fuzzy
@@ -3319,11 +3349,11 @@ msgstr "Fermer l'aperçu"
 
 #: templates/business_auth/brand_config.html:194
 msgid "Primary color"
-msgstr "Couleur principale""
+msgstr "Couleur principale\""
 
 #: templates/business_auth/brand_config.html:198
 msgid "Secondary color"
-msgstr "Couleur secondaire""
+msgstr "Couleur secondaire\""
 
 #: templates/business_auth/brand_config.html:202
 #, fuzzy
@@ -3332,11 +3362,11 @@ msgstr "Compte fermé"
 
 #: templates/business_auth/brand_config.html:205
 msgid "Live preview of your color palette."
-msgstr "Aperçu en direct de votre palette de couleurs.""
+msgstr "Aperçu en direct de votre palette de couleurs.\""
 
 #: templates/business_auth/brand_config.html:220
 msgid "Upload Logo"
-msgstr "Téléverser le logo""
+msgstr "Téléverser le logo\""
 
 #: templates/business_auth/brand_config.html:228
 msgid ""
@@ -3346,27 +3376,27 @@ msgstr ""
 
 #: templates/business_auth/brand_config.html:234
 msgid "Supported formats: PNG, JPG, JPEG, GIF, WEBP"
-msgstr "Formats supportés : PNG, JPG, JPEG, GIF, WEBP""
+msgstr "Formats supportés : PNG, JPG, JPEG, GIF, WEBP\""
 
 #: templates/business_auth/brand_config.html:235
 msgid "Maximum file size: 5MB"
-msgstr "Taille maximale du fichier : 5 Mo""
+msgstr "Taille maximale du fichier : 5 Mo\""
 
 #: templates/business_auth/brand_config.html:236
 msgid "Recommended dimensions: 400x200 pixels or similar ratio"
-msgstr "Dimensions recommandées : 400x200 pixels ou ratio similaire""
+msgstr "Dimensions recommandées : 400x200 pixels ou ratio similaire\""
 
 #: templates/business_auth/brand_config.html:237
 msgid "Transparent background recommended for PNG files"
-msgstr "Fond transparent recommandé pour les fichiers PNG""
+msgstr "Fond transparent recommandé pour les fichiers PNG\""
 
 #: templates/business_auth/brand_config.html:238
 msgid "PNG format recommended for logos with transparency"
-msgstr "Format PNG recommandé pour les logos avec transparence""
+msgstr "Format PNG recommandé pour les logos avec transparence\""
 
 #: templates/business_auth/brand_config.html:256
 msgid "Changes will take effect immediately after saving."
-msgstr "Les changements prendront effet immédiatement après la sauvegarde.""
+msgstr "Les changements prendront effet immédiatement après la sauvegarde.\""
 
 #: templates/business_auth/business_account_onboarding.html:21
 #, fuzzy
@@ -3390,7 +3420,7 @@ msgstr "Saisir le nom de l'entreprise"
 
 #: templates/business_auth/business_account_onboarding.html:78
 msgid "This will be displayed throughout the platform and in communications"
-msgstr "Ceci sera affiché sur toute la plateforme et dans les communications""
+msgstr "Ceci sera affiché sur toute la plateforme et dans les communications\""
 
 #: templates/business_auth/business_account_onboarding.html:102
 #, fuzzy
@@ -3404,11 +3434,11 @@ msgstr "Administrateur du compte entreprise"
 
 #: templates/business_auth/business_account_onboarding.html:124
 msgid "Administrator's first name"
-msgstr "Prénom de l'administrateur""
+msgstr "Prénom de l'administrateur\""
 
 #: templates/business_auth/business_account_onboarding.html:138
 msgid "Administrator's last name"
-msgstr "Nom de famille de l'administrateur""
+msgstr "Nom de famille de l'administrateur\""
 
 #: templates/business_auth/business_account_onboarding.html:153
 #, fuzzy
@@ -3417,7 +3447,7 @@ msgstr "participant@entreprise.com"
 
 #: templates/business_auth/business_account_onboarding.html:157
 msgid "The administrator will receive an invitation email at this address"
-msgstr "L'administrateur recevra un courriel d'invitation à cette adresse""
+msgstr "L'administrateur recevra un courriel d'invitation à cette adresse\""
 
 #: templates/business_auth/business_account_onboarding.html:168
 #, fuzzy
@@ -3436,7 +3466,7 @@ msgstr "Adresse e-mail *"
 
 #: templates/business_auth/email_config.html:71
 msgid "Choose your email delivery provider"
-msgstr "Choisissez votre fournisseur de livraison de courriels""
+msgstr "Choisissez votre fournisseur de livraison de courriels\""
 
 #: templates/business_auth/email_config.html:78
 #, fuzzy
@@ -3513,7 +3543,7 @@ msgstr "Serveur SMTP *"
 #: templates/business_auth/email_config.html:123
 #: templates/business_auth/onboarding/smtp.html:298
 msgid "smtp.gmail.com"
-msgstr "smtp.gmail.com""
+msgstr "smtp.gmail.com\""
 
 #: templates/business_auth/email_config.html:125
 #: templates/business_auth/onboarding/smtp.html:299
@@ -3526,9 +3556,10 @@ msgstr "Généré automatiquement à partir de la région"
 
 #: templates/business_auth/email_config.html:136
 msgid "AWS SES SMTP server is automatically set based on your region"
-msgstr "Le serveur SMTP AWS SES est configuré automatiquement selon votre région""
-"Le serveur SMTP AWS SES est automatiquement défini en fonction de votre "
-"région"
+msgstr ""
+"Le serveur SMTP AWS SES est configuré automatiquement selon votre "
+"région\"Le serveur SMTP AWS SES est automatiquement défini en fonction de"
+" votre région"
 
 #: templates/business_auth/email_config.html:141
 #: templates/business_auth/onboarding/smtp.html:302
@@ -3540,12 +3571,7 @@ msgid "Usually 587 (TLS) or 465 (SSL)"
 msgstr "Généralement 587 (TLS) ou 465 (SSL)"
 
 #: templates/business_auth/email_config.html:161
-#: templates/business_auth/email_config.html:512
-#: templates/business_auth/email_config.html:514
-#: templates/business_auth/email_config.html:530
-#: templates/business_auth/email_config.html:532
 #: templates/business_auth/email_config.html:553
-#: templates/business_auth/email_config.html:555
 msgid "Username"
 msgstr "Nom d'utilisateur"
 
@@ -3560,12 +3586,7 @@ msgid "Usually your email address"
 msgstr "Généralement votre adresse e-mail"
 
 #: templates/business_auth/email_config.html:178
-#: templates/business_auth/email_config.html:513
-#: templates/business_auth/email_config.html:515
-#: templates/business_auth/email_config.html:531
-#: templates/business_auth/email_config.html:533
 #: templates/business_auth/email_config.html:554
-#: templates/business_auth/email_config.html:556
 #: templates/business_auth/login.html:59 templates/business_auth/login.html:63
 #: templates/business_auth/login.html:65 templates/business_auth/login.html:104
 msgid "Password"
@@ -3637,13 +3658,14 @@ msgstr "Adresses e-mail administrateur"
 
 #: templates/business_auth/email_config.html:289
 msgid "admin@yourcompany.com, manager@yourcompany.com"
-msgstr "admin@votreentreprise.com, gestionnaire@votreentreprise.com""
+msgstr "admin@votreentreprise.com, gestionnaire@votreentreprise.com\""
 
 #: templates/business_auth/email_config.html:291
 msgid "Comma-separated list of email addresses for admin notifications"
-msgstr "Liste d'adresses courriel séparées par des virgules pour les notifications administrateur""
-"Liste d'adresses e-mail séparées par des virgules pour les notifications "
-"administrateur"
+msgstr ""
+"Liste d'adresses courriel séparées par des virgules pour les "
+"notifications administrateur\"Liste d'adresses e-mail séparées par des "
+"virgules pour les notifications administrateur"
 
 #: templates/business_auth/email_config.html:316
 msgid ""
@@ -3666,7 +3688,7 @@ msgstr "(200 caractères maximum)"
 #: templates/campaigns/create.html:180
 #, python-brace-format
 msgid "Your feedback is requested: {campaign_name}"
-msgstr "Votre retour est demandé : {campaign_name}""
+msgstr "Votre retour est demandé : {campaign_name}\""
 
 #: templates/business_auth/email_config.html:337
 msgid "Variables:"
@@ -3776,6 +3798,24 @@ msgstr "nom@exemple.com"
 msgid "Enter test email address"
 msgstr "Saisir l'adresse e-mail de test"
 
+#: templates/business_auth/email_config.html:530
+#, fuzzy
+msgid "AWS SES SMTP Username"
+msgstr "Entrez votre adresse e-mail"
+
+#: templates/business_auth/email_config.html:531
+#, fuzzy
+msgid "AWS SES SMTP Password"
+msgstr "Saisissez votre nouveau mot de passe"
+
+#: templates/business_auth/email_config.html:532
+msgid "SMTP username from AWS SES Console > SMTP Settings"
+msgstr ""
+
+#: templates/business_auth/email_config.html:533
+msgid "SMTP password from AWS SES Console (not your AWS password)"
+msgstr ""
+
 #: templates/business_auth/email_config.html:618
 msgid "Preview failed: ' + (data.error || 'Unknown error') + '"
 msgstr ""
@@ -3792,7 +3832,7 @@ msgstr "VOÏA - Voice Of Client"
 #: templates/business_auth/forgot_password.html:13
 #: templates/business_auth/reset_password.html:13
 msgid "VOÏA Password Reset"
-msgstr "Réinitialisation du mot de passe VOÏA""
+msgstr "Réinitialisation du mot de passe VOÏA\""
 
 #: templates/business_auth/forgot_password.html:16
 msgid "Reset Your Password"
@@ -3800,11 +3840,13 @@ msgstr "Réinitialisez votre mot de passe"
 
 #: templates/business_auth/forgot_password.html:17
 msgid "Enter your email address and we'll send you a password reset link"
-msgstr "Entrez votre adresse courriel et nous vous enverrons un lien de réinitialisation de mot de passe""
+msgstr ""
+"Entrez votre adresse courriel et nous vous enverrons un lien de "
+"réinitialisation de mot de passe\""
 
 #: templates/business_auth/forgot_password.html:36
 msgid "Password reset request form"
-msgstr "Formulaire de demande de réinitialisation de mot de passe""
+msgstr "Formulaire de demande de réinitialisation de mot de passe\""
 
 #: templates/business_auth/forgot_password.html:44
 #: templates/business_auth/login.html:44
@@ -3819,7 +3861,9 @@ msgstr "Adresse e-mail"
 
 #: templates/business_auth/forgot_password.html:56
 msgid "We'll send a password reset link to this email address"
-msgstr "Nous enverrons un lien de réinitialisation de mot de passe à cette adresse courriel""
+msgstr ""
+"Nous enverrons un lien de réinitialisation de mot de passe à cette "
+"adresse courriel\""
 
 #: templates/business_auth/forgot_password.html:59
 #, fuzzy
@@ -3903,10 +3947,12 @@ msgid "Add-on Not Purchased"
 msgstr "Prix du module complémentaire (USD)"
 
 #: templates/business_auth/license_overview.html:14
-msgid "License details and usage information for {{ account_data.name }}"
-msgstr "Détails de la licence et informations d'utilisation pour {{ account_data.name }}""
-"Détails et informations d'utilisation de la licence pour {{ "
-"account_data.name }}"
+#, fuzzy, python-format
+msgid "License details and usage information for %(name)s"
+msgstr ""
+"Détails de la licence et informations d'utilisation pour {{ "
+"account_data.name }}\"Détails et informations d'utilisation de la licence"
+" pour {{ account_data.name }}"
 
 #: templates/business_auth/license_overview.html:40
 msgid "License Type:"
@@ -4021,7 +4067,7 @@ msgstr "Dernière connexion"
 
 #: templates/business_auth/manage_users.html:135
 msgid "Never"
-msgstr "Jamais""
+msgstr "Jamais\""
 
 #: templates/business_auth/manage_users.html:143
 #, fuzzy
@@ -4035,7 +4081,7 @@ msgstr "Réinitialisez votre mot de passe"
 
 #: templates/business_auth/manage_users.html:168
 msgid "Deactivate User"
-msgstr "Désactiver l'utilisateur""
+msgstr "Désactiver l'utilisateur\""
 
 #: templates/business_auth/manage_users.html:175
 #, fuzzy
@@ -4054,7 +4100,7 @@ msgstr "Aucune réponse trouvée"
 
 #: templates/business_auth/manage_users.html:195
 msgid "Start building your team by adding the first user."
-msgstr "Commencez à bâtir votre équipe en ajoutant le premier utilisateur.""
+msgstr "Commencez à bâtir votre équipe en ajoutant le premier utilisateur.\""
 
 #: templates/business_auth/manage_users.html:217
 #, fuzzy
@@ -4087,9 +4133,10 @@ msgstr "Progression de l'intégration mise à jour."
 #: templates/business_auth/onboarding_progress.html:23
 #, fuzzy
 msgid "Complete these steps to configure your VOÏA platform"
-msgstr "Complétez ces étapes pour configurer votre plateforme VOÏA""
-"Complétez ces étapes pour accéder à votre plateforme VOÏA et commencer à "
-"collecter de précieux retours clients."
+msgstr ""
+"Complétez ces étapes pour configurer votre plateforme VOÏA\"Complétez ces"
+" étapes pour accéder à votre plateforme VOÏA et commencer à collecter de "
+"précieux retours clients."
 
 # Onboarding Progress Dashboard
 #: templates/business_auth/onboarding_progress.html:28
@@ -4254,7 +4301,7 @@ msgstr "Campagnes :"
 #: templates/business_auth/platform_dashboard.html:691
 #: templates/participants/list.html:401
 msgid "Nom"
-msgstr "Nom""
+msgstr "Nom\""
 
 #: templates/business_auth/platform_dashboard.html:692
 #: templates/participants/campaign_participants.html:463
@@ -4275,7 +4322,7 @@ msgstr "Saisissez votre nouveau mot de passe"
 
 #: templates/business_auth/reset_password.html:17
 msgid "Choose a strong password for your account"
-msgstr "Choisissez un mot de passe fort pour votre compte""
+msgstr "Choisissez un mot de passe fort pour votre compte\""
 
 #: templates/business_auth/reset_password.html:36
 #, fuzzy
@@ -4329,7 +4376,9 @@ msgstr "Choisissez votre expérience d'enquête"
 
 #: templates/business_auth/survey_config.html:36
 msgid "Tell us about your business to personalize the survey conversation"
-msgstr "Parlez-nous de votre entreprise pour personnaliser la conversation du sondage""
+msgstr ""
+"Parlez-nous de votre entreprise pour personnaliser la conversation du "
+"sondage\""
 
 #: templates/business_auth/survey_config.html:41
 #, fuzzy
@@ -4343,7 +4392,7 @@ msgstr "Sélectionnez la note"
 
 #: templates/business_auth/survey_config.html:53
 msgid "This helps tailor survey questions to your industry context"
-msgstr "Ceci aide à adapter les questions du sondage à votre contexte industriel""
+msgstr "Ceci aide à adapter les questions du sondage à votre contexte industriel\""
 
 #: templates/business_auth/survey_config.html:59
 #, fuzzy
@@ -4352,7 +4401,9 @@ msgstr "Historique de la conversation"
 
 #: templates/business_auth/survey_config.html:70
 msgid "Choose how the AI should communicate with your survey participants"
-msgstr "Choisissez comment l'IA devrait communiquer avec vos participants au sondage""
+msgstr ""
+"Choisissez comment l'IA devrait communiquer avec vos participants au "
+"sondage\""
 
 #: templates/business_auth/survey_config.html:78
 #, fuzzy
@@ -4361,7 +4412,7 @@ msgstr "Description :"
 
 #: templates/business_auth/survey_config.html:84
 msgid "Briefly describe what your company does and your mission..."
-msgstr "Décrivez brièvement ce que fait votre entreprise et votre mission...""
+msgstr "Décrivez brièvement ce que fait votre entreprise et votre mission...\""
 
 #: templates/business_auth/survey_config.html:89
 msgid ""
@@ -4372,15 +4423,17 @@ msgstr ""
 #: templates/business_auth/survey_config.html:97
 #: templates/campaigns/survey_config.html:220
 msgid "Product/Service Description"
-msgstr "Description du produit/service""
+msgstr "Description du produit/service\""
 
 #: templates/business_auth/survey_config.html:103
 msgid "Describe your main products or services in detail..."
-msgstr "Décrivez vos principaux produits ou services en détail...""
+msgstr "Décrivez vos principaux produits ou services en détail...\""
 
 #: templates/business_auth/survey_config.html:108
 msgid "Specific product details enable more targeted feedback collection"
-msgstr "Les détails spécifiques du produit permettent une collecte de retours plus ciblée""
+msgstr ""
+"Les détails spécifiques du produit permettent une collecte de retours "
+"plus ciblée\""
 
 #: templates/business_auth/survey_config.html:116
 #, fuzzy
@@ -4395,7 +4448,9 @@ msgstr ""
 
 #: templates/business_auth/survey_config.html:127
 msgid "Understanding your audience helps frame questions appropriately"
-msgstr "Comprendre votre audience aide à formuler les questions de manière appropriée""
+msgstr ""
+"Comprendre votre audience aide à formuler les questions de manière "
+"appropriée\""
 
 #: templates/business_auth/survey_config.html:139
 msgid "What do you want to learn from your survey participants?"
@@ -4427,7 +4482,7 @@ msgstr "Tarification"
 
 #: templates/business_auth/survey_config.html:173
 msgid "Custom Research"
-msgstr "Recherche personnalisée""
+msgstr "Recherche personnalisée\""
 
 #: templates/business_auth/survey_config.html:185
 #, fuzzy
@@ -4441,7 +4496,7 @@ msgstr "Nombre maximal d'utilisateurs"
 
 #: templates/business_auth/survey_config.html:208
 msgid "Absolute limit to keep surveys concise and engaging"
-msgstr "Limite absolue pour garder les sondages concis et engageants""
+msgstr "Limite absolue pour garder les sondages concis et engageants\""
 
 #: templates/business_auth/survey_config.html:214
 msgid "Time Limit (seconds)"
@@ -4449,23 +4504,23 @@ msgstr ""
 
 #: templates/business_auth/survey_config.html:230
 msgid "1min"
-msgstr "1 min""
+msgstr "1 min\""
 
 #: templates/business_auth/survey_config.html:231
 msgid "5min"
-msgstr "5 min""
+msgstr "5 min\""
 
 #: templates/business_auth/survey_config.html:233
 msgid "Maximum time participants can spend on the survey"
-msgstr "Temps maximum que les participants peuvent consacrer au sondage""
+msgstr "Temps maximum que les participants peuvent consacrer au sondage\""
 
 #: templates/business_auth/survey_config.html:239
 msgid "Follow-ups per Topic"
-msgstr "Suivis par sujet""
+msgstr "Suivis par sujet\""
 
 #: templates/business_auth/survey_config.html:257
 msgid "How deep to explore each topic with follow-up questions"
-msgstr "À quelle profondeur explorer chaque sujet avec des questions de suivi""
+msgstr "À quelle profondeur explorer chaque sujet avec des questions de suivi\""
 
 #: templates/business_auth/survey_config.html:269
 msgid ""
@@ -4479,7 +4534,7 @@ msgstr ""
 
 #: templates/business_auth/survey_config.html:289
 msgid "These topics will always be covered, in order of importance"
-msgstr "Ces sujets seront toujours couverts, par ordre d'importance""
+msgstr "Ces sujets seront toujours couverts, par ordre d'importance\""
 
 #: templates/business_auth/survey_config.html:295
 msgid "Optional Topics (if time allows)"
@@ -4487,11 +4542,13 @@ msgstr ""
 
 #: templates/business_auth/survey_config.html:310
 msgid "These topics can be skipped if the time/question limit is reached"
-msgstr "Ces sujets peuvent être sautés si la limite de temps/questions est atteinte""
+msgstr ""
+"Ces sujets peuvent être sautés si la limite de temps/questions est "
+"atteinte\""
 
 #: templates/business_auth/survey_config.html:322
 msgid "Personalize the survey experience with custom messages"
-msgstr "Personnalisez l'expérience du sondage avec des messages personnalisés""
+msgstr "Personnalisez l'expérience du sondage avec des messages personnalisés\""
 
 #: templates/business_auth/survey_config.html:327
 #, fuzzy
@@ -4521,8 +4578,9 @@ msgid "Save survey configuration"
 msgstr "Enregistrer la configuration de l'e-mail"
 
 #: templates/business_auth/licenses/assignment_form.html:22
-msgid "Configure license for {{ business_account.name }}"
-msgstr "Configurer la licence pour {{ business_account.name }}"
+#, fuzzy, python-format
+msgid "Configure license for %(name)s"
+msgstr "Configurer %(name)s"
 
 #: templates/business_auth/licenses/assignment_form.html:47
 #: templates/business_auth/licenses/assignment_form.html:52
@@ -4728,9 +4786,10 @@ msgstr "Fonctionnalité"
 
 #: templates/business_auth/licenses/assignment_form.html:319
 msgid "Optional add-on features with custom pricing and duration"
-msgstr "Fonctionnalités additionnelles optionnelles avec tarification et durée personnalisées""
-"Fonctionnalités supplémentaires optionnelles avec tarification et durée "
-"personnalisées"
+msgstr ""
+"Fonctionnalités additionnelles optionnelles avec tarification et durée "
+"personnalisées\"Fonctionnalités supplémentaires optionnelles avec "
+"tarification et durée personnalisées"
 
 #: templates/business_auth/licenses/assignment_form.html:336
 #: templates/campaigns/create.html:106 templates/campaigns/edit.html:122
@@ -4760,7 +4819,7 @@ msgstr "Prix du module complémentaire (USD)"
 
 #: templates/business_auth/licenses/assignment_form.html:355
 msgid "Custom pricing for this add-on period"
-msgstr "Tarification personnalisée pour cette période d'extension""
+msgstr "Tarification personnalisée pour cette période d'extension\""
 
 #: templates/business_auth/licenses/assignment_form.html:376
 #, fuzzy
@@ -4773,9 +4832,10 @@ msgstr "Ajoutez des notes sur cette attribution de licence..."
 
 #: templates/business_auth/licenses/assignment_form.html:379
 msgid "These notes will be recorded in the license history for audit purposes."
-msgstr "Ces notes seront enregistrées dans l'historique de la licence à des fins d'audit.""
-"Ces notes seront enregistrées dans l'historique des licences à des fins "
-"d'audit."
+msgstr ""
+"Ces notes seront enregistrées dans l'historique de la licence à des fins "
+"d'audit.\"Ces notes seront enregistrées dans l'historique des licences à "
+"des fins d'audit."
 
 #: templates/business_auth/licenses/assignment_form.html:407
 msgid "New"
@@ -4850,9 +4910,10 @@ msgstr ""
 
 #: templates/business_auth/licenses/assignment_result.html:468
 msgid "Confirm you have the necessary permissions to assign licenses"
-msgstr "Confirmez que vous avez les permissions nécessaires pour attribuer des licences""
-"Confirmez que vous disposez des autorisations nécessaires pour attribuer "
-"des licences"
+msgstr ""
+"Confirmez que vous avez les permissions nécessaires pour attribuer des "
+"licences\"Confirmez que vous disposez des autorisations nécessaires pour "
+"attribuer des licences"
 
 #: templates/business_auth/licenses/assignment_result.html:469
 msgid "Try refreshing the page and attempting the assignment again"
@@ -4860,9 +4921,10 @@ msgstr "Essayez d'actualiser la page et de refaire l'attribution"
 
 #: templates/business_auth/licenses/dashboard.html:22
 msgid "Monitor and manage all business account licenses across the platform"
-msgstr "Surveiller et gérer toutes les licences de comptes d'entreprise sur la plateforme""
-"Surveillez et gérez toutes les licences de comptes entreprise sur la "
-"plateforme"
+msgstr ""
+"Surveiller et gérer toutes les licences de comptes d'entreprise sur la "
+"plateforme\"Surveillez et gérez toutes les licences de comptes entreprise"
+" sur la plateforme"
 
 #: templates/business_auth/licenses/dashboard.html:68
 msgid "Total Accounts"
@@ -4927,8 +4989,9 @@ msgid "License History"
 msgstr "Historique des licences"
 
 #: templates/business_auth/licenses/history.html:339
-msgid "Current License: {{ current_license.type|title }}"
-msgstr "Licence actuelle : {{ current_license.type|title }}"
+#, fuzzy, python-format
+msgid "Current License: %(type)s"
+msgstr "Licence actuelle :"
 
 #: templates/business_auth/licenses/history.html:343
 #: templates/business_auth/licenses/history.html:468
@@ -4963,9 +5026,10 @@ msgstr "Ce compte entreprise n'a aucun historique d'attribution de licence."
 
 #: templates/business_auth/licenses/history.html:523
 msgid "Download license history data for record keeping or analysis."
-msgstr "Télécharger les données d'historique des licences pour la tenue de dossiers ou l'analyse.""
-"Téléchargez les données d'historique des licences pour archivage ou "
-"analyse."
+msgstr ""
+"Télécharger les données d'historique des licences pour la tenue de "
+"dossiers ou l'analyse.\"Téléchargez les données d'historique des licences"
+" pour archivage ou analyse."
 
 #: templates/business_auth/licenses/history.html:525
 #: templates/business_auth/licenses/history.html:528
@@ -5059,7 +5123,7 @@ msgstr "Nom complet du participant"
 
 #: templates/business_auth/onboarding/brand.html:312
 msgid "With your branding:"
-msgstr "Avec votre image de marque :""
+msgstr "Avec votre image de marque :\""
 
 #: templates/business_auth/onboarding/brand.html:312
 msgid "Your logo prominently displayed with \"Powered by VOÏA\" attribution below"
@@ -5067,11 +5131,11 @@ msgstr ""
 
 #: templates/business_auth/onboarding/brand.html:313
 msgid "Without branding:"
-msgstr "Sans image de marque :""
+msgstr "Sans image de marque :\""
 
 #: templates/business_auth/onboarding/brand.html:313
 msgid "Default VOÏA logo and colors"
-msgstr "Logo et couleurs VOÏA par défaut""
+msgstr "Logo et couleurs VOÏA par défaut\""
 
 #: templates/business_auth/onboarding/brand.html:322
 #, fuzzy
@@ -5086,7 +5150,7 @@ msgstr ""
 
 #: templates/business_auth/onboarding/brand.html:336
 msgid "Skip for Now"
-msgstr "Ignorer pour le moment""
+msgstr "Ignorer pour le moment\""
 
 #: templates/business_auth/onboarding/brand.html:339
 #, fuzzy
@@ -5108,9 +5172,10 @@ msgid "Your VOÏA platform is ready for action"
 msgstr "Votre plateforme VOÏA est prête à fonctionner"
 
 #: templates/business_auth/onboarding/complete.html:306
+#, fuzzy, python-format
 msgid ""
-"Congratulations, {{ current_user.get_full_name() }}! Your team is ready "
-"to start collecting valuable customer feedback."
+"Congratulations, %(name)s! Your team is ready to start collecting "
+"valuable customer feedback."
 msgstr ""
 "Félicitations, {{ current_user.get_full_name() }} ! Votre équipe est "
 "prête à commencer à collecter des retours clients précieux."
@@ -5217,7 +5282,7 @@ msgstr ""
 
 #: templates/business_auth/onboarding/smtp.html:278
 msgid "Your organization's email server settings"
-msgstr "Paramètres du serveur de courriels de votre organisation""
+msgstr "Paramètres du serveur de courriels de votre organisation\""
 
 #: templates/business_auth/onboarding/smtp.html:290
 #, fuzzy
@@ -5251,11 +5316,13 @@ msgstr "Mot de passe"
 
 #: templates/business_auth/onboarding/smtp.html:331
 msgid "How your name appears to survey recipients"
-msgstr "Comment votre nom apparaît aux destinataires du sondage""
+msgstr "Comment votre nom apparaît aux destinataires du sondage\""
 
 #: templates/business_auth/onboarding/smtp.html:341
 msgid "Send a test email to verify your SMTP settings are working correctly."
-msgstr "Envoyez un courriel de test pour vérifier que vos paramètres SMTP fonctionnent correctement.""
+msgstr ""
+"Envoyez un courriel de test pour vérifier que vos paramètres SMTP "
+"fonctionnent correctement.\""
 
 #: templates/business_auth/onboarding/smtp.html:344
 #, fuzzy
@@ -5271,9 +5338,10 @@ msgstr "Ajouter des membres à l'équipe"
 #: templates/business_auth/onboarding/users.html:318
 #, fuzzy
 msgid "Invite campaign managers to help create and manage surveys"
-msgstr "Invitez des gestionnaires de campagne pour aider à créer et gérer les sondages""
-"Invitez des responsables de campagne à vous aider à créer et gérer les "
-"enquêtes de retour client"
+msgstr ""
+"Invitez des gestionnaires de campagne pour aider à créer et gérer les "
+"sondages\"Invitez des responsables de campagne à vous aider à créer et "
+"gérer les enquêtes de retour client"
 
 #: templates/business_auth/onboarding/users.html:346
 #, fuzzy
@@ -5356,9 +5424,8 @@ msgid "Let's set up your platform for success"
 msgstr "Configurons votre plateforme pour la réussite"
 
 #: templates/business_auth/onboarding/welcome.html:260
-msgid ""
-"Welcome, {{ current_user.get_full_name() }}! You're setting up VOÏA for "
-"your team."
+#, fuzzy, python-format
+msgid "Welcome, %(name)s! You're setting up VOÏA for your team."
 msgstr ""
 "Bienvenue, {{ current_user.get_full_name() }} ! Vous configurez VOÏA pour"
 " votre équipe."
@@ -6027,6 +6094,7 @@ msgid "Select {{ participant.name }}"
 msgstr "Sélectionner {{ participant.name }}"
 
 #: templates/participants/campaign_participants.html:345
+#: templates/participants/list.html:502
 msgid "No participants match your search"
 msgstr "Aucun participant ne correspond à votre recherche"
 
@@ -6157,8 +6225,9 @@ msgstr ""
 "l'exactitude historique."
 
 #: templates/participants/create.html:23
-msgid "Add a new participant to {{ business_account.name }}"
-msgstr "Ajouter un nouveau participant à {{ business_account.name }}"
+#, fuzzy, python-format
+msgid "Add a new participant to %(name)s"
+msgstr "Gérez les participants à la campagne pour %(name)s"
 
 #: templates/participants/create.html:46 templates/participants/edit.html:85
 #, fuzzy
@@ -6212,10 +6281,6 @@ msgstr "Cadre dirigeant (C-Level)"
 msgid "VP / Director"
 msgstr "VP / Directeur"
 
-#: templates/participants/create.html:108 templates/participants/edit.html:156
-msgid "Manager"
-msgstr "Gestionnaire"
-
 #: templates/participants/create.html:109 templates/participants/edit.html:157
 msgid "Team Lead"
 msgstr "Chef d'équipe"
@@ -6264,8 +6329,8 @@ msgid "Select tier (optional)"
 msgstr "Sélectionnez une catégorie (optionnel)"
 
 #: templates/participants/create.html:145 templates/participants/edit.html:193
-#, no-python-format, python-format
-msgid "T1: Strategic (Top 5–10% clients)"
+#, python-format
+msgid "T1: Strategic (Top 5–10%% clients)"
 msgstr ""
 
 #: templates/participants/create.html:146 templates/participants/edit.html:194
@@ -6343,9 +6408,10 @@ msgstr "3. Assigner à une campagne"
 msgid "Add participant to active campaigns"
 msgstr "Ajoutez le participant aux campagnes actives"
 
-#: templates/participants/edit.html:38 templates/participants/edit.html:281
-msgid "Update participant"
-msgstr "Mettre à jour le participant"
+#: templates/participants/edit.html:38
+#, fuzzy, python-format
+msgid "Update participant information for %(name)s"
+msgstr "Mettre à jour les détails de la campagne pour %(name)s"
 
 #: templates/participants/edit.html:47
 #, fuzzy
@@ -6363,10 +6429,9 @@ msgstr ""
 "Ajoutez des données de segmentation pour des enquêtes personnalisées et "
 "une analytique avancée"
 
-#: templates/participants/list.html:151
-#, python-format
-msgid "Manage campaign participants for %(name)s"
-msgstr "Gérez les participants à la campagne pour %(name)s"
+#: templates/participants/edit.html:281
+msgid "Update participant"
+msgstr "Mettre à jour le participant"
 
 #: templates/participants/list.html:347
 msgid "Search by name, email, or company..."
@@ -6394,7 +6459,7 @@ msgstr "Créé"
 #: templates/participants/list.html:478 templates/participants/list.html:839
 #, fuzzy
 msgid "Edit participant"
-msgstr "Modifier le participant"Mettre à jour le participant"
+msgstr "Modifier le participant\"Mettre à jour le participant"
 
 #: templates/participants/list.html:486 templates/participants/list.html:847
 #, fuzzy
@@ -6402,13 +6467,9 @@ msgid "Delete participant"
 msgstr "Mettre à jour le participant"
 
 #: templates/participants/list.html:502
-#, python-brace-format, python-format
-msgid ""
-"No participants {% if search_query %}match your search{% else %}yet{% "
-"endif %}"
-msgstr ""
-"Aucun participant {% if search_query %}ne correspond à votre recherche{% "
-"else %}pour le moment{% endif %}"
+#, fuzzy
+msgid "No participants yet"
+msgstr "Participants"
 
 #: templates/participants/list.html:504
 msgid "Try adjusting your search terms or clear filters to view all participants."
@@ -6460,7 +6521,8 @@ msgid "Try adjusting your filter criteria."
 msgstr "Essayez d'ajuster vos critères de recherche ou vos filtres."
 
 #: templates/participants/upload.html:23
-msgid "Upload multiple participants to {{ business_account.name }} via CSV file"
+#, fuzzy, python-format
+msgid "Upload multiple participants to %(name)s via CSV file"
 msgstr ""
 "Téléversez plusieurs participants vers {{ business_account.name }} via un"
 " fichier CSV"
@@ -6690,4 +6752,51 @@ msgstr "Télécharger le modèle de fichier CSV"
 
 #~ msgid "Complete previous steps first"
 #~ msgstr "Complétez d'abord les étapes précédentes"
+
+#~ msgid "Welcome {{ current_user.get_full_name() }}"
+#~ msgstr "Bienvenue {{ current_user.get_full_name() }}"
+
+#~ msgid ""
+#~ "Add and manage team members for "
+#~ "your business account. Current usage: {{"
+#~ " admin_data.license_info.users_used if "
+#~ "admin_data.license_info else 1 }}/{{ "
+#~ "admin_data.license_info.users_limit if "
+#~ "admin_data.license_info else 5 }} users."
+#~ msgstr ""
+#~ "Ajoutez et gérez les membres de "
+#~ "votre équipe pour votre compte "
+#~ "entreprise. Utilisation actuelle : {{ "
+#~ "admin_data.license_info.users_used if "
+#~ "admin_data.license_info else 1 }}/{{ "
+#~ "admin_data.license_info.users_limit if "
+#~ "admin_data.license_info else 5 }} "
+#~ "utilisateurs."
+
+#~ msgid ""
+#~ "This name will be displayed in "
+#~ "surveys and emails. Leave blank to "
+#~ "use \"{{ business_account.name }}\"."
+#~ msgstr ""
+
+#~ msgid "Configure license for {{ business_account.name }}"
+#~ msgstr "Configurer la licence pour {{ business_account.name }}"
+
+#~ msgid "Current License: {{ current_license.type|title }}"
+#~ msgstr "Licence actuelle : {{ current_license.type|title }}"
+
+#~ msgid "Add a new participant to {{ business_account.name }}"
+#~ msgstr "Ajouter un nouveau participant à {{ business_account.name }}"
+
+#~ msgid "T1: Strategic (Top 5–10% clients)"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "No participants {% if search_query "
+#~ "%}match your search{% else %}yet{% endif"
+#~ " %}"
+#~ msgstr ""
+#~ "Aucun participant {% if search_query "
+#~ "%}ne correspond à votre recherche{% else"
+#~ " %}pour le moment{% endif %}"
 
