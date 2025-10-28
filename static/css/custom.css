@@ -8411,7 +8411,7 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
 }
 
 .stat-started {
-    border-left-color: #ff9800;
+    border-left-color: var(--license-trial-primary);
 }
 
 .stat-invited {
@@ -8432,7 +8432,7 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
 }
 
 .stat-started .stat-icon {
-    color: #ff9800;
+    color: var(--license-trial-primary);
 }
 
 .stat-invited .stat-icon {

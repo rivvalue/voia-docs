@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-28 01:56+0000\n"
+"POT-Creation-Date: 2025-10-28 02:05+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -874,7 +874,7 @@ msgstr ""
 
 #: templates/business_auth/activate_account.html:435
 #: templates/business_auth/licenses/overview.html:323
-#: templates/campaigns/view.html:491 templates/conversational_survey.html:52
+#: templates/campaigns/view.html:509 templates/conversational_survey.html:52
 #: templates/conversational_survey_business.html:65
 #: templates/dashboard.html:671 templates/survey.html:42
 msgid "Company Name"
@@ -4187,6 +4187,7 @@ msgid "Sent"
 msgstr ""
 
 #: templates/campaigns/list.html:118 templates/campaigns/list.html:155
+#: templates/campaigns/view.html:232
 #: templates/participants/campaign_participants.html:40
 #: templates/participants/campaign_participants.html:508
 #: templates/participants/campaign_participants.html:586
@@ -4250,92 +4251,126 @@ msgstr ""
 msgid "Response pagination"
 msgstr ""
 
+#: templates/campaigns/view.html:237
+msgid ""
+"Participants who have successfully completed and submitted their survey "
+"response."
+msgstr ""
+
+#: templates/campaigns/view.html:250
+#: templates/participants/campaign_participants.html:36
+#: templates/participants/campaign_participants.html:505
+msgid "Started"
+msgstr ""
+
+#: templates/campaigns/view.html:255
+msgid "Participants who have started the survey but have not yet completed it."
+msgstr ""
+
 #: templates/campaigns/view.html:268
+#: templates/participants/campaign_participants.html:32
+#: templates/participants/campaign_participants.html:502
+msgid "Invited"
+msgstr ""
+
+#: templates/campaigns/view.html:273
+msgid ""
+"Participants who have received an invitation email but have not yet "
+"started the survey."
+msgstr ""
+
+#: templates/campaigns/view.html:286
 msgid "Pending"
 msgstr ""
 
-#: templates/campaigns/view.html:309 templates/campaigns/view.html:311
+#: templates/campaigns/view.html:291
+msgid ""
+"Participants not yet invited to the campaign. They are associated with "
+"the campaign but have not received invitations."
+msgstr ""
+
+#: templates/campaigns/view.html:327 templates/campaigns/view.html:329
 msgid "Campaign Actions"
 msgstr ""
 
-#: templates/campaigns/view.html:341
+#: templates/campaigns/view.html:359
 msgid ""
 "Campaign needs description and at least one participant to be marked "
 "ready."
 msgstr ""
 
-#: templates/campaigns/view.html:344
+#: templates/campaigns/view.html:362
 msgid ""
 "Draft campaigns can be freely edited or deleted. Once marked ready, "
 "campaign details become locked."
 msgstr ""
 
-#: templates/campaigns/view.html:364
+#: templates/campaigns/view.html:382
 msgid "Campaign is ready for activation"
 msgstr ""
 
-#: templates/campaigns/view.html:377
+#: templates/campaigns/view.html:395
 msgid ""
 "This will only send invitations to participants who haven't been invited "
 "yet."
 msgstr ""
 
-#: templates/campaigns/view.html:401
+#: templates/campaigns/view.html:419
 msgid "Campaign is currently active and collecting responses"
 msgstr ""
 
-#: templates/campaigns/view.html:412
+#: templates/campaigns/view.html:430
 #, python-format
 msgid "This campaign finished on %(date)s"
 msgstr ""
 
-#: templates/campaigns/view.html:425
+#: templates/campaigns/view.html:443
 msgid "Individual Response Viewer"
 msgstr ""
 
-#: templates/campaigns/view.html:426
+#: templates/campaigns/view.html:444
 msgid ""
 "View and analyze individual participant responses and conversation "
 "transcripts."
 msgstr ""
 
-#: templates/campaigns/view.html:475
+#: templates/campaigns/view.html:493
 msgid "Select Transcript (.txt files only)"
 msgstr ""
 
-#: templates/campaigns/view.html:477
+#: templates/campaigns/view.html:495
 msgid "Upload meeting transcripts to extract survey insights automatically."
 msgstr ""
 
-#: templates/campaigns/view.html:481
+#: templates/campaigns/view.html:499
 msgid "Participant Name"
 msgstr ""
 
-#: templates/campaigns/view.html:482
+#: templates/campaigns/view.html:500
 msgid "Enter participant's full name"
 msgstr ""
 
-#: templates/campaigns/view.html:486
+#: templates/campaigns/view.html:504
 msgid "Participant Email"
 msgstr ""
 
-#: templates/campaigns/view.html:487
+#: templates/campaigns/view.html:505
 msgid "participant@company.com"
 msgstr ""
 
-#: templates/campaigns/view.html:492
+#: templates/campaigns/view.html:510
 msgid "Enter company name"
 msgstr ""
 
-#: templates/campaigns/view.html:528 templates/campaigns/view.html:688
+#: templates/campaigns/view.html:546 templates/campaigns/view.html:706
 msgid "No transcripts processed yet"
 msgstr ""
 
-#: templates/campaigns/view.html:546
+#: templates/campaigns/view.html:564
 msgid "About Transcript Analysis"
 msgstr ""
 
-#: templates/campaigns/view.html:547
+#: templates/campaigns/view.html:565
 msgid ""
 "VOÏA analyzes meeting transcripts to extract NPS scores, sentiment, "
 "themes, and actionable insights. Upload .txt files from phone calls, "
@@ -4375,16 +4410,6 @@ msgstr ""
 
 #: templates/participants/campaign_participants.html:21
 msgid "Manage participants for this campaign"
-msgstr ""
-
-#: templates/participants/campaign_participants.html:32
-#: templates/participants/campaign_participants.html:502
-msgid "Invited"
-msgstr ""
-
-#: templates/participants/campaign_participants.html:36
-#: templates/participants/campaign_participants.html:505
-msgid "Started"
 msgstr ""
 
 #: templates/participants/campaign_participants.html:65
