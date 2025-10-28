@@ -4091,7 +4091,7 @@ def license_dashboard():
             'core_licenses': license_distribution.get('core', 0),
             'plus_licenses': license_distribution.get('plus', 0),
             'pro_licenses': license_distribution.get('pro', 0),
-            'trial_accounts': license_distribution.get('trial', 0),
+            'trial_accounts': trial_accounts,  # Use STATUS counter (not TYPE) to show accounts actively trialing
             'expiring_soon': len(accounts_expiring_soon),
             'account_growth': 0  # Could calculate this from historical data later
         }
@@ -4114,7 +4114,7 @@ def license_dashboard():
             'is_platform_admin': is_platform_admin  # Platform admin status for conditional links
         }
         
-        return render_template('business_auth/licenses/dashboard.html', **dashboard_data)
+        return render_template('business_auth/licenses/dashboard.html', needs_charts=True, **dashboard_data)
         
     except Exception as e:
         logger.error(f"Error loading license dashboard: {e}")
