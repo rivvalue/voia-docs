@@ -8410,6 +8410,10 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     border-left-color: var(--success-green);
 }
 
+.stat-started {
+    border-left-color: #ff9800;
+}
+
 .stat-invited {
     border-left-color: var(--info-blue);
 }
@@ -8425,6 +8429,10 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
 
 .stat-completed .stat-icon {
     color: var(--success-green);
+}
+
+.stat-started .stat-icon {
+    color: #ff9800;
 }
 
 .stat-invited .stat-icon {

@@ -229,15 +229,33 @@
                         <div class="stat-content">
                             <div class="stat-value">{{ participant_stats.completed }}</div>
                             <div class="stat-label">
-                                Completed
+                                {{ _('Completed') }}
                                 <i class="fas fa-info-circle info-icon" 
                                    data-bs-toggle="popover" 
                                    data-bs-trigger="click" 
                                    data-bs-placement="top"
-                                   data-bs-content="Participants whose status was marked as 'completed' in the system. Status is updated when a survey response is successfully submitted."></i>
+                                   data-bs-content="{{ _('Participants who have successfully completed and submitted their survey response.') }}"></i>
                             </div>
                             {% if participant_stats.total > 0 %}
                             <div class="stat-percentage">{{ ((participant_stats.completed / participant_stats.total) * 100)|round(0)|int }}%</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item stat-started">
+                        <div class="stat-icon"><i class="fas fa-play-circle"></i></div>
+                        <div class="stat-content">
+                            <div class="stat-value">{{ participant_stats.started }}</div>
+                            <div class="stat-label">
+                                {{ _('Started') }}
+                                <i class="fas fa-info-circle info-icon" 
+                                   data-bs-toggle="popover" 
+                                   data-bs-trigger="click" 
+                                   data-bs-placement="top"
+                                   data-bs-content="{{ _('Participants who have started the survey but have not yet completed it.') }}"></i>
+                            </div>
+                            {% if participant_stats.total > 0 %}
+                            <div class="stat-percentage">{{ ((participant_stats.started / participant_stats.total) * 100)|round(0)|int }}%</div>
                             {% endif %}
                         </div>
                     </div>
@@ -247,12 +265,12 @@
                         <div class="stat-content">
                             <div class="stat-value">{{ participant_stats.invited }}</div>
                             <div class="stat-label">
-                                Invited
+                                {{ _('Invited') }}
                                 <i class="fas fa-info-circle info-icon" 
                                    data-bs-toggle="popover" 
                                    data-bs-trigger="click" 
                                    data-bs-placement="top"
-                                   data-bs-content="Participants whose status is 'invited'. This means an invitation email was sent but they haven't completed the survey yet."></i>
+                                   data-bs-content="{{ _('Participants who have received an invitation email but have not yet started the survey.') }}"></i>
                             </div>
                             {% if participant_stats.total > 0 %}
                             <div class="stat-percentage">{{ ((participant_stats.invited / participant_stats.total) * 100)|round(0)|int }}%</div>
@@ -270,7 +288,7 @@
                                    data-bs-toggle="popover" 
                                    data-bs-trigger="click" 
                                    data-bs-placement="top"
-                                   data-bs-content="Participants not yet invited to the campaign. They are associated with the campaign but haven't received invitations."></i>
+                                   data-bs-content="{{ _('Participants not yet invited to the campaign. They are associated with the campaign but have not received invitations.') }}"></i>
                             </div>
                             {% if participant_stats.total > 0 %}
                             <div class="stat-percentage">{{ ((participant_stats.pending / participant_stats.total) * 100)|round(0)|int }}%</div>
