@@ -326,16 +326,25 @@ class Campaign(db.Model):
         reminder_conversion_rate = None
         
         if self.reminder_enabled:
-            # Count sent reminders
+            # Count sent reminders (total emails)
             reminders_sent = EmailDelivery.query.filter_by(
                 campaign_id=self.id,
                 status='sent',
                 email_type='reminder'
             ).count()
             
+            # Count DISTINCT participants who received at least one reminder
+            participants_reminded = db.session.query(
+                func.count(func.distinct(EmailDelivery.campaign_participant_id))
+            ).filter(
+                EmailDelivery.campaign_id == self.id,
+                EmailDelivery.status == 'sent',
+                EmailDelivery.email_type == 'reminder'
+            ).scalar() or 0
+            
             # Calculate reminder conversion rate
             # (responses that came after reminder was sent)
-            if reminders_sent > 0:
+            if participants_reminded > 0:
                 # Count DISTINCT participants who responded after receiving a reminder
                 # This avoids overcounting if multiple reminder emails exist per participant
                 reminder_conversions = db.session.query(
@@ -351,7 +360,8 @@ class Campaign(db.Model):
                     SurveyResponse.created_at > EmailDelivery.sent_at
                 ).scalar() or 0
                 
-                reminder_conversion_rate = round((reminder_conversions / reminders_sent) * 100, 1)
+                # Calculate conversion rate: (participants who converted) / (participants who received reminders) * 100
+                reminder_conversion_rate = round((reminder_conversions / participants_reminded) * 100, 1)
         
         return {
             'invitations_sent': invitations_sent,
