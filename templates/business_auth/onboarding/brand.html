@@ -1,0 +1,398 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Brand Configuration') }} - VOÏA Setup{% endblock %}
+
+{% block page_class %}page-onboarding-brand{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Settings', 'url': url_for('business_auth.admin_panel')},
+    {'label': 'Account Setup', 'url': url_for('business_auth.onboarding_welcome')},
+    {'label': 'Brand Configuration', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+
+<style>
+/* Onboarding Brand specific styling */
+.onboarding-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 var(--spacing-lg);
+}
+
+.onboarding-header {
+    background: linear-gradient(135deg, rgba(var(--primary-red-rgb, 225, 58, 68), 0.1) 0%, rgba(var(--red-hover-rgb, 197, 45, 54), 0.15) 100%);
+    border: 1px solid var(--red-light);
+    color: var(--primary-black);
+    padding: 2rem;
+    border-radius: var(--radius-2xl);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.step-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: var(--primary-white);
+    font-size: 2rem;
+    box-shadow: var(--shadow-lg);
+}
+
+.progress-container {
+    background: var(--primary-white);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: var(--light-gray);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: var(--spacing-md);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-red), var(--red-hover));
+    transition: width 0.3s ease;
+}
+
+.form-container {
+    background: var(--primary-white);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--light-gray);
+    margin-bottom: var(--spacing-2xl);
+}
+
+.optional-badge {
+    display: inline-block;
+    background: rgba(34, 197, 94, 0.1);
+    color: rgb(21, 128, 61);
+    padding: var(--spacing-xs) var(--spacing-md);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    margin-left: var(--spacing-md);
+}
+
+.info-box {
+    background: rgba(59, 130, 246, 0.05);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.info-box h5 {
+    color: rgb(37, 99, 235);
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.info-box p {
+    color: var(--gray-dark);
+    font-size: var(--font-size-sm);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.preview-section {
+    background: rgba(var(--primary-red-rgb, 225, 58, 68), 0.05);
+    border: 1px solid rgba(var(--primary-red-rgb, 225, 58, 68), 0.2);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    margin-top: var(--spacing-xl);
+}
+
+.preview-section h5 {
+    color: var(--primary-red);
+    font-weight: 600;
+    margin-bottom: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.confirmation-checkbox {
+    background: rgba(34, 197, 94, 0.05);
+    border: 2px solid rgba(34, 197, 94, 0.3);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    margin: var(--spacing-2xl) 0;
+}
+
+.confirmation-checkbox label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    cursor: pointer;
+    font-size: var(--font-size-base);
+    color: var(--primary-black);
+    font-weight: 500;
+}
+
+.confirmation-checkbox input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+    margin-top: 2px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.confirmation-checkbox .checkbox-label-text {
+    flex: 1;
+}
+
+.confirmation-checkbox .checkbox-sublabel {
+    color: var(--gray-dark);
+    font-size: var(--font-size-sm);
+    font-weight: 400;
+    margin-top: var(--spacing-xs);
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-xl) 0;
+}
+
+.btn-skip {
+    background: transparent;
+    color: var(--gray-dark);
+    border: 2px solid var(--gray-medium);
+    padding: var(--spacing-md) var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.btn-skip:hover {
+    background: var(--light-gray);
+    border-color: var(--gray-dark);
+    color: var(--primary-black);
+}
+
+.btn-continue {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+    border: none;
+    padding: var(--spacing-md) var(--spacing-2xl);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-lg);
+    cursor: pointer;
+}
+
+.btn-continue:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+}
+
+.btn-continue:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.quick-link {
+    background: var(--primary-white);
+    border: 2px solid var(--light-gray);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.quick-link:hover {
+    border-color: var(--primary-red);
+    box-shadow: var(--shadow-md);
+}
+
+.quick-link a {
+    color: var(--primary-red);
+    text-decoration: none;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+}
+
+@media (max-width: 768px) {
+    .action-buttons {
+        flex-direction: column-reverse;
+    }
+    
+    .btn-skip,
+    .btn-continue {
+        width: 100%;
+    }
+}
+</style>
+
+<div class="onboarding-container">
+    <!-- Header -->
+    <div class="onboarding-header">
+        <div class="step-icon">
+            <i class="fas fa-palette"></i>
+        </div>
+        <h1 style="font-size: var(--font-size-3xl); font-weight: 700; margin-bottom: var(--spacing-sm);">
+            {{ _('Brand Configuration') }}
+            <span class="optional-badge">{{ _('Optional') }}</span>
+        </h1>
+        <p style="color: var(--gray-dark); font-size: var(--font-size-lg); margin: 0;">
+            {{ _('Personalize your survey experience') }}
+        </p>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ progress_percentage }}%"></div>
+        </div>
+        <div style="text-align: center; color: var(--gray-dark); font-size: var(--font-size-sm); font-weight: 500;">
+            {{ _('Step %(current)d of %(total)d', current=current_step_index + 1, total=all_steps|length) }}
+        </div>
+    </div>
+
+    <!-- Info Box -->
+    <div class="info-box">
+        <h5><i class="fas fa-info-circle"></i>{{ _('Why customize your brand?') }}</h5>
+        <p>
+            {{ _('When you add your logo and brand colors, survey participants will see YOUR brand instead of VOÏA\'s default branding. This creates a more professional, personalized experience and increases trust and response rates.') }}
+        </p>
+    </div>
+
+    <!-- Form Container -->
+    <div class="form-container">
+        <h3 style="margin-bottom: var(--spacing-xl); color: var(--primary-black); font-weight: 600;">
+            <i class="fas fa-paint-brush me-2"></i>{{ _('Customize Your Branding') }}
+        </h3>
+
+        <!-- Quick Link to Brand Config -->
+        <div class="quick-link">
+            <a href="{{ url_for('business_auth.brand_config') }}" target="_blank">
+                <i class="fas fa-external-link-alt"></i>
+                {{ _('Open Brand Configuration Settings') }}
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <p style="color: var(--gray-dark); margin-bottom: var(--spacing-2xl); line-height: 1.6;">
+            {{ _('Click the link above to configure your logo, primary color, and accent color. Once you\'re done, come back here and confirm you\'ve completed the setup.') }}
+        </p>
+
+        <!-- Preview Section -->
+        <div class="preview-section">
+            <h5><i class="fas fa-eye"></i>{{ _('What participants will see') }}</h5>
+            <p style="color: var(--gray-dark); font-size: var(--font-size-sm); margin: var(--spacing-md) 0 0 0;">
+                <strong>{{ _('With your branding:') }}</strong> {{ _('Your logo prominently displayed with "Powered by VOÏA" attribution below') }}<br>
+                <strong>{{ _('Without branding:') }}</strong> {{ _('Default VOÏA logo and colors') }}
+            </p>
+        </div>
+
+        <!-- Self-Confirmation Checkbox -->
+        <div class="confirmation-checkbox">
+            <label>
+                <input type="checkbox" id="brandConfirmed" name="brand_confirmed">
+                <div class="checkbox-label-text">
+                    <strong>{{ _('I\'ve configured my brand settings') }}</strong>
+                    <div class="checkbox-sublabel">
+                        {{ _('Check this box to confirm you\'ve uploaded your logo and set your brand colors, or check it to skip this step for now.') }}
+                    </div>
+                </div>
+            </label>
+        </div>
+
+        <form action="{{ url_for('business_auth.complete_onboarding_step', step='brand') }}" method="post" id="brandForm">
+            <input type="hidden" name="brand_confirmed" id="brandConfirmedInput" value="false">
+            <input type="hidden" name="skip_brand" id="skipBrandInput" value="false">
+
+            <div class="action-buttons">
+                <button type="button" class="btn-skip" id="skipButton">
+                    <i class="fas fa-forward me-2"></i>{{ _('Skip for Now') }}
+                </button>
+                <button type="submit" class="btn-continue" id="continueButton" disabled>
+                    <i class="fas fa-arrow-right me-2"></i>{{ _('Continue to Team Setup') }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+const brandConfirmedCheckbox = document.getElementById('brandConfirmed');
+const brandConfirmedInput = document.getElementById('brandConfirmedInput');
+const skipBrandInput = document.getElementById('skipBrandInput');
+const continueButton = document.getElementById('continueButton');
+const skipButton = document.getElementById('skipButton');
+const brandForm = document.getElementById('brandForm');
+
+// Enable continue button when checkbox is checked
+brandConfirmedCheckbox.addEventListener('change', function() {
+    continueButton.disabled = !this.checked;
+    if (this.checked) {
+        brandConfirmedInput.value = 'true';
+    } else {
+        brandConfirmedInput.value = 'false';
+    }
+});
+
+// Handle skip button
+skipButton.addEventListener('click', function() {
+    skipBrandInput.value = 'true';
+    brandConfirmedInput.value = 'false';
+    brandForm.submit();
+});
+
+// Handle form submission
+brandForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    fetch(this.action, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (data.redirect) {
+                window.location.href = data.redirect;
+            }
+        } else {
+            alert(data.error || '{{ _("Failed to proceed. Please try again.") }}');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('{{ _("An error occurred. Please try again.") }}');
+    });
+});
+</script>
+
+{% endblock %}
