@@ -493,6 +493,37 @@
                         {{ step.status_label }}
                     </div>
                 </div>
+                
+                <!-- Step Action Buttons -->
+                <div style="margin-top: var(--spacing-lg); padding-top: var(--spacing-lg); border-top: 1px solid var(--light-gray); display: flex; justify-content: flex-end; align-items: center; gap: var(--spacing-md);">
+                    {% if step.is_completed %}
+                        {% if step.completed_at %}
+                        <span style="color: var(--gray-dark); font-size: var(--font-size-sm);">
+                            <i class="fas fa-check-circle" style="color: rgb(34, 197, 94);"></i>
+                            {{ _('Completed on') }} {{ step.completed_at[:10] }}
+                        </span>
+                        {% endif %}
+                        <a href="{{ url_for('business_auth.onboarding_step', step=step.step_id) }}" 
+                           style="color: var(--primary-red); text-decoration: none; font-size: var(--font-size-sm); font-weight: 500; display: inline-flex; align-items: center; gap: var(--spacing-xs); padding: var(--spacing-sm) var(--spacing-md); border-radius: var(--radius-md); transition: all 0.2s ease;"
+                           onmouseover="this.style.background='rgba(var(--primary-red-rgb, 225, 58, 68), 0.1)'"
+                           onmouseout="this.style.background='transparent'">
+                            <i class="fas fa-eye"></i>
+                            {{ _('Review') }}
+                        </a>
+                    {% elif step.is_current %}
+                        <a href="{{ url_for('business_auth.onboarding_step', step=step.step_id) }}" 
+                           style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%); color: var(--primary-white); text-decoration: none; padding: var(--spacing-md) var(--spacing-xl); border-radius: var(--radius-lg); font-weight: 600; font-size: var(--font-size-base); display: inline-flex; align-items: center; gap: var(--spacing-sm); transition: all 0.3s ease; box-shadow: var(--shadow-md);"
+                           onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--shadow-lg)'"
+                           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='var(--shadow-md)'">
+                            <i class="fas fa-play-circle"></i>
+                            {{ _('Continue Step') }}
+                        </a>
+                    {% else %}
+                        <span style="color: var(--gray-dark); font-size: var(--font-size-sm); font-style: italic;">
+                            {{ _('Complete previous steps first') }}
+                        </span>
+                    {% endif %}
+                </div>
             </div>
             {% endfor %}
         </div>
