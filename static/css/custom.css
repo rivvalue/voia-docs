@@ -8425,22 +8425,7 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
 .stat-icon {
     font-size: 2rem;
     opacity: 0.6;
-}
-
-.stat-completed .stat-icon {
-    color: var(--success-green);
-}
-
-.stat-started .stat-icon {
-    color: var(--license-trial-primary);
-}
-
-.stat-invited .stat-icon {
-    color: var(--info-blue);
-}
-
-.stat-pending .stat-icon {
-    color: var(--warning-yellow);
+    color: var(--gray-medium);
 }
 
 .stat-content {
