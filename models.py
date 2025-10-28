@@ -1787,6 +1787,20 @@ class BusinessAccountUser(UserMixin, db.Model):
         """Get status of specific onboarding step"""
         progress = self.get_onboarding_progress()
         return progress["steps"].get(step_name, {"completed": False})
+    
+    def get_onboarding_progress_percentage(self):
+        """Get onboarding progress as percentage (0-100)"""
+        try:
+            from license_service import LicenseService
+            from onboarding_config import OnboardingFlowManager
+            
+            license_info = LicenseService.get_license_info(self.business_account_id)
+            license_type = license_info.get('license_type', 'core')
+            progress = self.get_onboarding_progress()
+            
+            return OnboardingFlowManager.get_progress_percentage(progress, license_type)
+        except Exception:
+            return 0.0
 
 
 class UserSession(db.Model):

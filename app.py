@@ -354,10 +354,16 @@ def inject_csrf():
 def inject_ui_version():
     from feature_flags import feature_flags
     from flask import session
+    from models import BusinessAccountUser
     
     # Get current UI version
     user_id = session.get('business_user_id')
     ui_version = feature_flags.get_ui_version(user_id=user_id)
+    
+    # Get current user object for onboarding access
+    current_user = None
+    if user_id:
+        current_user = BusinessAccountUser.query.get(user_id)
     
     return {
         'ui_version': ui_version,
@@ -365,7 +371,8 @@ def inject_ui_version():
         'force_v2_enabled': feature_flags.is_v2_forced(),
         'sidebar_enabled': feature_flags.is_feature_enabled('sidebar_navigation'),
         'business_user_id': user_id,
-        'business_user_email': session.get('business_user_email', '')
+        'business_user_email': session.get('business_user_email', ''),
+        'current_user': current_user
     }
 
 # Sentry Test Endpoint (Admin Only)
