@@ -119,9 +119,35 @@
             <div class="navbar-right">
                 <div class="d-flex align-items-center gap-3">
                     {% if is_business_authenticated %}
-                    <span class="navbar-text text-white">
-                        <i class="fas fa-user-circle me-2"></i>{{ business_user_name }}
-                    </span>
+                    <!-- User Dropdown Menu -->
+                    <div class="user-dropdown">
+                        <div class="user-dropdown-trigger">
+                            <i class="fas fa-user-circle me-2"></i>
+                            <span class="user-name">{{ business_user_name }}</span>
+                            <i class="fas fa-chevron-down ms-2 user-dropdown-arrow"></i>
+                        </div>
+                        <div class="user-dropdown-menu">
+                            <div class="user-dropdown-header">
+                                <div class="user-dropdown-name">{{ business_user_name }}</div>
+                                <div class="user-dropdown-email">{{ business_user_email }}</div>
+                            </div>
+                            <div class="user-dropdown-divider"></div>
+                            {% if current_user and current_user.role in ['admin', 'business_account_admin'] and not current_user.onboarding_completed %}
+                            <a href="{{ url_for('business_auth.onboarding_progress') }}" class="user-dropdown-item">
+                                <i class="fas fa-tasks"></i>
+                                <div class="user-dropdown-item-content">
+                                    <span class="user-dropdown-item-label">{{ _('Setup Progress') }}</span>
+                                    <span class="user-dropdown-item-badge">{{ current_user.get_onboarding_progress_percentage()|int }}%</span>
+                                </div>
+                            </a>
+                            <div class="user-dropdown-divider"></div>
+                            {% endif %}
+                            <a href="{{ url_for('business_auth.logout') }}" class="user-dropdown-item">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>{{ _('Logout') }}</span>
+                            </a>
+                        </div>
+                    </div>
                     {% endif %}
                     
                     <!-- Language toggle - always on the RIGHT -->
