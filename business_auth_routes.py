@@ -4413,9 +4413,9 @@ def upload_transcript(campaign_id):
         if not campaign:
             return jsonify({'error': 'Campaign not found'}), 404
         
-        # Check if campaign is completed or active (transcript analysis allowed)
-        if campaign.status not in ['active', 'completed']:
-            return jsonify({'error': 'Transcript analysis only allowed for active or completed campaigns'}), 400
+        # Check if campaign is active (only active campaigns can receive transcript uploads)
+        if campaign.status != 'active':
+            return jsonify({'error': 'Transcript upload only allowed for active campaigns'}), 400
         
         # Check for uploaded file
         if 'transcript_file' not in request.files:
@@ -4490,6 +4490,7 @@ def upload_transcript(campaign_id):
         logger.info(f"Transcript analysis queued for campaign {campaign_id} by user {user.email}")
         
         return jsonify({
+            'success': True,
             'message': 'Transcript uploaded successfully and queued for analysis',
             'campaign_id': campaign_id,
             'participant_name': participant_name
