@@ -2491,6 +2491,7 @@ def conversational_survey():
                 logger.info(f"✅ Using BUSINESS template for {participant_name}")
                 # Get campaign details including dates and custom_end_message
                 custom_end_message = None
+                campaign_description = None
                 campaign_start_date = None
                 campaign_end_date = None
                 campaign_id = session.get('campaign_id')
@@ -2499,6 +2500,7 @@ def conversational_survey():
                     campaign = Campaign.query.get(campaign_id)
                     if campaign:
                         custom_end_message = campaign.custom_end_message
+                        campaign_description = campaign.description
                         campaign_start_date = campaign.start_date
                         campaign_end_date = campaign.end_date
                 
@@ -2510,6 +2512,7 @@ def conversational_survey():
                                      participant_name=participant_name,
                                      participant_company=verification.get('participant_company'),
                                      campaign_name=campaign_name,
+                                     campaign_description=campaign_description,
                                      campaign_start_date=campaign_start_date,
                                      campaign_end_date=campaign_end_date,
                                      custom_end_message=custom_end_message,
@@ -2519,6 +2522,17 @@ def conversational_survey():
             else:
                 # Demo user - use existing template
                 logger.info("🔴 RETURNING DEMO TEMPLATE NOW (no participant/campaign)")
+                # Get campaign details for demo users too
+                campaign_description = None
+                campaign_end_date = None
+                campaign_id = session.get('campaign_id')
+                if campaign_id:
+                    from models import Campaign
+                    campaign = Campaign.query.get(campaign_id)
+                    if campaign:
+                        campaign_description = campaign.description
+                        campaign_end_date = campaign.end_date
+                
                 return render_template('conversational_survey.html', 
                                      authenticated=verification['authenticated'], 
                                      email=verification['email'], 
@@ -2526,6 +2540,8 @@ def conversational_survey():
                                      participant_name=participant_name,
                                      participant_company=verification.get('participant_company'),
                                      campaign_name=campaign_name,
+                                     campaign_description=campaign_description,
+                                     campaign_end_date=campaign_end_date,
                                      branding=branding_context,
                                      branding_context=branding_context,
                                      is_business_authenticated=False)
