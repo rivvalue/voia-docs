@@ -1,0 +1,678 @@
+[
+  {
+    "english": "Some Text That Definitely Has No Translation",
+    "french": ""
+  },
+  {
+    "english": "This token expires in 24 hours. Keep it secure and don't share it.",
+    "french": ""
+  },
+  {
+    "english": "Campaign-specific performance analytics and survey insights",
+    "french": ""
+  },
+  {
+    "english": "All time feedback collected",
+    "french": ""
+  },
+  {
+    "english": "Recent (30 days)",
+    "french": ""
+  },
+  {
+    "english": "Imminent churn risk (High/Critical)",
+    "french": ""
+  },
+  {
+    "english": "Revenue expansion opportunity",
+    "french": ""
+  },
+  {
+    "english": "Insufficient Data (<2 responses)",
+    "french": ""
+  },
+  {
+    "english": "Net Promoter Score distribution across different participant roles",
+    "french": ""
+  },
+  {
+    "english": "Geographic distribution of customer satisfaction",
+    "french": ""
+  },
+  {
+    "english": "Customer satisfaction across different tier levels",
+    "french": ""
+  },
+  {
+    "english": "Satisfaction Ratings by Segment",
+    "french": ""
+  },
+  {
+    "english": "Average satisfaction scores across all segmentation dimensions",
+    "french": ""
+  },
+  {
+    "english": "Tip: Speak naturally! VOÏA understands conversational responses.",
+    "french": ""
+  },
+  {
+    "english": "Your feedback has been successfully analyzed by VOÏA Intelligence.",
+    "french": ""
+  },
+  {
+    "english": "Experience the full power of Voice of Client Agent for your organization.",
+    "french": ""
+  },
+  {
+    "english": "We use your input to improve our services and client experience",
+    "french": ""
+  },
+  {
+    "english": "High-level overview of key performance indicators across all campaigns",
+    "french": ""
+  },
+  {
+    "english": "Click to view full trends",
+    "french": ""
+  },
+  {
+    "english": "View Trends",
+    "french": ""
+  },
+  {
+    "english": "Please select two campaigns above to view comparison results",
+    "french": ""
+  },
+  {
+    "english": "Analyze and compare campaign-specific performance metrics",
+    "french": ""
+  },
+  {
+    "english": "Companies with High or Critical churn risk level based on AI assessment",
+    "french": ""
+  },
+  {
+    "english": "Companies with High or Critical churn risk level",
+    "french": ""
+  },
+  {
+    "english": "Search company, opportunities, risks...",
+    "french": ""
+  },
+  {
+    "english": "High Potential",
+    "french": ""
+  },
+  {
+    "english": "Low (>20)",
+    "french": ""
+  },
+  {
+    "english": "Medium (-20 to 20)",
+    "french": ""
+  },
+  {
+    "english": "High (≤-20)",
+    "french": ""
+  },
+  {
+    "english": "Search by company name, participant name, or email...",
+    "french": ""
+  },
+  {
+    "english": "Simple steps to experience the power of AI-driven feedback collection.",
+    "french": ""
+  },
+  {
+    "english": "Explore the live insights dashboard, instantly generated from your input",
+    "french": ""
+  },
+  {
+    "english": "All responses are anonymized and used only for demonstration",
+    "french": ""
+  },
+  {
+    "english": "You'll take part in a live simulated campaign, where VO",
+    "french": ""
+  },
+  {
+    "english": "Once the dialogue is complete, VO",
+    "french": ""
+  },
+  {
+    "english": "Vocsa",
+    "french": ""
+  },
+  {
+    "english": "Your account has been suspended. Please contact support for assistance.",
+    "french": ""
+  },
+  {
+    "english": "Your account is currently inactive. Please contact support to reactivate.",
+    "french": ""
+  },
+  {
+    "english": "Please contact support for assistance with your account.",
+    "french": ""
+  },
+  {
+    "english": "Complete your account setup by creating a secure password",
+    "french": ""
+  },
+  {
+    "english": "Business analytics hub with comprehensive platform intelligence",
+    "french": ""
+  },
+  {
+    "english": "Monitor database connection and performance status",
+    "french": ""
+  },
+  {
+    "english": "Create and configure new business accounts with license assignment",
+    "french": ""
+  },
+  {
+    "english": "Cross-tenant license usage, trends, and compliance monitoring",
+    "french": ""
+  },
+  {
+    "english": "Track all activities and changes in your VOÏA account",
+    "french": ""
+  },
+  {
+    "english": "Days Shown",
+    "french": ""
+  },
+  {
+    "english": "Resource",
+    "french": ""
+  },
+  {
+    "english": "No Activity Yet",
+    "french": ""
+  },
+  {
+    "english": "Primary Color",
+    "french": ""
+  },
+  {
+    "english": "Main brand color used for headers, buttons, and accents.",
+    "french": ""
+  },
+  {
+    "english": "Secondary Color",
+    "french": ""
+  },
+  {
+    "english": "Supporting color for borders and subtle elements.",
+    "french": ""
+  },
+  {
+    "english": "Highlight color for success states and call-to-action elements.",
+    "french": ""
+  },
+  {
+    "english": "Text Color",
+    "french": ""
+  },
+  {
+    "english": "Primary text color for readability.",
+    "french": ""
+  },
+  {
+    "english": "Background color for documents and reports.",
+    "french": ""
+  },
+  {
+    "english": "Primary color",
+    "french": ""
+  },
+  {
+    "english": "Secondary color",
+    "french": ""
+  },
+  {
+    "english": "Live preview of your color palette.",
+    "french": ""
+  },
+  {
+    "english": "Upload Logo",
+    "french": ""
+  },
+  {
+    "english": "Supported formats: PNG, JPG, JPEG, GIF, WEBP",
+    "french": ""
+  },
+  {
+    "english": "Maximum file size: 5MB",
+    "french": ""
+  },
+  {
+    "english": "Recommended dimensions: 400x200 pixels or similar ratio",
+    "french": ""
+  },
+  {
+    "english": "Transparent background recommended for PNG files",
+    "french": ""
+  },
+  {
+    "english": "PNG format recommended for logos with transparency",
+    "french": ""
+  },
+  {
+    "english": "Changes will take effect immediately after saving.",
+    "french": ""
+  },
+  {
+    "english": "This will be displayed throughout the platform and in communications",
+    "french": ""
+  },
+  {
+    "english": "Administrator's first name",
+    "french": ""
+  },
+  {
+    "english": "Administrator's last name",
+    "french": ""
+  },
+  {
+    "english": "The administrator will receive an invitation email at this address",
+    "french": ""
+  },
+  {
+    "english": "Choose your email delivery provider",
+    "french": ""
+  },
+  {
+    "english": "smtp.gmail.com",
+    "french": ""
+  },
+  {
+    "english": "AWS SES SMTP server is automatically set based on your region",
+    "french": ""
+  },
+  {
+    "english": "Port *",
+    "french": ""
+  },
+  {
+    "english": "Where replies should be sent (if different from sender)",
+    "french": ""
+  },
+  {
+    "english": "admin@yourcompany.com, manager@yourcompany.com",
+    "french": ""
+  },
+  {
+    "english": "Comma-separated list of email addresses for admin notifications",
+    "french": ""
+  },
+  {
+    "english": "Your feedback is requested: {campaign_name}",
+    "french": ""
+  },
+  {
+    "english": "Preview failed: ' + (data.error || 'Unknown error') + '",
+    "french": ""
+  },
+  {
+    "english": "Network error: ' + error.message + '",
+    "french": ""
+  },
+  {
+    "english": "VOÏA Password Reset",
+    "french": ""
+  },
+  {
+    "english": "Enter your email address and we'll send you a password reset link",
+    "french": ""
+  },
+  {
+    "english": "Password reset request form",
+    "french": ""
+  },
+  {
+    "english": "We'll send a password reset link to this email address",
+    "french": ""
+  },
+  {
+    "english": "License details and usage information for {{ account_data.name }}",
+    "french": ""
+  },
+  {
+    "english": "Never",
+    "french": ""
+  },
+  {
+    "english": "Deactivate User",
+    "french": ""
+  },
+  {
+    "english": "Start building your team by adding the first user.",
+    "french": ""
+  },
+  {
+    "english": "Complete these steps to configure your VOÏA platform",
+    "french": ""
+  },
+  {
+    "english": "Nom",
+    "french": ""
+  },
+  {
+    "english": "Choose a strong password for your account",
+    "french": ""
+  },
+  {
+    "english": "Tell us about your business to personalize the survey conversation",
+    "french": ""
+  },
+  {
+    "english": "This helps tailor survey questions to your industry context",
+    "french": ""
+  },
+  {
+    "english": "Choose how the AI should communicate with your survey participants",
+    "french": ""
+  },
+  {
+    "english": "Briefly describe what your company does and your mission...",
+    "french": ""
+  },
+  {
+    "english": "Product/Service Description",
+    "french": ""
+  },
+  {
+    "english": "Describe your main products or services in detail...",
+    "french": ""
+  },
+  {
+    "english": "Specific product details enable more targeted feedback collection",
+    "french": ""
+  },
+  {
+    "english": "Understanding your audience helps frame questions appropriately",
+    "french": ""
+  },
+  {
+    "english": "What do you want to learn from your survey participants?",
+    "french": ""
+  },
+  {
+    "english": "Primary Survey Goals (select all that apply)",
+    "french": ""
+  },
+  {
+    "english": "Custom Research",
+    "french": ""
+  },
+  {
+    "english": "Absolute limit to keep surveys concise and engaging",
+    "french": ""
+  },
+  {
+    "english": "Time Limit (seconds)",
+    "french": ""
+  },
+  {
+    "english": "1min",
+    "french": ""
+  },
+  {
+    "english": "5min",
+    "french": ""
+  },
+  {
+    "english": "Maximum time participants can spend on the survey",
+    "french": ""
+  },
+  {
+    "english": "Follow-ups per Topic",
+    "french": ""
+  },
+  {
+    "english": "How deep to explore each topic with follow-up questions",
+    "french": ""
+  },
+  {
+    "english": "Prioritized Topics (covered first)",
+    "french": ""
+  },
+  {
+    "english": "These topics will always be covered, in order of importance",
+    "french": ""
+  },
+  {
+    "english": "Optional Topics (if time allows)",
+    "french": ""
+  },
+  {
+    "english": "These topics can be skipped if the time/question limit is reached",
+    "french": ""
+  },
+  {
+    "english": "Personalize the survey experience with custom messages",
+    "french": ""
+  },
+  {
+    "english": "Optional add-on features with custom pricing and duration",
+    "french": ""
+  },
+  {
+    "english": "Custom pricing for this add-on period",
+    "french": ""
+  },
+  {
+    "english": "These notes will be recorded in the license history for audit purposes.",
+    "french": ""
+  },
+  {
+    "english": "Ensure custom limits (for Pro licenses) are reasonable",
+    "french": ""
+  },
+  {
+    "english": "Confirm you have the necessary permissions to assign licenses",
+    "french": ""
+  },
+  {
+    "english": "Monitor and manage all business account licenses across the platform",
+    "french": ""
+  },
+  {
+    "english": "Download license history data for record keeping or analysis.",
+    "french": ""
+  },
+  {
+    "english": "Step %(current)d of %(total)d",
+    "french": ""
+  },
+  {
+    "english": "With your branding:",
+    "french": ""
+  },
+  {
+    "english": "Your logo prominently displayed with \\",
+    "french": ""
+  },
+  {
+    "english": "Without branding:",
+    "french": ""
+  },
+  {
+    "english": "Default VOÏA logo and colors",
+    "french": ""
+  },
+  {
+    "english": "Skip for Now",
+    "french": ""
+  },
+  {
+    "english": "Your organization's email server settings",
+    "french": ""
+  },
+  {
+    "english": "How your name appears to survey recipients",
+    "french": ""
+  },
+  {
+    "english": "Send a test email to verify your SMTP settings are working correctly.",
+    "french": ""
+  },
+  {
+    "english": "Invite campaign managers to help create and manage surveys",
+    "french": ""
+  },
+  {
+    "english": "Can create surveys, manage participants, and view analytics",
+    "french": ""
+  },
+  {
+    "english": "Can view survey results and analytics but cannot create campaigns",
+    "french": ""
+  },
+  {
+    "english": "John",
+    "french": ""
+  },
+  {
+    "english": "An invitation will be sent to this email address",
+    "french": ""
+  },
+  {
+    "english": "Campaign Manager is recommended for most team members",
+    "french": ""
+  },
+  {
+    "english": "Configure your SMTP settings to send survey invitations to participants",
+    "french": ""
+  },
+  {
+    "english": "Launch your first campaign and begin gathering valuable customer insights",
+    "french": ""
+  },
+  {
+    "english": "e.g., Q2 2025 Product Satisfaction Survey",
+    "french": ""
+  },
+  {
+    "english": "Optional description of campaign goals, focus areas, or target audience",
+    "french": ""
+  },
+  {
+    "english": "Reminders are sent only to participants who haven't responded yet",
+    "french": ""
+  },
+  {
+    "english": "This response doesn't contain conversational transcript data.",
+    "french": ""
+  },
+  {
+    "english": "An error occurred while exporting your data.",
+    "french": ""
+  },
+  {
+    "english": "Search participants, companies, or conversation content...",
+    "french": ""
+  },
+  {
+    "english": "Help the AI understand what you offer to ask better questions",
+    "french": ""
+  },
+  {
+    "english": "NPS is recommended for all campaigns to track customer loyalty",
+    "french": ""
+  },
+  {
+    "english": "Max Duration (seconds)",
+    "french": ""
+  },
+  {
+    "english": "Max Follow-ups per Topic",
+    "french": ""
+  },
+  {
+    "english": "Control topic depth exploration",
+    "french": ""
+  },
+  {
+    "english": "Prioritized Topics (cover first)",
+    "french": ""
+  },
+  {
+    "english": "These topics will be covered first and are most important",
+    "french": ""
+  },
+  {
+    "english": "Optional Topics (can be skipped)",
+    "french": ""
+  },
+  {
+    "english": "These topics will be skipped if time/questions run out",
+    "french": ""
+  },
+  {
+    "english": "Optional custom thank you message for survey completion",
+    "french": ""
+  },
+  {
+    "english": "Personalized message shown when participants complete the survey",
+    "french": ""
+  },
+  {
+    "english": "Optional: Override the default AI system prompt with custom instructions",
+    "french": ""
+  },
+  {
+    "english": "Upload meeting transcripts to extract survey insights automatically.",
+    "french": ""
+  },
+  {
+    "english": "Cannot remove participant - campaign is {{ campaign.status }}",
+    "french": ""
+  },
+  {
+    "english": "Use the form above to add participants to this campaign.",
+    "french": ""
+  },
+  {
+    "english": "John Doe",
+    "french": ""
+  },
+  {
+    "english": "Add segmentation data for personalized surveys and advanced analytics",
+    "french": ""
+  },
+  {
+    "english": "T1: Strategic (Top 5–10% clients)",
+    "french": ""
+  },
+  {
+    "english": "Years the participant has been using your product/service (optional)",
+    "french": ""
+  },
+  {
+    "english": "Update segmentation data for personalized surveys and advanced analytics",
+    "french": ""
+  },
+  {
+    "english": "Try adjusting your search terms or clear filters to view all participants.",
+    "french": ""
+  },
+  {
+    "english": "e.g., Manager, Director",
+    "french": ""
+  },
+  {
+    "english": "e.g., English, Spanish",
+    "french": ""
+  },
+  {
+    "english": "Upload multiple participants to {{ business_account.name }} via CSV file",
+    "french": ""
+  },
+  {
+    "english": "System checks CSV format and validates all required columns are present",
+    "french": ""
+  }
+]

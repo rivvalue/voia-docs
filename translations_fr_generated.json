@@ -1,0 +1,654 @@
+[
+  {
+    "english": "Some Text That Definitely Has No Translation",
+    "french": "Un texte qui n'a définitivement aucune traduction"
+  },
+  {
+    "english": "This token expires in 24 hours. Keep it secure and don't share it.",
+    "french": "Ce jeton expire dans 24 heures. Gardez-le sécurisé et ne le partagez pas."
+  },
+  {
+    "english": "Campaign-specific performance analytics and survey insights",
+    "french": "Analytiques de performance et insights spécifiques à la campagne"
+  },
+  {
+    "english": "All time feedback collected",
+    "french": "Tous les retours collectés"
+  },
+  {
+    "english": "Recent (30 days)",
+    "french": "Récent (30 jours)"
+  },
+  {
+    "english": "Imminent churn risk (High/Critical)",
+    "french": "Risque de départ imminent (Élevé/Critique)"
+  },
+  {
+    "english": "Revenue expansion opportunity",
+    "french": "Opportunité d'expansion de revenus"
+  },
+  {
+    "english": "Insufficient Data (<2 responses)",
+    "french": "Données insuffisantes (<2 réponses)"
+  },
+  {
+    "english": "Net Promoter Score distribution across different participant roles",
+    "french": "Distribution du score Net Promoter selon les différents rôles des participants"
+  },
+  {
+    "english": "Geographic distribution of customer satisfaction",
+    "french": "Distribution géographique de la satisfaction client"
+  },
+  {
+    "english": "Customer satisfaction across different tier levels",
+    "french": "Satisfaction client selon les différents niveaux"
+  },
+  {
+    "english": "Satisfaction Ratings by Segment",
+    "french": "Évaluations de satisfaction par segment"
+  },
+  {
+    "english": "Average satisfaction scores across all segmentation dimensions",
+    "french": "Scores de satisfaction moyens selon toutes les dimensions de segmentation"
+  },
+  {
+    "english": "Tip: Speak naturally! VOÏA understands conversational responses.",
+    "french": "Conseil : Parlez naturellement ! VOÏA comprend les réponses conversationnelles."
+  },
+  {
+    "english": "Your feedback has been successfully analyzed by VOÏA Intelligence.",
+    "french": "Vos retours ont été analysés avec succès par VOÏA Intelligence."
+  },
+  {
+    "english": "Experience the full power of Voice of Client Agent for your organization.",
+    "french": "Découvrez toute la puissance de Voice of Client Agent pour votre organisation."
+  },
+  {
+    "english": "We use your input to improve our services and client experience",
+    "french": "Nous utilisons vos retours pour améliorer nos services et l'expérience client"
+  },
+  {
+    "english": "High-level overview of key performance indicators across all campaigns",
+    "french": "Vue d'ensemble des indicateurs clés de performance pour toutes les campagnes"
+  },
+  {
+    "english": "Click to view full trends",
+    "french": "Cliquez pour voir les tendances complètes"
+  },
+  {
+    "english": "View Trends",
+    "french": "Voir les tendances"
+  },
+  {
+    "english": "Please select two campaigns above to view comparison results",
+    "french": "Veuillez sélectionner deux campagnes ci-dessus pour voir les résultats comparatifs"
+  },
+  {
+    "english": "Analyze and compare campaign-specific performance metrics",
+    "french": "Analyser et comparer les métriques de performance par campagne"
+  },
+  {
+    "english": "Companies with High or Critical churn risk level based on AI assessment",
+    "french": "Entreprises avec niveau de risque de départ élevé ou critique selon l'évaluation IA"
+  },
+  {
+    "english": "Companies with High or Critical churn risk level",
+    "french": "Entreprises avec niveau de risque de départ élevé ou critique"
+  },
+  {
+    "english": "Search company, opportunities, risks...",
+    "french": "Rechercher entreprise, opportunités, risques..."
+  },
+  {
+    "english": "High Potential",
+    "french": "Fort potentiel"
+  },
+  {
+    "english": "Low (>20)",
+    "french": "Faible (>20)"
+  },
+  {
+    "english": "Medium (-20 to 20)",
+    "french": "Moyen (-20 à 20)"
+  },
+  {
+    "english": "High (≤-20)",
+    "french": "Élevé (≤-20)"
+  },
+  {
+    "english": "Search by company name, participant name, or email...",
+    "french": "Rechercher par nom d'entreprise, nom de participant ou courriel..."
+  },
+  {
+    "english": "Simple steps to experience the power of AI-driven feedback collection.",
+    "french": "Étapes simples pour découvrir la puissance de la collecte de retours pilotée par IA."
+  },
+  {
+    "english": "Explore the live insights dashboard, instantly generated from your input",
+    "french": "Explorez le tableau de bord des insights en direct, généré instantanément à partir de vos réponses"
+  },
+  {
+    "english": "All responses are anonymized and used only for demonstration",
+    "french": "Toutes les réponses sont anonymisées et utilisées uniquement pour la démonstration"
+  },
+  {
+    "english": "You'll take part in a live simulated campaign, where VO",
+    "french": "Vous participerez à une campagne simulée en direct, où VO"
+  },
+  {
+    "english": "Once the dialogue is complete, VO",
+    "french": "Une fois le dialogue terminé, VO"
+  },
+  {
+    "english": "Vocsa",
+    "french": "Vocsa"
+  },
+  {
+    "english": "Your account has been suspended. Please contact support for assistance.",
+    "french": "Votre compte a été suspendu. Veuillez contacter le support pour assistance."
+  },
+  {
+    "english": "Your account is currently inactive. Please contact support to reactivate.",
+    "french": "Votre compte est actuellement inactif. Veuillez contacter le support pour le réactiver."
+  },
+  {
+    "english": "Please contact support for assistance with your account.",
+    "french": "Veuillez contacter le support pour assistance avec votre compte."
+  },
+  {
+    "english": "Complete your account setup by creating a secure password",
+    "french": "Complétez la configuration de votre compte en créant un mot de passe sécurisé"
+  },
+  {
+    "english": "Business analytics hub with comprehensive platform intelligence",
+    "french": "Centre d'analytiques d'affaires avec intelligence de plateforme complète"
+  },
+  {
+    "english": "Monitor database connection and performance status",
+    "french": "Surveiller la connexion à la base de données et l'état des performances"
+  },
+  {
+    "english": "Create and configure new business accounts with license assignment",
+    "french": "Créer et configurer de nouveaux comptes d'entreprise avec attribution de licences"
+  },
+  {
+    "english": "Cross-tenant license usage, trends, and compliance monitoring",
+    "french": "Utilisation des licences multi-locataires, tendances et surveillance de la conformité"
+  },
+  {
+    "english": "Track all activities and changes in your VOÏA account",
+    "french": "Suivre toutes les activités et changements dans votre compte VOÏA"
+  },
+  {
+    "english": "Days Shown",
+    "french": "Jours affichés"
+  },
+  {
+    "english": "Resource",
+    "french": "Ressource"
+  },
+  {
+    "english": "No Activity Yet",
+    "french": "Aucune activité pour le moment"
+  },
+  {
+    "english": "Primary Color",
+    "french": "Couleur principale"
+  },
+  {
+    "english": "Main brand color used for headers, buttons, and accents.",
+    "french": "Couleur de marque principale utilisée pour les en-têtes, boutons et accents."
+  },
+  {
+    "english": "Secondary Color",
+    "french": "Couleur secondaire"
+  },
+  {
+    "english": "Supporting color for borders and subtle elements.",
+    "french": "Couleur de support pour les bordures et éléments subtils."
+  },
+  {
+    "english": "Highlight color for success states and call-to-action elements.",
+    "french": "Couleur de surbrillance pour les états de succès et éléments d'appel à l'action."
+  },
+  {
+    "english": "Text Color",
+    "french": "Couleur du texte"
+  },
+  {
+    "english": "Primary text color for readability.",
+    "french": "Couleur de texte principale pour la lisibilité."
+  },
+  {
+    "english": "Background color for documents and reports.",
+    "french": "Couleur de fond pour les documents et rapports."
+  },
+  {
+    "english": "Primary color",
+    "french": "Couleur principale"
+  },
+  {
+    "english": "Secondary color",
+    "french": "Couleur secondaire"
+  },
+  {
+    "english": "Live preview of your color palette.",
+    "french": "Aperçu en direct de votre palette de couleurs."
+  },
+  {
+    "english": "Upload Logo",
+    "french": "Téléverser le logo"
+  },
+  {
+    "english": "Supported formats: PNG, JPG, JPEG, GIF, WEBP",
+    "french": "Formats supportés : PNG, JPG, JPEG, GIF, WEBP"
+  },
+  {
+    "english": "Maximum file size: 5MB",
+    "french": "Taille maximale du fichier : 5 Mo"
+  },
+  {
+    "english": "Recommended dimensions: 400x200 pixels or similar ratio",
+    "french": "Dimensions recommandées : 400x200 pixels ou ratio similaire"
+  },
+  {
+    "english": "Transparent background recommended for PNG files",
+    "french": "Fond transparent recommandé pour les fichiers PNG"
+  },
+  {
+    "english": "PNG format recommended for logos with transparency",
+    "french": "Format PNG recommandé pour les logos avec transparence"
+  },
+  {
+    "english": "Changes will take effect immediately after saving.",
+    "french": "Les changements prendront effet immédiatement après la sauvegarde."
+  },
+  {
+    "english": "This will be displayed throughout the platform and in communications",
+    "french": "Ceci sera affiché sur toute la plateforme et dans les communications"
+  },
+  {
+    "english": "Administrator's first name",
+    "french": "Prénom de l'administrateur"
+  },
+  {
+    "english": "Administrator's last name",
+    "french": "Nom de famille de l'administrateur"
+  },
+  {
+    "english": "The administrator will receive an invitation email at this address",
+    "french": "L'administrateur recevra un courriel d'invitation à cette adresse"
+  },
+  {
+    "english": "Choose your email delivery provider",
+    "french": "Choisissez votre fournisseur de livraison de courriels"
+  },
+  {
+    "english": "smtp.gmail.com",
+    "french": "smtp.gmail.com"
+  },
+  {
+    "english": "AWS SES SMTP server is automatically set based on your region",
+    "french": "Le serveur SMTP AWS SES est configuré automatiquement selon votre région"
+  },
+  {
+    "english": "Port *",
+    "french": "Port *"
+  },
+  {
+    "english": "Where replies should be sent (if different from sender)",
+    "french": "Où les réponses doivent être envoyées (si différent de l'expéditeur)"
+  },
+  {
+    "english": "admin@yourcompany.com, manager@yourcompany.com",
+    "french": "admin@votreentreprise.com, gestionnaire@votreentreprise.com"
+  },
+  {
+    "english": "Comma-separated list of email addresses for admin notifications",
+    "french": "Liste d'adresses courriel séparées par des virgules pour les notifications administrateur"
+  },
+  {
+    "english": "Your feedback is requested: {campaign_name}",
+    "french": "Votre retour est demandé : {campaign_name}"
+  },
+  {
+    "english": "Preview failed: ' + (data.error || 'Unknown error') + '",
+    "french": "Échec de l'aperçu : ' + (data.error || 'Erreur inconnue') + '"
+  },
+  {
+    "english": "Network error: ' + error.message + '",
+    "french": "Erreur réseau : ' + error.message + '"
+  },
+  {
+    "english": "VOÏA Password Reset",
+    "french": "Réinitialisation du mot de passe VOÏA"
+  },
+  {
+    "english": "Enter your email address and we'll send you a password reset link",
+    "french": "Entrez votre adresse courriel et nous vous enverrons un lien de réinitialisation de mot de passe"
+  },
+  {
+    "english": "Password reset request form",
+    "french": "Formulaire de demande de réinitialisation de mot de passe"
+  },
+  {
+    "english": "We'll send a password reset link to this email address",
+    "french": "Nous enverrons un lien de réinitialisation de mot de passe à cette adresse courriel"
+  },
+  {
+    "english": "License details and usage information for {{ account_data.name }}",
+    "french": "Détails de la licence et informations d'utilisation pour {{ account_data.name }}"
+  },
+  {
+    "english": "Never",
+    "french": "Jamais"
+  },
+  {
+    "english": "Deactivate User",
+    "french": "Désactiver l'utilisateur"
+  },
+  {
+    "english": "Start building your team by adding the first user.",
+    "french": "Commencez à bâtir votre équipe en ajoutant le premier utilisateur."
+  },
+  {
+    "english": "Complete these steps to configure your VOÏA platform",
+    "french": "Complétez ces étapes pour configurer votre plateforme VOÏA"
+  },
+  {
+    "english": "Nom",
+    "french": "Nom"
+  },
+  {
+    "english": "Choose a strong password for your account",
+    "french": "Choisissez un mot de passe fort pour votre compte"
+  },
+  {
+    "english": "Tell us about your business to personalize the survey conversation",
+    "french": "Parlez-nous de votre entreprise pour personnaliser la conversation du sondage"
+  },
+  {
+    "english": "This helps tailor survey questions to your industry context",
+    "french": "Ceci aide à adapter les questions du sondage à votre contexte industriel"
+  },
+  {
+    "english": "Choose how the AI should communicate with your survey participants",
+    "french": "Choisissez comment l'IA devrait communiquer avec vos participants au sondage"
+  },
+  {
+    "english": "Briefly describe what your company does and your mission...",
+    "french": "Décrivez brièvement ce que fait votre entreprise et votre mission..."
+  },
+  {
+    "english": "Product/Service Description",
+    "french": "Description du produit/service"
+  },
+  {
+    "english": "Describe your main products or services in detail...",
+    "french": "Décrivez vos principaux produits ou services en détail..."
+  },
+  {
+    "english": "Specific product details enable more targeted feedback collection",
+    "french": "Les détails spécifiques du produit permettent une collecte de retours plus ciblée"
+  },
+  {
+    "english": "Understanding your audience helps frame questions appropriately",
+    "french": "Comprendre votre audience aide à formuler les questions de manière appropriée"
+  },
+  {
+    "english": "What do you want to learn from your survey participants?",
+    "french": "Que voulez-vous apprendre de vos participants au sondage ?"
+  },
+  {
+    "english": "Primary Survey Goals (select all that apply)",
+    "french": "Objectifs principaux du sondage (sélectionnez tous ceux qui s'appliquent)"
+  },
+  {
+    "english": "Custom Research",
+    "french": "Recherche personnalisée"
+  },
+  {
+    "english": "Absolute limit to keep surveys concise and engaging",
+    "french": "Limite absolue pour garder les sondages concis et engageants"
+  },
+  {
+    "english": "Time Limit (seconds)",
+    "french": "Limite de temps (secondes)"
+  },
+  {
+    "english": "1min",
+    "french": "1 min"
+  },
+  {
+    "english": "5min",
+    "french": "5 min"
+  },
+  {
+    "english": "Maximum time participants can spend on the survey",
+    "french": "Temps maximum que les participants peuvent consacrer au sondage"
+  },
+  {
+    "english": "Follow-ups per Topic",
+    "french": "Suivis par sujet"
+  },
+  {
+    "english": "How deep to explore each topic with follow-up questions",
+    "french": "À quelle profondeur explorer chaque sujet avec des questions de suivi"
+  },
+  {
+    "english": "Prioritized Topics (covered first)",
+    "french": "Sujets prioritaires (traités en premier)"
+  },
+  {
+    "english": "These topics will always be covered, in order of importance",
+    "french": "Ces sujets seront toujours couverts, par ordre d'importance"
+  },
+  {
+    "english": "Optional Topics (if time allows)",
+    "french": "Sujets optionnels (si le temps le permet)"
+  },
+  {
+    "english": "These topics can be skipped if the time/question limit is reached",
+    "french": "Ces sujets peuvent être sautés si la limite de temps/questions est atteinte"
+  },
+  {
+    "english": "Personalize the survey experience with custom messages",
+    "french": "Personnalisez l'expérience du sondage avec des messages personnalisés"
+  },
+  {
+    "english": "Optional add-on features with custom pricing and duration",
+    "french": "Fonctionnalités additionnelles optionnelles avec tarification et durée personnalisées"
+  },
+  {
+    "english": "Custom pricing for this add-on period",
+    "french": "Tarification personnalisée pour cette période d'extension"
+  },
+  {
+    "english": "These notes will be recorded in the license history for audit purposes.",
+    "french": "Ces notes seront enregistrées dans l'historique de la licence à des fins d'audit."
+  },
+  {
+    "english": "Ensure custom limits (for Pro licenses) are reasonable",
+    "french": "Assurez-vous que les limites personnalisées (pour les licences Pro) sont raisonnables"
+  },
+  {
+    "english": "Confirm you have the necessary permissions to assign licenses",
+    "french": "Confirmez que vous avez les permissions nécessaires pour attribuer des licences"
+  },
+  {
+    "english": "Monitor and manage all business account licenses across the platform",
+    "french": "Surveiller et gérer toutes les licences de comptes d'entreprise sur la plateforme"
+  },
+  {
+    "english": "Download license history data for record keeping or analysis.",
+    "french": "Télécharger les données d'historique des licences pour la tenue de dossiers ou l'analyse."
+  },
+  {
+    "english": "Step %(current)d of %(total)d",
+    "french": "Étape %(current)d sur %(total)d"
+  },
+  {
+    "english": "With your branding:",
+    "french": "Avec votre image de marque :"
+  },
+  {
+    "english": "Your logo prominently displayed with \\",
+    "french": "Votre logo affiché en évidence avec \\"
+  },
+  {
+    "english": "Without branding:",
+    "french": "Sans image de marque :"
+  },
+  {
+    "english": "Default VOÏA logo and colors",
+    "french": "Logo et couleurs VOÏA par défaut"
+  },
+  {
+    "english": "Skip for Now",
+    "french": "Ignorer pour le moment"
+  },
+  {
+    "english": "Your organization's email server settings",
+    "french": "Paramètres du serveur de courriels de votre organisation"
+  },
+  {
+    "english": "How your name appears to survey recipients",
+    "french": "Comment votre nom apparaît aux destinataires du sondage"
+  },
+  {
+    "english": "Send a test email to verify your SMTP settings are working correctly.",
+    "french": "Envoyez un courriel de test pour vérifier que vos paramètres SMTP fonctionnent correctement."
+  },
+  {
+    "english": "Invite campaign managers to help create and manage surveys",
+    "french": "Invitez des gestionnaires de campagne pour aider à créer et gérer les sondages"
+  },
+  {
+    "english": "No expiration",
+    "french": "Sans expiration"
+  },
+  {
+    "english": "Awaiting assignment",
+    "french": "En attente d'attribution"
+  },
+  {
+    "english": "Survey participants who have not yet been assigned to a campaign",
+    "french": "Participants au sondage qui n'ont pas encore été assignés à une campagne"
+  },
+  {
+    "english": "Please select a campaign to add participants",
+    "french": "Veuillez sélectionner une campagne pour ajouter des participants"
+  },
+  {
+    "english": "Invite Participant",
+    "french": "Inviter le participant"
+  },
+  {
+    "english": "View participant's email delivery history and invitation status",
+    "french": "Voir l'historique de livraison des courriels et le statut d'invitation du participant"
+  },
+  {
+    "english": "View participant response history and survey completion status",
+    "french": "Voir l'historique des réponses et le statut de complétion du sondage du participant"
+  },
+  {
+    "english": "Generate a new unique survey access token for this participant",
+    "french": "Générer un nouveau jeton d'accès unique au sondage pour ce participant"
+  },
+  {
+    "english": "Optional field to categorize participants (e.g., Premium, Enterprise)",
+    "french": "Champ optionnel pour catégoriser les participants (ex. : Premium, Entreprise)"
+  },
+  {
+    "english": "Organize participants into groups for reporting (e.g., North America, Europe)",
+    "french": "Organiser les participants en groupes pour les rapports (ex. : Amérique du Nord, Europe)"
+  },
+  {
+    "english": "Categorize by business function or department (e.g., Sales, Engineering)",
+    "french": "Catégoriser par fonction d'affaires ou département (ex. : Ventes, Ingénierie)"
+  },
+  {
+    "english": "How long this participant has been a client (helps analyze feedback trends)",
+    "french": "Depuis combien de temps ce participant est client (aide à analyser les tendances de retours)"
+  },
+  {
+    "english": "Company's actual revenue with your organization (for business intelligence)",
+    "french": "Revenu réel de l'entreprise avec votre organisation (pour intelligence d'affaires)"
+  },
+  {
+    "english": "Add participant to campaign to enable email invitation",
+    "french": "Ajouter le participant à la campagne pour activer l'invitation par courriel"
+  },
+  {
+    "english": "Survey Deadline",
+    "french": "Date limite du sondage"
+  },
+  {
+    "english": "Set a specific deadline for survey completion",
+    "french": "Définir une date limite spécifique pour la complétion du sondage"
+  },
+  {
+    "english": "Reminder Schedule",
+    "french": "Calendrier de rappels"
+  },
+  {
+    "english": "Choose how frequently to send reminder emails",
+    "french": "Choisissez la fréquence d'envoi des courriels de rappel"
+  },
+  {
+    "english": "None (No reminders)",
+    "french": "Aucun (Pas de rappels)"
+  },
+  {
+    "english": "Conservative (Every 7 days)",
+    "french": "Conservateur (Tous les 7 jours)"
+  },
+  {
+    "english": "Moderate (Every 3 days)",
+    "french": "Modéré (Tous les 3 jours)"
+  },
+  {
+    "english": "Aggressive (Daily)",
+    "french": "Agressif (Quotidien)"
+  },
+  {
+    "english": "Reminders are automatically sent to participants who haven't completed the survey",
+    "french": "Les rappels sont automatiquement envoyés aux participants qui n'ont pas complété le sondage"
+  },
+  {
+    "english": "Edit participant",
+    "french": "Modifier le participant"
+  },
+  {
+    "english": "Remove from campaign",
+    "french": "Retirer de la campagne"
+  },
+  {
+    "english": "Individual response analysis with AI-generated insights and detailed participant feedback",
+    "french": "Analyse de réponse individuelle avec insights générés par IA et retours détaillés du participant"
+  },
+  {
+    "english": "Insights Dashboard",
+    "french": "Tableau de bord des insights"
+  },
+  {
+    "english": "Data Export",
+    "french": "Exportation des données"
+  },
+  {
+    "english": "Campaign Analytics",
+    "french": "Analytiques de campagne"
+  },
+  {
+    "english": "NPS by Segment",
+    "french": "NPS par segment"
+  },
+  {
+    "english": "Segmentation Insights",
+    "french": "Insights de segmentation"
+  },
+  {
+    "english": "Configure personalized survey settings for this campaign",
+    "french": "Configurer les paramètres de sondage personnalisés pour cette campagne"
+  }
+]
