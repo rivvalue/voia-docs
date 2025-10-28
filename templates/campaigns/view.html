@@ -299,11 +299,11 @@
                 
                 <div class="participant-summary-actions">
                     <a href="{{ url_for('participants.manage_campaign_participants', campaign_id=campaign.id) }}" 
-                       class="btn btn-primary btn-lg">
+                       class="btn btn-primary">
                         <i class="fas fa-users-cog me-2"></i>Manage Participants
                     </a>
                     <a href="{{ url_for('campaigns.survey_config', campaign_id=campaign.id) }}" 
-                       class="btn btn-outline-secondary">
+                       class="btn btn-secondary">
                         <i class="fas fa-cog me-2"></i>Survey Settings
                         {% if campaign.has_campaign_customization %}
                         <span class="badge bg-success ms-1">
@@ -333,7 +333,7 @@
                             <div class="campaign-actions-content">
                                 <div class="campaign-actions-primary">
                                     <a href="{{ url_for('campaigns.edit_draft_campaign', campaign_id=campaign.id) }}" 
-                                       class="btn btn-primary btn-lg">
+                                       class="btn btn-primary">
                                         <i class="fas fa-edit me-2"></i>Edit Campaign
                                     </a>
                                 </div>
@@ -370,7 +370,7 @@
                                 <div class="campaign-actions-primary">
                                     <form method="POST" action="{{ url_for('campaigns.activate_campaign', campaign_id=campaign.id) }}">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button type="submit" class="btn btn-primary btn-lg"
+                                        <button type="submit" class="btn btn-primary"
                                                 onclick="return confirm('Activate this campaign? Participants will be notified and the campaign will begin collecting responses.');">
                                             <i class="fas fa-play me-2"></i>Activate Campaign
                                         </button>
@@ -395,7 +395,7 @@
                                     <div class="campaign-actions-primary">
                                         <form method="POST" action="{{ url_for('campaigns.send_bulk_invitations', campaign_id=campaign.id) }}">
                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                            <button type="submit" class="btn btn-primary btn-lg"
+                                            <button type="submit" class="btn btn-primary"
                                                     onclick="return confirm('Send email invitations to all participants who have not been invited yet?');">
                                                 <i class="fas fa-envelope me-2"></i>Send Invitations
                                             </button>
@@ -405,7 +405,7 @@
                                     <div class="campaign-actions-secondary">
                                         <form method="POST" action="{{ url_for('campaigns.complete_campaign', campaign_id=campaign.id) }}" class="d-inline">
                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                            <button type="submit" class="btn btn-outline-secondary"
+                                            <button type="submit" class="btn btn-secondary"
                                                     onclick="return confirm('Complete this campaign early? This will stop response collection and mark the campaign as finished.');">
                                                 <i class="fas fa-stop me-2"></i>Complete Campaign
                                             </button>
