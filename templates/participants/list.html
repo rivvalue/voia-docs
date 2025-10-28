@@ -499,7 +499,7 @@
                         <div class="empty-state-icon">
                             <i class="fas fa-users"></i>
                         </div>
-                        <h3>{{ _('No participants {% if search_query %}match your search{% else %}yet{% endif %}') }}</h3>
+                        <h3>{% if search_query %}{{ _('No participants match your search') }}{% else %}{{ _('No participants yet') }}{% endif %}</h3>
                         {% if search_query %}
                         <p>{{ _('Try adjusting your search terms or clear filters to view all participants.') }}</p>
                         {% else %}
