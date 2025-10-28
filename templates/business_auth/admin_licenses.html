@@ -166,6 +166,14 @@
                                    class="btn btn-sm btn-outline-info" title={{ _('View History') }}>
                                     <i class="fas fa-history"></i>
                                 </a>
+                                {% if account.get('has_unactivated_admin') %}
+                                <form method="POST" action="{{ url_for('business_auth.resend_business_account_invitation', user_id=account.get('unactivated_admin_id')) }}" style="display: inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <button type="submit" class="btn btn-sm btn-outline-warning" title="Resend Activation Email to {{ account.get('unactivated_admin_email') }}">
+                                        <i class="fas fa-envelope"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
                             </div>
                         </td>
                     </tr>

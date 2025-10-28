@@ -3611,6 +3611,13 @@ def admin_licenses():
             account = data['account']
             license_info = data['license_info']
             
+            # Check if there's an unactivated admin user
+            unactivated_admin = BusinessAccountUser.query.filter_by(
+                business_account_id=account.id,
+                is_admin=True,
+                email_verified=False
+            ).first()
+            
             account_data = {
                 'id': account.id,
                 'name': account.name,
@@ -3628,7 +3635,10 @@ def admin_licenses():
                 'expires_soon': license_info.get('expires_soon', False),
                 'days_remaining': license_info.get('days_remaining', 0),
                 'total_respondents': license_info.get('total_respondents', 0),
-                'total_invitations': license_info.get('total_invitations', 0)
+                'total_invitations': license_info.get('total_invitations', 0),
+                'has_unactivated_admin': unactivated_admin is not None,
+                'unactivated_admin_id': unactivated_admin.id if unactivated_admin else None,
+                'unactivated_admin_email': unactivated_admin.email if unactivated_admin else None
             }
             licenses_data.append(account_data)
         
