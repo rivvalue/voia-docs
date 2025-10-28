@@ -1499,7 +1499,7 @@ class BusinessAccountUser(UserMixin, db.Model):
     # Onboarding flow (Phase 3: Mandatory Setup for Core/Plus licenses)
     onboarding_progress = db.Column(db.JSON, nullable=True, default=dict)
     onboarding_completed = db.Column(db.Boolean, nullable=False, default=False, index=True)
-    onboarding_version = db.Column(db.String(20), nullable=True, default='1.0')
+    onboarding_version = db.Column(db.Integer, nullable=True, default=1)
     onboarding_completed_at = db.Column(db.DateTime, nullable=True, index=True)
     
     # Timestamps
@@ -1735,7 +1735,7 @@ class BusinessAccountUser(UserMixin, db.Model):
         """Initialize onboarding progress for user"""
         if not self.onboarding_progress:
             self.onboarding_progress = self._get_default_onboarding_progress()
-            self.onboarding_version = "1.0"
+            self.onboarding_version = 1
     
     def complete_onboarding_step(self, step_name):
         """Mark an onboarding step as completed"""
