@@ -3942,9 +3942,9 @@ def license_dashboard():
         # Pass user context to template
         is_platform_admin = current_user.is_platform_admin() if current_user else False
         
-        # Get overall statistics with error handling
+        # Get overall statistics with error handling (exclude platform owner ID 10)
         try:
-            total_accounts = BusinessAccount.query.count()
+            total_accounts = BusinessAccount.query.filter(BusinessAccount.id != 10).count()
             if total_accounts < 0:
                 total_accounts = 0
         except Exception as count_error:
@@ -3964,7 +3964,7 @@ def license_dashboard():
         
         # Process customer business accounts only (exclude platform owner accounts)
         try:
-            business_accounts = BusinessAccount.query.filter(BusinessAccount.account_type != 'demo').all()
+            business_accounts = BusinessAccount.query.filter(BusinessAccount.id != 10).all()
         except Exception as query_error:
             logger.error(f"Error querying business accounts: {query_error}")
             business_accounts = []
@@ -4007,13 +4007,8 @@ def license_dashboard():
                     license_status = license_info.get('license_status', 'trial')
                     
                     # Validate license type and status values
-                    valid_license_types = ['core', 'plus', 'pro', 'trial', 'platform_admin']
+                    valid_license_types = ['core', 'plus', 'pro', 'trial']
                     valid_license_statuses = ['active', 'expired', 'trial', 'suspended', 'unlimited']
-                    
-                    # Skip platform_admin accounts from statistics (they're not real customer accounts)
-                    if license_type == 'platform_admin':
-                        accounts_processed -= 1  # Don't count platform admin in statistics
-                        continue
                     
                     if license_type not in valid_license_types:
                         logger.warning(f"Invalid license_type '{license_type}' for account {account.id}")
