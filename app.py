@@ -93,14 +93,24 @@ app.config['BABEL_SUPPORTED_LOCALES'] = ['en', 'fr']
 app.config['BABEL_TRANSLATION_DIRECTORIES'] = 'translations'
 
 def get_locale():
-    """Determine the best locale to use for this request"""
+    """Determine the best locale to use for this request with fallback protection"""
+    supported_locales = app.config.get('BABEL_SUPPORTED_LOCALES', ['en', 'fr'])
+    default_locale = app.config.get('BABEL_DEFAULT_LOCALE', 'en')
+    
     # 1. Check if user explicitly selected a language (stored in session)
     if 'language' in session:
-        return session['language']
+        session_lang = session['language']
+        # Validate session language is supported, otherwise fall back to default
+        if session_lang in supported_locales:
+            return session_lang
+        else:
+            # Invalid/tampered session value - fall back to default
+            logger.warning(f"Invalid session language '{session_lang}', falling back to '{default_locale}'")
+            return default_locale
     
     # 2. Try to guess the language from the user accept header
-    # For French market, we could default to 'fr' if preferred
-    return request.accept_languages.best_match(['en', 'fr']) or 'en'
+    best_match = request.accept_languages.best_match(supported_locales)
+    return best_match if best_match else default_locale
 
 # Initialize Babel
 babel = Babel(app, locale_selector=get_locale)
