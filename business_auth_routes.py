@@ -135,12 +135,11 @@ def require_business_auth(f):
                 current_user.initialize_onboarding()
                 db.session.commit()
             
-            # Redirect to current onboarding step
-            current_step = current_user.get_current_onboarding_step()
+            # Redirect to onboarding progress dashboard (self-assessment hub)
             if request.is_json:
-                return jsonify({'error': 'Onboarding required', 'redirect': url_for('business_auth.onboarding_step', step=current_step)}), 412
+                return jsonify({'error': 'Onboarding required', 'redirect': url_for('business_auth.onboarding_progress')}), 412
             
-            return redirect(url_for('business_auth.onboarding_step', step=current_step))
+            return redirect(url_for('business_auth.onboarding_progress'))
         
         return f(*args, **kwargs)
     
