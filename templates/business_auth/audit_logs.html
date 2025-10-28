@@ -25,19 +25,19 @@
     <div class="audit-stats-grid">
         <div class="audit-stat-card">
             <div class="audit-stat-number">{{ audit_stats.total_actions or 0 }}</div>
-            <div class="audit-stat-label">{{ _('Total Activities') }}</div>
+            <div class="audit-stat-label">Total Activities</div>
         </div>
         <div class="audit-stat-card">
             <div class="audit-stat-number">{{ audit_stats.action_counts.keys()|length or 0 }}</div>
-            <div class="audit-stat-label">{{ _('Activity Types') }}</div>
+            <div class="audit-stat-label">Activity Types</div>
         </div>
         <div class="audit-stat-card">
             <div class="audit-stat-number">{{ audit_stats.user_counts.keys()|length or 0 }}</div>
-            <div class="audit-stat-label">{{ _('Active Users') }}</div>
+            <div class="audit-stat-label">Active Users</div>
         </div>
         <div class="audit-stat-card">
             <div class="audit-stat-number">{{ audit_stats.date_range_days or 30 }}</div>
-            <div class="audit-stat-label">{{ _('Days Shown') }}</div>
+            <div class="audit-stat-label">Days Shown</div>
         </div>
     </div>
 
@@ -46,7 +46,7 @@
         <form method="GET" class="audit-filters-grid">
             <div class="audit-filter-group">
                 <label for="action_type">{{ _('Activity Type') }}</label>
-                <select id="action_type" name="action_type" class="form-select" aria-label={{ _('Filter by activity type') }}>
+                <select id="action_type" name="action_type" class="form-select" aria-label="Filter by activity type">
                     <option value="">All Activities</option>
                     {% for action in available_actions %}
                         <option value="{{ action }}" 
@@ -59,7 +59,7 @@
             
             <div class="audit-filter-group">
                 <label for="user_email">{{ _('User') }}</label>
-                <select id="user_email" name="user_email" class="form-select" aria-label={{ _('Filter by user') }}>
+                <select id="user_email" name="user_email" class="form-select" aria-label="Filter by user">
                     <option value="">All Users</option>
                     {% for user in available_users %}
                         <option value="{{ user }}" 
@@ -72,7 +72,7 @@
             
             <div class="audit-filter-group">
                 <label for="days_back">{{ _('Time Period') }}</label>
-                <select id="days_back" name="days_back" class="form-select" aria-label={{ _('Filter by time period') }}>
+                <select id="days_back" name="days_back" class="form-select" aria-label="Filter by time period">
                     <option value="7" {% if current_filters.days_back == 7 %}selected{% endif %}>Last 7 days</option>
                     <option value="30" {% if current_filters.days_back == 30 %}selected{% endif %}>Last 30 days</option>
                     <option value="90" {% if current_filters.days_back == 90 %}selected{% endif %}>Last 90 days</option>
@@ -81,7 +81,7 @@
             </div>
             
             <div class="audit-filter-group">
-                <button type="submit" class="audit-filter-btn" aria-label={{ _('Apply filters') }}>
+                <button type="submit" class="audit-filter-btn" aria-label="Apply filters">
                     <i class="fas fa-filter" aria-hidden="true"></i>
                     Apply Filters
                 </button>
@@ -93,7 +93,7 @@
     <div class="audit-table-container">
         {% if audit_logs %}
             <div class="audit-table-wrapper">
-                <table class="audit-table" role="table" aria-label={{ _('Audit logs table') }}>
+                <table class="audit-table" role="table" aria-label="Audit logs table">
                     <thead>
                         <tr>
                             <th scope="col">{{ _('Time') }}</th>
@@ -166,11 +166,11 @@
 
     <!-- Pagination -->
     {% if pagination.has_prev or pagination.has_next %}
-    <div class="audit-pagination" role="navigation" aria-label={{ _('Pagination') }}>
+    <div class="audit-pagination" role="navigation" aria-label="Pagination">
         {% if pagination.has_prev %}
             <a href="?page={{ pagination.prev_page }}&action_type={{ current_filters.action_type }}&user_email={{ current_filters.user_email }}&days_back={{ current_filters.days_back }}" 
                class="audit-pagination-btn"
-               aria-label={{ _('Go to previous page') }}>
+               aria-label="Go to previous page">
                 <i class="fas fa-chevron-left" aria-hidden="true"></i>
                 Previous
             </a>
@@ -186,7 +186,7 @@
         {% if pagination.has_next %}
             <a href="?page={{ pagination.next_page }}&action_type={{ current_filters.action_type }}&user_email={{ current_filters.user_email }}&days_back={{ current_filters.days_back }}" 
                class="audit-pagination-btn"
-               aria-label={{ _('Go to next page') }}>
+               aria-label="Go to next page">
                 Next
                 <i class="fas fa-chevron-right" aria-hidden="true"></i>
             </a>

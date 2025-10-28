@@ -68,7 +68,7 @@
                             <option value="smtp" {{ 'selected' if not email_config or email_config.email_provider == 'smtp' else '' }}>Standard SMTP</option>
                             <option value="aws_ses" {{ 'selected' if email_config and email_config.email_provider == 'aws_ses' else '' }}>AWS SES</option>
                         </select>
-                        <div class="email-help-text" id="email_provider_help">{{ _('Choose your email delivery provider') }}</div>
+                        <div class="email-help-text" id="email_provider_help">Choose your email delivery provider</div>
                     </div>
                 </div>
                 

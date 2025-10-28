@@ -321,7 +321,7 @@
                     <span class="data-value">{{ response.respondent_email or 'No email' }}</span>
                 </div>
                 <div class="data-item">
-                    <span class="data-label">{{ _('Company:') }}</span>
+                    <span class="data-label">Company:</span>
                     <span class="data-value">{{ response.company_name or 'Unknown' }}</span>
                 </div>
                 <div class="data-item">
@@ -336,7 +336,7 @@
                     <i class="fas fa-star"></i>Ratings & Scores
                 </h3>
                 <div class="data-item">
-                    <span class="data-label">{{ _('NPS Score:') }}</span>
+                    <span class="data-label">NPS Score:</span>
                     <span class="nps-score nps-{{ response.nps_category.lower() if response.nps_category else 'unknown' }}">
                         {{ response.nps_score if response.nps_score is not none else 'N/A' }}
                     </span>
@@ -349,19 +349,19 @@
                 {% endif %}
                 {% if response.product_value_rating %}
                 <div class="data-item">
-                    <span class="data-label">{{ _('Product Value:') }}</span>
+                    <span class="data-label">Product Value:</span>
                     <span class="data-value">{{ response.product_value_rating }}/5</span>
                 </div>
                 {% endif %}
                 {% if response.service_rating %}
                 <div class="data-item">
-                    <span class="data-label">{{ _('Service Quality:') }}</span>
+                    <span class="data-label">Service Quality:</span>
                     <span class="data-value">{{ response.service_rating }}/5</span>
                 </div>
                 {% endif %}
                 {% if response.pricing_rating %}
                 <div class="data-item">
-                    <span class="data-label">{{ _('Pricing:') }}</span>
+                    <span class="data-label">Pricing:</span>
                     <span class="data-value">{{ response.pricing_rating }}/5</span>
                 </div>
                 {% endif %}
@@ -374,7 +374,7 @@
                 </h3>
                 {% if response.sentiment_label %}
                 <div class="data-item">
-                    <span class="data-label">{{ _('Sentiment:') }}</span>
+                    <span class="data-label">Sentiment:</span>
                     <span class="sentiment-indicator sentiment-{{ response.sentiment_label.lower() if response.sentiment_label else 'neutral' }}">
                         {% if response.sentiment_label.lower() == 'positive' %}
                             <i class="fas fa-smile"></i>
@@ -391,7 +391,7 @@
                 
                 {% if response.churn_risk_level %}
                 <div class="data-item">
-                    <span class="data-label">{{ _('Churn Risk:') }}</span>
+                    <span class="data-label">Churn Risk:</span>
                     <span class="data-value">{{ response.churn_risk_level }} 
                         {% if response.churn_risk_score %}({{ "%.1f"|format(response.churn_risk_score * 10) }}%){% endif %}
                     </span>
@@ -400,7 +400,7 @@
 
                 {% if response.key_themes %}
                 <div class="mb-3">
-                    <span class="data-label d-block mb-2">{{ _('Key Themes:') }}</span>
+                    <span class="data-label d-block mb-2">Key Themes:</span>
                     <div class="themes-list">
                         {% for theme in response.key_themes %}
                         <span class="theme-tag">{{ theme }}</span>
@@ -416,7 +416,7 @@
                     <i class="fas fa-info-circle"></i>Response Metadata
                 </h3>
                 <div class="data-item">
-                    <span class="data-label">{{ _('Submitted:') }}</span>
+                    <span class="data-label">Submitted:</span>
                     <span class="data-value">
                         {% if response.updated_at %}
                             {% set display_date = response.updated_at[:10] if response.updated_at else 'N/A' %}
@@ -432,12 +432,12 @@
                     </span>
                 </div>
                 <div class="data-item">
-                    <span class="data-label">{{ _('Campaign:') }}</span>
+                    <span class="data-label">Campaign:</span>
                     <span class="data-value">{{ campaign.name }}</span>
                 </div>
                 {% if response.commercial_value %}
                 <div class="data-item">
-                    <span class="data-label">{{ _('Commercial Value:') }}</span>
+                    <span class="data-label">Commercial Value:</span>
                     <span class="data-value">${{ "{:,.0f}".format(response.commercial_value) }}</span>
                 </div>
                 {% endif %}
@@ -451,19 +451,19 @@
                 </h3>
                 {% if response.improvement_feedback %}
                 <div class="mb-2">
-                    <span class="data-label d-block">{{ _('Improvement Feedback:') }}</span>
+                    <span class="data-label d-block">Improvement Feedback:</span>
                     <p class="text-muted">{{ response.improvement_feedback }}</p>
                 </div>
                 {% endif %}
                 {% if response.recommendation_reason %}
                 <div class="mb-2">
-                    <span class="data-label d-block">{{ _('Recommendation Reason:') }}</span>
+                    <span class="data-label d-block">Recommendation Reason:</span>
                     <p class="text-muted">{{ response.recommendation_reason }}</p>
                 </div>
                 {% endif %}
                 {% if response.additional_comments %}
                 <div class="mb-2">
-                    <span class="data-label d-block">{{ _('Additional Comments:') }}</span>
+                    <span class="data-label d-block">Additional Comments:</span>
                     <p class="text-muted">{{ response.additional_comments }}</p>
                 </div>
                 {% endif %}

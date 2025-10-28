@@ -472,7 +472,7 @@
                                         </small>
                                     </td>
                                     <td data-label="Actions" class="text-end">
-                                        <div class="btn-group btn-group-sm" role="group" aria-label={{ _('Participant actions') }}>
+                                        <div class="btn-group btn-group-sm" role="group" aria-label="Participant actions">
                                             <a href="{{ url_for('participants.edit_participant', participant_id=participant.id) }}" 
                                                class="btn btn-outline-primary"
                                                title={{ _('Edit participant') }}
@@ -833,11 +833,11 @@ function updateParticipantTable(participants, pagination) {
                     <small class="text-muted">${createdDate}</small>
                 </td>
                 <td data-label="Actions" class="text-end">
-                    <div class="btn-group btn-group-sm" role="group" aria-label={{ _('Participant actions') }}>
+                    <div class="btn-group btn-group-sm" role="group" aria-label="Participant actions">
                         <a href="/business/participants/${p.id}/edit" 
                            class="btn btn-outline-primary"
                            title={{ _('Edit participant') }}
-                           aria-label={{ _('Edit ${p.name}') }}>
+                           aria-label="Edit ${p.name}">
                             <i class="fas fa-edit"></i>
                         </a>
                         <button type="button" 
@@ -845,7 +845,7 @@ function updateParticipantTable(participants, pagination) {
                                 data-participant-id="${p.id}"
                                 data-participant-name="${p.name}"
                                 title={{ _('Delete participant') }}
-                                aria-label={{ _('Delete ${p.name}') }}>
+                                aria-label="Delete ${p.name}">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -904,11 +904,11 @@ function updatePagination(pagination) {
         return;
     }
     
-    let html = '<nav aria-label={{ _('Participant pagination') }}><ul class="pagination justify-content-center mb-0">';
+    let html = '<nav aria-label="Participant pagination"><ul class="pagination justify-content-center mb-0">';
     
     // Previous button
     html += `<li class="page-item ${!pagination.has_prev ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="if(${pagination.has_prev}) { applyFilters(${pagination.prev_page}); return false; }" aria-label={{ _('Previous') }}>
+                <a class="page-link" href="#" onclick="if(${pagination.has_prev}) { applyFilters(${pagination.prev_page}); return false; }" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
              </li>`;
@@ -925,7 +925,7 @@ function updatePagination(pagination) {
     
     // Next button
     html += `<li class="page-item ${!pagination.has_next ? 'disabled' : ''}">
-                <a class="page-link" href="#" onclick="if(${pagination.has_next}) { applyFilters(${pagination.next_page}); return false; }" aria-label={{ _('Next') }}>
+                <a class="page-link" href="#" onclick="if(${pagination.has_next}) { applyFilters(${pagination.next_page}); return false; }" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
              </li>`;

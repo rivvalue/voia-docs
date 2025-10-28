@@ -336,13 +336,13 @@
                             <label for="transcript_start_date" class="form-label">{{ _('Start Date') }}</label>
                             <input type="date" class="form-control" id="transcript_start_date" name="transcript_start_date" 
                                    value="{{ current_license.transcript_analysis_start_date.strftime('%Y-%m-%d') if current_license and current_license.transcript_analysis_start_date else '' }}">
-                            <div class="form-text">{{ _('When transcript analysis access begins') }}</div>
+                            <div class="form-text">When transcript analysis access begins</div>
                         </div>
                         <div class="col-md-6">
                             <label for="transcript_end_date" class="form-label">{{ _('End Date') }}</label>
                             <input type="date" class="form-control" id="transcript_end_date" name="transcript_end_date" 
                                    value="{{ current_license.transcript_analysis_end_date.strftime('%Y-%m-%d') if current_license and current_license.transcript_analysis_end_date else '' }}">
-                            <div class="form-text">{{ _('When transcript analysis access expires') }}</div>
+                            <div class="form-text">When transcript analysis access expires</div>
                         </div>
                         <div class="col-md-6">
                             <label for="transcript_price" class="form-label">{{ _('Add-on Price (USD)') }}</label>
@@ -352,7 +352,7 @@
                                        min="0" step="0.01" placeholder="0.00"
                                        value="{{ '%.2f'|format(current_license.transcript_analysis_price|float) if current_license and current_license.transcript_analysis_price else '' }}">
                             </div>
-                            <div class="form-text">{{ _('Custom pricing for this add-on period') }}</div>
+                            <div class="form-text">Custom pricing for this add-on period</div>
                         </div>
                     </div>
                     <div class="alert alert-info mt-3 mb-0">

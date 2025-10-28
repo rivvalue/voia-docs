@@ -29,7 +29,7 @@
             {% for category, message in messages %}
                 <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert" aria-live="assertive">
                     {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label={{ _('Close') }}></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             {% endfor %}
         {% endif %}
@@ -46,7 +46,7 @@
         </div>
         <div class="users-limit-progress">
             {% set usage_percent = (users_count / license_info.users_limit * 100) if license_info.users_limit > 0 else 0 %}
-            <div class="users-progress-bar-container" role="progressbar" aria-valuenow="{{ usage_percent }}" aria-valuemin="0" aria-valuemax="100" aria-label={{ _('User limit usage') }}>
+            <div class="users-progress-bar-container" role="progressbar" aria-valuenow="{{ usage_percent }}" aria-valuemin="0" aria-valuemax="100" aria-label="User limit usage">
                 <div class="users-progress-fill {{ 'low' if usage_percent < 60 else 'medium' if usage_percent < 90 else 'high' }}" 
                      style="width: {{ usage_percent }}%"></div>
             </div>
@@ -57,7 +57,7 @@
                     class="users-btn-add" 
                     data-bs-toggle="modal" 
                     data-bs-target="#addUserModal"
-                    aria-label={{ _('Add new user') }}>
+                    aria-label="Add new user">
                 <i class="fas fa-plus" aria-hidden="true"></i>
                 Add User
             </button>
@@ -65,7 +65,7 @@
             <button type="button" 
                     class="users-btn-add" 
                     disabled 
-                    aria-label={{ _('Add user button disabled - license limit reached') }}
+                    aria-label="Add user button disabled - license limit reached"
                     title={{ _('License limit reached') }}>
                 <i class="fas fa-ban" aria-hidden="true"></i>
                 Limit Reached
@@ -117,13 +117,13 @@
                     <td>
                         {% set role_class = 'platform-admin' if user.role == 'platform_admin' else 'admin' if user.role in ['business_account_admin', 'admin'] else 'user' %}
                         {% set role_icon = 'fa-star' if user.role == 'platform_admin' else 'fa-crown' if user.role in ['business_account_admin', 'admin'] else 'fa-user' %}
-                        <span class="users-role-badge {{ role_class }}" role="status" aria-label={{ _('User role') }}>
+                        <span class="users-role-badge {{ role_class }}" role="status" aria-label="User role">
                             <i class="fas {{ role_icon }}" aria-hidden="true"></i>
                             {{ user.role.replace('_', ' ')|title }}
                         </span>
                     </td>
                     <td>
-                        <span class="users-status-badge {{ 'active' if user.is_active_user else 'inactive' }}" role="status" aria-label={{ _('User status') }}>
+                        <span class="users-status-badge {{ 'active' if user.is_active_user else 'inactive' }}" role="status" aria-label="User status">
                             <i class="fas {{ 'fa-check-circle' if user.is_active_user else 'fa-times-circle' }}" aria-hidden="true"></i>
                             {{ 'Active' if user.is_active_user else 'Inactive' }}
                         </span>
@@ -208,13 +208,13 @@
                     <h5 class="modal-title" id="addUserModalLabel">
                         <i class="fas fa-user-plus me-2" aria-hidden="true"></i>Add New User
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label={{ _('Close') }}></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="first_name" class="form-label">First Name <span class="text-danger" aria-label={{ _('required') }}>*</span></label>
+                                <label for="first_name" class="form-label">First Name <span class="text-danger" aria-label="required">*</span></label>
                                 <input type="text" 
                                        class="form-control" 
                                        id="first_name" 
@@ -226,7 +226,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="last_name" class="form-label">Last Name <span class="text-danger" aria-label={{ _('required') }}>*</span></label>
+                                <label for="last_name" class="form-label">Last Name <span class="text-danger" aria-label="required">*</span></label>
                                 <input type="text" 
                                        class="form-control" 
                                        id="last_name" 
@@ -239,7 +239,7 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="email" class="form-label">{{ _('Email Address') }} <span class="text-danger" aria-label={{ _('required') }}>*</span></label>
+                        <label for="email" class="form-label">{{ _('Email Address') }} <span class="text-danger" aria-label="required">*</span></label>
                         <input type="email" 
                                class="form-control" 
                                id="email" 
@@ -249,7 +249,7 @@
                                placeholder={{ _('user@company.com') }}
                                aria-required="true"
                                aria-describedby="email_help">
-                        <div class="form-text" id="email_help">{{ _('The user will receive an invitation email to activate their account.') }}</div>
+                        <div class="form-text" id="email_help">The user will receive an invitation email to activate their account.</div>
                     </div>
                     
                     <div class="mb-3">
@@ -272,7 +272,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
-                    <button type="submit" class="btn btn-primary" aria-label={{ _('Confirm add user') }}>
+                    <button type="submit" class="btn btn-primary" aria-label="Confirm add user">
                         <i class="fas fa-plus me-2" aria-hidden="true"></i>Add User
                     </button>
                 </div>
@@ -291,13 +291,13 @@
                     <h5 class="modal-title" id="editUserModalLabel">
                         <i class="fas fa-edit me-2" aria-hidden="true"></i>Edit User
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label={{ _('Close') }}></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="edit_first_name" class="form-label">First Name <span class="text-danger" aria-label={{ _('required') }}>*</span></label>
+                                <label for="edit_first_name" class="form-label">First Name <span class="text-danger" aria-label="required">*</span></label>
                                 <input type="text" 
                                        class="form-control" 
                                        id="edit_first_name" 
@@ -309,7 +309,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="edit_last_name" class="form-label">Last Name <span class="text-danger" aria-label={{ _('required') }}>*</span></label>
+                                <label for="edit_last_name" class="form-label">Last Name <span class="text-danger" aria-label="required">*</span></label>
                                 <input type="text" 
                                        class="form-control" 
                                        id="edit_last_name" 
@@ -322,7 +322,7 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="edit_email" class="form-label">{{ _('Email Address') }} <span class="text-danger" aria-label={{ _('required') }}>*</span></label>
+                        <label for="edit_email" class="form-label">{{ _('Email Address') }} <span class="text-danger" aria-label="required">*</span></label>
                         <input type="email" 
                                class="form-control" 
                                id="edit_email" 
@@ -347,7 +347,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
-                    <button type="submit" class="btn btn-primary" aria-label={{ _('Save changes') }}>
+                    <button type="submit" class="btn btn-primary" aria-label="Save changes">
                         <i class="fas fa-save me-2" aria-hidden="true"></i>Save Changes
                     </button>
                 </div>
