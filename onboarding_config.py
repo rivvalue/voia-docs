@@ -43,6 +43,15 @@ class OnboardingFlowManager:
             template='onboarding/smtp.html',
             required=True,
             validation_method='validate_smtp_configuration',
+            next_step='brand'
+        ),
+        'brand': OnboardingStep(
+            step_id='brand',
+            name='Brand Configuration',
+            description='Customize your logo and brand colors (optional)',
+            template='onboarding/brand.html',
+            required=False,
+            validation_method='validate_brand_configuration',
             next_step='users'
         ),
         'users': OnboardingStep(
@@ -66,12 +75,12 @@ class OnboardingFlowManager:
     # License-specific flow configurations
     ONBOARDING_FLOWS = {
         'core': {
-            'steps': ['welcome', 'smtp', 'users', 'complete'],
+            'steps': ['welcome', 'smtp', 'brand', 'users', 'complete'],
             'mandatory': True,
             'description': 'Essential setup for Core license holders'
         },
         'plus': {
-            'steps': ['welcome', 'smtp', 'users', 'complete'],
+            'steps': ['welcome', 'smtp', 'brand', 'users', 'complete'],
             'mandatory': True,
             'description': 'Enhanced setup for Plus license holders'
         },
@@ -81,7 +90,7 @@ class OnboardingFlowManager:
             'description': 'Pro license holders have optional onboarding'
         },
         'trial': {
-            'steps': ['welcome', 'smtp', 'users', 'complete'],
+            'steps': ['welcome', 'smtp', 'brand', 'users', 'complete'],
             'mandatory': True,
             'description': 'Trial setup to explore VOÏA features'
         }
@@ -241,6 +250,25 @@ class OnboardingValidation:
         except Exception as e:
             logger.error(f"SMTP validation error: {e}")
             return False, "Failed to validate SMTP configuration"
+    
+    @staticmethod
+    def validate_brand_configuration(user, form_data):
+        """Validate brand configuration step - optional/skippable"""
+        try:
+            # Check if user wants to skip
+            if form_data.get('skip_brand'):
+                return True, "Brand configuration skipped"
+            
+            # Check if user self-confirmed completion
+            if form_data.get('brand_confirmed'):
+                return True, "Brand configuration confirmed"
+            
+            # No strict validation - this step is optional
+            return True, "Brand configuration step completed"
+            
+        except Exception as e:
+            logger.error(f"Brand validation error: {e}")
+            return True, "Brand configuration step completed (with errors)"
     
     @staticmethod
     def validate_user_creation(user, form_data):
