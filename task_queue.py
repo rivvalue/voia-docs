@@ -935,10 +935,22 @@ Respond with ONLY the JSON object, no other text:"""
             # Parse the AI response
             ai_response = response.choices[0].message.content.strip()
             
+            # Strip markdown code blocks if present (OpenAI sometimes wraps JSON in ```json...```)
+            if ai_response.startswith('```'):
+                # Remove opening fence (```json or ```)
+                lines = ai_response.split('\n')
+                if lines[0].startswith('```'):
+                    lines = lines[1:]  # Remove first line
+                # Remove closing fence (```)
+                if lines and lines[-1].strip() == '```':
+                    lines = lines[:-1]  # Remove last line
+                ai_response = '\n'.join(lines).strip()
+            
             try:
                 analysis_data = json.loads(ai_response)
-            except json.JSONDecodeError:
+            except json.JSONDecodeError as e:
                 logger.error(f"Invalid JSON response from OpenAI: {ai_response[:200]}...")
+                logger.error(f"JSON decode error: {e}")
                 return None
             
             # Convert analysis data to match SurveyResponse schema
