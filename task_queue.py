@@ -954,27 +954,32 @@ Respond with ONLY the JSON object, no other text:"""
                 return None
             
             # Convert analysis data to match SurveyResponse schema
+            # Note: OpenAI returns fields with capital letters and spaces (e.g., "NPS Score")
+            # We normalize sentiment_label to lowercase for consistency with regular surveys
+            sentiment_label_raw = analysis_data.get('Sentiment Label', 'Neutral')
+            sentiment_label = sentiment_label_raw.lower() if sentiment_label_raw else 'neutral'
+            
             result = {
-                'nps_score': analysis_data.get('nps_score', 0),
-                'nps_category': analysis_data.get('nps_category', 'Detractor'),
-                'satisfaction_rating': analysis_data.get('satisfaction_rating'),
-                'product_value_rating': analysis_data.get('product_value_rating'),
-                'service_rating': analysis_data.get('service_rating'),
-                'pricing_rating': analysis_data.get('pricing_rating'),
-                'improvement_feedback': analysis_data.get('improvement_feedback', ''),
-                'recommendation_reason': analysis_data.get('recommendation_reason', ''),
-                'additional_comments': analysis_data.get('additional_comments', ''),
-                'sentiment_score': analysis_data.get('sentiment_score', 0.0),
-                'sentiment_label': analysis_data.get('sentiment_label', 'Neutral'),
-                'key_themes': json.dumps(analysis_data.get('key_themes', [])),
-                'churn_risk_score': analysis_data.get('churn_risk_score', 0.0),
-                'churn_risk_level': analysis_data.get('churn_risk_level', 'Minimal'),
-                'churn_risk_factors': json.dumps(analysis_data.get('churn_risk_factors', [])),
-                'growth_opportunities': json.dumps(analysis_data.get('growth_opportunities', [])),
-                'account_risk_factors': json.dumps(analysis_data.get('account_risk_factors', [])),
-                'growth_factor': analysis_data.get('growth_factor', 1.0),
-                'growth_rate': analysis_data.get('growth_rate', '0%'),
-                'growth_range': analysis_data.get('growth_range', '0-6')
+                'nps_score': analysis_data.get('NPS Score', 0),
+                'nps_category': analysis_data.get('NPS Category', 'Detractor'),
+                'satisfaction_rating': analysis_data.get('Satisfaction Rating'),
+                'product_value_rating': analysis_data.get('Product Value Rating'),
+                'service_rating': analysis_data.get('Service Rating'),
+                'pricing_rating': analysis_data.get('Pricing Rating'),
+                'improvement_feedback': analysis_data.get('Improvement Feedback', ''),
+                'recommendation_reason': analysis_data.get('Recommendation Reason', ''),
+                'additional_comments': analysis_data.get('Additional Comments', ''),
+                'sentiment_score': analysis_data.get('Sentiment Score', 0.0),
+                'sentiment_label': sentiment_label,
+                'key_themes': json.dumps(analysis_data.get('Key Themes', [])),
+                'churn_risk_score': analysis_data.get('Churn Risk Score', 0.0),
+                'churn_risk_level': analysis_data.get('Churn Risk Level', 'Minimal'),
+                'churn_risk_factors': json.dumps(analysis_data.get('Churn Risk Factors', [])),
+                'growth_opportunities': json.dumps(analysis_data.get('Growth Opportunities', [])),
+                'account_risk_factors': json.dumps(analysis_data.get('Account Risk Factors', [])),
+                'growth_factor': analysis_data.get('Growth Factor', 1.0),
+                'growth_rate': analysis_data.get('Growth Rate', '0%'),
+                'growth_range': analysis_data.get('Growth Range', '0-6')
             }
             
             return result
