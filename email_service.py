@@ -382,14 +382,18 @@ class EmailService:
             context = ssl.create_default_context()
             smtp_port = email_config['smtp_port'] or 587  # Default port fallback
             
+            logger.info(f"Sending email via SMTP: server={email_config['smtp_server']}, port={smtp_port}, username={email_config['smtp_username']}, to={recipients}, subject={subject}")
+            
             # Determine connection type
             if email_config.get('use_ssl', False):
                 # Use SSL connection
+                logger.info(f"Using SSL connection to {email_config['smtp_server']}:{smtp_port}")
                 with smtplib.SMTP_SSL(str(email_config['smtp_server']), smtp_port, context=context) as server:
                     server.login(str(email_config['smtp_username']), str(email_config['smtp_password']))
                     server.send_message(msg)
             else:
                 # Use TLS connection (default)
+                logger.info(f"Using TLS connection to {email_config['smtp_server']}:{smtp_port}")
                 with smtplib.SMTP(str(email_config['smtp_server']), smtp_port) as server:
                     if email_config.get('use_tls', True):
                         server.starttls(context=context)
