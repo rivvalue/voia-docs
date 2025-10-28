@@ -832,7 +832,7 @@ def create_business_account_with_admin():
 @business_auth_bp.route('/onboarding')
 @require_business_auth
 def onboarding_redirect():
-    """Redirect to current onboarding step"""
+    """Redirect to onboarding progress dashboard"""
     try:
         business_user_id = session.get('business_user_id')
         current_user = BusinessAccountUser.query.get(business_user_id)
@@ -846,8 +846,8 @@ def onboarding_redirect():
             current_user.initialize_onboarding()
             db.session.commit()
         
-        current_step = current_user.get_current_onboarding_step()
-        return redirect(url_for('business_auth.onboarding_step', step=current_step))
+        # Redirect to progress dashboard (self-assessment hub)
+        return redirect(url_for('business_auth.onboarding_progress'))
         
     except Exception as e:
         logger.error(f"Error in onboarding redirect: {e}")
