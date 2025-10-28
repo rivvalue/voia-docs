@@ -774,7 +774,7 @@ class TaskQueue:
                 participant = Participant(
                     name=participant_name,
                     email=participant_email,
-                    company=participant_company,
+                    company_name=participant_company,
                     business_account_id=business_account_id
                 )
                 db.session.add(participant)
@@ -782,9 +782,9 @@ class TaskQueue:
                 logger.info(f"Created new participant {participant_name} ({participant_email})")
             else:
                 # Update existing participant details if needed
-                if participant.name != participant_name or participant.company != participant_company:
+                if participant.name != participant_name or participant.company_name != participant_company:
                     participant.name = participant_name
-                    participant.company = participant_company
+                    participant.company_name = participant_company
                     logger.info(f"Updated participant {participant_name} ({participant_email})")
             
             # Create campaign participation record if doesn't exist
