@@ -10,12 +10,54 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <!-- Hero Section -->
-            <header class="conv-hero-section">
-                {% if branding and branding.logo_url %}
-                    <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}" class="conv-hero-logo">
-                {% endif %}
-                <h1 id="conv-main-heading" class="conv-hero-title">VO<span class="voia-red-accent">Ï</span>A</h1>
-                <p class="conv-hero-subtitle">{{ _('Share your experience') }}</p>
+            <header class="conv-hero-section" role="banner">
+                <!-- Tier 1: Business Identity & Campaign Information -->
+                <div class="conv-hero-primary" aria-label="{{ _('Survey information') }}">
+                    <div class="conv-brand-block">
+                        {% if branding and branding.logo_url %}
+                            <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}" class="conv-business-logo">
+                        {% endif %}
+                        <div class="conv-brand-text">
+                            {% if branding and branding.company_name %}
+                                <h1 id="conv-main-heading" class="conv-company-name">{{ branding.company_name }}</h1>
+                            {% endif %}
+                            {% if branding and branding.tagline %}
+                                <p class="conv-company-tagline">{{ branding.tagline }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    {% if campaign_name or campaign_description or campaign_end_date %}
+                    <div class="conv-campaign-meta" aria-label="{{ _('Campaign details') }}">
+                        {% if campaign_name %}
+                            <div class="conv-campaign-name">
+                                <i class="fas fa-bullseye me-2" aria-hidden="true"></i>
+                                <strong>{{ _('Campaign:') }}</strong> {{ campaign_name }}
+                            </div>
+                        {% endif %}
+                        {% if campaign_description %}
+                            <div class="conv-campaign-objective">
+                                <i class="fas fa-info-circle me-2" aria-hidden="true"></i>
+                                <strong>{{ _('Objective:') }}</strong> {{ campaign_description }}
+                            </div>
+                        {% endif %}
+                        {% if campaign_end_date %}
+                            <div class="conv-campaign-deadline">
+                                <i class="fas fa-clock me-2" aria-hidden="true"></i>
+                                <strong>{{ _('Please respond by:') }}</strong> 
+                                <span class="conv-deadline-date">{{ campaign_end_date.strftime('%B %d, %Y') if campaign_end_date else '' }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Tier 2: VOÏA Attribution -->
+                <div class="conv-hero-footer" aria-label="{{ _('Platform information') }}">
+                    <span class="conv-powered-text">{{ _('Powered by') }}</span>
+                    <span class="conv-voia-brand">VO<span class="voia-red-accent">Ï</span>A</span>
+                    <span class="conv-voia-tagline">{{ _('Voice Of Client') }}</span>
+                </div>
             </header>
 
             <!-- Authentication Check -->
