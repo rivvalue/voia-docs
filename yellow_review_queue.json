@@ -1,0 +1,2502 @@
+[
+  {
+    "file": "templates/business_auth/activate_account.html",
+    "line": "547",
+    "pattern": "Links (a tags)",
+    "text": "support@voia.com",
+    "context": "<a href=\"mailto:support@voia.com\">support@voia.com</a>",
+    "risk_level": "yellow",
+    "reason": "Link text - verify not email/URL",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/admin_licenses.html",
+    "line": "156",
+    "pattern": "Spans",
+    "text": "No expiration",
+    "context": "<span class=\"text-muted\">No expiration</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/admin_panel_v2.html",
+    "line": "702",
+    "pattern": "Divs with text",
+    "text": "Campaigns",
+    "context": "<div class=\"settings-stat-label\">Campaigns</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/admin_panel_v2.html",
+    "line": "706",
+    "pattern": "Divs with text",
+    "text": "Users",
+    "context": "<div class=\"settings-stat-label\">Users</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/admin_panel_v2.html",
+    "line": "710",
+    "pattern": "Divs with text",
+    "text": "Max Participants",
+    "context": "<div class=\"settings-stat-label\">Max Participants</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "28",
+    "pattern": "Divs with text",
+    "text": "Total Activities",
+    "context": "<div class=\"audit-stat-label\">Total Activities</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "32",
+    "pattern": "Divs with text",
+    "text": "Activity Types",
+    "context": "<div class=\"audit-stat-label\">Activity Types</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "36",
+    "pattern": "Divs with text",
+    "text": "Active Users",
+    "context": "<div class=\"audit-stat-label\">Active Users</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "40",
+    "pattern": "Divs with text",
+    "text": "Days Shown",
+    "context": "<div class=\"audit-stat-label\">Days Shown</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "49",
+    "pattern": "ARIA labels",
+    "text": "Filter by activity type",
+    "context": "aria-label=\"Filter by activity type\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "62",
+    "pattern": "ARIA labels",
+    "text": "Filter by user",
+    "context": "aria-label=\"Filter by user\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "75",
+    "pattern": "ARIA labels",
+    "text": "Filter by time period",
+    "context": "aria-label=\"Filter by time period\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "84",
+    "pattern": "ARIA labels",
+    "text": "Apply filters",
+    "context": "aria-label=\"Apply filters\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "96",
+    "pattern": "ARIA labels",
+    "text": "Audit logs table",
+    "context": "aria-label=\"Audit logs table\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "169",
+    "pattern": "ARIA labels",
+    "text": "Pagination",
+    "context": "aria-label=\"Pagination\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "173",
+    "pattern": "ARIA labels",
+    "text": "Go to previous page",
+    "context": "aria-label=\"Go to previous page\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "189",
+    "pattern": "ARIA labels",
+    "text": "Go to next page",
+    "context": "aria-label=\"Go to next page\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/brand_config.html",
+    "line": "190",
+    "pattern": "ARIA labels",
+    "text": "Color palette preview",
+    "context": "aria-label=\"Color palette preview\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/brand_config.html",
+    "line": "231",
+    "pattern": "ARIA labels",
+    "text": "Upload requirements",
+    "context": "aria-label=\"Upload requirements\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/brand_config.html",
+    "line": "250",
+    "pattern": "ARIA labels",
+    "text": "Save brand settings",
+    "context": "aria-label=\"Save brand settings\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "33",
+    "pattern": "ARIA labels",
+    "text": "Close",
+    "context": "aria-label=\"Close\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "78",
+    "pattern": "Divs with text",
+    "text": "This will be displayed throughout the platform and in communications",
+    "context": "<div class=\"form-text\">This will be displayed throughout the platform and in communications</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "102",
+    "pattern": "Divs with text",
+    "text": "Choose the license tier that best fits the business needs",
+    "context": "<div class=\"form-text\">Choose the license tier that best fits the business needs</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "157",
+    "pattern": "Divs with text",
+    "text": "The administrator will receive an invitation email at this address",
+    "context": "<div class=\"form-text\">The administrator will receive an invitation email at this address</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "168",
+    "pattern": "Spans",
+    "text": "the administrator",
+    "context": "<span id=\"email-preview\">the administrator</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "169",
+    "pattern": "Spans",
+    "text": "business name",
+    "context": "<span id=\"business-preview\">business name</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "69",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "aws_ses",
+    "context": "value=\"aws_ses\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "71",
+    "pattern": "Divs with text",
+    "text": "Choose your email delivery provider",
+    "context": "<div class=\"email-help-text\" id=\"email_provider_help\">Choose your email delivery provider</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "84",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "us-east-1",
+    "context": "value=\"us-east-1\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "85",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "us-east-2",
+    "context": "value=\"us-east-2\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "86",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "us-west-1",
+    "context": "value=\"us-west-1\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "87",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "us-west-2",
+    "context": "value=\"us-west-2\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "88",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "ca-central-1",
+    "context": "value=\"ca-central-1\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "89",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "eu-west-1",
+    "context": "value=\"eu-west-1\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "90",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "eu-west-2",
+    "context": "value=\"eu-west-2\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "91",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "eu-west-3",
+    "context": "value=\"eu-west-3\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "92",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "eu-central-1",
+    "context": "value=\"eu-central-1\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "93",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "ap-south-1",
+    "context": "value=\"ap-south-1\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "94",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "ap-northeast-1",
+    "context": "value=\"ap-northeast-1\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "95",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "ap-northeast-2",
+    "context": "value=\"ap-northeast-2\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "96",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "ap-southeast-1",
+    "context": "value=\"ap-southeast-1\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "97",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "ap-southeast-2",
+    "context": "value=\"ap-southeast-2\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "98",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "sa-east-1",
+    "context": "value=\"sa-east-1\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/forgot_password.html",
+    "line": "27",
+    "pattern": "ARIA labels",
+    "text": "Close",
+    "context": "aria-label=\"Close\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "27",
+    "pattern": "ARIA labels",
+    "text": "Account type",
+    "context": "aria-label=\"Account type\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "64",
+    "pattern": "Divs with text",
+    "text": "License Purchase Date",
+    "context": "<div class=\"license-date-label\">License Purchase Date</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "87",
+    "pattern": "Divs with text",
+    "text": "License Expiry Date",
+    "context": "<div class=\"license-date-label\">License Expiry Date</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "114",
+    "pattern": "ARIA labels",
+    "text": "License period details",
+    "context": "aria-label=\"License period details\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "120",
+    "pattern": "Divs with text",
+    "text": "License Period",
+    "context": "<div class=\"license-info-label\">License Period</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "130",
+    "pattern": "Divs with text",
+    "text": "License Duration",
+    "context": "<div class=\"license-info-label\">License Duration</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "156",
+    "pattern": "ARIA labels",
+    "text": "Campaigns used out of limit",
+    "context": "aria-label=\"Campaigns used out of limit\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "180",
+    "pattern": "ARIA labels",
+    "text": "Users count out of limit",
+    "context": "aria-label=\"Users count out of limit\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "251",
+    "pattern": "Divs with text",
+    "text": "Add-on Start Date",
+    "context": "<div class=\"license-date-label\">Add-on Start Date</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "276",
+    "pattern": "Divs with text",
+    "text": "Add-on End Date",
+    "context": "<div class=\"license-date-label\">Add-on End Date</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "303",
+    "pattern": "ARIA labels",
+    "text": "Add-on period details",
+    "context": "aria-label=\"Add-on period details\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "309",
+    "pattern": "Divs with text",
+    "text": "Add-on Period",
+    "context": "<div class=\"license-info-label\">Add-on Period</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "325",
+    "pattern": "Divs with text",
+    "text": "Add-on Duration",
+    "context": "<div class=\"license-info-label\">Add-on Duration</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "342",
+    "pattern": "Divs with text",
+    "text": "Transcript Analysis Not Configured",
+    "context": "<div class=\"license-date-label\">Transcript Analysis Not Configured</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "343",
+    "pattern": "Divs with text",
+    "text": "Add-on Not Purchased",
+    "context": "<div class=\"license-date-value\">Add-on Not Purchased</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "344",
+    "pattern": "Divs with text",
+    "text": "Contact your administrator to enable transcript analysis capabilities.",
+    "context": "<div class=\"license-date-meta\">                 Contact your administrator to enable transcript anal",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "227",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "pro",
+    "context": "value=\"pro\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "242",
+    "pattern": "Divs with text",
+    "text": "Custom",
+    "context": "<div style=\"font-size: var(--font-size-xl); font-weight: 600; color: var(--primary-red);\">Custom</di",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "243",
+    "pattern": "Divs with text",
+    "text": "pricing",
+    "context": "<div class=\"text-muted\" style=\"font-size: var(--font-size-xs);\">pricing</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "339",
+    "pattern": "Divs with text",
+    "text": "When transcript analysis access begins",
+    "context": "<div class=\"form-text\">When transcript analysis access begins</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "345",
+    "pattern": "Divs with text",
+    "text": "When transcript analysis access expires",
+    "context": "<div class=\"form-text\">When transcript analysis access expires</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "355",
+    "pattern": "Divs with text",
+    "text": "Custom pricing for this add-on period",
+    "context": "<div class=\"form-text\">Custom pricing for this add-on period</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_result.html",
+    "line": "342",
+    "pattern": "Spans",
+    "text": "Email:",
+    "context": "<span class=\"detail-label\">Email:</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/history.html",
+    "line": "486",
+    "pattern": "Spans",
+    "text": "Expiration",
+    "context": "<span class=\"detail-label\">Expiration</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/overview.html",
+    "line": "296",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "pro",
+    "context": "value=\"pro\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/overview.html",
+    "line": "305",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "expiring",
+    "context": "value=\"expiring\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/overview.html",
+    "line": "306",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "expired",
+    "context": "value=\"expired\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/overview.html",
+    "line": "377",
+    "pattern": "Spans",
+    "text": "Unlimited",
+    "context": "<span class=\"text-muted\">Unlimited</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/login.html",
+    "line": "27",
+    "pattern": "ARIA labels",
+    "text": "Close",
+    "context": "aria-label=\"Close\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/login.html",
+    "line": "87",
+    "pattern": "Links (a tags)",
+    "text": "RIVVALUE inc.",
+    "context": "<a href=\"https://www.rivvalue.com\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-muted\">RIVV",
+    "risk_level": "yellow",
+    "reason": "Link text - verify not email/URL",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "32",
+    "pattern": "ARIA labels",
+    "text": "Close",
+    "context": "aria-label=\"Close\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "49",
+    "pattern": "ARIA labels",
+    "text": "User limit usage",
+    "context": "aria-label=\"User limit usage\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "60",
+    "pattern": "ARIA labels",
+    "text": "Add new user",
+    "context": "aria-label=\"Add new user\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "68",
+    "pattern": "ARIA labels",
+    "text": "Add user button disabled - license limit reached",
+    "context": "aria-label=\"Add user button disabled - license limit reached\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "120",
+    "pattern": "ARIA labels",
+    "text": "User role",
+    "context": "aria-label=\"User role\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "126",
+    "pattern": "ARIA labels",
+    "text": "User status",
+    "context": "aria-label=\"User status\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "135",
+    "pattern": "Spans",
+    "text": "Never",
+    "context": "<span class=\"text-muted\">Never</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "183",
+    "pattern": "Spans",
+    "text": "Current User",
+    "context": "<span class=\"text-muted small\">Current User</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "211",
+    "pattern": "ARIA labels",
+    "text": "Close",
+    "context": "aria-label=\"Close\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "217",
+    "pattern": "ARIA labels",
+    "text": "required",
+    "context": "aria-label=\"required\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "229",
+    "pattern": "ARIA labels",
+    "text": "required",
+    "context": "aria-label=\"required\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "242",
+    "pattern": "ARIA labels",
+    "text": "required",
+    "context": "aria-label=\"required\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "252",
+    "pattern": "Divs with text",
+    "text": "The user will receive an invitation email to activate their account.",
+    "context": "<div class=\"form-text\" id=\"email_help\">The user will receive an invitation email to activate their a",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "258",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "manager",
+    "context": "value=\"manager\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "259",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "viewer",
+    "context": "value=\"viewer\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "260",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "admin",
+    "context": "value=\"admin\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "262",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "platform_admin",
+    "context": "value=\"platform_admin\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "275",
+    "pattern": "ARIA labels",
+    "text": "Confirm add user",
+    "context": "aria-label=\"Confirm add user\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "294",
+    "pattern": "ARIA labels",
+    "text": "Close",
+    "context": "aria-label=\"Close\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "300",
+    "pattern": "ARIA labels",
+    "text": "required",
+    "context": "aria-label=\"required\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "312",
+    "pattern": "ARIA labels",
+    "text": "required",
+    "context": "aria-label=\"required\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "325",
+    "pattern": "ARIA labels",
+    "text": "required",
+    "context": "aria-label=\"required\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "338",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "manager",
+    "context": "value=\"manager\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "339",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "viewer",
+    "context": "value=\"viewer\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "340",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "admin",
+    "context": "value=\"admin\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "342",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "platform_admin",
+    "context": "value=\"platform_admin\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "350",
+    "pattern": "ARIA labels",
+    "text": "Save changes",
+    "context": "aria-label=\"Save changes\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/onboarding/complete.html",
+    "line": "346",
+    "pattern": "Divs with text",
+    "text": "Team Members Added",
+    "context": "<div class=\"summary-title\">Team Members Added</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/onboarding/complete.html",
+    "line": "356",
+    "pattern": "Divs with text",
+    "text": "Platform Security",
+    "context": "<div class=\"summary-title\">Platform Security</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/onboarding/users.html",
+    "line": "411",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "manager",
+    "context": "value=\"manager\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/onboarding/users.html",
+    "line": "412",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "admin",
+    "context": "value=\"admin\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/onboarding/users.html",
+    "line": "413",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "viewer",
+    "context": "value=\"viewer\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/reset_password.html",
+    "line": "13",
+    "pattern": "ARIA labels",
+    "text": "VO\u00cfA Password Reset",
+    "context": "aria-label=\"VO\u00cfA Password Reset\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/reset_password.html",
+    "line": "27",
+    "pattern": "ARIA labels",
+    "text": "Close",
+    "context": "aria-label=\"Close\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/reset_password.html",
+    "line": "36",
+    "pattern": "ARIA labels",
+    "text": "Password reset form",
+    "context": "aria-label=\"Password reset form\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/reset_password.html",
+    "line": "51",
+    "pattern": "ARIA labels",
+    "text": "New password",
+    "context": "aria-label=\"New password\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/reset_password.html",
+    "line": "67",
+    "pattern": "ARIA labels",
+    "text": "Confirm new password",
+    "context": "aria-label=\"Confirm new password\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/reset_password.html",
+    "line": "78",
+    "pattern": "ARIA labels",
+    "text": "Reset password",
+    "context": "aria-label=\"Reset password\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/reset_password.html",
+    "line": "84",
+    "pattern": "ARIA labels",
+    "text": "Return to login page",
+    "context": "aria-label=\"Return to login page\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "146",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "NPS",
+    "context": "value=\"NPS\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "151",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Satisfaction",
+    "context": "value=\"Satisfaction\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "156",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Product Feedback",
+    "context": "value=\"Product Feedback\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "161",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Support Quality",
+    "context": "value=\"Support Quality\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "166",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Pricing Perception",
+    "context": "value=\"Pricing Perception\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "171",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Custom",
+    "context": "value=\"Custom\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "230",
+    "pattern": "Spans",
+    "text": "1min",
+    "context": "<span>1min</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "231",
+    "pattern": "Spans",
+    "text": "5min",
+    "context": "<span>5min</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "146",
+    "pattern": "Spans",
+    "text": "Jan 1 - Dec 31, 2024",
+    "context": "<span class=\"ms-2 text-muted\" id=\"activeCampaignDates\">Jan 1 - Dec 31, 2024</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "256",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "risk_heavy",
+    "context": "value=\"risk_heavy\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "257",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "balanced",
+    "context": "value=\"balanced\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "258",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "opportunity_heavy",
+    "context": "value=\"opportunity_heavy\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "265",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "critical",
+    "context": "value=\"critical\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "266",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "high",
+    "context": "value=\"high\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "267",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "medium",
+    "context": "value=\"medium\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "268",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "low",
+    "context": "value=\"low\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "275",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "yes",
+    "context": "value=\"yes\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "283",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "yes",
+    "context": "value=\"yes\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "410",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "promoters",
+    "context": "value=\"promoters\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "411",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "passives",
+    "context": "value=\"passives\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "412",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "detractors",
+    "context": "value=\"detractors\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "582",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "promoters",
+    "context": "value=\"promoters\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "583",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "passives",
+    "context": "value=\"passives\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "584",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "detractors",
+    "context": "value=\"detractors\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "765",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "created_at_desc",
+    "context": "value=\"created_at_desc\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "766",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "created_at_asc",
+    "context": "value=\"created_at_asc\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "767",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "nps_score_desc",
+    "context": "value=\"nps_score_desc\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "768",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "nps_score_asc",
+    "context": "value=\"nps_score_asc\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "1092",
+    "pattern": "Spans",
+    "text": "Role",
+    "context": "<span class=\"badge bg-primary\">Role</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "1109",
+    "pattern": "Spans",
+    "text": "Region",
+    "context": "<span class=\"badge bg-info\">Region</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "1126",
+    "pattern": "Spans",
+    "text": "Tier",
+    "context": "<span class=\"badge bg-warning text-dark\">Tier</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/create.html",
+    "line": "144",
+    "pattern": "Divs with text",
+    "text": "When enabled, participant names and company names will be anonymized using secure hashing. \n                        Anonymized participants will appear as \"Participant-{hash}\" in reports and analytics. \n                        This cannot be changed after campaign creation.",
+    "context": "<div class=\"form-text\">                         When enabled, participant names and company names wi",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/create.html",
+    "line": "171",
+    "pattern": "Divs with text",
+    "text": "When enabled, customize the email sent to participants. Leave unchecked to use your account's default email templates.",
+    "context": "<div class=\"form-text\" style=\"margin-left: 2.5rem; margin-top: 0.5rem;\">                         Whe",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/create.html",
+    "line": "181",
+    "pattern": "Divs with text",
+    "text": "Available variables: {participant_name}, {campaign_name}, {business_account_name}",
+    "context": "<div class=\"form-text\">Available variables: {participant_name}, {campaign_name}, {business_account_n",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/create.html",
+    "line": "189",
+    "pattern": "Divs with text",
+    "text": "Opens the email body. Available variables: {participant_name}, {campaign_name}, {business_account_name}",
+    "context": "<div class=\"form-text\">Opens the email body. Available variables: {participant_name}, {campaign_name",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/create.html",
+    "line": "206",
+    "pattern": "Divs with text",
+    "text": "Message before sign-off. Available variables: {participant_name}, {campaign_name}, {business_account_name}",
+    "context": "<div class=\"form-text\">Message before sign-off. Available variables: {participant_name}, {campaign_n",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/create.html",
+    "line": "237",
+    "pattern": "Divs with text",
+    "text": "Automatically send a follow-up email to participants who haven't completed the survey",
+    "context": "<div class=\"form-text\" style=\"margin-left: 2.5rem; margin-top: 0.5rem;\">                         Aut",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/edit.html",
+    "line": "159",
+    "pattern": "Divs with text",
+    "text": "Automatically send a follow-up email to participants who haven't completed the survey",
+    "context": "<div class=\"form-text\" style=\"margin-left: 2.5rem; margin-top: 0.5rem;\">                         Aut",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/individual_response.html",
+    "line": "324",
+    "pattern": "Spans",
+    "text": "Company:",
+    "context": "<span class=\"data-label\">Company:</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/individual_response.html",
+    "line": "339",
+    "pattern": "Spans",
+    "text": "NPS Score:",
+    "context": "<span class=\"data-label\">NPS Score:</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/individual_response.html",
+    "line": "352",
+    "pattern": "Spans",
+    "text": "Product Value:",
+    "context": "<span class=\"data-label\">Product Value:</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/individual_response.html",
+    "line": "358",
+    "pattern": "Spans",
+    "text": "Service Quality:",
+    "context": "<span class=\"data-label\">Service Quality:</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/individual_response.html",
+    "line": "364",
+    "pattern": "Spans",
+    "text": "Pricing:",
+    "context": "<span class=\"data-label\">Pricing:</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/individual_response.html",
+    "line": "377",
+    "pattern": "Spans",
+    "text": "Sentiment:",
+    "context": "<span class=\"data-label\">Sentiment:</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/individual_response.html",
+    "line": "394",
+    "pattern": "Spans",
+    "text": "Churn Risk:",
+    "context": "<span class=\"data-label\">Churn Risk:</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/individual_response.html",
+    "line": "403",
+    "pattern": "Spans",
+    "text": "Key Themes:",
+    "context": "<span class=\"data-label d-block mb-2\">Key Themes:</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/individual_response.html",
+    "line": "419",
+    "pattern": "Spans",
+    "text": "Submitted:",
+    "context": "<span class=\"data-label\">Submitted:</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/individual_response.html",
+    "line": "424",
+    "pattern": "Spans",
+    "text": "(updated)",
+    "context": "<span style=\"color: #666; font-size: 0.9em;\">(updated)</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/individual_response.html",
+    "line": "435",
+    "pattern": "Spans",
+    "text": "Campaign:",
+    "context": "<span class=\"data-label\">Campaign:</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/individual_response.html",
+    "line": "440",
+    "pattern": "Spans",
+    "text": "Commercial Value:",
+    "context": "<span class=\"data-label\">Commercial Value:</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/individual_response.html",
+    "line": "454",
+    "pattern": "Spans",
+    "text": "Improvement Feedback:",
+    "context": "<span class=\"data-label d-block\">Improvement Feedback:</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/individual_response.html",
+    "line": "460",
+    "pattern": "Spans",
+    "text": "Recommendation Reason:",
+    "context": "<span class=\"data-label d-block\">Recommendation Reason:</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/individual_response.html",
+    "line": "466",
+    "pattern": "Spans",
+    "text": "Additional Comments:",
+    "context": "<span class=\"data-label d-block\">Additional Comments:</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/list.html",
+    "line": "106",
+    "pattern": "Divs with text",
+    "text": "Participants",
+    "context": "<div class=\"small text-muted\">Participants</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "224",
+    "pattern": "Divs with text",
+    "text": "Help the AI understand what you offer to ask better questions",
+    "context": "<div class=\"form-text\">Help the AI understand what you offer to ask better questions</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "232",
+    "pattern": "Divs with text",
+    "text": "Who are you primarily serving? This helps tailor conversation tone and questions",
+    "context": "<div class=\"form-text\">Who are you primarily serving? This helps tailor conversation tone and questi",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "256",
+    "pattern": "Divs with text",
+    "text": "NPS is recommended for all campaigns to track customer loyalty",
+    "context": "<div class=\"form-text mt-2\">NPS is recommended for all campaigns to track customer loyalty</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "278",
+    "pattern": "Divs with text",
+    "text": "Hard limit on conversation length",
+    "context": "<div class=\"form-text\">Hard limit on conversation length</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "290",
+    "pattern": "Divs with text",
+    "text": "Time limit for entire conversation",
+    "context": "<div class=\"form-text\">Time limit for entire conversation</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "302",
+    "pattern": "Divs with text",
+    "text": "Control topic depth exploration",
+    "context": "<div class=\"form-text\">Control topic depth exploration</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "332",
+    "pattern": "Divs with text",
+    "text": "These topics will be covered first and are most important",
+    "context": "<div class=\"form-text\">These topics will be covered first and are most important</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "348",
+    "pattern": "Divs with text",
+    "text": "These topics will be skipped if time/questions run out",
+    "context": "<div class=\"form-text\">These topics will be skipped if time/questions run out</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "361",
+    "pattern": "Divs with text",
+    "text": "Personalized message shown when participants complete the survey",
+    "context": "<div class=\"form-text\">Personalized message shown when participants complete the survey</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "387",
+    "pattern": "Divs with text",
+    "text": "Advanced: Custom instructions for the AI conversation engine. Leave blank to use intelligent defaults.",
+    "context": "<div class=\"form-text\">                             Advanced: Custom instructions for the AI convers",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/view.html",
+    "line": "46",
+    "pattern": "Divs with text",
+    "text": "Start Date",
+    "context": "<div class=\"info-label\">Start Date</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/view.html",
+    "line": "50",
+    "pattern": "Divs with text",
+    "text": "End Date",
+    "context": "<div class=\"info-label\">End Date</div>",
+    "risk_level": "yellow",
+    "reason": "Div content - verify not used dynamically",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/view.html",
+    "line": "734",
+    "pattern": "Spans",
+    "text": "= 9 ? 'success' : transcript.nps_score >= 7 ? 'warning' : 'danger'}\">\n                            NPS: ${transcript.nps_score}/10",
+    "context": "<span class=\"badge bg-${transcript.nps_score >= 9 ? 'success' : transcript.nps_score >= 7 ? 'warning",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey.html",
+    "line": "133",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Less than 6 months",
+    "context": "value=\"Less than 6 months\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey.html",
+    "line": "134",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "6 months - 1 year",
+    "context": "value=\"6 months - 1 year\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey.html",
+    "line": "135",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "1-2 years",
+    "context": "value=\"1-2 years\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey.html",
+    "line": "136",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "2-3 years",
+    "context": "value=\"2-3 years\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey.html",
+    "line": "137",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "3-5 years",
+    "context": "value=\"3-5 years\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey.html",
+    "line": "138",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "5-10 years",
+    "context": "value=\"5-10 years\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey.html",
+    "line": "139",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "More than 10 years",
+    "context": "value=\"More than 10 years\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey_business.html",
+    "line": "112",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Less than 6 months",
+    "context": "value=\"Less than 6 months\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey_business.html",
+    "line": "113",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "6 months - 1 year",
+    "context": "value=\"6 months - 1 year\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey_business.html",
+    "line": "114",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "1-2 years",
+    "context": "value=\"1-2 years\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey_business.html",
+    "line": "115",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "2-3 years",
+    "context": "value=\"2-3 years\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey_business.html",
+    "line": "116",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "3-5 years",
+    "context": "value=\"3-5 years\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey_business.html",
+    "line": "117",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "5-10 years",
+    "context": "value=\"5-10 years\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey_business.html",
+    "line": "118",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "More than 10 years",
+    "context": "value=\"More than 10 years\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "222",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "opportunity_heavy",
+    "context": "value=\"opportunity_heavy\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "223",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "balanced",
+    "context": "value=\"balanced\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "224",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "risk_heavy",
+    "context": "value=\"risk_heavy\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "381",
+    "pattern": "Spans",
+    "text": "Campaign Name",
+    "context": "<span id=\"activeCampaignName\" class=\"fw-bold\">Campaign Name</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "382",
+    "pattern": "Spans",
+    "text": "Jan 1 - Dec 31, 2024",
+    "context": "<span class=\"ms-2 text-muted\" id=\"activeCampaignDates\">Jan 1 - Dec 31, 2024</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "492",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "risk_heavy",
+    "context": "value=\"risk_heavy\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "493",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "balanced",
+    "context": "value=\"balanced\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "494",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "opportunity_heavy",
+    "context": "value=\"opportunity_heavy\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "501",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "critical",
+    "context": "value=\"critical\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "502",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "high",
+    "context": "value=\"high\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "503",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "medium",
+    "context": "value=\"medium\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "504",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "low",
+    "context": "value=\"low\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "511",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "yes",
+    "context": "value=\"yes\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "519",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "yes",
+    "context": "value=\"yes\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "646",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "promoters",
+    "context": "value=\"promoters\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "647",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "passives",
+    "context": "value=\"passives\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "648",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "detractors",
+    "context": "value=\"detractors\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "818",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "promoters",
+    "context": "value=\"promoters\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "819",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "passives",
+    "context": "value=\"passives\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "820",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "detractors",
+    "context": "value=\"detractors\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "915",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "created_at_desc",
+    "context": "value=\"created_at_desc\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "916",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "created_at_asc",
+    "context": "value=\"created_at_asc\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "917",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "nps_score_desc",
+    "context": "value=\"nps_score_desc\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "918",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "nps_score_asc",
+    "context": "value=\"nps_score_asc\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/executive_summary.html",
+    "line": "215",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "opportunity_heavy",
+    "context": "value=\"opportunity_heavy\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/executive_summary.html",
+    "line": "216",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "balanced",
+    "context": "value=\"balanced\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/executive_summary.html",
+    "line": "217",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "risk_heavy",
+    "context": "value=\"risk_heavy\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/maintenance.html",
+    "line": "20",
+    "pattern": "ARIA labels",
+    "text": "VO\u00cfA coming soon page",
+    "context": "aria-label=\"VO\u00cfA coming soon page\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/maintenance.html",
+    "line": "36",
+    "pattern": "ARIA labels",
+    "text": "Get your demo access",
+    "context": "aria-label=\"Get your demo access\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/campaign_participants.html",
+    "line": "59",
+    "pattern": "ARIA labels",
+    "text": "Filter participants form",
+    "context": "aria-label=\"Filter participants form\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/campaign_participants.html",
+    "line": "143",
+    "pattern": "ARIA labels",
+    "text": "Apply filters",
+    "context": "aria-label=\"Apply filters\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/create.html",
+    "line": "106",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "C-Level",
+    "context": "value=\"C-Level\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/create.html",
+    "line": "126",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "LATAM",
+    "context": "value=\"LATAM\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/create.html",
+    "line": "127",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "EMEA",
+    "context": "value=\"EMEA\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/create.html",
+    "line": "128",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "APAC",
+    "context": "value=\"APAC\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/create.html",
+    "line": "167",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "other",
+    "context": "value=\"other\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/edit.html",
+    "line": "154",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "C-Level",
+    "context": "value=\"C-Level\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/edit.html",
+    "line": "174",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "LATAM",
+    "context": "value=\"LATAM\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/edit.html",
+    "line": "175",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "EMEA",
+    "context": "value=\"EMEA\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/edit.html",
+    "line": "176",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "APAC",
+    "context": "value=\"APAC\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/edit.html",
+    "line": "215",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "other",
+    "context": "value=\"other\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "475",
+    "pattern": "ARIA labels",
+    "text": "Participant actions",
+    "context": "aria-label=\"Participant actions\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "582",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Premium",
+    "context": "value=\"Premium\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "583",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Standard",
+    "context": "value=\"Standard\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "584",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Basic",
+    "context": "value=\"Basic\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "680",
+    "pattern": "Spans",
+    "text": "Loading...",
+    "context": "<span class=\"visually-hidden\">Loading...</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "836",
+    "pattern": "ARIA labels",
+    "text": "Participant actions",
+    "context": "aria-label=\"Participant actions\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "840",
+    "pattern": "ARIA labels",
+    "text": "Edit ${p.name}",
+    "context": "aria-label=\"Edit ${p.name}\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "848",
+    "pattern": "ARIA labels",
+    "text": "Delete ${p.name}",
+    "context": "aria-label=\"Delete ${p.name}\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "907",
+    "pattern": "ARIA labels",
+    "text": "Participant pagination",
+    "context": "aria-label=\"Participant pagination\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "911",
+    "pattern": "ARIA labels",
+    "text": "Previous",
+    "context": "aria-label=\"Previous\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "912",
+    "pattern": "Spans",
+    "text": "&laquo;",
+    "context": "<span aria-hidden=\"true\">&laquo;</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "928",
+    "pattern": "ARIA labels",
+    "text": "Next",
+    "context": "aria-label=\"Next\"",
+    "risk_level": "yellow",
+    "reason": "Accessibility label - needs screen reader testing",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "929",
+    "pattern": "Spans",
+    "text": "&raquo;",
+    "context": "<span aria-hidden=\"true\">&raquo;</span>",
+    "risk_level": "yellow",
+    "reason": "Span element - check for JavaScript dependencies",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/simple_auth.html",
+    "line": "16",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "test@example.com",
+    "context": "value=\"test@example.com\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/test_token.html",
+    "line": "20",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "test@example.com",
+    "context": "value=\"test@example.com\"",
+    "risk_level": "yellow",
+    "reason": "Form value - verify not used by backend logic",
+    "auto_fixable": false
+  }
+]

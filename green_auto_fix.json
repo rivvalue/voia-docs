@@ -1,0 +1,1792 @@
+[
+  {
+    "file": "templates/business_auth/account_status.html",
+    "line": "12",
+    "pattern": "Headings (h1-h6)",
+    "text": "Vocsa",
+    "context": "<h2 class=\"fw-bold text-primary\">Vocsa</h2>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/admin_licenses.html",
+    "line": "69",
+    "pattern": "Table headers (th)",
+    "text": "Business Account",
+    "context": "<th>Business Account</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/admin_licenses.html",
+    "line": "70",
+    "pattern": "Table headers (th)",
+    "text": "License Type",
+    "context": "<th>License Type</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/admin_licenses.html",
+    "line": "71",
+    "pattern": "Table headers (th)",
+    "text": "Status",
+    "context": "<th>Status</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/admin_licenses.html",
+    "line": "72",
+    "pattern": "Table headers (th)",
+    "text": "Campaigns",
+    "context": "<th>Campaigns</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/admin_licenses.html",
+    "line": "73",
+    "pattern": "Table headers (th)",
+    "text": "Users",
+    "context": "<th>Users</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/admin_licenses.html",
+    "line": "74",
+    "pattern": "Table headers (th)",
+    "text": "Respondents",
+    "context": "<th>Respondents</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/admin_licenses.html",
+    "line": "75",
+    "pattern": "Table headers (th)",
+    "text": "Invitations",
+    "context": "<th>Invitations</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/admin_licenses.html",
+    "line": "76",
+    "pattern": "Table headers (th)",
+    "text": "Expiration",
+    "context": "<th>Expiration</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/admin_licenses.html",
+    "line": "77",
+    "pattern": "Table headers (th)",
+    "text": "Actions",
+    "context": "<th>Actions</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/admin_licenses.html",
+    "line": "162",
+    "pattern": "Title attributes",
+    "text": "Manage License",
+    "context": "title=\"Manage License\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/admin_licenses.html",
+    "line": "166",
+    "pattern": "Title attributes",
+    "text": "View History",
+    "context": "title=\"View History\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/admin_licenses.html",
+    "line": "179",
+    "pattern": "Headings (h1-h6)",
+    "text": "No accounts found",
+    "context": "<h4>No accounts found</h4>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/admin_licenses.html",
+    "line": "180",
+    "pattern": "Paragraphs",
+    "text": "No business accounts match the current filter criteria.",
+    "context": "<p class=\"text-muted\">No business accounts match the current filter criteria.</p>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "21",
+    "pattern": "Paragraphs",
+    "text": "Track all activities and changes in your VO\u00cfA account",
+    "context": "<p>Track all activities and changes in your VO\u00cfA account</p>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "48",
+    "pattern": "Labels",
+    "text": "Activity Type",
+    "context": "<label for=\"action_type\">Activity Type</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "61",
+    "pattern": "Labels",
+    "text": "User",
+    "context": "<label for=\"user_email\">User</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "74",
+    "pattern": "Labels",
+    "text": "Time Period",
+    "context": "<label for=\"days_back\">Time Period</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "99",
+    "pattern": "Table headers (th)",
+    "text": "Time",
+    "context": "<th scope=\"col\">Time</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "100",
+    "pattern": "Table headers (th)",
+    "text": "User",
+    "context": "<th scope=\"col\">User</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "101",
+    "pattern": "Table headers (th)",
+    "text": "Activity",
+    "context": "<th scope=\"col\">Activity</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "102",
+    "pattern": "Table headers (th)",
+    "text": "Description",
+    "context": "<th scope=\"col\">Description</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "103",
+    "pattern": "Table headers (th)",
+    "text": "Resource",
+    "context": "<th scope=\"col\">Resource</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "161",
+    "pattern": "Headings (h1-h6)",
+    "text": "No Activity Yet",
+    "context": "<h3>No Activity Yet</h3>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "162",
+    "pattern": "Paragraphs",
+    "text": "No audit logs found for the selected filters. Try adjusting your filters or create some test data to get started.",
+    "context": "<p>No audit logs found for the selected filters. Try adjusting your filters or create some test data",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/brand_config.html",
+    "line": "194",
+    "pattern": "Title attributes",
+    "text": "Primary color",
+    "context": "title=\"Primary color\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/brand_config.html",
+    "line": "198",
+    "pattern": "Title attributes",
+    "text": "Secondary color",
+    "context": "title=\"Secondary color\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/brand_config.html",
+    "line": "202",
+    "pattern": "Title attributes",
+    "text": "Accent color",
+    "context": "title=\"Accent color\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "21",
+    "pattern": "Headings (h1-h6)",
+    "text": "Business Account Onboarding",
+    "context": "<h1 class=\"onboarding-header-title\">Business Account Onboarding</h1>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "22",
+    "pattern": "Paragraphs",
+    "text": "Create a new business account and invite the account administrator",
+    "context": "<p class=\"onboarding-header-subtitle\">Create a new business account and invite the account administr",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "63",
+    "pattern": "Headings (h1-h6)",
+    "text": "Business Account Information",
+    "context": "<h3 class=\"section-title\">Business Account Information</h3>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "74",
+    "pattern": "Placeholder attributes",
+    "text": "Enter the complete business name",
+    "context": "placeholder=\"Enter the complete business name\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "112",
+    "pattern": "Headings (h1-h6)",
+    "text": "Account Administrator Information",
+    "context": "<h3 class=\"section-title\">Account Administrator Information</h3>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "124",
+    "pattern": "Placeholder attributes",
+    "text": "Administrator's first name",
+    "context": "placeholder=\"Administrator's first name\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "138",
+    "pattern": "Placeholder attributes",
+    "text": "Administrator's last name",
+    "context": "placeholder=\"Administrator's last name\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "153",
+    "pattern": "Placeholder attributes",
+    "text": "admin@company.com",
+    "context": "placeholder=\"admin@company.com\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "60",
+    "pattern": "Labels",
+    "text": "Email Provider *",
+    "context": "<label class=\"email-form-label\" for=\"email_provider\">Email Provider *</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "78",
+    "pattern": "Labels",
+    "text": "AWS Region *",
+    "context": "<label class=\"email-form-label\" for=\"aws_region\">AWS Region *</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "123",
+    "pattern": "Placeholder attributes",
+    "text": "smtp.gmail.com",
+    "context": "placeholder=\"smtp.gmail.com\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "141",
+    "pattern": "Labels",
+    "text": "Port *",
+    "context": "<label class=\"email-form-label\" for=\"smtp_port\">Port *</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "168",
+    "pattern": "Placeholder attributes",
+    "text": "your-email@domain.com",
+    "context": "placeholder=\"your-email@domain.com\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "184",
+    "pattern": "Placeholder attributes",
+    "text": "Enter SMTP password",
+    "context": "placeholder=\"Enter SMTP password\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "238",
+    "pattern": "Placeholder attributes",
+    "text": "Your Company Name",
+    "context": "placeholder=\"Your Company Name\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "253",
+    "pattern": "Placeholder attributes",
+    "text": "noreply@yourcompany.com",
+    "context": "placeholder=\"noreply@yourcompany.com\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "269",
+    "pattern": "Placeholder attributes",
+    "text": "support@yourcompany.com",
+    "context": "placeholder=\"support@yourcompany.com\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "289",
+    "pattern": "Placeholder attributes",
+    "text": "admin@yourcompany.com, manager@yourcompany.com",
+    "context": "placeholder=\"admin@yourcompany.com, manager@yourcompany.com\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "332",
+    "pattern": "Placeholder attributes",
+    "text": "Your feedback is requested: {campaign_name}",
+    "context": "placeholder=\"Your feedback is requested: {campaign_name}\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "347",
+    "pattern": "Placeholder attributes",
+    "text": "{business_account_name} is requesting your valuable feedback through our Voice of Client system.",
+    "context": "placeholder=\"{business_account_name} is requesting your valuable feedback through our Voice of Clien",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "365",
+    "pattern": "Placeholder attributes",
+    "text": "Complete Your Survey",
+    "context": "placeholder=\"Complete Your Survey\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "380",
+    "pattern": "Placeholder attributes",
+    "text": "Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.&#10;&#10;Thank you for your time and valuable insights!",
+    "context": "placeholder=\"Your feedback helps improve services and experiences. The survey should take just a few",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "394",
+    "pattern": "Placeholder attributes",
+    "text": "This is an automated message. If you have any questions, please contact the organization that sent this survey.",
+    "context": "placeholder=\"This is an automated message. If you have any questions, please contact the organizatio",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "486",
+    "pattern": "Placeholder attributes",
+    "text": "test@example.com",
+    "context": "placeholder=\"test@example.com\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "618",
+    "pattern": "Paragraphs",
+    "text": "Preview failed: ' + (data.error || 'Unknown error') + '",
+    "context": "<p style=\"color: #dc3545;\">Preview failed: ' + (data.error || 'Unknown error') + '</p>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "622",
+    "pattern": "Paragraphs",
+    "text": "Network error: ' + error.message + '",
+    "context": "<p style=\"color: #dc3545;\">Network error: ' + error.message + '</p>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "238",
+    "pattern": "Headings (h1-h6)",
+    "text": "Pro License",
+    "context": "<h4 class=\"mb-1\" style=\"font-weight: 600;\">Pro License</h4>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "376",
+    "pattern": "Labels",
+    "text": "Notes (Optional)",
+    "context": "<label for=\"notes\" class=\"form-label\">Notes (Optional)</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/licenses/overview.html",
+    "line": "287",
+    "pattern": "Placeholder attributes",
+    "text": "Search by business name or email...",
+    "context": "placeholder=\"Search by business name or email...\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/licenses/overview.html",
+    "line": "329",
+    "pattern": "Table headers (th)",
+    "text": "Expiration",
+    "context": "<th>Expiration</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/licenses/overview.html",
+    "line": "330",
+    "pattern": "Table headers (th)",
+    "text": "Actions",
+    "context": "<th>Actions</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "69",
+    "pattern": "Title attributes",
+    "text": "License limit reached",
+    "context": "title=\"License limit reached\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "96",
+    "pattern": "Table headers (th)",
+    "text": "User",
+    "context": "<th scope=\"col\">User</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "98",
+    "pattern": "Table headers (th)",
+    "text": "Status",
+    "context": "<th scope=\"col\">Status</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "99",
+    "pattern": "Table headers (th)",
+    "text": "Last Login",
+    "context": "<th scope=\"col\">Last Login</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "100",
+    "pattern": "Table headers (th)",
+    "text": "Actions",
+    "context": "<th scope=\"col\">Actions</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "143",
+    "pattern": "Title attributes",
+    "text": "Edit User",
+    "context": "title=\"Edit User\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "155",
+    "pattern": "Title attributes",
+    "text": "Reset Password",
+    "context": "title=\"Reset Password\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "168",
+    "pattern": "Title attributes",
+    "text": "Deactivate User",
+    "context": "title=\"Deactivate User\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "175",
+    "pattern": "Title attributes",
+    "text": "Activate User",
+    "context": "title=\"Activate User\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "194",
+    "pattern": "Headings (h1-h6)",
+    "text": "No users found",
+    "context": "<h4>No users found</h4>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "195",
+    "pattern": "Paragraphs",
+    "text": "Start building your team by adding the first user.",
+    "context": "<p>Start building your team by adding the first user.</p>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "249",
+    "pattern": "Placeholder attributes",
+    "text": "user@company.com",
+    "context": "placeholder=\"user@company.com\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "274",
+    "pattern": "Buttons",
+    "text": "Cancel",
+    "context": "<button type=\"button\" class=\"btn btn-secondary\" data-bs-dismiss=\"modal\">Cancel</button>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "349",
+    "pattern": "Buttons",
+    "text": "Cancel",
+    "context": "<button type=\"button\" class=\"btn btn-secondary\" data-bs-dismiss=\"modal\">Cancel</button>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/onboarding/smtp.html",
+    "line": "258",
+    "pattern": "Paragraphs",
+    "text": "Configure SMTP settings to send survey invitations",
+    "context": "<p style=\"font-size: var(--font-size-lg); color: var(--gray-dark); margin: 0;\">Configure SMTP settin",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/onboarding/smtp.html",
+    "line": "295",
+    "pattern": "Labels",
+    "text": "SMTP Server *",
+    "context": "<label class=\"form-label\" for=\"smtp_server\">SMTP Server *</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/onboarding/smtp.html",
+    "line": "298",
+    "pattern": "Placeholder attributes",
+    "text": "smtp.gmail.com",
+    "context": "placeholder=\"smtp.gmail.com\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/onboarding/smtp.html",
+    "line": "302",
+    "pattern": "Labels",
+    "text": "Port *",
+    "context": "<label class=\"form-label\" for=\"smtp_port\">Port *</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/onboarding/smtp.html",
+    "line": "312",
+    "pattern": "Labels",
+    "text": "Username *",
+    "context": "<label class=\"form-label\" for=\"smtp_username\">Username *</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/onboarding/smtp.html",
+    "line": "315",
+    "pattern": "Placeholder attributes",
+    "text": "your-email@company.com",
+    "context": "placeholder=\"your-email@company.com\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/onboarding/smtp.html",
+    "line": "319",
+    "pattern": "Labels",
+    "text": "Password *",
+    "context": "<label class=\"form-label\" for=\"smtp_password\">Password *</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/onboarding/smtp.html",
+    "line": "327",
+    "pattern": "Labels",
+    "text": "Sender Name *",
+    "context": "<label class=\"form-label\" for=\"from_name\">Sender Name *</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/onboarding/smtp.html",
+    "line": "344",
+    "pattern": "Labels",
+    "text": "Test Email Address *",
+    "context": "<label class=\"form-label\" for=\"test_email\">Test Email Address *</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/onboarding/smtp.html",
+    "line": "346",
+    "pattern": "Placeholder attributes",
+    "text": "test@example.com",
+    "context": "placeholder=\"test@example.com\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/onboarding/users.html",
+    "line": "390",
+    "pattern": "Labels",
+    "text": "First Name *",
+    "context": "<label class=\"form-label\" for=\"first_name\">First Name *</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/onboarding/users.html",
+    "line": "392",
+    "pattern": "Placeholder attributes",
+    "text": "John",
+    "context": "placeholder=\"John\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/onboarding/users.html",
+    "line": "395",
+    "pattern": "Labels",
+    "text": "Last Name *",
+    "context": "<label class=\"form-label\" for=\"last_name\">Last Name *</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/onboarding/users.html",
+    "line": "397",
+    "pattern": "Placeholder attributes",
+    "text": "Smith",
+    "context": "placeholder=\"Smith\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/onboarding/users.html",
+    "line": "402",
+    "pattern": "Labels",
+    "text": "Email Address *",
+    "context": "<label class=\"form-label\" for=\"email\">Email Address *</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/onboarding/users.html",
+    "line": "404",
+    "pattern": "Placeholder attributes",
+    "text": "john.smith@company.com",
+    "context": "placeholder=\"john.smith@company.com\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/onboarding/users.html",
+    "line": "409",
+    "pattern": "Labels",
+    "text": "Role *",
+    "context": "<label class=\"form-label\" for=\"role\">Role *</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/platform_dashboard.html",
+    "line": "349",
+    "pattern": "Paragraphs",
+    "text": "Total Business Accounts",
+    "context": "<p class=\"metric-label\">Total Business Accounts</p>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/platform_dashboard.html",
+    "line": "363",
+    "pattern": "Paragraphs",
+    "text": "Total Active Users",
+    "context": "<p class=\"metric-label\">Total Active Users</p>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/platform_dashboard.html",
+    "line": "373",
+    "pattern": "Paragraphs",
+    "text": "Campaigns This Month",
+    "context": "<p class=\"metric-label\">Campaigns This Month</p>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/platform_dashboard.html",
+    "line": "383",
+    "pattern": "Paragraphs",
+    "text": "Responses This Month",
+    "context": "<p class=\"metric-label\">Responses This Month</p>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/platform_dashboard.html",
+    "line": "384",
+    "pattern": "Paragraphs",
+    "text": "Survey submissions",
+    "context": "<p class=\"metric-sublabel\">Survey submissions</p>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/platform_dashboard.html",
+    "line": "401",
+    "pattern": "Paragraphs",
+    "text": "Total Users",
+    "context": "<p class=\"metric-label\">Total Users</p>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/platform_dashboard.html",
+    "line": "691",
+    "pattern": "Table headers (th)",
+    "text": "Nom",
+    "context": "<th>Nom</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/reset_password.html",
+    "line": "16",
+    "pattern": "Headings (h1-h6)",
+    "text": "Set New Password",
+    "context": "<h2 class=\"business-login-title\">Set New Password</h2>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/reset_password.html",
+    "line": "17",
+    "pattern": "Paragraphs",
+    "text": "Choose a strong password for your account",
+    "context": "<p class=\"business-login-subtitle\">Choose a strong password for your account</p>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/reset_password.html",
+    "line": "45",
+    "pattern": "Placeholder attributes",
+    "text": "New Password",
+    "context": "placeholder=\"New Password\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/reset_password.html",
+    "line": "62",
+    "pattern": "Placeholder attributes",
+    "text": "Confirm New Password",
+    "context": "placeholder=\"Confirm New Password\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "84",
+    "pattern": "Placeholder attributes",
+    "text": "Briefly describe what your company does and your mission...",
+    "context": "placeholder=\"Briefly describe what your company does and your mission...\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "103",
+    "pattern": "Placeholder attributes",
+    "text": "Describe your main products or services in detail...",
+    "context": "placeholder=\"Describe your main products or services in detail...\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "122",
+    "pattern": "Placeholder attributes",
+    "text": "Describe your typical customers (e.g., small business owners, CFOs, healthcare providers...)",
+    "context": "placeholder=\"Describe your typical customers (e.g., small business owners, CFOs, healthcare provider",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "148",
+    "pattern": "Labels",
+    "text": "Net Promoter Score",
+    "context": "<label class=\"survey-config-form-check-label\" for=\"goal_nps\">Net Promoter Score</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "333",
+    "pattern": "Placeholder attributes",
+    "text": "Thank you for your valuable feedback! We truly appreciate the time you've taken to help us improve...",
+    "context": "placeholder=\"Thank you for your valuable feedback! We truly appreciate the time you've taken to help",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "520",
+    "pattern": "Table headers (th)",
+    "text": "Distribution",
+    "context": "<th>Distribution</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "788",
+    "pattern": "Table headers (th)",
+    "text": "NPS",
+    "context": "<th style=\"width: 10%; text-align: center;\">NPS</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/create.html",
+    "line": "84",
+    "pattern": "Placeholder attributes",
+    "text": "e.g., Q2 2025 Product Satisfaction Survey",
+    "context": "placeholder=\"e.g., Q2 2025 Product Satisfaction Survey\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/create.html",
+    "line": "90",
+    "pattern": "Labels",
+    "text": "Description",
+    "context": "<label for=\"description\" class=\"form-label\">Description</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/create.html",
+    "line": "92",
+    "pattern": "Placeholder attributes",
+    "text": "Optional description of campaign goals, focus areas, or target audience",
+    "context": "placeholder=\"Optional description of campaign goals, focus areas, or target audience\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/create.html",
+    "line": "180",
+    "pattern": "Placeholder attributes",
+    "text": "Your feedback is requested: {campaign_name}",
+    "context": "placeholder=\"Your feedback is requested: {campaign_name}\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/create.html",
+    "line": "188",
+    "pattern": "Placeholder attributes",
+    "text": "{business_account_name} is requesting your valuable feedback through our Voice of Client system.",
+    "context": "placeholder=\"{business_account_name} is requesting your valuable feedback through our Voice of Clien",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/create.html",
+    "line": "195",
+    "pattern": "Placeholder attributes",
+    "text": "Complete Your Survey",
+    "context": "placeholder=\"Complete Your Survey\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/create.html",
+    "line": "203",
+    "pattern": "Placeholder attributes",
+    "text": "Your feedback helps improve services and experiences. The survey should take just a few minutes to complete.\n\nThank you for your time and valuable insights!",
+    "context": "placeholder=\"Your feedback helps improve services and experiences. The survey should take just a few",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/create.html",
+    "line": "213",
+    "pattern": "Placeholder attributes",
+    "text": "This is an automated message. If you have any questions, please contact the organization that sent this survey.",
+    "context": "placeholder=\"This is an automated message. If you have any questions, please contact the organizatio",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/edit.html",
+    "line": "100",
+    "pattern": "Placeholder attributes",
+    "text": "e.g., Q2 2025 Product Satisfaction Survey",
+    "context": "placeholder=\"e.g., Q2 2025 Product Satisfaction Survey\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/edit.html",
+    "line": "106",
+    "pattern": "Labels",
+    "text": "Description",
+    "context": "<label for=\"description\" class=\"form-label\">Description</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/edit.html",
+    "line": "108",
+    "pattern": "Placeholder attributes",
+    "text": "Optional description of campaign goals, focus areas, or target audience",
+    "context": "placeholder=\"Optional description of campaign goals, focus areas, or target audience\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/individual_response.html",
+    "line": "514",
+    "pattern": "Headings (h1-h6)",
+    "text": "No Conversation History",
+    "context": "<h5 class=\"text-muted\">No Conversation History</h5>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/individual_response.html",
+    "line": "515",
+    "pattern": "Paragraphs",
+    "text": "This response doesn't contain conversational transcript data.",
+    "context": "<p class=\"text-muted\">This response doesn't contain conversational transcript data.</p>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/list.html",
+    "line": "171",
+    "pattern": "Table headers (th)",
+    "text": "Fin Date",
+    "context": "<th class=\"hide-on-tablet\">Fin Date</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/list.html",
+    "line": "172",
+    "pattern": "Table headers (th)",
+    "text": "Participants",
+    "context": "<th class=\"text-center\">Participants</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/list.html",
+    "line": "174",
+    "pattern": "Table headers (th)",
+    "text": "Actions",
+    "context": "<th class=\"text-center\">Actions</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/responses_list.html",
+    "line": "176",
+    "pattern": "Table headers (th)",
+    "text": "Participant",
+    "context": "<th>Participant</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/responses_list.html",
+    "line": "181",
+    "pattern": "Table headers (th)",
+    "text": "Actions",
+    "context": "<th class=\"text-end\">Actions</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "179",
+    "pattern": "Headings (h1-h6)",
+    "text": "Survey Configuration",
+    "context": "<h1 class=\"mb-1\">Survey Configuration</h1>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "215",
+    "pattern": "Paragraphs",
+    "text": "Define what your campaign surveys are about. This helps the AI ask more relevant questions and better understand your business context.",
+    "context": "<p class=\"section-description\">                     Define what your campaign surveys are about. Thi",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "220",
+    "pattern": "Labels",
+    "text": "Product/Service Description",
+    "context": "<label for=\"product_description\" class=\"form-label\">Product/Service Description</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "222",
+    "pattern": "Placeholder attributes",
+    "text": "Describe your main products or services (e.g., 'Cloud-based accounting software for small businesses')",
+    "context": "placeholder=\"Describe your main products or services (e.g., 'Cloud-based accounting software for sma",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "228",
+    "pattern": "Labels",
+    "text": "Target Clients",
+    "context": "<label for=\"target_clients_description\" class=\"form-label\">Target Clients</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "230",
+    "pattern": "Placeholder attributes",
+    "text": "Describe your ideal customers (e.g., 'Small business owners, CFOs, accounting firms')",
+    "context": "placeholder=\"Describe your ideal customers (e.g., 'Small business owners, CFOs, accounting firms')\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "241",
+    "pattern": "Paragraphs",
+    "text": "Select the key objectives for this campaign. The AI will prioritize these areas during conversations.",
+    "context": "<p class=\"section-description\">                     Select the key objectives for this campaign. The",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "264",
+    "pattern": "Paragraphs",
+    "text": "Set limits to keep conversations focused and manageable for your participants.",
+    "context": "<p class=\"section-description\">                     Set limits to keep conversations focused and man",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "271",
+    "pattern": "Labels",
+    "text": "Max Questions",
+    "context": "<label for=\"max_questions\" class=\"form-label\">Max Questions</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "283",
+    "pattern": "Labels",
+    "text": "Max Duration (seconds)",
+    "context": "<label for=\"max_duration_seconds\" class=\"form-label\">Max Duration (seconds)</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "295",
+    "pattern": "Labels",
+    "text": "Max Follow-ups per Topic",
+    "context": "<label for=\"max_follow_ups_per_topic\" class=\"form-label\">Max Follow-ups per Topic</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "313",
+    "pattern": "Paragraphs",
+    "text": "Choose which topics to cover first and which ones can be skipped if time runs out.",
+    "context": "<p class=\"section-description\">                     Choose which topics to cover first and which one",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "320",
+    "pattern": "Labels",
+    "text": "Prioritized Topics (cover first)",
+    "context": "<label class=\"form-label\">Prioritized Topics (cover first)</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "337",
+    "pattern": "Labels",
+    "text": "Optional Topics (can be skipped)",
+    "context": "<label class=\"form-label\">Optional Topics (can be skipped)</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "357",
+    "pattern": "Labels",
+    "text": "Custom End Message",
+    "context": "<label for=\"custom_end_message\" class=\"form-label\">Custom End Message</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "359",
+    "pattern": "Placeholder attributes",
+    "text": "Optional custom thank you message for survey completion",
+    "context": "placeholder=\"Optional custom thank you message for survey completion\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "383",
+    "pattern": "Labels",
+    "text": "Custom System Prompt",
+    "context": "<label for=\"custom_system_prompt\" class=\"form-label\">Custom System Prompt</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "385",
+    "pattern": "Placeholder attributes",
+    "text": "Optional: Override the default AI system prompt with custom instructions",
+    "context": "placeholder=\"Optional: Override the default AI system prompt with custom instructions\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/view.html",
+    "line": "723",
+    "pattern": "Title attributes",
+    "text": "Download transcript",
+    "context": "title=\"Download transcript\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/campaigns/view.html",
+    "line": "726",
+    "pattern": "Title attributes",
+    "text": "View analysis results",
+    "context": "title=\"View analysis results\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/company_responses.html",
+    "line": "73",
+    "pattern": "Table headers (th)",
+    "text": "NPS",
+    "context": "<th>NPS</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/demo_intro.html",
+    "line": "29",
+    "pattern": "Alt attributes",
+    "text": "Archelo Group Logo",
+    "context": "alt=\"Archelo Group Logo\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/executive_summary.html",
+    "line": "325",
+    "pattern": "Headings (h1-h6)",
+    "text": "Satisfaction",
+    "context": "<h6 class=\"mb-0\">Satisfaction</h6>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/maintenance.html",
+    "line": "26",
+    "pattern": "Paragraphs",
+    "text": "Turning voices into value",
+    "context": "<p class=\"index-hero-subtitle\">Turning voices into value</p>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/maintenance.html",
+    "line": "31",
+    "pattern": "Headings (h1-h6)",
+    "text": "Request Demo",
+    "context": "<h2 id=\"cta-heading\" class=\"visually-hidden\">Request Demo</h2>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/campaign_participants.html",
+    "line": "117",
+    "pattern": "Labels",
+    "text": "Language",
+    "context": "<label for=\"filter_language\" class=\"form-label\">Language</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/create.html",
+    "line": "46",
+    "pattern": "Placeholder attributes",
+    "text": "participant@example.com",
+    "context": "placeholder=\"participant@example.com\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/create.html",
+    "line": "63",
+    "pattern": "Placeholder attributes",
+    "text": "John Doe",
+    "context": "placeholder=\"John Doe\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/create.html",
+    "line": "78",
+    "pattern": "Placeholder attributes",
+    "text": "Acme Corporation",
+    "context": "placeholder=\"Acme Corporation\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/edit.html",
+    "line": "47",
+    "pattern": "Headings (h1-h6)",
+    "text": "Email Address Locked",
+    "context": "<h5 class=\"alert-heading mb-1\">Email Address Locked</h5>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/edit.html",
+    "line": "48",
+    "pattern": "Paragraphs",
+    "text": "This participant has survey history (responses, campaign associations, or email deliveries). \n                The email address cannot be changed to protect data integrity.",
+    "context": "<p class=\"mb-0\">                 This participant has survey history (responses, campaign associatio",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/edit.html",
+    "line": "85",
+    "pattern": "Placeholder attributes",
+    "text": "participant@example.com",
+    "context": "placeholder=\"participant@example.com\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/edit.html",
+    "line": "110",
+    "pattern": "Placeholder attributes",
+    "text": "John Doe",
+    "context": "placeholder=\"John Doe\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/edit.html",
+    "line": "126",
+    "pattern": "Placeholder attributes",
+    "text": "Acme Corporation",
+    "context": "placeholder=\"Acme Corporation\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/edit.html",
+    "line": "143",
+    "pattern": "Paragraphs",
+    "text": "Update segmentation data for personalized surveys and advanced analytics",
+    "context": "<p class=\"participant-help-text mb-3\">Update segmentation data for personalized surveys and advanced",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "296",
+    "pattern": "Labels",
+    "text": "Language",
+    "context": "<label for=\"filter_language\" class=\"form-label\">Language</label>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "401",
+    "pattern": "Table headers (th)",
+    "text": "Nom",
+    "context": "<th>Nom</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "405",
+    "pattern": "Table headers (th)",
+    "text": "Status",
+    "context": "<th>Status</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "407",
+    "pattern": "Table headers (th)",
+    "text": "Actions",
+    "context": "<th class=\"text-end\">Actions</th>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "478",
+    "pattern": "Title attributes",
+    "text": "Edit participant",
+    "context": "title=\"Edit participant\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "486",
+    "pattern": "Title attributes",
+    "text": "Delete participant",
+    "context": "title=\"Delete participant\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "557",
+    "pattern": "Placeholder attributes",
+    "text": "e.g., Manager, Director",
+    "context": "placeholder=\"e.g., Manager, Director\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "568",
+    "pattern": "Placeholder attributes",
+    "text": "e.g., North America, EMEA",
+    "context": "placeholder=\"e.g., North America, EMEA\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "593",
+    "pattern": "Labels",
+    "text": "Update Language",
+    "context": "<label class=\"form-check-label fw-bold\" for=\"updateLanguage\">                                     Up",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "597",
+    "pattern": "Placeholder attributes",
+    "text": "e.g., English, Spanish",
+    "context": "placeholder=\"e.g., English, Spanish\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "604",
+    "pattern": "Labels",
+    "text": "Update Tenure (years)",
+    "context": "<label class=\"form-check-label fw-bold\" for=\"updateTenure\">                                     Upda",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "615",
+    "pattern": "Labels",
+    "text": "Update Commercial Value ($)",
+    "context": "<label class=\"form-check-label fw-bold\" for=\"updateCommercialValue\">                                ",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "682",
+    "pattern": "Paragraphs",
+    "text": "Filtering participants...",
+    "context": "<p class=\"mt-2 text-muted\">Filtering participants...</p>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "745",
+    "pattern": "Paragraphs",
+    "text": "Error loading participants. Please try again.",
+    "context": "<p class=\"text-danger\">Error loading participants. Please try again.</p>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "765",
+    "pattern": "Headings (h1-h6)",
+    "text": "No participants match your filters",
+    "context": "<h3>No participants match your filters</h3>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "766",
+    "pattern": "Paragraphs",
+    "text": "Try adjusting your filter criteria.",
+    "context": "<p class=\"text-muted\">Try adjusting your filter criteria.</p>",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "839",
+    "pattern": "Title attributes",
+    "text": "Edit participant",
+    "context": "title=\"Edit participant\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "847",
+    "pattern": "Title attributes",
+    "text": "Delete participant",
+    "context": "title=\"Delete participant\"",
+    "risk_level": "green",
+    "reason": "Safe display text - auto-wrappable",
+    "auto_fixable": true
+  }
+]

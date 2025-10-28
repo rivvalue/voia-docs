@@ -1,0 +1,2312 @@
+[
+  {
+    "file": "templates/auth.html",
+    "line": "71",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "conversational",
+    "context": "value=\"conversational\"",
+    "risk_level": "red",
+    "reason": "Survey type value - backend dependency",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/auth.html",
+    "line": "76",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "traditional",
+    "context": "value=\"traditional\"",
+    "risk_level": "red",
+    "reason": "Survey type value - backend dependency",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/base.html",
+    "line": "40",
+    "pattern": "Alt attributes",
+    "text": "{{ branding_context.company_name }}",
+    "context": "alt=\"{{ branding_context.company_name }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/base.html",
+    "line": "104",
+    "pattern": "Alt attributes",
+    "text": "{{ branding_context.company_name }}",
+    "context": "alt=\"{{ branding_context.company_name }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/activate_account.html",
+    "line": "477",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/admin_licenses.html",
+    "line": "20",
+    "pattern": "Paragraphs",
+    "text": "Platform license management - {{ total_accounts }} total accounts",
+    "context": "<p class=\"admin-subtitle\">Platform license management - {{ total_accounts }} total accounts</p>",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/admin_licenses.html",
+    "line": "91",
+    "pattern": "Spans",
+    "text": "{{ account.get('license_type', 'trial')|title }}",
+    "context": "<span class=\"license-badge license-{{ account.get('license_type', 'trial') }}\">                     ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/admin_licenses.html",
+    "line": "96",
+    "pattern": "Spans",
+    "text": "{{ account.get('license_status', 'trial')|title }}",
+    "context": "<span class=\"status-badge status-{{ account.get('license_status', 'trial') }}\">                     ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/admin_licenses.html",
+    "line": "109",
+    "pattern": "Divs with text",
+    "text": "= 90 %}bg-danger\n                                        {% elif usage_percent >= 75 %}bg-warning\n                                        {% else %}bg-success{% endif %}\" \n                                        style=\"width: {{ usage_percent }}%\">",
+    "context": "<div class=\"progress-bar                                          {% if usage_percent >= 90 %}bg-dan",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/admin_licenses.html",
+    "line": "124",
+    "pattern": "Divs with text",
+    "text": "= 90 %}bg-danger\n                                        {% elif user_percent >= 75 %}bg-warning\n                                        {% else %}bg-info{% endif %}\" \n                                        style=\"width: {{ user_percent }}%\">",
+    "context": "<div class=\"progress-bar                                          {% if user_percent >= 90 %}bg-dang",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "52",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ action }}",
+    "context": "value=\"{{ action }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "65",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ user }}",
+    "context": "value=\"{{ user }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "110",
+    "pattern": "Divs with text",
+    "text": "{{ log.formatted_time or log.created_at }}",
+    "context": "<div class=\"audit-time\">                                     {{ log.formatted_time or log.created_at",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "115",
+    "pattern": "Divs with text",
+    "text": "{{ log.user_name or log.user_email or 'System' }}",
+    "context": "<div class=\"audit-user\">                                     {{ log.user_name or log.user_email or '",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "119",
+    "pattern": "Divs with text",
+    "text": "{{ log.user_email }}",
+    "context": "<div class=\"audit-user-email\">                                         {{ log.user_email }}         ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "133",
+    "pattern": "Spans",
+    "text": "{{ log.action_type.replace('_', ' ') }}",
+    "context": "<span class=\"audit-action-badge {{ action_class }}\"                                        role=\"sta",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "135",
+    "pattern": "ARIA labels",
+    "text": "{{ log.action_type.replace('_', ' ') }} activity",
+    "context": "aria-label=\"{{ log.action_type.replace('_', ' ') }} activity\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "140",
+    "pattern": "Divs with text",
+    "text": "{{ log.action_description }}",
+    "context": "<div class=\"audit-description\">                                     {{ log.action_description }}    ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "146",
+    "pattern": "Divs with text",
+    "text": "{{ log.resource_type or 'Resource' }}: {{ log.resource_name }}",
+    "context": "<div class=\"audit-resource\">                                         {{ log.resource_type or 'Resour",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/audit_logs.html",
+    "line": "184",
+    "pattern": "Spans",
+    "text": "Page {{ pagination.page }}",
+    "context": "<span class=\"audit-pagination-info\" aria-current=\"page\">Page {{ pagination.page }}</span>",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/brand_config.html",
+    "line": "59",
+    "pattern": "Paragraphs",
+    "text": "{{ branding_config.logo_filename if branding_config.logo_filename else _('No logo') ~ ' uploaded' }}",
+    "context": "<p class=\"brand-preview-value {{ 'empty' if not branding_config.logo_filename else '' }}\">          ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/brand_config.html",
+    "line": "68",
+    "pattern": "Paragraphs",
+    "text": "{{ branding_config.get_company_display_name() }}\n                        {% if not branding_config.company_display_name %}(default: {{ business_account.name }}){% endif %}",
+    "context": "<p class=\"brand-preview-value {{ 'empty' if not branding_config.company_display_name else '' }}\">   ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/brand_config.html",
+    "line": "79",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/brand_config.html",
+    "line": "94",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ branding_config.company_display_name if branding_config.company_display_name else '' }}",
+    "context": "value=\"{{ branding_config.company_display_name if branding_config.company_display_name else '' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/brand_config.html",
+    "line": "95",
+    "pattern": "Placeholder attributes",
+    "text": "{{ business_account.name }}",
+    "context": "placeholder=\"{{ business_account.name }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/brand_config.html",
+    "line": "118",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ branding_config.primary_color if branding_config.primary_color else '#dc3545' }}",
+    "context": "value=\"{{ branding_config.primary_color if branding_config.primary_color else '#dc3545' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/brand_config.html",
+    "line": "132",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ branding_config.secondary_color if branding_config.secondary_color else '#6c757d' }}",
+    "context": "value=\"{{ branding_config.secondary_color if branding_config.secondary_color else '#6c757d' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/brand_config.html",
+    "line": "149",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ branding_config.accent_color if branding_config.accent_color else '#28a745' }}",
+    "context": "value=\"{{ branding_config.accent_color if branding_config.accent_color else '#28a745' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/brand_config.html",
+    "line": "163",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ branding_config.text_color if branding_config.text_color else '#212529' }}",
+    "context": "value=\"{{ branding_config.text_color if branding_config.text_color else '#212529' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/brand_config.html",
+    "line": "180",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ branding_config.background_color if branding_config.background_color else '#ffffff' }}",
+    "context": "value=\"{{ branding_config.background_color if branding_config.background_color else '#ffffff' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "55",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/business_account_onboarding.html",
+    "line": "93",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ template_id }}",
+    "context": "value=\"{{ template_id }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "22",
+    "pattern": "Paragraphs",
+    "text": "Configure SMTP settings for {{ business_account.name }}",
+    "context": "<p>Configure SMTP settings for {{ business_account.name }}</p>",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "48",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "68",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "smtp",
+    "context": "value=\"smtp\"",
+    "risk_level": "red",
+    "reason": "Email provider value - backend dependency",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "122",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ email_config.smtp_server if email_config else '' }}",
+    "context": "value=\"{{ email_config.smtp_server if email_config else '' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "146",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ email_config.smtp_port if email_config else '587' }}",
+    "context": "value=\"{{ email_config.smtp_port if email_config else '587' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "167",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ email_config.smtp_username if email_config else '' }}",
+    "context": "value=\"{{ email_config.smtp_username if email_config else '' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "237",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ email_config.sender_name if email_config else business_account.name + ' Team' }}",
+    "context": "value=\"{{ email_config.sender_name if email_config else business_account.name + ' Team' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "252",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ email_config.sender_email if email_config else '' }}",
+    "context": "value=\"{{ email_config.sender_email if email_config else '' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "268",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ email_config.reply_to_email if email_config and email_config.reply_to_email else '' }}",
+    "context": "value=\"{{ email_config.reply_to_email if email_config and email_config.reply_to_email else '' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "288",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ email_config.get_admin_emails() | join(', ') if email_config and email_config.get_admin_emails() else '' }}",
+    "context": "value=\"{{ email_config.get_admin_emails() | join(', ') if email_config and email_config.get_admin_em",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "331",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ email_config.custom_subject_template if email_config else '' }}",
+    "context": "value=\"{{ email_config.custom_subject_template if email_config else '' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/email_config.html",
+    "line": "364",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ email_config.custom_cta_text if email_config else '' }}",
+    "context": "value=\"{{ email_config.custom_cta_text if email_config else '' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/forgot_password.html",
+    "line": "37",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "65",
+    "pattern": "Divs with text",
+    "text": "{% if license_start %}\n                            {{ license_start.strftime('%B %d, %Y') }}\n                        {% else %}\n                            Not Available\n                        {% endif %}",
+    "context": "<div class=\"license-date-value\">                         {% if license_start %}                     ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "72",
+    "pattern": "Divs with text",
+    "text": "{% if license_start %}\n                            {{ license_start.strftime('%A') }} - {{ days_since_activation if days_since_activation is defined else 0 }} days ago (activation date)\n                        {% else %}\n                            Trial account or missing license data\n                        {% endif %}",
+    "context": "<div class=\"license-date-meta\">                         {% if license_start %}                      ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "88",
+    "pattern": "Divs with text",
+    "text": "{% if license_end %}\n                            {{ license_end.strftime('%B %d, %Y') }}\n                        {% else %}\n                            Not Set\n                        {% endif %}",
+    "context": "<div class=\"license-date-value\">                         {% if license_end %}                       ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "95",
+    "pattern": "Divs with text",
+    "text": "{% if days_remaining is not none %}\n                            {% if days_remaining > 0 %}\n                                {{ days_remaining }} days remaining\n                            {% elif days_remaining == 0 %}\n                                Expires today\n                            {% else %}\n                                Expired\n                            {% endif %}\n                        {% else %}\n                            Trial account or no expiration set\n                        {% endif %}",
+    "context": "<div class=\"license-date-meta\">                         {% if days_remaining is not none %}         ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "252",
+    "pattern": "Divs with text",
+    "text": "{% if transcript_analysis.start_date %}\n                            {{ transcript_analysis.start_date.strftime('%B %d, %Y') if transcript_analysis.start_date is string == false else transcript_analysis.start_date }}\n                        {% else %}\n                            Not Set\n                        {% endif %}",
+    "context": "<div class=\"license-date-value\">                         {% if transcript_analysis.start_date %}    ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "259",
+    "pattern": "Divs with text",
+    "text": "{% if transcript_analysis.status == 'active' %}\n                            Transcript analysis is currently active\n                        {% elif transcript_analysis.status == 'scheduled' %}\n                            Access will begin on this date\n                        {% else %}\n                            Access period has started\n                        {% endif %}",
+    "context": "<div class=\"license-date-meta\">                         {% if transcript_analysis.status == 'active'",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "277",
+    "pattern": "Divs with text",
+    "text": "{% if transcript_analysis.end_date %}\n                            {{ transcript_analysis.end_date.strftime('%B %d, %Y') if transcript_analysis.end_date is string == false else transcript_analysis.end_date }}\n                        {% else %}\n                            Not Set\n                        {% endif %}",
+    "context": "<div class=\"license-date-value\">                         {% if transcript_analysis.end_date %}      ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "284",
+    "pattern": "Divs with text",
+    "text": "{% if transcript_analysis.days_remaining is defined and transcript_analysis.days_remaining is not none %}\n                            {% if transcript_analysis.days_remaining > 0 %}\n                                {{ transcript_analysis.days_remaining }} days remaining\n                            {% elif transcript_analysis.days_remaining == 0 %}\n                                Expires today\n                            {% else %}\n                                Access has expired\n                            {% endif %}\n                        {% else %}\n                            No expiration set\n                        {% endif %}",
+    "context": "<div class=\"license-date-meta\">                         {% if transcript_analysis.days_remaining is ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "310",
+    "pattern": "Divs with text",
+    "text": "{% if transcript_analysis.start_date is string == false and transcript_analysis.end_date is string == false %}\n                            {{ transcript_analysis.start_date.strftime('%b %d, %Y') }} - {{ transcript_analysis.end_date.strftime('%b %d, %Y') }}\n                        {% else %}\n                            {{ transcript_analysis.start_date }} - {{ transcript_analysis.end_date }}\n                        {% endif %}",
+    "context": "<div class=\"license-info-value\">                         {% if transcript_analysis.start_date is str",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_info.html",
+    "line": "326",
+    "pattern": "Divs with text",
+    "text": "{% if transcript_analysis.start_date is string == false and transcript_analysis.end_date is string == false %}\n                            {{ ((transcript_analysis.end_date - transcript_analysis.start_date).days // 30) }} months ({{ (transcript_analysis.end_date - transcript_analysis.start_date).days }} days)\n                        {% else %}\n                            Not calculated\n                        {% endif %}",
+    "context": "<div class=\"license-info-value\">                         {% if transcript_analysis.start_date is str",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_overview.html",
+    "line": "41",
+    "pattern": "Spans",
+    "text": "{{ account_data.license_type|title }}",
+    "context": "<span class=\"license-type license-{{ account_data.license_type }}\">                             {{ a",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/license_overview.html",
+    "line": "47",
+    "pattern": "Spans",
+    "text": "{{ account_data.license_status|title }}\n                            {% if account_data.expires_soon and account_data.days_remaining > 0 %}\n                                (Expires in {{ account_data.days_remaining }} days)\n                            {% endif %}",
+    "context": "<span class=\"license-status status-{{ account_data.license_status }}\">                             {",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "92",
+    "pattern": "Divs with text",
+    "text": "{{ usage_stats.users_count }}",
+    "context": "<div style=\"font-size: var(--font-size-2xl); font-weight: 600; color: var(--primary-red);\">         ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "102",
+    "pattern": "Divs with text",
+    "text": "{{ usage_stats.campaigns_count }}",
+    "context": "<div style=\"font-size: var(--font-size-2xl); font-weight: 600; color: var(--primary-red);\">         ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "119",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "120",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ business_account.id }}",
+    "context": "value=\"{{ business_account.id }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "136",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "core",
+    "context": "value=\"core\"",
+    "risk_level": "red",
+    "reason": "License type value - backend dependency",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "181",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "plus",
+    "context": "value=\"plus\"",
+    "risk_level": "red",
+    "reason": "License type value - backend dependency",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "285",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ current_license.max_users if current_license and current_license.type == 'pro' else 25 }}",
+    "context": "value=\"{{ current_license.max_users if current_license and current_license.type == 'pro' else 25 }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "291",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ current_license.max_campaigns if current_license and current_license.type == 'pro' else 100 }}",
+    "context": "value=\"{{ current_license.max_campaigns if current_license and current_license.type == 'pro' else 10",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "297",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ current_license.max_participants_per_campaign if current_license and current_license.type == 'pro' else 10000 }}",
+    "context": "value=\"{{ current_license.max_participants_per_campaign if current_license and current_license.type ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "303",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ current_license.max_invitations_per_campaign if current_license and current_license.type == 'pro' else 50000 }}",
+    "context": "value=\"{{ current_license.max_invitations_per_campaign if current_license and current_license.type =",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "338",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ current_license.transcript_analysis_start_date.strftime('%Y-%m-%d') if current_license and current_license.transcript_analysis_start_date else '' }}",
+    "context": "value=\"{{ current_license.transcript_analysis_start_date.strftime('%Y-%m-%d') if current_license and",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "344",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ current_license.transcript_analysis_end_date.strftime('%Y-%m-%d') if current_license and current_license.transcript_analysis_end_date else '' }}",
+    "context": "value=\"{{ current_license.transcript_analysis_end_date.strftime('%Y-%m-%d') if current_license and c",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_form.html",
+    "line": "353",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ '%.2f'|format(current_license.transcript_analysis_price|float) if current_license and current_license.transcript_analysis_price else '' }}",
+    "context": "value=\"{{ '%.2f'|format(current_license.transcript_analysis_price|float) if current_license and curr",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_result.html",
+    "line": "296",
+    "pattern": "Headings (h1-h6)",
+    "text": "{% if success %}\n                        License Assignment Successful!\n                    {% else %}\n                        License Assignment Failed\n                    {% endif %}",
+    "context": "<h1 class=\"result-title\">                     {% if success %}                         License Assig",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/assignment_result.html",
+    "line": "303",
+    "pattern": "Paragraphs",
+    "text": "{% if success %}\n                        The license has been successfully assigned to {{ business_account.name }}.\n                    {% else %}\n                        There was an issue assigning the license. Please review the details below.\n                    {% endif %}",
+    "context": "<p class=\"result-subtitle\">                     {% if success %}                         The license",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/dashboard.html",
+    "line": "157",
+    "pattern": "Links (a tags)",
+    "text": "{{ alert.action_text or 'View Details' }}",
+    "context": "<a href=\"{{ alert.action_url }}\" class=\"btn btn-sm btn-outline-primary\">                     {{ aler",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/history.html",
+    "line": "392",
+    "pattern": "Headings (h1-h6)",
+    "text": "{% set different_types = license_history | map(attribute='license_type') | list | unique | list %}\n                    {{ different_types|length }}",
+    "context": "<h3 class=\"stat-number\">                     {% set different_types = license_history | map(attribut",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/history.html",
+    "line": "399",
+    "pattern": "Headings (h1-h6)",
+    "text": "{% if license_history %}\n                        {% set first_license = license_history[-1] %}\n                        {% set days_since_first = (current_date - first_license.assigned_at).days if first_license and first_license.assigned_at else 0 %}\n                        {{ days_since_first }}\n                    {% else %}\n                        0\n                    {% endif %}",
+    "context": "<h3 class=\"stat-number\">                     {% if license_history %}                         {% set",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/history.html",
+    "line": "428",
+    "pattern": "Divs with text",
+    "text": "{{ record.duration_days }} day{{ 's' if record.duration_days != 1 else '' }}",
+    "context": "<div class=\"timeline-duration\">                         {{ record.duration_days }} day{{ 's' if reco",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/history.html",
+    "line": "435",
+    "pattern": "Divs with text",
+    "text": "{{ record.assigned_at.strftime('%B %d, %Y at %I:%M %p') if record.assigned_at else 'Unknown date' }}",
+    "context": "<div class=\"timeline-date\">                                 {{ record.assigned_at.strftime('%B %d, %",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/history.html",
+    "line": "438",
+    "pattern": "Headings (h1-h6)",
+    "text": "{% if record.action_type == 'assigned' %}\n                                    License Assigned: {{ record.license_type|title }}\n                                {% elif record.action_type == 'modified' %}\n                                    License Modified: {{ record.license_type|title }}\n                                {% elif record.action_type == 'expired' %}\n                                    License Expired: {{ record.license_type|title }}\n                                {% else %}\n                                    License Updated: {{ record.license_type|title }}\n                                {% endif %}",
+    "context": "<h5 class=\"timeline-action\">                                 {% if record.action_type == 'assigned' ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/overview.html",
+    "line": "288",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ request.args.get('search', '') }}",
+    "context": "value=\"{{ request.args.get('search', '') }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/overview.html",
+    "line": "294",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "core",
+    "context": "value=\"core\"",
+    "risk_level": "red",
+    "reason": "License type value - backend dependency",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/overview.html",
+    "line": "295",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "plus",
+    "context": "value=\"plus\"",
+    "risk_level": "red",
+    "reason": "License type value - backend dependency",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/overview.html",
+    "line": "297",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "trial",
+    "context": "value=\"trial\"",
+    "risk_level": "red",
+    "reason": "License type value - backend dependency",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/overview.html",
+    "line": "304",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "active",
+    "context": "value=\"active\"",
+    "risk_level": "red",
+    "reason": "Status value - backend dependency",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/overview.html",
+    "line": "429",
+    "pattern": "Divs with text",
+    "text": "Showing {{ pagination.per_page * (pagination.page - 1) + 1 }} \n                    to {{ min(pagination.per_page * pagination.page, pagination.total) }} \n                    of {{ pagination.total }} accounts",
+    "context": "<div class=\"text-muted\">                     Showing {{ pagination.per_page * (pagination.page - 1) ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/licenses/overview.html",
+    "line": "448",
+    "pattern": "Links (a tags)",
+    "text": "{{ page_num }}",
+    "context": "<a class=\"page-link\" href=\"{{ url_for('business_auth.business_license_overview', page=page_num, **re",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/login.html",
+    "line": "37",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "22",
+    "pattern": "Paragraphs",
+    "text": "Manage users and team members for {{ business_account.name }}",
+    "context": "<p>Manage users and team members for {{ business_account.name }}</p>",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "108",
+    "pattern": "Divs with text",
+    "text": "{{ user.first_name[:1]|upper }}{{ user.last_name[:1]|upper }}",
+    "context": "<div class=\"users-user-avatar\" role=\"img\" aria-label=\"User avatar for {{ user.get_full_name() }}\">  ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "108",
+    "pattern": "ARIA labels",
+    "text": "User avatar for {{ user.get_full_name() }}",
+    "context": "aria-label=\"User avatar for {{ user.get_full_name() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "145",
+    "pattern": "ARIA labels",
+    "text": "Edit {{ user.get_full_name() }}",
+    "context": "aria-label=\"Edit {{ user.get_full_name() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "152",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "156",
+    "pattern": "ARIA labels",
+    "text": "Reset password for {{ user.get_full_name() }}",
+    "context": "aria-label=\"Reset password for {{ user.get_full_name() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "164",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "169",
+    "pattern": "ARIA labels",
+    "text": "Deactivate {{ user.get_full_name() }}",
+    "context": "aria-label=\"Deactivate {{ user.get_full_name() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "176",
+    "pattern": "ARIA labels",
+    "text": "Activate {{ user.get_full_name() }}",
+    "context": "aria-label=\"Activate {{ user.get_full_name() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "206",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/manage_users.html",
+    "line": "289",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/onboarding/smtp.html",
+    "line": "266",
+    "pattern": "Divs with text",
+    "text": "Step {{ current_step_index + 1 }} of {{ all_steps|length }}: {{ step.name }}",
+    "context": "<div style=\"text-align: center; color: var(--gray-dark); font-size: var(--font-size-sm); font-weight",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/onboarding/smtp.html",
+    "line": "297",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ email_config.smtp_server if email_config else '' }}",
+    "context": "value=\"{{ email_config.smtp_server if email_config else '' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/onboarding/smtp.html",
+    "line": "304",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ email_config.smtp_port if email_config else 587 }}",
+    "context": "value=\"{{ email_config.smtp_port if email_config else 587 }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/onboarding/smtp.html",
+    "line": "314",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ email_config.smtp_username if email_config else '' }}",
+    "context": "value=\"{{ email_config.smtp_username if email_config else '' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/onboarding/smtp.html",
+    "line": "321",
+    "pattern": "Placeholder attributes",
+    "text": "{% if email_config %}\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022{% else %}Enter password{% endif %}",
+    "context": "placeholder=\"{% if email_config %}\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022{% else %}Enter password{% endif %}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/onboarding/smtp.html",
+    "line": "329",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ email_config.from_name if email_config else business_account.name }}",
+    "context": "value=\"{{ email_config.from_name if email_config else business_account.name }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/onboarding/smtp.html",
+    "line": "330",
+    "pattern": "Placeholder attributes",
+    "text": "{{ business_account.name }}",
+    "context": "placeholder=\"{{ business_account.name }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/onboarding/smtp.html",
+    "line": "346",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ current_user.email }}",
+    "context": "value=\"{{ current_user.email }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/onboarding/users.html",
+    "line": "326",
+    "pattern": "Divs with text",
+    "text": "Step {{ current_step_index + 1 }} of {{ all_steps|length }}: {{ step.name }}",
+    "context": "<div style=\"text-align: center; color: var(--gray-dark); font-size: var(--font-size-sm); font-weight",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/onboarding/users.html",
+    "line": "351",
+    "pattern": "Divs with text",
+    "text": "{{ user.first_name[0]|upper }}{{ user.last_name[0]|upper }}",
+    "context": "<div class=\"user-avatar\">                 {{ user.first_name[0]|upper }}{{ user.last_name[0]|upper }",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/onboarding/users.html",
+    "line": "358",
+    "pattern": "Divs with text",
+    "text": "{{ user.role|title }}",
+    "context": "<div class=\"role-badge role-{{ user.role }}\">                 {{ user.role|title }}             </di",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/onboarding/welcome.html",
+    "line": "252",
+    "pattern": "Divs with text",
+    "text": "Step {{ current_step_index + 1 }} of {{ all_steps|length }}: {{ step.name }}",
+    "context": "<div class=\"progress-text\">             Step {{ current_step_index + 1 }} of {{ all_steps|length }}:",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/onboarding_progress.html",
+    "line": "66",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/platform_dashboard.html",
+    "line": "310",
+    "pattern": "Paragraphs",
+    "text": "System-wide overview and management for {{ current_user.get_full_name() }}",
+    "context": "<p class=\"mb-0\" style=\"color: var(--primary-white); opacity: 0.9;\">System-wide overview and manageme",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/platform_dashboard.html",
+    "line": "350",
+    "pattern": "Paragraphs",
+    "text": "{{ dashboard_data.overview_metrics.trial_accounts }} trial, \n                        {{ dashboard_data.overview_metrics.customer_accounts }} customer, \n                        {{ dashboard_data.overview_metrics.demo_accounts }} demo",
+    "context": "<p class=\"metric-sublabel\">                         {{ dashboard_data.overview_metrics.trial_account",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/platform_dashboard.html",
+    "line": "538",
+    "pattern": "Divs with text",
+    "text": "{{ account.business_name[:2]|upper }}",
+    "context": "<div class=\"account-avatar\">                                 {{ account.business_name[:2]|upper }}  ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/platform_dashboard.html",
+    "line": "571",
+    "pattern": "Divs with text",
+    "text": "{{ account.name[:2]|upper }}",
+    "context": "<div class=\"account-avatar\">                             {{ account.name[:2]|upper }}               ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/platform_dashboard.html",
+    "line": "584",
+    "pattern": "Spans",
+    "text": "{{ account.status|title }}",
+    "context": "<span class=\"badge bg-{{ 'success' if account.status == 'active' else ('warning' if account.status =",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/platform_dashboard.html",
+    "line": "612",
+    "pattern": "Divs with text",
+    "text": "{{ item.account.name[:2]|upper }}",
+    "context": "<div class=\"account-avatar\">                         {{ item.account.name[:2]|upper }}              ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/platform_dashboard.html",
+    "line": "624",
+    "pattern": "Divs with text",
+    "text": "90 else 'medium' if item.users_usage > 80 else 'low' }}\" \n                                 style=\"width: {{ item.users_usage|min(100) }}%\">",
+    "context": "<div class=\"usage-fill {{ 'high' if item.users_usage > 90 else 'medium' if item.users_usage > 80 els",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/platform_dashboard.html",
+    "line": "632",
+    "pattern": "Divs with text",
+    "text": "90 else 'medium' if item.campaigns_usage > 80 else 'low' }}\" \n                                 style=\"width: {{ item.campaigns_usage|min(100) }}%\">",
+    "context": "<div class=\"usage-fill {{ 'high' if item.campaigns_usage > 90 else 'medium' if item.campaigns_usage ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/platform_dashboard.html",
+    "line": "666",
+    "pattern": "Divs with text",
+    "text": "{{ account_data.account_name[:2]|upper }}",
+    "context": "<div class=\"account-avatar\">                                     {{ account_data.account_name[:2]|up",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/platform_dashboard.html",
+    "line": "704",
+    "pattern": "Spans",
+    "text": "{{ user.role|title }}",
+    "context": "<span class=\"badge bg-{{ 'danger' if user.role == 'platform_admin' else ('primary' if user.role == '",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/reset_password.html",
+    "line": "38",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "28",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "48",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ industry }}",
+    "context": "value=\"{{ industry }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "65",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ tone }}",
+    "context": "value=\"{{ tone }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "86",
+    "pattern": "Divs with text",
+    "text": "{{ (business_account.company_description or '')|length }}/500 characters",
+    "context": "<div class=\"survey-config-character-counter\" id=\"company_description_counter\">                      ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "105",
+    "pattern": "Divs with text",
+    "text": "{{ (business_account.product_description or '')|length }}/500 characters",
+    "context": "<div class=\"survey-config-character-counter\" id=\"product_description_counter\">                      ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "124",
+    "pattern": "Divs with text",
+    "text": "{{ (business_account.target_clients_description or '')|length }}/300 characters",
+    "context": "<div class=\"survey-config-character-counter\" id=\"target_clients_description_counter\">               ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "201",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ business_account.max_questions or 8 }}",
+    "context": "value=\"{{ business_account.max_questions or 8 }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "226",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ business_account.max_duration_seconds or 120 }}",
+    "context": "value=\"{{ business_account.max_duration_seconds or 120 }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "250",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ business_account.max_follow_ups_per_topic or 2 }}",
+    "context": "value=\"{{ business_account.max_follow_ups_per_topic or 2 }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "283",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ topic }}",
+    "context": "value=\"{{ topic }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "304",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ topic }}",
+    "context": "value=\"{{ topic }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "335",
+    "pattern": "Divs with text",
+    "text": "{{ (business_account.custom_end_message or '')|length }}/1000 characters",
+    "context": "<div class=\"survey-config-character-counter\" id=\"custom_end_message_counter\">                       ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/business_auth/survey_config.html",
+    "line": "350",
+    "pattern": "Divs with text",
+    "text": "{{ business_account.custom_end_message }}",
+    "context": "<div class=\"survey-config-preview-content\">                     {{ business_account.custom_end_messa",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "454",
+    "pattern": "Spans",
+    "text": "20 %}bg-success{% elif company.company_nps >= -20 %}bg-secondary{% else %}bg-danger{% endif %}\">\n                                                        {% if company.company_nps > 0 %}+{% endif %}{{ company.company_nps }}",
+    "context": "<span class=\"badge {% if company.company_nps > 20 %}bg-success{% elif company.company_nps >= -20 %}b",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaign_insights.html",
+    "line": "460",
+    "pattern": "Spans",
+    "text": "{{ company.risk_level }}",
+    "context": "<span class=\"badge {% if company.risk_level == 'Low' %}bg-success{% elif company.risk_level == 'Medi",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/create.html",
+    "line": "73",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/edit.html",
+    "line": "88",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/edit.html",
+    "line": "99",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ campaign.name }}",
+    "context": "value=\"{{ campaign.name }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/edit.html",
+    "line": "124",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ campaign.start_date }}",
+    "context": "value=\"{{ campaign.start_date }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/edit.html",
+    "line": "132",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ campaign.end_date }}",
+    "context": "value=\"{{ campaign.end_date }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/individual_response.html",
+    "line": "340",
+    "pattern": "Spans",
+    "text": "{{ response.nps_score if response.nps_score is not none else 'N/A' }}",
+    "context": "<span class=\"nps-score nps-{{ response.nps_category.lower() if response.nps_category else 'unknown' ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/individual_response.html",
+    "line": "484",
+    "pattern": "Divs with text",
+    "text": "{% if message.role == 'ai' or message.role == 'assistant' or message.sender == 'ai' %}\n                                AI\n                            {% else %}\n                                {{ participant.name[:2].upper() if participant.name else 'U' }}\n                            {% endif %}",
+    "context": "<div class=\"message-avatar avatar-{{ 'ai' if message.role == 'ai' or message.role == 'assistant' or ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/individual_response.html",
+    "line": "498",
+    "pattern": "Divs with text",
+    "text": "{% if message.timestamp %}\n                                    {% if message.timestamp == 'now' %}\n                                        Now\n                                    {% else %}\n                                        {{ message.timestamp if message.timestamp and message.timestamp != 'now' else 'Now' }}\n                                    {% endif %}\n                                {% endif %}",
+    "context": "<div class=\"message-timestamp\">                                 {% if message.timestamp %}          ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/list.html",
+    "line": "85",
+    "pattern": "Spans",
+    "text": "{{ campaign.status|title }}",
+    "context": "<span class=\"campaign-status status-{{ campaign.status }}\">                     {{ campaign.status|t",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/list.html",
+    "line": "189",
+    "pattern": "Spans",
+    "text": "{{ campaign.status|title }}",
+    "context": "<span class=\"campaign-status status-{{ campaign.status }}\">                                 {{ campa",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/list.html",
+    "line": "222",
+    "pattern": "Divs with text",
+    "text": "{{ campaign_card(campaign) }}",
+    "context": "<div data-status=\"{{ campaign.status }}\">                 {{ campaign_card(campaign) }}             ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/responses_list.html",
+    "line": "137",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ search_query or '' }}",
+    "context": "value=\"{{ search_query or '' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/responses_list.html",
+    "line": "196",
+    "pattern": "Spans",
+    "text": "{{ response.nps_score if response.nps_score is not none else 'N/A' }}",
+    "context": "<span class=\"nps-score nps-{{ response.nps_category.lower() if response.nps_category else 'unknown' ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/responses_list.html",
+    "line": "201",
+    "pattern": "Spans",
+    "text": "{{ response.completion_status or 'Unknown' }}",
+    "context": "<span class=\"status-badge status-{{ response.completion_status or 'unknown' }}\">                    ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/responses_list.html",
+    "line": "233",
+    "pattern": "Paragraphs",
+    "text": "{% if search_query %}\n                    No responses match your search criteria. Try adjusting your search terms.\n                {% else %}\n                    This campaign doesn't have any participant responses yet.\n                {% endif %}",
+    "context": "<p class=\"text-muted\">                 {% if search_query %}                     No responses match ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/responses_list.html",
+    "line": "270",
+    "pattern": "Links (a tags)",
+    "text": "{{ page_num }}",
+    "context": "<a class=\"page-link\" href=\"{{ url_for('campaigns.campaign_responses', campaign_id=campaign.id, page=",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "180",
+    "pattern": "Paragraphs",
+    "text": "Customize survey behavior for \"{{ campaign.name }}\"",
+    "context": "<p class=\"mb-0 opacity-75\">Customize survey behavior for \"{{ campaign.name }}\"</p>",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "207",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "248",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ goal }}",
+    "context": "value=\"{{ goal }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "274",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ campaign.max_questions or 8 }}",
+    "context": "value=\"{{ campaign.max_questions or 8 }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "286",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ campaign.max_duration_seconds or 120 }}",
+    "context": "value=\"{{ campaign.max_duration_seconds or 120 }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "298",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ campaign.max_follow_ups_per_topic or 2 }}",
+    "context": "value=\"{{ campaign.max_follow_ups_per_topic or 2 }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "324",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ topic }}",
+    "context": "value=\"{{ topic }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "341",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ topic }}",
+    "context": "value=\"{{ topic }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/survey_config.html",
+    "line": "363",
+    "pattern": "Divs with text",
+    "text": "\"{{ campaign.custom_end_message }}\"",
+    "context": "<div class=\"preview-container\" id=\"end_message_preview\">                         \"{{ campaign.custom",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/view.html",
+    "line": "64",
+    "pattern": "Divs with text",
+    "text": "{% if campaign.days_remaining is not none and campaign.days_remaining >= 0 %}\n                    {{ campaign.days_remaining }}\n                {% elif campaign.days_since_ended is not none and campaign.days_since_ended >= 0 %}\n                    {{ campaign.days_since_ended }}\n                {% else %}\n                    0\n                {% endif %}",
+    "context": "<div class=\"info-value\">                 {% if campaign.days_remaining is not none and campaign.days",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/view.html",
+    "line": "122",
+    "pattern": "Divs with text",
+    "text": "{% if campaign.engagement_metrics.participation_rate is not none %}\n                    {{ campaign.engagement_metrics.participation_rate }}%\n                {% else %}\n                    N/A\n                {% endif %}",
+    "context": "<div class=\"info-value\">                 {% if campaign.engagement_metrics.participation_rate is not",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/view.html",
+    "line": "139",
+    "pattern": "Divs with text",
+    "text": "{% if campaign.engagement_metrics.email_success_rate is not none %}\n                    {{ campaign.engagement_metrics.email_success_rate }}%\n                {% else %}\n                    N/A\n                {% endif %}",
+    "context": "<div class=\"info-value\">                 {% if campaign.engagement_metrics.email_success_rate is not",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/view.html",
+    "line": "168",
+    "pattern": "Divs with text",
+    "text": "{% if campaign.engagement_metrics.reminder_conversion_rate is not none %}\n                    {{ campaign.engagement_metrics.reminder_conversion_rate }}%\n                {% else %}\n                    N/A\n                {% endif %}",
+    "context": "<div class=\"info-value\">                 {% if campaign.engagement_metrics.reminder_conversion_rate ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/view.html",
+    "line": "343",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/view.html",
+    "line": "372",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/view.html",
+    "line": "397",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/view.html",
+    "line": "407",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/campaigns/view.html",
+    "line": "454",
+    "pattern": "Headings (h1-h6)",
+    "text": "{% if campaign.engagement_metrics.participation_rate %}\n                                                    {{ campaign.engagement_metrics.participation_rate }}%\n                                                {% else %}\n                                                    N/A\n                                                {% endif %}",
+    "context": "<h5 class=\"text-success\">                                                 {% if campaign.engagement_",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/components/breadcrumb.html",
+    "line": "20",
+    "pattern": "Title attributes",
+    "text": "{{ item.label }}",
+    "context": "title=\"{{ item.label }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/components/ui_version_toggle.html",
+    "line": "17",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey.html",
+    "line": "18",
+    "pattern": "Alt attributes",
+    "text": "{{ branding.company_name }}",
+    "context": "alt=\"{{ branding.company_name }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey.html",
+    "line": "91",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey.html",
+    "line": "100",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ participant_company or '' }}",
+    "context": "value=\"{{ participant_company or '' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey.html",
+    "line": "112",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ participant_name or '' }}",
+    "context": "value=\"{{ participant_name or '' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey.html",
+    "line": "124",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ email or '' }}",
+    "context": "value=\"{{ email or '' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey_business.html",
+    "line": "12",
+    "pattern": "Divs with text",
+    "text": "{% include 'components/language_selector.html' %}",
+    "context": "<div style=\"position: fixed; top: 20px; right: 20px; z-index: 9999;\">     {% include 'components/lan",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey_business.html",
+    "line": "23",
+    "pattern": "Alt attributes",
+    "text": "{{ branding.company_name }}",
+    "context": "alt=\"{{ branding.company_name }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey_business.html",
+    "line": "86",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey_business.html",
+    "line": "91",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ participant_company }}",
+    "context": "value=\"{{ participant_company }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey_business.html",
+    "line": "97",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ participant_name }}",
+    "context": "value=\"{{ participant_name }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/conversational_survey_business.html",
+    "line": "103",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ email }}",
+    "context": "value=\"{{ email }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "690",
+    "pattern": "Spans",
+    "text": "20 %}bg-success{% elif company.company_nps >= -20 %}bg-secondary{% else %}bg-danger{% endif %}\">\n                                                        {% if company.company_nps > 0 %}+{% endif %}{{ company.company_nps }}",
+    "context": "<span class=\"badge {% if company.company_nps > 20 %}bg-success{% elif company.company_nps >= -20 %}b",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/dashboard.html",
+    "line": "696",
+    "pattern": "Spans",
+    "text": "{{ company.risk_level }}",
+    "context": "<span class=\"badge {% if company.risk_level == 'Low' %}bg-success{% elif company.risk_level == 'Medi",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/campaign_participants.html",
+    "line": "67",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ company }}",
+    "context": "value=\"{{ company }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/campaign_participants.html",
+    "line": "80",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ role }}",
+    "context": "value=\"{{ role }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/campaign_participants.html",
+    "line": "93",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ region }}",
+    "context": "value=\"{{ region }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/campaign_participants.html",
+    "line": "108",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ tier }}",
+    "context": "value=\"{{ tier }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/campaign_participants.html",
+    "line": "121",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ language }}",
+    "context": "value=\"{{ language }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/campaign_participants.html",
+    "line": "134",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ tenure }}",
+    "context": "value=\"{{ tenure }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/campaign_participants.html",
+    "line": "270",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/campaign_participants.html",
+    "line": "303",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ participant.id }}",
+    "context": "value=\"{{ participant.id }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/campaign_participants.html",
+    "line": "406",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ search_query or '' }}",
+    "context": "value=\"{{ search_query or '' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/campaign_participants.html",
+    "line": "476",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ participant.association_id }}",
+    "context": "value=\"{{ participant.association_id }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/campaign_participants.html",
+    "line": "516",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ url_for('survey', token=participant.token, _external=True) }}",
+    "context": "value=\"{{ url_for('survey', token=participant.token, _external=True) }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/campaign_participants.html",
+    "line": "535",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/campaign_participants.html",
+    "line": "542",
+    "pattern": "Title attributes",
+    "text": "Cannot remove participants from {{ campaign.status }} campaign",
+    "context": "title=\"Cannot remove participants from {{ campaign.status }} campaign\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/create.html",
+    "line": "29",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/edit.html",
+    "line": "58",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/edit.html",
+    "line": "61",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ participant.email }}",
+    "context": "value=\"{{ participant.email }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/edit.html",
+    "line": "84",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ participant.email }}",
+    "context": "value=\"{{ participant.email }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/edit.html",
+    "line": "90",
+    "pattern": "Divs with text",
+    "text": "{% if has_survey_history %}\n                            Email address cannot be changed (survey history exists)\n                            {% else %}\n                            Participant's email address for survey invitation\n                            {% endif %}",
+    "context": "<div class=\"participant-help-text\" id=\"email_help\">                             {% if has_survey_his",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/edit.html",
+    "line": "109",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ participant.name }}",
+    "context": "value=\"{{ participant.name }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/edit.html",
+    "line": "125",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ participant.company_name }}",
+    "context": "value=\"{{ participant.company_name }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/edit.html",
+    "line": "232",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ participant.tenure_years if participant.tenure_years is not none else '' }}",
+    "context": "value=\"{{ participant.tenure_years if participant.tenure_years is not none else '' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/edit.html",
+    "line": "254",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ participant.company_commercial_value if participant.company_commercial_value is not none else '' }}",
+    "context": "value=\"{{ participant.company_commercial_value if participant.company_commercial_value is not none e",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "236",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ search_query }}",
+    "context": "value=\"{{ search_query }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "246",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ company }}",
+    "context": "value=\"{{ company }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "259",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ role }}",
+    "context": "value=\"{{ role }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "272",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ region }}",
+    "context": "value=\"{{ region }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "287",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ tier }}",
+    "context": "value=\"{{ tier }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "300",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ language }}",
+    "context": "value=\"{{ language }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "313",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ tenure }}",
+    "context": "value=\"{{ tenure }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "346",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ search_query or '' }}",
+    "context": "value=\"{{ search_query or '' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "479",
+    "pattern": "ARIA labels",
+    "text": "Edit {{ participant.name }}",
+    "context": "aria-label=\"Edit {{ participant.name }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "487",
+    "pattern": "ARIA labels",
+    "text": "Delete {{ participant.name }}",
+    "context": "aria-label=\"Delete {{ participant.name }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/list.html",
+    "line": "581",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "Enterprise",
+    "context": "value=\"Enterprise\"",
+    "risk_level": "red",
+    "reason": "License type value - backend dependency",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/participants/upload.html",
+    "line": "42",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/public_survey_response.html",
+    "line": "87",
+    "pattern": "Spans",
+    "text": "{{ response.nps_score }}/10 ({{ response.nps_category }})",
+    "context": "<span class=\"public-nps-score public-nps-{{ response.nps_category.lower() }}\">                      ",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/server_auth.html",
+    "line": "30",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/server_auth.html",
+    "line": "44",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ request.form.get('email', '') }}",
+    "context": "value=\"{{ request.form.get('email', '') }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/survey.html",
+    "line": "15",
+    "pattern": "Alt attributes",
+    "text": "{{ branding.company_name }}",
+    "context": "alt=\"{{ branding.company_name }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/survey.html",
+    "line": "37",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ csrf_token() }}",
+    "context": "value=\"{{ csrf_token() }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/survey.html",
+    "line": "44",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ participant_company or '' }}",
+    "context": "value=\"{{ participant_company or '' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/survey.html",
+    "line": "50",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ participant_name or '' }}",
+    "context": "value=\"{{ participant_name or '' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/survey.html",
+    "line": "56",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ email or '' }}",
+    "context": "value=\"{{ email or '' }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/survey_choice.html",
+    "line": "14",
+    "pattern": "Alt attributes",
+    "text": "{{ branding.company_name }}",
+    "context": "alt=\"{{ branding.company_name }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/survey_choice.html",
+    "line": "51",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ request.args.get('token') }}",
+    "context": "value=\"{{ request.args.get('token') }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/survey_choice.html",
+    "line": "78",
+    "pattern": "Value attributes (buttons/inputs)",
+    "text": "{{ request.args.get('token') }}",
+    "context": "value=\"{{ request.args.get('token') }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  },
+  {
+    "file": "templates/survey_success.html",
+    "line": "12",
+    "pattern": "Alt attributes",
+    "text": "{{ branding.company_name }}",
+    "context": "alt=\"{{ branding.company_name }}\"",
+    "risk_level": "red",
+    "reason": "Contains Jinja syntax - false positive from scanner",
+    "auto_fixable": false
+  }
+]
