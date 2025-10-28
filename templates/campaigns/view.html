@@ -386,34 +386,36 @@
                         {% elif campaign.status == 'active' %}
                             <!-- Active State Actions -->
                             <div class="campaign-actions-content">
-                                <div class="campaign-actions-status campaign-actions-status-success mb-3">
+                                <div class="campaign-actions-status campaign-actions-status-success">
                                     <i class="fas fa-chart-line me-1"></i>
                                     <span>{{ _('Campaign is currently active and collecting responses') }}</span>
                                 </div>
                                 
-                                <div class="campaign-actions-primary">
-                                    <form method="POST" action="{{ url_for('campaigns.send_bulk_invitations', campaign_id=campaign.id) }}">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button type="submit" class="btn btn-primary btn-lg"
-                                                onclick="return confirm('Send email invitations to all participants who have not been invited yet?');">
-                                            <i class="fas fa-envelope me-2"></i>Send Invitations
-                                        </button>
-                                    </form>
+                                <div class="campaign-actions-actions">
+                                    <div class="campaign-actions-primary">
+                                        <form method="POST" action="{{ url_for('campaigns.send_bulk_invitations', campaign_id=campaign.id) }}">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-primary btn-lg"
+                                                    onclick="return confirm('Send email invitations to all participants who have not been invited yet?');">
+                                                <i class="fas fa-envelope me-2"></i>Send Invitations
+                                            </button>
+                                        </form>
+                                    </div>
+                                    
+                                    <div class="campaign-actions-secondary">
+                                        <form method="POST" action="{{ url_for('campaigns.complete_campaign', campaign_id=campaign.id) }}" class="d-inline">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-outline-secondary"
+                                                    onclick="return confirm('Complete this campaign early? This will stop response collection and mark the campaign as finished.');">
+                                                <i class="fas fa-stop me-2"></i>Complete Campaign
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
                                 
                                 <div class="campaign-actions-helper">
                                     <i class="fas fa-info-circle me-1"></i>
                                     <strong>Note:</strong> Send Invitations only targets participants who haven't been invited yet. Already invited participants will not receive duplicate emails.
-                                </div>
-                                
-                                <div class="campaign-actions-secondary">
-                                    <form method="POST" action="{{ url_for('campaigns.complete_campaign', campaign_id=campaign.id) }}" class="d-inline">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button type="submit" class="btn btn-outline-secondary"
-                                                onclick="return confirm('Complete this campaign early? This will stop response collection and mark the campaign as finished.');">
-                                            <i class="fas fa-stop me-2"></i>Complete Campaign
-                                        </button>
-                                    </form>
                                 </div>
                             </div>
                             

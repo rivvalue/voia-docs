@@ -8502,6 +8502,12 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     gap: var(--spacing-lg);
 }
 
+.campaign-actions-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
 .campaign-actions-primary,
 .campaign-actions-secondary {
     display: flex;
@@ -8509,11 +8515,27 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     gap: var(--spacing-md);
 }
 
-/* Desktop: Horizontal layout for actions */
+.campaign-actions-status {
+    padding: var(--spacing-md);
+    background: var(--gray-lightest);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    color: var(--gray-dark);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.campaign-actions-status-success {
+    border-left: 4px solid var(--success-green);
+}
+
+/* Desktop: Horizontal layout for action buttons only */
 @media (min-width: 992px) {
-    .campaign-actions-content {
+    .campaign-actions-actions {
         flex-direction: row;
         align-items: flex-start;
+        gap: var(--spacing-md);
     }
     
     .campaign-actions-primary {
@@ -8521,8 +8543,7 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     }
     
     .campaign-actions-secondary {
-        flex-direction: row;
-        flex: 1;
+        flex: 0 0 auto;
     }
 }
 
