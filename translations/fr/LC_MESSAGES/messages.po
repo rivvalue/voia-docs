@@ -6800,3 +6800,50 @@ msgstr "Télécharger le modèle de fichier CSV"
 #~ "%}ne correspond à votre recherche{% else"
 #~ " %}pour le moment{% endif %}"
 
+
+# Transcript Analysis Feature
+msgid "Transcript Analysis"
+msgstr "Analyse de transcription"
+
+msgid "Upload Meeting Transcript"
+msgstr "Télécharger la transcription de réunion"
+
+msgid "Processing transcript with AI..."
+msgstr "Traitement de la transcription avec l'IA..."
+
+msgid "Processed Transcripts"
+msgstr "Transcriptions traitées"
+
+msgid "Upload a transcript to get started"
+msgstr "Téléchargez une transcription pour commencer"
+
+msgid "Via Transcript"
+msgstr "Via transcription"
+
+msgid "Responses loaded by admins through transcript upload feature."
+msgstr "Réponses chargées par les administrateurs via la fonctionnalité de téléchargement de transcription."
+
+msgid "View and analyze individual participant responses and conversation transcripts."
+msgstr "Voir et analyser les réponses individuelles des participants et les transcriptions de conversations."
+
+msgid "Select Transcript (.txt files only)"
+msgstr "Sélectionner une transcription (fichiers .txt uniquement)"
+
+msgid "Upload meeting transcripts to extract survey insights automatically."
+msgstr "Téléchargez des transcriptions de réunions pour extraire automatiquement des informations d'enquête."
+
+msgid "No transcripts processed yet"
+msgstr "Aucune transcription traitée pour le moment"
+
+msgid "About Transcript Analysis"
+msgstr "À propos de l'analyse de transcription"
+
+msgid "VOÏA analyzes meeting transcripts to extract NPS scores, sentiment, themes, and actionable insights. Upload .txt files from phone calls, video meetings, or face-to-face discussions to automatically generate survey responses and integrate them with your campaign analytics."
+msgstr "VOÏA analyse les transcriptions de réunions pour extraire les scores NPS, le sentiment, les thèmes et les informations exploitables. Téléchargez des fichiers .txt d'appels téléphoniques, de réunions vidéo ou de discussions en face à face pour générer automatiquement des réponses d'enquête et les intégrer à vos analyses de campagne."
+
+msgid "Download transcript"
+msgstr "Télécharger la transcription"
+
+msgid "View analysis results"
+msgstr "Voir les résultats d'analyse"
+

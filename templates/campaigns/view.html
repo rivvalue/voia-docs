@@ -202,7 +202,7 @@
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="transcripts-tab" data-bs-toggle="tab" data-bs-target="#transcripts-pane" type="button" role="tab" aria-controls="transcripts-pane" aria-selected="false">
-                    <i class="fas fa-file-alt me-2"></i>Transcript Analysis
+                    <i class="fas fa-file-alt me-2"></i>{{ _('Transcript Analysis') }}
                 </button>
             </li>
             {% endif %}
@@ -515,7 +515,7 @@
                         <div class="card h-100">
                             <div class="card-header bg-info text-white">
                                 <h5 class="mb-0">
-                                    <i class="fas fa-upload me-2"></i>Upload Meeting Transcript
+                                    <i class="fas fa-upload me-2"></i>{{ _('Upload Meeting Transcript') }}
                                 </h5>
                             </div>
                             <div class="card-body">
@@ -553,7 +553,7 @@
                                     <div class="progress">
                                         <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
                                     </div>
-                                    <small class="text-muted mt-1 d-block">Processing transcript with AI...</small>
+                                    <small class="text-muted mt-1 d-block">{{ _('Processing transcript with AI...') }}</small>
                                 </div>
                                 
                                 <!-- Upload Status -->
@@ -567,7 +567,7 @@
                         <div class="card h-100">
                             <div class="card-header bg-secondary text-white">
                                 <h5 class="mb-0">
-                                    <i class="fas fa-list me-2"></i>Processed Transcripts
+                                    <i class="fas fa-list me-2"></i>{{ _('Processed Transcripts') }}
                                 </h5>
                             </div>
                             <div class="card-body">
@@ -575,7 +575,7 @@
                                     <div class="text-center py-3">
                                         <i class="fas fa-file-alt fa-2x text-muted mb-2"></i>
                                         <p class="text-muted mb-0">{{ _('No transcripts processed yet') }}</p>
-                                        <small class="text-muted">Upload a transcript to get started</small>
+                                        <small class="text-muted">{{ _('Upload a transcript to get started') }}</small>
                                     </div>
                                 </div>
                             </div>
@@ -740,7 +740,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="text-center py-3">
                     <i class="fas fa-file-alt fa-2x text-muted mb-2"></i>
                     <p class="text-muted mb-0">{{ _('No transcripts processed yet') }}</p>
-                    <small class="text-muted">Upload a transcript to get started</small>
+                    <small class="text-muted">{{ _('Upload a transcript to get started') }}</small>
                 </div>
             `;
             return;
