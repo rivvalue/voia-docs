@@ -495,6 +495,11 @@
                             <span class="{% if participant.status == 'completed' %}badge-voiia-success{% elif participant.status == 'started' %}badge-voiia-warning{% else %}badge-voiia-secondary{% endif %}" role="status" aria-label="{{ _('Status: {{ participant.status|title }}') }}">
                                 {{ participant.status|title }}
                             </span>
+                            {% if participant.source == 'transcript_upload' %}
+                                <span class="badge bg-info ms-1" title="{{ _('Response loaded via transcript upload') }}">
+                                    <i class="fas fa-file-upload"></i> {{ _('Transcript') }}
+                                </span>
+                            {% endif %}
                         </td>
                         <td>
                             <div class="small text-muted">
