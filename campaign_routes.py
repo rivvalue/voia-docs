@@ -1531,9 +1531,9 @@ def get_timeline_data():
         if not license_info:
             return jsonify({'error': 'License information not available'}), 400
         
-        # Calculate license duration in months
-        license_start = current_account.license_activated_at
-        license_end = current_account.license_expires_at
+        # Get license dates from license_info (uses LicenseHistory, not deprecated BusinessAccount columns)
+        license_start = license_info.get('license_start')
+        license_end = license_info.get('license_end')
         
         # Handle accounts without license dates (trials, newly onboarded)
         if not license_start or not license_end:
