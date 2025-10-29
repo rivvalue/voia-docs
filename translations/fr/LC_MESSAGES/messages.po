@@ -5662,7 +5662,6 @@ msgid "M"
 msgstr ""
 
 #: templates/campaigns/list.html:877
-#, fuzzy
 msgid "License Duration (Months)"
 msgstr "Durée de la licence (mois)"
 
