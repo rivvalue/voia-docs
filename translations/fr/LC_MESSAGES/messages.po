@@ -5664,7 +5664,7 @@ msgstr ""
 #: templates/campaigns/list.html:877
 #, fuzzy
 msgid "License Duration (Months)"
-msgstr ""
+msgstr "Durée de la licence (mois)"
 
 #: templates/campaigns/responses_list.html:112
 msgid "Review and analyze individual participant responses"
