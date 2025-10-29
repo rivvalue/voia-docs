@@ -1535,8 +1535,17 @@ def get_timeline_data():
         license_start = current_account.license_activated_at
         license_end = current_account.license_expires_at
         
+        # Handle accounts without license dates (trials, newly onboarded)
         if not license_start or not license_end:
-            return jsonify({'error': 'License dates not configured'}), 400
+            # Return empty timeline with message
+            logger.info(f"Timeline requested for business account {current_account.id} without license dates (trial/new account)")
+            return jsonify({
+                'license_months': 0,
+                'license_start': None,
+                'license_end': None,
+                'campaigns': [],
+                'message': _('License not activated yet. Timeline will be available once your license is activated.')
+            })
         
         # Calculate months between start and end
         months_diff = (license_end.year - license_start.year) * 12 + (license_end.month - license_start.month)

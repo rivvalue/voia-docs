@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-29 15:10+0000\n"
+"POT-Creation-Date: 2025-10-29 15:17+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -49,6 +49,12 @@ msgstr "Contexte du compte entreprise introuvable."
 #, fuzzy
 msgid "Failed to load survey configuration."
 msgstr "Échec du chargement de la configuration de l'enquête."
+
+#: campaign_routes.py:1547
+msgid ""
+"License not activated yet. Timeline will be available once your license "
+"is activated."
+msgstr "Licence non activée. La chronologie sera disponible une fois votre licence activée."
 
 #: test_translation_fallback.py:27
 #, fuzzy
@@ -290,7 +296,7 @@ msgstr "Insights de la campagne"
 #: templates/business_auth/licenses/assignment_form.html:563
 #: templates/business_auth/licenses/assignment_form.html:566
 #: templates/business_auth/licenses/overview.html:327
-#: templates/campaigns/list.html:879
+#: templates/campaigns/list.html:883
 msgid "Campaigns"
 msgstr "Campagnes"
 
@@ -1415,7 +1421,7 @@ msgstr "Résumé exécutif"
 msgid "Campaign KPI Overview"
 msgstr "Vue d'ensemble des indicateurs de campagne"
 
-#: templates/campaigns/list.html:852 templates/dashboard.html:70
+#: templates/campaigns/list.html:856 templates/dashboard.html:70
 #: templates/dashboard.html:301 templates/executive_summary.html:28
 #: templates/executive_summary.html:30 templates/executive_summary.html:63
 #: templates/executive_summary.html:132 templates/executive_summary.html:134
@@ -1570,8 +1576,8 @@ msgstr "Annuler"
 #: templates/campaigns/list.html:305 templates/campaigns/list.html:371
 #: templates/campaigns/list.html:383 templates/campaigns/list.html:430
 #: templates/campaigns/list.html:492 templates/campaigns/list.html:517
-#: templates/campaigns/list.html:656 templates/campaigns/list.html:853
-#: templates/campaigns/list.html:935
+#: templates/campaigns/list.html:656 templates/campaigns/list.html:857
+#: templates/campaigns/list.html:939
 #: templates/campaigns/responses_list.html:179 templates/dashboard.html:249
 #: templates/executive_summary.html:242 templates/participants/list.html:405
 msgid "Status"
@@ -5575,7 +5581,9 @@ msgstr "Chronologie des campagnes"
 
 #: templates/campaigns/list.html:172
 msgid "Visual overview of campaign schedules over your license duration"
-msgstr "Vue d'ensemble visuelle des calendriers de campagnes sur la durée de votre licence"
+msgstr ""
+"Vue d'ensemble visuelle des calendriers de campagnes sur la durée de "
+"votre licence"
 
 #: templates/campaigns/list.html:174
 msgid "Toggle timeline view"
@@ -5587,7 +5595,9 @@ msgstr "Chargement de la chronologie..."
 
 #: templates/campaigns/list.html:187
 msgid "Unable to load timeline data. Please refresh the page."
-msgstr "Impossible de charger les données de la chronologie. Veuillez actualiser la page."
+msgstr ""
+"Impossible de charger les données de la chronologie. Veuillez actualiser "
+"la page."
 
 #: templates/campaigns/list.html:190
 msgid "Campaign timeline visualization"
@@ -5638,24 +5648,23 @@ msgstr "Exporter toutes les données"
 msgid "An error occurred while exporting your data."
 msgstr ""
 
-#: templates/campaigns/list.html:806 templates/campaigns/list.html:854
+#: templates/campaigns/list.html:810 templates/campaigns/list.html:858
 #, fuzzy
 msgid "Month"
 msgstr "Mois"
 
-#: templates/campaigns/list.html:854
+#: templates/campaigns/list.html:858
 msgid "Duration"
 msgstr "Durée"
-msgstr "Durée :"
 
-#: templates/campaigns/list.html:868
-msgstr "M"
+#: templates/campaigns/list.html:872
+msgid "M"
 msgstr ""
 
-#: templates/campaigns/list.html:873
+#: templates/campaigns/list.html:877
 #, fuzzy
 msgid "License Duration (Months)"
-msgstr "Durée de la licence (mois)"
+msgstr ""
 
 #: templates/campaigns/responses_list.html:112
 msgid "Review and analyze individual participant responses"

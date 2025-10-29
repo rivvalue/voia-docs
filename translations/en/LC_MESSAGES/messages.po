@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-29 15:10+0000\n"
+"POT-Creation-Date: 2025-10-29 15:17+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: en\n"
@@ -46,6 +46,12 @@ msgstr ""
 
 #: business_auth_routes.py:3439
 msgid "Failed to load survey configuration."
+msgstr ""
+
+#: campaign_routes.py:1547
+msgid ""
+"License not activated yet. Timeline will be available once your license "
+"is activated."
 msgstr ""
 
 #: test_translation_fallback.py:27
@@ -285,7 +291,7 @@ msgstr ""
 #: templates/business_auth/licenses/assignment_form.html:563
 #: templates/business_auth/licenses/assignment_form.html:566
 #: templates/business_auth/licenses/overview.html:327
-#: templates/campaigns/list.html:879
+#: templates/campaigns/list.html:883
 msgid "Campaigns"
 msgstr ""
 
@@ -1347,7 +1353,7 @@ msgstr ""
 msgid "Campaign KPI Overview"
 msgstr ""
 
-#: templates/campaigns/list.html:852 templates/dashboard.html:70
+#: templates/campaigns/list.html:856 templates/dashboard.html:70
 #: templates/dashboard.html:301 templates/executive_summary.html:28
 #: templates/executive_summary.html:30 templates/executive_summary.html:63
 #: templates/executive_summary.html:132 templates/executive_summary.html:134
@@ -1497,8 +1503,8 @@ msgstr ""
 #: templates/campaigns/list.html:305 templates/campaigns/list.html:371
 #: templates/campaigns/list.html:383 templates/campaigns/list.html:430
 #: templates/campaigns/list.html:492 templates/campaigns/list.html:517
-#: templates/campaigns/list.html:656 templates/campaigns/list.html:853
-#: templates/campaigns/list.html:935
+#: templates/campaigns/list.html:656 templates/campaigns/list.html:857
+#: templates/campaigns/list.html:939
 #: templates/campaigns/responses_list.html:179 templates/dashboard.html:249
 #: templates/executive_summary.html:242 templates/participants/list.html:405
 msgid "Status"
@@ -5236,19 +5242,19 @@ msgstr ""
 msgid "An error occurred while exporting your data."
 msgstr ""
 
-#: templates/campaigns/list.html:806 templates/campaigns/list.html:854
+#: templates/campaigns/list.html:810 templates/campaigns/list.html:858
 msgid "Month"
 msgstr ""
 
-#: templates/campaigns/list.html:854
+#: templates/campaigns/list.html:858
 msgid "Duration"
 msgstr ""
 
-#: templates/campaigns/list.html:868
+#: templates/campaigns/list.html:872
 msgid "M"
 msgstr ""
 
-#: templates/campaigns/list.html:873
+#: templates/campaigns/list.html:877
 msgid "License Duration (Months)"
 msgstr ""
 
