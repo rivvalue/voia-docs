@@ -877,8 +877,7 @@ function renderTimeline(data) {
                             return [
                                 '{{ _("Status") }}: ' + campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1),
                                 '{{ _("Start") }}: ' + monthNames[startDate.getMonth()] + ' ' + startDate.getFullYear(),
-                                '{{ _("End") }}: ' + monthNames[endDate.getMonth()] + ' ' + endDate.getFullYear(),
-                                '{{ _("Duration") }}: {{ _("Month") }} ' + campaign.start_month + ' - ' + campaign.end_month
+                                '{{ _("End") }}: ' + monthNames[endDate.getMonth()] + ' ' + endDate.getFullYear()
                             ];
                         }
                     }
