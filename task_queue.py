@@ -775,7 +775,8 @@ class TaskQueue:
                     name=participant_name,
                     email=participant_email,
                     company_name=participant_company,
-                    business_account_id=business_account_id
+                    business_account_id=business_account_id,
+                    source='transcript_upload'  # Track origin as transcript upload
                 )
                 db.session.add(participant)
                 db.session.flush()  # Get participant ID
