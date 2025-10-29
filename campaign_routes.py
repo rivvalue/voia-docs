@@ -1509,3 +1509,70 @@ def export_campaign_responses(campaign_id):
     except Exception as e:
         logger.error(f"Error exporting campaign {campaign_id}: {e}")
         return jsonify({'error': 'Failed to export campaign data'}), 500
+
+
+@campaign_bp.route('/api/timeline-data')
+@require_business_auth
+@require_permission('manage_participants')
+def get_timeline_data():
+    """Get campaign timeline data for visualization"""
+    try:
+        from flask_babel import gettext as _
+        from dateutil.relativedelta import relativedelta
+        
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account not found'}), 400
+        
+        # Get license information
+        from license_service import LicenseService
+        license_info = LicenseService.get_license_info(current_account.id)
+        
+        if not license_info:
+            return jsonify({'error': 'License information not available'}), 400
+        
+        # Calculate license duration in months
+        license_start = current_account.license_activated_at
+        license_end = current_account.license_expires_at
+        
+        if not license_start or not license_end:
+            return jsonify({'error': 'License dates not configured'}), 400
+        
+        # Calculate months between start and end
+        months_diff = (license_end.year - license_start.year) * 12 + (license_end.month - license_start.month)
+        
+        # Get all campaigns for this business account
+        campaigns = Campaign.query.filter_by(
+            business_account_id=current_account.id
+        ).order_by(Campaign.start_date).all()
+        
+        # Build timeline data
+        timeline_data = []
+        for campaign in campaigns:
+            # Calculate campaign position in months from license start
+            start_month = (campaign.start_date.year - license_start.year) * 12 + (campaign.start_date.month - license_start.month)
+            end_month = (campaign.end_date.year - license_start.year) * 12 + (campaign.end_date.month - license_start.month)
+            
+            # Clamp to license duration
+            start_month = max(0, min(start_month, months_diff))
+            end_month = max(0, min(end_month, months_diff))
+            
+            timeline_data.append({
+                'name': campaign.name,
+                'status': campaign.status,
+                'start_month': start_month,
+                'end_month': end_month,
+                'start_date': campaign.start_date.isoformat(),
+                'end_date': campaign.end_date.isoformat()
+            })
+        
+        return jsonify({
+            'license_months': months_diff,
+            'license_start': license_start.isoformat(),
+            'license_end': license_end.isoformat(),
+            'campaigns': timeline_data
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting timeline data: {e}")
+        return jsonify({'error': 'Failed to load timeline data'}), 500
