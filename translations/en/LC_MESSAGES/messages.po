@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-28 19:38+0000\n"
+"POT-Creation-Date: 2025-10-29 15:10+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: en\n"
@@ -17,34 +17,34 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: business_auth_routes.py:905
+#: business_auth_routes.py:983
 #: templates/business_auth/onboarding_progress.html:36
 #: templates/campaigns/list.html:118 templates/campaigns/list.html:155
-#: templates/campaigns/view.html:232
+#: templates/campaigns/view.html:229
 #: templates/participants/campaign_participants.html:40
-#: templates/participants/campaign_participants.html:508
-#: templates/participants/campaign_participants.html:586
-#: templates/participants/campaign_participants.html:612
+#: templates/participants/campaign_participants.html:513
+#: templates/participants/campaign_participants.html:591
+#: templates/participants/campaign_participants.html:617
 msgid "Completed"
 msgstr ""
 
-#: business_auth_routes.py:910
+#: business_auth_routes.py:988
 msgid "In Progress"
 msgstr ""
 
-#: business_auth_routes.py:915
+#: business_auth_routes.py:993
 msgid "Not Started"
 msgstr ""
 
-#: business_auth_routes.py:2331 business_auth_routes.py:2376
-#: business_auth_routes.py:2426 business_auth_routes.py:2591
-#: business_auth_routes.py:2614 business_auth_routes.py:3001
-#: business_auth_routes.py:3025 business_auth_routes.py:3326
-#: business_auth_routes.py:3365 business_auth_routes.py:4571
+#: business_auth_routes.py:2409 business_auth_routes.py:2456
+#: business_auth_routes.py:2511 business_auth_routes.py:2676
+#: business_auth_routes.py:2699 business_auth_routes.py:3086
+#: business_auth_routes.py:3110 business_auth_routes.py:3411
+#: business_auth_routes.py:3450 business_auth_routes.py:4610
 msgid "Business account context not found."
 msgstr ""
 
-#: business_auth_routes.py:3354
+#: business_auth_routes.py:3439
 msgid "Failed to load survey configuration."
 msgstr ""
 
@@ -273,22 +273,23 @@ msgid "Campaign Insights"
 msgstr ""
 
 #: templates/base.html:69 templates/business_auth/admin_licenses.html:72
-#: templates/business_auth/admin_panel_v2.html:702
+#: templates/business_auth/admin_panel_v2.html:686
 #: templates/business_auth/license_overview.html:85
 #: templates/business_auth/license_overview.html:236
 #: templates/business_auth/licenses/assignment_form.html:106
 #: templates/business_auth/licenses/assignment_form.html:289
-#: templates/business_auth/licenses/assignment_form.html:422
-#: templates/business_auth/licenses/assignment_form.html:424
-#: templates/business_auth/licenses/assignment_form.html:610
-#: templates/business_auth/licenses/assignment_form.html:615
-#: templates/business_auth/licenses/assignment_form.html:634
-#: templates/business_auth/licenses/assignment_form.html:637
+#: templates/business_auth/licenses/assignment_form.html:368
+#: templates/business_auth/licenses/assignment_form.html:370
+#: templates/business_auth/licenses/assignment_form.html:539
+#: templates/business_auth/licenses/assignment_form.html:544
+#: templates/business_auth/licenses/assignment_form.html:563
+#: templates/business_auth/licenses/assignment_form.html:566
 #: templates/business_auth/licenses/overview.html:327
+#: templates/campaigns/list.html:879
 msgid "Campaigns"
 msgstr ""
 
-#: templates/base.html:73 templates/campaigns/list.html:172
+#: templates/base.html:73 templates/campaigns/list.html:209
 msgid "Participants"
 msgstr ""
 
@@ -392,8 +393,8 @@ msgid "Currently showing data from active campaign:"
 msgstr ""
 
 #: templates/campaign_insights.html:145 templates/campaigns/create.html:82
-#: templates/campaigns/edit.html:97 templates/campaigns/list.html:168
-#: templates/campaigns/list.html:258 templates/dashboard.html:381
+#: templates/campaigns/edit.html:97 templates/campaigns/list.html:205
+#: templates/campaigns/list.html:295 templates/dashboard.html:381
 msgid "Campaign Name"
 msgstr ""
 
@@ -764,13 +765,13 @@ msgstr ""
 
 #: templates/business_auth/reset_password.html:27
 #: templates/campaign_insights.html:747 templates/campaign_insights.html:832
-#: templates/campaign_insights.html:919 templates/campaigns/list.html:253
-#: templates/campaigns/list.html:289 templates/campaigns/list.html:415
+#: templates/campaign_insights.html:919 templates/campaigns/list.html:290
+#: templates/campaigns/list.html:326 templates/campaigns/list.html:452
 #: templates/dashboard.html:897 templates/dashboard.html:982
 #: templates/dashboard.html:1069 templates/executive_summary.html:278
 #: templates/executive_summary.html:365
-#: templates/participants/campaign_participants.html:904
-#: templates/participants/campaign_participants.html:935
+#: templates/participants/campaign_participants.html:909
+#: templates/participants/campaign_participants.html:940
 #: templates/participants/edit.html:24 templates/participants/list.html:538
 #: templates/participants/list.html:1303 templates/participants/upload.html:34
 msgid "Close"
@@ -998,7 +999,7 @@ msgstr ""
 
 #: templates/business_auth/activate_account.html:435
 #: templates/business_auth/licenses/overview.html:323
-#: templates/campaigns/view.html:508 templates/conversational_survey.html:94
+#: templates/campaigns/view.html:540 templates/conversational_survey.html:94
 #: templates/conversational_survey_business.html:89
 #: templates/dashboard.html:671 templates/survey.html:42
 msgid "Company Name"
@@ -1346,12 +1347,13 @@ msgstr ""
 msgid "Campaign KPI Overview"
 msgstr ""
 
-#: templates/dashboard.html:70 templates/dashboard.html:301
-#: templates/executive_summary.html:28 templates/executive_summary.html:30
-#: templates/executive_summary.html:63 templates/executive_summary.html:132
-#: templates/executive_summary.html:134 templates/executive_summary.html:136
-#: templates/executive_summary.html:194 templates/executive_summary.html:197
-#: templates/executive_summary.html:200 templates/executive_summary.html:276
+#: templates/campaigns/list.html:852 templates/dashboard.html:70
+#: templates/dashboard.html:301 templates/executive_summary.html:28
+#: templates/executive_summary.html:30 templates/executive_summary.html:63
+#: templates/executive_summary.html:132 templates/executive_summary.html:134
+#: templates/executive_summary.html:136 templates/executive_summary.html:194
+#: templates/executive_summary.html:197 templates/executive_summary.html:200
+#: templates/executive_summary.html:276
 msgid "Campaign"
 msgstr ""
 
@@ -1491,11 +1493,12 @@ msgstr ""
 #: templates/business_auth/manage_users.html:98
 #: templates/business_auth/platform_dashboard.html:421
 #: templates/business_auth/platform_dashboard.html:694
-#: templates/campaigns/list.html:169 templates/campaigns/list.html:188
-#: templates/campaigns/list.html:268 templates/campaigns/list.html:334
-#: templates/campaigns/list.html:346 templates/campaigns/list.html:393
-#: templates/campaigns/list.html:455 templates/campaigns/list.html:480
-#: templates/campaigns/list.html:619 templates/campaigns/list.html:730
+#: templates/campaigns/list.html:206 templates/campaigns/list.html:225
+#: templates/campaigns/list.html:305 templates/campaigns/list.html:371
+#: templates/campaigns/list.html:383 templates/campaigns/list.html:430
+#: templates/campaigns/list.html:492 templates/campaigns/list.html:517
+#: templates/campaigns/list.html:656 templates/campaigns/list.html:853
+#: templates/campaigns/list.html:935
 #: templates/campaigns/responses_list.html:179 templates/dashboard.html:249
 #: templates/executive_summary.html:242 templates/participants/list.html:405
 msgid "Status"
@@ -2451,7 +2454,7 @@ msgid "Enter email address"
 msgstr ""
 
 #: templates/business_auth/account_status.html:12
-msgid "Vocsa"
+msgid "VOÏA"
 msgstr ""
 
 #: templates/business_auth/account_status.html:13
@@ -2551,17 +2554,17 @@ msgid "License Type"
 msgstr ""
 
 #: templates/business_auth/admin_licenses.html:73
-#: templates/business_auth/admin_panel_v2.html:706
+#: templates/business_auth/admin_panel_v2.html:690
 #: templates/business_auth/license_overview.html:107
 #: templates/business_auth/license_overview.html:241
 #: templates/business_auth/licenses/assignment_form.html:96
 #: templates/business_auth/licenses/assignment_form.html:283
-#: templates/business_auth/licenses/assignment_form.html:417
-#: templates/business_auth/licenses/assignment_form.html:419
-#: templates/business_auth/licenses/assignment_form.html:609
-#: templates/business_auth/licenses/assignment_form.html:614
-#: templates/business_auth/licenses/assignment_form.html:633
-#: templates/business_auth/licenses/assignment_form.html:636
+#: templates/business_auth/licenses/assignment_form.html:363
+#: templates/business_auth/licenses/assignment_form.html:365
+#: templates/business_auth/licenses/assignment_form.html:538
+#: templates/business_auth/licenses/assignment_form.html:543
+#: templates/business_auth/licenses/assignment_form.html:562
+#: templates/business_auth/licenses/assignment_form.html:565
 #: templates/business_auth/licenses/overview.html:326
 msgid "Users"
 msgstr ""
@@ -2584,7 +2587,7 @@ msgstr ""
 #: templates/business_auth/licenses/overview.html:330
 #: templates/business_auth/manage_users.html:100
 #: templates/business_auth/onboarding_progress.html:131
-#: templates/campaigns/list.html:174
+#: templates/campaigns/list.html:211
 #: templates/campaigns/responses_list.html:181
 #: templates/participants/list.html:407
 msgid "Actions"
@@ -2604,12 +2607,12 @@ msgstr ""
 msgid "View History"
 msgstr ""
 
-#: templates/business_auth/admin_licenses.html:179
+#: templates/business_auth/admin_licenses.html:187
 #: templates/business_auth/licenses/overview.html:419
 msgid "No accounts found"
 msgstr ""
 
-#: templates/business_auth/admin_licenses.html:180
+#: templates/business_auth/admin_licenses.html:188
 msgid "No business accounts match the current filter criteria."
 msgstr ""
 
@@ -2628,8 +2631,8 @@ msgid "Business analytics hub with comprehensive platform intelligence"
 msgstr ""
 
 #: templates/business_auth/admin_panel.html:408
-#: templates/business_auth/admin_panel_v2.html:771
-#: templates/business_auth/admin_panel_v2.html:778
+#: templates/business_auth/admin_panel_v2.html:739
+#: templates/business_auth/admin_panel_v2.html:746
 #: templates/business_auth/platform_dashboard.html:3
 #: templates/business_auth/platform_dashboard.html:309
 msgid "Business Analytics Hub"
@@ -2760,7 +2763,7 @@ msgid "Team Members"
 msgstr ""
 
 #: templates/business_auth/admin_panel.html:722
-#: templates/business_auth/admin_panel_v2.html:710
+#: templates/business_auth/admin_panel_v2.html:694
 msgid "Max Participants"
 msgstr ""
 
@@ -2942,75 +2945,66 @@ msgstr ""
 msgid "View system activity and user action history"
 msgstr ""
 
-#: templates/business_auth/admin_panel_v2.html:642
-#: templates/business_auth/admin_panel_v2.html:649
-msgid "Database Health"
-msgstr ""
-
-#: templates/business_auth/admin_panel_v2.html:650
-msgid "Monitor database connection and performance status"
-msgstr ""
-
-#: templates/business_auth/admin_panel_v2.html:661
-#: templates/business_auth/admin_panel_v2.html:673
+#: templates/business_auth/admin_panel_v2.html:645
+#: templates/business_auth/admin_panel_v2.html:657
 msgid "System Settings"
 msgstr ""
 
-#: templates/business_auth/admin_panel_v2.html:681
-#: templates/business_auth/admin_panel_v2.html:689
-#: templates/business_auth/licenses/dashboard.html:288
+#: templates/business_auth/admin_panel_v2.html:665
+#: templates/business_auth/admin_panel_v2.html:673
+#: templates/business_auth/licenses/dashboard.html:287
 msgid "License Information"
 msgstr ""
 
-#: templates/business_auth/admin_panel_v2.html:715
-#: templates/business_auth/admin_panel_v2.html:722
-msgid "Performance Metrics"
-msgstr ""
-
-#: templates/business_auth/admin_panel_v2.html:723
-msgid "Monitor system performance and cache status"
-msgstr ""
-
-#: templates/business_auth/admin_panel_v2.html:738
+#: templates/business_auth/admin_panel_v2.html:706
 msgid "Campaign Scheduler"
 msgstr ""
 
-#: templates/business_auth/admin_panel_v2.html:739
+#: templates/business_auth/admin_panel_v2.html:707
 msgid "View and manage automated campaign lifecycle"
 msgstr ""
 
-#: templates/business_auth/admin_panel_v2.html:750
-#: templates/business_auth/admin_panel_v2.html:763
+#: templates/business_auth/admin_panel_v2.html:718
+#: templates/business_auth/admin_panel_v2.html:731
 msgid "Platform Administration"
 msgstr ""
 
-#: templates/business_auth/admin_panel_v2.html:779
+#: templates/business_auth/admin_panel_v2.html:747
 msgid "Platform-wide metrics, license usage, and business intelligence"
 msgstr ""
 
-#: templates/business_auth/admin_panel_v2.html:794
+#: templates/business_auth/admin_panel_v2.html:762
 msgid "Onboard Business Account"
 msgstr ""
 
-#: templates/business_auth/admin_panel_v2.html:795
+#: templates/business_auth/admin_panel_v2.html:763
 msgid "Create and configure new business accounts with license assignment"
 msgstr ""
 
-#: templates/business_auth/admin_panel_v2.html:810
+#: templates/business_auth/admin_panel_v2.html:778
 msgid "License Management"
 msgstr ""
 
-#: templates/business_auth/admin_panel_v2.html:811
+#: templates/business_auth/admin_panel_v2.html:779
 msgid "Cross-tenant license usage, trends, and compliance monitoring"
 msgstr ""
 
-#: templates/business_auth/admin_panel_v2.html:819
-#: templates/business_auth/admin_panel_v2.html:826
+#: templates/business_auth/admin_panel_v2.html:787
+#: templates/business_auth/admin_panel_v2.html:794
 msgid "Platform Admin Users"
 msgstr ""
 
-#: templates/business_auth/admin_panel_v2.html:827
+#: templates/business_auth/admin_panel_v2.html:795
 msgid "Manage cross-tenant administrator accounts and permissions"
+msgstr ""
+
+#: templates/business_auth/admin_panel_v2.html:803
+#: templates/business_auth/admin_panel_v2.html:810
+msgid "Performance Metrics"
+msgstr ""
+
+#: templates/business_auth/admin_panel_v2.html:811
+msgid "Monitor system performance and cache status"
 msgstr ""
 
 #: templates/business_auth/audit_logs.html:21
@@ -3675,30 +3669,6 @@ msgstr ""
 msgid "License Duration"
 msgstr ""
 
-#: templates/business_auth/license_info.html:251
-msgid "Add-on Start Date"
-msgstr ""
-
-#: templates/business_auth/license_info.html:276
-msgid "Add-on End Date"
-msgstr ""
-
-#: templates/business_auth/license_info.html:309
-msgid "Add-on Period"
-msgstr ""
-
-#: templates/business_auth/license_info.html:325
-msgid "Add-on Duration"
-msgstr ""
-
-#: templates/business_auth/license_info.html:342
-msgid "Transcript Analysis Not Configured"
-msgstr ""
-
-#: templates/business_auth/license_info.html:343
-msgid "Add-on Not Purchased"
-msgstr ""
-
 #: templates/business_auth/license_overview.html:14
 #, python-format
 msgid "License details and usage information for %(name)s"
@@ -3853,7 +3823,7 @@ msgstr ""
 
 #: templates/business_auth/manage_users.html:274
 #: templates/business_auth/manage_users.html:349
-#: templates/participants/campaign_participants.html:951
+#: templates/participants/campaign_participants.html:956
 #: templates/participants/list.html:632
 msgid "Cancel"
 msgstr ""
@@ -4276,8 +4246,8 @@ msgstr ""
 
 #: templates/business_auth/licenses/assignment_form.html:47
 #: templates/business_auth/licenses/assignment_form.html:52
-#: templates/business_auth/licenses/assignment_form.html:406
-#: templates/business_auth/licenses/assignment_form.html:560
+#: templates/business_auth/licenses/assignment_form.html:352
+#: templates/business_auth/licenses/assignment_form.html:506
 #: templates/components/ui_version_toggle.html:26
 msgid "Current"
 msgstr ""
@@ -4448,7 +4418,7 @@ msgid "Number of campaigns per month"
 msgstr ""
 
 #: templates/business_auth/licenses/assignment_form.html:295
-#: templates/business_auth/licenses/assignment_form.html:427
+#: templates/business_auth/licenses/assignment_form.html:373
 msgid "Target Responses per Campaign"
 msgstr ""
 
@@ -4467,57 +4437,23 @@ msgid ""
 "response rate)"
 msgstr ""
 
-#: templates/business_auth/licenses/assignment_form.html:312
-#: templates/business_auth/licenses/assignment_form.html:317
-#: templates/business_auth/licenses/assignment_form.html:405
-msgid "Feature"
-msgstr ""
-
-#: templates/business_auth/licenses/assignment_form.html:319
-msgid "Optional add-on features with custom pricing and duration"
-msgstr ""
-
-#: templates/business_auth/licenses/assignment_form.html:336
-#: templates/campaigns/create.html:106 templates/campaigns/edit.html:122
-#: templates/campaigns/view.html:46
-msgid "Start Date"
-msgstr ""
-
-#: templates/business_auth/licenses/assignment_form.html:339
-msgid "When transcript analysis access begins"
-msgstr ""
-
-#: templates/business_auth/licenses/assignment_form.html:342
-#: templates/campaigns/create.html:113 templates/campaigns/edit.html:130
-#: templates/campaigns/view.html:50
-msgid "End Date"
-msgstr ""
-
-#: templates/business_auth/licenses/assignment_form.html:345
-msgid "When transcript analysis access expires"
-msgstr ""
-
-#: templates/business_auth/licenses/assignment_form.html:348
-msgid "Add-on Price (USD)"
-msgstr ""
-
-#: templates/business_auth/licenses/assignment_form.html:355
-msgid "Custom pricing for this add-on period"
-msgstr ""
-
-#: templates/business_auth/licenses/assignment_form.html:376
+#: templates/business_auth/licenses/assignment_form.html:322
 msgid "Notes (Optional)"
 msgstr ""
 
-#: templates/business_auth/licenses/assignment_form.html:378
+#: templates/business_auth/licenses/assignment_form.html:324
 msgid "Add any notes about this license assignment..."
 msgstr ""
 
-#: templates/business_auth/licenses/assignment_form.html:379
+#: templates/business_auth/licenses/assignment_form.html:325
 msgid "These notes will be recorded in the license history for audit purposes."
 msgstr ""
 
-#: templates/business_auth/licenses/assignment_form.html:407
+#: templates/business_auth/licenses/assignment_form.html:351
+msgid "Feature"
+msgstr ""
+
+#: templates/business_auth/licenses/assignment_form.html:353
 msgid "New"
 msgstr ""
 
@@ -4594,61 +4530,61 @@ msgstr ""
 msgid "Try refreshing the page and attempting the assignment again"
 msgstr ""
 
-#: templates/business_auth/licenses/dashboard.html:22
+#: templates/business_auth/licenses/dashboard.html:21
 msgid "Monitor and manage all business account licenses across the platform"
 msgstr ""
 
-#: templates/business_auth/licenses/dashboard.html:68
+#: templates/business_auth/licenses/dashboard.html:67
 msgid "Total Accounts"
 msgstr ""
 
-#: templates/business_auth/licenses/dashboard.html:84
+#: templates/business_auth/licenses/dashboard.html:83
 msgid "Core Licenses"
 msgstr ""
 
-#: templates/business_auth/licenses/dashboard.html:94
+#: templates/business_auth/licenses/dashboard.html:93
 msgid "Plus Licenses"
 msgstr ""
 
-#: templates/business_auth/licenses/dashboard.html:104
+#: templates/business_auth/licenses/dashboard.html:103
 msgid "Pro Licenses"
 msgstr ""
 
-#: templates/business_auth/licenses/dashboard.html:114
-#: templates/business_auth/licenses/dashboard.html:263
+#: templates/business_auth/licenses/dashboard.html:113
+#: templates/business_auth/licenses/dashboard.html:262
 msgid "Trial Accounts"
 msgstr ""
 
-#: templates/business_auth/licenses/dashboard.html:124
+#: templates/business_auth/licenses/dashboard.html:123
 #: templates/business_auth/licenses/overview.html:305
 msgid "Expiring Soon"
 msgstr ""
 
-#: templates/business_auth/licenses/dashboard.html:229
+#: templates/business_auth/licenses/dashboard.html:228
 msgid "No recent license activity"
 msgstr ""
 
-#: templates/business_auth/licenses/dashboard.html:251
+#: templates/business_auth/licenses/dashboard.html:250
 msgid "View All Accounts"
 msgstr ""
 
-#: templates/business_auth/licenses/dashboard.html:257
+#: templates/business_auth/licenses/dashboard.html:256
 msgid "Expiring Licenses"
 msgstr ""
 
-#: templates/business_auth/licenses/dashboard.html:269
+#: templates/business_auth/licenses/dashboard.html:268
 msgid "High Usage Reports"
 msgstr ""
 
-#: templates/business_auth/licenses/dashboard.html:276
+#: templates/business_auth/licenses/dashboard.html:275
 msgid "License Overview"
 msgstr ""
 
-#: templates/business_auth/licenses/dashboard.html:282
+#: templates/business_auth/licenses/dashboard.html:281
 msgid "Expiration Details"
 msgstr ""
 
-#: templates/business_auth/licenses/dashboard.html:294
+#: templates/business_auth/licenses/dashboard.html:293
 msgid "Usage Details"
 msgstr ""
 
@@ -5099,8 +5035,18 @@ msgstr ""
 msgid "Optional details about this campaign's purpose and scope"
 msgstr ""
 
+#: templates/campaigns/create.html:106 templates/campaigns/edit.html:122
+#: templates/campaigns/view.html:46
+msgid "Start Date"
+msgstr ""
+
 #: templates/campaigns/create.html:108 templates/campaigns/edit.html:125
 msgid "When should this campaign begin?"
+msgstr ""
+
+#: templates/campaigns/create.html:113 templates/campaigns/edit.html:130
+#: templates/campaigns/view.html:50
+msgid "End Date"
 msgstr ""
 
 #: templates/campaigns/create.html:115 templates/campaigns/edit.html:133
@@ -5205,17 +5151,17 @@ msgstr ""
 msgid "Manage Participants"
 msgstr ""
 
-#: templates/campaigns/list.html:64 templates/campaigns/list.html:437
-#: templates/campaigns/list.html:441 templates/campaigns/list.html:623
-#: templates/campaigns/list.html:631
+#: templates/campaigns/list.html:64 templates/campaigns/list.html:474
+#: templates/campaigns/list.html:478 templates/campaigns/list.html:660
+#: templates/campaigns/list.html:668
 msgid "Executive Report"
 msgstr ""
 
-#: templates/campaigns/list.html:98 templates/campaigns/list.html:170
-#: templates/campaigns/list.html:193 templates/campaigns/list.html:269
-#: templates/campaigns/list.html:311 templates/campaigns/list.html:318
-#: templates/campaigns/list.html:332 templates/campaigns/list.html:485
-#: templates/campaigns/list.html:542 templates/campaigns/list.html:580
+#: templates/campaigns/list.html:98 templates/campaigns/list.html:207
+#: templates/campaigns/list.html:230 templates/campaigns/list.html:306
+#: templates/campaigns/list.html:348 templates/campaigns/list.html:355
+#: templates/campaigns/list.html:369 templates/campaigns/list.html:522
+#: templates/campaigns/list.html:579 templates/campaigns/list.html:617
 msgid "Start"
 msgstr ""
 
@@ -5227,39 +5173,83 @@ msgstr ""
 msgid "Draft"
 msgstr ""
 
-#: templates/campaigns/list.html:171
+#: templates/campaigns/list.html:170
+msgid "Campaign Timeline"
+msgstr ""
+
+#: templates/campaigns/list.html:172
+msgid "Visual overview of campaign schedules over your license duration"
+msgstr ""
+
+#: templates/campaigns/list.html:174
+msgid "Toggle timeline view"
+msgstr ""
+
+#: templates/campaigns/list.html:181 templates/campaigns/list.html:183
+msgid "Loading timeline..."
+msgstr ""
+
+#: templates/campaigns/list.html:187
+msgid "Unable to load timeline data. Please refresh the page."
+msgstr ""
+
+#: templates/campaigns/list.html:190
+msgid "Campaign timeline visualization"
+msgstr ""
+
+#: templates/campaigns/list.html:194
+msgid "No campaigns scheduled yet."
+msgstr ""
+
+#: templates/campaigns/list.html:208
 msgid "Fin Date"
 msgstr ""
 
-#: templates/campaigns/list.html:173 templates/campaigns/list.html:202
+#: templates/campaigns/list.html:210 templates/campaigns/list.html:239
 msgid "Sent/Completed"
 msgstr ""
 
-#: templates/campaigns/list.html:233
+#: templates/campaigns/list.html:270
 msgid "Ready to gather insights?"
 msgstr ""
 
-#: templates/campaigns/list.html:234
+#: templates/campaigns/list.html:271
 msgid ""
 "Create your first campaign to start collecting customer feedback and "
 "understanding their experience. Campaigns help you organize survey "
 "participants, send invitations, and analyze results."
 msgstr ""
 
-#: templates/campaigns/list.html:276
+#: templates/campaigns/list.html:313
 msgid "Export Complete!"
 msgstr ""
 
-#: templates/campaigns/list.html:277
+#: templates/campaigns/list.html:314
 msgid "Your campaign data has been successfully exported."
 msgstr ""
 
-#: templates/campaigns/list.html:287
+#: templates/campaigns/list.html:324
 msgid "Export Failed"
 msgstr ""
 
-#: templates/campaigns/list.html:288
+#: templates/campaigns/list.html:325
 msgid "An error occurred while exporting your data."
+msgstr ""
+
+#: templates/campaigns/list.html:806 templates/campaigns/list.html:854
+msgid "Month"
+msgstr ""
+
+#: templates/campaigns/list.html:854
+msgid "Duration"
+msgstr ""
+
+#: templates/campaigns/list.html:868
+msgid "M"
+msgstr ""
+
+#: templates/campaigns/list.html:873
+msgid "License Duration (Months)"
 msgstr ""
 
 #: templates/campaigns/responses_list.html:112
@@ -5375,120 +5365,158 @@ msgstr ""
 msgid "Optional: Override the default AI system prompt with custom instructions"
 msgstr ""
 
-#: templates/campaigns/view.html:237
+#: templates/campaigns/view.html:205
+msgid "Transcript Analysis"
+msgstr ""
+
+#: templates/campaigns/view.html:234
 msgid ""
 "Participants who have successfully completed and submitted their survey "
 "response."
 msgstr ""
 
-#: templates/campaigns/view.html:250
+#: templates/campaigns/view.html:247
 #: templates/participants/campaign_participants.html:36
-#: templates/participants/campaign_participants.html:505
+#: templates/participants/campaign_participants.html:510
 msgid "Started"
 msgstr ""
 
-#: templates/campaigns/view.html:255
+#: templates/campaigns/view.html:252
 msgid "Participants who have started the survey but have not yet completed it."
 msgstr ""
 
-#: templates/campaigns/view.html:268
+#: templates/campaigns/view.html:265
 #: templates/participants/campaign_participants.html:32
-#: templates/participants/campaign_participants.html:502
+#: templates/participants/campaign_participants.html:507
 msgid "Invited"
 msgstr ""
 
-#: templates/campaigns/view.html:273
+#: templates/campaigns/view.html:270
 msgid ""
 "Participants who have received an invitation email but have not yet "
 "started the survey."
 msgstr ""
 
-#: templates/campaigns/view.html:286
+#: templates/campaigns/view.html:283
 msgid "Pending"
 msgstr ""
 
-#: templates/campaigns/view.html:291
+#: templates/campaigns/view.html:288
 msgid ""
 "Participants not yet invited to the campaign. They are associated with "
 "the campaign but have not received invitations."
 msgstr ""
 
-#: templates/campaigns/view.html:327 templates/campaigns/view.html:329
+#: templates/campaigns/view.html:301
+msgid "Via Email"
+msgstr ""
+
+#: templates/campaigns/view.html:306
+msgid ""
+"Responses submitted through email invitations (form or conversational "
+"surveys)."
+msgstr ""
+
+#: templates/campaigns/view.html:319
+msgid "Via Transcript"
+msgstr ""
+
+#: templates/campaigns/view.html:324
+msgid "Responses loaded by admins through transcript upload feature."
+msgstr ""
+
+#: templates/campaigns/view.html:360 templates/campaigns/view.html:362
 msgid "Campaign Actions"
 msgstr ""
 
-#: templates/campaigns/view.html:359
+#: templates/campaigns/view.html:392
 msgid ""
 "Campaign needs description and at least one participant to be marked "
 "ready."
 msgstr ""
 
-#: templates/campaigns/view.html:362
+#: templates/campaigns/view.html:395
 msgid ""
 "Draft campaigns can be freely edited or deleted. Once marked ready, "
 "campaign details become locked."
 msgstr ""
 
-#: templates/campaigns/view.html:382
+#: templates/campaigns/view.html:415
 msgid "Campaign is ready for activation"
 msgstr ""
 
-#: templates/campaigns/view.html:391
+#: templates/campaigns/view.html:424
 msgid "Campaign is currently active and collecting responses"
 msgstr ""
 
-#: templates/campaigns/view.html:429
+#: templates/campaigns/view.html:462
 #, python-format
 msgid "This campaign finished on %(date)s"
 msgstr ""
 
-#: templates/campaigns/view.html:442
+#: templates/campaigns/view.html:475
 msgid "Individual Response Viewer"
 msgstr ""
 
-#: templates/campaigns/view.html:443
+#: templates/campaigns/view.html:476
 msgid ""
 "View and analyze individual participant responses and conversation "
 "transcripts."
 msgstr ""
 
-#: templates/campaigns/view.html:492
+#: templates/campaigns/view.html:518
+msgid "Upload Meeting Transcript"
+msgstr ""
+
+#: templates/campaigns/view.html:524
 msgid "Select Transcript (.txt files only)"
 msgstr ""
 
-#: templates/campaigns/view.html:494
+#: templates/campaigns/view.html:526
 msgid "Upload meeting transcripts to extract survey insights automatically."
 msgstr ""
 
-#: templates/campaigns/view.html:498
+#: templates/campaigns/view.html:530
 msgid "Participant Name"
 msgstr ""
 
-#: templates/campaigns/view.html:499
+#: templates/campaigns/view.html:531
 msgid "Enter participant's full name"
 msgstr ""
 
-#: templates/campaigns/view.html:503
+#: templates/campaigns/view.html:535
 msgid "Participant Email"
 msgstr ""
 
-#: templates/campaigns/view.html:504
+#: templates/campaigns/view.html:536
 msgid "participant@company.com"
 msgstr ""
 
-#: templates/campaigns/view.html:509
+#: templates/campaigns/view.html:541
 msgid "Enter company name"
 msgstr ""
 
-#: templates/campaigns/view.html:545 templates/campaigns/view.html:705
+#: templates/campaigns/view.html:556
+msgid "Processing transcript with AI..."
+msgstr ""
+
+#: templates/campaigns/view.html:570
+msgid "Processed Transcripts"
+msgstr ""
+
+#: templates/campaigns/view.html:577 templates/campaigns/view.html:742
 msgid "No transcripts processed yet"
 msgstr ""
 
-#: templates/campaigns/view.html:563
+#: templates/campaigns/view.html:578 templates/campaigns/view.html:743
+msgid "Upload a transcript to get started"
+msgstr ""
+
+#: templates/campaigns/view.html:595
 msgid "About Transcript Analysis"
 msgstr ""
 
-#: templates/campaigns/view.html:564
+#: templates/campaigns/view.html:596
 msgid ""
 "VOÏA analyzes meeting transcripts to extract NPS scores, sentiment, "
 "themes, and actionable insights. Upload .txt files from phone calls, "
@@ -5496,11 +5524,11 @@ msgid ""
 "survey responses and integrate them with your campaign analytics."
 msgstr ""
 
-#: templates/campaigns/view.html:723
+#: templates/campaigns/view.html:760
 msgid "Download transcript"
 msgstr ""
 
-#: templates/campaigns/view.html:726
+#: templates/campaigns/view.html:763
 msgid "View analysis results"
 msgstr ""
 
@@ -5589,7 +5617,7 @@ msgstr ""
 
 #: templates/participants/campaign_participants.html:146
 #: templates/participants/campaign_participants.html:164
-#: templates/participants/campaign_participants.html:790
+#: templates/participants/campaign_participants.html:795
 msgid "Clear all filters"
 msgstr ""
 
@@ -5671,7 +5699,7 @@ msgid "Clear search"
 msgstr ""
 
 #: templates/participants/campaign_participants.html:438
-#: templates/participants/campaign_participants.html:530
+#: templates/participants/campaign_participants.html:535
 msgid "Participant actions"
 msgstr ""
 
@@ -5691,70 +5719,78 @@ msgstr ""
 msgid "Status: {{ participant.status|title }}"
 msgstr ""
 
-#: templates/participants/campaign_participants.html:518
+#: templates/participants/campaign_participants.html:499
+msgid "Response loaded via transcript upload"
+msgstr ""
+
+#: templates/participants/campaign_participants.html:500
+msgid "Transcript"
+msgstr ""
+
+#: templates/participants/campaign_participants.html:523
 msgid "Survey link for {{ participant.name }}"
 msgstr ""
 
-#: templates/participants/campaign_participants.html:521
+#: templates/participants/campaign_participants.html:526
 msgid "Copy survey link for {{ participant.name }}"
 msgstr ""
 
-#: templates/participants/campaign_participants.html:526
+#: templates/participants/campaign_participants.html:531
 msgid "No token"
 msgstr ""
 
-#: templates/participants/campaign_participants.html:536
+#: templates/participants/campaign_participants.html:541
 msgid "Remove {{ participant.name }} from campaign"
 msgstr ""
 
-#: templates/participants/campaign_participants.html:543
+#: templates/participants/campaign_participants.html:548
 msgid "Cannot remove participant - campaign is {{ campaign.status }}"
 msgstr ""
 
-#: templates/participants/campaign_participants.html:557
+#: templates/participants/campaign_participants.html:562
 msgid "No participants assigned to this campaign yet"
 msgstr ""
 
-#: templates/participants/campaign_participants.html:559
+#: templates/participants/campaign_participants.html:564
 msgid "Use the form above to add participants to this campaign."
 msgstr ""
 
-#: templates/participants/campaign_participants.html:561
+#: templates/participants/campaign_participants.html:566
 msgid "Create participants first, then assign them to campaigns."
 msgstr ""
 
-#: templates/participants/campaign_participants.html:562
+#: templates/participants/campaign_participants.html:567
 msgid "Create first participant"
 msgstr ""
 
-#: templates/participants/campaign_participants.html:595
+#: templates/participants/campaign_participants.html:600
 msgid "Participant list locked - collecting responses"
 msgstr ""
 
-#: templates/participants/campaign_participants.html:597
+#: templates/participants/campaign_participants.html:602
 msgid "Participant list permanently locked"
 msgstr ""
 
-#: templates/participants/campaign_participants.html:604
+#: templates/participants/campaign_participants.html:609
 msgid ""
 "The campaign is being prepared. You can freely add or remove "
 "participants, modify campaign details, and prepare for launch."
 msgstr ""
 
-#: templates/participants/campaign_participants.html:607
+#: templates/participants/campaign_participants.html:612
 msgid ""
 "Campaign is prepared and ready to go live. You can still add or remove "
 "participants until the campaign is activated."
 msgstr ""
 
-#: templates/participants/campaign_participants.html:610
+#: templates/participants/campaign_participants.html:615
 msgid ""
 "Campaign is live and collecting survey responses. Participant list is "
 "locked to maintain data integrity. Wait for completion to modify "
 "participants."
 msgstr ""
 
-#: templates/participants/campaign_participants.html:613
+#: templates/participants/campaign_participants.html:618
 msgid ""
 "Campaign has finished. All data is preserved and participant list is "
 "permanently locked to maintain historical accuracy."
@@ -6315,5 +6351,47 @@ msgstr ""
 #~ msgid ""
 #~ "Upload multiple participants to {{ "
 #~ "business_account.name }} via CSV file"
+#~ msgstr ""
+
+#~ msgid "Vocsa"
+#~ msgstr ""
+
+#~ msgid "Database Health"
+#~ msgstr ""
+
+#~ msgid "Monitor database connection and performance status"
+#~ msgstr ""
+
+#~ msgid "Add-on Start Date"
+#~ msgstr ""
+
+#~ msgid "Add-on End Date"
+#~ msgstr ""
+
+#~ msgid "Add-on Period"
+#~ msgstr ""
+
+#~ msgid "Add-on Duration"
+#~ msgstr ""
+
+#~ msgid "Transcript Analysis Not Configured"
+#~ msgstr ""
+
+#~ msgid "Add-on Not Purchased"
+#~ msgstr ""
+
+#~ msgid "Optional add-on features with custom pricing and duration"
+#~ msgstr ""
+
+#~ msgid "When transcript analysis access begins"
+#~ msgstr ""
+
+#~ msgid "When transcript analysis access expires"
+#~ msgstr ""
+
+#~ msgid "Add-on Price (USD)"
+#~ msgstr ""
+
+#~ msgid "Custom pricing for this add-on period"
 #~ msgstr ""
 

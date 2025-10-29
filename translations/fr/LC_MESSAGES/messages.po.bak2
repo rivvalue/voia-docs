@@ -5641,21 +5641,21 @@ msgstr ""
 #: templates/campaigns/list.html:806 templates/campaigns/list.html:854
 #, fuzzy
 msgid "Month"
-msgstr "Mois"
+msgstr "Basculer"
 
 #: templates/campaigns/list.html:854
+#, fuzzy
 msgid "Duration"
-msgstr "Durée"
 msgstr "Durée :"
 
 #: templates/campaigns/list.html:868
-msgstr "M"
+msgid "M"
 msgstr ""
 
 #: templates/campaigns/list.html:873
 #, fuzzy
 msgid "License Duration (Months)"
-msgstr "Durée de la licence (mois)"
+msgstr "Informations sur la licence"
 
 #: templates/campaigns/responses_list.html:112
 msgid "Review and analyze individual participant responses"
