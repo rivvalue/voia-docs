@@ -3073,6 +3073,226 @@ def preview_email_content():
         }), 500
 
 
+# ==== PLATFORM EMAIL SETTINGS ROUTES ====
+
+@business_auth_bp.route('/admin/platform-email-settings')
+@require_business_auth
+@require_platform_admin
+def platform_email_settings():
+    """Platform-wide AWS SES configuration page (Platform Admin Only)"""
+    try:
+        current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+        
+        # Get existing platform email settings if any
+        from models import PlatformEmailSettings
+        platform_settings = PlatformEmailSettings.query.first()
+        
+        return render_template('business_auth/platform_email_settings.html',
+                             platform_settings=platform_settings,
+                             current_user=current_user)
+    
+    except Exception as e:
+        logger.error(f"Error loading platform email settings: {e}")
+        flash('Failed to load platform email settings.', 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+
+@business_auth_bp.route('/admin/platform-email-settings/save', methods=['POST'])
+@require_business_auth
+@require_platform_admin
+def save_platform_email_settings():
+    """Save platform-wide AWS SES configuration (Platform Admin Only)"""
+    try:
+        current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+        if not current_user:
+            flash('User session invalid.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get form data
+        aws_region = request.form.get('aws_region', '').strip()
+        smtp_server = request.form.get('smtp_server', '').strip()
+        smtp_port = request.form.get('smtp_port', '587')
+        smtp_username = request.form.get('smtp_username', '').strip()
+        smtp_password = request.form.get('smtp_password', '').strip()
+        use_tls = request.form.get('use_tls') == 'on'
+        use_ssl = request.form.get('use_ssl') == 'on'
+        
+        # Validate required fields
+        if not all([aws_region, smtp_server, smtp_username]):
+            flash('AWS Region, SMTP Server, and SMTP Username are required.', 'error')
+            return redirect(url_for('business_auth.platform_email_settings'))
+        
+        # Validate port
+        try:
+            smtp_port = int(smtp_port)
+            if not (1 <= smtp_port <= 65535):
+                raise ValueError("Port must be between 1 and 65535")
+        except ValueError:
+            flash('Invalid SMTP port. Please enter a number between 1 and 65535.', 'error')
+            return redirect(url_for('business_auth.platform_email_settings'))
+        
+        # Get or create platform email settings (singleton)
+        from models import PlatformEmailSettings
+        platform_settings = PlatformEmailSettings.query.first()
+        
+        if not platform_settings:
+            platform_settings = PlatformEmailSettings()
+            db.session.add(platform_settings)
+        
+        # Update settings
+        platform_settings.aws_region = aws_region
+        platform_settings.smtp_server = smtp_server
+        platform_settings.smtp_port = smtp_port
+        platform_settings.smtp_username = smtp_username
+        platform_settings.use_tls = use_tls
+        platform_settings.use_ssl = use_ssl
+        platform_settings.configured_by_user_id = current_user.id
+        platform_settings.updated_at = datetime.utcnow()
+        
+        # Update password only if provided (allows updating other fields without re-entering password)
+        if smtp_password:
+            platform_settings.set_smtp_password(smtp_password)
+        
+        # Validation passed but not yet tested
+        platform_settings.is_verified = False
+        
+        db.session.commit()
+        
+        # Queue audit log
+        queue_audit_log(
+            business_account_id=session.get('business_account_id'),
+            action_type='platform_email_settings_update',
+            resource_type='platform_email_settings',
+            resource_id=platform_settings.id,
+            user_name=current_user.get_full_name(),
+            details={
+                'aws_region': aws_region,
+                'smtp_server': smtp_server,
+                'smtp_port': smtp_port,
+                'smtp_username': smtp_username,
+                'use_tls': use_tls,
+                'use_ssl': use_ssl
+            }
+        )
+        
+        flash('Platform email settings saved successfully. Please test the connection to verify.', 'success')
+        return redirect(url_for('business_auth.platform_email_settings'))
+    
+    except Exception as e:
+        logger.error(f"Error saving platform email settings: {e}")
+        db.session.rollback()
+        flash(f'Failed to save platform email settings: {str(e)}', 'error')
+        return redirect(url_for('business_auth.platform_email_settings'))
+
+
+@business_auth_bp.route('/admin/platform-email-settings/test', methods=['POST'])
+@require_business_auth
+@require_platform_admin
+@rate_limit(limit=10)
+def test_platform_email_settings():
+    """Test platform email configuration connection (Platform Admin Only)"""
+    try:
+        from models import PlatformEmailSettings
+        platform_settings = PlatformEmailSettings.query.first()
+        
+        if not platform_settings:
+            return jsonify({
+                'success': False,
+                'error': 'No platform email settings configured'
+            }), 400
+        
+        # Get password
+        smtp_password = platform_settings.get_smtp_password()
+        if not smtp_password:
+            return jsonify({
+                'success': False,
+                'error': 'SMTP password not configured'
+            }), 400
+        
+        # Test SMTP connection
+        import smtplib
+        from email.mime.text import MIMEText
+        
+        try:
+            # Create SMTP connection
+            if platform_settings.use_ssl:
+                server = smtplib.SMTP_SSL(platform_settings.smtp_server, platform_settings.smtp_port, timeout=10)
+            else:
+                server = smtplib.SMTP(platform_settings.smtp_server, platform_settings.smtp_port, timeout=10)
+                if platform_settings.use_tls:
+                    server.starttls()
+            
+            # Authenticate
+            server.login(platform_settings.smtp_username, smtp_password)
+            server.quit()
+            
+            # Update verification status
+            platform_settings.is_verified = True
+            platform_settings.last_test_at = datetime.utcnow()
+            platform_settings.last_test_result = json.dumps({
+                'status': 'success',
+                'message': 'Connection successful',
+                'timestamp': datetime.utcnow().isoformat()
+            })
+            db.session.commit()
+            
+            # Queue audit log
+            current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+            queue_audit_log(
+                business_account_id=session.get('business_account_id'),
+                action_type='platform_email_settings_test',
+                resource_type='platform_email_settings',
+                resource_id=platform_settings.id,
+                user_name=current_user.get_full_name() if current_user else 'Unknown',
+                details={'result': 'success'}
+            )
+            
+            return jsonify({
+                'success': True,
+                'message': 'SMTP connection successful! Platform email settings verified.'
+            })
+        
+        except smtplib.SMTPAuthenticationError as e:
+            error_msg = 'Authentication failed. Please check your SMTP username and password.'
+            platform_settings.is_verified = False
+            platform_settings.last_test_at = datetime.utcnow()
+            platform_settings.last_test_result = json.dumps({
+                'status': 'error',
+                'message': error_msg,
+                'error_type': 'authentication',
+                'timestamp': datetime.utcnow().isoformat()
+            })
+            db.session.commit()
+            
+            return jsonify({
+                'success': False,
+                'error': error_msg
+            }), 400
+        
+        except Exception as smtp_error:
+            error_msg = f'Connection failed: {str(smtp_error)}'
+            platform_settings.is_verified = False
+            platform_settings.last_test_at = datetime.utcnow()
+            platform_settings.last_test_result = json.dumps({
+                'status': 'error',
+                'message': error_msg,
+                'timestamp': datetime.utcnow().isoformat()
+            })
+            db.session.commit()
+            
+            return jsonify({
+                'success': False,
+                'error': error_msg
+            }), 400
+    
+    except Exception as e:
+        logger.error(f"Error testing platform email settings: {e}")
+        return jsonify({
+            'success': False,
+            'error': f'Test failed: {str(e)}'
+        }), 500
+
+
 # ==== BRANDING CONFIGURATION ROUTES ====
 
 @business_auth_bp.route('/admin/brand-config')

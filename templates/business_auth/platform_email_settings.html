@@ -1,0 +1,319 @@
+{% extends "base.html" %}
+
+{% block title %}Platform Email Settings - VOÏA{% endblock %}
+
+{% block page_class %}page-platform-email-settings{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Settings', 'url': url_for('business_auth.admin_panel')},
+    {'label': 'Platform Email Settings', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+<div class="settings-hub-container">
+    <!-- Header -->
+    <div class="settings-hub-header">
+        <div class="settings-hub-header-content">
+            <h1 class="settings-hub-title">
+                <i class="fas fa-cloud me-2" aria-hidden="true"></i>
+                Platform Email Settings
+            </h1>
+            <p class="settings-hub-subtitle">Configure platform-wide AWS SES credentials for VOÏA-managed email delivery</p>
+        </div>
+    </div>
+
+    <!-- Platform Admin Badge -->
+    <div class="mb-4">
+        <span class="badge bg-danger" style="font-size: 14px; padding: 8px 16px;">
+            <i class="fas fa-shield-alt me-2"></i>Platform Administrator Only
+        </span>
+    </div>
+
+    <!-- Current Status -->
+    {% if platform_settings %}
+        {% if platform_settings.is_verified %}
+            <div class="email-config-status success" role="status" aria-live="polite">
+                <strong><i class="fas fa-check-circle me-2" aria-hidden="true"></i>Platform email configuration is active and verified</strong>
+                Last tested: {{ platform_settings.last_test_at.strftime('%Y-%m-%d %H:%M:%S') if platform_settings.last_test_at else 'Never' }} UTC
+            </div>
+        {% else %}
+            <div class="email-config-status warning" role="alert" aria-live="polite">
+                <strong><i class="fas fa-exclamation-triangle me-2" aria-hidden="true"></i>Platform email configuration exists but not verified</strong>
+                Please test your configuration to ensure it works properly.
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="email-config-status error" role="alert" aria-live="polite">
+            <strong><i class="fas fa-times-circle me-2" aria-hidden="true"></i>No platform email configuration found</strong>
+            Configure AWS SES settings below to enable VOÏA-managed email delivery for business accounts.
+        </div>
+    {% endif %}
+
+    <!-- Info Box -->
+    <div class="settings-card mb-4">
+        <h3 class="settings-section-title">
+            <i class="fas fa-info-circle text-primary me-2"></i>
+            About Platform Email Settings
+        </h3>
+        <div class="alert alert-info mb-0">
+            <p class="mb-2"><strong>VOÏA-Managed Email Delivery:</strong></p>
+            <ul class="mb-0">
+                <li>Business accounts can use the platform's AWS SES credentials for email sending</li>
+                <li>Emails are sent white-labeled from each business account's verified domain</li>
+                <li>Business accounts must verify their domains via DNS DKIM records</li>
+                <li>Manual workflow: You add domains to AWS Console and provide DKIM records to business accounts</li>
+                <li>No AWS SDK integration - fully manual domain management process</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Configuration Form -->
+    <form method="POST" action="{{ url_for('business_auth.save_platform_email_settings') }}" id="platformEmailForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        
+        <!-- AWS SES Settings -->
+        <div class="settings-card mb-4">
+            <h3 class="settings-section-title">
+                <i class="fas fa-aws me-2"></i>
+                AWS SES Configuration
+            </h3>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="settings-form-group">
+                        <label class="settings-form-label" for="aws_region">AWS Region *</label>
+                        <select class="settings-form-control" 
+                                id="aws_region" 
+                                name="aws_region"
+                                required
+                                aria-required="true"
+                                aria-describedby="aws_region_help">
+                            <option value="">Select a region</option>
+                            <option value="us-east-1" {{ 'selected' if platform_settings and platform_settings.aws_region == 'us-east-1' else '' }}>US East (N. Virginia)</option>
+                            <option value="us-east-2" {{ 'selected' if platform_settings and platform_settings.aws_region == 'us-east-2' else '' }}>US East (Ohio)</option>
+                            <option value="us-west-1" {{ 'selected' if platform_settings and platform_settings.aws_region == 'us-west-1' else '' }}>US West (N. California)</option>
+                            <option value="us-west-2" {{ 'selected' if platform_settings and platform_settings.aws_region == 'us-west-2' else '' }}>US West (Oregon)</option>
+                            <option value="ca-central-1" {{ 'selected' if platform_settings and platform_settings.aws_region == 'ca-central-1' else '' }}>Canada (Central)</option>
+                            <option value="eu-west-1" {{ 'selected' if platform_settings and platform_settings.aws_region == 'eu-west-1' else '' }}>Europe (Ireland)</option>
+                            <option value="eu-west-2" {{ 'selected' if platform_settings and platform_settings.aws_region == 'eu-west-2' else '' }}>Europe (London)</option>
+                            <option value="eu-west-3" {{ 'selected' if platform_settings and platform_settings.aws_region == 'eu-west-3' else '' }}>Europe (Paris)</option>
+                            <option value="eu-central-1" {{ 'selected' if platform_settings and platform_settings.aws_region == 'eu-central-1' else '' }}>Europe (Frankfurt)</option>
+                            <option value="ap-south-1" {{ 'selected' if platform_settings and platform_settings.aws_region == 'ap-south-1' else '' }}>Asia Pacific (Mumbai)</option>
+                            <option value="ap-northeast-1" {{ 'selected' if platform_settings and platform_settings.aws_region == 'ap-northeast-1' else '' }}>Asia Pacific (Tokyo)</option>
+                            <option value="ap-northeast-2" {{ 'selected' if platform_settings and platform_settings.aws_region == 'ap-northeast-2' else '' }}>Asia Pacific (Seoul)</option>
+                            <option value="ap-southeast-1" {{ 'selected' if platform_settings and platform_settings.aws_region == 'ap-southeast-1' else '' }}>Asia Pacific (Singapore)</option>
+                            <option value="ap-southeast-2" {{ 'selected' if platform_settings and platform_settings.aws_region == 'ap-southeast-2' else '' }}>Asia Pacific (Sydney)</option>
+                            <option value="sa-east-1" {{ 'selected' if platform_settings and platform_settings.aws_region == 'sa-east-1' else '' }}>South America (São Paulo)</option>
+                        </select>
+                        <small class="form-text text-muted" id="aws_region_help">Select the AWS region where you configured SES</small>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="settings-form-group">
+                        <label class="settings-form-label" for="smtp_server">SMTP Server *</label>
+                        <input type="text" 
+                               class="settings-form-control" 
+                               id="smtp_server" 
+                               name="smtp_server" 
+                               value="{{ platform_settings.smtp_server if platform_settings else '' }}" 
+                               placeholder="email-smtp.us-east-1.amazonaws.com"
+                               required
+                               aria-required="true"
+                               aria-describedby="smtp_server_help">
+                        <small class="form-text text-muted" id="smtp_server_help">AWS SES SMTP endpoint (e.g., email-smtp.REGION.amazonaws.com)</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="settings-form-group">
+                        <label class="settings-form-label" for="smtp_port">SMTP Port *</label>
+                        <input type="number" 
+                               class="settings-form-control" 
+                               id="smtp_port" 
+                               name="smtp_port" 
+                               value="{{ platform_settings.smtp_port if platform_settings else '587' }}" 
+                               min="1" 
+                               max="65535" 
+                               required
+                               aria-required="true"
+                               aria-describedby="smtp_port_help">
+                        <small class="form-text text-muted" id="smtp_port_help">Usually 587 (TLS) or 465 (SSL)</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="settings-form-group">
+                        <div class="settings-form-check" style="margin-top: 35px;">
+                            <input type="checkbox" 
+                                   class="settings-form-check-input" 
+                                   id="use_tls" 
+                                   name="use_tls" 
+                                   {{ 'checked' if (platform_settings and platform_settings.use_tls) or not platform_settings else '' }}>
+                            <label class="settings-form-check-label" for="use_tls">
+                                Use TLS (recommended for port 587)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="settings-form-group">
+                        <div class="settings-form-check" style="margin-top: 35px;">
+                            <input type="checkbox" 
+                                   class="settings-form-check-input" 
+                                   id="use_ssl" 
+                                   name="use_ssl" 
+                                   {{ 'checked' if platform_settings and platform_settings.use_ssl else '' }}>
+                            <label class="settings-form-check-label" for="use_ssl">
+                                Use SSL (for port 465)
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="settings-form-group">
+                        <label class="settings-form-label" for="smtp_username">SMTP Username (Access Key ID) *</label>
+                        <input type="text" 
+                               class="settings-form-control" 
+                               id="smtp_username" 
+                               name="smtp_username" 
+                               value="{{ platform_settings.smtp_username if platform_settings else '' }}" 
+                               placeholder="AKIA..."
+                               required
+                               aria-required="true"
+                               aria-describedby="smtp_username_help">
+                        <small class="form-text text-muted" id="smtp_username_help">AWS SES SMTP credentials username (IAM Access Key ID)</small>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="settings-form-group">
+                        <label class="settings-form-label" for="smtp_password">
+                            SMTP Password (Secret Access Key) {{ '*' if not platform_settings else '(leave blank to keep current)' }}
+                        </label>
+                        <input type="password" 
+                               class="settings-form-control" 
+                               id="smtp_password" 
+                               name="smtp_password" 
+                               placeholder="Enter AWS SES SMTP password"
+                               {{ 'required aria-required=true' if not platform_settings else '' }}
+                               aria-describedby="smtp_password_help">
+                        <small class="form-text text-muted" id="smtp_password_help">AWS SES SMTP credentials password (converted from Secret Access Key)</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Form Actions -->
+        <div class="settings-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    {% if platform_settings and platform_settings.updated_at %}
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>
+                            Last updated: {{ platform_settings.updated_at.strftime('%Y-%m-%d %H:%M:%S') }} UTC
+                        </small>
+                    {% endif %}
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='{{ url_for('business_auth.admin_panel') }}'">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" id="testConnectionBtn" {% if not platform_settings %}disabled{% endif %}>
+                        <i class="fas fa-vial me-2"></i>Test Connection
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Save Configuration
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Test Connection Modal -->
+<div class="modal fade" id="testResultModal" tabindex="-1" aria-labelledby="testResultModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="testResultModalLabel">Connection Test Result</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="testResultBody">
+                <!-- Test result will be inserted here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const testBtn = document.getElementById('testConnectionBtn');
+    const modal = new bootstrap.Modal(document.getElementById('testResultModal'));
+    const testResultBody = document.getElementById('testResultBody');
+    
+    testBtn.addEventListener('click', function() {
+        // Disable button and show loading state
+        testBtn.disabled = true;
+        testBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Testing...';
+        
+        // Make AJAX request to test endpoint
+        fetch('{{ url_for("business_auth.test_platform_email_settings") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                testResultBody.innerHTML = `
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>Success!</strong> ${data.message}
+                    </div>
+                    <p class="mb-0">Your platform AWS SES configuration is working correctly and can be used for VOÏA-managed email delivery.</p>
+                `;
+            } else {
+                testResultBody.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-times-circle me-2"></i>
+                        <strong>Connection Failed</strong>
+                    </div>
+                    <p class="mb-0"><strong>Error:</strong> ${data.error}</p>
+                    <p class="mt-3 mb-0"><strong>Troubleshooting:</strong></p>
+                    <ul>
+                        <li>Verify your AWS SES SMTP credentials are correct</li>
+                        <li>Check that the SMTP server matches your AWS region</li>
+                        <li>Ensure your IAM user has SES sending permissions</li>
+                        <li>Confirm TLS/SSL settings match your port (587=TLS, 465=SSL)</li>
+                    </ul>
+                `;
+            }
+            modal.show();
+        })
+        .catch(error => {
+            testResultBody.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-times-circle me-2"></i>
+                    <strong>Test Failed</strong>
+                </div>
+                <p class="mb-0">An error occurred while testing the connection: ${error.message}</p>
+            `;
+            modal.show();
+        })
+        .finally(() => {
+            // Re-enable button
+            testBtn.disabled = false;
+            testBtn.innerHTML = '<i class="fas fa-vial me-2"></i>Test Connection';
+        });
+    });
+});
+</script>
+{% endblock %}
