@@ -119,6 +119,28 @@
             </div>
         </div>
         <div class="info-item">
+            <div class="info-value">{{ campaign.engagement_metrics.email_responses }}</div>
+            <div class="info-label">
+                <i class="fas fa-envelope"></i> Via Email Invites
+                <i class="fas fa-info-circle info-icon" 
+                   data-bs-toggle="popover" 
+                   data-bs-trigger="click" 
+                   data-bs-placement="top"
+                   data-bs-content="Responses submitted through email invitations (form or conversational surveys). These are responses from participants who received email invitations."></i>
+            </div>
+        </div>
+        <div class="info-item">
+            <div class="info-value">{{ campaign.engagement_metrics.transcript_responses }}</div>
+            <div class="info-label">
+                <i class="fas fa-file-upload"></i> Via Transcript Upload
+                <i class="fas fa-info-circle info-icon" 
+                   data-bs-toggle="popover" 
+                   data-bs-trigger="click" 
+                   data-bs-placement="top"
+                   data-bs-content="Responses loaded by admins through transcript upload feature. These responses were created from uploaded conversation transcripts."></i>
+            </div>
+        </div>
+        <div class="info-item">
             <div class="info-value">
                 {% if campaign.engagement_metrics.participation_rate is not none %}
                     {{ campaign.engagement_metrics.participation_rate }}%
