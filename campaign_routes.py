@@ -1535,6 +1535,8 @@ def get_timeline_data():
         license_start = license_info.get('license_start')
         license_end = license_info.get('license_end')
         
+        logger.debug(f"Timeline data for business_account_id {current_account.id}: license_start={license_start}, license_end={license_end}, license_type={license_info.get('license_type')}")
+        
         # Handle accounts without license dates (trials, newly onboarded)
         if not license_start or not license_end:
             # Return empty timeline with message
