@@ -188,6 +188,24 @@
                     </div>
                     <div id="timelineCanvas" class="d-none">
                         <canvas id="campaignTimelineChart" aria-label="{{ _('Campaign timeline visualization') }}" role="img"></canvas>
+                        <div class="timeline-legend mt-3 d-flex flex-wrap gap-3 justify-content-center" role="list" aria-label="{{ _('Campaign status legend') }}">
+                            <div class="legend-item d-flex align-items-center" role="listitem">
+                                <span class="legend-color" style="background-color: rgba(102, 102, 102, 0.8); border: 2px solid rgb(102, 102, 102);" aria-hidden="true"></span>
+                                <span class="legend-label">{{ _('Draft') }}</span>
+                            </div>
+                            <div class="legend-item d-flex align-items-center" role="listitem">
+                                <span class="legend-color" style="background-color: rgba(225, 58, 68, 0.8); border: 2px solid rgb(225, 58, 68);" aria-hidden="true"></span>
+                                <span class="legend-label">{{ _('Ready') }}</span>
+                            </div>
+                            <div class="legend-item d-flex align-items-center" role="listitem">
+                                <span class="legend-color" style="background-color: rgba(46, 117, 50, 0.8); border: 2px solid rgb(46, 117, 50);" aria-hidden="true"></span>
+                                <span class="legend-label">{{ _('Active') }}</span>
+                            </div>
+                            <div class="legend-item d-flex align-items-center" role="listitem">
+                                <span class="legend-color" style="background-color: rgba(33, 150, 243, 0.8); border: 2px solid rgb(33, 150, 243);" aria-hidden="true"></span>
+                                <span class="legend-label">{{ _('Completed') }}</span>
+                            </div>
+                        </div>
                     </div>
                     <div id="timelineEmpty" class="d-none text-center py-4">
                         <i class="fas fa-info-circle text-muted fa-3x mb-3" aria-hidden="true"></i>

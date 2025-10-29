@@ -11554,6 +11554,30 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     color: var(--primary-red);
 }
 
+/* Timeline Legend Styles */
+.timeline-legend {
+    padding: var(--spacing-md) 0;
+    font-size: var(--font-size-sm);
+}
+
+.timeline-legend .legend-item {
+    gap: var(--spacing-sm);
+}
+
+.timeline-legend .legend-color {
+    display: inline-block;
+    width: 24px;
+    height: 16px;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.timeline-legend .legend-label {
+    font-weight: 500;
+    color: var(--neutral-dark);
+    white-space: nowrap;
+}
+
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
     .card-header-v2 {
@@ -11570,5 +11594,15 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     
     #timelineCanvas {
         min-height: 250px;
+    }
+    
+    .timeline-legend {
+        font-size: var(--font-size-xs);
+        gap: var(--spacing-sm) !important;
+    }
+    
+    .timeline-legend .legend-color {
+        width: 20px;
+        height: 14px;
     }
 }
