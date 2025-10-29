@@ -489,6 +489,25 @@
                         </a>
                     </div>
 
+                    <!-- Platform Email Settings (Platform Admin Only) -->
+                    {% if current_user.is_platform_admin() %}
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-server"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">Platform Email Settings</h4>
+                                <p class="settings-item-desc">Configure AWS SES credentials for VOÏA-managed email delivery</p>
+                            </div>
+                            <span class="badge bg-danger ms-2">Platform Admin</span>
+                        </div>
+                        <a href="{{ url_for('business_auth.platform_email_settings') }}" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-shield-alt me-1"></i>Manage
+                        </a>
+                    </div>
+                    {% endif %}
+
                     <!-- {{ _('Brand Configuration') }} -->
                     <div class="settings-item">
                         <div class="settings-item-header">
