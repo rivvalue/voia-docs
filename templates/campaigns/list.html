@@ -11,26 +11,23 @@
 ] %}
 {% include 'components/breadcrumb.html' %}
 
-<!-- Campaign Header -->
-<div class="header-gradient-primary campaign-page-header">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <h1 class="page-title mb-1">{{ _('Campaign Management') }}</h1>
-                <p class="page-subtitle mb-0">{{ _('Manage survey campaigns for %(name)s', name=business_account.name) }}</p>
+<div class="container">
+    
+    <!-- Page Header (V2 Neutral Style) -->
+    <div class="card-v2 mb-4">
+        <div class="card-header-v2 card-header-neutral d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-0">
+                    <i class="fas fa-bullhorn me-2" aria-hidden="true"></i>
+                    {{ _('Campaign Management') }}
+                </h5>
+                <small>{{ _('Manage survey campaigns for %(name)s', name=business_account.name) }}</small>
             </div>
-            <div class="col-md-4">
-                <div class="text-end">
-                    <a href="{{ url_for('campaigns.create_campaign') }}" class="create-campaign-btn">
-                        <i class="fas fa-plus me-2"></i>Create Campaign
-                    </a>
-                </div>
-            </div>
+            <a href="{{ url_for('campaigns.create_campaign') }}" class="create-campaign-btn">
+                <i class="fas fa-plus me-2"></i>{{ _('Create Campaign') }}
+            </a>
         </div>
     </div>
-</div>
-
-<div class="container">
 
     {# Campaign Action Buttons Macro #}
     {% macro campaign_actions(campaign, view_type='table') %}
@@ -156,19 +153,19 @@
                         <canvas id="campaignTimelineChart" aria-label="{{ _('Campaign timeline visualization') }}" role="img"></canvas>
                         <div class="timeline-legend mt-3 d-flex flex-wrap gap-3 justify-content-center" role="list" aria-label="{{ _('Campaign status legend') }}">
                             <div class="legend-item d-flex align-items-center" role="listitem">
-                                <span class="legend-color" style="background-color: rgba(138, 138, 138, 0.3); border: 2px solid #BDBDBD;" aria-hidden="true"></span>
+                                <span class="legend-color legend-draft" aria-hidden="true"></span>
                                 <span class="legend-label">{{ _('Draft') }}</span>
                             </div>
                             <div class="legend-item d-flex align-items-center" role="listitem">
-                                <span class="legend-color" style="background-color: #E9E8E4; border: 2px solid #BDBDBD;" aria-hidden="true"></span>
+                                <span class="legend-color legend-ready" aria-hidden="true"></span>
                                 <span class="legend-label">{{ _('Ready') }}</span>
                             </div>
                             <div class="legend-item d-flex align-items-center" role="listitem">
-                                <span class="legend-color" style="background-color: #E13A44; border: 2px solid #C52D36;" aria-hidden="true"></span>
+                                <span class="legend-color legend-active" aria-hidden="true"></span>
                                 <span class="legend-label">{{ _('Active') }}</span>
                             </div>
                             <div class="legend-item d-flex align-items-center" role="listitem">
-                                <span class="legend-color" style="background-color: rgba(225, 58, 68, 0.15); border: 2px solid rgba(225, 58, 68, 0.5);" aria-hidden="true"></span>
+                                <span class="legend-color legend-completed" aria-hidden="true"></span>
                                 <span class="legend-label">{{ _('Completed') }}</span>
                             </div>
                         </div>
@@ -181,42 +178,52 @@
             </div>
         </div>
 
-        <!-- Campaign Controls -->
-        <div class="campaign-controls">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <div class="view-toggle">
-                        <button type="button" id="listViewBtn" class="active" onclick="switchView('list')">
-                            <i class="fas fa-list me-2"></i>List
-                        </button>
-                        <button type="button" id="gridViewBtn" onclick="switchView('grid')">
-                            <i class="fas fa-th me-2"></i>Grid
-                        </button>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="filters-section">
-                        <div class="status-filters">
-                            <a href="#" class="status-filter all active-filter" data-status="all">
-                                {{ _('All') }} <span class="badge">{{ campaigns|length }}</span>
-                            </a>
-                            <a href="#" class="status-filter draft" data-status="draft">
-                                {{ _('Draft') }} <span class="badge">{{ campaigns|selectattr('status', 'in', ['draft', 'ready'])|list|length }}</span>
-                            </a>
-                            <a href="#" class="status-filter active" data-status="active">
-                                {{ _('Active') }} <span class="badge">{{ campaigns|selectattr('status', '==', 'active')|list|length }}</span>
-                            </a>
-                            <a href="#" class="status-filter completed" data-status="completed">
-                                {{ _('Completed') }} <span class="badge">{{ campaigns|selectattr('status', '==', 'completed')|list|length }}</span>
-                            </a>
+        <!-- Manage Campaigns Card (Filters + Table/Grid) -->
+        <div class="card-v2">
+            <div class="card-header-v2 card-header-neutral">
+                <h5 class="mb-0">
+                    <i class="fas fa-tasks me-2" aria-hidden="true"></i>
+                    {{ _('Manage Campaigns') }}
+                </h5>
+                <small>{{ _('Filter and view campaign details') }}</small>
+            </div>
+            <div class="card-body-v2">
+                <!-- Campaign Controls -->
+                <div class="campaign-controls mb-3">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="view-toggle">
+                                <button type="button" id="listViewBtn" class="active" onclick="switchView('list')">
+                                    <i class="fas fa-list me-2"></i>List
+                                </button>
+                                <button type="button" id="gridViewBtn" onclick="switchView('grid')">
+                                    <i class="fas fa-th me-2"></i>Grid
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="filters-section">
+                                <div class="status-filters">
+                                    <a href="#" class="status-filter all active-filter" data-status="all">
+                                        {{ _('All') }} <span class="badge">{{ campaigns|length }}</span>
+                                    </a>
+                                    <a href="#" class="status-filter draft" data-status="draft">
+                                        {{ _('Draft') }} <span class="badge">{{ campaigns|selectattr('status', 'in', ['draft', 'ready'])|list|length }}</span>
+                                    </a>
+                                    <a href="#" class="status-filter active" data-status="active">
+                                        {{ _('Active') }} <span class="badge">{{ campaigns|selectattr('status', '==', 'active')|list|length }}</span>
+                                    </a>
+                                    <a href="#" class="status-filter completed" data-status="completed">
+                                        {{ _('Completed') }} <span class="badge">{{ campaigns|selectattr('status', '==', 'completed')|list|length }}</span>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- List View (Default) -->
-        <div id="listView" class="campaigns-table">
+                <!-- List View (Default) -->
+                <div id="listView" class="campaigns-table">
             <table class="table table-hover mb-0 responsive-table">
                 <thead>
                     <tr>
@@ -278,6 +285,8 @@
                 {{ campaign_card(campaign) }}
             </div>
             {% endfor %}
+        </div>
+            </div>
         </div>
     {% else %}
         <!-- Empty State - No Campaigns -->
@@ -807,19 +816,19 @@ function loadTimelineData() {
 function renderTimeline(data) {
     const ctx = document.getElementById('campaignTimelineChart');
     
-    // V2 Status color mapping (EXACT match with table badge CSS)
+    // V2 Status color mapping using CSS variables for consistency
     const statusColors = {
-        'draft': 'rgba(138, 138, 138, 0.3)',      // Light gray (slightly more opaque for visibility)
-        'ready': '#E9E8E4',                       // Light gray background
-        'active': '#E13A44',                      // VOÏA primary red (gradient simplified to solid)
-        'completed': 'rgba(225, 58, 68, 0.15)'    // Light red tint (slightly more opaque)
+        'draft': 'var(--status-draft-bg)',
+        'ready': 'var(--status-ready-bg)',
+        'active': 'var(--status-active-bg)',
+        'completed': 'var(--status-completed-bg)'
     };
     
     const statusBorderColors = {
-        'draft': '#BDBDBD',                       // Medium gray border
-        'ready': '#BDBDBD',                       // Medium gray border  
-        'active': '#C52D36',                      // Red-hover border
-        'completed': 'rgba(225, 58, 68, 0.5)'     // Red border (more opaque)
+        'draft': 'var(--status-draft-border)',
+        'ready': 'var(--status-ready-border)',
+        'active': 'var(--status-active-border)',
+        'completed': 'var(--status-completed-border)'
     };
     
     // Prepare chart data with floating bars (one dataset with all campaigns)
