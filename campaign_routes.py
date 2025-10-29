@@ -298,15 +298,10 @@ def view_campaign(campaign_id):
         campaign_data = campaign.to_dict()
         campaign_data['engagement_metrics'] = campaign.get_engagement_metrics()
         
-        # Check license for transcript analysis feature
-        from license_service import LicenseService
-        has_transcript_analysis = LicenseService.can_use_transcript_analysis(current_account.id)
-        
         return render_template('campaigns/view.html',
                              campaign=campaign_data,
                              participant_stats=campaign_participant_stats,
-                             business_account=current_account.to_dict(),
-                             has_transcript_analysis=has_transcript_analysis)
+                             business_account=current_account.to_dict())
         
     except Exception as e:
         logger.error(f"Campaign view error: {e}")

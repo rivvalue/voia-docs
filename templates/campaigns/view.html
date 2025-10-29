@@ -200,13 +200,11 @@
                     <span class="badge bg-danger ms-1">{{ campaign.engagement_metrics.surveys_completed }}</span>
                 </button>
             </li>
-            {% if has_transcript_analysis %}
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="transcripts-tab" data-bs-toggle="tab" data-bs-target="#transcripts-pane" type="button" role="tab" aria-controls="transcripts-pane" aria-selected="false">
                     <i class="fas fa-file-alt me-2"></i>Transcript Analysis
                 </button>
             </li>
-            {% endif %}
             {% endif %}
         </ul>
 
@@ -510,7 +508,6 @@
             </div>
             
             <!-- Transcript Analysis Tab -->
-            {% if has_transcript_analysis %}
             <div class="tab-pane fade" id="transcripts-pane" role="tabpanel" aria-labelledby="transcripts-tab">
                 <div class="row">
                     <div class="col-md-6">
@@ -603,7 +600,6 @@
                     </div>
                 </div>
             </div>
-            {% endif %}
             {% endif %}
         </div>
     </div>
