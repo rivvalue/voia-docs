@@ -1526,7 +1526,7 @@ def get_timeline_data():
         
         # Get license information
         from license_service import LicenseService
-        license_info = LicenseService.get_license_info(current_account.id)
+        license_info = LicenseService.get_license_info(current_account.id, bypass_admin_override=True)
         
         if not license_info:
             return jsonify({'error': 'License information not available'}), 400
