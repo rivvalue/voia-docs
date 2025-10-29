@@ -307,6 +307,17 @@ class Campaign(db.Model):
         # Count completed surveys
         surveys_completed = SurveyResponse.query.filter_by(campaign_id=self.id).count()
         
+        # Count responses by source type
+        email_responses = SurveyResponse.query.filter(
+            SurveyResponse.campaign_id == self.id,
+            SurveyResponse.source_type.in_(['form', 'conversational'])
+        ).count()
+        
+        transcript_responses = SurveyResponse.query.filter_by(
+            campaign_id=self.id,
+            source_type='transcript'
+        ).count()
+        
         # Get total participants count
         total_participants = self.participants_count
         
@@ -366,6 +377,8 @@ class Campaign(db.Model):
         return {
             'invitations_sent': invitations_sent,
             'surveys_completed': surveys_completed,
+            'email_responses': email_responses,
+            'transcript_responses': transcript_responses,
             'total_participants': total_participants,
             'participation_rate': participation_rate,
             'email_success_rate': email_success_rate,
