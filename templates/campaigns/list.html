@@ -160,6 +160,43 @@
             </div>
         </div>
 
+        <!-- Campaign Timeline Viewer -->
+        <div class="campaign-timeline-section mb-4">
+            <div class="card-v2">
+                <div class="card-header-v2 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0">
+                            <i class="fas fa-calendar-alt me-2" aria-hidden="true"></i>
+                            {{ _('Campaign Timeline') }}
+                        </h5>
+                        <small class="text-muted">{{ _('Visual overview of campaign schedules over your license duration') }}</small>
+                    </div>
+                    <button type="button" class="btn-icon-v2" onclick="toggleTimeline()" aria-label="{{ _('Toggle timeline view') }}">
+                        <i class="fas fa-chevron-down" id="timelineToggleIcon" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <div class="card-body-v2" id="timelineContainer" style="display: none;">
+                    <div id="timelineLoading" class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">{{ _('Loading timeline...') }}</span>
+                        </div>
+                        <p class="text-muted mt-2">{{ _('Loading timeline...') }}</p>
+                    </div>
+                    <div id="timelineError" class="alert alert-warning d-none" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2" aria-hidden="true"></i>
+                        {{ _('Unable to load timeline data. Please refresh the page.') }}
+                    </div>
+                    <div id="timelineCanvas" class="d-none">
+                        <canvas id="campaignTimelineChart" aria-label="{{ _('Campaign timeline visualization') }}" role="img"></canvas>
+                    </div>
+                    <div id="timelineEmpty" class="d-none text-center py-4">
+                        <i class="fas fa-info-circle text-muted fa-3x mb-3" aria-hidden="true"></i>
+                        <p class="text-muted">{{ _('No campaigns scheduled yet.') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- List View (Default) -->
         <div id="listView" class="campaigns-table">
             <table class="table table-hover mb-0 responsive-table">
@@ -682,6 +719,174 @@ function filterCampaigns(status) {
             card.style.display = 'none';
         }
     });
+}
+
+// Campaign Timeline Functions
+let timelineChart = null;
+let timelineLoaded = false;
+
+function toggleTimeline() {
+    const container = document.getElementById('timelineContainer');
+    const icon = document.getElementById('timelineToggleIcon');
+    
+    if (container.style.display === 'none') {
+        container.style.display = 'block';
+        icon.classList.remove('fa-chevron-down');
+        icon.classList.add('fa-chevron-up');
+        
+        // Load timeline data only once
+        if (!timelineLoaded) {
+            loadTimelineData();
+            timelineLoaded = true;
+        }
+    } else {
+        container.style.display = 'none';
+        icon.classList.remove('fa-chevron-up');
+        icon.classList.add('fa-chevron-down');
+    }
+}
+
+function loadTimelineData() {
+    const loadingDiv = document.getElementById('timelineLoading');
+    const errorDiv = document.getElementById('timelineError');
+    const canvasDiv = document.getElementById('timelineCanvas');
+    const emptyDiv = document.getElementById('timelineEmpty');
+    
+    // Show loading
+    loadingDiv.style.display = 'block';
+    errorDiv.classList.add('d-none');
+    canvasDiv.classList.add('d-none');
+    emptyDiv.classList.add('d-none');
+    
+    fetch('{{ url_for("campaigns.get_timeline_data") }}')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to load timeline data');
+            }
+            return response.json();
+        })
+        .then(data => {
+            loadingDiv.style.display = 'none';
+            
+            if (data.campaigns && data.campaigns.length > 0) {
+                renderTimeline(data);
+                canvasDiv.classList.remove('d-none');
+            } else {
+                emptyDiv.classList.remove('d-none');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading timeline:', error);
+            loadingDiv.style.display = 'none';
+            errorDiv.classList.remove('d-none');
+        });
+}
+
+function renderTimeline(data) {
+    const ctx = document.getElementById('campaignTimelineChart');
+    
+    // Status color mapping (matching campaign status colors)
+    const statusColors = {
+        'draft': 'rgba(102, 102, 102, 0.7)',      // Gray
+        'ready': 'rgba(225, 58, 68, 0.7)',        // Red
+        'active': 'rgba(46, 117, 50, 0.7)',       // Green
+        'completed': 'rgba(33, 150, 243, 0.7)'    // Blue
+    };
+    
+    const statusBorderColors = {
+        'draft': 'rgb(102, 102, 102)',
+        'ready': 'rgb(225, 58, 68)',
+        'active': 'rgb(46, 117, 50)',
+        'completed': 'rgb(33, 150, 243)'
+    };
+    
+    // Generate month labels
+    const monthLabels = [];
+    for (let i = 0; i <= data.license_months; i++) {
+        monthLabels.push('{{ _("Month") }} ' + i);
+    }
+    
+    // Prepare datasets - one bar per campaign
+    const datasets = data.campaigns.map(campaign => {
+        const duration = campaign.end_month - campaign.start_month + 1;
+        
+        return {
+            label: campaign.name,
+            data: [{
+                x: [campaign.start_month, campaign.end_month + 1],
+                y: campaign.name
+            }],
+            backgroundColor: statusColors[campaign.status] || statusColors['draft'],
+            borderColor: statusBorderColors[campaign.status] || statusBorderColors['draft'],
+            borderWidth: 2,
+            barPercentage: 0.8,
+            categoryPercentage: 0.9
+        };
+    });
+    
+    // Destroy existing chart if it exists
+    if (timelineChart) {
+        timelineChart.destroy();
+    }
+    
+    // Create new chart
+    timelineChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: data.campaigns.map(c => c.name),
+            datasets: datasets
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const campaign = data.campaigns[context.dataIndex];
+                            return [
+                                '{{ _("Campaign") }}: ' + campaign.name,
+                                '{{ _("Status") }}: ' + campaign.status,
+                                '{{ _("Duration") }}: ' + '{{ _("Month") }} ' + campaign.start_month + ' - ' + '{{ _("Month") }} ' + campaign.end_month
+                            ];
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    type: 'linear',
+                    min: 0,
+                    max: data.license_months,
+                    ticks: {
+                        stepSize: 1,
+                        callback: function(value) {
+                            return '{{ _("M") }}' + Math.floor(value);
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: '{{ _("License Duration (Months)") }}'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: '{{ _("Campaigns") }}'
+                    }
+                }
+            }
+        }
+    });
+    
+    // Set appropriate height based on number of campaigns
+    const chartHeight = Math.max(300, data.campaigns.length * 50);
+    ctx.style.height = chartHeight + 'px';
+    ctx.parentElement.style.height = chartHeight + 'px';
 }
 
 // ========== OPTIMIZED: Single DOMContentLoaded handler - Progressive Loading ==========
