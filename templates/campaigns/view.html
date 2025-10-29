@@ -119,28 +119,6 @@
             </div>
         </div>
         <div class="info-item">
-            <div class="info-value">{{ campaign.engagement_metrics.email_responses }}</div>
-            <div class="info-label">
-                <i class="fas fa-envelope"></i> Via Email Invites
-                <i class="fas fa-info-circle info-icon" 
-                   data-bs-toggle="popover" 
-                   data-bs-trigger="click" 
-                   data-bs-placement="top"
-                   data-bs-content="Responses submitted through email invitations (form or conversational surveys). These are responses from participants who received email invitations."></i>
-            </div>
-        </div>
-        <div class="info-item">
-            <div class="info-value">{{ campaign.engagement_metrics.transcript_responses }}</div>
-            <div class="info-label">
-                <i class="fas fa-file-upload"></i> Via Transcript Upload
-                <i class="fas fa-info-circle info-icon" 
-                   data-bs-toggle="popover" 
-                   data-bs-trigger="click" 
-                   data-bs-placement="top"
-                   data-bs-content="Responses loaded by admins through transcript upload feature. These responses were created from uploaded conversation transcripts."></i>
-            </div>
-        </div>
-        <div class="info-item">
             <div class="info-value">
                 {% if campaign.engagement_metrics.participation_rate is not none %}
                     {{ campaign.engagement_metrics.participation_rate }}%
@@ -226,7 +204,6 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="transcripts-tab" data-bs-toggle="tab" data-bs-target="#transcripts-pane" type="button" role="tab" aria-controls="transcripts-pane" aria-selected="false">
                     <i class="fas fa-file-alt me-2"></i>Transcript Analysis
-                    <span class="badge bg-info ms-1" id="transcripts-count">{{ transcript_count }}</span>
                 </button>
             </li>
             {% endif %}
@@ -314,6 +291,42 @@
                             </div>
                             {% if participant_stats.total > 0 %}
                             <div class="stat-percentage">{{ ((participant_stats.pending / participant_stats.total) * 100)|round(0)|int }}%</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item stat-email">
+                        <div class="stat-icon"><i class="fas fa-envelope"></i></div>
+                        <div class="stat-content">
+                            <div class="stat-value">{{ campaign.engagement_metrics.email_responses }}</div>
+                            <div class="stat-label">
+                                {{ _('Via Email') }}
+                                <i class="fas fa-info-circle info-icon" 
+                                   data-bs-toggle="popover" 
+                                   data-bs-trigger="click" 
+                                   data-bs-placement="top"
+                                   data-bs-content="{{ _('Responses submitted through email invitations (form or conversational surveys).') }}"></i>
+                            </div>
+                            {% if campaign.engagement_metrics.surveys_completed > 0 %}
+                            <div class="stat-percentage">{{ ((campaign.engagement_metrics.email_responses / campaign.engagement_metrics.surveys_completed) * 100)|round(0)|int }}%</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="stat-item stat-transcript">
+                        <div class="stat-icon"><i class="fas fa-file-upload"></i></div>
+                        <div class="stat-content">
+                            <div class="stat-value">{{ campaign.engagement_metrics.transcript_responses }}</div>
+                            <div class="stat-label">
+                                {{ _('Via Transcript') }}
+                                <i class="fas fa-info-circle info-icon" 
+                                   data-bs-toggle="popover" 
+                                   data-bs-trigger="click" 
+                                   data-bs-placement="top"
+                                   data-bs-content="{{ _('Responses loaded by admins through transcript upload feature.') }}"></i>
+                            </div>
+                            {% if campaign.engagement_metrics.surveys_completed > 0 %}
+                            <div class="stat-percentage">{{ ((campaign.engagement_metrics.transcript_responses / campaign.engagement_metrics.surveys_completed) * 100)|round(0)|int }}%</div>
                             {% endif %}
                         </div>
                     </div>

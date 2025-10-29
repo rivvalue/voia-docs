@@ -302,21 +302,11 @@ def view_campaign(campaign_id):
         from license_service import LicenseService
         has_transcript_analysis = LicenseService.can_use_transcript_analysis(current_account.id)
         
-        # Get transcript count for badge
-        transcript_count = 0
-        if has_transcript_analysis:
-            from models import SurveyResponse
-            transcript_count = SurveyResponse.query.filter_by(
-                campaign_id=campaign_id,
-                source_type='transcript'
-            ).count()
-        
         return render_template('campaigns/view.html',
                              campaign=campaign_data,
                              participant_stats=campaign_participant_stats,
                              business_account=current_account.to_dict(),
-                             has_transcript_analysis=has_transcript_analysis,
-                             transcript_count=transcript_count)
+                             has_transcript_analysis=has_transcript_analysis)
         
     except Exception as e:
         logger.error(f"Campaign view error: {e}")
