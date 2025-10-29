@@ -30,32 +30,49 @@ def get_filter_options(business_account_id):
     """
     Get all available filter options for participant attributes
     Used to populate filter dropdowns on initial page load
+    OPTIMIZED: Single query fetches all filter columns at once, then processes in Python
     """
-    from sqlalchemy import func as sql_func
+    # Fetch all distinct filter values in a single query (6 queries -> 1 query)
+    results = db.session.query(
+        Participant.company_name,
+        Participant.role,
+        Participant.region,
+        Participant.customer_tier,
+        Participant.language,
+        Participant.tenure_years
+    ).filter(
+        Participant.business_account_id == business_account_id
+    ).distinct().all()
     
-    base_query = Participant.query.filter_by(business_account_id=business_account_id)
+    # Process results in Python (efficient for typical dataset sizes)
+    companies = set()
+    roles = set()
+    regions = set()
+    tiers = set()
+    languages = set()
+    tenure_ranges = set()
+    
+    for row in results:
+        if row.company_name:
+            companies.add(row.company_name)
+        if row.role:
+            roles.add(row.role)
+        if row.region:
+            regions.add(row.region)
+        if row.customer_tier:
+            tiers.add(row.customer_tier)
+        if row.language:
+            languages.add(row.language)
+        if row.tenure_years is not None:
+            tenure_ranges.add(str(row.tenure_years))
     
     return {
-        'companies': [c[0] for c in base_query.with_entities(Participant.company_name).filter(
-            Participant.company_name.isnot(None), Participant.company_name != ''
-        ).distinct().order_by(Participant.company_name).all()],
-        'roles': [r[0] for r in base_query.with_entities(Participant.role).filter(
-            Participant.role.isnot(None), Participant.role != ''
-        ).distinct().order_by(Participant.role).all()],
-        'regions': [r[0] for r in base_query.with_entities(Participant.region).filter(
-            Participant.region.isnot(None), Participant.region != ''
-        ).distinct().order_by(Participant.region).all()],
-        'tiers': [t[0] for t in base_query.with_entities(Participant.customer_tier).filter(
-            Participant.customer_tier.isnot(None), Participant.customer_tier != ''
-        ).distinct().order_by(Participant.customer_tier).all()],
-        'languages': [l[0] for l in base_query.with_entities(Participant.language).filter(
-            Participant.language.isnot(None), Participant.language != ''
-        ).distinct().order_by(Participant.language).all()],
-        'tenure_ranges': sorted(list(set([
-            str(t[0]) for t in base_query.with_entities(Participant.tenure_years).filter(
-                Participant.tenure_years.isnot(None)
-            ).distinct().all()
-        ])), key=lambda x: int(x) if x.isdigit() else 0)
+        'companies': sorted(list(companies)),
+        'roles': sorted(list(roles)),
+        'regions': sorted(list(regions)),
+        'tiers': sorted(list(tiers)),
+        'languages': sorted(list(languages)),
+        'tenure_ranges': sorted(list(tenure_ranges), key=lambda x: float(x) if x.replace('.', '', 1).isdigit() else 0)
     }
 
 
