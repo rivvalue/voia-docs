@@ -903,6 +903,24 @@ class EmailConfiguration(db.Model):
     # AWS SES Specific Configuration
     aws_region = db.Column(db.String(50), nullable=True)  # e.g., 'us-east-1', 'eu-west-1'
     
+    # Platform Email Mode (NEW - for dual-mode support)
+    use_platform_email = db.Column(db.Boolean, nullable=False, default=False)  # True = VOÏA-managed, False = Client-managed
+    
+    # Domain Verification (NEW - for VOÏA-managed AWS SES mode)
+    sender_domain = db.Column(db.String(255), nullable=True)  # e.g., 'clientA.com'
+    domain_verified = db.Column(db.Boolean, nullable=False, default=False)
+    domain_verification_status = db.Column(db.String(50), nullable=True)  # 'pending', 'verified', 'failed'
+    
+    # DKIM Records for DNS Configuration (NEW - manually entered by platform admin from AWS Console)
+    dkim_record_1_name = db.Column(db.String(500), nullable=True)  # e.g., 'abc123._domainkey.clientA.com'
+    dkim_record_1_value = db.Column(db.String(500), nullable=True)  # e.g., 'abc123.dkim.amazonses.com'
+    dkim_record_2_name = db.Column(db.String(500), nullable=True)
+    dkim_record_2_value = db.Column(db.String(500), nullable=True)
+    dkim_record_3_name = db.Column(db.String(500), nullable=True)
+    dkim_record_3_value = db.Column(db.String(500), nullable=True)
+    
+    domain_verified_at = db.Column(db.DateTime, nullable=True)  # When verification was confirmed
+    
     # Sender Configuration
     sender_name = db.Column(db.String(200), nullable=False)
     sender_email = db.Column(db.String(200), nullable=False)
@@ -1093,7 +1111,14 @@ class EmailConfiguration(db.Model):
             'last_test_at': self.last_test_at.isoformat() if self.last_test_at else None,
             'last_test_result': self.get_last_test_result(),
             'created_at': self.created_at.isoformat() if self.created_at else None,
-            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None,
+            # New fields for domain verification
+            'use_platform_email': self.use_platform_email,
+            'sender_domain': self.sender_domain,
+            'domain_verified': self.domain_verified,
+            'domain_verification_status': self.domain_verification_status,
+            'domain_verified_at': self.domain_verified_at.isoformat() if self.domain_verified_at else None,
+            'dkim_records': self.get_dkim_records()
         }
         
         if include_password:
@@ -1105,35 +1130,61 @@ class EmailConfiguration(db.Model):
         """Validate email configuration fields"""
         errors = []
         
-        # Provider-specific validation
-        if self.is_aws_ses():
-            # AWS SES validation
-            if not self.aws_region:
-                errors.append("AWS region is required for AWS SES")
-            # SMTP server is auto-generated for AWS SES, so don't validate it here
+        if self.use_platform_email:
+            # Platform-managed AWS SES mode validation
+            # No SMTP credentials needed (uses platform settings)
+            # Only validate sender identity and domain verification
+            
+            if not self.sender_domain:
+                errors.append("Sender domain is required for platform email")
+            
+            if not self.sender_name:
+                errors.append("Sender name is required")
+            
+            if not self.sender_email:
+                errors.append("Sender email is required")
+            elif '@' not in self.sender_email:
+                errors.append("Valid sender email is required")
+            elif self.sender_domain and self.sender_domain not in self.sender_email:
+                errors.append(f"Sender email must be from domain {self.sender_domain}")
+            
+            # Check DKIM records are present
+            if not self.has_dkim_records():
+                errors.append("DKIM records must be configured for domain verification")
+        
         else:
-            # Standard SMTP validation
-            if not self.smtp_server:
-                errors.append("SMTP server is required")
+            # Client-managed SMTP mode validation (original logic)
+            
+            # Provider-specific validation
+            if self.is_aws_ses():
+                # AWS SES validation
+                if not self.aws_region:
+                    errors.append("AWS region is required for AWS SES")
+                # SMTP server is auto-generated for AWS SES, so don't validate it here
+            else:
+                # Standard SMTP validation
+                if not self.smtp_server:
+                    errors.append("SMTP server is required")
+            
+            # Common validations for both providers
+            if not self.smtp_port or not (1 <= self.smtp_port <= 65535):
+                errors.append("Valid SMTP port (1-65535) is required")
+            
+            if not self.smtp_username:
+                errors.append("SMTP username is required")
+            
+            if not self.smtp_password_encrypted:
+                errors.append("SMTP password is required")
+            
+            if not self.sender_name:
+                errors.append("Sender name is required")
+            
+            if not self.sender_email:
+                errors.append("Sender email is required")
+            elif '@' not in self.sender_email:
+                errors.append("Valid sender email is required")
         
-        # Common validations for both providers
-        if not self.smtp_port or not (1 <= self.smtp_port <= 65535):
-            errors.append("Valid SMTP port (1-65535) is required")
-        
-        if not self.smtp_username:
-            errors.append("SMTP username is required")
-        
-        if not self.smtp_password_encrypted:
-            errors.append("SMTP password is required")
-        
-        if not self.sender_name:
-            errors.append("Sender name is required")
-        
-        if not self.sender_email:
-            errors.append("Sender email is required")
-        elif '@' not in self.sender_email:
-            errors.append("Valid sender email is required")
-        
+        # Common validation for both modes
         if self.reply_to_email and '@' not in self.reply_to_email:
             errors.append("Valid reply-to email is required")
         
@@ -1233,6 +1284,41 @@ class EmailConfiguration(db.Model):
         
         return errors
     
+    def get_dkim_records(self):
+        """Get DKIM records as a list of dictionaries
+        
+        Returns:
+            List of DKIM records with name and value, filtering out empty records
+        """
+        records = []
+        
+        if self.dkim_record_1_name and self.dkim_record_1_value:
+            records.append({
+                'name': self.dkim_record_1_name,
+                'value': self.dkim_record_1_value,
+                'record_number': 1
+            })
+        
+        if self.dkim_record_2_name and self.dkim_record_2_value:
+            records.append({
+                'name': self.dkim_record_2_name,
+                'value': self.dkim_record_2_value,
+                'record_number': 2
+            })
+        
+        if self.dkim_record_3_name and self.dkim_record_3_value:
+            records.append({
+                'name': self.dkim_record_3_name,
+                'value': self.dkim_record_3_value,
+                'record_number': 3
+            })
+        
+        return records
+    
+    def has_dkim_records(self):
+        """Check if any DKIM records are configured"""
+        return len(self.get_dkim_records()) > 0
+    
     @staticmethod
     def get_for_business_account(business_account_id):
         """Get email configuration for a business account"""
@@ -1240,6 +1326,126 @@ class EmailConfiguration(db.Model):
             business_account_id=business_account_id,
             is_active=True
         ).first()
+
+
+class PlatformEmailSettings(db.Model):
+    """Platform-wide AWS SES configuration (single record for VOÏA platform)"""
+    __tablename__ = 'platform_email_settings'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    
+    # AWS SES credentials (used for ALL business accounts when use_platform_email=True)
+    aws_region = db.Column(db.String(50), nullable=False)  # e.g., 'us-east-1'
+    smtp_server = db.Column(db.String(255), nullable=False)  # Auto-generated: email-smtp.{region}.amazonaws.com
+    smtp_port = db.Column(db.Integer, nullable=False, default=587)
+    smtp_username = db.Column(db.String(255), nullable=False)  # VOÏA's SES SMTP username
+    smtp_password_encrypted = db.Column(db.Text, nullable=False)  # VOÏA's SES SMTP password (encrypted)
+    use_tls = db.Column(db.Boolean, nullable=False, default=True)
+    use_ssl = db.Column(db.Boolean, nullable=False, default=False)
+    
+    # Configuration status
+    is_verified = db.Column(db.Boolean, nullable=False, default=False)
+    last_test_at = db.Column(db.DateTime, nullable=True)
+    last_test_result = db.Column(db.Text, nullable=True)  # JSON result of last test
+    
+    # Metadata
+    configured_at = db.Column(db.DateTime, default=datetime.utcnow)
+    configured_by_user_id = db.Column(db.Integer, db.ForeignKey('business_account_users.id'), nullable=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationship
+    configured_by = db.relationship('BusinessAccountUser', foreign_keys=[configured_by_user_id])
+    
+    def set_smtp_password(self, password):
+        """Encrypt and store SMTP password (reuses EmailConfiguration encryption logic)"""
+        if password:
+            from cryptography.fernet import Fernet
+            import base64
+            import os
+            
+            key = os.environ.get('EMAIL_ENCRYPTION_KEY')
+            if not key:
+                secret_key = os.environ.get('SESSION_SECRET', 'development-key').encode()
+                key = base64.urlsafe_b64encode(secret_key[:32].ljust(32, b'0'))
+            else:
+                key = key.encode()
+            
+            fernet = Fernet(key)
+            encrypted_password = fernet.encrypt(password.encode())
+            self.smtp_password_encrypted = base64.urlsafe_b64encode(encrypted_password).decode()
+    
+    def get_smtp_password(self):
+        """Decrypt and return SMTP password"""
+        if self.smtp_password_encrypted:
+            from cryptography.fernet import Fernet
+            import base64
+            import os
+            import logging
+            
+            logger = logging.getLogger(__name__)
+            key_sources = []
+            
+            primary_key = os.environ.get('EMAIL_ENCRYPTION_KEY')
+            if primary_key:
+                key_sources.append(('primary', primary_key.encode()))
+            
+            previous_key = os.environ.get('EMAIL_ENCRYPTION_PREVIOUS_KEY')
+            if previous_key:
+                key_sources.append(('previous', previous_key.encode()))
+            
+            session_secret = os.environ.get('SESSION_SECRET', 'development-key').encode()
+            session_key = base64.urlsafe_b64encode(session_secret[:32].ljust(32, b'0'))
+            key_sources.append(('session_current', session_key))
+            
+            for key_name, key in key_sources:
+                try:
+                    fernet = Fernet(key)
+                    encrypted_data = base64.urlsafe_b64decode(self.smtp_password_encrypted.encode())
+                    decrypted_password = fernet.decrypt(encrypted_data).decode()
+                    return decrypted_password
+                except Exception as e:
+                    logger.debug(f"Failed to decrypt with {key_name} key: {str(e)[:100]}")
+                    continue
+            
+            logger.error("Failed to decrypt platform email password with any available key")
+            return None
+        return None
+    
+    def set_test_result(self, result):
+        """Set test result as JSON and update verification status"""
+        self.last_test_at = datetime.utcnow()
+        self.last_test_result = json.dumps(result)
+        self.is_verified = result.get('success', False)
+    
+    def get_last_test_result(self):
+        """Parse last test result from JSON"""
+        if self.last_test_result:
+            try:
+                return json.loads(self.last_test_result)
+            except:
+                return {}
+        return {}
+    
+    def to_dict(self, include_password=False):
+        """Convert to dictionary representation"""
+        data = {
+            'id': self.id,
+            'aws_region': self.aws_region,
+            'smtp_server': self.smtp_server,
+            'smtp_port': self.smtp_port,
+            'smtp_username': self.smtp_username,
+            'use_tls': self.use_tls,
+            'use_ssl': self.use_ssl,
+            'is_verified': self.is_verified,
+            'last_test_at': self.last_test_at.isoformat() if self.last_test_at else None,
+            'configured_at': self.configured_at.isoformat() if self.configured_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+        
+        if include_password:
+            data['smtp_password'] = self.get_smtp_password()
+        
+        return data
 
 
 class Participant(db.Model):
