@@ -11464,3 +11464,111 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
         justify-content: center;
     }
 }
+
+/* ========================================
+   Campaign Timeline Viewer (V2 Design)
+   ======================================== */
+
+.campaign-timeline-section {
+    margin-bottom: var(--spacing-xl);
+}
+
+.card-v2 {
+    background-color: var(--primary-white);
+    border: 1px solid var(--light-gray);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    transition: box-shadow 0.3s ease;
+}
+
+.card-v2:hover {
+    box-shadow: var(--shadow-lg);
+}
+
+.card-header-v2 {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    color: var(--primary-white);
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-bottom: 2px solid var(--red-hover);
+}
+
+.card-header-v2 h5 {
+    font-family: var(--font-family-headings);
+    font-weight: 700;
+    font-size: var(--font-size-lg);
+    margin: 0;
+    letter-spacing: var(--letter-spacing-wide);
+}
+
+.card-header-v2 small {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: var(--font-size-sm);
+    display: block;
+    margin-top: var(--spacing-xs);
+}
+
+.card-body-v2 {
+    padding: var(--spacing-xl);
+    background-color: var(--primary-white);
+}
+
+.btn-icon-v2 {
+    background: transparent;
+    border: none;
+    color: var(--primary-white);
+    cursor: pointer;
+    padding: var(--spacing-sm);
+    border-radius: var(--radius);
+    transition: all 0.3s ease;
+    font-size: var(--font-size-lg);
+}
+
+.btn-icon-v2:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.btn-icon-v2:focus {
+    outline: 2px solid var(--primary-white);
+    outline-offset: 2px;
+}
+
+/* Timeline Canvas Container */
+#timelineCanvas {
+    min-height: 300px;
+    max-height: 800px;
+    position: relative;
+}
+
+#campaignTimelineChart {
+    width: 100% !important;
+    height: auto !important;
+}
+
+/* Loading State */
+#timelineLoading .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    border-width: 0.3rem;
+    color: var(--primary-red);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .card-header-v2 {
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+    
+    .card-body-v2 {
+        padding: var(--spacing-lg);
+    }
+    
+    .card-header-v2 h5 {
+        font-size: var(--font-size-base);
+    }
+    
+    #timelineCanvas {
+        min-height: 250px;
+    }
+}
