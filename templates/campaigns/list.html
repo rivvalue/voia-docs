@@ -816,19 +816,22 @@ function loadTimelineData() {
 function renderTimeline(data) {
     const ctx = document.getElementById('campaignTimelineChart');
     
-    // V2 Status color mapping using CSS variables for consistency
+    // Get computed CSS variable values (Chart.js doesn't resolve CSS variables)
+    const rootStyles = getComputedStyle(document.documentElement);
+    
+    // V2 Status color mapping - resolved from CSS variables
     const statusColors = {
-        'draft': 'var(--status-draft-bg)',
-        'ready': 'var(--status-ready-bg)',
-        'active': 'var(--status-active-bg)',
-        'completed': 'var(--status-completed-bg)'
+        'draft': rootStyles.getPropertyValue('--status-draft-bg').trim(),
+        'ready': rootStyles.getPropertyValue('--status-ready-bg').trim(),
+        'active': rootStyles.getPropertyValue('--status-active-bg').trim(),
+        'completed': rootStyles.getPropertyValue('--status-completed-bg').trim()
     };
     
     const statusBorderColors = {
-        'draft': 'var(--status-draft-border)',
-        'ready': 'var(--status-ready-border)',
-        'active': 'var(--status-active-border)',
-        'completed': 'var(--status-completed-border)'
+        'draft': rootStyles.getPropertyValue('--status-draft-border').trim(),
+        'ready': rootStyles.getPropertyValue('--status-ready-border').trim(),
+        'active': rootStyles.getPropertyValue('--status-active-border').trim(),
+        'completed': rootStyles.getPropertyValue('--status-completed-border').trim()
     };
     
     // Prepare chart data with floating bars (one dataset with all campaigns)

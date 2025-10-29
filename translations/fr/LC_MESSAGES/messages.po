@@ -1957,6 +1957,14 @@ msgstr "Gestion des participants"
 msgid "Campaign Management"
 msgstr "Gestion des campagnes"
 
+#: templates/campaigns/list.html:189
+msgid "Manage Campaigns"
+msgstr "Gérer les campagnes"
+
+#: templates/campaigns/list.html:191
+msgid "Filter and view campaign details"
+msgstr "Filtrer et consulter les détails de campagne"
+
 #: templates/business_auth/admin_panel_v2.html:529
 #: templates/business_auth/admin_panel_v2.html:541 templates/index.html:133
 msgid "User Management"
