@@ -1280,7 +1280,7 @@ class Participant(db.Model):
     tenure_years = db.Column(db.Float, nullable=True)  # Years of product/service usage (e.g., 2.5 years)
     
     # Origin tracking for management visibility
-    source = db.Column(db.String(20), nullable=False, default='trial', index=True)  # 'trial', 'admin_single', 'admin_bulk'
+    source = db.Column(db.String(20), nullable=False, default='trial', index=True)  # 'trial', 'admin_single', 'admin_bulk', 'transcript_upload'
     
     # Token authentication (unified token system)
     token = db.Column(db.String(255), nullable=True, unique=True, index=True)  # UUID token for survey access
@@ -1346,7 +1346,8 @@ class Participant(db.Model):
         origin_badges = {
             'trial': {'text': 'Trial User', 'class': 'badge-info'},
             'admin_single': {'text': 'Admin Created', 'class': 'badge-success'},
-            'admin_bulk': {'text': 'Bulk Upload', 'class': 'badge-warning'}
+            'admin_bulk': {'text': 'Bulk Upload', 'class': 'badge-warning'},
+            'transcript_upload': {'text': 'Transcript Upload', 'class': 'badge-info'}
         }
         return origin_badges.get(self.source, {'text': 'Unknown', 'class': 'badge-secondary'})
     
