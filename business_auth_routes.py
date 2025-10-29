@@ -2449,7 +2449,9 @@ def scheduler_status():
     try:
         current_account = get_current_business_account()
         if not current_account:
-            if request.is_json:
+            # Check if JSON response is requested (via Content-Type or Accept header)
+            wants_json = request.is_json or 'application/json' in request.headers.get('Accept', '')
+            if wants_json:
                 return jsonify({'error': 'Business account context not found'}), 400
             flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.admin_panel'))
@@ -2468,7 +2470,10 @@ def scheduler_status():
             'completed': Campaign.query.filter_by(business_account_id=current_account.id, status='completed').count()
         }
         
-        if request.is_json:
+        # Check if JSON response is requested (via Content-Type or Accept header)
+        wants_json = request.is_json or 'application/json' in request.headers.get('Accept', '')
+        
+        if wants_json:
             return jsonify({
                 'scheduler_stats': scheduler_stats,
                 'campaign_counts': campaign_counts,
@@ -2486,7 +2491,9 @@ def scheduler_status():
         
     except Exception as e:
         logger.error(f"Error getting scheduler status: {e}")
-        if request.is_json:
+        # Check if JSON response is requested (via Content-Type or Accept header)
+        wants_json = request.is_json or 'application/json' in request.headers.get('Accept', '')
+        if wants_json:
             return jsonify({'error': 'Failed to get scheduler status'}), 500
         flash('Failed to get scheduler status.', 'error')
         return redirect(url_for('business_auth.admin_panel'))
