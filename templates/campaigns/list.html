@@ -794,10 +794,10 @@ function renderTimeline(data) {
     
     // Status color mapping (matching campaign status colors)
     const statusColors = {
-        'draft': 'rgba(102, 102, 102, 0.7)',      // Gray
-        'ready': 'rgba(225, 58, 68, 0.7)',        // Red
-        'active': 'rgba(46, 117, 50, 0.7)',       // Green
-        'completed': 'rgba(33, 150, 243, 0.7)'    // Blue
+        'draft': 'rgba(102, 102, 102, 0.8)',      // Gray
+        'ready': 'rgba(225, 58, 68, 0.8)',        // Red (VOÏA primary)
+        'active': 'rgba(46, 117, 50, 0.8)',       // Green
+        'completed': 'rgba(33, 150, 243, 0.8)'    // Blue
     };
     
     const statusBorderColors = {
@@ -807,41 +807,33 @@ function renderTimeline(data) {
         'completed': 'rgb(33, 150, 243)'
     };
     
-    // Generate month labels
-    const monthLabels = [];
-    for (let i = 0; i <= data.license_months; i++) {
-        monthLabels.push('{{ _("Month") }} ' + i);
-    }
-    
-    // Prepare datasets - one bar per campaign
-    const datasets = data.campaigns.map(campaign => {
-        const duration = campaign.end_month - campaign.start_month + 1;
-        
-        return {
-            label: campaign.name,
-            data: [{
-                x: [campaign.start_month, campaign.end_month + 1],
-                y: campaign.name
-            }],
-            backgroundColor: statusColors[campaign.status] || statusColors['draft'],
-            borderColor: statusBorderColors[campaign.status] || statusBorderColors['draft'],
-            borderWidth: 2,
-            barPercentage: 0.8,
-            categoryPercentage: 0.9
-        };
+    // Prepare chart data with floating bars (one dataset with all campaigns)
+    const chartData = data.campaigns.map((campaign, index) => {
+        return [campaign.start_month, campaign.end_month + 1]; // +1 to include end month
     });
+    
+    const campaignColors = data.campaigns.map(c => statusColors[c.status] || statusColors['draft']);
+    const campaignBorders = data.campaigns.map(c => statusBorderColors[c.status] || statusBorderColors['draft']);
     
     // Destroy existing chart if it exists
     if (timelineChart) {
         timelineChart.destroy();
     }
     
-    // Create new chart
+    // Create new chart with floating bars
     timelineChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: data.campaigns.map(c => c.name),
-            datasets: datasets
+            datasets: [{
+                label: '{{ _("Campaign Duration") }}',
+                data: chartData,
+                backgroundColor: campaignColors,
+                borderColor: campaignBorders,
+                borderWidth: 2,
+                borderRadius: 4,
+                barPercentage: 0.7
+            }]
         },
         options: {
             indexAxis: 'y',
@@ -853,12 +845,22 @@ function renderTimeline(data) {
                 },
                 tooltip: {
                     callbacks: {
+                        title: function(context) {
+                            return context[0].label;
+                        },
                         label: function(context) {
                             const campaign = data.campaigns[context.dataIndex];
+                            const startDate = new Date(campaign.start_date);
+                            const endDate = new Date(campaign.end_date);
+                            const monthNames = ['{{ _("Jan") }}', '{{ _("Feb") }}', '{{ _("Mar") }}', '{{ _("Apr") }}', 
+                                              '{{ _("May") }}', '{{ _("Jun") }}', '{{ _("Jul") }}', '{{ _("Aug") }}', 
+                                              '{{ _("Sep") }}', '{{ _("Oct") }}', '{{ _("Nov") }}', '{{ _("Dec") }}'];
+                            
                             return [
-                                '{{ _("Campaign") }}: ' + campaign.name,
-                                '{{ _("Status") }}: ' + campaign.status,
-                                '{{ _("Duration") }}: ' + '{{ _("Month") }} ' + campaign.start_month + ' - ' + '{{ _("Month") }} ' + campaign.end_month
+                                '{{ _("Status") }}: ' + campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1),
+                                '{{ _("Start") }}: ' + monthNames[startDate.getMonth()] + ' ' + startDate.getFullYear(),
+                                '{{ _("End") }}: ' + monthNames[endDate.getMonth()] + ' ' + endDate.getFullYear(),
+                                '{{ _("Duration") }}: {{ _("Month") }} ' + campaign.start_month + ' - ' + campaign.end_month
                             ];
                         }
                     }
@@ -868,7 +870,7 @@ function renderTimeline(data) {
                 x: {
                     type: 'linear',
                     min: 0,
-                    max: data.license_months,
+                    max: data.license_months + 1,
                     ticks: {
                         stepSize: 1,
                         callback: function(value) {
@@ -877,13 +879,27 @@ function renderTimeline(data) {
                     },
                     title: {
                         display: true,
-                        text: '{{ _("License Duration (Months)") }}'
+                        text: '{{ _("License Duration (Months)") }}',
+                        font: {
+                            weight: 'bold',
+                            size: 12
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
                     }
                 },
                 y: {
                     title: {
                         display: true,
-                        text: '{{ _("Campaigns") }}'
+                        text: '{{ _("Campaigns") }}',
+                        font: {
+                            weight: 'bold',
+                            size: 12
+                        }
+                    },
+                    grid: {
+                        display: false
                     }
                 }
             }
@@ -891,7 +907,7 @@ function renderTimeline(data) {
     });
     
     // Set appropriate height based on number of campaigns
-    const chartHeight = Math.max(300, data.campaigns.length * 50);
+    const chartHeight = Math.max(300, data.campaigns.length * 60 + 80);
     ctx.style.height = chartHeight + 'px';
     ctx.parentElement.style.height = chartHeight + 'px';
 }
