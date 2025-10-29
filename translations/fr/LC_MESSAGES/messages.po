@@ -6892,3 +6892,40 @@ msgstr "Télécharger le modèle de fichier CSV"
 #~ msgid "Custom pricing for this add-on period"
 #~ msgstr "Tarification personnalisée pour cette période d'extension\""
 
+
+# Month abbreviations for timeline
+msgid "Jan"
+msgstr "Jan"
+
+msgid "Feb"
+msgstr "Fév"
+
+msgid "Mar"
+msgstr "Mar"
+
+msgid "Apr"
+msgstr "Avr"
+
+msgid "May"
+msgstr "Mai"
+
+msgid "Jun"
+msgstr "Juin"
+
+msgid "Jul"
+msgstr "Juil"
+
+msgid "Aug"
+msgstr "Août"
+
+msgid "Sep"
+msgstr "Sep"
+
+msgid "Oct"
+msgstr "Oct"
+
+msgid "Nov"
+msgstr "Nov"
+
+msgid "Dec"
+msgstr "Déc"
