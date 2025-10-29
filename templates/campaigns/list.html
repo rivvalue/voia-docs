@@ -172,10 +172,10 @@
                         <small class="text-muted">{{ _('Visual overview of campaign schedules over your license duration') }}</small>
                     </div>
                     <button type="button" class="btn-icon-v2" onclick="toggleTimeline()" aria-label="{{ _('Toggle timeline view') }}">
-                        <i class="fas fa-chevron-down" id="timelineToggleIcon" aria-hidden="true"></i>
+                        <i class="fas fa-chevron-up" id="timelineToggleIcon" aria-hidden="true"></i>
                     </button>
                 </div>
-                <div class="card-body-v2" id="timelineContainer" style="display: none;">
+                <div class="card-body-v2" id="timelineContainer">
                     <div id="timelineLoading" class="text-center py-4">
                         <div class="spinner-border text-primary" role="status">
                             <span class="visually-hidden">{{ _('Loading timeline...') }}</span>
@@ -920,6 +920,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Restore view preference (needed for layout)
     const savedView = sessionStorage.getItem('campaignView') || 'list';
     switchView(savedView);
+    
+    // Auto-load timeline data (timeline expanded by default)
+    loadTimelineData();
+    timelineLoaded = true;
     
     // Add status filter click handlers (needed for interactivity)
     document.querySelectorAll('.status-filter').forEach(filter => {
