@@ -1256,6 +1256,13 @@ class Participant(db.Model):
         db.Index('idx_participant_customer_tier', 'customer_tier'),
         db.Index('idx_participant_language', 'language'),
         db.Index('idx_participant_tenure_years', 'tenure_years'),
+        # Composite indexes for optimized filter queries (October 2025)
+        db.Index('idx_participant_ba_company', 'business_account_id', 'company_name', 'status'),
+        db.Index('idx_participant_ba_role', 'business_account_id', 'role', 'status'),
+        db.Index('idx_participant_ba_region', 'business_account_id', 'region', 'status'),
+        db.Index('idx_participant_ba_tier', 'business_account_id', 'customer_tier', 'status'),
+        db.Index('idx_participant_ba_language', 'business_account_id', 'language', 'status'),
+        db.Index('idx_participant_ba_tenure', 'business_account_id', 'tenure_years', 'status'),
     )
     
     id = db.Column(db.Integer, primary_key=True)
