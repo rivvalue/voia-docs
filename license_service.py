@@ -527,55 +527,6 @@ class LicenseService:
                 'can_use_transcript_analysis': LicenseService.can_use_transcript_analysis(business_account_id)
             })
             
-            # Add transcript analysis add-on information
-            if current_license:
-                from datetime import date
-                today = date.today()
-                
-                # Determine transcript analysis status
-                has_addon = False
-                addon_status = 'inactive'
-                addon_start = None
-                addon_end = None
-                addon_price = None
-                addon_days_remaining = 0
-                
-                if current_license.transcript_analysis_start_date and current_license.transcript_analysis_end_date:
-                    # Date-based add-on
-                    addon_start = current_license.transcript_analysis_start_date
-                    addon_end = current_license.transcript_analysis_end_date
-                    addon_price = current_license.transcript_analysis_price
-                    
-                    if addon_start <= today <= addon_end:
-                        has_addon = True
-                        addon_status = 'active'
-                        addon_days_remaining = (addon_end - today).days
-                    elif today > addon_end:
-                        addon_status = 'expired'
-                    else:
-                        addon_status = 'scheduled'
-                        
-                elif current_license.has_transcript_analysis:
-                    # Legacy boolean-based add-on
-                    has_addon = True
-                    addon_status = 'active'
-                    addon_start = current_license.activated_at.date() if hasattr(current_license.activated_at, 'date') else current_license.activated_at
-                    addon_end = current_license.expires_at.date() if hasattr(current_license.expires_at, 'date') else current_license.expires_at
-                    if addon_end and isinstance(addon_end, date):
-                        addon_days_remaining = (addon_end - today).days if addon_end > today else 0
-                
-                license_info.update({
-                    'transcript_analysis': {
-                        'has_addon': has_addon,
-                        'status': addon_status,
-                        'start_date': addon_start,
-                        'end_date': addon_end,
-                        'price': float(addon_price) if addon_price else None,
-                        'days_remaining': addon_days_remaining,
-                        'expires_soon': addon_days_remaining <= 30 and addon_days_remaining > 0
-                    }
-                })
-            
             logger.debug(f"Generated license info for business_account_id {business_account_id}: "
                         f"type={license_info['license_type']}, status={license_info['license_status']}, "
                         f"campaigns={campaigns_used}/{license_info['campaigns_limit']}")
@@ -611,16 +562,7 @@ class LicenseService:
             'participants_limit': 999999,  # Unlimited participants
             'can_activate_campaign': True,
             'can_add_user': True,
-            'can_use_transcript_analysis': True,
-            'transcript_analysis': {
-                'has_addon': True,
-                'status': 'unlimited',
-                'start_date': None,
-                'end_date': None,
-                'price': 0.0,
-                'days_remaining': 999999,
-                'expires_soon': False
-            }
+            'can_use_transcript_analysis': True
         }
 
     @staticmethod
@@ -1160,26 +1102,10 @@ class LicenseService:
                     return False, None, f"License transition failed: {transition_msg}"
                 transition_message = f" (Previous {existing_license.license_type} license expired)"
             
-            # Step 5: Process transcript analysis add-on configuration
-            transcript_start_date = None
-            transcript_end_date = None
-            transcript_price = None
-            transcript_addon_enabled = False
-            
-            if transcript_addon_config:
-                transcript_addon_enabled = transcript_addon_config.get('enabled', False)
-                transcript_start_date = transcript_addon_config.get('start_date')
-                transcript_end_date = transcript_addon_config.get('end_date')
-                transcript_price = transcript_addon_config.get('price')
-                logger.info(f"Transcript analysis add-on configured for business_id {business_id}: "
-                           f"enabled={transcript_addon_enabled}, start={transcript_start_date}, end={transcript_end_date}, price={transcript_price}")
-            
-            # Step 6: Create new license record with comprehensive audit trail
+            # Step 5: Create new license record with comprehensive audit trail
             assignment_notes = f"License assigned by {created_by or 'System'}"
             if custom_config:
                 assignment_notes += f" with custom limits: {custom_config}"
-            if transcript_addon_config:
-                assignment_notes += f" with transcript analysis add-on (${transcript_price or 0} from {transcript_start_date} to {transcript_end_date})"
             if transition_message:
                 assignment_notes += transition_message
             
@@ -1194,11 +1120,6 @@ class LicenseService:
                 max_participants_per_campaign=license_config['max_participants_per_campaign'],
                 max_invitations_per_campaign=license_config['max_invitations_per_campaign'],
                 annual_price=license_config.get('annual_price'),
-                # Transcript analysis add-on fields
-                transcript_analysis_start_date=transcript_start_date,
-                transcript_analysis_end_date=transcript_end_date,
-                transcript_analysis_price=transcript_price,
-                has_transcript_analysis=transcript_addon_enabled,
                 created_by=created_by,
                 notes=assignment_notes
             )
