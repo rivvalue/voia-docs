@@ -696,22 +696,6 @@
                     </div>
                     {% endif %}
 
-                    <!-- {{ _('Performance Metrics') }} -->
-                    <div class="settings-item">
-                        <div class="settings-item-header">
-                            <div class="settings-item-icon">
-                                <i class="fas fa-tachometer-alt"></i>
-                            </div>
-                            <div class="settings-item-info">
-                                <h4 class="settings-item-title">{{ _('Performance Metrics') }}</h4>
-                                <p class="settings-item-desc">{{ _('Monitor system performance and cache status') }}</p>
-                            </div>
-                        </div>
-                        <a href="/business/admin/performance-metrics" class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-chart-line me-1"></i>View Metrics
-                        </a>
-                    </div>
-
                     <!-- Scheduler Status -->
                     <div class="settings-item">
                         <div class="settings-item-header">
@@ -813,6 +797,22 @@
                         </div>
                         <a href="{{ url_for('business_auth.manage_users') }}" class="btn btn-outline-primary btn-sm">
                             <i class="fas fa-users-cog me-1"></i>Manage
+                        </a>
+                    </div>
+
+                    <!-- {{ _('Performance Metrics') }} -->
+                    <div class="settings-item">
+                        <div class="settings-item-header">
+                            <div class="settings-item-icon">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <div class="settings-item-info">
+                                <h4 class="settings-item-title">{{ _('Performance Metrics') }}</h4>
+                                <p class="settings-item-desc">{{ _('Monitor system performance and cache status') }}</p>
+                            </div>
+                        </div>
+                        <a href="/business/admin/performance-metrics" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-chart-line me-1"></i>View Metrics
                         </a>
                     </div>
 
