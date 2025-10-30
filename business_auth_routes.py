@@ -3773,43 +3773,43 @@ def test_email_delivery_config():
             if current_user:
                 test_recipient = current_user.email
             else:
-                flash('Please provide a test email address.', 'error')
+                flash(_('Please provide a test email address.'), 'error')
                 return redirect(url_for('business_auth.email_delivery_config'))
         
         # Validate email format
         import re
         email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         if not re.match(email_pattern, test_recipient):
-            flash('Please provide a valid email address.', 'error')
+            flash(_('Please provide a valid email address.'), 'error')
             return redirect(url_for('business_auth.email_delivery_config'))
         
         # Get email configuration
         email_config = current_account.get_email_configuration()
         if not email_config:
-            flash('Email configuration not found. Please configure your email settings first.', 'error')
+            flash(_('Email configuration not found. Please configure your email settings first.'), 'error')
             return redirect(url_for('business_auth.email_delivery_config'))
         
         # Validate configuration based on mode
         if email_config.use_platform_email:
             # VOÏA-Managed mode validation
             if not email_config.domain_verified:
-                flash('Your domain is not yet verified. Please contact the platform administrator.', 'error')
+                flash(_('Your domain is not yet verified. Please contact the platform administrator.'), 'error')
                 return redirect(url_for('business_auth.email_delivery_config'))
             
             if not email_config.sender_domain or not email_config.sender_email:
-                flash('Please complete your VOÏA-Managed email configuration (domain and sender email required).', 'error')
+                flash(_('Please complete your VOÏA-Managed email configuration (domain and sender email required).'), 'error')
                 return redirect(url_for('business_auth.email_delivery_config'))
             
             # Check platform settings exist
             from models import PlatformEmailSettings
             platform_settings = PlatformEmailSettings.query.first()
             if not platform_settings or not platform_settings.is_verified:
-                flash('Platform email settings are not configured. Please contact the platform administrator.', 'error')
+                flash(_('Platform email settings are not configured. Please contact the platform administrator.'), 'error')
                 return redirect(url_for('business_auth.email_delivery_config'))
         else:
             # Client-Managed mode validation
             if not email_config.smtp_server or not email_config.sender_email:
-                flash('Please complete your Client-Managed email configuration (SMTP server and sender email required).', 'error')
+                flash(_('Please complete your Client-Managed email configuration (SMTP server and sender email required).'), 'error')
                 return redirect(url_for('business_auth.email_delivery_config'))
         
         # Send test email
@@ -3878,16 +3878,16 @@ This is an automated test message from VOÏA - Voice Of Client"""
         
         # Show result to user
         if result.get('success'):
-            flash(f'Test email sent successfully to {test_recipient}! Please check your inbox.', 'success')
+            flash(_('Test email sent successfully to %(email)s! Please check your inbox.', email=test_recipient), 'success')
         else:
-            error_msg = result.get('error', 'Unknown error occurred')
-            flash(f'Failed to send test email: {error_msg}', 'error')
+            error_msg = result.get('error', _('Unknown error occurred'))
+            flash(_('Failed to send test email: %(error)s', error=error_msg), 'error')
         
         return redirect(url_for('business_auth.email_delivery_config'))
     
     except Exception as e:
         logger.error(f"Error sending test email: {e}")
-        flash(f'Failed to send test email: {str(e)}', 'error')
+        flash(_('Failed to send test email: %(error)s', error=str(e)), 'error')
         return redirect(url_for('business_auth.email_delivery_config'))
 
 

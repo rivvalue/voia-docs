@@ -391,36 +391,32 @@
     <div class="settings-card mb-4">
         <h3 class="settings-section-title">
             <i class="fas fa-paper-plane me-2"></i>
-            Test Email Configuration
+            {{ _('Test Email Configuration') }}
         </h3>
         <p class="text-muted mb-3">
-            Send a test email to verify your email configuration is working correctly.
+            {{ _('Send a test email to verify your email configuration is working correctly.') }}
         </p>
         
         <form method="POST" action="{{ url_for('business_auth.test_email_delivery_config') }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="settings-form-group">
-                        <label class="settings-form-label" for="test_email">Test Email Address</label>
-                        <input type="email" 
-                               class="settings-form-control" 
-                               id="test_email" 
-                               name="test_email" 
-                               value="{{ session.get('business_user_email', '') }}"
-                               placeholder="recipient@example.com"
-                               required>
-                        <small class="form-text text-muted">
-                            We'll send a test email to this address to verify your configuration.
-                        </small>
-                    </div>
+            <div class="row g-3 align-items-end">
+                <div class="col-12 col-md-8">
+                    <label class="settings-form-label" for="test_email">{{ _('Test Email Address') }}</label>
+                    <input type="email" 
+                           class="settings-form-control" 
+                           id="test_email" 
+                           name="test_email" 
+                           value="{{ session.get('business_user_email', '') }}"
+                           placeholder="{{ _('recipient@example.com') }}"
+                           required>
+                    <small class="form-text text-muted d-block mt-1">
+                        {{ _("We'll send a test email to this address to verify your configuration.") }}
+                    </small>
                 </div>
-                <div class="col-md-4 d-flex align-items-end">
-                    <div class="settings-form-group w-100">
-                        <button type="submit" class="btn btn-outline-primary w-100">
-                            <i class="fas fa-paper-plane me-2"></i>Send Test Email
-                        </button>
-                    </div>
+                <div class="col-12 col-md-4">
+                    <button type="submit" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-paper-plane me-2"></i>{{ _('Send Test Email') }}
+                    </button>
                 </div>
             </div>
         </form>
