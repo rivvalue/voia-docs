@@ -3551,6 +3551,205 @@ def delete_platform_email_domain(config_id):
         return redirect(url_for('business_auth.platform_email_domains'))
 
 
+# ==== EMAIL DELIVERY CONFIGURATION ROUTES (Business Account) ====
+
+@business_auth_bp.route('/admin/email-delivery-config')
+@require_business_auth
+def email_delivery_config():
+    """Email delivery configuration page - dual-mode: VOÏA-Managed or Client-Managed (Business Admin)"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            logger.error("No current account found in email delivery config route")
+            flash(_('Business account context not found.'), 'error')
+            return redirect(url_for('business_auth.admin_panel'))
+        
+        # Get existing email configuration if any
+        email_config = current_account.get_email_configuration()
+        
+        # Get available verified domains for this business account (for VOÏA-Managed mode)
+        from models import EmailConfiguration
+        available_domains = EmailConfiguration.query.filter_by(
+            business_account_id=current_account.id,
+            use_platform_email=True,
+            domain_verified=True
+        ).all()
+        
+        return render_template('business_auth/email_delivery_config.html',
+                             email_config=email_config,
+                             available_domains=available_domains,
+                             business_account=current_account)
+    
+    except Exception as e:
+        logger.error(f"Error loading email delivery configuration: {e}")
+        flash('Failed to load email delivery configuration.', 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+
+@business_auth_bp.route('/admin/email-delivery-config/save', methods=['POST'])
+@require_business_auth
+def save_email_delivery_config():
+    """Save email delivery configuration (dual-mode support)"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            flash(_('Business account context not found.'), 'error')
+            return redirect(url_for('business_auth.admin_panel'))
+        
+        # Get email delivery mode
+        email_mode = request.form.get('email_mode', 'client_managed').strip()  # 'voïa_managed' or 'client_managed'
+        
+        # Get or create email configuration
+        email_config = current_account.get_email_configuration()
+        if not email_config:
+            email_config = EmailConfiguration(business_account_id=current_account.id)
+            db.session.add(email_config)
+        
+        # Set the email delivery mode
+        if email_mode == 'voïa_managed':
+            # VOÏA-Managed Mode: Use platform AWS SES
+            email_config.use_platform_email = True
+            
+            # Get selected domain
+            selected_domain_id = request.form.get('selected_domain_id')
+            if not selected_domain_id:
+                flash('Please select a verified domain for VOÏA-Managed email delivery.', 'error')
+                return redirect(url_for('business_auth.email_delivery_config'))
+            
+            # Verify the domain belongs to this business account and is verified
+            from models import EmailConfiguration as EC
+            selected_domain_config = EC.query.filter_by(
+                id=selected_domain_id,
+                business_account_id=current_account.id,
+                use_platform_email=True,
+                domain_verified=True
+            ).first()
+            
+            if not selected_domain_config:
+                flash('Invalid or unverified domain selected.', 'error')
+                return redirect(url_for('business_auth.email_delivery_config'))
+            
+            # Copy domain configuration to email_config
+            email_config.sender_domain = selected_domain_config.sender_domain
+            email_config.domain_verified = True
+            email_config.domain_verified_at = selected_domain_config.domain_verified_at
+            email_config.dkim_record_1_name = selected_domain_config.dkim_record_1_name
+            email_config.dkim_record_1_value = selected_domain_config.dkim_record_1_value
+            email_config.dkim_record_2_name = selected_domain_config.dkim_record_2_name
+            email_config.dkim_record_2_value = selected_domain_config.dkim_record_2_value
+            email_config.dkim_record_3_name = selected_domain_config.dkim_record_3_name
+            email_config.dkim_record_3_value = selected_domain_config.dkim_record_3_value
+            
+            # Get sender configuration (still required for "From" name and email)
+            sender_name = request.form.get('sender_name', '').strip()
+            sender_email = request.form.get('sender_email', '').strip()
+            
+            if not sender_name or not sender_email:
+                flash('Sender name and email are required.', 'error')
+                return redirect(url_for('business_auth.email_delivery_config'))
+            
+            # Validate sender email domain matches selected domain
+            if '@' in sender_email:
+                sender_email_domain = sender_email.split('@')[1].lower()
+                if sender_email_domain != email_config.sender_domain:
+                    flash(f'Sender email must use the verified domain: {email_config.sender_domain}', 'error')
+                    return redirect(url_for('business_auth.email_delivery_config'))
+            
+            email_config.sender_name = sender_name
+            email_config.sender_email = sender_email
+            email_config.reply_to_email = request.form.get('reply_to_email', '').strip() or None
+            
+            # Clear client-managed SMTP fields
+            email_config.smtp_server = None
+            email_config.smtp_port = 587  # Keep default
+            email_config.smtp_username = None
+            email_config.smtp_password_encrypted = None
+            email_config.use_tls = True
+            email_config.use_ssl = False
+            
+        else:
+            # Client-Managed Mode: Use their own SMTP credentials
+            email_config.use_platform_email = False
+            
+            # Get SMTP configuration
+            email_provider = request.form.get('email_provider', 'smtp').strip()
+            smtp_server = request.form.get('smtp_server', '').strip()
+            smtp_port = request.form.get('smtp_port', '587')
+            smtp_username = request.form.get('smtp_username', '').strip()
+            smtp_password = request.form.get('smtp_password', '').strip()
+            use_tls = request.form.get('use_tls') == 'on'
+            use_ssl = request.form.get('use_ssl') == 'on'
+            sender_name = request.form.get('sender_name', '').strip()
+            sender_email = request.form.get('sender_email', '').strip()
+            reply_to_email = request.form.get('reply_to_email', '').strip()
+            
+            # Validate required fields
+            if not smtp_server or not sender_name or not sender_email:
+                flash('SMTP server, sender name, and sender email are required for client-managed mode.', 'error')
+                return redirect(url_for('business_auth.email_delivery_config'))
+            
+            # Validate port
+            try:
+                smtp_port = int(smtp_port)
+                if not (1 <= smtp_port <= 65535):
+                    raise ValueError("Port must be between 1 and 65535")
+            except ValueError:
+                flash('Invalid SMTP port. Please enter a number between 1 and 65535.', 'error')
+                return redirect(url_for('business_auth.email_delivery_config'))
+            
+            # Update configuration
+            email_config.email_provider = email_provider
+            email_config.smtp_server = smtp_server
+            email_config.smtp_port = smtp_port
+            email_config.smtp_username = smtp_username
+            email_config.use_tls = use_tls
+            email_config.use_ssl = use_ssl
+            email_config.sender_name = sender_name
+            email_config.sender_email = sender_email
+            email_config.reply_to_email = reply_to_email if reply_to_email else None
+            
+            # Update password only if provided
+            if smtp_password:
+                email_config.set_smtp_password(smtp_password)
+            
+            # Clear VOÏA-managed fields
+            email_config.sender_domain = None
+            email_config.domain_verified = False
+            email_config.domain_verified_at = None
+            email_config.dkim_record_1_name = None
+            email_config.dkim_record_1_value = None
+            email_config.dkim_record_2_name = None
+            email_config.dkim_record_2_value = None
+            email_config.dkim_record_3_name = None
+            email_config.dkim_record_3_value = None
+        
+        # Save to database
+        db.session.commit()
+        
+        # Audit log
+        from audit_utils import queue_audit_log
+        queue_audit_log(
+            business_account_id=current_account.id,
+            action_type='email_delivery_config_updated',
+            resource_type='email_configuration',
+            resource_id=email_config.id,
+            user_name=session.get('business_user_name', 'Unknown'),
+            details={
+                'mode': 'VOÏA-Managed' if email_mode == 'voïa_managed' else 'Client-Managed',
+                'domain': email_config.sender_domain if email_mode == 'voïa_managed' else None
+            }
+        )
+        
+        flash('Email delivery configuration saved successfully!', 'success')
+        return redirect(url_for('business_auth.email_delivery_config'))
+    
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error saving email delivery configuration: {e}")
+        flash(f'Failed to save email delivery configuration: {str(e)}', 'error')
+        return redirect(url_for('business_auth.email_delivery_config'))
+
+
 # ==== BRANDING CONFIGURATION ROUTES ====
 
 @business_auth_bp.route('/admin/brand-config')
