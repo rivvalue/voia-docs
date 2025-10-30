@@ -16,7 +16,7 @@ from typing import List, Dict, Optional, Union
 from flask import current_app, url_for, render_template_string
 import jwt
 from app import db
-from models import EmailDelivery, EmailConfiguration, BrandingConfig
+from models import EmailDelivery, EmailConfiguration, BrandingConfig, PlatformEmailSettings
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +54,12 @@ class EmailService:
             self.default_smtp_server = None
     
     def _get_email_config(self, business_account_id: Optional[int] = None) -> Dict:
-        """Get email configuration for a business account or fall back to defaults"""
+        """Get email configuration for a business account or fall back to defaults
+        
+        Supports dual-mode email delivery:
+        - VOÏA-Managed: Uses platform AWS SES credentials + business account verified domain
+        - Client-Managed: Uses business account's own SMTP credentials
+        """
         config = {
             'smtp_server': self.default_smtp_server,
             'smtp_port': self.default_smtp_port,
@@ -66,7 +71,8 @@ class EmailService:
             'sender_email': self.default_smtp_username,
             'reply_to_email': None,
             'admin_emails': self.default_admin_emails,
-            'source': 'system_default'
+            'source': 'system_default',
+            'email_mode': 'system_default'
         }
         
         logger.info(f"_get_email_config called with business_account_id={business_account_id}")
@@ -78,45 +84,90 @@ class EmailService:
                 logger.info(f"EmailConfiguration.get_for_business_account({business_account_id}) returned: {email_config is not None}")
                 
                 if email_config:
-                    # Test is_valid() step by step
-                    validation_errors = email_config.validate_configuration()
-                    logger.info(f"Validation errors for business_account_id {business_account_id}: {validation_errors}")
+                    # Check if business account uses VOÏA-managed email (platform AWS SES)
+                    if email_config.use_platform_email:
+                        logger.info(f"Business account {business_account_id} uses VOÏA-managed email delivery")
+                        
+                        # Load platform AWS SES credentials
+                        platform_settings = PlatformEmailSettings.query.first()
+                        
+                        if platform_settings and platform_settings.is_verified:
+                            # Validate business account has verified domain
+                            if not email_config.domain_verified:
+                                logger.error(f"Business account {business_account_id} domain not verified for VOÏA-managed mode")
+                                raise ValueError("Domain verification required for VOÏA-managed email delivery")
+                            
+                            if not email_config.sender_domain or not email_config.sender_email:
+                                logger.error(f"Business account {business_account_id} missing sender domain/email")
+                                raise ValueError("Sender domain and email required for VOÏA-managed email delivery")
+                            
+                            # Use platform AWS SES credentials + business account sender info
+                            config.update({
+                                'smtp_server': platform_settings.smtp_server,
+                                'smtp_port': platform_settings.smtp_port,
+                                'smtp_username': platform_settings.smtp_username,
+                                'smtp_password': platform_settings.get_smtp_password(),
+                                'use_tls': platform_settings.use_tls,
+                                'use_ssl': platform_settings.use_ssl,
+                                'sender_name': email_config.sender_name,
+                                'sender_email': email_config.sender_email,  # Business account's verified domain email
+                                'reply_to_email': email_config.reply_to_email,
+                                'admin_emails': email_config.get_admin_emails(),
+                                'source': 'voia_managed',
+                                'email_mode': 'voia_managed',
+                                'sender_domain': email_config.sender_domain,
+                                'aws_region': platform_settings.aws_region
+                            })
+                            
+                            logger.info(f"SUCCESS: Using VOÏA-managed email for business account {business_account_id} (Domain: {email_config.sender_domain}, Region: {platform_settings.aws_region})")
+                        else:
+                            logger.error("Platform AWS SES credentials not configured or not verified")
+                            raise ValueError("Platform email settings not available")
                     
-                    if len(validation_errors) == 0:
-                        decrypted_password = email_config.get_smtp_password()
-                        is_valid_result = email_config.is_valid()
-                        logger.info(f"is_valid() result for business_account_id {business_account_id}: {is_valid_result}")
                     else:
-                        logger.error(f"CRITICAL: Basic validation failed for business_account_id {business_account_id}: {validation_errors}")
-                        is_valid_result = False
+                        # Client-Managed mode: Use business account's own SMTP credentials
+                        logger.info(f"Business account {business_account_id} uses client-managed email delivery")
+                        
+                        # Validate client-managed configuration
+                        validation_errors = email_config.validate_configuration()
+                        logger.info(f"Validation errors for business_account_id {business_account_id}: {validation_errors}")
+                        
+                        if len(validation_errors) == 0:
+                            decrypted_password = email_config.get_smtp_password()
+                            is_valid_result = email_config.is_valid()
+                            logger.info(f"is_valid() result for business_account_id {business_account_id}: {is_valid_result}")
+                        else:
+                            logger.error(f"CRITICAL: Basic validation failed for business_account_id {business_account_id}: {validation_errors}")
+                            is_valid_result = False
+                        
+                        if is_valid_result:
+                            # Auto-generate SMTP server for AWS SES if needed
+                            email_config.ensure_ses_smtp_server()
+                            
+                            config.update({
+                                'smtp_server': email_config.smtp_server,
+                                'smtp_port': email_config.smtp_port,
+                                'smtp_username': email_config.smtp_username,
+                                'smtp_password': email_config.get_smtp_password(),
+                                'use_tls': email_config.use_tls,
+                                'use_ssl': email_config.use_ssl,
+                                'sender_name': email_config.sender_name,
+                                'sender_email': email_config.sender_email,
+                                'reply_to_email': email_config.reply_to_email,
+                                'admin_emails': email_config.get_admin_emails(),
+                                'email_provider': email_config.email_provider if hasattr(email_config, 'email_provider') else 'smtp',
+                                'aws_region': email_config.aws_region if hasattr(email_config, 'aws_region') else None,
+                                'source': 'business_account',
+                                'email_mode': 'client_managed'
+                            })
+                            
+                            provider_info = f"AWS SES ({email_config.aws_region})" if email_config.is_aws_ses() else "SMTP"
+                            logger.info(f"SUCCESS: Using client-managed email configuration for account {business_account_id} (Provider: {provider_info})")
+                        else:
+                            logger.error(f"FAILED: Invalid client-managed email configuration for account {business_account_id}, falling back to system defaults")
                 else:
                     logger.error(f"CRITICAL: No EmailConfiguration record found for business_account_id {business_account_id}")
-                    is_valid_result = False
-                
-                if email_config and is_valid_result:
-                    # Auto-generate SMTP server for AWS SES if needed
-                    email_config.ensure_ses_smtp_server()
                     
-                    config.update({
-                        'smtp_server': email_config.smtp_server,
-                        'smtp_port': email_config.smtp_port,
-                        'smtp_username': email_config.smtp_username,
-                        'smtp_password': email_config.get_smtp_password(),
-                        'use_tls': email_config.use_tls,
-                        'use_ssl': email_config.use_ssl,
-                        'sender_name': email_config.sender_name,
-                        'sender_email': email_config.sender_email,
-                        'reply_to_email': email_config.reply_to_email,
-                        'admin_emails': email_config.get_admin_emails(),
-                        'email_provider': email_config.email_provider if hasattr(email_config, 'email_provider') else 'smtp',
-                        'aws_region': email_config.aws_region if hasattr(email_config, 'aws_region') else None,
-                        'source': 'business_account'
-                    })
-                    
-                    provider_info = f"AWS SES ({email_config.aws_region})" if email_config.is_aws_ses() else "SMTP"
-                    logger.debug(f"SUCCESS: Using business account email configuration for account {business_account_id} (Provider: {provider_info})")
-                else:
-                    logger.error(f"FAILED: Invalid business account email configuration for account {business_account_id}, falling back to system defaults")
             except Exception as e:
                 logger.error(f"EXCEPTION: Failed to load business account email configuration for account {business_account_id}: {e}")
                 logger.error(f"Exception details: {type(e).__name__}: {str(e)}")
