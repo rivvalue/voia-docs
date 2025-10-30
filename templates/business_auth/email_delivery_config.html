@@ -92,11 +92,11 @@
                     <input class="form-check-input" 
                            type="radio" 
                            name="email_mode" 
-                           id="mode_voïa_managed" 
-                           value="voïa_managed"
+                           id="mode_voia_managed" 
+                           value="voia_managed"
                            {{ 'checked' if email_config and email_config.use_platform_email else '' }}
                            onchange="toggleEmailMode()">
-                    <label class="form-check-label" for="mode_voïa_managed">
+                    <label class="form-check-label" for="mode_voia_managed">
                         <strong><i class="fas fa-cloud text-primary me-2"></i>VOÏA-Managed Email Delivery</strong>
                         <br>
                         <small class="text-muted">Use platform's AWS SES with your verified domain</small>
@@ -121,7 +121,7 @@
         </div>
 
         <!-- VOÏA-Managed Configuration -->
-        <div id="voïa_managed_section" style="display: none;">
+        <div id="voia_managed_section" style="display: none;">
             <div class="settings-card mb-4">
                 <h3 class="settings-section-title">
                     <i class="fas fa-globe me-2"></i>
@@ -394,18 +394,18 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function toggleEmailMode() {
-    const voïaManagedRadio = document.getElementById('mode_voïa_managed');
-    const voïaManagedSection = document.getElementById('voïa_managed_section');
+    const voiaManagedRadio = document.getElementById('mode_voia_managed');
+    const voiaManagedSection = document.getElementById('voia_managed_section');
     const clientManagedSection = document.getElementById('client_managed_section');
     
-    if (voïaManagedRadio.checked) {
-        voïaManagedSection.style.display = 'block';
+    if (voiaManagedRadio.checked) {
+        voiaManagedSection.style.display = 'block';
         clientManagedSection.style.display = 'none';
         
         // Update DKIM display if domain is already selected
         updateDKIMDisplay();
     } else {
-        voïaManagedSection.style.display = 'none';
+        voiaManagedSection.style.display = 'none';
         clientManagedSection.style.display = 'block';
     }
 }
