@@ -3754,6 +3754,143 @@ def save_email_delivery_config():
         return redirect(url_for('business_auth.email_delivery_config'))
 
 
+@business_auth_bp.route('/admin/email-delivery-config/test', methods=['POST'])
+@require_business_auth
+@rate_limit(limit=3)  # 3 test emails per hour to prevent abuse
+def test_email_delivery_config():
+    """Send test email to verify business account email configuration"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            flash(_('Business account context not found.'), 'error')
+            return redirect(url_for('business_auth.email_delivery_config'))
+        
+        # Get test recipient email (default to current user's email)
+        current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+        test_recipient = request.form.get('test_email', '').strip()
+        
+        if not test_recipient:
+            if current_user:
+                test_recipient = current_user.email
+            else:
+                flash('Please provide a test email address.', 'error')
+                return redirect(url_for('business_auth.email_delivery_config'))
+        
+        # Validate email format
+        import re
+        email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_pattern, test_recipient):
+            flash('Please provide a valid email address.', 'error')
+            return redirect(url_for('business_auth.email_delivery_config'))
+        
+        # Get email configuration
+        email_config = current_account.get_email_configuration()
+        if not email_config:
+            flash('Email configuration not found. Please configure your email settings first.', 'error')
+            return redirect(url_for('business_auth.email_delivery_config'))
+        
+        # Validate configuration based on mode
+        if email_config.use_platform_email:
+            # VOÏA-Managed mode validation
+            if not email_config.domain_verified:
+                flash('Your domain is not yet verified. Please contact the platform administrator.', 'error')
+                return redirect(url_for('business_auth.email_delivery_config'))
+            
+            if not email_config.sender_domain or not email_config.sender_email:
+                flash('Please complete your VOÏA-Managed email configuration (domain and sender email required).', 'error')
+                return redirect(url_for('business_auth.email_delivery_config'))
+            
+            # Check platform settings exist
+            from models import PlatformEmailSettings
+            platform_settings = PlatformEmailSettings.query.first()
+            if not platform_settings or not platform_settings.is_verified:
+                flash('Platform email settings are not configured. Please contact the platform administrator.', 'error')
+                return redirect(url_for('business_auth.email_delivery_config'))
+        else:
+            # Client-Managed mode validation
+            if not email_config.smtp_server or not email_config.sender_email:
+                flash('Please complete your Client-Managed email configuration (SMTP server and sender email required).', 'error')
+                return redirect(url_for('business_auth.email_delivery_config'))
+        
+        # Send test email
+        from email_service import email_service
+        
+        email_mode = 'VOÏA-Managed' if email_config.use_platform_email else 'Client-Managed'
+        subject = f'Test Email from {current_account.name}'
+        text_body = f"""This is a test email from your VOÏA email configuration.
+
+Configuration Mode: {email_mode}
+Business Account: {current_account.name}
+Sender Email: {email_config.sender_email}
+Test Time: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}
+
+If you received this email, your email configuration is working correctly!
+
+---
+This is an automated test message from VOÏA - Voice Of Client"""
+        
+        html_body = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #dc3545;">Test Email from VOÏA</h2>
+                <p>This is a test email from your VOÏA email configuration.</p>
+                
+                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                    <p style="margin: 5px 0;"><strong>Configuration Mode:</strong> {email_mode}</p>
+                    <p style="margin: 5px 0;"><strong>Business Account:</strong> {current_account.name}</p>
+                    <p style="margin: 5px 0;"><strong>Sender Email:</strong> {email_config.sender_email}</p>
+                    <p style="margin: 5px 0;"><strong>Test Time:</strong> {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}</p>
+                </div>
+                
+                <p style="color: #28a745; font-weight: bold;">✓ If you received this email, your email configuration is working correctly!</p>
+                
+                <hr style="border: none; border-top: 1px solid #dee2e6; margin: 30px 0;">
+                <p style="font-size: 12px; color: #6c757d;">This is an automated test message from VOÏA - Voice Of Client</p>
+            </div>
+        </body>
+        </html>
+        """
+        
+        result = email_service.send_email(
+            to_emails=[test_recipient],
+            subject=subject,
+            text_body=text_body,
+            html_body=html_body,
+            business_account_id=current_account.id
+        )
+        
+        # Audit log
+        from audit_utils import queue_audit_log
+        queue_audit_log(
+            business_account_id=current_account.id,
+            action_type='email_delivery_config_test',
+            resource_type='email_configuration',
+            resource_id=email_config.id,
+            user_name=session.get('business_user_name', 'Unknown'),
+            details={
+                'test_recipient': test_recipient,
+                'mode': email_mode,
+                'success': result.get('success', False),
+                'error': result.get('error') if not result.get('success') else None
+            }
+        )
+        
+        # Show result to user
+        if result.get('success'):
+            flash(f'Test email sent successfully to {test_recipient}! Please check your inbox.', 'success')
+        else:
+            error_msg = result.get('error', 'Unknown error occurred')
+            flash(f'Failed to send test email: {error_msg}', 'error')
+        
+        return redirect(url_for('business_auth.email_delivery_config'))
+    
+    except Exception as e:
+        logger.error(f"Error sending test email: {e}")
+        flash(f'Failed to send test email: {str(e)}', 'error')
+        return redirect(url_for('business_auth.email_delivery_config'))
+
+
 # ==== BRANDING CONFIGURATION ROUTES ====
 
 @business_auth_bp.route('/admin/brand-config')
