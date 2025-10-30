@@ -386,6 +386,7 @@
         </p>
         
         <form method="POST" action="{{ url_for('business_auth.test_email_delivery_config') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <div class="row">
                 <div class="col-md-8">
                     <div class="settings-form-group">
