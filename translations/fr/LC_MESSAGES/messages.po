@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: VOÏA 1.0\n"
 "Report-Msgid-Bugs-To: support@rivvalue.com\n"
-"POT-Creation-Date: 2025-10-29 15:17+0000\n"
+"POT-Creation-Date: 2025-10-30 13:56+0000\n"
 "PO-Revision-Date: 2025-10-24 07:35+0000\n"
 "Last-Translator: Rivvalue Team\n"
 "Language: fr\n"
@@ -19,8 +19,8 @@ msgstr ""
 
 #: business_auth_routes.py:983
 #: templates/business_auth/onboarding_progress.html:36
-#: templates/campaigns/list.html:118 templates/campaigns/list.html:155
-#: templates/campaigns/view.html:229
+#: templates/campaigns/list.html:114 templates/campaigns/list.html:168
+#: templates/campaigns/list.html:216 templates/campaigns/view.html:229
 #: templates/participants/campaign_participants.html:40
 #: templates/participants/campaign_participants.html:513
 #: templates/participants/campaign_participants.html:591
@@ -38,23 +38,80 @@ msgstr "Pas commencé"
 
 #: business_auth_routes.py:2409 business_auth_routes.py:2456
 #: business_auth_routes.py:2511 business_auth_routes.py:2676
-#: business_auth_routes.py:2699 business_auth_routes.py:3086
-#: business_auth_routes.py:3110 business_auth_routes.py:3411
-#: business_auth_routes.py:3450 business_auth_routes.py:4610
+#: business_auth_routes.py:2699 business_auth_routes.py:3568
+#: business_auth_routes.py:3600 business_auth_routes.py:3765
+#: business_auth_routes.py:3904 business_auth_routes.py:3928
+#: business_auth_routes.py:4229 business_auth_routes.py:4268
+#: business_auth_routes.py:5428
 #, fuzzy
 msgid "Business account context not found."
 msgstr "Contexte du compte entreprise introuvable."
 
-#: business_auth_routes.py:3439
+#: business_auth_routes.py:3776
+#, fuzzy
+msgid "Please provide a test email address."
+msgstr "Veuillez entrer une adresse e-mail"
+
+#: business_auth_routes.py:3783
+#, fuzzy
+msgid "Please provide a valid email address."
+msgstr "Veuillez entrer une adresse e-mail valide"
+
+#: business_auth_routes.py:3789
+msgid "Email configuration not found. Please configure your email settings first."
+msgstr ""
+
+#: business_auth_routes.py:3796
+msgid ""
+"Your domain is not yet verified. Please contact the platform "
+"administrator."
+msgstr ""
+
+#: business_auth_routes.py:3800
+msgid ""
+"Please complete your VOÏA-Managed email configuration (domain and sender "
+"email required)."
+msgstr ""
+
+#: business_auth_routes.py:3807
+msgid ""
+"Platform email settings are not configured. Please contact the platform "
+"administrator."
+msgstr ""
+
+#: business_auth_routes.py:3812
+msgid ""
+"Please complete your Client-Managed email configuration (SMTP server and "
+"sender email required)."
+msgstr ""
+
+#: business_auth_routes.py:3881
+#, python-format
+msgid "Test email sent successfully to %(email)s! Please check your inbox."
+msgstr ""
+
+#: business_auth_routes.py:3883
+#, fuzzy
+msgid "Unknown error occurred"
+msgstr "Erreur inconnue"
+
+#: business_auth_routes.py:3884 business_auth_routes.py:3890
+#, python-format
+msgid "Failed to send test email: %(error)s"
+msgstr ""
+
+#: business_auth_routes.py:4257
 #, fuzzy
 msgid "Failed to load survey configuration."
 msgstr "Échec du chargement de la configuration de l'enquête."
 
-#: campaign_routes.py:1547
+#: campaign_routes.py:1549
 msgid ""
 "License not activated yet. Timeline will be available once your license "
 "is activated."
-msgstr "Licence non activée. La chronologie sera disponible une fois votre licence activée."
+msgstr ""
+"Licence non activée. La chronologie sera disponible une fois votre "
+"licence activée."
 
 #: test_translation_fallback.py:27
 #, fuzzy
@@ -62,7 +119,8 @@ msgid "Dashboard"
 msgstr "Aller au tableau de bord"
 
 #: templates/business_auth/licenses/overview.html:304
-#: templates/campaigns/list.html:152 test_translation_fallback.py:75
+#: templates/campaigns/list.html:164 templates/campaigns/list.html:213
+#: test_translation_fallback.py:75
 msgid "Active"
 msgstr "Actif"
 
@@ -278,13 +336,13 @@ msgstr "Résumé exécutif"
 
 #: templates/base.html:64 templates/campaign_insights.html:4
 #: templates/campaign_insights.html:21 templates/campaign_insights.html:42
-#: templates/campaign_insights.html:723 templates/campaigns/list.html:45
+#: templates/campaign_insights.html:723 templates/campaigns/list.html:41
 #: templates/dashboard.html:281
 msgid "Campaign Insights"
 msgstr "Insights de la campagne"
 
 #: templates/base.html:69 templates/business_auth/admin_licenses.html:72
-#: templates/business_auth/admin_panel_v2.html:686
+#: templates/business_auth/admin_panel_v2.html:705
 #: templates/business_auth/license_overview.html:85
 #: templates/business_auth/license_overview.html:236
 #: templates/business_auth/licenses/assignment_form.html:106
@@ -296,11 +354,11 @@ msgstr "Insights de la campagne"
 #: templates/business_auth/licenses/assignment_form.html:563
 #: templates/business_auth/licenses/assignment_form.html:566
 #: templates/business_auth/licenses/overview.html:327
-#: templates/campaigns/list.html:883
+#: templates/campaigns/list.html:929
 msgid "Campaigns"
 msgstr "Campagnes"
 
-#: templates/base.html:73 templates/campaigns/list.html:209
+#: templates/base.html:73 templates/campaigns/list.html:233
 msgid "Participants"
 msgstr "Participants"
 
@@ -409,8 +467,8 @@ msgid "Currently showing data from active campaign:"
 msgstr "Affichage des données de la campagne active"
 
 #: templates/campaign_insights.html:145 templates/campaigns/create.html:82
-#: templates/campaigns/edit.html:97 templates/campaigns/list.html:205
-#: templates/campaigns/list.html:295 templates/dashboard.html:381
+#: templates/campaigns/edit.html:97 templates/campaigns/list.html:229
+#: templates/campaigns/list.html:318 templates/dashboard.html:381
 msgid "Campaign Name"
 msgstr "Nom de la campagne"
 
@@ -531,7 +589,7 @@ msgstr "Rechercher"
 #: templates/campaign_insights.html:255 templates/campaign_insights.html:264
 #: templates/campaign_insights.html:274 templates/campaign_insights.html:282
 #: templates/campaign_insights.html:409 templates/campaign_insights.html:581
-#: templates/campaigns/list.html:146 templates/dashboard.html:491
+#: templates/campaigns/list.html:207 templates/dashboard.html:491
 #: templates/dashboard.html:500 templates/dashboard.html:510
 #: templates/dashboard.html:518
 msgid "All"
@@ -798,8 +856,8 @@ msgstr "Satisfaction"
 
 #: templates/business_auth/reset_password.html:27
 #: templates/campaign_insights.html:747 templates/campaign_insights.html:832
-#: templates/campaign_insights.html:919 templates/campaigns/list.html:290
-#: templates/campaigns/list.html:326 templates/campaigns/list.html:452
+#: templates/campaign_insights.html:919 templates/campaigns/list.html:313
+#: templates/campaigns/list.html:349 templates/campaigns/list.html:478
 #: templates/dashboard.html:897 templates/dashboard.html:982
 #: templates/dashboard.html:1069 templates/executive_summary.html:278
 #: templates/executive_summary.html:365
@@ -1421,13 +1479,12 @@ msgstr "Résumé exécutif"
 msgid "Campaign KPI Overview"
 msgstr "Vue d'ensemble des indicateurs de campagne"
 
-#: templates/campaigns/list.html:856 templates/dashboard.html:70
-#: templates/dashboard.html:301 templates/executive_summary.html:28
-#: templates/executive_summary.html:30 templates/executive_summary.html:63
-#: templates/executive_summary.html:132 templates/executive_summary.html:134
-#: templates/executive_summary.html:136 templates/executive_summary.html:194
-#: templates/executive_summary.html:197 templates/executive_summary.html:200
-#: templates/executive_summary.html:276
+#: templates/dashboard.html:70 templates/dashboard.html:301
+#: templates/executive_summary.html:28 templates/executive_summary.html:30
+#: templates/executive_summary.html:63 templates/executive_summary.html:132
+#: templates/executive_summary.html:134 templates/executive_summary.html:136
+#: templates/executive_summary.html:194 templates/executive_summary.html:197
+#: templates/executive_summary.html:200 templates/executive_summary.html:276
 msgid "Campaign"
 msgstr "Campagnes"
 
@@ -1572,12 +1629,12 @@ msgstr "Annuler"
 #: templates/business_auth/manage_users.html:98
 #: templates/business_auth/platform_dashboard.html:421
 #: templates/business_auth/platform_dashboard.html:694
-#: templates/campaigns/list.html:206 templates/campaigns/list.html:225
-#: templates/campaigns/list.html:305 templates/campaigns/list.html:371
-#: templates/campaigns/list.html:383 templates/campaigns/list.html:430
-#: templates/campaigns/list.html:492 templates/campaigns/list.html:517
-#: templates/campaigns/list.html:656 templates/campaigns/list.html:857
-#: templates/campaigns/list.html:939
+#: templates/campaigns/list.html:230 templates/campaigns/list.html:249
+#: templates/campaigns/list.html:328 templates/campaigns/list.html:397
+#: templates/campaigns/list.html:409 templates/campaigns/list.html:456
+#: templates/campaigns/list.html:518 templates/campaigns/list.html:543
+#: templates/campaigns/list.html:682 templates/campaigns/list.html:886
+#: templates/campaigns/list.html:996
 #: templates/campaigns/responses_list.html:179 templates/dashboard.html:249
 #: templates/executive_summary.html:242 templates/participants/list.html:405
 msgid "Status"
@@ -1952,21 +2009,13 @@ msgstr "Analytique et intelligence d'affaires"
 msgid "Participant Management"
 msgstr "Gestion des participants"
 
-#: templates/campaigns/list.html:3 templates/campaigns/list.html:19
+#: templates/campaigns/list.html:3 templates/campaigns/list.html:20
 #: templates/index.html:128
 msgid "Campaign Management"
 msgstr "Gestion des campagnes"
 
-#: templates/campaigns/list.html:189
-msgid "Manage Campaigns"
-msgstr "Gérer les campagnes"
-
-#: templates/campaigns/list.html:191
-msgid "Filter and view campaign details"
-msgstr "Filtrer et consulter les détails de campagne"
-
-#: templates/business_auth/admin_panel_v2.html:529
-#: templates/business_auth/admin_panel_v2.html:541 templates/index.html:133
+#: templates/business_auth/admin_panel_v2.html:548
+#: templates/business_auth/admin_panel_v2.html:560 templates/index.html:133
 msgid "User Management"
 msgstr "Gestion des utilisateurs"
 
@@ -2726,7 +2775,7 @@ msgid "License Type"
 msgstr "Type de licence"
 
 #: templates/business_auth/admin_licenses.html:73
-#: templates/business_auth/admin_panel_v2.html:690
+#: templates/business_auth/admin_panel_v2.html:709
 #: templates/business_auth/license_overview.html:107
 #: templates/business_auth/license_overview.html:241
 #: templates/business_auth/licenses/assignment_form.html:96
@@ -2762,7 +2811,7 @@ msgstr "Pas d'expiration"
 #: templates/business_auth/licenses/overview.html:330
 #: templates/business_auth/manage_users.html:100
 #: templates/business_auth/onboarding_progress.html:131
-#: templates/campaigns/list.html:211
+#: templates/campaigns/list.html:235
 #: templates/campaigns/responses_list.html:181
 #: templates/participants/list.html:407
 msgid "Actions"
@@ -2811,8 +2860,8 @@ msgstr ""
 " de la plateforme"
 
 #: templates/business_auth/admin_panel.html:408
-#: templates/business_auth/admin_panel_v2.html:739
-#: templates/business_auth/admin_panel_v2.html:746
+#: templates/business_auth/admin_panel_v2.html:758
+#: templates/business_auth/admin_panel_v2.html:765
 #: templates/business_auth/platform_dashboard.html:3
 #: templates/business_auth/platform_dashboard.html:309
 msgid "Business Analytics Hub"
@@ -2937,13 +2986,13 @@ msgid "Campaigns Used"
 msgstr "Campagnes utilisées"
 
 #: templates/business_auth/admin_panel.html:710
-#: templates/business_auth/admin_panel_v2.html:550
-#: templates/business_auth/admin_panel_v2.html:557
+#: templates/business_auth/admin_panel_v2.html:569
+#: templates/business_auth/admin_panel_v2.html:576
 msgid "Team Members"
 msgstr "Membres de l'équipe"
 
 #: templates/business_auth/admin_panel.html:722
-#: templates/business_auth/admin_panel_v2.html:694
+#: templates/business_auth/admin_panel_v2.html:713
 msgid "Max Participants"
 msgstr "Nombre maximum de participants"
 
@@ -3055,143 +3104,139 @@ msgstr "Paramètres du compte"
 
 #: templates/business_auth/admin_panel_v2.html:476
 #: templates/business_auth/admin_panel_v2.html:483
-#: templates/business_auth/onboarding/complete.html:336
-#: templates/business_auth/onboarding/smtp.html:3
-#: templates/business_auth/onboarding/smtp.html:257
-#: templates/business_auth/onboarding/smtp.html:282
-#: templates/business_auth/onboarding/welcome.html:281
-msgid "Email Configuration"
+#, fuzzy
+msgid "Email Delivery Configuration"
 msgstr "Configuration de l'e-mail"
 
 #: templates/business_auth/admin_panel_v2.html:484
-msgid "Configure SMTP settings for sending survey invitations"
-msgstr "Configurez les paramètres SMTP pour l'envoi des invitations à l'enquête"
+msgid "Choose between VOÏA-managed or client-managed email delivery"
+msgstr ""
 
-#: templates/business_auth/admin_panel_v2.html:492
-#: templates/business_auth/admin_panel_v2.html:499
+#: templates/business_auth/admin_panel_v2.html:511
+#: templates/business_auth/admin_panel_v2.html:518
 #: templates/business_auth/onboarding/brand.html:3
 #: templates/business_auth/onboarding/brand.html:263
 #: templates/business_auth/onboarding/welcome.html:288
 msgid "Brand Configuration"
 msgstr "Configuration de la marque"
 
-#: templates/business_auth/admin_panel_v2.html:500
+#: templates/business_auth/admin_panel_v2.html:519
 msgid "Customize your brand colors, logo, and visual identity"
 msgstr "Personnalisez les couleurs, le logo et l'identité visuelle de votre marque"
 
-#: templates/business_auth/admin_panel_v2.html:508
-#: templates/business_auth/admin_panel_v2.html:516
+#: templates/business_auth/admin_panel_v2.html:527
+#: templates/business_auth/admin_panel_v2.html:535
 msgid "Survey Defaults"
 msgstr "Paramètres par défaut de l'enquête"
 
-#: templates/business_auth/admin_panel_v2.html:517
+#: templates/business_auth/admin_panel_v2.html:536
 msgid "Set default AI conversation settings for surveys"
 msgstr "Définissez les paramètres de conversation IA par défaut pour les enquêtes"
 
-#: templates/business_auth/admin_panel_v2.html:558
+#: templates/business_auth/admin_panel_v2.html:577
 msgid "Add and manage team members for your business account"
 msgstr "Ajoutez et gérez les membres de votre équipe pour votre compte entreprise"
 
-#: templates/business_auth/admin_panel_v2.html:571
+#: templates/business_auth/admin_panel_v2.html:590
 msgid "Users Active"
 msgstr "Utilisateurs actifs"
 
-#: templates/business_auth/admin_panel_v2.html:575
+#: templates/business_auth/admin_panel_v2.html:594
 msgid "User Limit"
 msgstr "Limite d'utilisateurs"
 
-#: templates/business_auth/admin_panel_v2.html:582
+#: templates/business_auth/admin_panel_v2.html:601
 msgid "Permission Required"
 msgstr "Autorisation requise"
 
-#: templates/business_auth/admin_panel_v2.html:590
-#: templates/business_auth/admin_panel_v2.html:602
+#: templates/business_auth/admin_panel_v2.html:609
+#: templates/business_auth/admin_panel_v2.html:621
 msgid "Data Management"
 msgstr "Gestion des données"
 
-#: templates/business_auth/admin_panel_v2.html:617
-#: templates/campaigns/list.html:56
+#: templates/business_auth/admin_panel_v2.html:636
+#: templates/campaigns/list.html:52
 msgid "Export Data"
 msgstr "Actualiser les données"
 
-#: templates/business_auth/admin_panel_v2.html:618
+#: templates/business_auth/admin_panel_v2.html:637
 msgid "Export all survey responses for analysis and reporting"
 msgstr "Exportez toutes les réponses aux enquêtes pour l'analyse et les rapports"
 
-#: templates/business_auth/admin_panel_v2.html:626
-#: templates/business_auth/admin_panel_v2.html:633
+#: templates/business_auth/admin_panel_v2.html:645
+#: templates/business_auth/admin_panel_v2.html:652
 msgid "Audit Logs"
 msgstr "Journaux d'audit"
 
-#: templates/business_auth/admin_panel_v2.html:634
+#: templates/business_auth/admin_panel_v2.html:653
 msgid "View system activity and user action history"
 msgstr "Consultez l'activité du système et l'historique des actions utilisateur"
 
-#: templates/business_auth/admin_panel_v2.html:645
-#: templates/business_auth/admin_panel_v2.html:657
+#: templates/business_auth/admin_panel_v2.html:664
+#: templates/business_auth/admin_panel_v2.html:676
 msgid "System Settings"
 msgstr "Paramètres du système"
 
-#: templates/business_auth/admin_panel_v2.html:665
-#: templates/business_auth/admin_panel_v2.html:673
+#: templates/business_auth/admin_panel_v2.html:684
+#: templates/business_auth/admin_panel_v2.html:692
 #: templates/business_auth/licenses/dashboard.html:287
 msgid "License Information"
 msgstr "Informations sur la licence"
 
-#: templates/business_auth/admin_panel_v2.html:706
+#: templates/business_auth/admin_panel_v2.html:725
 msgid "Campaign Scheduler"
 msgstr "Planificateur de campagnes"
 
-#: templates/business_auth/admin_panel_v2.html:707
+#: templates/business_auth/admin_panel_v2.html:726
 msgid "View and manage automated campaign lifecycle"
 msgstr "Afficher et gérer le cycle de vie automatisé des campagnes"
 
-#: templates/business_auth/admin_panel_v2.html:718
-#: templates/business_auth/admin_panel_v2.html:731
+#: templates/business_auth/admin_panel_v2.html:737
+#: templates/business_auth/admin_panel_v2.html:750
 msgid "Platform Administration"
 msgstr "Administration de la plateforme"
 
-#: templates/business_auth/admin_panel_v2.html:747
+#: templates/business_auth/admin_panel_v2.html:766
 msgid "Platform-wide metrics, license usage, and business intelligence"
 msgstr "Indicateurs globaux, utilisation des licences et intelligence d'affaires"
 
-#: templates/business_auth/admin_panel_v2.html:762
+#: templates/business_auth/admin_panel_v2.html:781
 msgid "Onboard Business Account"
 msgstr "Intégrer un compte entreprise"
 
-#: templates/business_auth/admin_panel_v2.html:763
+#: templates/business_auth/admin_panel_v2.html:782
 msgid "Create and configure new business accounts with license assignment"
 msgstr ""
 "Créer et configurer de nouveaux comptes d'entreprise avec attribution de "
 "licences\"Créez et configurez de nouveaux comptes d'entreprise avec "
 "attribution de licence"
 
-#: templates/business_auth/admin_panel_v2.html:778
+#: templates/business_auth/admin_panel_v2.html:797
 msgid "License Management"
 msgstr "Gestion des licences"
 
-#: templates/business_auth/admin_panel_v2.html:779
+#: templates/business_auth/admin_panel_v2.html:798
 msgid "Cross-tenant license usage, trends, and compliance monitoring"
 msgstr ""
 "Utilisation des licences multi-locataires, tendances et surveillance de "
 "la conformité\"Utilisation des licences inter-locataires, tendances et "
 "suivi de conformité"
 
-#: templates/business_auth/admin_panel_v2.html:787
-#: templates/business_auth/admin_panel_v2.html:794
+#: templates/business_auth/admin_panel_v2.html:806
+#: templates/business_auth/admin_panel_v2.html:813
 msgid "Platform Admin Users"
 msgstr "Administrateurs de la plateforme"
 
-#: templates/business_auth/admin_panel_v2.html:795
+#: templates/business_auth/admin_panel_v2.html:814
 msgid "Manage cross-tenant administrator accounts and permissions"
 msgstr "Gérez les comptes et autorisations des administrateurs inter-locataires"
 
-#: templates/business_auth/admin_panel_v2.html:803
-#: templates/business_auth/admin_panel_v2.html:810
+#: templates/business_auth/admin_panel_v2.html:822
+#: templates/business_auth/admin_panel_v2.html:829
 msgid "Performance Metrics"
 msgstr "Indicateurs de performance"
 
-#: templates/business_auth/admin_panel_v2.html:811
+#: templates/business_auth/admin_panel_v2.html:830
 msgid "Monitor system performance and cache status"
 msgstr "Surveillez les performances du système et l'état du cache"
 
@@ -3791,6 +3836,7 @@ msgid "Save email configuration"
 msgstr "Enregistrer la configuration de l'e-mail"
 
 #: templates/business_auth/email_config.html:482
+#: templates/business_auth/email_delivery_config.html:404
 msgid "Test Email Address"
 msgstr "Adresse e-mail de test"
 
@@ -3829,6 +3875,26 @@ msgstr ""
 #: templates/business_auth/email_config.html:622
 msgid "Network error: ' + error.message + '"
 msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:394
+msgid "Test Email Configuration"
+msgstr "Configuration de l'email de test"
+
+#: templates/business_auth/email_delivery_config.html:397
+msgid "Send a test email to verify your email configuration is working correctly."
+msgstr "Envoyez un email de test pour vérifier que votre configuration email fonctionne correctement."
+
+#: templates/business_auth/email_delivery_config.html:410
+msgid "recipient@example.com"
+msgstr "destinataire@exemple.com"
+
+#: templates/business_auth/email_delivery_config.html:413
+msgid "We'll send a test email to this address to verify your configuration."
+msgstr "Nous enverrons un email de test à cette adresse pour vérifier votre configuration."
+
+#: templates/business_auth/email_delivery_config.html:418
+msgid "Send Test Email"
+msgstr "Envoyer un email de test"
 
 #: templates/business_auth/forgot_password.html:3
 #, fuzzy
@@ -5129,6 +5195,14 @@ msgstr ""
 msgid "Here's what you've successfully set up:"
 msgstr "Voici ce que vous avez configuré avec succès :"
 
+#: templates/business_auth/onboarding/complete.html:336
+#: templates/business_auth/onboarding/smtp.html:3
+#: templates/business_auth/onboarding/smtp.html:257
+#: templates/business_auth/onboarding/smtp.html:282
+#: templates/business_auth/onboarding/welcome.html:281
+msgid "Email Configuration"
+msgstr "Configuration de l'e-mail"
+
 #: templates/business_auth/onboarding/complete.html:337
 msgid ""
 "Your SMTP settings are configured and tested. You can now send survey "
@@ -5542,134 +5616,204 @@ msgstr "Historique de la conversation"
 msgid "This response doesn't contain conversational transcript data."
 msgstr ""
 
-#: templates/campaigns/list.html:20
+#: templates/campaigns/list.html:21
 #, fuzzy, python-format
 msgid "Manage survey campaigns for %(name)s"
 msgstr "Gérer les campagnes d\\'enquête pour %(name)s"
 
-#: templates/campaigns/list.html:40
+#: templates/campaigns/list.html:25
+#, fuzzy
+msgid "Create Campaign"
+msgstr "Créer une nouvelle campagne"
+
+#: templates/campaigns/list.html:36
 #, fuzzy
 msgid "View Details"
 msgstr "Détails"
 
-#: templates/campaigns/list.html:50
+#: templates/campaigns/list.html:46
 #, fuzzy
 msgid "Manage Participants"
 msgstr "Nombre maximum de participants"
 
-#: templates/campaigns/list.html:64 templates/campaigns/list.html:474
-#: templates/campaigns/list.html:478 templates/campaigns/list.html:660
-#: templates/campaigns/list.html:668
+#: templates/campaigns/list.html:60 templates/campaigns/list.html:500
+#: templates/campaigns/list.html:504 templates/campaigns/list.html:686
+#: templates/campaigns/list.html:694
 #, fuzzy
 msgid "Executive Report"
 msgstr "Résumé exécutif"
 
-#: templates/campaigns/list.html:98 templates/campaigns/list.html:207
-#: templates/campaigns/list.html:230 templates/campaigns/list.html:306
-#: templates/campaigns/list.html:348 templates/campaigns/list.html:355
-#: templates/campaigns/list.html:369 templates/campaigns/list.html:522
-#: templates/campaigns/list.html:579 templates/campaigns/list.html:617
+#: templates/campaigns/list.html:94 templates/campaigns/list.html:231
+#: templates/campaigns/list.html:254 templates/campaigns/list.html:329
+#: templates/campaigns/list.html:374 templates/campaigns/list.html:381
+#: templates/campaigns/list.html:395 templates/campaigns/list.html:548
+#: templates/campaigns/list.html:605 templates/campaigns/list.html:643
+#: templates/campaigns/list.html:887
 #, fuzzy
 msgid "Start"
 msgstr "Commencé"
 
-#: templates/campaigns/list.html:114
+#: templates/campaigns/list.html:110
 #, fuzzy
 msgid "Sent"
 msgstr "Sentiment :"
 
-#: templates/campaigns/list.html:149
-#, fuzzy
-msgid "Draft"
-msgstr "Date de fin"
-
-#: templates/campaigns/list.html:170
+#: templates/campaigns/list.html:132
 msgid "Campaign Timeline"
 msgstr "Chronologie des campagnes"
 
-#: templates/campaigns/list.html:172
+#: templates/campaigns/list.html:134
 msgid "Visual overview of campaign schedules over your license duration"
 msgstr ""
 "Vue d'ensemble visuelle des calendriers de campagnes sur la durée de "
 "votre licence"
 
-#: templates/campaigns/list.html:174
+#: templates/campaigns/list.html:136
 msgid "Toggle timeline view"
 msgstr "Afficher/masquer la chronologie"
 
-#: templates/campaigns/list.html:181 templates/campaigns/list.html:183
+#: templates/campaigns/list.html:143 templates/campaigns/list.html:145
 msgid "Loading timeline..."
 msgstr "Chargement de la chronologie..."
 
-#: templates/campaigns/list.html:187
+#: templates/campaigns/list.html:149
 msgid "Unable to load timeline data. Please refresh the page."
 msgstr ""
 "Impossible de charger les données de la chronologie. Veuillez actualiser "
 "la page."
 
-#: templates/campaigns/list.html:190
+#: templates/campaigns/list.html:152
 msgid "Campaign timeline visualization"
 msgstr "Visualisation de la chronologie des campagnes"
 
-#: templates/campaigns/list.html:194
+#: templates/campaigns/list.html:153
+#, fuzzy
+msgid "Campaign status legend"
+msgstr "Campagnes utilisées"
+
+#: templates/campaigns/list.html:156 templates/campaigns/list.html:210
+#, fuzzy
+msgid "Draft"
+msgstr "Date de fin"
+
+#: templates/campaigns/list.html:160
+#, fuzzy
+msgid "Ready"
+msgstr "Créé"
+
+#: templates/campaigns/list.html:174
 msgid "No campaigns scheduled yet."
 msgstr "Aucune campagne planifiée pour le moment."
 
-#: templates/campaigns/list.html:208
+#: templates/campaigns/list.html:185
+msgid "Manage Campaigns"
+msgstr "Gérer les campagnes"
+
+#: templates/campaigns/list.html:187
+msgid "Filter and view campaign details"
+msgstr "Filtrer et consulter les détails de campagne"
+
+#: templates/campaigns/list.html:232
 #, fuzzy
 msgid "Fin Date"
 msgstr "Date de fin"
 
-#: templates/campaigns/list.html:210 templates/campaigns/list.html:239
+#: templates/campaigns/list.html:234 templates/campaigns/list.html:263
 #, fuzzy
 msgid "Sent/Completed"
 msgstr "Terminé"
 
-#: templates/campaigns/list.html:270
+#: templates/campaigns/list.html:296
 #, fuzzy
 msgid "Ready to gather insights?"
 msgstr "Prêt à commencer ?"
 
-#: templates/campaigns/list.html:271
+#: templates/campaigns/list.html:297
 msgid ""
 "Create your first campaign to start collecting customer feedback and "
 "understanding their experience. Campaigns help you organize survey "
 "participants, send invitations, and analyze results."
 msgstr ""
 
-#: templates/campaigns/list.html:313
+#: templates/campaigns/list.html:336
 #, fuzzy
 msgid "Export Complete!"
 msgstr "Configuration terminée !"
 
-#: templates/campaigns/list.html:314
+#: templates/campaigns/list.html:337
 #, fuzzy
 msgid "Your campaign data has been successfully exported."
 msgstr "a été soumis avec succès."
 
-#: templates/campaigns/list.html:324
+#: templates/campaigns/list.html:347
 #, fuzzy
 msgid "Export Failed"
 msgstr "Exporter toutes les données"
 
-#: templates/campaigns/list.html:325
+#: templates/campaigns/list.html:348
 msgid "An error occurred while exporting your data."
 msgstr ""
 
-#: templates/campaigns/list.html:810 templates/campaigns/list.html:858
+#: templates/campaigns/list.html:855
 #, fuzzy
-msgid "Month"
-msgstr "Mois"
+msgid "Campaign Duration"
+msgstr "Actions de la campagne"
 
-#: templates/campaigns/list.html:858
-msgid "Duration"
-msgstr "Durée"
+# Month abbreviations for timeline
+#: templates/campaigns/list.html:881 templates/campaigns/list.html:907
+msgid "Jan"
+msgstr "Jan"
 
-#: templates/campaigns/list.html:872
-msgid "M"
-msgstr ""
+#: templates/campaigns/list.html:881 templates/campaigns/list.html:907
+msgid "Feb"
+msgstr "Fév"
 
-#: templates/campaigns/list.html:877
+#: templates/campaigns/list.html:881 templates/campaigns/list.html:907
+msgid "Mar"
+msgstr "Mar"
+
+#: templates/campaigns/list.html:881 templates/campaigns/list.html:907
+msgid "Apr"
+msgstr "Avr"
+
+#: templates/campaigns/list.html:882 templates/campaigns/list.html:908
+msgid "May"
+msgstr "Mai"
+
+#: templates/campaigns/list.html:882 templates/campaigns/list.html:908
+msgid "Jun"
+msgstr "Juin"
+
+#: templates/campaigns/list.html:882 templates/campaigns/list.html:908
+msgid "Jul"
+msgstr "Juil"
+
+#: templates/campaigns/list.html:882 templates/campaigns/list.html:908
+msgid "Aug"
+msgstr "Août"
+
+#: templates/campaigns/list.html:883 templates/campaigns/list.html:909
+msgid "Sep"
+msgstr "Sep"
+
+#: templates/campaigns/list.html:883 templates/campaigns/list.html:909
+msgid "Oct"
+msgstr "Oct"
+
+#: templates/campaigns/list.html:883 templates/campaigns/list.html:909
+msgid "Nov"
+msgstr "Nov"
+
+#: templates/campaigns/list.html:883 templates/campaigns/list.html:909
+msgid "Dec"
+msgstr "Déc"
+
+#: templates/campaigns/list.html:888
+#, fuzzy
+msgid "End"
+msgstr "En attente"
+
+#: templates/campaigns/list.html:916
 msgid "License Duration (Months)"
 msgstr "Durée de la licence (mois)"
 
@@ -6899,40 +7043,15 @@ msgstr "Télécharger le modèle de fichier CSV"
 #~ msgid "Custom pricing for this add-on period"
 #~ msgstr "Tarification personnalisée pour cette période d'extension\""
 
+#~ msgid "Configure SMTP settings for sending survey invitations"
+#~ msgstr "Configurez les paramètres SMTP pour l'envoi des invitations à l'enquête"
 
-# Month abbreviations for timeline
-msgid "Jan"
-msgstr "Jan"
+#~ msgid "Month"
+#~ msgstr "Mois"
 
-msgid "Feb"
-msgstr "Fév"
+#~ msgid "Duration"
+#~ msgstr "Durée"
 
-msgid "Mar"
-msgstr "Mar"
+#~ msgid "M"
+#~ msgstr ""
 
-msgid "Apr"
-msgstr "Avr"
-
-msgid "May"
-msgstr "Mai"
-
-msgid "Jun"
-msgstr "Juin"
-
-msgid "Jul"
-msgstr "Juil"
-
-msgid "Aug"
-msgstr "Août"
-
-msgid "Sep"
-msgstr "Sep"
-
-msgid "Oct"
-msgstr "Oct"
-
-msgid "Nov"
-msgstr "Nov"
-
-msgid "Dec"
-msgstr "Déc"
