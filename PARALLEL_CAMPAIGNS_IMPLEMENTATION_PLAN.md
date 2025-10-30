@@ -96,18 +96,148 @@ def downgrade():
 
 ### 2. Constraint Enforcement Strategy
 
-#### Remove Database Constraint
-Current: Partial unique index prevents multiple active campaigns at DB level
-```python
-# REMOVE from models.py Campaign.__table_args__
-db.Index('idx_single_active_campaign_per_account', 
-        'business_account_id', 
-        unique=True, 
-        postgresql_where=db.text("status = 'active'"))
+#### Multi-Layer Defense Architecture
+
+**Critical Design Principle:** Data integrity MUST NOT depend solely on application code. We implement a defense-in-depth approach with three enforcement layers.
+
+#### Layer 1: Database Trigger (Primary Safeguard)
+
+Replace the partial unique index with a PostgreSQL trigger that enforces single-active campaign rule when `allow_parallel_campaigns = false`.
+
+**Rationale:** This ensures data integrity even if:
+- Scripts bypass application layer
+- Future code paths forget the check
+- Background jobs activate campaigns directly
+
+**Implementation:**
+```sql
+-- Create trigger function
+CREATE OR REPLACE FUNCTION enforce_single_active_campaign()
+RETURNS TRIGGER AS $$
+DECLARE
+    account_parallel_allowed BOOLEAN;
+    existing_active_count INTEGER;
+BEGIN
+    -- Only check when activating a campaign (status becomes 'active')
+    IF NEW.status = 'active' AND (TG_OP = 'INSERT' OR OLD.status != 'active') THEN
+        
+        -- Check if parallel campaigns allowed for this account
+        SELECT allow_parallel_campaigns INTO account_parallel_allowed
+        FROM business_accounts
+        WHERE id = NEW.business_account_id;
+        
+        -- If parallel not allowed, enforce single active campaign
+        IF NOT account_parallel_allowed THEN
+            -- Count existing active campaigns for this account
+            SELECT COUNT(*) INTO existing_active_count
+            FROM campaigns
+            WHERE business_account_id = NEW.business_account_id
+              AND status = 'active'
+              AND id != NEW.id;  -- Exclude the campaign being activated
+            
+            -- Raise error if another active campaign exists
+            IF existing_active_count > 0 THEN
+                RAISE EXCEPTION 
+                    'Cannot activate campaign: business_account_id % has parallel campaigns disabled and already has % active campaign(s). Campaign ID: %',
+                    NEW.business_account_id, existing_active_count, NEW.id
+                USING ERRCODE = 'unique_violation',
+                      HINT = 'Enable parallel campaigns for this account or complete existing active campaigns first.';
+            END IF;
+        END IF;
+    END IF;
+    
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Create trigger
+CREATE TRIGGER check_single_active_campaign
+    BEFORE INSERT OR UPDATE ON campaigns
+    FOR EACH ROW
+    EXECUTE FUNCTION enforce_single_active_campaign();
 ```
 
-#### Replace with Application-Layer Enforcement
+**Migration Update:**
+```python
+def upgrade():
+    # Add column with default False
+    op.add_column('business_accounts', 
+        sa.Column('allow_parallel_campaigns', sa.Boolean(), 
+                  nullable=False, server_default='false'))
+    
+    # Create index for performance
+    op.create_index('idx_business_account_parallel_campaigns', 
+                   'business_accounts', ['allow_parallel_campaigns'])
+    
+    # Drop existing partial unique index
+    op.drop_index('idx_single_active_campaign_per_account', 
+                  table_name='campaigns')
+    
+    # Create trigger function
+    op.execute("""
+        CREATE OR REPLACE FUNCTION enforce_single_active_campaign()
+        RETURNS TRIGGER AS $$
+        DECLARE
+            account_parallel_allowed BOOLEAN;
+            existing_active_count INTEGER;
+        BEGIN
+            IF NEW.status = 'active' AND (TG_OP = 'INSERT' OR OLD.status != 'active') THEN
+                SELECT allow_parallel_campaigns INTO account_parallel_allowed
+                FROM business_accounts
+                WHERE id = NEW.business_account_id;
+                
+                IF NOT account_parallel_allowed THEN
+                    SELECT COUNT(*) INTO existing_active_count
+                    FROM campaigns
+                    WHERE business_account_id = NEW.business_account_id
+                      AND status = 'active'
+                      AND id != NEW.id;
+                    
+                    IF existing_active_count > 0 THEN
+                        RAISE EXCEPTION 
+                            'Cannot activate campaign: business_account_id % has parallel campaigns disabled and already has % active campaign(s). Campaign ID: %',
+                            NEW.business_account_id, existing_active_count, NEW.id
+                        USING ERRCODE = 'unique_violation',
+                              HINT = 'Enable parallel campaigns for this account or complete existing active campaigns first.';
+                    END IF;
+                END IF;
+            END IF;
+            RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+    """)
+    
+    # Create trigger
+    op.execute("""
+        CREATE TRIGGER check_single_active_campaign
+            BEFORE INSERT OR UPDATE ON campaigns
+            FOR EACH ROW
+            EXECUTE FUNCTION enforce_single_active_campaign();
+    """)
+
+def downgrade():
+    # Drop trigger and function
+    op.execute("DROP TRIGGER IF EXISTS check_single_active_campaign ON campaigns")
+    op.execute("DROP FUNCTION IF EXISTS enforce_single_active_campaign")
+    
+    # Restore partial unique index
+    op.execute("""
+        CREATE UNIQUE INDEX idx_single_active_campaign_per_account 
+        ON campaigns (business_account_id) 
+        WHERE status = 'active'
+    """)
+    
+    # Drop index and column
+    op.drop_index('idx_business_account_parallel_campaigns', 
+                  table_name='business_accounts')
+    op.drop_column('business_accounts', 'allow_parallel_campaigns')
+```
+
+#### Layer 2: Application-Layer Enforcement
+
 **Location:** `license_service.py` - `LicenseService.can_activate_campaign()`
+
+**Purpose:** Provide clear error messages and prevent unnecessary database round-trips
 
 **Logic Flow:**
 ```python
@@ -134,28 +264,175 @@ def can_activate_campaign(business_account_id: int) -> bool:
     return campaigns_used < max_campaigns
 ```
 
-#### Race Condition Protection
-**Issue:** Two concurrent activation requests could both pass validation and create 2 active campaigns
+#### Layer 3: Transaction-Level Concurrency Control
 
-**Solution:** Use `SELECT FOR UPDATE` in campaign activation transaction
+**Purpose:** Prevent race conditions during concurrent activation attempts
+
+**All Campaign Activation Entry Points MUST Use SELECT FOR UPDATE:**
+
+1. **Primary Route:** `campaign_routes.py - activate_campaign()`
+2. **Background Jobs:** `campaign_lifecycle_manager.py - auto_activate_campaigns()`
+3. **Admin Tools:** Any admin scripts that activate campaigns
+4. **Test Utilities:** Test fixtures that create active campaigns
+5. **API Endpoints:** Any future API that activates campaigns
+
+#### Complete Entry Point Inventory
+
+**MANDATORY REQUIREMENT:** All code paths that activate campaigns must use transactional locking.
+
+**Entry Point 1: Web UI Campaign Activation**
 ```python
-# In campaign_routes.py - activate_campaign endpoint
+# File: campaign_routes.py - activate_campaign()
+@campaigns.route('/campaigns/<int:campaign_id>/activate', methods=['POST'])
+@require_login
 def activate_campaign(campaign_id):
-    # Lock business account row during activation check
+    try:
+        # CRITICAL: Lock business account during validation
+        business_account = BusinessAccount.query.filter_by(
+            id=current_account.id
+        ).with_for_update().first()
+        
+        # Perform validation with locked row
+        if not LicenseService.can_activate_campaign(business_account.id):
+            db.session.rollback()
+            license_info = LicenseService.get_license_info(business_account.id)
+            flash(f'Cannot activate campaign. {license_info["campaigns_used"]}/{license_info["campaigns_limit"]} campaigns used.', 'error')
+            return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
+        # Get campaign and verify ownership
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=business_account.id
+        ).first_or_404()
+        
+        # Activate campaign (trigger will enforce rules)
+        campaign.status = 'active'
+        db.session.commit()
+        
+        flash('Campaign activated successfully', 'success')
+        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        
+    except IntegrityError as e:
+        db.session.rollback()
+        if 'parallel campaigns disabled' in str(e).lower():
+            flash('Cannot activate: Another campaign is already active. Please complete it first.', 'error')
+        else:
+            flash('Database error during activation', 'error')
+        return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+```
+
+**Entry Point 2: Background Job - Auto Campaign Lifecycle**
+```python
+# File: campaign_lifecycle_manager.py - auto_activate_campaigns()
+def auto_activate_campaigns():
+    """Background job to auto-activate ready campaigns on their start_date"""
+    today = date.today()
+    
+    # Find campaigns ready for activation
+    ready_campaigns = Campaign.query.filter(
+        Campaign.status == 'ready',
+        Campaign.start_date <= today
+    ).all()
+    
+    for campaign in ready_campaigns:
+        try:
+            # CRITICAL: Lock business account during validation
+            business_account = BusinessAccount.query.filter_by(
+                id=campaign.business_account_id
+            ).with_for_update().first()
+            
+            # Check if activation allowed
+            if not LicenseService.can_activate_campaign(business_account.id):
+                logger.warning(f"Cannot auto-activate campaign {campaign.id}: License limit reached")
+                continue
+            
+            # Activate (trigger will enforce parallel rules)
+            campaign.status = 'active'
+            db.session.commit()
+            logger.info(f"Auto-activated campaign {campaign.id}")
+            
+        except IntegrityError as e:
+            db.session.rollback()
+            logger.error(f"Failed to auto-activate campaign {campaign.id}: {e}")
+```
+
+**Entry Point 3: Admin Scripts**
+```python
+# File: admin_tools/force_activate_campaign.py
+def force_activate_campaign(campaign_id, override_limits=False):
+    """Admin script to manually activate a campaign"""
+    with app.app_context():
+        campaign = Campaign.query.get_or_404(campaign_id)
+        
+        if not override_limits:
+            # CRITICAL: Lock business account
+            business_account = BusinessAccount.query.filter_by(
+                id=campaign.business_account_id
+            ).with_for_update().first()
+            
+            if not LicenseService.can_activate_campaign(business_account.id):
+                raise ValueError("Cannot activate: License limits exceeded")
+        
+        # Activate (trigger will enforce parallel rules unless overridden)
+        campaign.status = 'active'
+        
+        try:
+            db.session.commit()
+            print(f"Campaign {campaign_id} activated successfully")
+        except IntegrityError as e:
+            db.session.rollback()
+            if override_limits:
+                # For emergency overrides, disable trigger temporarily
+                print("WARNING: Overriding parallel campaign restriction")
+                db.session.execute("SET session_replication_role = 'replica'")
+                campaign.status = 'active'
+                db.session.commit()
+                db.session.execute("SET session_replication_role = 'origin'")
+            else:
+                raise
+```
+
+**Entry Point 4: Test Utilities**
+```python
+# File: tests/fixtures.py - create_active_campaign()
+def create_active_campaign(business_account, name="Test Campaign"):
+    """Test helper to create an active campaign"""
+    # CRITICAL: Lock business account during test setup
     business_account = BusinessAccount.query.filter_by(
-        id=current_account.id
+        id=business_account.id
     ).with_for_update().first()
     
-    # Perform validation with locked row
-    if not LicenseService.can_activate_campaign(business_account.id):
-        db.session.rollback()
-        flash('Cannot activate campaign...', 'error')
-        return redirect(...)
+    campaign = Campaign(
+        name=name,
+        business_account_id=business_account.id,
+        start_date=date.today(),
+        end_date=date.today() + timedelta(days=30),
+        status='active'  # Will trigger enforcement
+    )
     
-    # Activate campaign
-    campaign.status = 'active'
-    db.session.commit()
+    db.session.add(campaign)
+    
+    try:
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        # If parallel disabled and active exists, this is expected
+        if not business_account.allow_parallel_campaigns:
+            raise ValueError("Cannot create second active campaign: parallel disabled")
+        raise
+    
+    return campaign
 ```
+
+**Entry Point Audit Checklist:**
+
+- [ ] `campaign_routes.py`: activate_campaign() - uses SELECT FOR UPDATE ✓
+- [ ] `campaign_lifecycle_manager.py`: auto_activate_campaigns() - uses SELECT FOR UPDATE ✓
+- [ ] `admin_tools/*.py`: All admin scripts reviewed and updated ✓
+- [ ] `tests/fixtures.py`: Test helpers handle trigger exceptions ✓
+- [ ] Future API endpoints: Must use SELECT FOR UPDATE (enforced by code review)
+
+**Code Review Requirement:** Any PR that activates campaigns MUST include transactional locking.
 
 ### 3. UI Integration
 
@@ -249,20 +526,204 @@ def toggle_parallel_campaigns(account_id):
 
 ### 4. Audit Trail Integration
 
-#### New Event Types
+#### Complete Audit Event Specification
+
+**CRITICAL:** Audit logging must use correct field names based on context (platform admin vs business user)
+
+#### Event Type 1: `parallel_campaign_setting_changed`
+
+**Triggered When:** Platform admin enables/disables parallel campaigns for a business account
+
+**Implementation:**
 ```python
-# Add to audit_service.py or models.py - AuditLog event types
-EVENT_TYPES = [
-    'parallel_campaign_setting_changed',      # Platform admin toggled setting
-    'campaign_activation_blocked_parallel',   # Activation blocked due to parallel setting
-    # ... existing event types
-]
+# File: business_auth_routes.py - toggle_parallel_campaigns()
+from audit_service import queue_audit_log
+
+# After changing the setting
+queue_audit_log(
+    business_account_id=business_account.id,
+    user_id=session.get('business_user_id'),  # Platform admin's user ID
+    event_type='parallel_campaign_setting_changed',
+    event_description=f'Parallel campaigns {"enabled" if enable else "disabled"} by platform admin',
+    metadata={
+        'old_value': old_value,  # Boolean: previous setting
+        'new_value': enable,      # Boolean: new setting
+        'changed_by_user_id': session.get('business_user_id'),
+        'changed_by_email': session.get('business_user_email'),
+        'changed_by_name': current_user.full_name if current_user else 'Unknown',
+        'is_platform_admin': True,
+        'account_name': business_account.business_name,
+        'account_id': business_account.id,
+        'timestamp': datetime.utcnow().isoformat(),
+        'ip_address': request.remote_addr,
+        'user_agent': request.headers.get('User-Agent', 'Unknown')
+    }
+)
 ```
 
-#### Logging Points
-1. **Setting Changed**: When platform admin toggles the setting
-2. **Activation Blocked**: When campaign activation is denied due to parallel setting
-3. **Setting Checked**: Optional debug logging during validation
+**Field Mappings:**
+- `business_account_id`: ID of the account whose setting changed
+- `user_id`: Platform admin's BusinessAccountUser.id
+- `metadata.changed_by_user_id`: Same as user_id (redundant but explicit)
+- `metadata.changed_by_email`: Platform admin's email
+- `metadata.old_value`: Previous allow_parallel_campaigns value
+- `metadata.new_value`: New allow_parallel_campaigns value
+
+**Database Schema:**
+```python
+# Existing AuditLog model supports this structure
+class AuditLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    business_account_id = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, nullable=True)  # Platform admin ID
+    event_type = db.Column(db.String(100), nullable=False)
+    event_description = db.Column(db.Text, nullable=True)
+    metadata = db.Column(db.JSON, nullable=True)  # Flexible structure
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+```
+
+#### Event Type 2: `campaign_activation_blocked_parallel`
+
+**Triggered When:** Campaign activation blocked due to parallel campaigns disabled
+
+**Implementation:**
+```python
+# File: license_service.py - can_activate_campaign()
+def can_activate_campaign(business_account_id: int) -> bool:
+    business_account = BusinessAccount.query.get(business_account_id)
+    
+    if not business_account.allow_parallel_campaigns:
+        active_count = Campaign.query.filter(
+            Campaign.business_account_id == business_account_id,
+            Campaign.status == 'active'
+        ).count()
+        
+        if active_count >= 1:
+            # Get existing active campaigns for logging
+            active_campaigns = Campaign.query.filter(
+                Campaign.business_account_id == business_account_id,
+                Campaign.status == 'active'
+            ).all()
+            
+            # Log the blocked activation attempt
+            # CRITICAL: Use has_request_context() to support background jobs, scripts, tests
+            from audit_service import queue_audit_log
+            from flask import has_request_context, session, request
+            
+            # Safely extract request context data with fallbacks
+            if has_request_context():
+                user_id = session.get('business_user_id')
+                user_email = session.get('business_user_email')
+                ip_address = request.remote_addr
+                user_agent = request.headers.get('User-Agent', 'Unknown')
+                context_type = 'web_request'
+            else:
+                # Background job, admin script, or test context
+                user_id = None
+                user_email = 'system_background_job'
+                ip_address = None
+                user_agent = 'Background Process'
+                context_type = 'background_job'
+            
+            queue_audit_log(
+                business_account_id=business_account_id,
+                user_id=user_id,  # None for background jobs
+                event_type='campaign_activation_blocked_parallel',
+                event_description=f'Campaign activation blocked: parallel campaigns disabled, {active_count} active campaign(s) exist',
+                metadata={
+                    'reason': 'parallel_campaigns_disabled',
+                    'allow_parallel_campaigns': False,
+                    'existing_active_count': active_count,
+                    'existing_campaign_ids': [c.id for c in active_campaigns],
+                    'existing_campaign_names': [c.name for c in active_campaigns],
+                    'attempted_by_user_id': user_id,
+                    'attempted_by_email': user_email,
+                    'context_type': context_type,  # 'web_request' or 'background_job'
+                    'timestamp': datetime.utcnow().isoformat(),
+                    'ip_address': ip_address,
+                    'user_agent': user_agent
+                }
+            )
+            
+            logger.warning(f"Business account {business_account_id} attempted to activate "
+                          f"second campaign while parallel campaigns disabled (context: {context_type})")
+            return False
+    
+    # Continue with normal validation...
+```
+
+**Field Mappings:**
+- `business_account_id`: Account attempting activation
+- `user_id`: Business user attempting to activate campaign
+- `metadata.existing_active_count`: Number of currently active campaigns
+- `metadata.existing_campaign_ids`: Array of active campaign IDs
+- `metadata.existing_campaign_names`: Array of active campaign names
+
+#### Audit Service Compatibility Check
+
+**Current `queue_audit_log()` Signature:**
+```python
+# File: audit_service.py
+def queue_audit_log(
+    business_account_id: int,
+    user_id: int = None,
+    event_type: str = None,
+    event_description: str = None,
+    metadata: dict = None
+):
+    """Queue an audit log entry for async processing"""
+    # Implementation uses PostgreSQL task queue
+```
+
+**Compatibility:** ✓ CONFIRMED - No changes needed to audit_service.py
+
+**Logging Points Summary:**
+
+1. **Setting Changed** (business_auth_routes.py):
+   - Location: `toggle_parallel_campaigns()` route
+   - Trigger: After successful database commit
+   - Async: Yes (via task queue)
+
+2. **Activation Blocked** (license_service.py):
+   - Location: `can_activate_campaign()` method
+   - Trigger: Before returning False
+   - Async: Yes (via task queue)
+
+3. **Database Trigger Fired** (PostgreSQL):
+   - Location: Campaign INSERT/UPDATE trigger
+   - Logged: Via application error handling
+   - Sample error message logged to application logs
+
+#### Audit Event Queries
+
+**Query: Get all parallel campaign setting changes**
+```sql
+SELECT 
+    al.created_at,
+    al.event_description,
+    ba.business_name,
+    al.metadata->>'changed_by_email' as changed_by,
+    al.metadata->>'old_value' as old_value,
+    al.metadata->>'new_value' as new_value
+FROM audit_logs al
+JOIN business_accounts ba ON al.business_account_id = ba.id
+WHERE al.event_type = 'parallel_campaign_setting_changed'
+ORDER BY al.created_at DESC;
+```
+
+**Query: Get all blocked activations**
+```sql
+SELECT 
+    al.created_at,
+    ba.business_name,
+    al.metadata->>'attempted_by_email' as attempted_by,
+    al.metadata->>'existing_active_count' as active_count,
+    al.metadata->>'existing_campaign_names' as blocked_campaigns
+FROM audit_logs al
+JOIN business_accounts ba ON al.business_account_id = ba.id
+WHERE al.event_type = 'campaign_activation_blocked_parallel'
+ORDER BY al.created_at DESC;
+```
 
 ---
 
@@ -469,22 +930,47 @@ EVENT_TYPES = [
 - Then: Cannot activate 5th campaign (license limit)
 - And: Clear error message about license limit
 
+**TC-6: Background Job Activation (Non-Request Context)**
+- Given: Background job auto-activating ready campaigns
+- When: Job attempts to activate campaign with parallel disabled and active exists
+- Then: Activation blocked correctly
+- And: Audit log created with context_type='background_job'
+- And: No Flask request context errors raised
+
+**TC-7: Admin Script Activation (Non-Request Context)**
+- Given: Admin script activating campaign via CLI
+- When: Script runs outside Flask request context
+- Then: Campaign activation succeeds/fails based on rules
+- And: Audit logging works without session/request proxies
+- And: No RuntimeError exceptions
+
+**TC-8: Test Fixture Creation (Non-Request Context)**
+- Given: Test setup creating active campaigns
+- When: Test runs without request context
+- Then: Database trigger enforces rules correctly
+- And: Test handles IntegrityError appropriately
+- And: No proxy access errors
+
 **Deliverables:**
 - Test suite: `test_parallel_campaigns.py`
+- Non-request context tests: `test_parallel_campaigns_background.py`
 - Integration test results
 - Performance test report
 - QA sign-off
 
 **Risks:**
 - Incomplete test coverage
-- Missed edge cases
+- Missed edge cases (especially non-request contexts)
 - Performance regressions
+- RuntimeError in background jobs
 
 **Mitigation:**
 - Code coverage requirement: >90%
 - Peer review of test cases
+- Explicit tests for all activation contexts
 - Load testing with production-like data
 - Performance baseline comparison
+- CI/CD tests run without Flask request context
 
 ---
 
