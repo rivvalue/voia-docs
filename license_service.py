@@ -156,6 +156,9 @@ class LicenseService:
         Check if business account can activate another campaign based on current license limits.
         Platform administrators have unlimited access.
         
+        Only counts campaigns that have reached 'active' or 'completed' status towards license limits.
+        Draft and ready campaigns do NOT count, allowing users to prepare multiple campaigns.
+        
         Replaces BusinessAccount.can_activate_campaign() with license_history table lookup.
         Maintains backward compatibility including trial account behavior.
         
@@ -168,7 +171,7 @@ class LicenseService:
         Backward Compatibility:
             - Uses same logic as original method (4 campaigns per license period)
             - Falls back to calendar year for trial accounts without license history
-            - Counts ALL campaigns that started in current period regardless of status
+            - Now counts only active/completed campaigns (not drafts) - Bug Fix Oct 2025
         """
         try:
             # Check if current user is a platform admin (unlimited access)
@@ -226,13 +229,16 @@ class LicenseService:
         """
         Count campaigns used in the current license period.
         
+        Only counts campaigns that have reached 'active' or 'completed' status.
+        Draft and ready campaigns do NOT count towards license limits.
+        
         Args:
             business_account_id: Business account ID to check
             period_start: Start of period to check (defaults to current license period)
             period_end: End of period to check (defaults to current license period)
             
         Returns:
-            int: Number of campaigns started in the period
+            int: Number of active/completed campaigns started in the period
         """
         try:
             # Get period dates if not provided
@@ -245,15 +251,17 @@ class LicenseService:
                     period_start = date(current_year, 1, 1) 
                     period_end = date(current_year, 12, 31)
             
-            # Count campaigns that started in this period (regardless of status)
+            # Count campaigns that started in this period AND have been active or completed
+            # Draft and ready campaigns do NOT count towards license limits
             campaigns_count = Campaign.query.filter(
                 Campaign.business_account_id == business_account_id,
                 Campaign.start_date >= period_start,
-                Campaign.start_date <= period_end
+                Campaign.start_date <= period_end,
+                Campaign.status.in_(['active', 'completed'])
             ).count()
             
-            logger.debug(f"Found {campaigns_count} campaigns for business_account_id {business_account_id} "
-                        f"in period {period_start} to {period_end}")
+            logger.debug(f"Found {campaigns_count} active/completed campaigns for business_account_id {business_account_id} "
+                        f"in period {period_start} to {period_end} (draft/ready campaigns excluded from count)")
             
             return campaigns_count
             
