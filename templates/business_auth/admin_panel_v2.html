@@ -473,18 +473,18 @@
             </div>
             <div class="settings-card-content" id="account-settings-content">
                 <div class="settings-card-body">
-                    <!-- {{ _('Email Configuration') }} -->
+                    <!-- {{ _('Email Delivery Configuration') }} -->
                     <div class="settings-item">
                         <div class="settings-item-header">
                             <div class="settings-item-icon">
                                 <i class="fas fa-envelope"></i>
                             </div>
                             <div class="settings-item-info">
-                                <h4 class="settings-item-title">{{ _('Email Configuration') }}</h4>
-                                <p class="settings-item-desc">{{ _('Configure SMTP settings for sending survey invitations') }}</p>
+                                <h4 class="settings-item-title">{{ _('Email Delivery Configuration') }}</h4>
+                                <p class="settings-item-desc">{{ _('Choose between VOÏA-managed or client-managed email delivery') }}</p>
                             </div>
                         </div>
-                        <a href="{{ url_for('business_auth.email_config') }}" class="btn btn-outline-primary btn-sm">
+                        <a href="{{ url_for('business_auth.email_delivery_config') }}" class="btn btn-outline-primary btn-sm">
                             <i class="fas fa-cog me-1"></i>Configure
                         </a>
                     </div>
