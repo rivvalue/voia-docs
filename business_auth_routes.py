@@ -3557,10 +3557,62 @@ def delete_platform_email_domain(config_id):
 
 # ==== EMAIL DELIVERY CONFIGURATION ROUTES (Business Account) ====
 
+def _get_email_delivery_data(business_account_id):
+    """Get email delivery configuration data (cached for 6 hours to avoid expensive SES API calls).
+    
+    Returns a dict with:
+        - email_config: EmailConfiguration object or None
+        - available_domains: List of verified domains for VOÏA-Managed mode
+    
+    This function caches only the DATA, not the rendered HTML, to preserve CSRF tokens.
+    """
+    from app import cache
+    from models import EmailConfiguration, BusinessAccount
+    
+    cache_key = f'email_delivery_data_{business_account_id}'
+    
+    # Try to get from cache
+    cached_data = cache.get(cache_key)
+    if cached_data:
+        logger.debug(f"Serving email delivery data from cache: {cache_key}")
+        return cached_data
+    
+    # Cache miss - fetch from database
+    logger.debug(f"Cache miss for email delivery data: {cache_key}")
+    
+    business_account = BusinessAccount.query.get(business_account_id)
+    if not business_account:
+        return None
+    
+    # Get existing email configuration if any
+    email_config = business_account.get_email_configuration()
+    
+    # Get available verified domains for this business account (for VOÏA-Managed mode)
+    available_domains = EmailConfiguration.query.filter_by(
+        business_account_id=business_account_id,
+        use_platform_email=True,
+        domain_verified=True
+    ).all()
+    
+    data = {
+        'email_config': email_config,
+        'available_domains': available_domains
+    }
+    
+    # Cache for 6 hours (21600 seconds)
+    cache.set(cache_key, data, timeout=21600)
+    logger.debug(f"Cached email delivery data: {cache_key}")
+    
+    return data
+
 @business_auth_bp.route('/admin/email-delivery-config')
 @require_business_auth
 def email_delivery_config():
-    """Email delivery configuration page - dual-mode: VOÏA-Managed or Client-Managed (Business Admin)"""
+    """Email delivery configuration page - dual-mode: VOÏA-Managed or Client-Managed (Business Admin)
+    
+    Data is cached for 6 hours to avoid expensive SES API calls on every page load.
+    Template is rendered fresh on each request to preserve CSRF tokens.
+    """
     try:
         current_account = get_current_business_account()
         if not current_account:
@@ -3568,20 +3620,17 @@ def email_delivery_config():
             flash(_('Business account context not found.'), 'error')
             return redirect(url_for('business_auth.admin_panel'))
         
-        # Get existing email configuration if any
-        email_config = current_account.get_email_configuration()
+        # Get cached data (includes email_config and available_domains)
+        data = _get_email_delivery_data(current_account.id)
+        if not data:
+            logger.error(f"Failed to retrieve email delivery data for account {current_account.id}")
+            flash(_('Failed to load email delivery configuration.'), 'error')
+            return redirect(url_for('business_auth.admin_panel'))
         
-        # Get available verified domains for this business account (for VOÏA-Managed mode)
-        from models import EmailConfiguration
-        available_domains = EmailConfiguration.query.filter_by(
-            business_account_id=current_account.id,
-            use_platform_email=True,
-            domain_verified=True
-        ).all()
-        
+        # Render template fresh on each request to preserve CSRF tokens
         return render_template('business_auth/email_delivery_config.html',
-                             email_config=email_config,
-                             available_domains=available_domains,
+                             email_config=data['email_config'],
+                             available_domains=data['available_domains'],
                              business_account=current_account)
     
     except Exception as e:
@@ -3593,7 +3642,12 @@ def email_delivery_config():
 @business_auth_bp.route('/admin/email-delivery-config/save', methods=['POST'])
 @require_business_auth
 def save_email_delivery_config():
-    """Save email delivery configuration (dual-mode support)"""
+    """Save email delivery configuration (dual-mode support)
+    
+    Invalidates cache after successful save to ensure fresh data on next load.
+    """
+    from app import cache
+    
     try:
         current_account = get_current_business_account()
         if not current_account:
@@ -3729,6 +3783,11 @@ def save_email_delivery_config():
         
         # Save to database
         db.session.commit()
+        
+        # Invalidate data cache to ensure fresh data on next load
+        cache_key = f'email_delivery_data_{current_account.id}'
+        cache.delete(cache_key)
+        logger.debug(f"Invalidated email delivery data cache: {cache_key}")
         
         # Audit log
         from audit_utils import queue_audit_log
