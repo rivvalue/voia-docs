@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-10-30 13:56+0000\n"
+"POT-Creation-Date: 2025-10-30 14:10+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -348,7 +348,8 @@ msgstr ""
 msgid "Participants"
 msgstr ""
 
-#: templates/base.html:77 templates/business_auth/license_overview.html:246
+#: templates/base.html:77 templates/business_auth/email_delivery_config.html:10
+#: templates/business_auth/license_overview.html:246
 #: templates/business_auth/onboarding_progress.html:10
 msgid "Settings"
 msgstr ""
@@ -2921,6 +2922,9 @@ msgstr ""
 
 #: templates/business_auth/admin_panel_v2.html:476
 #: templates/business_auth/admin_panel_v2.html:483
+#: templates/business_auth/email_delivery_config.html:3
+#: templates/business_auth/email_delivery_config.html:11
+#: templates/business_auth/email_delivery_config.html:21
 msgid "Email Delivery Configuration"
 msgstr ""
 
@@ -3361,6 +3365,7 @@ msgstr ""
 #: templates/business_auth/email_config.html:106
 #: templates/business_auth/email_config.html:110
 #: templates/business_auth/email_config.html:132
+#: templates/business_auth/email_delivery_config.html:268
 msgid "SMTP Server"
 msgstr ""
 
@@ -3635,6 +3640,249 @@ msgstr ""
 msgid "Network error: ' + error.message + '"
 msgstr ""
 
+#: templates/business_auth/email_delivery_config.html:23
+msgid "Choose how VOÏA sends emails on behalf of your business account"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:43
+msgid "VOÏA-Managed Email Delivery Active"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:44
+msgid "Using verified domain"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:44
+#: templates/business_auth/email_delivery_config.html:49
+msgid "Not configured"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:48
+msgid "Client-Managed Email Delivery Active"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:49
+msgid "Using your own SMTP server"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:54
+msgid "No email configuration found"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:55
+msgid "Please configure your email delivery method below."
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:63
+msgid "Email Delivery Modes"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:68
+msgid "VOÏA-Managed:"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:70
+msgid "Use platform's AWS SES credentials"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:71
+msgid "Send from your verified domain"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:72
+msgid "Requires DNS configuration (DKIM records)"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:73
+msgid "White-labeled email delivery"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:79
+msgid "Client-Managed:"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:81
+msgid "Use your own SMTP server"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:82
+msgid "Full control over credentials"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:83
+msgid "Supports Gmail, AWS SES, SendGrid, etc."
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:84
+msgid "No DNS configuration required"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:99
+msgid "Email Delivery Mode"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:112
+msgid "VOÏA-Managed Email Delivery"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:114
+msgid "Use platform's AWS SES with your verified domain"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:127
+msgid "Client-Managed Email Delivery"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:129
+msgid "Use your own SMTP server credentials"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:140
+msgid "VOÏA-Managed Configuration"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:146
+msgid "Select Verified Domain"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:152
+msgid "Select a verified domain"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:169
+msgid ""
+"Only verified domains are shown. Contact platform administrator to add "
+"new domains."
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:178
+msgid "DNS Configuration Required"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:180
+msgid "Add these DKIM records to your domain's DNS settings:"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:183
+msgid "Record 1:"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:184
+#: templates/business_auth/email_delivery_config.html:191
+#: templates/business_auth/email_delivery_config.html:198
+#: templates/campaigns/individual_response.html:316
+msgid "Name:"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:185
+#: templates/business_auth/email_delivery_config.html:192
+#: templates/business_auth/email_delivery_config.html:199
+msgid "Type:"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:186
+#: templates/business_auth/email_delivery_config.html:193
+#: templates/business_auth/email_delivery_config.html:200
+msgid "Value:"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:190
+msgid "Record 2:"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:197
+msgid "Record 3:"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:209
+#: templates/business_auth/email_delivery_config.html:352
+msgid "Sender Name"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:215
+#: templates/business_auth/email_delivery_config.html:358
+msgid "e.g., Customer Success Team"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:216
+msgid "This name will appear in the \"From\" field"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:221
+#: templates/business_auth/email_delivery_config.html:363
+msgid "Sender Email"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:227
+#: templates/business_auth/email_delivery_config.html:369
+msgid "e.g., noreply@yourdomain.com"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:228
+msgid "Must use the selected verified domain"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:234
+#: templates/business_auth/email_delivery_config.html:375
+msgid "Reply-To Email (Optional)"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:240
+#: templates/business_auth/email_delivery_config.html:381
+msgid "e.g., support@yourdomain.com"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:247
+msgid "No Verified Domains Available"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:250
+msgid ""
+"You don't have any verified domains yet. Please contact your platform "
+"administrator to add and verify your domain before using VOÏA-Managed "
+"email delivery."
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:262
+msgid "Client-Managed SMTP Configuration"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:274
+msgid "e.g., smtp.gmail.com or email-smtp.us-east-1.amazonaws.com"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:279
+msgid "SMTP Port"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:294
+msgid "SMTP Username"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:300
+msgid "SMTP username or access key"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:305
+msgid "SMTP Password"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:310
+msgid "Leave blank to keep existing password"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:312
+msgid "Password is encrypted and stored securely"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:327
+msgid "Use TLS (Recommended for port 587)"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:341
+msgid "Use SSL (Recommended for port 465)"
+msgstr ""
+
 #: templates/business_auth/email_delivery_config.html:394
 msgid "Test Email Configuration"
 msgstr ""
@@ -3653,6 +3901,18 @@ msgstr ""
 
 #: templates/business_auth/email_delivery_config.html:418
 msgid "Send Test Email"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:431
+#: templates/business_auth/manage_users.html:274
+#: templates/business_auth/manage_users.html:349
+#: templates/participants/campaign_participants.html:956
+#: templates/participants/list.html:632
+msgid "Cancel"
+msgstr ""
+
+#: templates/business_auth/email_delivery_config.html:434
+msgid "Save Configuration"
 msgstr ""
 
 #: templates/business_auth/forgot_password.html:3
@@ -3876,13 +4136,6 @@ msgstr ""
 
 #: templates/business_auth/manage_users.html:249
 msgid "user@company.com"
-msgstr ""
-
-#: templates/business_auth/manage_users.html:274
-#: templates/business_auth/manage_users.html:349
-#: templates/participants/campaign_participants.html:956
-#: templates/participants/list.html:632
-msgid "Cancel"
 msgstr ""
 
 #: templates/business_auth/manage_users.html:350
@@ -5162,10 +5415,6 @@ msgstr ""
 
 #: templates/campaigns/individual_response.html:297
 msgid "Search results highlighted for:"
-msgstr ""
-
-#: templates/campaigns/individual_response.html:316
-msgid "Name:"
 msgstr ""
 
 #: templates/campaigns/individual_response.html:394
