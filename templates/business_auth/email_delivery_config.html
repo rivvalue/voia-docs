@@ -1,0 +1,462 @@
+{% extends "base.html" %}
+
+{% block title %}Email Delivery Configuration - VOÏA{% endblock %}
+
+{% block page_class %}page-email-delivery-config{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Settings', 'url': url_for('business_auth.admin_panel')},
+    {'label': 'Email Delivery Configuration', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+
+<div class="settings-hub-container">
+    <!-- Header -->
+    <div class="settings-hub-header">
+        <div class="settings-hub-header-content">
+            <h1 class="settings-hub-title">
+                <i class="fas fa-envelope me-2" aria-hidden="true"></i>
+                Email Delivery Configuration
+            </h1>
+            <p class="settings-hub-subtitle">Choose how VOÏA sends emails on behalf of your business account</p>
+        </div>
+    </div>
+
+    <!-- Current Status -->
+    {% if email_config %}
+        {% if email_config.use_platform_email %}
+            <div class="email-config-status success" role="status" aria-live="polite">
+                <strong><i class="fas fa-check-circle me-2" aria-hidden="true"></i>VOÏA-Managed Email Delivery Active</strong>
+                Using verified domain: {{ email_config.sender_domain or 'Not configured' }}
+            </div>
+        {% else %}
+            <div class="email-config-status info" role="status" aria-live="polite">
+                <strong><i class="fas fa-info-circle me-2" aria-hidden="true"></i>Client-Managed Email Delivery Active</strong>
+                Using your own SMTP server: {{ email_config.smtp_server or 'Not configured' }}
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="email-config-status warning" role="alert" aria-live="polite">
+            <strong><i class="fas fa-exclamation-triangle me-2" aria-hidden="true"></i>No email configuration found</strong>
+            Please configure your email delivery method below.
+        </div>
+    {% endif %}
+
+    <!-- Info Box -->
+    <div class="settings-card mb-4">
+        <h3 class="settings-section-title">
+            <i class="fas fa-lightbulb text-primary me-2"></i>
+            Email Delivery Modes
+        </h3>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="alert alert-info mb-0">
+                    <p class="mb-2"><strong><i class="fas fa-cloud me-2"></i>VOÏA-Managed:</strong></p>
+                    <ul class="mb-0">
+                        <li>Use platform's AWS SES credentials</li>
+                        <li>Send from your verified domain</li>
+                        <li>Requires DNS configuration (DKIM records)</li>
+                        <li>White-labeled email delivery</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="alert alert-secondary mb-0">
+                    <p class="mb-2"><strong><i class="fas fa-server me-2"></i>Client-Managed:</strong></p>
+                    <ul class="mb-0">
+                        <li>Use your own SMTP server</li>
+                        <li>Full control over credentials</li>
+                        <li>Supports Gmail, AWS SES, SendGrid, etc.</li>
+                        <li>No DNS configuration required</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration Form -->
+    <form method="POST" action="{{ url_for('business_auth.save_email_delivery_config') }}" id="emailDeliveryForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        
+        <!-- Mode Selection -->
+        <div class="settings-card mb-4">
+            <h3 class="settings-section-title">
+                <i class="fas fa-toggle-on me-2"></i>
+                Email Delivery Mode
+            </h3>
+            
+            <div class="settings-form-group">
+                <div class="form-check mb-3">
+                    <input class="form-check-input" 
+                           type="radio" 
+                           name="email_mode" 
+                           id="mode_voïa_managed" 
+                           value="voïa_managed"
+                           {{ 'checked' if email_config and email_config.use_platform_email else '' }}
+                           onchange="toggleEmailMode()">
+                    <label class="form-check-label" for="mode_voïa_managed">
+                        <strong><i class="fas fa-cloud text-primary me-2"></i>VOÏA-Managed Email Delivery</strong>
+                        <br>
+                        <small class="text-muted">Use platform's AWS SES with your verified domain</small>
+                    </label>
+                </div>
+                
+                <div class="form-check">
+                    <input class="form-check-input" 
+                           type="radio" 
+                           name="email_mode" 
+                           id="mode_client_managed" 
+                           value="client_managed"
+                           {{ 'checked' if not email_config or not email_config.use_platform_email else '' }}
+                           onchange="toggleEmailMode()">
+                    <label class="form-check-label" for="mode_client_managed">
+                        <strong><i class="fas fa-server text-secondary me-2"></i>Client-Managed Email Delivery</strong>
+                        <br>
+                        <small class="text-muted">Use your own SMTP server credentials</small>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- VOÏA-Managed Configuration -->
+        <div id="voïa_managed_section" style="display: none;">
+            <div class="settings-card mb-4">
+                <h3 class="settings-section-title">
+                    <i class="fas fa-globe me-2"></i>
+                    VOÏA-Managed Configuration
+                </h3>
+                
+                {% if available_domains %}
+                    <div class="settings-form-group">
+                        <label class="settings-form-label" for="selected_domain_id">
+                            Select Verified Domain *
+                        </label>
+                        <select class="settings-form-control" 
+                                id="selected_domain_id" 
+                                name="selected_domain_id"
+                                onchange="updateDKIMDisplay()">
+                            <option value="">-- Select a verified domain --</option>
+                            {% for domain in available_domains %}
+                                <option value="{{ domain.id }}" 
+                                        data-domain="{{ domain.sender_domain }}"
+                                        data-dkim1-name="{{ domain.dkim_record_1_name or '' }}"
+                                        data-dkim1-value="{{ domain.dkim_record_1_value or '' }}"
+                                        data-dkim2-name="{{ domain.dkim_record_2_name or '' }}"
+                                        data-dkim2-value="{{ domain.dkim_record_2_value or '' }}"
+                                        data-dkim3-name="{{ domain.dkim_record_3_name or '' }}"
+                                        data-dkim3-value="{{ domain.dkim_record_3_value or '' }}"
+                                        {{ 'selected' if email_config and email_config.sender_domain == domain.sender_domain else '' }}>
+                                    {{ domain.sender_domain }}
+                                    <span class="badge bg-success ms-2">Verified</span>
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <small class="form-text text-muted">
+                            Only verified domains are shown. Contact platform administrator to add new domains.
+                        </small>
+                    </div>
+
+                    <!-- DKIM Records Display -->
+                    <div id="dkim_records_section" style="display: none;">
+                        <div class="alert alert-info">
+                            <h5 class="mb-3">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                DNS Configuration Required
+                            </h5>
+                            <p>Add these DKIM records to your domain's DNS settings:</p>
+                            
+                            <div id="dkim_record_1_display" class="mb-3" style="display: none;">
+                                <strong>Record 1:</strong><br>
+                                <small><strong>Name:</strong> <code id="dkim1_name_value"></code></small><br>
+                                <small><strong>Type:</strong> CNAME</small><br>
+                                <small><strong>Value:</strong> <code id="dkim1_value_value"></code></small>
+                            </div>
+                            
+                            <div id="dkim_record_2_display" class="mb-3" style="display: none;">
+                                <strong>Record 2:</strong><br>
+                                <small><strong>Name:</strong> <code id="dkim2_name_value"></code></small><br>
+                                <small><strong>Type:</strong> CNAME</small><br>
+                                <small><strong>Value:</strong> <code id="dkim2_value_value"></code></small>
+                            </div>
+                            
+                            <div id="dkim_record_3_display" class="mb-3" style="display: none;">
+                                <strong>Record 3:</strong><br>
+                                <small><strong>Name:</strong> <code id="dkim3_name_value"></code></small><br>
+                                <small><strong>Type:</strong> CNAME</small><br>
+                                <small><strong>Value:</strong> <code id="dkim3_value_value"></code></small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sender Information -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="settings-form-group">
+                                <label class="settings-form-label" for="voïa_sender_name">Sender Name *</label>
+                                <input type="text" 
+                                       class="settings-form-control" 
+                                       id="voïa_sender_name" 
+                                       name="sender_name" 
+                                       value="{{ email_config.sender_name if email_config else '' }}"
+                                       placeholder="e.g., Customer Success Team">
+                                <small class="form-text text-muted">This name will appear in the "From" field</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="settings-form-group">
+                                <label class="settings-form-label" for="voïa_sender_email">Sender Email *</label>
+                                <input type="email" 
+                                       class="settings-form-control" 
+                                       id="voïa_sender_email" 
+                                       name="sender_email" 
+                                       value="{{ email_config.sender_email if email_config else '' }}"
+                                       placeholder="e.g., noreply@yourdomain.com">
+                                <small class="form-text text-muted">Must use the selected verified domain</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-form-group">
+                        <label class="settings-form-label" for="voïa_reply_to_email">Reply-To Email (Optional)</label>
+                        <input type="email" 
+                               class="settings-form-control" 
+                               id="voïa_reply_to_email" 
+                               name="reply_to_email" 
+                               value="{{ email_config.reply_to_email if email_config else '' }}"
+                               placeholder="e.g., support@yourdomain.com">
+                    </div>
+
+                {% else %}
+                    <div class="alert alert-warning">
+                        <h5 class="mb-2">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            No Verified Domains Available
+                        </h5>
+                        <p class="mb-0">
+                            You don't have any verified domains yet. Please contact your platform administrator to add and verify your domain before using VOÏA-Managed email delivery.
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Client-Managed Configuration -->
+        <div id="client_managed_section" style="display: none;">
+            <div class="settings-card mb-4">
+                <h3 class="settings-section-title">
+                    <i class="fas fa-server me-2"></i>
+                    Client-Managed SMTP Configuration
+                </h3>
+                
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="settings-form-group">
+                            <label class="settings-form-label" for="smtp_server">SMTP Server *</label>
+                            <input type="text" 
+                                   class="settings-form-control" 
+                                   id="smtp_server" 
+                                   name="smtp_server" 
+                                   value="{{ email_config.smtp_server if email_config and not email_config.use_platform_email else '' }}"
+                                   placeholder="e.g., smtp.gmail.com or email-smtp.us-east-1.amazonaws.com">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="settings-form-group">
+                            <label class="settings-form-label" for="smtp_port">SMTP Port *</label>
+                            <input type="number" 
+                                   class="settings-form-control" 
+                                   id="smtp_port" 
+                                   name="smtp_port" 
+                                   value="{{ email_config.smtp_port if email_config and not email_config.use_platform_email else '587' }}"
+                                   min="1" 
+                                   max="65535">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="settings-form-group">
+                            <label class="settings-form-label" for="smtp_username">SMTP Username</label>
+                            <input type="text" 
+                                   class="settings-form-control" 
+                                   id="smtp_username" 
+                                   name="smtp_username" 
+                                   value="{{ email_config.smtp_username if email_config and not email_config.use_platform_email else '' }}"
+                                   placeholder="SMTP username or access key">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="settings-form-group">
+                            <label class="settings-form-label" for="smtp_password">SMTP Password</label>
+                            <input type="password" 
+                                   class="settings-form-control" 
+                                   id="smtp_password" 
+                                   name="smtp_password" 
+                                   placeholder="Leave blank to keep existing password"
+                                   autocomplete="new-password">
+                            <small class="form-text text-muted">Password is encrypted and stored securely</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="settings-form-group">
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="checkbox" 
+                                       id="use_tls" 
+                                       name="use_tls"
+                                       {{ 'checked' if not email_config or email_config.use_tls else '' }}>
+                                <label class="form-check-label" for="use_tls">
+                                    Use TLS (Recommended for port 587)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="settings-form-group">
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="checkbox" 
+                                       id="use_ssl" 
+                                       name="use_ssl"
+                                       {{ 'checked' if email_config and email_config.use_ssl else '' }}>
+                                <label class="form-check-label" for="use_ssl">
+                                    Use SSL (Recommended for port 465)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sender Information for Client-Managed -->
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="settings-form-group">
+                            <label class="settings-form-label" for="client_sender_name">Sender Name *</label>
+                            <input type="text" 
+                                   class="settings-form-control" 
+                                   id="client_sender_name" 
+                                   name="sender_name" 
+                                   value="{{ email_config.sender_name if email_config and not email_config.use_platform_email else '' }}"
+                                   placeholder="e.g., Customer Success Team">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="settings-form-group">
+                            <label class="settings-form-label" for="client_sender_email">Sender Email *</label>
+                            <input type="email" 
+                                   class="settings-form-control" 
+                                   id="client_sender_email" 
+                                   name="sender_email" 
+                                   value="{{ email_config.sender_email if email_config and not email_config.use_platform_email else '' }}"
+                                   placeholder="e.g., noreply@yourdomain.com">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-form-group">
+                    <label class="settings-form-label" for="client_reply_to_email">Reply-To Email (Optional)</label>
+                    <input type="email" 
+                           class="settings-form-control" 
+                           id="client_reply_to_email" 
+                           name="reply_to_email" 
+                           value="{{ email_config.reply_to_email if email_config and not email_config.use_platform_email else '' }}"
+                           placeholder="e.g., support@yourdomain.com">
+                </div>
+
+                <input type="hidden" name="email_provider" value="smtp">
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="settings-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{{ url_for('business_auth.admin_panel') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Cancel
+                </a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-save me-2"></i>Save Configuration
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+// Initialize mode display on page load
+document.addEventListener('DOMContentLoaded', function() {
+    toggleEmailMode();
+});
+
+function toggleEmailMode() {
+    const voïaManagedRadio = document.getElementById('mode_voïa_managed');
+    const voïaManagedSection = document.getElementById('voïa_managed_section');
+    const clientManagedSection = document.getElementById('client_managed_section');
+    
+    if (voïaManagedRadio.checked) {
+        voïaManagedSection.style.display = 'block';
+        clientManagedSection.style.display = 'none';
+        
+        // Update DKIM display if domain is already selected
+        updateDKIMDisplay();
+    } else {
+        voïaManagedSection.style.display = 'none';
+        clientManagedSection.style.display = 'block';
+    }
+}
+
+function updateDKIMDisplay() {
+    const domainSelect = document.getElementById('selected_domain_id');
+    const dkimSection = document.getElementById('dkim_records_section');
+    
+    if (!domainSelect || !dkimSection) return;
+    
+    const selectedOption = domainSelect.options[domainSelect.selectedIndex];
+    
+    if (selectedOption && selectedOption.value) {
+        // Show DKIM section
+        dkimSection.style.display = 'block';
+        
+        // Update DKIM record 1
+        const dkim1Name = selectedOption.getAttribute('data-dkim1-name');
+        const dkim1Value = selectedOption.getAttribute('data-dkim1-value');
+        if (dkim1Name && dkim1Value) {
+            document.getElementById('dkim_record_1_display').style.display = 'block';
+            document.getElementById('dkim1_name_value').textContent = dkim1Name;
+            document.getElementById('dkim1_value_value').textContent = dkim1Value;
+        } else {
+            document.getElementById('dkim_record_1_display').style.display = 'none';
+        }
+        
+        // Update DKIM record 2
+        const dkim2Name = selectedOption.getAttribute('data-dkim2-name');
+        const dkim2Value = selectedOption.getAttribute('data-dkim2-value');
+        if (dkim2Name && dkim2Value) {
+            document.getElementById('dkim_record_2_display').style.display = 'block';
+            document.getElementById('dkim2_name_value').textContent = dkim2Name;
+            document.getElementById('dkim2_value_value').textContent = dkim2Value;
+        } else {
+            document.getElementById('dkim_record_2_display').style.display = 'none';
+        }
+        
+        // Update DKIM record 3
+        const dkim3Name = selectedOption.getAttribute('data-dkim3-name');
+        const dkim3Value = selectedOption.getAttribute('data-dkim3-value');
+        if (dkim3Name && dkim3Value) {
+            document.getElementById('dkim_record_3_display').style.display = 'block';
+            document.getElementById('dkim3_name_value').textContent = dkim3Name;
+            document.getElementById('dkim3_value_value').textContent = dkim3Value;
+        } else {
+            document.getElementById('dkim_record_3_display').style.display = 'none';
+        }
+    } else {
+        dkimSection.style.display = 'none';
+    }
+}
+</script>
+{% endblock %}
