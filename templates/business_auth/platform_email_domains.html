@@ -1,0 +1,592 @@
+{% extends "base.html" %}
+
+{% block title %}Platform Email Domains - VOÏA{% endblock %}
+
+{% block page_class %}page-platform-email-domains{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Settings', 'url': url_for('business_auth.admin_panel')},
+    {'label': 'Platform Email Settings', 'url': url_for('business_auth.platform_email_settings')},
+    {'label': 'Domain Management', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+<div class="settings-hub-container">
+    <!-- Header -->
+    <div class="settings-hub-header">
+        <div class="settings-hub-header-content">
+            <h1 class="settings-hub-title">
+                <i class="fas fa-globe me-2" aria-hidden="true"></i>
+                Platform Email Domains
+            </h1>
+            <p class="settings-hub-subtitle">Manage verified domains for VOÏA-managed email delivery across all business accounts</p>
+        </div>
+        <div class="settings-hub-actions">
+            <button type="button" class="settings-action-btn" onclick="showAddDomainModal()" aria-label="Add New Domain">
+                <i class="fas fa-plus me-2"></i>Add Domain
+            </button>
+        </div>
+    </div>
+
+    <!-- Platform Admin Badge -->
+    <div class="mb-4">
+        <span class="badge bg-danger" style="font-size: 14px; padding: 8px 16px;">
+            <i class="fas fa-shield-alt me-2"></i>Platform Administrator Only
+        </span>
+    </div>
+
+    <!-- Current Status -->
+    {% if domains %}
+        <div class="email-config-status success" role="status" aria-live="polite">
+            <strong><i class="fas fa-check-circle me-2" aria-hidden="true"></i>{{ domains|length }} domain(s) configured for VOÏA-managed email</strong>
+            Verified: {{ domains|selectattr('domain_verified')|list|length }} | Pending: {{ domains|rejectattr('domain_verified')|list|length }}
+        </div>
+    {% else %}
+        <div class="email-config-status warning" role="alert" aria-live="polite">
+            <strong><i class="fas fa-info-circle me-2" aria-hidden="true"></i>No domains configured yet</strong>
+            Click "Add Domain" to configure the first verified domain for a business account.
+        </div>
+    {% endif %}
+
+    <!-- Info Box -->
+    <div class="settings-card mb-4">
+        <h3 class="settings-section-title">
+            <i class="fas fa-info-circle text-primary me-2"></i>
+            About Domain Management
+        </h3>
+        <div class="alert alert-info mb-0">
+            <p class="mb-2"><strong>Manual Domain Verification Workflow:</strong></p>
+            <ol class="mb-0">
+                <li><strong>Add domain to AWS SES Console</strong> - Log into AWS Console and add the business account's domain</li>
+                <li><strong>Copy DKIM records</strong> - AWS will generate 3 DKIM records (name/value pairs)</li>
+                <li><strong>Enter DKIM records here</strong> - Use this page to store the DKIM records for each business account</li>
+                <li><strong>Share with business account</strong> - Provide DKIM records to the business account for their DNS configuration</li>
+                <li><strong>Verify DNS</strong> - After business account configures DNS, verify in AWS Console</li>
+                <li><strong>Mark as verified</strong> - Once verified in AWS, update the status here</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Domains List -->
+    <div class="settings-card">
+        <h3 class="settings-section-title">
+            <i class="fas fa-list me-2"></i>
+            Configured Domains
+        </h3>
+        
+        {% if domains %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Domain</th>
+                        <th scope="col">Business Account</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Verified Date</th>
+                        <th scope="col">DKIM Records</th>
+                        <th scope="col" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for domain in domains %}
+                    <tr>
+                        <td>
+                            <strong>{{ domain.sender_domain or 'N/A' }}</strong>
+                        </td>
+                        <td>
+                            {{ domain.business_account.name if domain.business_account else 'Unknown' }}
+                        </td>
+                        <td>
+                            {% if domain.domain_verified %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle me-1"></i>Verified
+                                </span>
+                            {% else %}
+                                <span class="badge bg-warning">
+                                    <i class="fas fa-clock me-1"></i>Pending
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ domain.domain_verified_at.strftime('%Y-%m-%d') if domain.domain_verified_at else 'Not verified' }}
+                        </td>
+                        <td>
+                            {% set dkim_count = [domain.dkim_record_1_name, domain.dkim_record_2_name, domain.dkim_record_3_name]|select|list|length %}
+                            <span class="badge bg-secondary">{{ dkim_count }}/3 records</span>
+                        </td>
+                        <td class="text-end">
+                            <button type="button" 
+                                    class="btn btn-sm btn-outline-primary me-1" 
+                                    onclick="showEditDomainModal({{ domain.id }})"
+                                    aria-label="Edit domain">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button type="button" 
+                                    class="btn btn-sm btn-outline-danger" 
+                                    onclick="confirmDeleteDomain({{ domain.id }}, '{{ domain.sender_domain }}')"
+                                    aria-label="Delete domain">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+            <p class="text-muted">No domains configured. Click "Add Domain" to get started.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add Domain Modal -->
+<div class="modal fade" id="addDomainModal" tabindex="-1" aria-labelledby="addDomainModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="POST" action="{{ url_for('business_auth.add_platform_email_domain') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="addDomainModalLabel">
+                        <i class="fas fa-plus-circle me-2"></i>Add New Domain
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <div class="modal-body">
+                    <!-- Business Account Selection -->
+                    <div class="mb-3">
+                        <label for="business_account_id" class="form-label">Business Account *</label>
+                        <select class="form-select" id="business_account_id" name="business_account_id" required>
+                            <option value="">Select a business account</option>
+                            {% for account in business_accounts %}
+                            <option value="{{ account.id }}">{{ account.name }} ({{ account.account_type }})</option>
+                            {% endfor %}
+                        </select>
+                        <small class="form-text text-muted">Select the business account this domain belongs to</small>
+                    </div>
+
+                    <!-- Domain Name -->
+                    <div class="mb-3">
+                        <label for="sender_domain" class="form-label">Domain Name *</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="sender_domain" 
+                               name="sender_domain" 
+                               placeholder="example.com"
+                               pattern="[a-z0-9.-]+"
+                               required>
+                        <small class="form-text text-muted">Enter the domain name (lowercase, no protocol)</small>
+                    </div>
+
+                    <hr>
+
+                    <!-- DKIM Records Section -->
+                    <h6 class="mb-3"><i class="fas fa-key me-2"></i>DKIM Records (from AWS SES Console)</h6>
+                    <p class="text-muted small mb-3">Copy these values from AWS SES Console after adding the domain. AWS generates 3 DKIM records for domain verification.</p>
+
+                    <!-- DKIM Record 1 -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <strong>DKIM Record 1</strong>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-2">
+                                <label for="dkim_record_1_name" class="form-label">Record Name</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="dkim_record_1_name" 
+                                       name="dkim_record_1_name" 
+                                       placeholder="abc123._domainkey.example.com">
+                            </div>
+                            <div>
+                                <label for="dkim_record_1_value" class="form-label">Record Value</label>
+                                <textarea class="form-control" 
+                                          id="dkim_record_1_value" 
+                                          name="dkim_record_1_value" 
+                                          rows="2"
+                                          placeholder="p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQ..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DKIM Record 2 -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <strong>DKIM Record 2</strong>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-2">
+                                <label for="dkim_record_2_name" class="form-label">Record Name</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="dkim_record_2_name" 
+                                       name="dkim_record_2_name" 
+                                       placeholder="def456._domainkey.example.com">
+                            </div>
+                            <div>
+                                <label for="dkim_record_2_value" class="form-label">Record Value</label>
+                                <textarea class="form-control" 
+                                          id="dkim_record_2_value" 
+                                          name="dkim_record_2_value" 
+                                          rows="2"
+                                          placeholder="p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQ..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DKIM Record 3 -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-light">
+                            <strong>DKIM Record 3</strong>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-2">
+                                <label for="dkim_record_3_name" class="form-label">Record Name</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="dkim_record_3_name" 
+                                       name="dkim_record_3_name" 
+                                       placeholder="ghi789._domainkey.example.com">
+                            </div>
+                            <div>
+                                <label for="dkim_record_3_value" class="form-label">Record Value</label>
+                                <textarea class="form-control" 
+                                          id="dkim_record_3_value" 
+                                          name="dkim_record_3_value" 
+                                          rows="2"
+                                          placeholder="p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQ..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Verification Status -->
+                    <div class="form-check">
+                        <input class="form-check-input" 
+                               type="checkbox" 
+                               id="domain_verified_add" 
+                               name="domain_verified">
+                        <label class="form-check-label" for="domain_verified_add">
+                            <strong>Mark as Verified</strong>
+                            <small class="text-muted d-block">Only check this after verifying the domain in AWS SES Console</small>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Add Domain
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Domain Modal (dynamically populated) -->
+<div class="modal fade" id="editDomainModal" tabindex="-1" aria-labelledby="editDomainModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div id="editDomainForm"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteDomainModal" tabindex="-1" aria-labelledby="deleteDomainModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteDomainModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to remove domain <strong id="deleteDomainName"></strong>?</p>
+                <p class="text-danger mb-0"><i class="fas fa-info-circle me-2"></i>This will revert the email configuration back to client-managed mode.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form method="POST" id="deleteDomainForm" style="display:inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>Delete Domain
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Show Add Domain Modal
+function showAddDomainModal() {
+    const modal = new bootstrap.Modal(document.getElementById('addDomainModal'));
+    modal.show();
+}
+
+// Show Edit Domain Modal
+function showEditDomainModal(configId) {
+    // Find domain data from the table
+    const domains = {{ domains|tojson|safe }};
+    const domain = domains.find(d => d.id === configId);
+    
+    if (!domain) {
+        alert('Domain not found');
+        return;
+    }
+    
+    // Build edit form HTML
+    const formHtml = `
+        <form method="POST" action="/business/admin/platform-email-domains/edit/${configId}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-edit me-2"></i>Edit Domain: ${domain.sender_domain || 'N/A'}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <strong>Business Account:</strong> ${domain.business_account?.name || 'Unknown'}
+                </div>
+
+                <h6 class="mb-3"><i class="fas fa-key me-2"></i>DKIM Records</h6>
+
+                <!-- DKIM Record 1 -->
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <strong>DKIM Record 1</strong>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <label class="form-label">Record Name</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="dkim_record_1_name" 
+                                   value="${domain.dkim_record_1_name || ''}">
+                        </div>
+                        <div>
+                            <label class="form-label">Record Value</label>
+                            <textarea class="form-control" 
+                                      name="dkim_record_1_value" 
+                                      rows="2">${domain.dkim_record_1_value || ''}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DKIM Record 2 -->
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <strong>DKIM Record 2</strong>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <label class="form-label">Record Name</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="dkim_record_2_name" 
+                                   value="${domain.dkim_record_2_name || ''}">
+                        </div>
+                        <div>
+                            <label class="form-label">Record Value</label>
+                            <textarea class="form-control" 
+                                      name="dkim_record_2_value" 
+                                      rows="2">${domain.dkim_record_2_value || ''}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DKIM Record 3 -->
+                <div class="card mb-3">
+                    <div class="card-header bg-light">
+                        <strong>DKIM Record 3</strong>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <label class="form-label">Record Name</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   name="dkim_record_3_name" 
+                                   value="${domain.dkim_record_3_name || ''}">
+                        </div>
+                        <div>
+                            <label class="form-label">Record Value</label>
+                            <textarea class="form-control" 
+                                      name="dkim_record_3_value" 
+                                      rows="2">${domain.dkim_record_3_value || ''}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <!-- Verification Status -->
+                <div class="form-check">
+                    <input class="form-check-input" 
+                           type="checkbox" 
+                           name="domain_verified"
+                           ${domain.domain_verified ? 'checked' : ''}>
+                    <label class="form-check-label">
+                        <strong>Domain Verified</strong>
+                        <small class="text-muted d-block">Check this after verifying in AWS SES Console</small>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Update Domain
+                </button>
+            </div>
+        </form>
+    `;
+    
+    document.getElementById('editDomainForm').innerHTML = formHtml;
+    const modal = new bootstrap.Modal(document.getElementById('editDomainModal'));
+    modal.show();
+}
+
+// Confirm Delete Domain
+function confirmDeleteDomain(configId, domainName) {
+    document.getElementById('deleteDomainName').textContent = domainName;
+    document.getElementById('deleteDomainForm').action = `/business/admin/platform-email-domains/delete/${configId}`;
+    
+    const modal = new bootstrap.Modal(document.getElementById('deleteDomainModal'));
+    modal.show();
+}
+</script>
+
+<style>
+/* Settings Hub v2 Styles */
+.settings-hub-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--spacing-xl);
+}
+
+.settings-hub-header {
+    background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%);
+    padding: var(--spacing-2xl);
+    margin: calc(-1 * var(--spacing-xl)) calc(-1 * var(--spacing-xl)) var(--spacing-2xl);
+    border-radius: 0;
+    color: var(--primary-white);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+}
+
+.settings-hub-header-content {
+    flex: 1;
+    min-width: 250px;
+}
+
+.settings-hub-title {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-3xl);
+    font-weight: 700;
+    margin: 0 0 var(--spacing-sm) 0;
+    color: var(--primary-white);
+}
+
+.settings-hub-subtitle {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+    margin: 0;
+    opacity: 0.9;
+    color: var(--primary-white);
+}
+
+.settings-hub-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+}
+
+.settings-action-btn {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--primary-white);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.settings-action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+.settings-card {
+    background: var(--primary-white);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.settings-section-title {
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    margin-bottom: var(--spacing-lg);
+    color: var(--primary-dark);
+}
+
+.email-config-status {
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-xl);
+    border-left: 4px solid;
+}
+
+.email-config-status.success {
+    background-color: #d4edda;
+    border-color: #28a745;
+    color: #155724;
+}
+
+.email-config-status.warning {
+    background-color: #fff3cd;
+    border-color: #ffc107;
+    color: #856404;
+}
+
+.email-config-status.error {
+    background-color: #f8d7da;
+    border-color: #dc3545;
+    color: #721c24;
+}
+
+@media (max-width: 767px) {
+    .settings-hub-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .settings-hub-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+</style>
+{% endblock %}
