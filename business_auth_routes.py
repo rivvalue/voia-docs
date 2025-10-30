@@ -3293,6 +3293,264 @@ def test_platform_email_settings():
         }), 500
 
 
+# ==== PLATFORM EMAIL DOMAIN MANAGEMENT ROUTES ====
+
+@business_auth_bp.route('/admin/platform-email-domains')
+@require_business_auth
+@require_platform_admin
+def platform_email_domains():
+    """Platform-wide domain management page (Platform Admin Only)"""
+    try:
+        current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+        
+        # Get all verified domains across all business accounts
+        from models import EmailConfiguration, BusinessAccount
+        
+        # Get all email configurations that use platform email (VOÏA-managed)
+        domains = EmailConfiguration.query.filter_by(use_platform_email=True).all()
+        
+        # Get all business accounts for dropdown
+        business_accounts = BusinessAccount.query.filter_by(status='active').order_by(BusinessAccount.name).all()
+        
+        return render_template('business_auth/platform_email_domains.html',
+                             domains=domains,
+                             business_accounts=business_accounts,
+                             current_user=current_user)
+    
+    except Exception as e:
+        logger.error(f"Error loading platform email domains: {e}")
+        flash('Failed to load platform email domains.', 'error')
+        return redirect(url_for('business_auth.platform_email_settings'))
+
+
+@business_auth_bp.route('/admin/platform-email-domains/add', methods=['POST'])
+@require_business_auth
+@require_platform_admin
+def add_platform_email_domain():
+    """Add a new verified domain (Platform Admin Only)"""
+    try:
+        current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+        if not current_user:
+            flash('User session invalid.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get form data
+        business_account_id = request.form.get('business_account_id')
+        sender_domain = request.form.get('sender_domain', '').strip().lower()
+        domain_verified = request.form.get('domain_verified') == 'on'
+        
+        # DKIM records
+        dkim_record_1_name = request.form.get('dkim_record_1_name', '').strip()
+        dkim_record_1_value = request.form.get('dkim_record_1_value', '').strip()
+        dkim_record_2_name = request.form.get('dkim_record_2_name', '').strip()
+        dkim_record_2_value = request.form.get('dkim_record_2_value', '').strip()
+        dkim_record_3_name = request.form.get('dkim_record_3_name', '').strip()
+        dkim_record_3_value = request.form.get('dkim_record_3_value', '').strip()
+        
+        # Validate required fields
+        if not business_account_id or not sender_domain:
+            flash('Business Account and Domain Name are required.', 'error')
+            return redirect(url_for('business_auth.platform_email_domains'))
+        
+        # Validate business account exists
+        from models import BusinessAccount
+        business_account = BusinessAccount.query.get(business_account_id)
+        if not business_account:
+            flash('Invalid business account selected.', 'error')
+            return redirect(url_for('business_auth.platform_email_domains'))
+        
+        # Check if domain already exists for this business account
+        from models import EmailConfiguration
+        existing_domain = EmailConfiguration.query.filter_by(
+            business_account_id=business_account_id,
+            sender_domain=sender_domain,
+            use_platform_email=True
+        ).first()
+        
+        if existing_domain:
+            flash(f'Domain {sender_domain} already exists for {business_account.name}.', 'error')
+            return redirect(url_for('business_auth.platform_email_domains'))
+        
+        # Create new email configuration for this domain
+        email_config = EmailConfiguration.query.filter_by(business_account_id=business_account_id).first()
+        
+        if not email_config:
+            # Create new email configuration
+            email_config = EmailConfiguration(business_account_id=business_account_id)
+            db.session.add(email_config)
+        
+        # Update with platform email settings
+        email_config.use_platform_email = True
+        email_config.sender_domain = sender_domain
+        email_config.domain_verified = domain_verified
+        email_config.domain_verified_at = datetime.utcnow() if domain_verified else None
+        
+        # Set DKIM records
+        email_config.dkim_record_1_name = dkim_record_1_name if dkim_record_1_name else None
+        email_config.dkim_record_1_value = dkim_record_1_value if dkim_record_1_value else None
+        email_config.dkim_record_2_name = dkim_record_2_name if dkim_record_2_name else None
+        email_config.dkim_record_2_value = dkim_record_2_value if dkim_record_2_value else None
+        email_config.dkim_record_3_name = dkim_record_3_name if dkim_record_3_name else None
+        email_config.dkim_record_3_value = dkim_record_3_value if dkim_record_3_value else None
+        
+        db.session.commit()
+        
+        # Audit log
+        queue_audit_log(
+            business_account_id=business_account_id,
+            action_type='platform_email_domain_add',
+            resource_type='email_configuration',
+            resource_id=email_config.id,
+            user_name=current_user.get_full_name(),
+            details={
+                'domain': sender_domain,
+                'verified': domain_verified,
+                'business_account': business_account.name
+            }
+        )
+        
+        flash(f'Domain {sender_domain} added successfully for {business_account.name}.', 'success')
+        return redirect(url_for('business_auth.platform_email_domains'))
+    
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error adding platform email domain: {e}")
+        flash(f'Failed to add domain: {str(e)}', 'error')
+        return redirect(url_for('business_auth.platform_email_domains'))
+
+
+@business_auth_bp.route('/admin/platform-email-domains/edit/<int:config_id>', methods=['POST'])
+@require_business_auth
+@require_platform_admin
+def edit_platform_email_domain(config_id):
+    """Edit an existing verified domain (Platform Admin Only)"""
+    try:
+        current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+        if not current_user:
+            flash('User session invalid.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get email configuration
+        from models import EmailConfiguration
+        email_config = EmailConfiguration.query.get(config_id)
+        
+        if not email_config:
+            flash('Domain configuration not found.', 'error')
+            return redirect(url_for('business_auth.platform_email_domains'))
+        
+        # Get form data
+        domain_verified = request.form.get('domain_verified') == 'on'
+        
+        # DKIM records
+        dkim_record_1_name = request.form.get('dkim_record_1_name', '').strip()
+        dkim_record_1_value = request.form.get('dkim_record_1_value', '').strip()
+        dkim_record_2_name = request.form.get('dkim_record_2_name', '').strip()
+        dkim_record_2_value = request.form.get('dkim_record_2_value', '').strip()
+        dkim_record_3_name = request.form.get('dkim_record_3_name', '').strip()
+        dkim_record_3_value = request.form.get('dkim_record_3_value', '').strip()
+        
+        # Update domain verification status
+        was_verified = email_config.domain_verified
+        email_config.domain_verified = domain_verified
+        
+        if domain_verified and not was_verified:
+            email_config.domain_verified_at = datetime.utcnow()
+        elif not domain_verified and was_verified:
+            email_config.domain_verified_at = None
+        
+        # Update DKIM records
+        email_config.dkim_record_1_name = dkim_record_1_name if dkim_record_1_name else None
+        email_config.dkim_record_1_value = dkim_record_1_value if dkim_record_1_value else None
+        email_config.dkim_record_2_name = dkim_record_2_name if dkim_record_2_name else None
+        email_config.dkim_record_2_value = dkim_record_2_value if dkim_record_2_value else None
+        email_config.dkim_record_3_name = dkim_record_3_name if dkim_record_3_name else None
+        email_config.dkim_record_3_value = dkim_record_3_value if dkim_record_3_value else None
+        
+        db.session.commit()
+        
+        # Audit log
+        queue_audit_log(
+            business_account_id=email_config.business_account_id,
+            action_type='platform_email_domain_update',
+            resource_type='email_configuration',
+            resource_id=email_config.id,
+            user_name=current_user.get_full_name(),
+            details={
+                'domain': email_config.sender_domain,
+                'verified': domain_verified,
+                'verification_changed': was_verified != domain_verified
+            }
+        )
+        
+        flash(f'Domain {email_config.sender_domain} updated successfully.', 'success')
+        return redirect(url_for('business_auth.platform_email_domains'))
+    
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error editing platform email domain: {e}")
+        flash(f'Failed to update domain: {str(e)}', 'error')
+        return redirect(url_for('business_auth.platform_email_domains'))
+
+
+@business_auth_bp.route('/admin/platform-email-domains/delete/<int:config_id>', methods=['POST'])
+@require_business_auth
+@require_platform_admin
+def delete_platform_email_domain(config_id):
+    """Delete a verified domain (Platform Admin Only)"""
+    try:
+        current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+        if not current_user:
+            flash('User session invalid.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get email configuration
+        from models import EmailConfiguration
+        email_config = EmailConfiguration.query.get(config_id)
+        
+        if not email_config:
+            flash('Domain configuration not found.', 'error')
+            return redirect(url_for('business_auth.platform_email_domains'))
+        
+        domain_name = email_config.sender_domain
+        business_account_id = email_config.business_account_id
+        
+        # Safety check: Only allow deletion if not actively used
+        # For now, we'll allow deletion and just reset to client-managed mode
+        email_config.use_platform_email = False
+        email_config.sender_domain = None
+        email_config.domain_verified = False
+        email_config.domain_verified_at = None
+        email_config.dkim_record_1_name = None
+        email_config.dkim_record_1_value = None
+        email_config.dkim_record_2_name = None
+        email_config.dkim_record_2_value = None
+        email_config.dkim_record_3_name = None
+        email_config.dkim_record_3_value = None
+        
+        db.session.commit()
+        
+        # Audit log
+        queue_audit_log(
+            business_account_id=business_account_id,
+            action_type='platform_email_domain_delete',
+            resource_type='email_configuration',
+            resource_id=email_config.id,
+            user_name=current_user.get_full_name(),
+            details={
+                'domain': domain_name
+            }
+        )
+        
+        flash(f'Domain {domain_name} removed successfully.', 'success')
+        return redirect(url_for('business_auth.platform_email_domains'))
+    
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error deleting platform email domain: {e}")
+        flash(f'Failed to delete domain: {str(e)}', 'error')
+        return redirect(url_for('business_auth.platform_email_domains'))
+
+
 # ==== BRANDING CONFIGURATION ROUTES ====
 
 @business_auth_bp.route('/admin/brand-config')
