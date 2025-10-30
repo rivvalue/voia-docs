@@ -57,7 +57,16 @@ CORS(app,
 
 # Disable template caching for development
 app.config["TEMPLATES_AUTO_RELOAD"] = True
-app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
+
+# Static file caching: Enable in production for performance, disable in dev for convenience
+# Industry standard: 1 year cache for versioned static assets (CSS, JS, images)
+if is_production:
+    app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 31536000  # 1 year (industry standard)
+    logger.info("✅ Static file caching enabled: 1 year (production)")
+else:
+    # Development: 1 hour cache allows testing without aggressive caching
+    app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 3600  # 1 hour
+    logger.info("⚙️ Static file caching: 1 hour (development/demo)")
 
 # Set maximum file upload size to 5MB for security
 app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024
