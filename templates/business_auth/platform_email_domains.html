@@ -336,7 +336,7 @@ function showAddDomainModal() {
 // Show Edit Domain Modal
 function showEditDomainModal(configId) {
     // Find domain data from the table
-    const domains = {{ domains|tojson|safe }};
+    const domains = {{ domains_data|tojson|safe }};
     const domain = domains.find(d => d.id === configId);
     
     if (!domain) {

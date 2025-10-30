@@ -3312,8 +3312,12 @@ def platform_email_domains():
         # Get all business accounts for dropdown
         business_accounts = BusinessAccount.query.filter_by(status='active').order_by(BusinessAccount.name).all()
         
+        # Convert domains to dictionaries for JSON serialization in template
+        domains_data = [domain.to_dict() for domain in domains]
+        
         return render_template('business_auth/platform_email_domains.html',
                              domains=domains,
+                             domains_data=domains_data,
                              business_accounts=business_accounts,
                              current_user=current_user)
     
