@@ -688,8 +688,23 @@ def business_account_onboarding():
         # Get available license templates
         license_templates = LicenseTemplateManager.get_all_templates()
         
+        # Get pending users (not yet activated) with their business account info
+        pending_users = db.session.query(
+            BusinessAccountUser,
+            BusinessAccount.name.label('business_name')
+        ).join(
+            BusinessAccount,
+            BusinessAccountUser.business_account_id == BusinessAccount.id
+        ).filter(
+            BusinessAccountUser.email_verified == False,
+            BusinessAccountUser.invitation_token != None
+        ).order_by(
+            BusinessAccountUser.invited_at.desc()
+        ).all()
+        
         return render_template('business_auth/business_account_onboarding.html',
-                             license_templates=license_templates)
+                             license_templates=license_templates,
+                             pending_users=pending_users)
     
     except Exception as e:
         logger.error(f"Error loading business account onboarding page: {e}")
@@ -880,9 +895,12 @@ def resend_business_account_invitation(user_id):
             business_account_id=business_account.id,
             action_type='invitation_resent',
             resource_type='business_account_user',
+            resource_id=user.id,
             details={
                 'user_email': user.email,
                 'user_id': user.id,
+                'user_name': user.get_full_name(),
+                'business_account_name': business_account.name,
                 'resent_by': session.get('business_user_id'),
                 'email_success': email_result.get('success')
             }

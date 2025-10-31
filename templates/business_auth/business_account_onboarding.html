@@ -36,6 +36,70 @@
             {% endif %}
         {% endwith %}
 
+        <!-- Pending Activations Section -->
+        {% if pending_users %}
+        <div class="admin-section mb-4">
+            <div class="section-header">
+                <div class="section-icon">
+                    <i class="fas fa-clock" aria-hidden="true"></i>
+                </div>
+                <h3 class="section-title">{{ _('Pending Account Activations') }}</h3>
+            </div>
+            <p class="text-muted mb-3">
+                <i class="fas fa-info-circle me-2" aria-hidden="true"></i>
+                {{ _('The following administrators have been invited but have not yet activated their accounts.') }}
+            </p>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">{{ _('Administrator') }}</th>
+                            <th scope="col">{{ _('Email') }}</th>
+                            <th scope="col">{{ _('Business Account') }}</th>
+                            <th scope="col">{{ _('Invited') }}</th>
+                            <th scope="col" class="text-center">{{ _('Actions') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user, business_name in pending_users %}
+                        <tr>
+                            <td>
+                                <i class="fas fa-user-clock me-2 text-warning" aria-hidden="true"></i>
+                                <strong>{{ user.get_full_name() }}</strong>
+                            </td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ business_name }}</td>
+                            <td>
+                                {% if user.invited_at %}
+                                    <small class="text-muted">
+                                        {{ user.invited_at.strftime('%Y-%m-%d %H:%M') }}
+                                    </small>
+                                {% else %}
+                                    <small class="text-muted">{{ _('Unknown') }}</small>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <form method="POST" 
+                                      action="{{ url_for('business_auth.resend_business_account_invitation', user_id=user.id) }}" 
+                                      style="display: inline;"
+                                      onsubmit="return confirm('{{ _('Resend invitation email to') }} {{ user.email }}?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <button type="submit" 
+                                            class="btn btn-sm btn-outline-primary"
+                                            title="{{ _('Resend Invitation Email') }}">
+                                        <i class="fas fa-paper-plane me-1" aria-hidden="true"></i>
+                                        {{ _('Resend Invitation') }}
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
         <!-- Information Box -->
         <div class="onboarding-info-box">
             <h6>
