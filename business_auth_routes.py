@@ -3379,9 +3379,22 @@ def add_platform_email_domain():
         email_config = EmailConfiguration.query.filter_by(business_account_id=business_account_id).first()
         
         if not email_config:
-            # Create new email configuration
-            email_config = EmailConfiguration(business_account_id=business_account_id)
+            # Create new email configuration with smart defaults
+            email_config = EmailConfiguration(
+                business_account_id=business_account_id,
+                sender_name=business_account.name,  # Default: business account name
+                sender_email=f"noreply@{sender_domain}",  # Default: noreply@domain
+                reply_to_email=business_account.contact_email or f"support@{sender_domain}"  # Default: contact email or support@domain
+            )
             db.session.add(email_config)
+        else:
+            # Update sender defaults if not already set
+            if not email_config.sender_name:
+                email_config.sender_name = business_account.name
+            if not email_config.sender_email:
+                email_config.sender_email = f"noreply@{sender_domain}"
+            if not email_config.reply_to_email:
+                email_config.reply_to_email = business_account.contact_email or f"support@{sender_domain}"
         
         # Update with platform email settings
         email_config.use_platform_email = True
@@ -3413,7 +3426,7 @@ def add_platform_email_domain():
             }
         )
         
-        flash(f'Domain {sender_domain} added successfully for {business_account.name}.', 'success')
+        flash(f'Domain {sender_domain} added successfully for {business_account.name}. Sender defaults applied - business account can customize sender identity in Email Settings.', 'success')
         return redirect(url_for('business_auth.platform_email_domains'))
     
     except Exception as e:
