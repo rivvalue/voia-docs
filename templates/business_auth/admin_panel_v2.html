@@ -445,6 +445,9 @@
         </div>
     </div>
 
+    <!-- Onboarding Progress Banner -->
+    {% include 'business_auth/onboarding_banner.html' %}
+
     <!-- Account Type Badge -->
     <div class="account-type-badge">
         <i class="fas fa-{{ 'flask' if business_account.account_type == 'demo' else 'building' }}"></i>

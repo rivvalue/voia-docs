@@ -123,27 +123,67 @@ def require_business_auth(f):
                 return render_template('business_auth/account_status.html', 
                                      account_status=current_account.status)
         
-        # Check mandatory onboarding for Core/Plus license holders (no regression)
+        # Track onboarding status but don't block access (Solution 2: Conditional Access)
         current_user = BusinessAccountUser.query.get(business_user_id)
-        if (current_user and 
-            current_user.requires_onboarding() and 
-            not request.endpoint.startswith('business_auth.onboarding') and
-            request.endpoint not in ['business_auth.logout', 'business_auth.session_status', 'business_auth.brand_config', 'business_auth.save_brand_config']):
-            
+        if current_user and current_user.requires_onboarding():
             # Initialize onboarding progress if not set
             if not current_user.onboarding_progress:
                 current_user.initialize_onboarding()
                 db.session.commit()
             
-            # Redirect to onboarding progress dashboard (self-assessment hub)
-            if request.is_json:
-                return jsonify({'error': 'Onboarding required', 'redirect': url_for('business_auth.onboarding_progress')}), 412
-            
-            return redirect(url_for('business_auth.onboarding_progress'))
+            # Store incomplete onboarding flag in session for banner display
+            session['onboarding_incomplete'] = True
+            session['onboarding_url'] = url_for('business_auth.onboarding_progress')
+        else:
+            # Clear the flag if onboarding is complete
+            session.pop('onboarding_incomplete', None)
+            session.pop('onboarding_url', None)
         
         return f(*args, **kwargs)
     
     return decorated_function
+
+def get_onboarding_status():
+    """Get detailed onboarding status for the current user"""
+    business_user_id = session.get('business_user_id')
+    if not business_user_id:
+        return None
+    
+    current_user = BusinessAccountUser.query.get(business_user_id)
+    if not current_user or not current_user.requires_onboarding():
+        return None
+    
+    # Get onboarding progress
+    progress = current_user.get_onboarding_progress()
+    if not progress:
+        return None
+    
+    # Calculate incomplete steps
+    incomplete_steps = []
+    steps_info = {
+        'smtp_config': {'label': 'Email Setup', 'url': url_for('business_auth.email_config')},
+        'brand_config': {'label': 'Brand Configuration', 'url': url_for('business_auth.brand_config')},
+        'team_members': {'label': 'Team Members', 'url': url_for('business_auth.manage_users')}
+    }
+    
+    for step, info in steps_info.items():
+        if not progress.get(step, {}).get('completed', False):
+            incomplete_steps.append({
+                'name': step,
+                'label': info['label'],
+                'url': info['url'],
+                'required': progress.get(step, {}).get('required', False)
+            })
+    
+    if not incomplete_steps:
+        return None
+    
+    return {
+        'incomplete_steps': incomplete_steps,
+        'progress_url': url_for('business_auth.onboarding_progress'),
+        'total_steps': len(steps_info),
+        'completed_steps': len(steps_info) - len(incomplete_steps)
+    }
 
 def require_permission(permission):
     """Decorator to check user permissions"""
