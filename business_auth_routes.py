@@ -5,7 +5,7 @@ Provides login/logout routes for business account users without affecting public
 
 from flask import Blueprint, request, render_template, redirect, url_for, session, flash, jsonify, send_file
 from werkzeug.security import check_password_hash, generate_password_hash
-from models import BusinessAccountUser, UserSession, BusinessAccount, EmailConfiguration, LicenseHistory, db
+from models import BusinessAccountUser, UserSession, BusinessAccount, EmailConfiguration, EmailDelivery, LicenseHistory, db
 from rate_limiter import rate_limit
 from license_service import LicenseService
 from feature_flags import feature_flags
@@ -796,6 +796,18 @@ def create_business_account_with_admin():
         except Exception as audit_error:
             logger.error(f"Failed to log business account creation audit: {audit_error}")
         
+        # Create EmailDelivery record for tracking
+        email_delivery = EmailDelivery()
+        email_delivery.business_account_id = business_account.id
+        email_delivery.email_type = 'business_account_invitation'
+        email_delivery.recipient_email = admin_email
+        email_delivery.recipient_name = f"{admin_first_name} {admin_last_name}"
+        email_delivery.subject = f"Welcome to VOÏA - Activate Your Business Account"
+        email_delivery.status = 'pending'
+        
+        db.session.add(email_delivery)
+        db.session.flush()  # Get the ID
+        
         # Send invitation email using platform owner's email service
         # NOTE: Use platform_owner business account's SMTP config
         # because the newly created business account doesn't have email config yet
@@ -812,8 +824,11 @@ def create_business_account_with_admin():
             user_last_name=admin_last_name,
             business_account_name=business_name,
             invitation_token=invitation_token,
+            email_delivery_id=email_delivery.id,
             business_account_id=platform_business_account_id  # Use platform owner's SMTP config
         )
+        
+        db.session.commit()
         
         if email_result.get('success'):
             logger.info(f"Business account '{business_name}' created successfully with admin user {admin_email}")
@@ -858,6 +873,18 @@ def resend_business_account_invitation(user_id):
         invitation_token = user.generate_invitation_token()
         db.session.commit()
         
+        # Create EmailDelivery record for tracking
+        email_delivery = EmailDelivery()
+        email_delivery.business_account_id = business_account.id
+        email_delivery.email_type = 'business_account_invitation'
+        email_delivery.recipient_email = user.email
+        email_delivery.recipient_name = user.get_full_name()
+        email_delivery.subject = f"Welcome to VOÏA - Activate Your Business Account"
+        email_delivery.status = 'pending'
+        
+        db.session.add(email_delivery)
+        db.session.flush()  # Get the ID
+        
         # Send invitation email using platform owner's SMTP
         from email_service import EmailService
         email_service = EmailService()
@@ -871,8 +898,11 @@ def resend_business_account_invitation(user_id):
             user_last_name=user.last_name,
             business_account_name=business_account.name,
             invitation_token=invitation_token,
+            email_delivery_id=email_delivery.id,
             business_account_id=platform_business_account_id
         )
+        
+        db.session.commit()
         
         # Log the resend attempt
         from audit_utils import queue_audit_log
