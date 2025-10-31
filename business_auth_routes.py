@@ -688,23 +688,8 @@ def business_account_onboarding():
         # Get available license templates
         license_templates = LicenseTemplateManager.get_all_templates()
         
-        # Get pending users (not yet activated) with their business account info
-        pending_users = db.session.query(
-            BusinessAccountUser,
-            BusinessAccount.name.label('business_name')
-        ).join(
-            BusinessAccount,
-            BusinessAccountUser.business_account_id == BusinessAccount.id
-        ).filter(
-            BusinessAccountUser.email_verified == False,
-            BusinessAccountUser.invitation_token != None
-        ).order_by(
-            BusinessAccountUser.invited_at.desc()
-        ).all()
-        
         return render_template('business_auth/business_account_onboarding.html',
-                             license_templates=license_templates,
-                             pending_users=pending_users)
+                             license_templates=license_templates)
     
     except Exception as e:
         logger.error(f"Error loading business account onboarding page: {e}")
