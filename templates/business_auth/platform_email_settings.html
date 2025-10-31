@@ -281,11 +281,15 @@ document.addEventListener('DOMContentLoaded', function() {
         testBtn.disabled = true;
         testBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Testing...';
         
+        // Get CSRF token from form
+        const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+        
         // Make AJAX request to test endpoint
         fetch('{{ url_for("business_auth.test_platform_email_settings") }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
             }
         })
         .then(response => response.json())
