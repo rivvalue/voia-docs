@@ -3378,23 +3378,28 @@ def add_platform_email_domain():
         # Create new email configuration for this domain
         email_config = EmailConfiguration.query.filter_by(business_account_id=business_account_id).first()
         
+        # Guaranteed fallback values (never None or empty)
+        default_sender_name = (business_account.name if business_account.name else f"Team {sender_domain}").strip() or f"Team {sender_domain}"
+        default_sender_email = f"noreply@{sender_domain}"
+        default_reply_to = (business_account.contact_email if business_account.contact_email and '@' in business_account.contact_email else f"support@{sender_domain}").strip() or f"support@{sender_domain}"
+        
         if not email_config:
-            # Create new email configuration with smart defaults
+            # Create new email configuration with guaranteed non-null defaults
             email_config = EmailConfiguration(
                 business_account_id=business_account_id,
-                sender_name=business_account.name,  # Default: business account name
-                sender_email=f"noreply@{sender_domain}",  # Default: noreply@domain
-                reply_to_email=business_account.contact_email or f"support@{sender_domain}"  # Default: contact email or support@domain
+                sender_name=default_sender_name,
+                sender_email=default_sender_email,
+                reply_to_email=default_reply_to
             )
             db.session.add(email_config)
         else:
             # Update sender defaults if not already set
-            if not email_config.sender_name:
-                email_config.sender_name = business_account.name
-            if not email_config.sender_email:
-                email_config.sender_email = f"noreply@{sender_domain}"
-            if not email_config.reply_to_email:
-                email_config.reply_to_email = business_account.contact_email or f"support@{sender_domain}"
+            if not email_config.sender_name or not email_config.sender_name.strip():
+                email_config.sender_name = default_sender_name
+            if not email_config.sender_email or not email_config.sender_email.strip():
+                email_config.sender_email = default_sender_email
+            if not email_config.reply_to_email or not email_config.reply_to_email.strip():
+                email_config.reply_to_email = default_reply_to
         
         # Update with platform email settings
         email_config.use_platform_email = True
