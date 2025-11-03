@@ -203,20 +203,12 @@
 <script>
 // Convert UTC timestamps to user's local timezone
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Timezone conversion script loaded');
-    const elements = document.querySelectorAll('.audit-time');
-    console.log('Found ' + elements.length + ' timestamp elements');
-    
-    elements.forEach((el, index) => {
+    document.querySelectorAll('.audit-time').forEach(el => {
         const utcTimestamp = el.dataset.utc;
-        console.log('Element ' + index + ' data-utc:', utcTimestamp);
-        
         if (utcTimestamp) {
             try {
                 const localDate = new Date(utcTimestamp);
-                console.log('Parsed date:', localDate);
-                
-                const formatted = localDate.toLocaleString('en-US', {
+                el.textContent = localDate.toLocaleString('en-US', {
                     month: 'long',
                     day: 'numeric', 
                     year: 'numeric',
@@ -225,14 +217,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     hour12: true,
                     timeZoneName: 'short'
                 });
-                console.log('Formatted:', formatted);
-                
-                el.textContent = formatted;
             } catch (e) {
                 console.error('Error converting timestamp:', e);
             }
-        } else {
-            console.log('Element ' + index + ' has no data-utc attribute');
         }
     });
 });

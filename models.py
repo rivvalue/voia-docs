@@ -2412,7 +2412,7 @@ class AuditLog(db.Model):
             'resource_name': self.resource_name,
             'details': json.loads(self.details) if self.details else None,
             'ip_address': self.ip_address,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'created_at': self.created_at.isoformat() + 'Z' if self.created_at else None,
             'business_account_name': self.business_account.name if self.business_account else None,
             'formatted_time': self.created_at.strftime('%B %d, %Y at %I:%M %p') if self.created_at else None
         }
