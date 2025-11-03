@@ -410,7 +410,7 @@
                 </a>
                 
                 <div class="d-flex gap-2">
-                    {% if config.ENABLE_PROMPT_PREVIEW and not is_readonly %}
+                    {% if ENABLE_PROMPT_PREVIEW and not is_readonly %}
                     <button type="button" 
                             class="btn btn-secondary"
                             onclick="showPromptPreview()"
@@ -432,7 +432,7 @@
 </div>
 
 <!-- Prompt Preview Modal (Dev Only) -->
-{% if config.ENABLE_PROMPT_PREVIEW %}
+{% if ENABLE_PROMPT_PREVIEW %}
 <div class="modal fade" id="promptPreviewModal" tabindex="-1" aria-labelledby="promptPreviewModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -489,7 +489,7 @@
 {% endif %}
 
 <script>
-{% if config.ENABLE_PROMPT_PREVIEW %}
+{% if ENABLE_PROMPT_PREVIEW %}
 // Prompt Preview Functionality (Dev Only)
 function showPromptPreview() {
     const campaignId = {{ campaign.id }};

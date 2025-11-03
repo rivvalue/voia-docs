@@ -394,6 +394,15 @@ def inject_ui_version():
         'current_user': current_user
     }
 
+# Make development features available in templates
+@app.context_processor
+def inject_dev_features():
+    """Inject development-only feature flags to templates"""
+    import os
+    return {
+        'ENABLE_PROMPT_PREVIEW': os.getenv('ENABLE_PROMPT_PREVIEW') == 'true'
+    }
+
 # Sentry Test Endpoint (Admin Only)
 @app.route('/business/admin/test-sentry-error')
 def test_sentry_error():
