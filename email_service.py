@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 from email.message import EmailMessage
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.utils import formataddr
 from typing import List, Dict, Optional, Union
 from flask import current_app, url_for, render_template_string
 import jwt
@@ -391,9 +392,9 @@ class EmailService:
             sender = from_email or email_config['sender_email'] or email_config['smtp_username']
             sender_name = email_config.get('sender_name', 'VOÏA Team')
             
-            # Create message with proper sender formatting
+            # Create message with proper sender formatting using formataddr to handle special characters
             if sender_name and sender_name != sender:
-                formatted_sender = f"{sender_name} <{sender}>"
+                formatted_sender = formataddr((sender_name, sender))
             else:
                 formatted_sender = sender
             
