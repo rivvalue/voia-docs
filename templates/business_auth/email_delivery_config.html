@@ -384,6 +384,18 @@
                 <input type="hidden" name="email_provider" value="smtp">
             </div>
         </div>
+
+        <!-- Action Buttons -->
+        <div class="settings-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{{ url_for('business_auth.admin_panel') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>{{ _('Cancel') }}
+                </a>
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-save me-2"></i>{{ _('Save Configuration') }}
+                </button>
+            </div>
+        </div>
     </form>
 
     <!-- Test Email Configuration -->
@@ -424,20 +436,6 @@
         </form>
     </div>
     {% endif %}
-
-    <form method="POST" action="{{ url_for('business_auth.save_email_delivery_config') }}">
-        <!-- Action Buttons -->
-        <div class="settings-card">
-            <div class="d-flex justify-content-between align-items-center">
-                <a href="{{ url_for('business_auth.admin_panel') }}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left me-2"></i>{{ _('Cancel') }}
-                </a>
-                <button type="submit" class="btn btn-danger">
-                    <i class="fas fa-save me-2"></i>{{ _('Save Configuration') }}
-                </button>
-            </div>
-        </div>
-    </form>
 </div>
 
 <script>
