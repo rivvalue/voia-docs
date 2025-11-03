@@ -11732,6 +11732,7 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     gap: 0.75rem;
     font-weight: 600;
     font-size: 1.1rem;
+    margin: 0; /* Remove any default margins */
 }
 
 .brand-preview-header i {
@@ -11745,6 +11746,7 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     border-radius: 8px;
     padding: 1rem;
     transition: all 0.2s ease;
+    margin: 0; /* Remove any default margins */
 }
 
 .brand-color-card:hover {
