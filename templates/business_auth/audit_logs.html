@@ -107,7 +107,7 @@
                         {% for log in audit_logs %}
                         <tr>
                             <td>
-                                <div class="audit-time">
+                                <div class="audit-time" data-utc="{{ log.created_at }}">
                                     {{ log.formatted_time or log.created_at }}
                                 </div>
                             </td>
@@ -201,6 +201,29 @@
 </div>
 
 <script>
+// Convert UTC timestamps to user's local timezone
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.audit-time').forEach(el => {
+        const utcTimestamp = el.dataset.utc;
+        if (utcTimestamp) {
+            try {
+                const localDate = new Date(utcTimestamp);
+                el.textContent = localDate.toLocaleString('en-US', {
+                    month: 'long',
+                    day: 'numeric', 
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true,
+                    timeZoneName: 'short'
+                });
+            } catch (e) {
+                console.error('Error converting timestamp:', e);
+            }
+        }
+    });
+});
+
 // Auto-refresh page every 30 seconds to show new audit entries
 setInterval(() => {
     // Only refresh if no user interaction in last 10 seconds
