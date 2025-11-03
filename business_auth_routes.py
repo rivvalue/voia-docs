@@ -4088,6 +4088,23 @@ def save_brand_config():
         text_color = request.form.get('text_color', '#212529').strip()
         background_color = request.form.get('background_color', '#ffffff').strip()
         
+        # Server-side validation: Validate hex color format
+        import re
+        hex_color_pattern = re.compile(r'^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$')
+        
+        colors_to_validate = {
+            'Primary Color': primary_color,
+            'Secondary Color': secondary_color,
+            'Accent Color': accent_color,
+            'Text Color': text_color,
+            'Background Color': background_color
+        }
+        
+        for color_name, color_value in colors_to_validate.items():
+            if not hex_color_pattern.match(color_value):
+                flash(f'Invalid {color_name} format. Please use a valid hex color (e.g., #FF0000).', 'error')
+                return redirect(url_for('business_auth.brand_config'))
+        
         # Get or create branding configuration
         from models import BrandingConfig
         branding_config = BrandingConfig.get_or_create_for_business_account(current_account.id)

@@ -209,6 +209,75 @@
             </div>
         </div>
 
+        <!-- Live Survey Preview -->
+        <div class="brand-config-form-section">
+            <h3 class="brand-section-title">
+                <i class="fas fa-eye" aria-hidden="true"></i>
+                {{ _('Live Survey Preview') }}
+            </h3>
+            <p class="brand-help-text mb-4">
+                {{ _('See how your brand colors will appear in surveys. Changes update in real-time as you adjust the color palette above.') }}
+            </p>
+            
+            <div class="brand-preview-panel" id="brandPreviewPanel">
+                <!-- Hero Section Preview -->
+                <div class="preview-hero">
+                    <div class="preview-hero-content">
+                        <div class="preview-company-info">
+                            <div class="preview-company-logo-placeholder">
+                                {{ branding_config.get_company_display_name() }}
+                            </div>
+                            <h2 class="preview-welcome">
+                                {{ _('Hi John, thank you for participating') }}
+                            </h2>
+                        </div>
+                        <div class="preview-campaign-meta">
+                            <i class="fas fa-bullseye"></i>
+                            <span><strong>{{ _('Campaign:') }}</strong> {{ _('Q4 Feedback Survey') }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Button Preview -->
+                <div class="preview-section">
+                    <h4 class="preview-section-title">{{ _('Buttons') }}</h4>
+                    <button class="preview-btn-primary" type="button">
+                        <i class="fas fa-comments me-2"></i>{{ _('Start Survey') }}
+                    </button>
+                </div>
+                
+                <!-- Chat Messages Preview -->
+                <div class="preview-section">
+                    <h4 class="preview-section-title">{{ _('Chat Interface') }}</h4>
+                    <div class="preview-chat-messages">
+                        <div class="preview-message user">
+                            {{ _('This is how your responses will appear') }}
+                        </div>
+                        <div class="preview-message assistant">
+                            {{ _('This is how VOÏA questions will appear') }}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Form Input Preview -->
+                <div class="preview-section">
+                    <h4 class="preview-section-title">{{ _('Form Inputs') }}</h4>
+                    <div class="preview-form-group">
+                        <label class="preview-form-label">{{ _('Email Address') }}</label>
+                        <input type="text" class="preview-form-input" placeholder="user@example.com" readonly>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar Preview -->
+                <div class="preview-section">
+                    <h4 class="preview-section-title">{{ _('Progress Indicator') }}</h4>
+                    <div class="preview-progress-container">
+                        <div class="preview-progress-bar" style="width: 60%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Logo Upload -->
         <div class="brand-config-form-section">
             <h3 class="brand-section-title">
@@ -325,6 +394,54 @@ document.addEventListener('DOMContentLoaded', function() {
             input.addEventListener('input', updateColorPreview);
         }
     });
+
+    // ================================================================
+    // LIVE PREVIEW PANEL - Real-time Brand Color Updates
+    // ================================================================
+    // CRITICAL: Updates CSS variables on the PREVIEW CONTAINER ONLY
+    // Does NOT affect documentElement or any VOÏA UI elements
+    // ================================================================
+    
+    const previewPanel = document.getElementById('brandPreviewPanel');
+    
+    function updateLivePreview() {
+        if (!previewPanel) return;
+        
+        // Get current color values from form inputs
+        const primaryColor = document.getElementById('primary_color').value;
+        const secondaryColor = document.getElementById('secondary_color').value;
+        const accentColor = document.getElementById('accent_color').value;
+        const textColor = document.getElementById('text_color').value;
+        const backgroundColor = document.getElementById('background_color').value;
+        
+        // CRITICAL: Set CSS variables on the preview container ONLY
+        // NOT on documentElement (which would affect the entire page)
+        previewPanel.style.setProperty('--preview-primary', primaryColor);
+        previewPanel.style.setProperty('--preview-secondary', secondaryColor);
+        previewPanel.style.setProperty('--preview-accent', accentColor);
+        previewPanel.style.setProperty('--preview-text', textColor);
+        previewPanel.style.setProperty('--preview-background', backgroundColor);
+    }
+    
+    // Add event listeners for ALL color inputs to update live preview
+    const colorInputIds = [
+        'primary_color', 
+        'secondary_color', 
+        'accent_color', 
+        'text_color', 
+        'background_color'
+    ];
+    
+    colorInputIds.forEach(function(id) {
+        const input = document.getElementById(id);
+        if (input) {
+            // Update preview on color change
+            input.addEventListener('input', updateLivePreview);
+        }
+    });
+    
+    // Initialize preview with current values on page load
+    updateLivePreview();
 
     // Form validation
     const form = document.getElementById('brandConfigForm');
