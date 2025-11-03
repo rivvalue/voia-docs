@@ -100,126 +100,137 @@
             </div>
         </div>
 
-        <!-- Color Palette -->
+        <!-- Brand Studio: Color Palette + Live Preview -->
         <div class="brand-config-form-section">
             <h3 class="brand-section-title">
                 <i class="fas fa-palette" aria-hidden="true"></i>
-                Color Palette
+                {{ _('Brand Studio') }}
             </h3>
+            <p class="brand-help-text mb-4">
+                {{ _('Customize your brand colors and see them come to life in real-time. Adjust the palette on the left to instantly preview how your surveys will look.') }}
+            </p>
             
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="brand-form-group">
-                        <label class="brand-form-label" for="primary_color">{{ _('Primary Color') }}</label>
+            <!-- Split Panel Grid: Color Controls + Live Preview -->
+            <div class="brand-studio-grid" id="brandStudioGrid">
+                
+                <!-- LEFT PANEL: Color Controls -->
+                <div class="brand-studio-controls">
+                    
+                    <!-- Primary Color Card -->
+                    <div class="brand-color-card" data-color-target="primary">
+                        <div class="brand-color-card-header">
+                            <div class="brand-color-label">
+                                <i class="fas fa-circle color-icon" id="icon-primary"></i>
+                                <span class="color-name">{{ _('Primary Color') }}</span>
+                            </div>
+                            <span class="color-badge" id="badge-primary">#dc3545</span>
+                        </div>
                         <input type="color" 
-                               class="brand-form-control" 
+                               class="brand-color-input" 
                                id="primary_color" 
                                name="primary_color" 
                                value="{{ branding_config.primary_color if branding_config.primary_color else '#dc3545' }}"
-                               aria-describedby="primary_color_help">
-                        <div class="brand-help-text" id="primary_color_help">
-                            {{ _('Main brand color used for headers, buttons, and accents.') }}
+                               aria-label="{{ _('Primary Color') }}">
+                        <div class="brand-color-usage">
+                            <i class="fas fa-info-circle"></i>
+                            {{ _('Headers, buttons, user messages') }}
                         </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="brand-form-group">
-                        <label class="brand-form-label" for="secondary_color">{{ _('Secondary Color') }}</label>
+                    
+                    <!-- Secondary Color Card -->
+                    <div class="brand-color-card" data-color-target="secondary">
+                        <div class="brand-color-card-header">
+                            <div class="brand-color-label">
+                                <i class="fas fa-circle color-icon" id="icon-secondary"></i>
+                                <span class="color-name">{{ _('Secondary Color') }}</span>
+                            </div>
+                            <span class="color-badge" id="badge-secondary">#6c757d</span>
+                        </div>
                         <input type="color" 
-                               class="brand-form-control" 
+                               class="brand-color-input" 
                                id="secondary_color" 
                                name="secondary_color" 
                                value="{{ branding_config.secondary_color if branding_config.secondary_color else '#6c757d' }}"
-                               aria-describedby="secondary_color_help">
-                        <div class="brand-help-text" id="secondary_color_help">
-                            {{ _('Supporting color for borders and subtle elements.') }}
+                               aria-label="{{ _('Secondary Color') }}">
+                        <div class="brand-color-usage">
+                            <i class="fas fa-info-circle"></i>
+                            {{ _('Gradients, metadata, borders') }}
                         </div>
                     </div>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="brand-form-group">
-                        <label class="brand-form-label" for="accent_color">{{ _('Accent Color') }}</label>
+                    
+                    <!-- Accent Color Card -->
+                    <div class="brand-color-card" data-color-target="accent">
+                        <div class="brand-color-card-header">
+                            <div class="brand-color-label">
+                                <i class="fas fa-circle color-icon" id="icon-accent"></i>
+                                <span class="color-name">{{ _('Accent Color') }}</span>
+                            </div>
+                            <span class="color-badge" id="badge-accent">#28a745</span>
+                        </div>
                         <input type="color" 
-                               class="brand-form-control" 
+                               class="brand-color-input" 
                                id="accent_color" 
                                name="accent_color" 
                                value="{{ branding_config.accent_color if branding_config.accent_color else '#28a745' }}"
-                               aria-describedby="accent_color_help">
-                        <div class="brand-help-text" id="accent_color_help">
-                            {{ _('Highlight color for success states and call-to-action elements.') }}
+                               aria-label="{{ _('Accent Color') }}">
+                        <div class="brand-color-usage">
+                            <i class="fas fa-info-circle"></i>
+                            {{ _('Progress bars, highlights, success') }}
                         </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="brand-form-group">
-                        <label class="brand-form-label" for="text_color">{{ _('Text Color') }}</label>
+                    
+                    <!-- Text Color Card -->
+                    <div class="brand-color-card" data-color-target="text">
+                        <div class="brand-color-card-header">
+                            <div class="brand-color-label">
+                                <i class="fas fa-circle color-icon" id="icon-text"></i>
+                                <span class="color-name">{{ _('Text Color') }}</span>
+                            </div>
+                            <span class="color-badge" id="badge-text">#212529</span>
+                        </div>
                         <input type="color" 
-                               class="brand-form-control" 
+                               class="brand-color-input" 
                                id="text_color" 
                                name="text_color" 
                                value="{{ branding_config.text_color if branding_config.text_color else '#212529' }}"
-                               aria-describedby="text_color_help">
-                        <div class="brand-help-text" id="text_color_help">
-                            {{ _('Primary text color for readability.') }}
+                               aria-label="{{ _('Text Color') }}">
+                        <div class="brand-color-usage">
+                            <i class="fas fa-info-circle"></i>
+                            {{ _('Body text, labels, headings') }}
                         </div>
                     </div>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="brand-form-group">
-                        <label class="brand-form-label" for="background_color">{{ _('Background Color') }}</label>
+                    
+                    <!-- Background Color Card -->
+                    <div class="brand-color-card" data-color-target="background">
+                        <div class="brand-color-card-header">
+                            <div class="brand-color-label">
+                                <i class="fas fa-circle color-icon" id="icon-background"></i>
+                                <span class="color-name">{{ _('Background Color') }}</span>
+                            </div>
+                            <span class="color-badge" id="badge-background">#ffffff</span>
+                        </div>
                         <input type="color" 
-                               class="brand-form-control" 
+                               class="brand-color-input" 
                                id="background_color" 
                                name="background_color" 
                                value="{{ branding_config.background_color if branding_config.background_color else '#ffffff' }}"
-                               aria-describedby="background_color_help">
-                        <div class="brand-help-text" id="background_color_help">
-                            {{ _('Background color for documents and reports.') }}
+                               aria-label="{{ _('Background Color') }}">
+                        <div class="brand-color-usage">
+                            <i class="fas fa-info-circle"></i>
+                            {{ _('Form backgrounds, documents, reports') }}
                         </div>
                     </div>
+                    
                 </div>
-                <div class="col-md-6">
-                    <div class="brand-form-group">
-                        <label class="brand-form-label">{{ _('Color Preview') }}</label>
-                        <div class="brand-color-preview" role="img" aria-label="Color palette preview">
-                            <div class="brand-color-preview-item" 
-                                 id="preview-primary" 
-                                 style="background: {{ branding_config.primary_color if branding_config.primary_color else '#dc3545' }};"
-                                 title={{ _('Primary color') }}></div>
-                            <div class="brand-color-preview-item" 
-                                 id="preview-secondary" 
-                                 style="background: {{ branding_config.secondary_color if branding_config.secondary_color else '#6c757d' }};"
-                                 title={{ _('Secondary color') }}></div>
-                            <div class="brand-color-preview-item" 
-                                 id="preview-accent" 
-                                 style="background: {{ branding_config.accent_color if branding_config.accent_color else '#28a745' }};"
-                                 title={{ _('Accent color') }}></div>
-                        </div>
-                        <div class="brand-help-text">
-                            {{ _('Live preview of your color palette.') }}
-                        </div>
+                
+                <!-- RIGHT PANEL: Live Preview -->
+                <div class="brand-studio-preview">
+                    <div class="brand-preview-header">
+                        <i class="fas fa-eye"></i>
+                        <span>{{ _('Live Survey Preview') }}</span>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Live Survey Preview -->
-        <div class="brand-config-form-section">
-            <h3 class="brand-section-title">
-                <i class="fas fa-eye" aria-hidden="true"></i>
-                {{ _('Live Survey Preview') }}
-            </h3>
-            <p class="brand-help-text mb-4">
-                {{ _('See how your brand colors will appear in surveys. Changes update in real-time as you adjust the color palette above.') }}
-            </p>
-            
-            <div class="brand-preview-panel" id="brandPreviewPanel">
+                    
+                    <div class="brand-preview-panel" id="brandPreviewPanel">
                 <!-- Hero Section Preview -->
                 <div class="preview-hero">
                     <div class="preview-hero-content">
@@ -268,15 +279,21 @@
                     </div>
                 </div>
                 
-                <!-- Progress Bar Preview -->
-                <div class="preview-section">
-                    <h4 class="preview-section-title">{{ _('Progress Indicator') }}</h4>
-                    <div class="preview-progress-container">
-                        <div class="preview-progress-bar" style="width: 60%;"></div>
+                        <!-- Progress Bar Preview -->
+                        <div class="preview-section">
+                            <h4 class="preview-section-title">{{ _('Progress Indicator') }}</h4>
+                            <div class="preview-progress-container">
+                                <div class="preview-progress-bar" style="width: 60%;"></div>
+                            </div>
+                        </div>
                     </div>
+                    <!-- END: brand-preview-panel -->
                 </div>
+                <!-- END: brand-studio-preview -->
             </div>
+            <!-- END: brand-studio-grid -->
         </div>
+        <!-- END: brand-config-form-section (Brand Studio) -->
 
         <!-- Logo Upload -->
         <div class="brand-config-form-section">
@@ -376,54 +393,51 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Live color preview updates
-    function updateColorPreview() {
-        const primaryColor = document.getElementById('primary_color').value;
-        const secondaryColor = document.getElementById('secondary_color').value;
-        const accentColor = document.getElementById('accent_color').value;
-        
-        document.getElementById('preview-primary').style.background = primaryColor;
-        document.getElementById('preview-secondary').style.background = secondaryColor;
-        document.getElementById('preview-accent').style.background = accentColor;
-    }
-
-    // Add event listeners for color inputs
-    ['primary_color', 'secondary_color', 'accent_color'].forEach(function(id) {
-        const input = document.getElementById(id);
-        if (input) {
-            input.addEventListener('input', updateColorPreview);
-        }
-    });
-
     // ================================================================
-    // LIVE PREVIEW PANEL - Real-time Brand Color Updates
+    // BRAND STUDIO - Real-time Color Updates
     // ================================================================
+    // Updates preview panel, color badges, and color icons in real-time
     // CRITICAL: Updates CSS variables on the PREVIEW CONTAINER ONLY
     // Does NOT affect documentElement or any VOÏA UI elements
     // ================================================================
     
     const previewPanel = document.getElementById('brandPreviewPanel');
     
-    function updateLivePreview() {
-        if (!previewPanel) return;
-        
+    function updateBrandStudio() {
         // Get current color values from form inputs
-        const primaryColor = document.getElementById('primary_color').value;
-        const secondaryColor = document.getElementById('secondary_color').value;
-        const accentColor = document.getElementById('accent_color').value;
-        const textColor = document.getElementById('text_color').value;
-        const backgroundColor = document.getElementById('background_color').value;
+        const colors = {
+            primary: document.getElementById('primary_color').value,
+            secondary: document.getElementById('secondary_color').value,
+            accent: document.getElementById('accent_color').value,
+            text: document.getElementById('text_color').value,
+            background: document.getElementById('background_color').value
+        };
         
-        // CRITICAL: Set CSS variables on the preview container ONLY
-        // NOT on documentElement (which would affect the entire page)
-        previewPanel.style.setProperty('--preview-primary', primaryColor);
-        previewPanel.style.setProperty('--preview-secondary', secondaryColor);
-        previewPanel.style.setProperty('--preview-accent', accentColor);
-        previewPanel.style.setProperty('--preview-text', textColor);
-        previewPanel.style.setProperty('--preview-background', backgroundColor);
+        // Update preview panel CSS variables (scoped to preview container ONLY)
+        if (previewPanel) {
+            previewPanel.style.setProperty('--preview-primary', colors.primary);
+            previewPanel.style.setProperty('--preview-secondary', colors.secondary);
+            previewPanel.style.setProperty('--preview-accent', colors.accent);
+            previewPanel.style.setProperty('--preview-text', colors.text);
+            previewPanel.style.setProperty('--preview-background', colors.background);
+        }
+        
+        // Update color badges (hex values)
+        document.getElementById('badge-primary').textContent = colors.primary.toUpperCase();
+        document.getElementById('badge-secondary').textContent = colors.secondary.toUpperCase();
+        document.getElementById('badge-accent').textContent = colors.accent.toUpperCase();
+        document.getElementById('badge-text').textContent = colors.text.toUpperCase();
+        document.getElementById('badge-background').textContent = colors.background.toUpperCase();
+        
+        // Update color icons (show actual color)
+        document.getElementById('icon-primary').style.color = colors.primary;
+        document.getElementById('icon-secondary').style.color = colors.secondary;
+        document.getElementById('icon-accent').style.color = colors.accent;
+        document.getElementById('icon-text').style.color = colors.text;
+        document.getElementById('icon-background').style.color = colors.background;
     }
     
-    // Add event listeners for ALL color inputs to update live preview
+    // Add event listeners for ALL color inputs
     const colorInputIds = [
         'primary_color', 
         'secondary_color', 
@@ -435,13 +449,13 @@ document.addEventListener('DOMContentLoaded', function() {
     colorInputIds.forEach(function(id) {
         const input = document.getElementById(id);
         if (input) {
-            // Update preview on color change
-            input.addEventListener('input', updateLivePreview);
+            // Update Brand Studio on color change
+            input.addEventListener('input', updateBrandStudio);
         }
     });
     
-    // Initialize preview with current values on page load
-    updateLivePreview();
+    // Initialize Brand Studio with current values on page load
+    updateBrandStudio();
 
     // Form validation
     const form = document.getElementById('brandConfigForm');

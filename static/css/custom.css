@@ -11648,6 +11648,167 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
 }
 
 /* ================================================================
+   BRAND STUDIO - SPLIT PANEL LAYOUT
+   ================================================================
+   Combines color palette controls and live preview in a
+   responsive grid layout for professional brand customization.
+   ================================================================ */
+
+/* Brand Studio Grid Container */
+.brand-studio-grid {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    gap: 2rem;
+    margin-top: 1.5rem;
+}
+
+/* Left Panel: Color Controls */
+.brand-studio-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Right Panel: Live Preview */
+.brand-studio-preview {
+    display: flex;
+    flex-direction: column;
+    min-height: 600px;
+}
+
+/* Brand Preview Header */
+.brand-preview-header {
+    background: linear-gradient(135deg, var(--primary-red), var(--dark-red));
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.brand-preview-header i {
+    font-size: 1.2rem;
+}
+
+/* Color Card Styling */
+.brand-color-card {
+    background: white;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1rem;
+    transition: all 0.2s ease;
+}
+
+.brand-color-card:hover {
+    border-color: var(--primary-red);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.1);
+}
+
+.brand-color-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.brand-color-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.brand-color-label .color-icon {
+    font-size: 0.875rem;
+}
+
+.brand-color-label .color-name {
+    font-weight: 600;
+    color: var(--neutral-dark);
+    font-size: 0.95rem;
+}
+
+.color-badge {
+    font-family: 'Courier New', monospace;
+    background: #f8f9fa;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    color: #495057;
+    font-weight: 500;
+}
+
+.brand-color-input {
+    width: 100%;
+    height: 50px;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.brand-color-input:hover {
+    border-color: var(--primary-red);
+}
+
+.brand-color-input:focus {
+    outline: none;
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+.brand-color-usage {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.brand-color-usage i {
+    font-size: 0.75rem;
+    opacity: 0.7;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 991px) {
+    .brand-studio-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .brand-studio-preview {
+        order: 2;
+    }
+    
+    .brand-studio-controls {
+        order: 1;
+    }
+}
+
+@media (max-width: 767px) {
+    .brand-studio-controls {
+        gap: 0.75rem;
+    }
+    
+    .brand-color-card {
+        padding: 0.875rem;
+    }
+    
+    .brand-color-input {
+        height: 40px;
+    }
+    
+    .brand-preview-header {
+        padding: 0.875rem 1.25rem;
+        font-size: 1rem;
+    }
+}
+
+/* ================================================================
    BRAND PREVIEW PANEL - ISOLATED STYLES
    ================================================================
    CRITICAL: All styles MUST be scoped under .brand-preview-panel
@@ -11666,10 +11827,10 @@ body:not([data-ui-version="v2"]) .sidebar-overlay {
     /* Panel Container */
     background: #f8f9fa;
     border: 2px solid #dee2e6;
-    border-radius: 8px;
+    border-radius: 0 0 8px 8px;
     padding: 2rem;
-    margin-top: 1.5rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    flex: 1;
 }
 
 /* Hero Section Preview */
