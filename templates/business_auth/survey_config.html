@@ -363,6 +363,17 @@
                     <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     Cancel
                 </a>
+                
+                {% if config.ENABLE_PROMPT_PREVIEW %}
+                <button type="button" 
+                        class="btn btn-secondary"
+                        onclick="showPromptPreview()"
+                        aria-label="Preview AI prompt (dev only)">
+                    <i class="fas fa-code" aria-hidden="true"></i>
+                    Preview Prompt (Dev)
+                </button>
+                {% endif %}
+                
                 <button type="submit" 
                         class="survey-config-btn-save"
                         aria-label="{{ _('Save survey configuration') }}">
@@ -373,10 +384,108 @@
         </div>
     </form>
 </div>
+
+<!-- Prompt Preview Modal (Dev Only) -->
+{% if config.ENABLE_PROMPT_PREVIEW %}
+<div class="modal fade" id="promptPreviewModal" tabindex="-1" aria-labelledby="promptPreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="promptPreviewModalLabel">
+                    <i class="fas fa-code me-2"></i>
+                    AI Prompt Preview (Development Only)
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Note:</strong> This shows the system prompt that will be sent to OpenAI based on your customization settings. 
+                    Placeholders like <code>{{participant_name}}</code> will be replaced with actual participant data during surveys.
+                </div>
+                
+                <ul class="nav nav-tabs" id="previewTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="prompt-tab" data-bs-toggle="tab" data-bs-target="#promptContent" type="button" role="tab">
+                            System Prompt
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="config-tab" data-bs-toggle="tab" data-bs-target="#configContent" type="button" role="tab">
+                            Configuration JSON
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="metadata-tab" data-bs-toggle="tab" data-bs-target="#metadataContent" type="button" role="tab">
+                            Metadata
+                        </button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content mt-3" id="previewTabContent">
+                    <div class="tab-pane fade show active" id="promptContent" role="tabpanel">
+                        <pre id="promptPreviewContent" style="background: #f8f9fa; padding: 1rem; border-radius: 4px; max-height: 500px; overflow-y: auto; font-size: 0.875rem;"></pre>
+                    </div>
+                    <div class="tab-pane fade" id="configContent" role="tabpanel">
+                        <pre id="configPreviewContent" style="background: #f8f9fa; padding: 1rem; border-radius: 4px; max-height: 500px; overflow-y: auto; font-size: 0.875rem;"></pre>
+                    </div>
+                    <div class="tab-pane fade" id="metadataContent" role="tabpanel">
+                        <pre id="metadataPreviewContent" style="background: #f8f9fa; padding: 1rem; border-radius: 4px; max-height: 500px; overflow-y: auto; font-size: 0.875rem;"></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 {% endblock %}
 
 {% block scripts %}
 <script>
+{% if config.ENABLE_PROMPT_PREVIEW %}
+// Prompt Preview Functionality (Dev Only)
+function showPromptPreview() {
+    const accountId = {{ business_account.id }};
+    
+    // Show loading state
+    const modal = new bootstrap.Modal(document.getElementById('promptPreviewModal'));
+    document.getElementById('promptPreviewContent').textContent = 'Loading prompt preview...';
+    document.getElementById('configPreviewContent').textContent = 'Loading...';
+    document.getElementById('metadataPreviewContent').textContent = 'Loading...';
+    modal.show();
+    
+    // Fetch prompt preview
+    fetch(`/business/dev/prompt-preview?account_id=${accountId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Display system prompt
+                document.getElementById('promptPreviewContent').textContent = data.prompt;
+                
+                // Display config JSON
+                document.getElementById('configPreviewContent').textContent = 
+                    JSON.stringify(data.config, null, 2);
+                
+                // Display metadata
+                document.getElementById('metadataPreviewContent').textContent = 
+                    JSON.stringify(data.metadata, null, 2) + '\n\nSample Context:\n' +
+                    JSON.stringify(data.sample_context, null, 2);
+            } else {
+                document.getElementById('promptPreviewContent').textContent = 
+                    'Error: ' + (data.error || 'Failed to generate preview');
+            }
+        })
+        .catch(error => {
+            document.getElementById('promptPreviewContent').textContent = 
+                'Error loading preview: ' + error.message;
+        });
+}
+{% endif %}
+
 // Character counter functionality
 function updateCharacterCounter(textareaId, counterId, maxLength) {
     const textarea = document.getElementById(textareaId);

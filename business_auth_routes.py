@@ -4516,6 +4516,69 @@ def save_survey_config():
         return redirect(url_for('business_auth.survey_config'))
 
 
+
+# ==== DEVELOPMENT-ONLY ROUTES ====
+
+@business_auth_bp.route('/dev/prompt-preview')
+@require_business_auth
+def prompt_preview():
+    """
+    Development-only endpoint for previewing AI survey prompts
+    Requires ENABLE_PROMPT_PREVIEW=true environment variable
+    Multi-tenant safe: Always uses session business account, validates campaign ownership
+    """
+    import os
+    
+    # Guard: Only available when environment variable is enabled
+    if not os.getenv('ENABLE_PROMPT_PREVIEW') == 'true':
+        return jsonify({'error': 'Not available'}), 404
+    
+    try:
+        # CRITICAL: Always use session's business account (ignore user-supplied account_id to prevent tenant leakage)
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Not authenticated'}), 401
+        
+        business_account_id = current_account.id
+        
+        # Get optional campaign_id from request
+        campaign_id = request.args.get('campaign_id', type=int)
+        
+        # Validate campaign ownership if campaign_id provided
+        if campaign_id:
+            from models import Campaign
+            campaign = Campaign.query.filter_by(
+                id=campaign_id,
+                business_account_id=business_account_id  # Enforce tenant ownership
+            ).first()
+            
+            if not campaign:
+                return jsonify({'error': 'Campaign not found or access denied'}), 404
+        
+        # Generate preview using helper
+        from prompt_preview_helper import build_preview_prompt
+        
+        preview_data = build_preview_prompt(
+            business_account_id=business_account_id,
+            campaign_id=campaign_id
+        )
+        
+        # Return preview data as JSON
+        return jsonify({
+            'success': True,
+            'prompt': preview_data['system_prompt'],
+            'config': preview_data['config'],
+            'metadata': preview_data['metadata'],
+            'sample_context': preview_data['sample_context']
+        })
+    
+    except Exception as e:
+        logger.error(f"Error generating prompt preview: {e}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
 # ==== LICENSE MANAGEMENT ROUTES ====
 
 # Business account license overview routes (for regular business users)
