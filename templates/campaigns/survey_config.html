@@ -494,15 +494,49 @@
 function showPromptPreview() {
     const campaignId = {{ campaign.id }};
     
+    // Serialize all form fields to capture current (unsaved) state
+    const formData = {
+        campaign_id: campaignId,
+        
+        // Text fields
+        product_description: document.getElementById('product_description')?.value || '',
+        custom_end_message: document.getElementById('custom_end_message')?.value || '',
+        custom_system_prompt: document.getElementById('custom_system_prompt')?.value || '',
+        
+        // Numeric fields
+        max_questions: parseInt(document.getElementById('max_questions')?.value) || 8,
+        max_duration_seconds: parseInt(document.getElementById('max_duration_seconds')?.value) || 120,
+        max_follow_ups_per_topic: parseInt(document.getElementById('max_follow_ups_per_topic')?.value) || 2,
+        
+        // Checkbox arrays
+        survey_goals: Array.from(document.querySelectorAll('input[name="survey_goals"]:checked'))
+            .map(el => el.value),
+        prioritized_topics: Array.from(document.querySelectorAll('input[name="prioritized_topics"]:checked'))
+            .map(el => el.value)
+    };
+    
     // Show loading state
     const modal = new bootstrap.Modal(document.getElementById('promptPreviewModal'));
-    document.getElementById('promptPreviewContent').textContent = 'Loading prompt preview...';
+    document.getElementById('promptPreviewContent').textContent = 'Loading prompt preview with current form values...';
     document.getElementById('configPreviewContent').textContent = 'Loading...';
     document.getElementById('metadataPreviewContent').textContent = 'Loading...';
     modal.show();
     
-    // Fetch prompt preview for this campaign
-    fetch(`/business/dev/prompt-preview?campaign_id=${campaignId}`)
+    // Get CSRF token
+    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+    
+    // POST form data to preview endpoint
+    fetch('/business/dev/prompt-preview', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            campaign_id: campaignId,
+            config_overrides: formData
+        })
+    })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
