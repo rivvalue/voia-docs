@@ -4519,13 +4519,74 @@ def save_survey_config():
 
 # ==== DEVELOPMENT-ONLY ROUTES ====
 
-@business_auth_bp.route('/dev/prompt-preview')
+def _sanitize_config_overrides(overrides):
+    """
+    Validate and sanitize survey config overrides from client
+    Prevents injection attacks and ensures data types are correct
+    """
+    import re
+    
+    sanitized = {}
+    
+    # Text fields - strip HTML/script tags, limit length
+    text_fields = {
+        'industry': 100,
+        'conversation_tone': 50,
+        'company_description': 500,
+        'product_description': 500,
+        'target_clients_description': 300,
+        'custom_end_message': 1000,
+        'custom_system_prompt': 5000
+    }
+    
+    for field, max_length in text_fields.items():
+        if field in overrides:
+            value = str(overrides[field])
+            # Strip script tags
+            value = re.sub(r'<script[^>]*>.*?</script>', '', value, flags=re.IGNORECASE | re.DOTALL)
+            # Limit length
+            value = value[:max_length]
+            sanitized[field] = value
+    
+    # Numeric fields - ensure integers within valid ranges
+    numeric_fields = {
+        'max_questions': (3, 15, 8),
+        'max_duration_seconds': (60, 300, 120),
+        'max_follow_ups_per_topic': (1, 5, 2)
+    }
+    
+    for field, (min_val, max_val, default) in numeric_fields.items():
+        if field in overrides:
+            try:
+                value = int(overrides[field])
+                # Clamp to valid range
+                value = max(min_val, min(max_val, value))
+                sanitized[field] = value
+            except (ValueError, TypeError):
+                sanitized[field] = default
+    
+    # Array fields - ensure they're lists of strings
+    array_fields = ['survey_goals', 'prioritized_topics', 'optional_topics']
+    
+    for field in array_fields:
+        if field in overrides:
+            if isinstance(overrides[field], list):
+                # Filter out non-strings and limit to 20 items
+                sanitized[field] = [str(item)[:100] for item in overrides[field] if item][:20]
+            else:
+                sanitized[field] = []
+    
+    return sanitized
+
+@business_auth_bp.route('/dev/prompt-preview', methods=['GET', 'POST'])
 @require_business_auth
 def prompt_preview():
     """
     Development-only endpoint for previewing AI survey prompts
     Requires ENABLE_PROMPT_PREVIEW=true environment variable
     Multi-tenant safe: Always uses session business account, validates campaign ownership
+    
+    Supports both GET (DB values) and POST (form override values) for pre-save validation
     """
     import os
     
@@ -4541,8 +4602,31 @@ def prompt_preview():
         
         business_account_id = current_account.id
         
-        # Get optional campaign_id from request
-        campaign_id = request.args.get('campaign_id', type=int)
+        # Get optional campaign_id (from query string for GET, from body for POST)
+        campaign_id = None
+        config_overrides = None
+        
+        if request.method == 'POST':
+            # Extract data from JSON body
+            data = request.get_json() or {}
+            # Note: dict.get doesn't support type parameter (unlike request.args.get)
+            # Safely parse campaign_id with try/except to handle malformed inputs
+            campaign_id = None
+            if 'campaign_id' in data and data['campaign_id']:
+                try:
+                    campaign_id = int(data['campaign_id'])
+                except (ValueError, TypeError):
+                    logger.warning(f"Invalid campaign_id in preview request: {data.get('campaign_id')}")
+                    campaign_id = None
+            
+            config_overrides = data.get('config_overrides', {})
+            
+            # Validate and sanitize overrides
+            if config_overrides:
+                config_overrides = _sanitize_config_overrides(config_overrides)
+        else:
+            # GET request - use query params (legacy support)
+            campaign_id = request.args.get('campaign_id', type=int)
         
         # Validate campaign ownership if campaign_id provided
         if campaign_id:
@@ -4555,12 +4639,13 @@ def prompt_preview():
             if not campaign:
                 return jsonify({'error': 'Campaign not found or access denied'}), 404
         
-        # Generate preview using helper
+        # Generate preview using helper (with optional overrides)
         from prompt_preview_helper import build_preview_prompt
         
         preview_data = build_preview_prompt(
             business_account_id=business_account_id,
-            campaign_id=campaign_id
+            campaign_id=campaign_id,
+            config_overrides=config_overrides
         )
         
         # Return preview data as JSON
