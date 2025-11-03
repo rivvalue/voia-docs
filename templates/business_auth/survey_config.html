@@ -449,17 +449,51 @@
 {% if ENABLE_PROMPT_PREVIEW %}
 // Prompt Preview Functionality (Dev Only)
 function showPromptPreview() {
-    const accountId = {{ business_account.id }};
+    // Serialize all form fields to capture current (unsaved) state
+    const formData = {
+        // Text and select fields
+        industry: document.getElementById('industry')?.value || '',
+        conversation_tone: document.getElementById('conversation_tone')?.value || '',
+        company_description: document.getElementById('company_description')?.value || '',
+        product_description: document.getElementById('product_description')?.value || '',
+        target_clients_description: document.getElementById('target_clients_description')?.value || '',
+        custom_end_message: document.getElementById('custom_end_message')?.value || '',
+        
+        // Numeric fields (range inputs)
+        max_questions: parseInt(document.getElementById('max_questions')?.value) || 8,
+        max_duration_seconds: parseInt(document.getElementById('max_duration_seconds')?.value) || 120,
+        max_follow_ups_per_topic: parseInt(document.getElementById('max_follow_ups_per_topic')?.value) || 2,
+        
+        // Checkbox arrays
+        survey_goals: Array.from(document.querySelectorAll('input[name="survey_goals"]:checked'))
+            .map(el => el.value),
+        prioritized_topics: Array.from(document.querySelectorAll('input[name="prioritized_topics"]:checked'))
+            .map(el => el.value),
+        optional_topics: Array.from(document.querySelectorAll('input[name="optional_topics"]:checked'))
+            .map(el => el.value)
+    };
     
     // Show loading state
     const modal = new bootstrap.Modal(document.getElementById('promptPreviewModal'));
-    document.getElementById('promptPreviewContent').textContent = 'Loading prompt preview...';
+    document.getElementById('promptPreviewContent').textContent = 'Loading prompt preview with current form values...';
     document.getElementById('configPreviewContent').textContent = 'Loading...';
     document.getElementById('metadataPreviewContent').textContent = 'Loading...';
     modal.show();
     
-    // Fetch prompt preview
-    fetch(`/business/dev/prompt-preview?account_id=${accountId}`)
+    // Get CSRF token
+    const csrfToken = document.querySelector('input[name="csrf_token"]')?.value;
+    
+    // POST form data to preview endpoint
+    fetch('/business/dev/prompt-preview', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            config_overrides: formData
+        })
+    })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
