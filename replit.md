@@ -1,6 +1,16 @@
 # Overview
 VOÏA (Voice Of Client) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. It transforms raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project includes a production-ready multi-tenant participant management system with extensive email delivery capabilities, AI-powered conversational surveys using a hybrid prompt architecture, and participant segmentation for personalized experiences and advanced analytics.
 
+# Recent Changes
+**November 4, 2025**: Implemented role-based AI persona templates and prompt optimization
+- Added 5-tier persona template system (C-Level, VP/Director, Manager, Team Lead, End User) for conversational surveys
+- Implemented intelligent role mapping with word-boundary pattern matching to avoid false positives
+- Added anonymization guards to prevent role exposure when anonymization is enabled
+- Implemented multilingual support via hybrid approach (English personas + GPT language instruction)
+- Updated prompt instructions from SQL-like mechanical directives to natural language for improved clarity
+- Separated Support Quality (`support_rating`) from Professional Services (`service_rating`) in database schema and analytics
+- All changes validated via Prompt Preview feature and architect review with backward compatibility confirmed
+
 # User Preferences
 Preferred communication style: Simple, everyday language.
 User interface tone: Thought leadership and research-oriented language, avoiding sales-oriented messaging.
@@ -15,8 +25,8 @@ The system is a Flask web application with a multi-tiered architecture. The fron
 **Technical Implementations**:
 -   **Survey Collection**: Multi-step forms with dynamic follow-up questions and real-time validation.
 -   **AI Analysis Engine**: Sentiment analysis, key theme extraction, churn risk assessment, growth opportunity identification, and NPS-based growth factor analysis.
--   **Conversational Surveys (VOÏA)**: AI-powered (GPT-4o) natural language interface with advanced personalization and a hybrid prompt architecture for dynamic question generation and structured data extraction. Includes participant segmentation and feature flag rollout.
--   **Data Management**: Centralized data aggregation, NPS calculation, time-based filtering, and optimized database queries.
+-   **Conversational Surveys (VOÏA)**: AI-powered (GPT-4o) natural language interface with advanced personalization and a hybrid prompt architecture for dynamic question generation and structured data extraction. Features role-based persona templates (5-tier system: C-Level, VP/Director, Manager, Team Lead, End User) that adapt AI tone and focus based on participant seniority. Includes intelligent role mapping with word-boundary pattern matching, anonymization guards for privacy protection, multilingual support via hybrid approach (English personas + GPT language instruction), and natural language prompt instructions for improved clarity. Includes participant segmentation and feature flag rollout.
+-   **Data Management**: Centralized data aggregation, NPS calculation, time-based filtering, and optimized database queries. Separate tracking of Professional Services quality (`service_rating`) and Support Quality (`support_rating`) for granular analytics with nullable backward-compatible schema.
 -   **Authentication**: JWT token-based with email validation, admin roles, server-side token generation, and automatic invalidation.
 -   **Performance & Scalability**: PostgreSQL-backed persistent task queue, database indexing, connection pooling, asynchronous background tasks for AI, IP-based rate limiting, optimized dashboard queries, admin-configurable response caching, and frontend optimizations. Scaled to support 100 concurrent users via Gunicorn multi-worker configuration and expanded SQLAlchemy connection pool. Environment-aware static file caching (1-year browser cache in production, 1-hour in development) reduces bandwidth by 75% and improves page navigation speed by 500ms.
 -   **Audit Trail System**: Comprehensive audit logging with accurate timestamp preservation, integrated with a PostgreSQL task queue for async processing.
