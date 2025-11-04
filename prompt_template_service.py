@@ -17,10 +17,122 @@ TOPIC_FIELD_MAP = {
     "Professional Services Quality": ["service_rating"],
     "Product Value": ["product_value_rating"],
     "Pricing Value": ["pricing_rating"],
-    "Support Quality": ["service_rating"],
+    "Support Quality": ["support_rating"],
     "Improvement Suggestions": ["improvement_feedback"],
     "Additional Feedback": ["additional_comments"]
 }
+
+# Role-Based Persona Templates for Conversational Surveys
+# These personas adapt the AI's tone and focus based on participant seniority
+PERSONA_TEMPLATES = {
+    'c_level': """You are VOÏA, an AI-powered feedback agent. You're speaking with a C-level executive at one of {business_account_name}'s client organizations.
+
+Your role is to lead a strategic, respectful conversation focused on the executive's perception of {business_account_name}'s overall value, trust, alignment with business goals, and ROI.
+
+Use a concise, professional tone. Prioritize high-level themes like:
+- Business impact
+- Relationship strength
+- Pricing justification
+- Roadmap alignment
+- Renewal confidence
+
+Avoid detailed product questions unless raised by the executive. Be mindful of their time and keep the conversation efficient.""",
+    
+    'vp_director': """You are VOÏA, a feedback specialist speaking with a senior leader (VP or Director) who oversees operations related to {business_account_name}'s products or services.
+
+Focus the conversation on:
+- Adoption and performance of the solution
+- Internal feedback from their teams
+- Ease of collaboration with {business_account_name}
+- Perceived value and strategic alignment
+
+Maintain a professional tone with space for nuance. Invite constructive feedback and let them expand where needed. Highlight how their insights shape future improvements.""",
+    
+    'manager': """You are VOÏA, gathering feedback from a manager directly responsible for teams using {business_account_name}'s solutions.
+
+Keep the conversation operational and practical:
+- How the product/service performs day to day
+- Feedback received from their team
+- Responsiveness of {business_account_name}'s support or delivery teams
+- Specific frictions or wins in the collaboration
+
+Maintain a professional but personable tone. Use their answers to explore real-world usage, friction points, and overall satisfaction.""",
+    
+    'team_lead': """You are VOÏA, collecting feedback from a team lead or supervisor who supports users of {business_account_name}'s product or services.
+
+Your conversation should focus on:
+- Day-to-day usability
+- Training/support experience
+- Integration with team workflows
+- Communication with {business_account_name}'s reps
+
+Use accessible language. Be encouraging and non-technical. Give space for honest input about what works well and what doesn't.""",
+    
+    'end_user': """You are VOÏA, a friendly AI assistant asking for feedback from someone who uses {business_account_name}'s product or service in their day-to-day work.
+
+Keep the tone conversational and clear. Focus on:
+- What they like or dislike about the tool/service
+- Ease of use
+- Any frustrations or suggestions
+- Whether they'd recommend it to others in their role
+
+Avoid jargon or business terms. Make them feel heard and valued as the people who experience the product most directly.""",
+    
+    'default': """You are VOÏA, an AI-powered customer feedback specialist conducting a survey for {business_account_name}.
+
+Your role is to lead a natural, conversational dialogue focused on gathering strategic feedback about the client's experience and satisfaction with {business_account_name}'s products or services.
+
+Maintain a professional yet approachable tone. Adapt your focus based on the participant's responses and ensure they feel heard throughout the conversation."""
+}
+
+
+def _map_role_to_tier(role_string: Optional[str]) -> str:
+    """
+    Map participant role to persona tier with normalized matching
+    
+    Args:
+        role_string: Raw role string from participant data
+        
+    Returns:
+        Persona tier key (c_level, vp_director, manager, team_lead, end_user, default)
+    """
+    if not role_string:
+        return 'end_user'  # Conservative default when role is missing
+    
+    normalized = role_string.lower().strip()
+    
+    # C-Level patterns - use word boundary checks to avoid false matches
+    # (e.g., "director" shouldn't match "cto" from "director")
+    c_level_titles = ['ceo', 'cfo', 'coo', 'cto', 'chief']
+    for title in c_level_titles:
+        # Check if title appears as a complete word (with word boundaries)
+        if f' {title} ' in f' {normalized} ' or normalized.startswith(f'{title} ') or normalized.endswith(f' {title}') or normalized == title:
+            return 'c_level'
+    
+    # Check for "president" (but not "vice president") or "executive director"
+    if ' president' in normalized or normalized == 'president':
+        if 'vice' not in normalized:
+            return 'c_level'
+    if 'executive director' in normalized:
+        return 'c_level'
+    
+    # VP/Director patterns
+    vp_director_patterns = ['vp', 'vice president', 'director', 'head of', 'senior director']
+    if any(pattern in normalized for pattern in vp_director_patterns):
+        return 'vp_director'
+    
+    # Manager patterns (but not "team lead manager")
+    manager_patterns = ['manager', 'product manager', 'project manager', 'program manager']
+    if any(pattern in normalized for pattern in manager_patterns) and 'lead' not in normalized:
+        return 'manager'
+    
+    # Team Lead patterns
+    team_lead_patterns = ['team lead', 'supervisor', 'lead', 'coordinator']
+    if any(pattern in normalized for pattern in team_lead_patterns):
+        return 'team_lead'
+    
+    # End User / IC - conservative default
+    return 'end_user'
 
 
 class PromptTemplateService:
@@ -223,6 +335,31 @@ class PromptTemplateService:
         
         return 120  # Default
     
+    def _select_persona_template(self, participant_data: Optional[Dict[str, Any]] = None, anonymize: bool = False) -> str:
+        """
+        Select appropriate persona template based on participant role
+        
+        Args:
+            participant_data: Dictionary with participant info including role
+            anonymize: Whether anonymization is enabled for this campaign
+            
+        Returns:
+            Formatted persona template with business account name substituted
+        """
+        business_name = self.get_company_name()
+        
+        # Use default persona if anonymization is enabled OR participant data is missing
+        if anonymize or not participant_data:
+            return PERSONA_TEMPLATES['default'].format(business_account_name=business_name)
+        
+        # Extract role and map to tier
+        role = participant_data.get('role')
+        tier = _map_role_to_tier(role)
+        
+        # Get persona template and substitute business name
+        persona_template = PERSONA_TEMPLATES.get(tier, PERSONA_TEMPLATES['default'])
+        return persona_template.format(business_account_name=business_name)
+    
     def generate_welcome_message(self, respondent_name: str) -> str:
         """Generate personalized welcome message"""
         company_name = self.get_company_name()
@@ -257,6 +394,24 @@ class PromptTemplateService:
         """Generate hybrid prompt with structured JSON configuration and conversation guidance"""
         survey_config = self.build_survey_config_json(participant_data)
         
+        # Check if anonymization is enabled for this campaign
+        anonymize = self.campaign and self.campaign.anonymize_responses if self.campaign else False
+        
+        # Select role-based persona template
+        persona_intro = self._select_persona_template(participant_data, anonymize)
+        
+        # Get participant language for response
+        participant_language = 'en'  # Default to English
+        if participant_data and participant_data.get('language'):
+            participant_language = participant_data.get('language')
+        
+        # Language instruction based on participant preference
+        language_instruction = ""
+        if participant_language and participant_language != 'en':
+            language_map = {'fr': 'French', 'es': 'Spanish'}
+            language_name = language_map.get(participant_language, participant_language)
+            language_instruction = f"\n\nIMPORTANT: Conduct this entire conversation in {language_name}. Ask questions and respond in {language_name}."
+        
         # Build participant profile section
         participant_section = ""
         if survey_config.get("participant_profile"):
@@ -287,22 +442,14 @@ SURVEY DATA COLLECTED SO FAR:
 
 CONVERSATION STEP: {step_count} / {survey_config['max_questions']}
 
-You are VOÏA, an AI-powered customer feedback specialist conducting a survey for {survey_config['company_name']}.
+{persona_intro}{language_instruction}
 
 Your responsibilities:
 1. Follow SURVEY CONFIGURATION.goals priorities strictly - always work through topics in priority order
 2. Ask ONE question at a time in a {survey_config['conversation_tone']} conversational style
-3. Select the highest-priority remaining topic from goals list (check SURVEY DATA COLLECTED for completed topics)
+3. Select the highest-priority remaining topic from goals list - only ask about details that are still missing
 4. Stop when max_questions ({survey_config['max_questions']}) is reached
-5. Never ask for data already in SURVEY DATA COLLECTED SO FAR
-
-Personalization guidelines (adapt based on participant profile):
-- C-Level/VP roles: Focus on ROI, strategic value, executive concerns, business impact
-- Manager/Team Lead roles: Focus on team productivity, operational efficiency, workflow improvements  
-- End User roles: Focus on day-to-day usability, feature requests, user experience
-- Enterprise tier: Ask about integration, compliance, scalability, enterprise features
-- SMB/Startup tier: Focus on ease of use, value for money, support responsiveness
-- Regional considerations: Use region-appropriate examples and timezone-aware language
+5. Before asking any question, check if the data has already been collected. Only ask for missing fields.
 
 Be empathetic, adapt to user communication style, and keep the conversation natural while respecting all constraints.
 
@@ -347,8 +494,7 @@ GUIDELINES:
 - Keep the conversation natural and engaging
 - Use a {tone} tone throughout
 - Ask ONE question at a time
-- CRITICALLY IMPORTANT: DON'T ask for information you already have (check SURVEY DATA COLLECTED SO FAR)
-- ALREADY COLLECTED DATA CHECK: Before asking ANY question, verify the field is NULL in SURVEY DATA COLLECTED SO FAR
+- Before asking any question, check if the data has already been collected. Only ask for missing fields.
 - Reference their previous responses to show you're listening
 - If they mention specific issues, dig deeper with follow-up questions
 - Keep questions focused on {company_name}'s performance and relationship
@@ -382,8 +528,7 @@ YOUR ROLE: You are a helpful customer feedback specialist having a natural conve
 GUIDELINES:
 - Keep the conversation natural and engaging
 - Ask ONE question at a time
-- CRITICALLY IMPORTANT: DON'T ask for information you already have (check SURVEY DATA COLLECTED SO FAR)
-- ALREADY COLLECTED DATA CHECK: Before asking ANY question, verify the field is NULL in SURVEY DATA COLLECTED SO FAR
+- Before asking any question, check if the data has already been collected. Only ask for missing fields.
 - Reference their previous responses to show you're listening
 - If they mention specific issues, dig deeper with follow-up questions
 - Keep questions focused on Archelo Group's performance and relationship

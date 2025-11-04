@@ -699,6 +699,13 @@ def get_dashboard_data(campaign_id=None):
             pricing_query = pricing_query.filter(SurveyResponse.campaign_id == campaign_id)
         avg_pricing = pricing_query.scalar() or 0
         
+        support_query = db.session.query(func.avg(SurveyResponse.support_rating)).filter(
+            SurveyResponse.support_rating.isnot(None)
+        )
+        if campaign_id:
+            support_query = support_query.filter(SurveyResponse.campaign_id == campaign_id)
+        avg_support = support_query.scalar() or 0
+        
         # Tenure distribution with campaign filtering
         tenure_query = db.session.query(
             SurveyResponse.tenure_with_fc,
@@ -816,7 +823,8 @@ def get_dashboard_data(campaign_id=None):
                 'satisfaction': float(round(avg_satisfaction, 1)),
                 'product_value': float(round(avg_product_value, 1)),
                 'service': float(round(avg_service, 1)),
-                'pricing': float(round(avg_pricing, 1))
+                'pricing': float(round(avg_pricing, 1)),
+                'support': float(round(avg_support, 1))
             },
             'tenure_distribution': [
                 {'tenure': row.tenure_with_fc, 'count': row.count}
@@ -871,7 +879,8 @@ def convert_snapshot_to_dashboard_format(snapshot):
             'satisfaction': float(snapshot.avg_satisfaction_rating or 0),
             'pricing': float(snapshot.avg_pricing_rating or 0),
             'service': float(snapshot.avg_service_rating or 0),
-            'product_value': float(snapshot.avg_product_value_rating or 0)
+            'product_value': float(snapshot.avg_product_value_rating or 0),
+            'support': float(snapshot.avg_support_rating or 0)
         }
         
         # Return comprehensive dashboard data from snapshot
@@ -1361,12 +1370,18 @@ def generate_campaign_kpi_snapshot(campaign_id):
             SurveyResponse.product_value_rating.isnot(None)
         ).scalar() or 0
         
+        avg_support = db.session.query(func.avg(SurveyResponse.support_rating)).filter(
+            SurveyResponse.campaign_id == campaign_id,
+            SurveyResponse.support_rating.isnot(None)
+        ).scalar() or 0
+        
         # Ratings distribution for charts
         ratings_distribution = [
             {"category": "Satisfaction", "rating": round(float(avg_satisfaction), 2) if avg_satisfaction else 0},
             {"category": "Pricing", "rating": round(float(avg_pricing), 2) if avg_pricing else 0},
             {"category": "Service", "rating": round(float(avg_service), 2) if avg_service else 0},
-            {"category": "Product Value", "rating": round(float(avg_product_value), 2) if avg_product_value else 0}
+            {"category": "Product Value", "rating": round(float(avg_product_value), 2) if avg_product_value else 0},
+            {"category": "Support", "rating": round(float(avg_support), 2) if avg_support else 0}
         ]
         
         # ============================================================================
@@ -1642,6 +1657,7 @@ def generate_campaign_kpi_snapshot(campaign_id):
             avg_pricing_rating=round(float(avg_pricing), 2) if avg_pricing else None,
             avg_service_rating=round(float(avg_service), 2) if avg_service else None,
             avg_product_value_rating=round(float(avg_product_value), 2) if avg_product_value else None,
+            avg_support_rating=round(float(avg_support), 2) if avg_support else None,
             sentiment_positive_pct=sentiment_positive_pct,
             sentiment_negative_pct=sentiment_negative_pct,
             sentiment_neutral_pct=sentiment_neutral_pct,

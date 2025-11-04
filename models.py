@@ -31,6 +31,7 @@ class SurveyResponse(db.Model):
     product_value_rating = db.Column(db.Integer)
     service_rating = db.Column(db.Integer)
     pricing_rating = db.Column(db.Integer)
+    support_rating = db.Column(db.Integer, nullable=True)
     
     # Text responses
     improvement_feedback = db.Column(db.Text)
@@ -90,6 +91,7 @@ class SurveyResponse(db.Model):
             'product_value_rating': self.product_value_rating,
             'service_rating': self.service_rating,
             'pricing_rating': self.pricing_rating,
+            'support_rating': self.support_rating,
             'improvement_feedback': self.improvement_feedback,
             'recommendation_reason': self.recommendation_reason,
             'additional_comments': self.additional_comments,
@@ -611,6 +613,7 @@ class CampaignKPISnapshot(db.Model):
     avg_pricing_rating = db.Column(db.Float, nullable=True)
     avg_service_rating = db.Column(db.Float, nullable=True)
     avg_product_value_rating = db.Column(db.Float, nullable=True)
+    avg_support_rating = db.Column(db.Float, nullable=True)
     
     # Sentiment Distribution (percentages)
     sentiment_positive_pct = db.Column(db.Float, nullable=True, default=0.0)
@@ -676,6 +679,7 @@ class CampaignKPISnapshot(db.Model):
             'avg_pricing_rating': self.avg_pricing_rating,
             'avg_service_rating': self.avg_service_rating,
             'avg_product_value_rating': self.avg_product_value_rating,
+            'avg_support_rating': self.avg_support_rating,
             'sentiment_positive_pct': self.sentiment_positive_pct,
             'sentiment_negative_pct': self.sentiment_negative_pct,
             'sentiment_neutral_pct': self.sentiment_neutral_pct,
