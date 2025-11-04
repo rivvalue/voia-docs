@@ -4,6 +4,7 @@ Dedicated routes for campaign lifecycle management with email invitation functio
 """
 
 import logging
+import os
 import uuid
 from datetime import datetime, timedelta
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
@@ -1114,7 +1115,8 @@ def survey_config(campaign_id):
         # Allow viewing for all statuses - template handles read-only mode for active/completed
         return render_template('campaigns/survey_config.html',
                              campaign=campaign.to_dict(),
-                             business_account=current_account.to_dict())
+                             business_account=current_account.to_dict(),
+                             ENABLE_PROMPT_PREVIEW=os.getenv('ENABLE_PROMPT_PREVIEW') == 'true')
         
     except Exception as e:
         logger.error(f"Survey config display error for campaign {campaign_id}: {e}")

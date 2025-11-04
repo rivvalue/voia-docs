@@ -12,6 +12,7 @@ from feature_flags import feature_flags
 from audit_utils import queue_audit_log
 from flask_babel import gettext as _
 import logging
+import os
 from datetime import datetime, timedelta, date
 import json
 import re
@@ -4417,7 +4418,8 @@ def survey_config():
                              business_account=current_account,
                              industry_options=industry_options,
                              tone_options=tone_options,
-                             topic_options=topic_options)
+                             topic_options=topic_options,
+                             ENABLE_PROMPT_PREVIEW=os.getenv('ENABLE_PROMPT_PREVIEW') == 'true')
     
     except Exception as e:
         logger.error(f"Error loading survey configuration: {e}")
