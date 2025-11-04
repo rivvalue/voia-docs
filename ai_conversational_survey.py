@@ -1076,6 +1076,104 @@ Be conversational, empathetic, and adaptive to their communication style."""
 # Global instances for session persistence
 ai_conversation_instances = {}
 
+
+def save_conversation_state(conversation_id: str, ai_survey: 'AIConversationalSurvey'):
+    """Save conversation state to database for persistence across workers and restarts"""
+    try:
+        from app import db
+        from models import ActiveConversation
+        import json
+        import logging
+        
+        logger = logging.getLogger(__name__)
+        
+        conversation_data = {
+            'conversation_history': json.dumps(ai_survey.conversation_history),
+            'extracted_data': json.dumps(ai_survey.extracted_data),
+            'survey_data': json.dumps(ai_survey.survey_data),
+            'step_count': ai_survey.step_count,
+            'business_account_id': ai_survey.business_account_id,
+            'campaign_id': ai_survey.campaign_id,
+            'participant_data': json.dumps(ai_survey.participant_data) if ai_survey.participant_data else None
+        }
+        
+        existing = ActiveConversation.query.filter_by(conversation_id=conversation_id).first()
+        
+        if existing:
+            for key, value in conversation_data.items():
+                setattr(existing, key, value)
+            existing.last_updated = datetime.utcnow()
+        else:
+            new_conversation = ActiveConversation(
+                conversation_id=conversation_id,
+                **conversation_data
+            )
+            db.session.add(new_conversation)
+        
+        db.session.commit()
+        logger.debug(f"Conversation state saved for {conversation_id}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Error saving conversation state for {conversation_id}: {e}")
+        db.session.rollback()
+        return False
+
+
+def load_conversation_state(conversation_id: str) -> Optional[Dict[str, Any]]:
+    """Load conversation state from database"""
+    try:
+        from models import ActiveConversation
+        import json
+        import logging
+        
+        logger = logging.getLogger(__name__)
+        
+        session = ActiveConversation.query.filter_by(conversation_id=conversation_id).first()
+        
+        if not session:
+            logger.debug(f"No persisted state found for conversation {conversation_id}")
+            return None
+        
+        state = {
+            'conversation_history': json.loads(session.conversation_history) if session.conversation_history else [],
+            'extracted_data': json.loads(session.extracted_data) if session.extracted_data else {},
+            'survey_data': json.loads(session.survey_data) if session.survey_data else {},
+            'step_count': session.step_count,
+            'business_account_id': session.business_account_id,
+            'campaign_id': session.campaign_id,
+            'participant_data': json.loads(session.participant_data) if session.participant_data else None
+        }
+        
+        logger.debug(f"Loaded conversation state for {conversation_id}: step {state['step_count']}")
+        return state
+        
+    except Exception as e:
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error loading conversation state for {conversation_id}: {e}")
+        return None
+
+
+def delete_conversation_state(conversation_id: str):
+    """Delete conversation state from database after finalization"""
+    try:
+        from app import db
+        from models import ActiveConversation
+        import logging
+        
+        logger = logging.getLogger(__name__)
+        
+        session = ActiveConversation.query.filter_by(conversation_id=conversation_id).first()
+        if session:
+            db.session.delete(session)
+            db.session.commit()
+            logger.debug(f"Deleted conversation state for {conversation_id}")
+        
+    except Exception as e:
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error deleting conversation state for {conversation_id}: {e}")
+        db.session.rollback()
+
 def start_ai_conversational_survey(company_name: str, respondent_name: str, tenure_with_fc=None, business_account_id: Optional[int] = None, campaign_id: Optional[int] = None, participant_data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """Start a new AI-powered conversational survey session with optional participant segmentation data"""
     conversation_id = str(uuid.uuid4())
@@ -1092,6 +1190,8 @@ def start_ai_conversational_survey(company_name: str, respondent_name: str, tenu
     # Store instance for session persistence
     ai_conversation_instances[conversation_id] = ai_survey
     
+    save_conversation_state(conversation_id, ai_survey)
+    
     return result
 
 def process_ai_conversation_response(user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
@@ -1105,42 +1205,61 @@ def process_ai_conversation_response(user_input: str, context: Dict[str, Any]) -
     if conversation_id and conversation_id in ai_conversation_instances:
         ai_survey = ai_conversation_instances[conversation_id]
         print(f"DEBUG: Found existing instance with step {ai_survey.step_count}, extracted data: {ai_survey.extracted_data}")
-        return ai_survey.process_user_response(user_input, context)
+        response = ai_survey.process_user_response(user_input, context)
+        
+        save_conversation_state(conversation_id, ai_survey)
+        
+        return response
     else:
-        print(f"WARNING: No instance found for conversation_id {conversation_id}, recreating from context")
+        print(f"WARNING: No instance found for conversation_id {conversation_id}, attempting database recovery")
         print(f"AVAILABLE INSTANCES: {ai_conversation_instances}")
         
-        # RECOVERY: Recreate the conversation instance from context data
-        business_account_id = context.get('business_account_id')
-        campaign_id = context.get('campaign_id')
-        participant_data = context.get('participant_data')  # Restore participant data if available
-        ai_survey = AIConversationalSurvey(business_account_id=business_account_id, campaign_id=campaign_id, participant_data=participant_data)
+        persisted_state = load_conversation_state(conversation_id)
         
-        # Restore survey data from context
-        company_name = context.get('company_name', '')
-        respondent_name = context.get('respondent_name', '')
-        
-        # Initialize the survey data with context
-        ai_survey.survey_data = {
-            'company_name': company_name,
-            'respondent_name': respondent_name,
-            'conversation_history': context.get('conversation_history', []),
-            'extracted_data': context.get('extracted_data', {})
-        }
-        
-        # Set extracted data from context
-        ai_survey.extracted_data = ai_survey.survey_data['extracted_data']
-        
-        # Try to restore step count from context or estimate it
-        ai_survey.step_count = context.get('step_count', len(context.get('conversation_history', [])) // 2)
-        
-        print(f"RECOVERY: Recreated instance with step {ai_survey.step_count}, extracted data: {ai_survey.extracted_data}")
-        
-        # Store the recreated instance
-        if conversation_id:
+        if persisted_state:
+            print(f"DATABASE RECOVERY: Found persisted state, step {persisted_state['step_count']}")
+            business_account_id = persisted_state['business_account_id']
+            campaign_id = persisted_state['campaign_id']
+            participant_data = persisted_state['participant_data']
+            
+            ai_survey = AIConversationalSurvey(business_account_id=business_account_id, campaign_id=campaign_id, participant_data=participant_data)
+            ai_survey.conversation_history = persisted_state['conversation_history']
+            ai_survey.extracted_data = persisted_state['extracted_data']
+            ai_survey.survey_data = persisted_state['survey_data']
+            ai_survey.step_count = persisted_state['step_count']
+            
             ai_conversation_instances[conversation_id] = ai_survey
+            
+        else:
+            print(f"FALLBACK: No database state, recreating from client context")
+            business_account_id = context.get('business_account_id')
+            campaign_id = context.get('campaign_id')
+            participant_data = context.get('participant_data')
+            ai_survey = AIConversationalSurvey(business_account_id=business_account_id, campaign_id=campaign_id, participant_data=participant_data)
+            
+            company_name = context.get('company_name', '')
+            respondent_name = context.get('respondent_name', '')
+            
+            ai_survey.survey_data = {
+                'company_name': company_name,
+                'respondent_name': respondent_name,
+                'conversation_history': context.get('conversation_history', []),
+                'extracted_data': context.get('extracted_data', {})
+            }
+            
+            ai_survey.extracted_data = ai_survey.survey_data['extracted_data']
+            ai_survey.step_count = context.get('step_count', len(context.get('conversation_history', [])) // 2)
+            
+            print(f"FALLBACK: Recreated instance with step {ai_survey.step_count}, extracted data: {ai_survey.extracted_data}")
+            
+            if conversation_id:
+                ai_conversation_instances[conversation_id] = ai_survey
         
-        return ai_survey.process_user_response(user_input, context)
+        response = ai_survey.process_user_response(user_input, context)
+        
+        save_conversation_state(conversation_id, ai_survey)
+        
+        return response
 
 def finalize_ai_conversational_survey(context: Dict[str, Any]) -> Dict[str, Any]:
     """Finalize and convert AI conversational survey to structured format"""
@@ -1149,12 +1268,32 @@ def finalize_ai_conversational_survey(context: Dict[str, Any]) -> Dict[str, Any]
     print(f"Finalizing conversation {conversation_id}")
     print(f"Available instances: {list(ai_conversation_instances.keys())}")
     
+    ai_survey = None
+    
     if conversation_id and conversation_id in ai_conversation_instances:
         ai_survey = ai_conversation_instances[conversation_id]
+        print(f"Found in-memory AI survey instance with extracted data: {ai_survey.extracted_data}")
+    else:
+        print("No in-memory instance found - attempting database recovery")
+        persisted_state = load_conversation_state(conversation_id)
         
-        print(f"Found AI survey instance with extracted data: {ai_survey.extracted_data}")
+        if persisted_state:
+            print(f"DATABASE RECOVERY (finalize): Found persisted state, step {persisted_state['step_count']}")
+            business_account_id = persisted_state['business_account_id']
+            campaign_id = persisted_state['campaign_id']
+            participant_data = persisted_state['participant_data']
+            
+            ai_survey = AIConversationalSurvey(business_account_id=business_account_id, campaign_id=campaign_id, participant_data=participant_data)
+            ai_survey.conversation_history = persisted_state['conversation_history']
+            ai_survey.extracted_data = persisted_state['extracted_data']
+            ai_survey.survey_data = persisted_state['survey_data']
+            ai_survey.step_count = persisted_state['step_count']
+        else:
+            print("FALLBACK (finalize): No database state, using client context")
+    
+    if ai_survey:
+        print(f"Using AI survey instance with extracted data: {ai_survey.extracted_data}")
         
-        # Use the extracted data from the AI survey instance
         finalization_context = {
             'company_name': ai_survey.survey_data.get('company_name'),
             'respondent_name': ai_survey.survey_data.get('respondent_name'),
@@ -1164,12 +1303,14 @@ def finalize_ai_conversational_survey(context: Dict[str, Any]) -> Dict[str, Any]
         result = ai_survey.finalize_survey(finalization_context)
         print(f"Finalized result: {result}")
         
-        # Clean up the instance
-        del ai_conversation_instances[conversation_id]
+        if conversation_id in ai_conversation_instances:
+            del ai_conversation_instances[conversation_id]
+        
+        delete_conversation_state(conversation_id)
+        
         return result
     else:
-        print("No conversation instance found - using fallback")
-        # Enhanced fallback - try to extract from context
+        print("CLIENT FALLBACK: No instance or database state found - using context")
         survey_data = context.get('survey_data', {})
         extracted_data = survey_data.get('extracted_data', {})
         

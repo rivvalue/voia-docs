@@ -618,6 +618,7 @@ def cleanup_old_tasks():
     
     - Completed tasks: kept for 7 days
     - Failed tasks: kept for 30 days
+    - Stale conversations: kept for 24 hours
     
     Should be run daily via cron or scheduled task.
     """
@@ -640,16 +641,26 @@ def cleanup_old_tasks():
             """)
         )
         
+        # Delete stale active conversations older than 24 hours
+        result_conversations = db.session.execute(
+            text("""
+                DELETE FROM active_conversations 
+                WHERE last_updated < NOW() - INTERVAL '24 hours'
+            """)
+        )
+        
         db.session.commit()
         
         completed_count = result_completed.rowcount
         failed_count = result_failed.rowcount
+        conversation_count = result_conversations.rowcount
         
-        logger.info(f"Task cleanup: deleted {completed_count} completed tasks (>7 days) and {failed_count} failed tasks (>30 days)")
+        logger.info(f"Task cleanup: deleted {completed_count} completed tasks (>7 days), {failed_count} failed tasks (>30 days), and {conversation_count} stale conversations (>24 hours)")
         
         return {
             'completed_deleted': completed_count,
-            'failed_deleted': failed_count
+            'failed_deleted': failed_count,
+            'conversations_deleted': conversation_count
         }
         
     except Exception as e:

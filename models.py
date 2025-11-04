@@ -128,6 +128,41 @@ class SurveyResponse(db.Model):
         return []
 
 
+class ActiveConversation(db.Model):
+    __tablename__ = 'active_conversations'
+    __table_args__ = (
+        db.Index('idx_active_conv_last_updated', 'last_updated'),
+    )
+    
+    conversation_id = db.Column(db.String(36), primary_key=True)
+    business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=True, index=True)
+    campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=True, index=True)
+    participant_data = db.Column(db.Text, nullable=True)
+    conversation_history = db.Column(db.Text, nullable=False, default='[]')
+    extracted_data = db.Column(db.Text, nullable=False, default='{}')
+    survey_data = db.Column(db.Text, nullable=False, default='{}')
+    step_count = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    
+    business_account = db.relationship('BusinessAccount', foreign_keys='ActiveConversation.business_account_id')
+    campaign = db.relationship('Campaign', foreign_keys='ActiveConversation.campaign_id')
+    
+    def to_dict(self):
+        return {
+            'conversation_id': self.conversation_id,
+            'business_account_id': self.business_account_id,
+            'campaign_id': self.campaign_id,
+            'participant_data': json.loads(self.participant_data) if self.participant_data else None,
+            'conversation_history': json.loads(self.conversation_history) if self.conversation_history else [],
+            'extracted_data': json.loads(self.extracted_data) if self.extracted_data else {},
+            'survey_data': json.loads(self.survey_data) if self.survey_data else {},
+            'step_count': self.step_count,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'last_updated': self.last_updated.isoformat() if self.last_updated else None
+        }
+
+
 class Campaign(db.Model):
     """Campaign model for tracking feedback collection periods"""
     __tablename__ = 'campaigns'

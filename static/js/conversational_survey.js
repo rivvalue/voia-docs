@@ -26,11 +26,70 @@ let conversationState = {
     isComplete: false
 };
 
+function persistConversationState() {
+    try {
+        const stateToSave = {
+            conversationId: conversationState.conversationId,
+            messages: conversationState.messages,
+            surveyData: conversationState.surveyData,
+            currentStep: conversationState.currentStep,
+            timestamp: new Date().toISOString()
+        };
+        sessionStorage.setItem('voiaConversation', JSON.stringify(stateToSave));
+        console.log('Conversation state persisted to sessionStorage');
+    } catch (error) {
+        console.error('Failed to persist conversation state:', error);
+    }
+}
+
+function restoreConversationState() {
+    try {
+        const saved = sessionStorage.getItem('voiaConversation');
+        if (saved) {
+            const data = JSON.parse(saved);
+            conversationState.conversationId = data.conversationId;
+            conversationState.messages = data.messages || [];
+            conversationState.surveyData = data.surveyData || {};
+            conversationState.currentStep = data.currentStep || 'setup';
+            
+            console.log('Restored conversation state from sessionStorage:', data.timestamp);
+            console.log('Messages restored:', conversationState.messages.length);
+            
+            if (conversationState.messages.length > 0) {
+                const chatArea = document.getElementById('chatArea');
+                if (chatArea) {
+                    chatArea.innerHTML = '';
+                    conversationState.messages.forEach(msg => {
+                        addMessage(msg.sender, msg.message, false);
+                    });
+                }
+            }
+            
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.error('Failed to restore conversation state:', error);
+        return false;
+    }
+}
+
+function clearConversationState() {
+    try {
+        sessionStorage.removeItem('voiaConversation');
+        console.log('Conversation state cleared from sessionStorage');
+    } catch (error) {
+        console.error('Failed to clear conversation state:', error);
+    }
+}
+
 // Initialize the conversational survey
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM loaded, initializing conversational survey...');
     console.log('isAuthenticated:', window.isAuthenticated);
     console.log('userEmail:', window.userEmail);
+    
+    restoreConversationState();
     
     // Force setup regardless of authentication status for debugging
     setupEventListeners();
@@ -273,7 +332,7 @@ function sendMessage() {
     });
 }
 
-function addMessage(sender, message) {
+function addMessage(sender, message, persist = true) {
     const chatMessages = document.getElementById('chatMessages');
     const messageElement = document.createElement('div');
     messageElement.className = `chat-message ${sender === 'ai' ? 'assistant' : 'user'}`;
@@ -291,6 +350,11 @@ function addMessage(sender, message) {
         message: message,
         timestamp: new Date().toISOString()
     });
+    
+    // Persist to sessionStorage (skip during initial restoration)
+    if (persist) {
+        persistConversationState();
+    }
 }
 
 function formatMessage(message) {
@@ -533,6 +597,9 @@ function finalizeSurvey() {
         if (data.error) {
             throw new Error(data.error);
         }
+        
+        // Clear persisted conversation state from sessionStorage
+        clearConversationState();
         
         // Show completion state
         showSurveyComplete();
