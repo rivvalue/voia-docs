@@ -144,8 +144,11 @@ Return ONLY valid JSON in this exact format:
 }}"""
 
         # Single OpenAI API call for all analysis
+        # Model selection via environment variable for cost optimization
+        analysis_model = os.environ.get('AI_ANALYSIS_MODEL', 'gpt-4o-mini')
+        
         ai_response = openai_client.chat.completions.create(
-            model="gpt-4o",
+            model=analysis_model,
             messages=[
                 {
                     "role": "system",

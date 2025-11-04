@@ -228,8 +228,11 @@ Only include fields that are clearly present in the response. If a field is not 
 
 IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), return null for those fields to prevent overwrites."""
 
+            # Model selection via environment variable for cost optimization
+            conversation_model = os.environ.get('AI_CONVERSATION_MODEL', 'gpt-4o')
+            
             response = self.openai_client.chat.completions.create(
-                model="gpt-4o",
+                model=conversation_model,
                 messages=[{"role": "user", "content": prompt}],
                 response_format={"type": "json_object"},
                 max_tokens=400,
@@ -725,8 +728,11 @@ RESPONSE FORMAT - Return JSON:
 
 Be conversational, empathetic, and adaptive to their communication style."""
 
+            # Model selection via environment variable for cost optimization
+            conversation_model = os.environ.get('AI_CONVERSATION_MODEL', 'gpt-4o')
+            
             response = self.openai_client.chat.completions.create(
-                model="gpt-4o",
+                model=conversation_model,
                 messages=[{"role": "user", "content": full_prompt}],
                 response_format={"type": "json_object"},
                 max_tokens=300,
