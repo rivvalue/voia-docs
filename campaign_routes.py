@@ -252,9 +252,8 @@ def create_campaign():
 
 @campaign_bp.route('/<int:campaign_id>')
 @require_business_auth
-@require_permission('manage_participants')
 def view_campaign(campaign_id):
-    """View campaign details"""
+    """View campaign details (read-only access for all authenticated users)"""
     try:
         current_account = get_current_business_account()
         if not current_account:
