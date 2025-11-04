@@ -1082,6 +1082,7 @@ def save_conversation_state(conversation_id: str, ai_survey: 'AIConversationalSu
     try:
         from app import db
         from models import ActiveConversation
+        from datetime import datetime
         import json
         import logging
         
