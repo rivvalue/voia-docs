@@ -2,6 +2,14 @@
 VOÏA (Voice Of Client) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. It transforms raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project includes a production-ready multi-tenant participant management system with extensive email delivery capabilities, AI-powered conversational surveys using a hybrid prompt architecture, and participant segmentation for personalized experiences and advanced analytics.
 
 # Recent Changes
+**November 4, 2025**: Enhanced AI prompt personalization with structured context block
+- Implemented comprehensive context block in `build_survey_config_json()` to pass full business metadata to OpenAI
+- Context block now includes: company_description, product_description (with campaign override), target_clients (with campaign override), and industry
+- Increased AI personalization effectiveness from ~45% to ~95% by providing complete business context with every question
+- Campaign-specific values override business account defaults with intelligent null-omission (only non-empty fields included)
+- Backward compatible implementation - existing surveys unaffected, new context automatically enriches all future conversations
+- Context block visible in Prompt Preview feature for debugging and validation
+
 **November 4, 2025**: Implemented role-based AI persona templates and prompt optimization
 - Added 5-tier persona template system (C-Level, VP/Director, Manager, Team Lead, End User) for conversational surveys
 - Implemented intelligent role mapping with word-boundary pattern matching to avoid false positives

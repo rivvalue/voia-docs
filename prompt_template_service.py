@@ -649,7 +649,7 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
         return all_topics
     
     def build_survey_config_json(self, participant_data: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """Build structured survey configuration JSON for hybrid prompt architecture"""
+        """Build structured survey configuration JSON for hybrid prompt architecture with rich context"""
         company_name = self.get_company_name()
         
         # Build participant profile if data provided
@@ -665,6 +665,35 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
                 "language": participant_data.get("language", "en")
             }
         
+        # Build context block with campaign overrides (only include non-null values)
+        context = {}
+        
+        # Company description (business account only)
+        if self.business_account and hasattr(self.business_account, 'company_description') and self.business_account.company_description:
+            context['company_description'] = self.business_account.company_description
+        
+        # Product description (campaign overrides business account)
+        product_desc = None
+        if self.campaign and hasattr(self.campaign, 'product_description') and self.campaign.product_description:
+            product_desc = self.campaign.product_description
+        elif self.business_account and hasattr(self.business_account, 'product_description') and self.business_account.product_description:
+            product_desc = self.business_account.product_description
+        if product_desc:
+            context['product_description'] = product_desc
+        
+        # Target clients (campaign overrides business account)
+        target_clients = None
+        if self.campaign and hasattr(self.campaign, 'target_clients_description') and self.campaign.target_clients_description:
+            target_clients = self.campaign.target_clients_description
+        elif self.business_account and hasattr(self.business_account, 'target_clients_description') and self.business_account.target_clients_description:
+            target_clients = self.business_account.target_clients_description
+        if target_clients:
+            context['target_clients'] = target_clients
+        
+        # Industry (business account)
+        if self.business_account and hasattr(self.business_account, 'industry') and self.business_account.industry:
+            context['industry'] = self.business_account.industry
+        
         # Build survey configuration
         config = {
             "goals": self._build_prioritized_topics_with_fields(),
@@ -672,8 +701,7 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
             "max_duration_seconds": self.get_max_duration_seconds(),
             "conversation_tone": self.get_conversation_tone(),
             "company_name": company_name,
-            "industry": self.business_account.industry if self.business_account and hasattr(self.business_account, 'industry') else None,
-            "target_clients": self.business_account.target_clients_description if self.business_account and hasattr(self.business_account, 'target_clients_description') else None,
+            "context": context,
             "participant_profile": participant_profile
         }
         
