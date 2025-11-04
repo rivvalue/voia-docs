@@ -444,7 +444,16 @@ with app.app_context():
     import models_auth  # noqa: F401
     
     # Create database tables before importing routes
-    db.create_all()
+    try:
+        db.create_all()
+    except Exception as e:
+        # Handle DuplicateTable errors gracefully (tables already exist)
+        error_msg = str(e).lower()
+        if 'already exists' in error_msg or 'duplicatetable' in error_msg:
+            logger.info("Database tables already exist - skipping creation")
+        else:
+            # Re-raise unexpected errors
+            raise
     
     from task_queue import start_task_queue
     from business_accounts import business_account_manager
