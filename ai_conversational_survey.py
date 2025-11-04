@@ -1123,12 +1123,12 @@ def save_conversation_state(conversation_id: str, ai_survey: 'AIConversationalSu
 
 def load_conversation_state(conversation_id: str) -> Optional[Dict[str, Any]]:
     """Load conversation state from database"""
+    import logging
+    logger = logging.getLogger(__name__)
+    
     try:
         from models import ActiveConversation
         import json
-        import logging
-        
-        logger = logging.getLogger(__name__)
         
         session = ActiveConversation.query.filter_by(conversation_id=conversation_id).first()
         
@@ -1157,12 +1157,12 @@ def load_conversation_state(conversation_id: str) -> Optional[Dict[str, Any]]:
 
 def delete_conversation_state(conversation_id: str):
     """Delete conversation state from database after finalization"""
+    import logging
+    logger = logging.getLogger(__name__)
+    
     try:
         from app import db
         from models import ActiveConversation
-        import logging
-        
-        logger = logging.getLogger(__name__)
         
         session = ActiveConversation.query.filter_by(conversation_id=conversation_id).first()
         if session:

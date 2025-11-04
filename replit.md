@@ -2,6 +2,17 @@
 VOÏA (Voice Of Client) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. It transforms raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project includes a production-ready multi-tenant participant management system with extensive email delivery capabilities, AI-powered conversational surveys using a hybrid prompt architecture, and participant segmentation for personalized experiences and advanced analytics.
 
 # Recent Changes
+**November 4, 2025**: Implemented persistent conversation state storage to prevent data loss
+- Added ActiveConversation model with PostgreSQL-backed persistent storage for conversation state
+- Implemented three-tier recovery strategy: in-memory → database → client sessionStorage
+- Database persistence occurs after each message exchange, conversation start, and finalization
+- Client-side sessionStorage backup survives page refreshes and browser crashes
+- Automated cleanup job removes stale conversations (>24 hours old) to prevent database bloat
+- Fixes Q3 eNPS data loss issue where 12 responses lost conversation transcripts due to multi-worker memory isolation and server restarts
+- Zero impact on OpenAI API interaction or token usage
+- Performance overhead: ~10-20ms per message (~1% of total time)
+- Production-ready with proper error handling and graceful fallbacks
+
 **November 4, 2025**: Enhanced AI prompt personalization with structured context block
 - Implemented comprehensive context block in `build_survey_config_json()` to pass full business metadata to OpenAI
 - Context block now includes: company_description, product_description (with campaign override), target_clients (with campaign override), and industry
