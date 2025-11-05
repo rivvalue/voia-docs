@@ -1698,7 +1698,7 @@ def bulk_remove_campaign_participants(campaign_id):
                     'business_account_id': current_account.id,
                     'user_id': session.get('business_user_id')
                 },
-                business_account_id=current_account.id
+                priority=1
             )
             
             logger.info(f"Queued background job for removing {len(association_ids)} participants from campaign {campaign_id}")
