@@ -364,24 +364,22 @@
                         {% if campaign.status == 'draft' %}
                             <!-- Draft State Actions -->
                             <div class="campaign-actions-content">
-                                <div class="campaign-actions-primary">
+                                <div class="campaign-actions-buttons d-flex flex-column flex-md-row gap-2">
                                     <a href="{{ url_for('campaigns.edit_draft_campaign', campaign_id=campaign.id) }}" 
-                                       class="btn btn-primary">
+                                       class="btn btn-primary flex-fill">
                                         <i class="fas fa-edit me-2"></i>Edit Campaign
                                     </a>
-                                </div>
-                                
-                                <div class="campaign-actions-secondary">
-                                    <form method="POST" action="{{ url_for('campaigns.mark_ready', campaign_id=campaign.id) }}" class="d-inline">
+                                    
+                                    <form method="POST" action="{{ url_for('campaigns.mark_ready', campaign_id=campaign.id) }}" class="d-flex flex-fill">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button type="submit" class="btn btn-success"
+                                        <button type="submit" class="btn btn-success flex-fill"
                                                 {% if not campaign.description or participant_stats.total == 0 %}disabled{% endif %}
                                                 onclick="return confirm('Mark this campaign as ready for activation? You will not be able to modify campaign details after this.');">
                                             <i class="fas fa-check me-2"></i>Mark as Ready
                                         </button>
                                     </form>
                                     
-                                    <button type="button" class="btn btn-outline-danger" onclick="confirmDelete()">
+                                    <button type="button" class="btn btn-outline-danger flex-fill" onclick="confirmDelete()">
                                         <i class="fas fa-trash-alt me-2"></i>Delete Draft
                                     </button>
                                 </div>
