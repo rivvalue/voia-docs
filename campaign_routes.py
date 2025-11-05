@@ -1231,6 +1231,48 @@ def save_survey_config(campaign_id):
         return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
 
 
+@campaign_bp.route('/<int:campaign_id>/email-preview')
+@require_business_auth
+@require_permission('manage_participants')
+def email_preview(campaign_id):
+    """Preview campaign email without sending"""
+    try:
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account context not found'}), 401
+        
+        # Get campaign (scoped to current business account)
+        campaign = Campaign.query.filter_by(
+            id=campaign_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not campaign:
+            return jsonify({'error': 'Campaign not found'}), 404
+        
+        # Get email type from query parameter (default: invitation)
+        email_type = request.args.get('type', 'invitation')
+        
+        # Validate email type
+        valid_types = ['invitation', 'reminder_primary', 'reminder_midpoint']
+        if email_type not in valid_types:
+            return jsonify({'error': f'Invalid email type. Must be one of: {", ".join(valid_types)}'}), 400
+        
+        # Generate email preview using email service
+        result = email_service.preview_campaign_email(campaign, email_type=email_type)
+        
+        if not result['success']:
+            logger.error(f"Email preview generation failed: {result.get('error')}")
+            return jsonify({'error': 'Failed to generate email preview'}), 500
+        
+        # Return HTML preview
+        return result['html_body'], 200, {'Content-Type': 'text/html; charset=utf-8'}
+        
+    except Exception as e:
+        logger.error(f"Error generating email preview for campaign {campaign_id}: {e}")
+        return jsonify({'error': 'Failed to generate email preview'}), 500
+
+
 @campaign_bp.route('/<int:campaign_id>/responses')
 @require_business_auth
 # @require_permission('manage_participants')  # Temporarily disabled for testing

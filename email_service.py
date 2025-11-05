@@ -291,6 +291,335 @@ class EmailService:
             result = result.replace(placeholder, str(value))
         return result
     
+    def _build_invitation_email_html(self, 
+                                     participant_name: str,
+                                     campaign_name: str,
+                                     survey_url: str,
+                                     intro_text: str,
+                                     closing_text: str,
+                                     footer_text: str,
+                                     branding: Dict,
+                                     email_content: Dict) -> str:
+        """Build invitation email HTML template.
+        
+        Shared helper used by both send_participant_invitation and preview_campaign_email
+        to ensure templates are identical.
+        
+        Args:
+            participant_name: Name of participant
+            campaign_name: Campaign name
+            survey_url: Survey access URL
+            intro_text: Introduction text (variable-substituted)
+            closing_text: Closing text (variable-substituted)
+            footer_text: Footer text (variable-substituted)
+            branding: Branding configuration dict
+            email_content: Email content dict with cta_text
+            
+        Returns:
+            HTML string for invitation email
+        """
+        # Build logo HTML
+        logo_html = ""
+        if branding['logo_url']:
+            logo_url = branding['logo_url']
+            company_name = branding['company_name']
+            logo_html = f'<img src="{logo_url}" alt="{company_name}" style="max-height: 60px; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;">'
+        
+        return f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Survey Invitation - {campaign_name}</title>
+    <style>
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }}
+        .container {{
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+        .header {{
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #E13A44;
+        }}
+        .logo {{
+            font-size: 24px;
+            font-weight: bold;
+            color: #E13A44;
+            margin-bottom: 5px;
+        }}
+        .logo-image {{
+            max-height: 60px;
+            margin-bottom: 10px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }}
+        .tagline {{
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }}
+        .campaign-name {{
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #E13A44;
+            margin: 20px 0;
+            font-weight: 500;
+        }}
+        .cta-button {{
+            display: inline-block;
+            background-color: #E13A44;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: 500;
+            text-align: center;
+        }}
+        .cta-button:hover {{
+            background-color: #c12e3a;
+        }}
+        .footer {{
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }}
+        .security-note {{
+            background-color: #e7f3ff;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            margin: 15px 0;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            {logo_html}
+            <div class="logo">{branding['company_name']}</div>
+            <div class="tagline">{branding['tagline']}</div>
+        </div>
+        
+        <h2>Hello {participant_name},</h2>
+        
+        <p>{intro_text}</p>
+        
+        <div class="campaign-name">
+            <strong>Campaign:</strong> {campaign_name}
+        </div>
+        
+        <div style="text-align: center;">
+            <a href="{survey_url}" class="cta-button">{email_content['cta_text']}</a>
+        </div>
+        
+        <div class="security-note">
+            <strong>🔒 Security Note:</strong> This personalized link is secure and will expire in 72 hours.
+        </div>
+        
+        <p style="white-space: pre-line;">{closing_text}</p>
+        
+        <p>Best regards,<br>
+        The {branding['company_name']} Team</p>
+        
+        <div class="footer">
+            {footer_text}
+        </div>
+    </div>
+</body>
+</html>
+"""
+    
+    def _build_reminder_email_html(self,
+                                   participant_name: str,
+                                   campaign_name: str,
+                                   survey_url: str,
+                                   intro_text: str,
+                                   closing_text: str,
+                                   footer_text: str,
+                                   branding: Dict,
+                                   email_content: Dict,
+                                   reminder_badge_text: str = "⏰ Friendly Reminder") -> str:
+        """Build reminder email HTML template.
+        
+        Shared helper used by both send_participant_reminder and preview_campaign_email
+        to ensure templates are identical.
+        
+        Args:
+            participant_name: Name of participant
+            campaign_name: Campaign name
+            survey_url: Survey access URL
+            intro_text: Introduction text (variable-substituted)
+            closing_text: Closing text (variable-substituted)
+            footer_text: Footer text (variable-substituted)
+            branding: Branding configuration dict
+            email_content: Email content dict with cta_text
+            reminder_badge_text: Badge text (e.g., "⏰ Friendly Reminder" or "⏰ Midpoint Reminder")
+            
+        Returns:
+            HTML string for reminder email
+        """
+        # Build logo HTML
+        logo_html = ""
+        if branding['logo_url']:
+            logo_url = branding['logo_url']
+            company_name = branding['company_name']
+            logo_html = f'<img src="{logo_url}" alt="{company_name}" style="max-height: 60px; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;">'
+        
+        return f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Survey Reminder - {campaign_name}</title>
+    <style>
+        body {{
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }}
+        .container {{
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+        .header {{
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #E13A44;
+        }}
+        .logo {{
+            font-size: 24px;
+            font-weight: bold;
+            color: #E13A44;
+            margin-bottom: 5px;
+        }}
+        .tagline {{
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }}
+        .reminder-badge {{
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }}
+        .campaign-name {{
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #E13A44;
+            margin: 20px 0;
+            font-weight: 500;
+        }}
+        .cta-button {{
+            display: inline-block;
+            background-color: #E13A44;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: 500;
+            text-align: center;
+        }}
+        .cta-button:hover {{
+            background-color: #c12e3a;
+        }}
+        .footer {{
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+        }}
+        .security-note {{
+            background-color: #e7f3ff;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            margin: 15px 0;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            {logo_html}
+            <div class="logo">{branding['company_name']}</div>
+            <div class="tagline">{branding['tagline']}</div>
+        </div>
+        
+        <div style="text-align: center;">
+            <span class="reminder-badge">{reminder_badge_text}</span>
+        </div>
+        
+        <h2>Hello {participant_name},</h2>
+        
+        <p>We wanted to remind you about an opportunity to share your feedback with us.</p>
+        
+        <p>{intro_text}</p>
+        
+        <div class="campaign-name">
+            <strong>Campaign:</strong> {campaign_name}
+        </div>
+        
+        <p>If you haven't already completed the survey, please take a few moments to share your thoughts.</p>
+        
+        <div style="text-align: center;">
+            <a href="{survey_url}" class="cta-button">{email_content['cta_text']}</a>
+        </div>
+        
+        <div class="security-note">
+            <strong>🔒 Security Note:</strong> This personalized link is secure and will remain active until the campaign ends.
+        </div>
+        
+        <p>Your input is valuable to us, and we appreciate you taking the time to participate.</p>
+        
+        <p style="white-space: pre-line;">{closing_text}</p>
+        
+        <p>Best regards,<br>
+        The {branding['company_name']} Team</p>
+        
+        <div class="footer">
+            {footer_text}
+        </div>
+    </div>
+</body>
+</html>
+"""
+    
     def is_configured(self, business_account_id: Optional[int] = None) -> bool:
         """Check if email service is properly configured for a business account or system default"""
         logger.debug(f"is_configured() called with business_account_id={business_account_id}")
@@ -682,135 +1011,17 @@ The {branding['company_name']} Team
 {footer_text}
 """
             
-            # HTML body with branding support
-            logo_html = ""
-            if branding['logo_url']:
-                logo_url = branding['logo_url']
-                company_name = branding['company_name']
-                logo_html = f'<img src="{logo_url}" alt="{company_name}" style="max-height: 60px; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;">'
-            
-            html_body = f"""
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Survey Invitation - {campaign_name}</title>
-    <style>
-        body {{
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f8f9fa;
-        }}
-        .container {{
-            background-color: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }}
-        .header {{
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #E13A44;
-        }}
-        .logo {{
-            font-size: 24px;
-            font-weight: bold;
-            color: #E13A44;
-            margin-bottom: 5px;
-        }}
-        .logo-image {{
-            max-height: 60px;
-            margin-bottom: 10px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
-        }}
-        .tagline {{
-            font-size: 14px;
-            color: #666;
-            font-style: italic;
-        }}
-        .campaign-name {{
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-            border-left: 4px solid #E13A44;
-            margin: 20px 0;
-            font-weight: 500;
-        }}
-        .cta-button {{
-            display: inline-block;
-            background-color: #E13A44;
-            color: white;
-            padding: 15px 30px;
-            text-decoration: none;
-            border-radius: 5px;
-            margin: 20px 0;
-            font-weight: 500;
-            text-align: center;
-        }}
-        .cta-button:hover {{
-            background-color: #c12e3a;
-        }}
-        .footer {{
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            font-size: 12px;
-            color: #666;
-            text-align: center;
-        }}
-        .security-note {{
-            background-color: #e7f3ff;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 14px;
-            margin: 15px 0;
-        }}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            {logo_html}
-            <div class="logo">{branding['company_name']}</div>
-            <div class="tagline">{branding['tagline']}</div>
-        </div>
-        
-        <h2>Hello {participant_name},</h2>
-        
-        <p>{intro_text}</p>
-        
-        <div class="campaign-name">
-            <strong>Campaign:</strong> {campaign_name}
-        </div>
-        
-        <div style="text-align: center;">
-            <a href="{survey_url}" class="cta-button">{email_content['cta_text']}</a>
-        </div>
-        
-        <div class="security-note">
-            <strong>🔒 Security Note:</strong> This personalized link is secure and will expire in 72 hours.
-        </div>
-        
-        <p style="white-space: pre-line;">{closing_text}</p>
-        
-        <p>Best regards,<br>
-        The {branding['company_name']} Team</p>
-        
-        <div class="footer">
-            {footer_text}
-        </div>
-    </div>
-</body>
-</html>
-"""
+            # HTML body using shared template helper
+            html_body = self._build_invitation_email_html(
+                participant_name=participant_name,
+                campaign_name=campaign_name,
+                survey_url=survey_url,
+                intro_text=intro_text,
+                closing_text=closing_text,
+                footer_text=footer_text,
+                branding=branding,
+                email_content=email_content
+            )
             
             # Send the email
             result = self.send_email(
@@ -925,148 +1136,18 @@ The {branding['company_name']} Team
 {footer_text}
 """
             
-            # HTML body with branding support
-            logo_html = ""
-            if branding['logo_url']:
-                logo_url = branding['logo_url']
-                company_name = branding['company_name']
-                logo_html = f'<img src="{logo_url}" alt="{company_name}" style="max-height: 60px; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;">'
-            
-            html_body = f"""
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Survey Reminder - {campaign_name}</title>
-    <style>
-        body {{
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f8f9fa;
-        }}
-        .container {{
-            background-color: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }}
-        .header {{
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #E13A44;
-        }}
-        .logo {{
-            font-size: 24px;
-            font-weight: bold;
-            color: #E13A44;
-            margin-bottom: 5px;
-        }}
-        .tagline {{
-            font-size: 14px;
-            color: #666;
-            font-style: italic;
-        }}
-        .reminder-badge {{
-            background-color: #fff3cd;
-            color: #856404;
-            padding: 8px 16px;
-            border-radius: 20px;
-            display: inline-block;
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 20px;
-        }}
-        .campaign-name {{
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-            border-left: 4px solid #E13A44;
-            margin: 20px 0;
-            font-weight: 500;
-        }}
-        .cta-button {{
-            display: inline-block;
-            background-color: #E13A44;
-            color: white;
-            padding: 15px 30px;
-            text-decoration: none;
-            border-radius: 5px;
-            margin: 20px 0;
-            font-weight: 500;
-            text-align: center;
-        }}
-        .cta-button:hover {{
-            background-color: #c12e3a;
-        }}
-        .footer {{
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            font-size: 12px;
-            color: #666;
-            text-align: center;
-        }}
-        .security-note {{
-            background-color: #e7f3ff;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 14px;
-            margin: 15px 0;
-        }}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            {logo_html}
-            <div class="logo">{branding['company_name']}</div>
-            <div class="tagline">{branding['tagline']}</div>
-        </div>
-        
-        <div style="text-align: center;">
-            <span class="reminder-badge">⏰ Friendly Reminder</span>
-        </div>
-        
-        <h2>Hello {participant_name},</h2>
-        
-        <p>We wanted to remind you about an opportunity to share your feedback with us.</p>
-        
-        <p>{intro_text}</p>
-        
-        <div class="campaign-name">
-            <strong>Campaign:</strong> {campaign_name}
-        </div>
-        
-        <p>If you haven't already completed the survey, please take a few moments to share your thoughts.</p>
-        
-        <div style="text-align: center;">
-            <a href="{survey_url}" class="cta-button">{email_content['cta_text']}</a>
-        </div>
-        
-        <div class="security-note">
-            <strong>🔒 Security Note:</strong> This personalized link is secure and will remain active until the campaign ends.
-        </div>
-        
-        <p>Your input is valuable to us, and we appreciate you taking the time to participate.</p>
-        
-        <p style="white-space: pre-line;">{closing_text}</p>
-        
-        <p>Best regards,<br>
-        The {branding['company_name']} Team</p>
-        
-        <div class="footer">
-            {footer_text}
-        </div>
-    </div>
-</body>
-</html>
-"""
+            # HTML body using shared template helper
+            html_body = self._build_reminder_email_html(
+                participant_name=participant_name,
+                campaign_name=campaign_name,
+                survey_url=survey_url,
+                intro_text=intro_text,
+                closing_text=closing_text,
+                footer_text=footer_text,
+                branding=branding,
+                email_content=email_content,
+                reminder_badge_text="⏰ Friendly Reminder"
+            )
             
             # Send the email
             result = self.send_email(
@@ -1098,6 +1179,115 @@ The {branding['company_name']} Team
                 'error': error_msg,
                 'email_type': 'reminder',
                 'participant_email': participant_email
+            }
+
+    def preview_campaign_email(self, campaign, email_type: str = 'invitation') -> Dict:
+        """
+        Generate email preview HTML for a campaign without sending.
+        Reuses the exact same template logic as send_participant_invitation/reminder.
+        
+        Args:
+            campaign: Campaign object
+            email_type: Type of email to preview ('invitation', 'reminder_primary', 'reminder_midpoint')
+            
+        Returns:
+            Dict with 'subject', 'html_body', and metadata
+        """
+        try:
+            # Mock participant data for preview
+            mock_participant_name = "Jean Dupont"
+            mock_participant_email = "example@company.com"
+            mock_survey_token = "preview-token-abc123xyz789"
+            
+            # Get business account info
+            business_account = campaign.business_account
+            business_account_name = business_account.name if business_account else "Your Organization"
+            business_account_id = business_account.id if business_account else None
+            
+            # Get branding configuration
+            branding = self._get_branding_config(business_account_id)
+            
+            # Get custom email content with 3-tier fallback
+            email_content = self._get_email_content(business_account_id, campaign=campaign)
+            
+            # Generate mock survey URL
+            survey_url = url_for('survey', token=mock_survey_token, _external=True)
+            
+            # Template variables for substitution
+            template_vars = {
+                'participant_name': mock_participant_name,
+                'campaign_name': campaign.name,
+                'business_account_name': business_account_name,
+                'survey_url': survey_url
+            }
+            
+            # Build email based on type
+            if email_type == 'invitation':
+                # Email subject
+                subject = self._substitute_variables(email_content['subject'], template_vars)
+                
+                # Build text content
+                intro_text = self._substitute_variables(email_content['intro'], template_vars)
+                closing_text = self._substitute_variables(email_content['closing'], template_vars)
+                footer_text = self._substitute_variables(email_content['footer'], template_vars)
+                
+                # HTML body using shared template helper
+                html_body = self._build_invitation_email_html(
+                    participant_name=mock_participant_name,
+                    campaign_name=campaign.name,
+                    survey_url=survey_url,
+                    intro_text=intro_text,
+                    closing_text=closing_text,
+                    footer_text=footer_text,
+                    branding=branding,
+                    email_content=email_content
+                )
+                
+            else:  # reminder_primary or reminder_midpoint
+                # Email subject with reminder indicator
+                subject = f"Reminder: {self._substitute_variables(email_content['subject'], template_vars)}"
+                
+                # Build text content
+                intro_text = self._substitute_variables(email_content['intro'], template_vars)
+                closing_text = self._substitute_variables(email_content['closing'], template_vars)
+                footer_text = self._substitute_variables(email_content['footer'], template_vars)
+                
+                # Determine reminder badge text
+                if email_type == 'reminder_midpoint':
+                    reminder_badge_text = "⏰ Midpoint Reminder"
+                else:
+                    reminder_badge_text = "⏰ Friendly Reminder"
+                
+                # HTML body using shared template helper
+                html_body = self._build_reminder_email_html(
+                    participant_name=mock_participant_name,
+                    campaign_name=campaign.name,
+                    survey_url=survey_url,
+                    intro_text=intro_text,
+                    closing_text=closing_text,
+                    footer_text=footer_text,
+                    branding=branding,
+                    email_content=email_content,
+                    reminder_badge_text=reminder_badge_text
+                )
+            
+            return {
+                'success': True,
+                'email_type': email_type,
+                'subject': subject,
+                'html_body': html_body,
+                'mock_participant_name': mock_participant_name,
+                'campaign_name': campaign.name
+            }
+            
+        except Exception as e:
+            error_msg = f"Failed to generate email preview for campaign {campaign.id}: {str(e)}"
+            logger.error(error_msg)
+            
+            return {
+                'success': False,
+                'error': error_msg,
+                'email_type': email_type
             }
 
     def send_business_account_invitation(self, 
