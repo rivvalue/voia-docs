@@ -5442,7 +5442,10 @@ def generate_executive_report_manually(campaign_id):
         from task_queue import task_queue
         task_queue.add_task('executive_report', data_id=campaign.id, task_data={
             'campaign_id': campaign.id,
-            'business_account_id': current_account.id
+            'business_account_id': current_account.id,
+            'user_id': user.id,
+            'user_email': user.email,
+            'user_name': user.get_full_name()
         })
         
         logger.info(f"Manual executive report generation queued for campaign {campaign.id} by user {user.email}")
@@ -5512,7 +5515,10 @@ def regenerate_executive_report(campaign_id):
             'campaign_id': campaign.id,
             'business_account_id': current_account.id,
             'regenerating': True,
-            'report_id': existing_report.id
+            'report_id': existing_report.id,
+            'user_id': user.id,
+            'user_email': user.email,
+            'user_name': user.get_full_name()
         })
         
         logger.info(f"Executive report regeneration queued for campaign {campaign.id} by user {user.email}")

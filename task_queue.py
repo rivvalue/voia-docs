@@ -985,12 +985,18 @@ class TaskQueue:
                     
                     campaign = Campaign.query.get(campaign_id)
                     
+                    # Extract user information from task data (passed from manual trigger)
+                    user_email = task_data.get('user_email')
+                    user_name = task_data.get('user_name')
+                    
                     queue_audit_log(
                         business_account_id=business_account_id,
                         action_type='executive_report_regenerated' if is_regenerating else 'executive_report_generated',
                         resource_type='campaign',
                         resource_id=campaign_id,
                         resource_name=campaign.name if campaign else f'Campaign {campaign_id}',
+                        user_email=user_email,
+                        user_name=user_name,
                         details={
                             'file_path': report_file_path,
                             'report_type': 'executive_report',
