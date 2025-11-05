@@ -32,16 +32,27 @@ def notify(message, category='info', business_account_id=None, user_id=None, **m
         notify('License limit warning', 'warning', usage_percent=95)
     """
     try:
-        # Auto-detect business_account_id from session if not provided
+        # Auto-detect business_account_id from session if not provided (only in request context)
         if not business_account_id:
-            business_account_id = session.get('business_account_id')
+            try:
+                from flask import has_request_context
+                if has_request_context():
+                    business_account_id = session.get('business_account_id')
+            except:
+                pass
+            
             if not business_account_id:
                 logger.warning("Cannot create notification: business_account_id not found")
                 return None
         
-        # Auto-detect user_id from session if not provided
+        # Auto-detect user_id from session if not provided (only in request context)
         if not user_id:
-            user_id = session.get('business_user_id')
+            try:
+                from flask import has_request_context
+                if has_request_context():
+                    user_id = session.get('business_user_id')
+            except:
+                pass
         
         # Validate category
         valid_categories = ['success', 'error', 'warning', 'info']
