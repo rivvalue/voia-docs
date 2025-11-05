@@ -298,7 +298,10 @@ class TaskQueue:
                 logger.error(f"EmailDelivery record {email_delivery_id} not found")
                 return False
             
-            # Send the reminder email
+            # Get email_type from task_data (either 'reminder_primary' or 'reminder_midpoint')
+            email_type = task_data.get('email_type', 'reminder_primary')
+            
+            # Send the reminder email with the appropriate type
             result = email_service.send_participant_reminder(
                 participant_email=task_data['participant_email'],
                 participant_name=task_data['participant_name'],
@@ -307,7 +310,8 @@ class TaskQueue:
                 business_account_name=task_data['business_account_name'],
                 email_delivery_id=email_delivery_id,
                 business_account_id=task_data.get('business_account_id'),
-                campaign=None  # Could optionally pass campaign object for custom content
+                campaign=None,  # Could optionally pass campaign object for custom content
+                email_type=email_type  # Pass email_type to differentiate primary vs midpoint
             )
             
             return result['success']
@@ -1517,6 +1521,7 @@ Respond with ONLY the JSON object, no other text:"""
                 db.session.rollback()
             
             # Process reminder emails (twice daily: 9 AM and 2 PM UTC)
+            # Dual-reminder system: Primary (after delay_days) + Midpoint (halfway through campaign)
             try:
                 from reminder_service import ReminderService
                 from datetime import datetime
@@ -1526,24 +1531,39 @@ Respond with ONLY the JSON object, no other text:"""
                 # Only process reminders during scheduled hours (9 AM and 2 PM UTC)
                 # This runs twice daily for efficiency and professional timing
                 if current_hour in [9, 14]:
-                    reminder_start = datetime.utcnow()
-                    
-                    # PERFORMANCE: Conservative batch size (50/run = 6.7% of worker capacity)
-                    # Uses composite index idx_campaign_participant_reminder for 41x speedup
-                    reminder_stats = ReminderService.process_reminder_batch(
+                    # Process PRIMARY reminders (sent after reminder_delay_days)
+                    primary_start = datetime.utcnow()
+                    primary_stats = ReminderService.process_reminder_batch(
+                        reminder_type='primary',
                         campaign_id=None,      # Process all eligible campaigns
                         batch_size=50,         # Limit to prevent queue overload
                         stagger_minutes=0      # Queue handles async delivery naturally
                     )
+                    primary_duration_ms = (datetime.utcnow() - primary_start).total_seconds() * 1000
                     
-                    reminder_duration_ms = (datetime.utcnow() - reminder_start).total_seconds() * 1000
+                    if primary_stats['processed'] > 0:
+                        logger.info(f"Primary reminder batch: {primary_stats['processed']} queued, "
+                                   f"{primary_stats['total_eligible']} total eligible, "
+                                   f"{primary_duration_ms:.1f}ms")
                     
-                    if reminder_stats['processed'] > 0:
-                        logger.info(f"Reminder batch: {reminder_stats['processed']} queued, "
-                                   f"{reminder_stats['total_eligible']} total eligible, "
-                                   f"{reminder_duration_ms:.1f}ms")
+                    changes_made += primary_stats['processed']
                     
-                    changes_made += reminder_stats['processed']
+                    # Process MIDPOINT reminders (sent halfway through campaign)
+                    midpoint_start = datetime.utcnow()
+                    midpoint_stats = ReminderService.process_reminder_batch(
+                        reminder_type='midpoint',
+                        campaign_id=None,      # Process all eligible campaigns
+                        batch_size=50,         # Limit to prevent queue overload
+                        stagger_minutes=0      # Queue handles async delivery naturally
+                    )
+                    midpoint_duration_ms = (datetime.utcnow() - midpoint_start).total_seconds() * 1000
+                    
+                    if midpoint_stats['processed'] > 0:
+                        logger.info(f"Midpoint reminder batch: {midpoint_stats['processed']} queued, "
+                                   f"{midpoint_stats['total_eligible']} total eligible, "
+                                   f"{midpoint_duration_ms:.1f}ms")
+                    
+                    changes_made += midpoint_stats['processed']
                 else:
                     # Outside scheduled hours - skip reminder processing
                     logger.info(f"Reminder processing skipped (current hour: {current_hour}:00 UTC, scheduled: 09:00 and 14:00 UTC)")

@@ -2,8 +2,12 @@
 Reminder Service - Automated email reminder system for campaign participants
 
 This service handles the identification and processing of participants who are eligible
-for reminder emails. It implements a single-reminder strategy with configurable delay
+for reminder emails. It implements a dual-reminder strategy with configurable timing
 to increase response rates while minimizing email volume.
+
+Reminder Types:
+1. Primary Reminder: Sent after reminder_delay_days from invitation (e.g., 7 days)
+2. Midpoint Reminder: Sent halfway through campaign duration to persistent non-respondents
 
 Performance considerations:
 - Uses optimized LEFT JOIN queries instead of subqueries
@@ -27,9 +31,9 @@ class ReminderService:
     """Service for managing automated campaign reminder emails"""
     
     @staticmethod
-    def get_reminder_eligible_participants(campaign_id=None, limit=None):
+    def get_primary_reminder_eligible_participants(campaign_id=None, limit=None):
         """
-        Find participants eligible for reminder emails using optimized query.
+        Find participants eligible for PRIMARY reminder emails (sent after delay_days).
         
         Eligibility criteria:
         1. Campaign has reminder_enabled=True
@@ -37,7 +41,7 @@ class ReminderService:
         3. Participant status is 'invited' (not started or completed)
         4. invited_at is older than campaign.reminder_delay_days
         5. No survey response exists for this participant
-        6. No reminder email has been sent yet (email_type='reminder')
+        6. No primary reminder has been sent yet (email_type='reminder_primary')
         
         Performance optimization:
         - Uses LEFT JOIN instead of NOT EXISTS subqueries
@@ -51,7 +55,7 @@ class ReminderService:
             limit: Optional limit for testing/batching
             
         Returns:
-            List of CampaignParticipant objects eligible for reminders
+            List of CampaignParticipant objects eligible for primary reminders
         """
         now = datetime.utcnow()
         
@@ -69,7 +73,7 @@ class ReminderService:
             EmailDelivery,
             and_(
                 EmailDelivery.campaign_participant_id == CampaignParticipant.id,
-                EmailDelivery.email_type == 'reminder'
+                EmailDelivery.email_type == 'reminder_primary'
             )
         )
         
@@ -80,7 +84,7 @@ class ReminderService:
             CampaignParticipant.status == 'invited',
             CampaignParticipant.invited_at.isnot(None),
             SurveyResponse.id.is_(None),  # No survey response exists
-            EmailDelivery.id.is_(None),  # No reminder sent yet
+            EmailDelivery.id.is_(None),  # No primary reminder sent yet
         ]
         
         # Add campaign filter if specified
@@ -101,6 +105,87 @@ class ReminderService:
         
         # Apply limit (default 1000 for safety, can be overridden)
         # This prevents unbounded memory loads even if limit=None
+        if limit is None:
+            limit = 1000  # Safety default
+        query = query.limit(limit)
+        
+        # Execute query - fully optimized in SQL with limit
+        return query.all()
+    
+    @staticmethod
+    def get_midpoint_reminder_eligible_participants(campaign_id=None, limit=None):
+        """
+        Find participants eligible for MIDPOINT reminder emails (sent halfway through campaign).
+        
+        Eligibility criteria:
+        1. Campaign has reminder_enabled=True
+        2. Campaign is in 'active' status
+        3. Participant status is 'invited' (not started or completed)
+        4. No survey response exists for this participant
+        5. No midpoint reminder has been sent yet (email_type='reminder_midpoint')
+        6. Current date >= campaign midpoint date (start_date + (end_date - start_date) / 2)
+        
+        Performance optimization:
+        - Uses LEFT JOIN instead of NOT EXISTS subqueries
+        - Calculates midpoint date in SQL using PostgreSQL date arithmetic
+        - LIMIT applied in SQL, never loads unbounded data into memory
+        
+        Args:
+            campaign_id: Optional campaign ID to filter by specific campaign
+            limit: Optional limit for testing/batching
+            
+        Returns:
+            List of CampaignParticipant objects eligible for midpoint reminders
+        """
+        now = datetime.utcnow()
+        today = now.date()
+        
+        # Base query with eager loading of relationships
+        query = db.session.query(CampaignParticipant).join(
+            Campaign,
+            CampaignParticipant.campaign_id == Campaign.id
+        ).join(
+            Participant,
+            CampaignParticipant.participant_id == Participant.id
+        ).outerjoin(
+            SurveyResponse,
+            SurveyResponse.campaign_participant_id == CampaignParticipant.id
+        ).outerjoin(
+            EmailDelivery,
+            and_(
+                EmailDelivery.campaign_participant_id == CampaignParticipant.id,
+                EmailDelivery.email_type == 'reminder_midpoint'
+            )
+        )
+        
+        # Build filter conditions
+        filters = [
+            Campaign.status == 'active',
+            Campaign.reminder_enabled == True,
+            CampaignParticipant.status == 'invited',
+            CampaignParticipant.invited_at.isnot(None),
+            SurveyResponse.id.is_(None),  # No survey response exists
+            EmailDelivery.id.is_(None),  # No midpoint reminder sent yet
+        ]
+        
+        # Add campaign filter if specified
+        if campaign_id:
+            filters.append(Campaign.id == campaign_id)
+        
+        # Add SQL-based midpoint date filter
+        # Midpoint = start_date + (end_date - start_date) / 2
+        # SQL: campaigns.start_date + ((campaigns.end_date - campaigns.start_date) / 2)
+        # We send midpoint reminder when: CURRENT_DATE >= midpoint_date
+        filters.append(
+            text("CURRENT_DATE >= campaigns.start_date + ((campaigns.end_date - campaigns.start_date) / 2)")
+        )
+        
+        query = query.filter(and_(*filters))
+        
+        # Order by invited_at to process oldest first
+        query = query.order_by(CampaignParticipant.invited_at.asc())
+        
+        # Apply limit (default 1000 for safety, can be overridden)
         if limit is None:
             limit = 1000  # Safety default
         query = query.limit(limit)
@@ -210,7 +295,7 @@ class ReminderService:
         }
     
     @staticmethod
-    def process_reminder_batch(campaign_id=None, batch_size=100, stagger_minutes=5):
+    def process_reminder_batch(reminder_type='primary', campaign_id=None, batch_size=100, stagger_minutes=5):
         """
         Process a batch of reminder emails for eligible participants.
         
@@ -227,12 +312,14 @@ class ReminderService:
         - Handles errors gracefully without stopping entire batch
         
         Args:
+            reminder_type: Type of reminder to send ('primary' or 'midpoint')
             campaign_id: Optional campaign ID to limit processing to one campaign
             batch_size: Maximum number of reminders to process (default 100)
             stagger_minutes: Minutes to stagger between email queue submissions (default 5)
             
         Returns:
             Dictionary with processing statistics:
+            - reminder_type: Type of reminder processed
             - total_eligible: Number of participants eligible for reminders
             - processed: Number of reminder emails queued
             - failed: Number of failures
@@ -240,9 +327,16 @@ class ReminderService:
         """
         from email_service import email_service
         
-        logger.info(f"Starting reminder batch processing (campaign_id={campaign_id}, batch_size={batch_size})")
+        # Validate reminder_type
+        if reminder_type not in ['primary', 'midpoint']:
+            raise ValueError(f"Invalid reminder_type: {reminder_type}. Must be 'primary' or 'midpoint'")
+        
+        email_type = f'reminder_{reminder_type}'
+        
+        logger.info(f"Starting {reminder_type} reminder batch processing (campaign_id={campaign_id}, batch_size={batch_size})")
         
         stats = {
+            'reminder_type': reminder_type,
             'total_eligible': 0,
             'processed': 0,
             'failed': 0,
@@ -250,14 +344,20 @@ class ReminderService:
         }
         
         try:
-            # Get eligible participants
-            eligible_participants = ReminderService.get_reminder_eligible_participants(
-                campaign_id=campaign_id,
-                limit=batch_size
-            )
+            # Get eligible participants based on reminder type
+            if reminder_type == 'primary':
+                eligible_participants = ReminderService.get_primary_reminder_eligible_participants(
+                    campaign_id=campaign_id,
+                    limit=batch_size
+                )
+            else:  # midpoint
+                eligible_participants = ReminderService.get_midpoint_reminder_eligible_participants(
+                    campaign_id=campaign_id,
+                    limit=batch_size
+                )
             
             stats['total_eligible'] = len(eligible_participants)
-            logger.info(f"Found {stats['total_eligible']} eligible participants for reminders")
+            logger.info(f"Found {stats['total_eligible']} eligible participants for {reminder_type} reminders")
             
             if not eligible_participants:
                 logger.info("No eligible participants found for reminder processing")
@@ -286,7 +386,7 @@ class ReminderService:
                         campaign_id=campaign.id,
                         participant_id=participant.id,
                         campaign_participant_id=cp.id,
-                        email_type='reminder',
+                        email_type=email_type,  # 'reminder_primary' or 'reminder_midpoint'
                         recipient_email=participant.email,
                         recipient_name=participant.name,
                         subject=f"Reminder: Share Your Feedback - {campaign.name}",
@@ -306,7 +406,8 @@ class ReminderService:
                         'survey_token': cp.token,
                         'business_account_name': business_account.name,
                         'business_account_id': business_account.id,
-                        'campaign_id': campaign.id
+                        'campaign_id': campaign.id,
+                        'email_type': email_type  # Pass email_type to email service
                     }
                     
                     task_queue.add_task(
@@ -321,7 +422,7 @@ class ReminderService:
                     db.session.commit()
                     
                     stats['processed'] += 1
-                    logger.debug(f"Queued reminder for {participant.email} (campaign: {campaign.name})")
+                    logger.debug(f"Queued {reminder_type} reminder for {participant.email} (campaign: {campaign.name})")
                     
                 except Exception as e:
                     error_msg = f"Failed to process reminder for CampaignParticipant {cp.id}: {str(e)}"
@@ -332,10 +433,10 @@ class ReminderService:
                     db.session.rollback()
                     continue
             
-            logger.info(f"Reminder batch processing complete: {stats['processed']} queued, {stats['failed']} failed")
+            logger.info(f"{reminder_type.capitalize()} reminder batch processing complete: {stats['processed']} queued, {stats['failed']} failed")
             
         except Exception as e:
-            error_msg = f"Critical error in reminder batch processing: {str(e)}"
+            error_msg = f"Critical error in {reminder_type} reminder batch processing: {str(e)}"
             logger.error(error_msg)
             stats['errors'].append(error_msg)
             db.session.rollback()

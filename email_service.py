@@ -1051,12 +1051,14 @@ The {branding['company_name']} Team
                                   business_account_name: str,
                                   email_delivery_id: Optional[int] = None,
                                   business_account_id: Optional[int] = None,
-                                  campaign=None) -> Dict:
+                                  campaign=None,
+                                  email_type: str = 'reminder_primary') -> Dict:
         """
         Send reminder email to a participant who hasn't completed the survey.
         
-        Reuses the same template infrastructure as participant invitations but with
-        modified messaging to indicate this is a reminder rather than initial invitation.
+        Supports dual-reminder system:
+        - Primary reminder: Sent after reminder_delay_days (email_type='reminder_primary')
+        - Midpoint reminder: Sent halfway through campaign (email_type='reminder_midpoint')
         
         Args:
             participant_email: Participant's email
@@ -1067,6 +1069,7 @@ The {branding['company_name']} Team
             email_delivery_id: Optional EmailDelivery record ID for tracking
             business_account_id: Optional business account ID for tenant-specific configuration
             campaign: Optional Campaign object for campaign-specific email content
+            email_type: Type of reminder ('reminder_primary' or 'reminder_midpoint')
             
         Returns:
             Dict with success status and details
@@ -1078,6 +1081,12 @@ The {branding['company_name']} Team
             
             # Generate survey URL (using the correct 'survey' route)
             survey_url = url_for('survey', token=survey_token, _external=True)
+            
+            # Determine badge text based on reminder type
+            if email_type == 'reminder_midpoint':
+                reminder_badge_text = "⏰ Midpoint Reminder"
+            else:  # reminder_primary or fallback
+                reminder_badge_text = "⏰ Friendly Reminder"
             
             # Reminders use standard non-customizable messaging
             subject = f"Reminder: {campaign_name} - Your Feedback is Valuable"
@@ -1107,7 +1116,7 @@ The {branding['company_name']} Team
                 campaign_name=campaign_name,
                 survey_url=survey_url,
                 branding=branding,
-                reminder_badge_text="⏰ Friendly Reminder"
+                reminder_badge_text=reminder_badge_text  # Use appropriate badge
             )
             
             # Send the email
@@ -1123,7 +1132,7 @@ The {branding['company_name']} Team
             # Add reminder-specific metadata
             if result['success']:
                 result.update({
-                    'email_type': 'reminder',
+                    'email_type': email_type,  # Use the specific email_type (reminder_primary or reminder_midpoint)
                     'campaign_name': campaign_name,
                     'participant_name': participant_name,
                     'survey_token': survey_token[:20] + '...'  # Truncated for logging
@@ -1138,7 +1147,7 @@ The {branding['company_name']} Team
             return {
                 'success': False,
                 'error': error_msg,
-                'email_type': 'reminder',
+                'email_type': email_type,  # Use the specific email_type
                 'participant_email': participant_email
             }
 
