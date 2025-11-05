@@ -871,7 +871,49 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initial state
     updateSelectionState();
+    
+    // Intercept form submission for bulk add confirmation
+    const addParticipantsForm = document.getElementById('addParticipantsForm');
+    if (addParticipantsForm) {
+        addParticipantsForm.addEventListener('submit', function(e) {
+            const selectedCount = document.querySelectorAll('.participant-checkbox:checked').length;
+            
+            // Show confirmation modal for bulk operations (100+ participants)
+            if (selectedCount >= 100) {
+                e.preventDefault();
+                openBulkAddModal();
+                return false;
+            }
+            // Allow form to submit normally for < 100 participants
+        });
+    }
 });
+
+// Open bulk add confirmation modal
+function openBulkAddModal() {
+    const selectedCount = document.querySelectorAll('.participant-checkbox:checked').length;
+    document.getElementById('bulkAddCountModal').textContent = selectedCount;
+    
+    const modal = new bootstrap.Modal(document.getElementById('bulkAddModal'));
+    modal.show();
+}
+
+// Submit bulk add form
+function submitBulkAdd() {
+    const form = document.getElementById('addParticipantsForm');
+    const btn = document.getElementById('confirmBulkAddBtn');
+    
+    // Disable button and show loading state
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Processing...';
+    
+    // Close modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('bulkAddModal'));
+    modal.hide();
+    
+    // Submit the form
+    form.submit();
+}
 
 // Copy individual token
 function copyToken(button, participantName) {
@@ -1113,6 +1155,40 @@ function submitBulkRemove() {
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
                 <button type="button" class="btn btn-danger" onclick="submitBulkRemove()" id="confirmBulkRemoveBtn">
                     <i class="fas fa-trash me-1"></i>Remove Participants
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Add Confirmation Modal -->
+<div class="modal fade" id="bulkAddModal" tabindex="-1" aria-labelledby="bulkAddModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="bulkAddModalLabel">
+                    <i class="fas fa-info-circle me-2"></i>Confirm Bulk Addition
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-users me-2"></i>
+                    You are about to add <strong><span id="bulkAddCountModal">0</span> participant(s)</strong> to <strong>{{ campaign.name }}</strong>.
+                </div>
+                <p><strong>This operation will:</strong></p>
+                <ul>
+                    <li>Add the selected participants to this campaign</li>
+                    <li>Process in the background (you'll be notified when complete)</li>
+                    <li>Set participant status to "invited" by default</li>
+                    <li>Not affect their participation in other campaigns</li>
+                </ul>
+                <p class="mb-0"><strong>The page will reload to show progress. Continue?</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                <button type="button" class="btn btn-primary" onclick="submitBulkAdd()" id="confirmBulkAddBtn">
+                    <i class="fas fa-plus me-1"></i>Add Participants
                 </button>
             </div>
         </div>
