@@ -973,7 +973,7 @@ class TaskQueue:
             
             if report_file_path:
                 # Store report information in database
-                self._store_executive_report_info(campaign_id, business_account_id, report_file_path, is_regenerating, report_id)
+                report_record = self._store_executive_report_info(campaign_id, business_account_id, report_file_path, is_regenerating, report_id)
                 
                 action_type = "regenerated" if is_regenerating else "generated"
                 logger.info(f"Executive report {action_type} for campaign {campaign_id}: {report_file_path}")
@@ -1000,6 +1000,30 @@ class TaskQueue:
                 except Exception as e:
                     logger.error(f"Failed to log executive report audit event: {e}")
                 
+                # Send success notification
+                try:
+                    from notification_utils import notify
+                    from models import Campaign
+                    
+                    campaign = Campaign.query.get(campaign_id)
+                    campaign_name = campaign.name if campaign else f'Campaign {campaign_id}'
+                    
+                    action_verb = "regenerated" if is_regenerating else "ready to download"
+                    message = f"Executive report for '{campaign_name}' is {action_verb}"
+                    
+                    notify(
+                        business_account_id=business_account_id,
+                        user_id=task_data.get('user_id'),  # None if not provided (account-wide notification)
+                        category='success',
+                        message=message,
+                        campaign_id=campaign_id,
+                        report_id=report_record.id if report_record else None,
+                        report_file=report_file_path,
+                        action_type=action_type
+                    )
+                except Exception as notify_error:
+                    logger.error(f"Failed to send executive report success notification: {notify_error}")
+                
                 return True
             else:
                 # If regeneration failed, update status back to failed
@@ -1013,6 +1037,28 @@ class TaskQueue:
                             db.session.commit()
                     except Exception as e:
                         logger.error(f"Error updating report status to failed: {e}")
+                
+                # Send failure notification
+                try:
+                    from notification_utils import notify
+                    from models import Campaign
+                    
+                    campaign = Campaign.query.get(campaign_id)
+                    campaign_name = campaign.name if campaign else f'Campaign {campaign_id}'
+                    
+                    action_verb = "regeneration" if is_regenerating else "generation"
+                    message = f"Executive report {action_verb} failed for '{campaign_name}'"
+                    
+                    notify(
+                        business_account_id=business_account_id,
+                        user_id=task_data.get('user_id'),
+                        category='error',
+                        message=message,
+                        campaign_id=campaign_id,
+                        action_type=action_verb
+                    )
+                except Exception as notify_error:
+                    logger.error(f"Failed to send executive report failure notification: {notify_error}")
                 
                 logger.error(f"Failed to generate executive report for campaign {campaign_id}")
                 return False
@@ -1029,6 +1075,30 @@ class TaskQueue:
                         db.session.commit()
                 except Exception as db_e:
                     logger.error(f"Error updating report status to failed: {db_e}")
+            
+            # Send error notification for exception case
+            try:
+                from notification_utils import notify
+                from models import Campaign
+                
+                campaign = Campaign.query.get(campaign_id)
+                campaign_name = campaign.name if campaign else f'Campaign {campaign_id}'
+                
+                is_regenerating = task_data.get('regenerating', False)
+                action_verb = "regeneration" if is_regenerating else "generation"
+                message = f"Executive report {action_verb} failed for '{campaign_name}'"
+                
+                notify(
+                    business_account_id=business_account_id,
+                    user_id=task_data.get('user_id'),
+                    category='error',
+                    message=message,
+                    campaign_id=campaign_id,
+                    error=str(e),
+                    action_type=action_verb
+                )
+            except Exception as notify_error:
+                logger.error(f"Failed to send executive report exception notification: {notify_error}")
             
             logger.error(f"Executive report task error for campaign {campaign_id}: {e}")
             return False
@@ -1079,9 +1149,11 @@ class TaskQueue:
             
             action = "regenerated" if is_regenerating else "stored"
             logger.info(f"Executive report info {action} for campaign {campaign_id}")
+            return report
             
         except Exception as e:
             logger.error(f"Failed to store executive report info: {e}")
+            return None
     
     def _process_transcript_analysis_task(self, task_data, worker_id):
         """Process transcript analysis task - create participant and analyze transcript"""
