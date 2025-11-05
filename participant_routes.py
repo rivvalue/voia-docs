@@ -1455,65 +1455,111 @@ def manage_campaign_participants(campaign_id: int):
                     flash('Cannot add participants. License limit exceeded.', 'error')
                 return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
             
-            added_count = 0
-            for participant_id in participant_ids:
-                try:
-                    # Verify participant exists and belongs to current business account
-                    participant = Participant.query.filter_by(
-                        id=int(participant_id),
-                        business_account_id=current_account.id
-                    ).first()
-                    
-                    if not participant:
-                        continue
-                    
-                    # Check if association already exists
-                    existing = CampaignParticipant.query.filter_by(
-                        campaign_id=campaign_id,
-                        participant_id=participant_id
-                    ).first()
-                    
-                    if existing:
-                        continue
-                    
-                    # Create campaign-participant association (no separate token - uses participant's unified token)
-                    association = CampaignParticipant()
-                    association.campaign_id = campaign_id
-                    association.participant_id = participant_id
-                    association.business_account_id = current_account.id
-                    association.status = 'invited'  # Campaign-specific status tracking
-                    # Note: Using unified token system - no separate campaign tokens needed
-                    
-                    db.session.add(association)
-                    added_count += 1
-                    
-                except ValueError:
-                    continue
+            # Determine processing strategy based on count
+            BULK_THRESHOLD = 100  # Process asynchronously if adding 100+ participants
+            participant_count = len(participant_ids)
             
-            db.session.commit()
+            if participant_count >= BULK_THRESHOLD:
+                # Use background job for bulk operations
+                from models import BulkOperationJob
+                from task_queue import task_queue
+                import uuid
+                
+                # Create job record
+                job = BulkOperationJob(
+                    job_id=str(uuid.uuid4()),
+                    business_account_id=current_account.id,
+                    user_id=session.get('business_user_id'),
+                    operation_type='bulk_participant_add',
+                    operation_data=json.dumps({
+                        'campaign_id': campaign_id,
+                        'campaign_name': campaign.name,
+                        'participant_count': participant_count
+                    }),
+                    status='pending',
+                    progress=0
+                )
+                
+                db.session.add(job)
+                db.session.commit()
+                
+                # Queue background task
+                task_queue.add_task(
+                    task_type='bulk_participant_add',
+                    priority=1,
+                    task_data={
+                        'job_id': job.id,
+                        'campaign_id': campaign_id,
+                        'participant_ids': [int(pid) for pid in participant_ids],
+                        'business_account_id': current_account.id,
+                        'user_id': session.get('business_user_id')
+                    }
+                )
+                
+                flash(f'Adding {participant_count} participants in the background. You will be notified when complete.', 'info')
+                logger.info(f"Queued bulk participant add job {job.job_id} for campaign {campaign_id} ({participant_count} participants)")
+                return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
             
-            # Audit logging for adding participants to campaign
-            if added_count > 0:
-                try:
-                    queue_audit_log(
-                        business_account_id=current_account.id,
-                        action_type='participants_added',
-                        resource_type='campaign',
-                        resource_id=campaign_id,
-                        resource_name=campaign.name,
-                        details={
-                            'count': added_count
-                        }
-                    )
-                except Exception as audit_error:
-                    logger.error(f"Failed to log participants added to campaign audit: {audit_error}")
-                    
-                flash(f'Added {added_count} participant(s) to campaign {campaign.name}.', 'success')
-                logger.info(f"Added {added_count} participants to campaign {campaign.name} (ID: {campaign_id})")
             else:
-                flash('No new participants were added.', 'warning')
-            
-            return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+                # Process synchronously for small operations (< 100 participants)
+                added_count = 0
+                for participant_id in participant_ids:
+                    try:
+                        # Verify participant exists and belongs to current business account
+                        participant = Participant.query.filter_by(
+                            id=int(participant_id),
+                            business_account_id=current_account.id
+                        ).first()
+                        
+                        if not participant:
+                            continue
+                        
+                        # Check if association already exists
+                        existing = CampaignParticipant.query.filter_by(
+                            campaign_id=campaign_id,
+                            participant_id=participant_id
+                        ).first()
+                        
+                        if existing:
+                            continue
+                        
+                        # Create campaign-participant association
+                        association = CampaignParticipant()
+                        association.campaign_id = campaign_id
+                        association.participant_id = participant_id
+                        association.business_account_id = current_account.id
+                        association.status = 'invited'
+                        
+                        db.session.add(association)
+                        added_count += 1
+                        
+                    except ValueError:
+                        continue
+                
+                db.session.commit()
+                
+                # Audit logging for adding participants to campaign
+                if added_count > 0:
+                    try:
+                        queue_audit_log(
+                            business_account_id=current_account.id,
+                            action_type='participants_added',
+                            resource_type='campaign',
+                            resource_id=campaign_id,
+                            resource_name=campaign.name,
+                            details={
+                                'count': added_count
+                            }
+                        )
+                    except Exception as audit_error:
+                        logger.error(f"Failed to log participants added to campaign audit: {audit_error}")
+                        
+                    flash(f'Added {added_count} participant(s) to campaign {campaign.name}.', 'success')
+                    logger.info(f"Added {added_count} participants to campaign {campaign.name} (ID: {campaign_id})")
+                else:
+                    flash('No new participants were added.', 'warning')
+                
+                return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
             
     except Exception as e:
         db.session.rollback()

@@ -193,6 +193,17 @@ class TaskQueue:
                     logger.info(f"Worker {worker_id} completed reminder email to {participant_email}")
                 else:
                     logger.error(f"Worker {worker_id} failed reminder email task")
+                    
+            elif task_type == 'bulk_participant_add':
+                # Process bulk participant addition task
+                success = self._process_bulk_participant_add_task(task_data, worker_id)
+                
+                if success:
+                    campaign_id = task_data.get('campaign_id', 'unknown')
+                    participant_count = task_data.get('participant_count', 0)
+                    logger.info(f"Worker {worker_id} completed bulk participant add for campaign {campaign_id} ({participant_count} participants)")
+                else:
+                    logger.error(f"Worker {worker_id} failed bulk participant add task")
                         
         except Exception as e:
             logger.error(f"Error processing task {task}: {e}")
@@ -306,6 +317,149 @@ class TaskQueue:
             if email_delivery:
                 email_delivery.mark_failed(f"Task processing error: {str(e)}", is_permanent=False)
                 db.session.commit()
+            return False
+    
+    def _process_bulk_participant_add_task(self, task_data, worker_id):
+        """Process bulk participant addition task with batching and progress tracking"""
+        from models import BulkOperationJob
+        from notification_utils import notify
+        from license_service import LicenseService
+        
+        job_id = task_data.get('job_id')
+        campaign_id = task_data.get('campaign_id')
+        participant_ids = task_data.get('participant_ids', [])
+        business_account_id = task_data.get('business_account_id')
+        user_id = task_data.get('user_id')
+        
+        if not all([job_id, campaign_id, participant_ids, business_account_id]):
+            logger.error(f"Bulk participant add task missing required data")
+            return False
+        
+        try:
+            # Get the job record
+            job = BulkOperationJob.query.get(job_id)
+            if not job:
+                logger.error(f"BulkOperationJob {job_id} not found")
+                return False
+            
+            # Update job status to processing
+            job.status = 'processing'
+            job.started_at = datetime.utcnow()
+            db.session.commit()
+            
+            # Get campaign
+            campaign = Campaign.query.filter_by(
+                id=campaign_id,
+                business_account_id=business_account_id
+            ).first()
+            
+            if not campaign:
+                logger.error(f"Campaign {campaign_id} not found")
+                job.status = 'failed'
+                job.completed_at = datetime.utcnow()
+                job.result = json.dumps({'error': 'Campaign not found'})
+                db.session.commit()
+                return False
+            
+            # Process participants in batches of 100
+            BATCH_SIZE = 100
+            total_count = len(participant_ids)
+            success_count = 0
+            skip_count = 0
+            error_count = 0
+            
+            for i in range(0, len(participant_ids), BATCH_SIZE):
+                batch = participant_ids[i:i + BATCH_SIZE]
+                
+                # Process batch
+                for participant_id in batch:
+                    try:
+                        # Check if already exists
+                        existing = CampaignParticipant.query.filter_by(
+                            campaign_id=campaign_id,
+                            participant_id=participant_id
+                        ).first()
+                        
+                        if existing:
+                            skip_count += 1
+                            continue
+                        
+                        # Create new campaign participant
+                        campaign_participant = CampaignParticipant(
+                            campaign_id=campaign_id,
+                            participant_id=participant_id,
+                            business_account_id=business_account_id,
+                            status='invited'
+                        )
+                        
+                        db.session.add(campaign_participant)
+                        success_count += 1
+                        
+                    except Exception as e:
+                        logger.error(f"Error adding participant {participant_id}: {e}")
+                        error_count += 1
+                
+                # Commit batch
+                db.session.commit()
+                
+                # Update job progress
+                processed = min(i + BATCH_SIZE, total_count)
+                job.progress = int((processed / total_count) * 100)
+                db.session.commit()
+                
+                logger.info(f"Batch processed: {processed}/{total_count} participants")
+            
+            # Mark job as completed
+            job.status = 'completed'
+            job.completed_at = datetime.utcnow()
+            job.result = json.dumps({
+                'total': total_count,
+                'added': success_count,
+                'skipped': skip_count,
+                'failed': error_count
+            })
+            db.session.commit()
+            
+            # Send notification
+            message = f"{success_count} participants added to campaign '{campaign.name}'"
+            if skip_count > 0:
+                message += f" ({skip_count} already assigned)"
+            if error_count > 0:
+                message += f" ({error_count} failed)"
+            
+            notify(
+                business_account_id=business_account_id,
+                user_id=user_id,
+                category='success' if error_count == 0 else 'warning',
+                message=message
+            )
+            
+            logger.info(f"Bulk participant add completed: {success_count} added, {skip_count} skipped, {error_count} failed")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Bulk participant add task error: {e}")
+            db.session.rollback()
+            
+            # Update job status
+            try:
+                job = BulkOperationJob.query.get(job_id)
+                if job:
+                    job.status = 'failed'
+                    job.completed_at = datetime.utcnow()
+                    job.result = json.dumps({'error': str(e)})
+                    db.session.commit()
+                    
+                    # Send error notification
+                    notify(
+                        business_account_id=business_account_id,
+                        user_id=user_id,
+                        category='error',
+                        message=f"Failed to add participants to campaign: {str(e)}"
+                    )
+            except Exception as notify_error:
+                logger.error(f"Failed to send error notification: {notify_error}")
+            
             return False
     
     def _create_email_delivery_record(self, task_data):
