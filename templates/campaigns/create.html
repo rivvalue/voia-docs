@@ -235,24 +235,22 @@ Thank you for your time and valuable insights!"></textarea>
                         </label>
                     </div>
                     <div class="form-text" style="margin-left: 2.5rem; margin-top: 0.5rem;">
-                        {{ _('Two automated reminders will be sent: a primary reminder and a midpoint reminder') }}
+                        {{ _('Two automated reminders will be sent: a Last Chance reminder and a midpoint reminder') }}
                     </div>
                 </div>
 
                 <div id="reminderDelayFields">
-                    <!-- Primary Reminder Configuration -->
+                    <!-- Last Chance Reminder Configuration -->
                     <div class="mb-4">
                         <label for="reminder_delay_days" class="form-label">
-                            <i class="fas fa-envelope text-primary me-1"></i><strong>{{ _('Primary Reminder') }}</strong>
+                            <i class="fas fa-envelope text-danger me-1"></i><strong>{{ _('Last Chance Reminder') }}</strong>
                         </label>
                         <select class="form-select" id="reminder_delay_days" name="reminder_delay_days">
-                            <option value="3">3 days after invitation</option>
-                            <option value="5">5 days after invitation</option>
-                            <option value="7" selected>7 days after invitation (recommended)</option>
-                            <option value="10">10 days after invitation</option>
-                            <option value="14">14 days after invitation</option>
+                            <option value="7">7 days before campaign ends</option>
+                            <option value="10" selected>10 days before campaign ends (recommended)</option>
+                            <option value="14">14 days before campaign ends</option>
                         </select>
-                        <div class="form-text">{{ _('First reminder sent X days after each participant receives their invitation') }}</div>
+                        <div class="form-text">{{ _('Final reminder sent X days before the campaign closes - creates urgency for non-respondents') }}</div>
                     </div>
 
                     <!-- Midpoint Reminder Display (Read-Only) -->
@@ -282,8 +280,8 @@ Thank you for your time and valuable insights!"></textarea>
                         <i class="fas fa-info-circle me-2"></i>
                         <strong>{{ _('How dual reminders work:') }}</strong>
                         <ul class="mb-0 mt-2">
-                            <li>{{ _('Primary reminder: Sent X days after each participant\'s invitation (configurable above)') }}</li>
-                            <li>{{ _('Midpoint reminder: Sent automatically when campaign reaches its halfway point') }}</li>
+                            <li>{{ _('Midpoint reminder: Sent automatically when campaign reaches its halfway point (first reminder)') }}</li>
+                            <li>{{ _('Last Chance reminder: Sent X days before campaign closes (creates urgency for final push)') }}</li>
                             <li>{{ _('Both reminders are sent only to participants who haven\'t responded yet') }}</li>
                             <li>{{ _('Each reminder type is sent only once per participant') }}</li>
                             <li>{{ _('Reminders are processed twice daily (9 AM and 2 PM UTC) during active campaigns') }}</li>
@@ -355,7 +353,7 @@ function toggleReminderFields() {
     }
 }
 
-// Calculate and display midpoint reminder timing
+// Calculate and display midpoint reminder timing and Last Chance reminder
 function updateMidpointReminderDisplay() {
     const startDateInput = document.getElementById('start_date');
     const endDateInput = document.getElementById('end_date');
@@ -366,7 +364,7 @@ function updateMidpointReminderDisplay() {
     
     const startDate = startDateInput.value;
     const endDate = endDateInput.value;
-    const reminderDelay = parseInt(reminderDelaySelect.value) || 7;
+    const reminderDelay = parseInt(reminderDelaySelect.value) || 10;
     
     if (!startDate || !endDate) {
         midpointDisplay.innerHTML = '<i class="fas fa-calendar-alt me-2 text-muted"></i><span class="text-muted">{{ _("Campaign dates will be auto-filled on page load") }}</span>';
@@ -388,43 +386,52 @@ function updateMidpointReminderDisplay() {
     const durationMs = end - start;
     const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24));
     
-    // Calculate midpoint date
+    // Calculate midpoint date (sent first)
     const midpointMs = start.getTime() + (durationMs / 2);
     const midpointDate = new Date(midpointMs);
     const midpointDay = Math.ceil(durationDays / 2);
     
+    // Calculate Last Chance date (sent X days BEFORE end)
+    const lastChanceDate = new Date(end);
+    lastChanceDate.setDate(lastChanceDate.getDate() - reminderDelay);
+    const lastChanceDay = durationDays - reminderDelay;
+    
     // Format midpoint date for display
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
-    const formattedDate = midpointDate.toLocaleDateString('en-US', options);
+    const formattedMidpoint = midpointDate.toLocaleDateString('en-US', options);
+    const formattedLastChance = lastChanceDate.toLocaleDateString('en-US', options);
     
-    // Update display
+    // Update display with BOTH reminders
     midpointDisplay.innerHTML = `
         <i class="fas fa-calendar-check me-2 text-success"></i>
-        <strong>Sends on ${formattedDate}</strong>
-        <span class="text-muted ms-2">(Day ${midpointDay} of ${durationDays})</span>
+        <strong>Midpoint:</strong> ${formattedMidpoint} (Day ${midpointDay})
+        <br>
+        <i class="fas fa-exclamation-triangle me-2 text-danger"></i>
+        <strong>Last Chance:</strong> ${formattedLastChance} (Day ${lastChanceDay})
     `;
     
     // Check for spacing issues
     let showWarning = false;
     let warningText = '';
     
-    // Warning 1: Primary reminder after midpoint
-    if (reminderDelay >= midpointDay) {
+    // Warning 1: Last Chance reminder BEFORE midpoint (wrong order!)
+    if (lastChanceDay <= midpointDay) {
         showWarning = true;
-        warningText = `{{ _("Primary reminder (day ${reminderDelay}) will send after or at the same time as midpoint reminder (day ${midpointDay}). Consider reducing the primary reminder delay.") }}`;
-        warningText = warningText.replace('${reminderDelay}', reminderDelay).replace('${midpointDay}', midpointDay);
+        warningText = `{{ _("Last Chance reminder (day ${lastChanceDay}) sends before or at midpoint (day ${midpointDay}). Increase the offset to at least ${minOffset} days.") }}`;
+        const minOffset = durationDays - midpointDay + 1;
+        warningText = warningText.replace('${lastChanceDay}', lastChanceDay).replace('${midpointDay}', midpointDay).replace('${minOffset}', minOffset);
     }
-    // Warning 2: Reminders too close together (within 2 days)
-    else if (Math.abs(reminderDelay - midpointDay) < 2) {
+    // Warning 2: Reminders too close together (within 3 days)
+    else if (Math.abs(lastChanceDay - midpointDay) < 3) {
         showWarning = true;
-        warningText = `{{ _("Primary reminder (day ${reminderDelay}) and midpoint reminder (day ${midpointDay}) are very close together. Consider adjusting the primary reminder delay for better spacing.") }}`;
-        warningText = warningText.replace('${reminderDelay}', reminderDelay).replace('${midpointDay}', midpointDay);
+        warningText = `{{ _("Last Chance reminder (day ${lastChanceDay}) and midpoint (day ${midpointDay}) are very close. Consider increasing spacing.") }}`;
+        warningText = warningText.replace('${lastChanceDay}', lastChanceDay).replace('${midpointDay}', midpointDay);
     }
-    // Warning 3: Primary reminder too close to campaign end
-    else if (reminderDelay >= durationDays - 2) {
+    // Warning 3: Last Chance too close to end (< 3 days)
+    else if (reminderDelay < 3) {
         showWarning = true;
-        warningText = `{{ _("Primary reminder (day ${reminderDelay}) is very close to campaign end (day ${durationDays}). Participants may not have enough time to respond.") }}`;
-        warningText = warningText.replace('${reminderDelay}', reminderDelay).replace('${durationDays}', durationDays);
+        warningText = `{{ _("Last Chance reminder only ${reminderDelay} days before end - participants may not have time to respond.") }}`;
+        warningText = warningText.replace('${reminderDelay}', reminderDelay);
     }
     
     if (showWarning) {
