@@ -943,14 +943,22 @@ function submitBulkRemove() {
     })
     .then(data => {
         if (data.success) {
-            // {{ _('Close') }} modal
+            // Close modal
             bootstrap.Modal.getInstance(document.getElementById('bulkRemoveModal')).hide();
             
-            // Show success message
-            alert(`Successfully removed ${data.removed} participant(s) from {{ campaign.name }}.`);
-            
-            // Reload page to show updated data
-            window.location.reload();
+            // Check if this is a synchronous or asynchronous operation
+            if (data.job_id) {
+                // Asynchronous operation - show "job started" message
+                // The progress indicator will handle the rest
+                showToast('info', `Bulk removal job started. Processing ${data.participant_count || selectedCampaignParticipants.size} participants...`);
+                
+                // Reload to show progress indicator
+                window.location.reload();
+            } else {
+                // Synchronous operation - show success and reload
+                alert(`Successfully removed ${data.removed} participant(s) from {{ campaign.name }}.`);
+                window.location.reload();
+            }
         } else {
             alert(`Error: ${data.error}\n${data.message || data.details || ''}`);
             btn.disabled = false;
