@@ -40,6 +40,7 @@ The system is a Flask web application with a multi-tiered architecture, using Ji
 -   **Transcript Upload System**: AI-powered meeting transcript analysis universally available across all license tiers.
 -   **Prompt Preview System (Development Only)**: Environment-gated feature for inspecting AI system prompts in survey customization pages, available in global and campaign-specific contexts.
 -   **AI Cost Optimization Strategy**: Tiered OpenAI model routing architecture for 77% cost reduction, using GPT-4o-mini for most tasks with rule-based escalation to GPT-4o for high-risk scenarios.
+-   **Notification System**: Real-time in-app notification center with professional UI for executive report generation and bulk operations. Features polished bell icon with unread badges, category-specific icons, mobile-responsive dropdown design with smooth animations, and Flask-Babel integration for French/English support. Notifications include rich metadata for deep linking to reports and resources.
 
 # External Dependencies
 -   **OpenAI API**: For advanced AI functionalities (sentiment analysis, theme extraction, conversational surveys).
