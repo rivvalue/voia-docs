@@ -85,7 +85,7 @@ class ExecutiveReportGenerator:
         ).all()
         
         # Calculate current campaign KPIs
-        current_kpis = self._calculate_campaign_kpis(responses)
+        current_kpis = self._calculate_campaign_kpis(responses, campaign)
         
         # Get previous campaigns for delta calculations
         previous_campaigns = self._get_previous_campaigns(campaign, business_account.id)
@@ -119,7 +119,7 @@ class ExecutiveReportGenerator:
             'generated_at': datetime.utcnow()
         }
     
-    def _calculate_campaign_kpis(self, responses: List) -> Dict:
+    def _calculate_campaign_kpis(self, responses: List, campaign) -> Dict:
         """Calculate KPIs for current campaign"""
         if not responses:
             return {
@@ -134,7 +134,12 @@ class ExecutiveReportGenerator:
         # Basic metrics
         total_responses = len(responses)
         nps_scores = [r.nps_score for r in responses if r.nps_score is not None]
-        nps_score = sum(nps_scores) / len(nps_scores) if nps_scores else 0
+        
+        # Calculate NPS using standard formula: (promoters - detractors) / total * 100
+        promoters = sum(1 for score in nps_scores if score >= 9)
+        passives = sum(1 for score in nps_scores if 7 <= score <= 8)
+        detractors = sum(1 for score in nps_scores if score <= 6)
+        nps_score = ((promoters - detractors) / len(nps_scores) * 100) if nps_scores else 0
         
         # Sentiment analysis
         sentiment_counts = {'positive': 0, 'neutral': 0, 'negative': 0}
@@ -159,10 +164,14 @@ class ExecutiveReportGenerator:
         for sentiment, count in sentiment_counts.items():
             sentiment_breakdown[sentiment] = (count / total_responses * 100) if total_responses > 0 else 0
         
+        # Calculate actual participation rate from campaign participants
+        total_participants = campaign.participants_count
+        response_rate = (total_responses / total_participants * 100) if total_participants > 0 else 0
+        
         return {
             'total_responses': total_responses,
             'nps_score': round(nps_score, 1),
-            'response_rate': 85.0,  # TODO: Calculate actual response rate from participants
+            'response_rate': round(response_rate, 1),
             'sentiment_breakdown': sentiment_breakdown,
             'avg_churn_risk': round(sum(churn_risks) / len(churn_risks), 1) if churn_risks else 0,
             'avg_growth_score': round(sum(growth_scores) / len(growth_scores), 1) if growth_scores else 0
@@ -210,7 +219,7 @@ class ExecutiveReportGenerator:
         # Get most recent previous campaign for comparison
         prev_campaign = previous_campaigns[0]
         prev_responses = prev_campaign.responses.all() if prev_campaign.responses else []
-        prev_kpis = self._calculate_campaign_kpis(prev_responses)
+        prev_kpis = self._calculate_campaign_kpis(prev_responses, prev_campaign)
         
         # Calculate deltas
         nps_delta = current_kpis['nps_score'] - prev_kpis['nps_score']
