@@ -1027,6 +1027,22 @@ class TaskQueue:
             except Exception as e:
                 logger.error(f"Failed to log transcript analysis audit event: {e}")
             
+            # Send notification for transcript analysis completion
+            try:
+                from notification_utils import notify
+                
+                nps_score = analysis_result.get('nps_score', 'N/A')
+                sentiment = analysis_result.get('sentiment_label', 'Unknown')
+                
+                notify(
+                    business_account_id=business_account_id,
+                    user_id=None,  # Account-wide notification
+                    category='success',
+                    message=f"Transcript analyzed for {participant_name} in campaign '{campaign.name}' - NPS: {nps_score}, Sentiment: {sentiment}"
+                )
+            except Exception as e:
+                logger.error(f"Failed to send transcript analysis notification: {e}")
+            
             return True
             
         except Exception as e:
