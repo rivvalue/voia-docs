@@ -5,9 +5,14 @@ This service handles the identification and processing of participants who are e
 for reminder emails. It implements a dual-reminder strategy with configurable timing
 to increase response rates while minimizing email volume.
 
-Reminder Types:
-1. Primary Reminder: Sent after reminder_delay_days from invitation (e.g., 7 days)
-2. Midpoint Reminder: Sent halfway through campaign duration to persistent non-respondents
+Reminder Types (sent in this order):
+1. Midpoint Reminder: Sent automatically halfway through campaign duration (Day ~30-45 for 60-90 day campaigns)
+2. Last Chance Reminder: Sent X days BEFORE campaign closes (configurable: 7, 10, or 14 days before end_date)
+
+This strategic reversal creates:
+- Early engagement: Midpoint reminder catches participants who haven't started yet
+- Final urgency: Last Chance reminder creates deadline pressure for non-respondents
+- Better spacing: Avoids clustering reminders at the beginning when participants already received invitations
 
 Performance considerations:
 - Uses optimized LEFT JOIN queries instead of subqueries
