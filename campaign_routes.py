@@ -423,6 +423,53 @@ def edit_draft_campaign(campaign_id):
         campaign.reminder_enabled = reminder_enabled
         campaign.reminder_delay_days = reminder_delay_days
         
+        # Custom email content
+        use_custom_email_content = request.form.get('use_custom_email_content') == 'on'
+        if campaign.use_custom_email_content != use_custom_email_content:
+            changes['use_custom_email_content'] = {'old': campaign.use_custom_email_content, 'new': use_custom_email_content}
+        
+        campaign.use_custom_email_content = use_custom_email_content
+        
+        if use_custom_email_content:
+            custom_subject = request.form.get('custom_subject_template', '').strip() or None
+            custom_intro = request.form.get('custom_intro_message', '').strip() or None
+            custom_cta = request.form.get('custom_cta_text', '').strip() or None
+            custom_closing = request.form.get('custom_closing_message', '').strip() or None
+            custom_footer = request.form.get('custom_footer_note', '').strip() or None
+            
+            # Track changes
+            if campaign.custom_subject_template != custom_subject:
+                changes['custom_subject_template'] = {'old': campaign.custom_subject_template, 'new': custom_subject}
+            if campaign.custom_intro_message != custom_intro:
+                changes['custom_intro_message'] = {'old': campaign.custom_intro_message, 'new': custom_intro}
+            if campaign.custom_cta_text != custom_cta:
+                changes['custom_cta_text'] = {'old': campaign.custom_cta_text, 'new': custom_cta}
+            if campaign.custom_closing_message != custom_closing:
+                changes['custom_closing_message'] = {'old': campaign.custom_closing_message, 'new': custom_closing}
+            if campaign.custom_footer_note != custom_footer:
+                changes['custom_footer_note'] = {'old': campaign.custom_footer_note, 'new': custom_footer}
+            
+            campaign.custom_subject_template = custom_subject
+            campaign.custom_intro_message = custom_intro
+            campaign.custom_cta_text = custom_cta
+            campaign.custom_closing_message = custom_closing
+            campaign.custom_footer_note = custom_footer
+        else:
+            # Clear custom content if disabled
+            campaign.custom_subject_template = None
+            campaign.custom_intro_message = None
+            campaign.custom_cta_text = None
+            campaign.custom_closing_message = None
+            campaign.custom_footer_note = None
+        
+        # Validate custom email content if enabled
+        content_errors = campaign.validate_custom_email_content()
+        if content_errors:
+            db.session.rollback()
+            for error in content_errors:
+                flash(error, 'error')
+            return redirect(url_for('campaigns.edit_draft_campaign', campaign_id=campaign_id))
+        
         db.session.commit()
         
         # Audit log if changes were made
