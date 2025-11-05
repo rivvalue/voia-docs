@@ -272,8 +272,13 @@ class Campaign(db.Model):
             # Reminder configuration
             'reminder_enabled': self.reminder_enabled,
             'reminder_delay_days': self.reminder_delay_days,
-            # Email customization flags
+            # Email customization flags and content
             'use_custom_email_content': self.use_custom_email_content,
+            'custom_subject_template': self.custom_subject_template,
+            'custom_intro_message': self.custom_intro_message,
+            'custom_cta_text': self.custom_cta_text,
+            'custom_closing_message': self.custom_closing_message,
+            'custom_footer_note': self.custom_footer_note,
             'has_campaign_customization': self.product_description is not None or self.target_clients_description is not None
         }
         
