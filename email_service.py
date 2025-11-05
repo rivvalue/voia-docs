@@ -419,6 +419,10 @@ class EmailService:
             <div class="tagline">{branding['tagline']}</div>
         </div>
         
+        <div style="background-color: #f0f8ff; padding: 15px; border-radius: 5px; border-left: 4px solid #4A90E2; margin-bottom: 20px;">
+            <strong>📋 New Survey Invitation</strong>
+        </div>
+        
         <h2>Hello {participant_name},</h2>
         
         <p>{intro_text}</p>
