@@ -214,7 +214,7 @@ Thank you for your time and valuable insights!">{{ campaign.custom_closing_messa
             <!-- Reminder Settings -->
             <div class="form-section">
                 <h3 class="section-title">
-                    <i class="fas fa-bell"></i>Email Reminder Settings
+                    <i class="fas fa-bell"></i>{{ _('Dual Reminder Schedule') }}
                 </h3>
                 
                 <div class="mb-4">
@@ -222,34 +222,62 @@ Thank you for your time and valuable insights!">{{ campaign.custom_closing_messa
                         <input class="form-check-input" type="checkbox" id="reminder_enabled" name="reminder_enabled" 
                                {% if campaign.reminder_enabled %}checked{% endif %} style="cursor: pointer;">
                         <label class="form-check-label" for="reminder_enabled" style="cursor: pointer;">
-                            <strong>Send reminder emails to non-respondents</strong>
+                            <strong>{{ _('Send reminder emails to non-respondents') }}</strong>
                         </label>
                     </div>
                     <div class="form-text" style="margin-left: 2.5rem; margin-top: 0.5rem;">
-                        Automatically send a follow-up email to participants who haven't completed the survey
+                        {{ _('Two automated reminders will be sent: a primary reminder and a midpoint reminder') }}
                     </div>
                 </div>
 
                 <div id="reminderDelayFields">
-                    <div class="mb-3">
-                        <label for="reminder_delay_days" class="form-label">{{ _('Days to Wait Before Reminder') }}</label>
+                    <!-- Primary Reminder Configuration -->
+                    <div class="mb-4">
+                        <label for="reminder_delay_days" class="form-label">
+                            <i class="fas fa-envelope text-primary me-1"></i><strong>{{ _('Primary Reminder') }}</strong>
+                        </label>
                         <select class="form-select" id="reminder_delay_days" name="reminder_delay_days">
-                            <option value="3" {% if campaign.reminder_delay_days == 3 %}selected{% endif %}>3 days</option>
-                            <option value="5" {% if campaign.reminder_delay_days == 5 %}selected{% endif %}>5 days</option>
-                            <option value="7" {% if campaign.reminder_delay_days == 7 or not campaign.reminder_delay_days %}selected{% endif %}>7 days (recommended)</option>
-                            <option value="10" {% if campaign.reminder_delay_days == 10 %}selected{% endif %}>10 days</option>
-                            <option value="14" {% if campaign.reminder_delay_days == 14 %}selected{% endif %}>14 days</option>
+                            <option value="3" {% if campaign.reminder_delay_days == 3 %}selected{% endif %}>3 days after invitation</option>
+                            <option value="5" {% if campaign.reminder_delay_days == 5 %}selected{% endif %}>5 days after invitation</option>
+                            <option value="7" {% if campaign.reminder_delay_days == 7 or not campaign.reminder_delay_days %}selected{% endif %}>7 days after invitation (recommended)</option>
+                            <option value="10" {% if campaign.reminder_delay_days == 10 %}selected{% endif %}>10 days after invitation</option>
+                            <option value="14" {% if campaign.reminder_delay_days == 14 %}selected{% endif %}>14 days after invitation</option>
                         </select>
-                        <div class="form-text">{{ _('How many days after the invitation should we send the reminder?') }}</div>
+                        <div class="form-text">{{ _('First reminder sent X days after each participant receives their invitation') }}</div>
                     </div>
 
+                    <!-- Midpoint Reminder Display (Read-Only) -->
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="fas fa-clock text-warning me-1"></i><strong>{{ _('Midpoint Reminder') }}</strong>
+                            <span class="badge bg-secondary ms-2">{{ _('Automatic') }}</span>
+                        </label>
+                        <div class="alert alert-light border" style="background-color: #f8f9fa;">
+                            <div id="midpointReminderInfo">
+                                <i class="fas fa-calendar-alt me-2 text-muted"></i>
+                                <span id="midpointDateDisplay" class="text-muted">{{ _('Select campaign dates to see midpoint reminder timing') }}</span>
+                            </div>
+                        </div>
+                        <div class="form-text">{{ _('Second reminder automatically sent halfway through the campaign duration') }}</div>
+                    </div>
+
+                    <!-- Spacing Warning Alert -->
+                    <div id="reminderSpacingWarning" class="alert alert-warning d-none">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>{{ _('Reminder Spacing Alert:') }}</strong>
+                        <span id="reminderSpacingMessage"></span>
+                    </div>
+
+                    <!-- How It Works Info -->
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle me-2"></i>
-                        <strong>How it works:</strong>
+                        <strong>{{ _('How dual reminders work:') }}</strong>
                         <ul class="mb-0 mt-2">
-                            <li>{{ _('Reminders are sent only to participants who haven\'t responded yet') }}</li>
-                            <li>{{ _('Only one reminder is sent per participant') }}</li>
-                            <li>{{ _('Reminders are processed daily during active campaigns') }}</li>
+                            <li>{{ _('Primary reminder: Sent X days after each participant\'s invitation (configurable above)') }}</li>
+                            <li>{{ _('Midpoint reminder: Sent automatically when campaign reaches its halfway point') }}</li>
+                            <li>{{ _('Both reminders are sent only to participants who haven\'t responded yet') }}</li>
+                            <li>{{ _('Each reminder type is sent only once per participant') }}</li>
+                            <li>{{ _('Reminders are processed twice daily (9 AM and 2 PM UTC) during active campaigns') }}</li>
                         </ul>
                     </div>
                 </div>
@@ -375,12 +403,99 @@ function toggleReminderFields() {
     }
 }
 
+// Calculate and display midpoint reminder timing
+function updateMidpointReminderDisplay() {
+    const startDateInput = document.getElementById('start_date');
+    const endDateInput = document.getElementById('end_date');
+    const reminderDelaySelect = document.getElementById('reminder_delay_days');
+    const midpointDisplay = document.getElementById('midpointDateDisplay');
+    const warningAlert = document.getElementById('reminderSpacingWarning');
+    const warningMessage = document.getElementById('reminderSpacingMessage');
+    
+    const startDate = startDateInput.value;
+    const endDate = endDateInput.value;
+    const reminderDelay = parseInt(reminderDelaySelect.value) || 7;
+    
+    if (!startDate || !endDate) {
+        midpointDisplay.innerHTML = '<i class="fas fa-calendar-alt me-2 text-muted"></i><span class="text-muted">{{ _("Select campaign dates to see midpoint reminder timing") }}</span>';
+        warningAlert.classList.add('d-none');
+        return;
+    }
+    
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    // Validate dates
+    if (end <= start) {
+        midpointDisplay.innerHTML = '<i class="fas fa-exclamation-circle me-2 text-danger"></i><span class="text-danger">{{ _("End date must be after start date") }}</span>';
+        warningAlert.classList.add('d-none');
+        return;
+    }
+    
+    // Calculate campaign duration in days
+    const durationMs = end - start;
+    const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24));
+    
+    // Calculate midpoint date
+    const midpointMs = start.getTime() + (durationMs / 2);
+    const midpointDate = new Date(midpointMs);
+    const midpointDay = Math.ceil(durationDays / 2);
+    
+    // Format midpoint date for display
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    const formattedDate = midpointDate.toLocaleDateString('en-US', options);
+    
+    // Update display
+    midpointDisplay.innerHTML = `
+        <i class="fas fa-calendar-check me-2 text-success"></i>
+        <strong>Sends on ${formattedDate}</strong>
+        <span class="text-muted ms-2">(Day ${midpointDay} of ${durationDays})</span>
+    `;
+    
+    // Check for spacing issues
+    let showWarning = false;
+    let warningText = '';
+    
+    // Warning 1: Primary reminder after midpoint
+    if (reminderDelay >= midpointDay) {
+        showWarning = true;
+        warningText = `{{ _("Primary reminder (day ${reminderDelay}) will send after or at the same time as midpoint reminder (day ${midpointDay}). Consider reducing the primary reminder delay.") }}`;
+        warningText = warningText.replace('${reminderDelay}', reminderDelay).replace('${midpointDay}', midpointDay);
+    }
+    // Warning 2: Reminders too close together (within 2 days)
+    else if (Math.abs(reminderDelay - midpointDay) < 2) {
+        showWarning = true;
+        warningText = `{{ _("Primary reminder (day ${reminderDelay}) and midpoint reminder (day ${midpointDay}) are very close together. Consider adjusting the primary reminder delay for better spacing.") }}`;
+        warningText = warningText.replace('${reminderDelay}', reminderDelay).replace('${midpointDay}', midpointDay);
+    }
+    // Warning 3: Primary reminder too close to campaign end
+    else if (reminderDelay >= durationDays - 2) {
+        showWarning = true;
+        warningText = `{{ _("Primary reminder (day ${reminderDelay}) is very close to campaign end (day ${durationDays}). Participants may not have enough time to respond.") }}`;
+        warningText = warningText.replace('${reminderDelay}', reminderDelay).replace('${durationDays}', durationDays);
+    }
+    
+    if (showWarning) {
+        warningMessage.textContent = warningText;
+        warningAlert.classList.remove('d-none');
+    } else {
+        warningAlert.classList.add('d-none');
+    }
+}
+
 // Initialize toggles
 document.getElementById('use_custom_email_content').addEventListener('change', toggleCustomEmailContent);
 toggleCustomEmailContent(); // Initialize on page load
 
 document.getElementById('reminder_enabled').addEventListener('change', toggleReminderFields);
 toggleReminderFields(); // Initialize on page load
+
+// Update midpoint display when dates or reminder delay changes
+document.getElementById('start_date').addEventListener('change', updateMidpointReminderDisplay);
+document.getElementById('end_date').addEventListener('change', updateMidpointReminderDisplay);
+document.getElementById('reminder_delay_days').addEventListener('change', updateMidpointReminderDisplay);
+// Initialize midpoint display on page load
+updateMidpointReminderDisplay();
 
 // Email Preview Function
 function previewEmail(emailType) {
