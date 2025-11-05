@@ -336,7 +336,9 @@
         // Function to update notification count
         async function updateNotificationCount() {
             try {
-                const response = await fetch('/api/notifications/count');
+                const response = await fetch(`/api/notifications/count?_=${Date.now()}`, {
+                    cache: 'no-store'
+                });
                 const data = await response.json();
                 
                 if (data.unread_count > 0) {
@@ -360,7 +362,9 @@
         // Function to load notifications
         async function loadNotifications() {
             try {
-                const response = await fetch('/api/notifications?limit=10');
+                const response = await fetch(`/api/notifications?limit=10&_=${Date.now()}`, {
+                    cache: 'no-store'
+                });
                 const data = await response.json();
                 
                 if (data.notifications.length === 0) {
