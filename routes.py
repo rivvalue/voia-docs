@@ -3468,7 +3468,11 @@ def get_notification_count():
         user_id = session.get('business_user_id')
         count = get_unread_count(current_account.id, user_id)
         
-        return jsonify({'unread_count': count})
+        response = jsonify({'unread_count': count})
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        return response
         
     except Exception as e:
         logger.error(f"Error getting notification count: {e}")
@@ -3504,10 +3508,14 @@ def get_notifications():
             Notification.created_at.desc()
         ).limit(limit).all()
         
-        return jsonify({
+        response = jsonify({
             'notifications': [n.to_dict() for n in notifications],
             'total': len(notifications)
         })
+        response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        return response
         
     except Exception as e:
         logger.error(f"Error getting notifications: {e}")
