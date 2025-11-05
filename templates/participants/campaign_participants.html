@@ -100,7 +100,8 @@
                     }
                     
                     function pollJobStatus() {
-                        fetch('{{ url_for("participants.get_bulk_job_status", job_id="_JOB_ID_") }}'.replace('_JOB_ID_', jobId))
+                        const statusUrl = '/business/participants/api/bulk-jobs/' + jobId + '/status';
+                        fetch(statusUrl)
                             .then(response => {
                                 if (!response.ok) {
                                     throw new Error('Failed to fetch job status');
