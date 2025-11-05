@@ -95,7 +95,7 @@ class ReminderService:
         # Uses text() to construct: invited_at <= NOW() - INTERVAL 'X days'
         # where X is the campaign's reminder_delay_days value
         filters.append(
-            text("campaign_participants.invited_at <= NOW() - (campaigns.reminder_delay_days || ' days')::INTERVAL")
+            text("campaign_participants.invited_at <= NOW() - campaigns.reminder_delay_days * INTERVAL '1 day'")
         )
         
         query = query.filter(and_(*filters))
