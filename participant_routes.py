@@ -1863,6 +1863,60 @@ def bulk_remove_campaign_participants(campaign_id):
 
 
 # ==============================================================================
+# BULK OPERATION STATUS API
+# ==============================================================================
+
+@participant_bp.route('/api/bulk-jobs/<job_id>/status', methods=['GET'])
+@require_business_auth
+def get_bulk_job_status(job_id):
+    """Get status of a bulk operation job for polling"""
+    try:
+        from models import BulkOperationJob
+        
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account not found'}), 401
+        
+        # Query job by UUID and business account
+        job = BulkOperationJob.query.filter_by(
+            job_id=job_id,
+            business_account_id=current_account.id
+        ).first()
+        
+        if not job:
+            return jsonify({'error': 'Job not found'}), 404
+        
+        # Prepare response
+        response_data = {
+            'job_id': job.job_id,
+            'operation_type': job.operation_type,
+            'status': job.status,
+            'progress': job.progress,
+            'created_at': job.created_at.isoformat() if job.created_at else None,
+            'started_at': job.started_at.isoformat() if job.started_at else None,
+            'completed_at': job.completed_at.isoformat() if job.completed_at else None
+        }
+        
+        # Add result details if completed
+        if job.status == 'completed' and job.result:
+            try:
+                result = json.loads(job.result) if isinstance(job.result, str) else job.result
+                response_data['result'] = result
+            except:
+                pass
+        
+        # Add error if failed
+        if job.status == 'failed' and job.error:
+            response_data['error'] = job.error
+        
+        return jsonify(response_data)
+        
+    except Exception as e:
+        logger.error(f"Error getting bulk job status: {e}")
+        return jsonify({'error': 'Failed to get job status'}), 500
+
+
+# ==============================================================================
 # INDIVIDUAL PARTICIPANT INVITATION ROUTES
 # ==============================================================================
 

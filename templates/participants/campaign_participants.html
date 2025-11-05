@@ -50,31 +50,132 @@
             
             <!-- Bulk Job Status Indicator -->
             {% if active_bulk_job %}
-            <div class="alert alert-warning d-flex align-items-center mb-3" role="alert">
-                <div class="spinner-border spinner-border-sm me-3" role="status">
+            <div class="alert alert-warning d-flex align-items-center mb-3" role="alert" id="bulkJobAlert">
+                <div class="spinner-border spinner-border-sm me-3" role="status" id="bulkJobSpinner">
                     <span class="visually-hidden">Processing...</span>
                 </div>
                 <div class="flex-grow-1">
-                    <strong>
+                    <strong id="bulkJobTitle">
                         <i class="fas fa-tasks me-2" aria-hidden="true"></i>
                         Bulk {{ active_bulk_job.operation_type.replace('bulk_participant_', '') }} in progress
                     </strong>
                     <div class="progress mt-2" style="height: 20px;">
                         <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                             id="bulkJobProgressBar"
                              role="progressbar" 
                              style="width: {{ active_bulk_job.progress }}%"
                              aria-valuenow="{{ active_bulk_job.progress }}" 
                              aria-valuemin="0" 
                              aria-valuemax="100">
-                            {{ active_bulk_job.progress }}%
+                            <span id="bulkJobProgressText">{{ active_bulk_job.progress }}%</span>
                         </div>
                     </div>
-                    <small class="text-muted">
-                        Status: {{ active_bulk_job.status }} | Started: {{ active_bulk_job.created_at }}
+                    <small class="text-muted" id="bulkJobDetails">
+                        Status: <span id="bulkJobStatus">{{ active_bulk_job.status }}</span> | Started: {{ active_bulk_job.created_at }}
                         <br>Adding and removing participants is disabled while this operation is in progress.
                     </small>
                 </div>
             </div>
+            <script>
+                // Real-time bulk job progress tracking
+                (function() {
+                    const jobId = '{{ active_bulk_job.job_id }}';
+                    const pollInterval = 2000; // Poll every 2 seconds
+                    let pollTimer = null;
+                    
+                    function updateProgressUI(data) {
+                        const progressBar = document.getElementById('bulkJobProgressBar');
+                        const progressText = document.getElementById('bulkJobProgressText');
+                        const statusText = document.getElementById('bulkJobStatus');
+                        
+                        if (progressBar && progressText) {
+                            progressBar.style.width = data.progress + '%';
+                            progressBar.setAttribute('aria-valuenow', data.progress);
+                            progressText.textContent = data.progress + '%';
+                        }
+                        
+                        if (statusText) {
+                            statusText.textContent = data.status;
+                        }
+                    }
+                    
+                    function pollJobStatus() {
+                        fetch('{{ url_for("participants.get_bulk_job_status", job_id="_JOB_ID_") }}'.replace('_JOB_ID_', jobId))
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Failed to fetch job status');
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                console.log('Bulk job status:', data);
+                                
+                                // Update progress UI
+                                updateProgressUI(data);
+                                
+                                // Check if job completed
+                                if (data.status === 'completed') {
+                                    console.log('Bulk job completed! Reloading page...');
+                                    clearInterval(pollTimer);
+                                    
+                                    // Show completion state briefly
+                                    const alert = document.getElementById('bulkJobAlert');
+                                    const spinner = document.getElementById('bulkJobSpinner');
+                                    const title = document.getElementById('bulkJobTitle');
+                                    
+                                    if (alert) {
+                                        alert.className = 'alert alert-success d-flex align-items-center mb-3';
+                                    }
+                                    if (spinner) {
+                                        spinner.remove();
+                                    }
+                                    if (title) {
+                                        title.innerHTML = '<i class="fas fa-check-circle me-2"></i>Bulk operation completed!';
+                                    }
+                                    
+                                    // Reload page after 1 second to show updated counts
+                                    setTimeout(() => {
+                                        window.location.reload();
+                                    }, 1000);
+                                } else if (data.status === 'failed') {
+                                    console.error('Bulk job failed:', data.error);
+                                    clearInterval(pollTimer);
+                                    
+                                    // Show error state
+                                    const alert = document.getElementById('bulkJobAlert');
+                                    const title = document.getElementById('bulkJobTitle');
+                                    
+                                    if (alert) {
+                                        alert.className = 'alert alert-danger d-flex align-items-center mb-3';
+                                    }
+                                    if (title) {
+                                        title.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>Bulk operation failed';
+                                    }
+                                    
+                                    // Reload page after 3 seconds
+                                    setTimeout(() => {
+                                        window.location.reload();
+                                    }, 3000);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error polling job status:', error);
+                                // Don't clear interval on network errors - keep trying
+                            });
+                    }
+                    
+                    // Start polling immediately and then every 2 seconds
+                    pollJobStatus();
+                    pollTimer = setInterval(pollJobStatus, pollInterval);
+                    
+                    // Clean up on page unload
+                    window.addEventListener('beforeunload', function() {
+                        if (pollTimer) {
+                            clearInterval(pollTimer);
+                        }
+                    });
+                })();
+            </script>
             {% endif %}
             
             <!-- Filter Criteria -->
