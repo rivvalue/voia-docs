@@ -13,12 +13,22 @@
 {% include 'components/breadcrumb.html' %}
 <div class="audit-logs-container">
     <!-- Header -->
-    <div class="audit-header">
-        <h1>
-            <i class="fas fa-clipboard-list me-2" aria-hidden="true"></i>
-            Account Activity Trail
-        </h1>
-        <p>{{ _('Track all activities and changes in your VOÏA account') }}</p>
+    <div class="audit-header" style="display: flex; justify-content: space-between; align-items: start;">
+        <div>
+            <h1>
+                <i class="fas fa-clipboard-list me-2" aria-hidden="true"></i>
+                Account Activity Trail
+            </h1>
+            <p>{{ _('Track all activities and changes in your VOÏA account') }}</p>
+        </div>
+        
+        <!-- Refresh Button -->
+        <button class="btn btn-sm btn-link text-muted p-1" 
+                onclick="refreshData()" 
+                title="{{ _('Refresh data') }}"
+                aria-label="{{ _('Refresh data') }}">
+            <i class="fas fa-sync-alt"></i>
+        </button>
     </div>
 
     <!-- Statistics -->
@@ -224,17 +234,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Auto-refresh page every 30 seconds to show new audit entries
-setInterval(() => {
-    // Only refresh if no user interaction in last 10 seconds
-    if (Date.now() - (window.lastUserInteraction || 0) > 10000) {
-        window.location.reload();
-    }
-}, 30000);
-
-// Track user interactions
-document.addEventListener('click', () => window.lastUserInteraction = Date.now());
-document.addEventListener('keypress', () => window.lastUserInteraction = Date.now());
+// Refresh data function
+function refreshData() {
+    location.reload();
+}
 </script>
 
 {% endblock %}
