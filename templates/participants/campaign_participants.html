@@ -48,6 +48,35 @@
                 <i class="fas fa-user-plus" aria-hidden="true"></i>Add Participants to Campaign
             </h5>
             
+            <!-- Bulk Job Status Indicator -->
+            {% if active_bulk_job %}
+            <div class="alert alert-warning d-flex align-items-center mb-3" role="alert">
+                <div class="spinner-border spinner-border-sm me-3" role="status">
+                    <span class="visually-hidden">Processing...</span>
+                </div>
+                <div class="flex-grow-1">
+                    <strong>
+                        <i class="fas fa-tasks me-2" aria-hidden="true"></i>
+                        Bulk {{ active_bulk_job.operation_type.replace('bulk_participant_', '') }} in progress
+                    </strong>
+                    <div class="progress mt-2" style="height: 20px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" 
+                             style="width: {{ active_bulk_job.progress }}%"
+                             aria-valuenow="{{ active_bulk_job.progress }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                            {{ active_bulk_job.progress }}%
+                        </div>
+                    </div>
+                    <small class="text-muted">
+                        Status: {{ active_bulk_job.status }} | Started: {{ active_bulk_job.created_at }}
+                        <br>Adding and removing participants is disabled while this operation is in progress.
+                    </small>
+                </div>
+            </div>
+            {% endif %}
+            
             <!-- Filter Criteria -->
             <div class="filter-panel-header" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="true" aria-controls="filterCollapse" role="button">
                 <h6 class="filter-panel-title">
@@ -347,12 +376,16 @@
                 
                 <!-- Actions -->
                 <div class="participant-actions mt-3">
-                    <button type="submit" class="btn btn-voïa-red" id="addSelectedBtn" disabled aria-label="{{ _('Add selected participants to campaign') }}">
+                    <button type="submit" class="btn btn-voïa-red" id="addSelectedBtn" disabled {% if active_bulk_job %}data-bulk-job-active="true"{% endif %} aria-label="{{ _('Add selected participants to campaign') }}">
                         <i class="fas fa-plus me-2" aria-hidden="true"></i>
                         Add Selected (<span id="selectedCount">0</span>)
                     </button>
                     <small class="text-muted ms-3">
+                        {% if active_bulk_job %}
+                        Bulk operation in progress - please wait
+                        {% else %}
                         Select participants to add them to this campaign
+                        {% endif %}
                     </small>
                 </div>
             </form>
@@ -438,7 +471,7 @@
             <div class="btn-group" role="group" aria-label="{{ _('Participant actions') }}">
                 <!-- Bulk Remove Button (only visible when participants selected and campaign is draft/ready) -->
                 {% if campaign.status in ['draft', 'ready'] %}
-                <button type="button" class="btn btn-outline-danger btn-sm" id="bulkRemoveBtn" style="display: none;" onclick="openBulkRemoveModal()" aria-label="{{ _('Bulk remove selected participants') }}">
+                <button type="button" class="btn btn-outline-danger btn-sm" id="bulkRemoveBtn" style="display: none;" onclick="openBulkRemoveModal()" {% if active_bulk_job %}disabled data-bulk-job-active="true"{% endif %} aria-label="{{ _('Bulk remove selected participants') }}">
                     <i class="fas fa-trash me-2" aria-hidden="true"></i>Remove Selected (<span id="bulkRemoveCount">0</span>)
                 </button>
                 {% endif %}
@@ -661,7 +694,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const count = checkedBoxes.length;
         
         selectedCountSpan.textContent = count;
-        addSelectedBtn.disabled = count === 0;
+        // Keep button disabled if bulk job is active OR no selections
+        const hasBulkJob = addSelectedBtn.hasAttribute('data-bulk-job-active');
+        addSelectedBtn.disabled = hasBulkJob || count === 0;
         
         // Update select all checkbox state
         const visibleCheckboxes = Array.from(participantCheckboxes).filter(cb => {
@@ -852,7 +887,9 @@ function updateBulkRemoveSelection() {
     
     if (btn && countSpan) {
         countSpan.textContent = count;
-        btn.style.display = count > 0 ? 'inline-block' : 'none';
+        // Don't show button if bulk job is active
+        const hasBulkJob = btn.hasAttribute('data-bulk-job-active');
+        btn.style.display = (count > 0 && !hasBulkJob) ? 'inline-block' : 'none';
     }
     
     // Update select all checkbox state

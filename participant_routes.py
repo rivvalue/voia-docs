@@ -1417,6 +1417,12 @@ def manage_campaign_participants(campaign_id: int):
                 })
                 current_participants.append(participant_data)
             
+            # Check for active bulk job
+            active_bulk_job = None
+            if campaign.has_active_bulk_job and campaign.active_bulk_job_id:
+                from models import BulkOperationJob
+                active_bulk_job = BulkOperationJob.query.get(campaign.active_bulk_job_id)
+            
             return render_template('participants/campaign_participants.html',
                                  campaign=campaign.to_dict(),
                                  current_participants=current_participants,
@@ -1426,7 +1432,8 @@ def manage_campaign_participants(campaign_id: int):
                                  campaign_stats=campaign_stats,
                                  filter_options=filter_options,
                                  active_filters=active_filters,
-                                 total_available_count=total_available_count)
+                                 total_available_count=total_available_count,
+                                 active_bulk_job=active_bulk_job.to_dict() if active_bulk_job else None)
         
         # Handle POST - Add participants to campaign
         if request.method == 'POST':
