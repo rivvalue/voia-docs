@@ -426,6 +426,27 @@ class TaskQueue:
             
             db.session.commit()
             
+            # Audit logging for bulk participant add
+            try:
+                from audit_utils import queue_audit_log
+                queue_audit_log(
+                    business_account_id=business_account_id,
+                    action_type='participants_added',
+                    resource_type='campaign',
+                    resource_id=campaign_id,
+                    resource_name=campaign.name,
+                    details={
+                        'job_id': job.job_id,
+                        'total': total_count,
+                        'added': success_count,
+                        'skipped': skip_count,
+                        'failed': error_count,
+                        'method': 'background_task'
+                    }
+                )
+            except Exception as audit_error:
+                logger.error(f"Failed to log bulk participant add audit: {audit_error}")
+            
             # Send notification
             message = f"{success_count} participants added to campaign '{campaign.name}'"
             if skip_count > 0:
@@ -569,6 +590,26 @@ class TaskQueue:
             campaign.active_bulk_operation = None
             
             db.session.commit()
+            
+            # Audit logging for bulk participant removal
+            try:
+                from audit_utils import queue_audit_log
+                queue_audit_log(
+                    business_account_id=business_account_id,
+                    action_type='participants_removed',
+                    resource_type='campaign',
+                    resource_id=campaign_id,
+                    resource_name=campaign.name,
+                    details={
+                        'job_id': job.job_id,
+                        'total': total_count,
+                        'removed': removed_count,
+                        'failed': error_count,
+                        'method': 'background_task'
+                    }
+                )
+            except Exception as audit_error:
+                logger.error(f"Failed to log bulk participant removal audit: {audit_error}")
             
             # Send notification
             message = f"{removed_count} participants removed from campaign '{campaign.name}'"
