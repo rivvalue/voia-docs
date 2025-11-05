@@ -2990,3 +2990,89 @@ class ExportJob(db.Model):
             'completed_at': self.completed_at.isoformat() if self.completed_at else None,
             'campaign_name': self.campaign.name if self.campaign else None
         }
+
+class Notification(db.Model):
+    """Model for persistent in-app notifications"""
+    __tablename__ = 'notifications'
+    __table_args__ = (
+        db.Index('idx_user_unread', 'user_id', 'unread', 'created_at'),
+    )
+    
+    id = db.Column(db.Integer, primary_key=True)
+    business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
+    user_id = db.Column(db.Integer, nullable=True, index=True)
+    
+    message = db.Column(db.String(500), nullable=False)
+    category = db.Column(db.String(20), nullable=False, default='info')
+    metadata = db.Column(db.Text, nullable=True)
+    
+    unread = db.Column(db.Boolean, default=True, index=True)
+    dismissed = db.Column(db.Boolean, default=False)
+    
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    read_at = db.Column(db.DateTime, nullable=True)
+    
+    business_account = db.relationship('BusinessAccount', backref='notifications')
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'business_account_id': self.business_account_id,
+            'user_id': self.user_id,
+            'message': self.message,
+            'category': self.category,
+            'metadata': json.loads(self.metadata) if self.metadata else {},
+            'unread': self.unread,
+            'dismissed': self.dismissed,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'read_at': self.read_at.isoformat() if self.read_at else None
+        }
+
+class BulkOperationJob(db.Model):
+    """Model for tracking bulk operation jobs"""
+    __tablename__ = 'bulk_operation_jobs'
+    __table_args__ = (
+        db.Index('idx_job_status', 'business_account_id', 'status', 'created_at'),
+    )
+    
+    id = db.Column(db.Integer, primary_key=True)
+    business_account_id = db.Column(db.Integer, db.ForeignKey('business_accounts.id'), nullable=False, index=True)
+    user_id = db.Column(db.Integer, nullable=True)
+    campaign_id = db.Column(db.Integer, db.ForeignKey('campaigns.id'), nullable=True, index=True)
+    
+    operation_type = db.Column(db.String(50), nullable=False)
+    total_count = db.Column(db.Integer, nullable=False)
+    processed_count = db.Column(db.Integer, default=0)
+    success_count = db.Column(db.Integer, default=0)
+    error_count = db.Column(db.Integer, default=0)
+    
+    status = db.Column(db.String(20), default='pending', nullable=False, index=True)
+    result_message = db.Column(db.String(500), nullable=True)
+    error_details = db.Column(db.Text, nullable=True)
+    
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+    started_at = db.Column(db.DateTime, nullable=True)
+    completed_at = db.Column(db.DateTime, nullable=True)
+    
+    business_account = db.relationship('BusinessAccount', backref='bulk_jobs')
+    campaign = db.relationship('Campaign', backref='bulk_jobs')
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'business_account_id': self.business_account_id,
+            'user_id': self.user_id,
+            'campaign_id': self.campaign_id,
+            'operation_type': self.operation_type,
+            'total_count': self.total_count,
+            'processed_count': self.processed_count,
+            'success_count': self.success_count,
+            'error_count': self.error_count,
+            'status': self.status,
+            'result_message': self.result_message,
+            'error_details': self.error_details,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'started_at': self.started_at.isoformat() if self.started_at else None,
+            'completed_at': self.completed_at.isoformat() if self.completed_at else None,
+            'campaign_name': self.campaign.name if self.campaign else None
+        }

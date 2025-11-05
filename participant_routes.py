@@ -9,6 +9,7 @@ from business_auth_routes import require_business_auth, require_permission, curr
 from models import Participant, Campaign, BusinessAccount, CampaignParticipant, EmailDelivery, db
 from task_queue import add_email_task
 from email_service import email_service
+from license_service import LicenseService
 from datetime import datetime
 import logging
 import csv
@@ -1436,6 +1437,22 @@ def manage_campaign_participants(campaign_id: int):
             participant_ids = request.form.getlist('participant_ids')
             if not participant_ids:
                 flash('No participants selected.', 'error')
+                return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
+            
+            # License enforcement: Check if adding these participants would exceed license limit
+            if not LicenseService.can_add_participants(
+                business_account_id=current_account.id,
+                campaign_id=campaign_id,
+                additional_count=len(participant_ids)
+            ):
+                # Get license details for user-friendly message
+                current_license = LicenseService.get_current_license(current_account.id)
+                if current_license:
+                    limit = current_license.max_invitations_per_campaign
+                    license_name = current_license.license_type.title()
+                    flash(f'Cannot add {len(participant_ids)} participant(s). Your {license_name} license allows a maximum of {limit:,} participants per campaign. Please upgrade your license to add more participants.', 'error')
+                else:
+                    flash('Cannot add participants. License limit exceeded.', 'error')
                 return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
             
             added_count = 0
