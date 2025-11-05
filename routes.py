@@ -3450,4 +3450,115 @@ def regenerate_all_survey_tokens():
         return jsonify({'error': 'Failed to regenerate tokens'}), 500
 
 
+# ============================================================================
+# NOTIFICATION CENTER API ENDPOINTS
+# ============================================================================
+
+@app.route('/api/notifications/count', methods=['GET'])
+@require_business_auth
+def get_notification_count():
+    """Get count of unread notifications"""
+    try:
+        from notification_utils import get_unread_count
+        
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account not found'}), 401
+        
+        user_id = session.get('business_user_id')
+        count = get_unread_count(current_account.id, user_id)
+        
+        return jsonify({'unread_count': count})
+        
+    except Exception as e:
+        logger.error(f"Error getting notification count: {e}")
+        return jsonify({'error': 'Failed to get notification count'}), 500
+
+
+@app.route('/api/notifications', methods=['GET'])
+@require_business_auth
+def get_notifications():
+    """Get recent notifications"""
+    try:
+        from models import Notification
+        
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account not found'}), 401
+        
+        user_id = session.get('business_user_id')
+        limit = int(request.args.get('limit', 20))
+        
+        # Get notifications for this business account
+        query = Notification.query.filter_by(
+            business_account_id=current_account.id
+        )
+        
+        # Filter by user if specified (or show account-wide notifications)
+        if user_id:
+            query = query.filter(
+                (Notification.user_id == user_id) | (Notification.user_id.is_(None))
+            )
+        
+        notifications = query.order_by(
+            Notification.created_at.desc()
+        ).limit(limit).all()
+        
+        return jsonify({
+            'notifications': [n.to_dict() for n in notifications],
+            'total': len(notifications)
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting notifications: {e}")
+        return jsonify({'error': 'Failed to get notifications'}), 500
+
+
+@app.route('/api/notifications/<int:notification_id>/read', methods=['POST'])
+@require_business_auth
+def mark_notification_read(notification_id):
+    """Mark a notification as read"""
+    try:
+        from notification_utils import mark_as_read
+        
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account not found'}), 401
+        
+        success = mark_as_read(notification_id, current_account.id)
+        
+        if success:
+            return jsonify({'success': True})
+        else:
+            return jsonify({'error': 'Notification not found'}), 404
+        
+    except Exception as e:
+        logger.error(f"Error marking notification as read: {e}")
+        return jsonify({'error': 'Failed to mark notification as read'}), 500
+
+
+@app.route('/api/notifications/mark-all-read', methods=['POST'])
+@require_business_auth
+def mark_all_notifications_read():
+    """Mark all notifications as read"""
+    try:
+        from notification_utils import mark_all_as_read
+        
+        current_account = get_current_business_account()
+        if not current_account:
+            return jsonify({'error': 'Business account not found'}), 401
+        
+        user_id = session.get('business_user_id')
+        count = mark_all_as_read(current_account.id, user_id)
+        
+        return jsonify({
+            'success': True,
+            'marked_count': count
+        })
+        
+    except Exception as e:
+        logger.error(f"Error marking all notifications as read: {e}")
+        return jsonify({'error': 'Failed to mark all notifications as read'}), 500
+
+
 
