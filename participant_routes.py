@@ -3,7 +3,7 @@ Phase 3: Participant Management Routes
 Provides CRUD operations for campaign participants with proper tenant scoping
 """
 
-from flask import Blueprint, request, render_template, redirect, url_for, flash, jsonify
+from flask import Blueprint, request, render_template, redirect, url_for, flash, jsonify, session
 from sqlalchemy.orm import joinedload
 from business_auth_routes import require_business_auth, require_permission, current_tenant_id, get_current_business_account
 from models import Participant, Campaign, BusinessAccount, CampaignParticipant, EmailDelivery, db
@@ -14,6 +14,7 @@ from datetime import datetime
 import logging
 import csv
 import io
+import json
 import uuid
 from audit_utils import queue_audit_log
 
