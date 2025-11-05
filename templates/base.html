@@ -151,9 +151,9 @@
                     
                     <!-- Notification Bell Icon (business users only) -->
                     <div class="notification-center">
-                        <button class="btn btn-link position-relative notification-bell" id="notificationBell" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button class="btn btn-link position-relative notification-bell" id="notificationBell" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.5rem;">
                             <i class="fas fa-bell"></i>
-                            <span class="notification-badge badge bg-danger position-absolute translate-middle" id="notificationBadge" style="display: none;">0</span>
+                            <span class="notification-badge badge bg-danger position-absolute" id="notificationBadge" style="display: none; top: 0; right: 0; transform: translate(25%, -25%); font-size: 0.65rem; padding: 0.25em 0.5em;">0</span>
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end notification-dropdown" id="notificationDropdown">
                             <li class="notification-header d-flex justify-content-between align-items-center px-3 py-2">
@@ -422,8 +422,11 @@
         if (markAllReadBtn) {
             markAllReadBtn.addEventListener('click', async function(e) {
                 e.preventDefault();
+                console.log('🔔 Mark all as read clicked');
                 try {
                     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+                    console.log('🔔 CSRF token:', csrfToken ? 'present' : 'MISSING');
+                    
                     const response = await fetch('/api/notifications/mark-all-read', {
                         method: 'POST',
                         headers: {
@@ -433,13 +436,20 @@
                         credentials: 'same-origin'
                     });
                     
+                    console.log('🔔 Mark all response status:', response.status);
+                    
                     if (!response.ok) {
-                        console.error('Failed to mark all as read:', response.status, response.statusText);
+                        const errorText = await response.text();
+                        console.error('Failed to mark all as read:', response.status, response.statusText, errorText);
                         return;
                     }
                     
+                    const data = await response.json();
+                    console.log('🔔 Mark all response:', data);
+                    
                     await updateNotificationCount();
                     await loadNotifications();
+                    console.log('🔔 Mark all as read completed');
                 } catch (error) {
                     console.error('Error marking all as read:', error);
                 }
