@@ -1878,6 +1878,9 @@ def get_bulk_job_status(job_id):
             return jsonify({'error': 'Business account not found'}), 401
         
         # Query job by UUID and business account
+        # Expire session to get fresh data from database (avoid caching stale progress)
+        db.session.expire_all()
+        
         job = BulkOperationJob.query.filter_by(
             job_id=job_id,
             business_account_id=current_account.id

@@ -80,6 +80,11 @@ class PostgresTaskQueue:
             recovered_count = self.recover_stale_tasks(stale_threshold_minutes=self.stale_task_threshold)
             if recovered_count > 0:
                 logger.warning(f"Recovered {recovered_count} stale tasks on startup")
+            
+            # Recover stuck bulk operation jobs and clear campaign locks
+            bulk_recovered_count = self.recover_stuck_bulk_jobs(stale_threshold_minutes=self.stale_task_threshold)
+            if bulk_recovered_count > 0:
+                logger.warning(f"Recovered {bulk_recovered_count} stuck bulk operation jobs on startup")
         
         # Start worker threads
         for i in range(self.max_workers):
