@@ -224,6 +224,11 @@ class Campaign(db.Model):
     reminder_enabled = db.Column(db.Boolean, nullable=False, default=False)
     reminder_delay_days = db.Column(db.Integer, nullable=False, default=5)
     
+    # Bulk operation tracking (concurrency control)
+    has_active_bulk_job = db.Column(db.Boolean, nullable=False, default=False, index=True)
+    active_bulk_job_id = db.Column(db.Integer, db.ForeignKey('bulk_operation_jobs.id'), nullable=True, index=True)
+    active_bulk_operation = db.Column(db.String(50), nullable=True)  # 'add' or 'remove'
+    
     # Metadata
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     completed_at = db.Column(db.DateTime, nullable=True)

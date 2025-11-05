@@ -418,6 +418,12 @@ class TaskQueue:
                 'skipped': skip_count,
                 'failed': error_count
             })
+            
+            # Clear campaign lock
+            campaign.has_active_bulk_job = False
+            campaign.active_bulk_job_id = None
+            campaign.active_bulk_operation = None
+            
             db.session.commit()
             
             # Send notification
@@ -441,22 +447,30 @@ class TaskQueue:
             logger.error(f"Bulk participant add task error: {e}")
             db.session.rollback()
             
-            # Update job status
+            # Update job status and clear campaign lock
             try:
                 job = BulkOperationJob.query.get(job_id)
+                campaign = Campaign.query.get(campaign_id)
                 if job:
                     job.status = 'failed'
                     job.completed_at = datetime.utcnow()
                     job.result = json.dumps({'error': str(e)})
-                    db.session.commit()
                     
-                    # Send error notification
-                    notify(
-                        business_account_id=business_account_id,
-                        user_id=user_id,
-                        category='error',
-                        message=f"Failed to add participants to campaign: {str(e)}"
-                    )
+                # Clear campaign lock even on failure
+                if campaign:
+                    campaign.has_active_bulk_job = False
+                    campaign.active_bulk_job_id = None
+                    campaign.active_bulk_operation = None
+                    
+                db.session.commit()
+                
+                # Send error notification
+                notify(
+                    business_account_id=business_account_id,
+                    user_id=user_id,
+                    category='error',
+                    message=f"Failed to add participants to campaign: {str(e)}"
+                )
             except Exception as notify_error:
                 logger.error(f"Failed to send error notification: {notify_error}")
             
@@ -548,6 +562,12 @@ class TaskQueue:
                 'removed': removed_count,
                 'failed': error_count
             })
+            
+            # Clear campaign lock
+            campaign.has_active_bulk_job = False
+            campaign.active_bulk_job_id = None
+            campaign.active_bulk_operation = None
+            
             db.session.commit()
             
             # Send notification
@@ -569,22 +589,30 @@ class TaskQueue:
             logger.error(f"Bulk participant remove task error: {e}")
             db.session.rollback()
             
-            # Update job status
+            # Update job status and clear campaign lock
             try:
                 job = BulkOperationJob.query.get(job_id)
+                campaign = Campaign.query.get(campaign_id)
                 if job:
                     job.status = 'failed'
                     job.completed_at = datetime.utcnow()
                     job.result = json.dumps({'error': str(e)})
-                    db.session.commit()
                     
-                    # Send error notification
-                    notify(
-                        business_account_id=business_account_id,
-                        user_id=user_id,
-                        category='error',
-                        message=f"Failed to remove participants from campaign: {str(e)}"
-                    )
+                # Clear campaign lock even on failure
+                if campaign:
+                    campaign.has_active_bulk_job = False
+                    campaign.active_bulk_job_id = None
+                    campaign.active_bulk_operation = None
+                    
+                db.session.commit()
+                
+                # Send error notification
+                notify(
+                    business_account_id=business_account_id,
+                    user_id=user_id,
+                    category='error',
+                    message=f"Failed to remove participants from campaign: {str(e)}"
+                )
             except Exception as notify_error:
                 logger.error(f"Failed to send error notification: {notify_error}")
             

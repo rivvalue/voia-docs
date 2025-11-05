@@ -1465,6 +1465,18 @@ def manage_campaign_participants(campaign_id: int):
                 from models import BulkOperationJob
                 from task_queue import task_queue
                 import uuid
+                from sqlalchemy import text
+                
+                # Atomic lock acquisition using SELECT FOR UPDATE
+                campaign_locked = db.session.query(Campaign).filter(
+                    Campaign.id == campaign_id
+                ).with_for_update().first()
+                
+                # Check for active bulk job (now atomic - row is locked)
+                if campaign_locked.has_active_bulk_job:
+                    db.session.rollback()
+                    flash(f'A bulk operation is already in progress for this campaign ({campaign_locked.active_bulk_operation}). Please wait for it to complete.', 'warning')
+                    return redirect(url_for('participants.manage_campaign_participants', campaign_id=campaign_id))
                 
                 # Create job record
                 job = BulkOperationJob(
@@ -1474,7 +1486,7 @@ def manage_campaign_participants(campaign_id: int):
                     operation_type='bulk_participant_add',
                     operation_data=json.dumps({
                         'campaign_id': campaign_id,
-                        'campaign_name': campaign.name,
+                        'campaign_name': campaign_locked.name,
                         'participant_count': participant_count
                     }),
                     status='pending',
@@ -1482,6 +1494,13 @@ def manage_campaign_participants(campaign_id: int):
                 )
                 
                 db.session.add(job)
+                db.session.flush()  # Get job.id before setting campaign lock
+                
+                # Set campaign lock atomically (row is already locked)
+                campaign_locked.has_active_bulk_job = True
+                campaign_locked.active_bulk_job_id = job.id
+                campaign_locked.active_bulk_operation = 'add'
+                
                 db.session.commit()
                 
                 # Queue background task
@@ -1673,6 +1692,20 @@ def bulk_remove_campaign_participants(campaign_id):
             from models import BulkOperationJob
             from task_queue import task_queue
             
+            # Atomic lock acquisition using SELECT FOR UPDATE
+            campaign_locked = db.session.query(Campaign).filter(
+                Campaign.id == campaign_id
+            ).with_for_update().first()
+            
+            # Check for active bulk job (now atomic - row is locked)
+            if campaign_locked.has_active_bulk_job:
+                db.session.rollback()
+                return jsonify({
+                    'success': False,
+                    'error': 'Bulk operation in progress',
+                    'message': f'A bulk {campaign_locked.active_bulk_operation} operation is already in progress. Please wait for it to complete.'
+                }), 409
+            
             # Create job record
             job_uuid = str(uuid.uuid4())
             job = BulkOperationJob(
@@ -1686,6 +1719,13 @@ def bulk_remove_campaign_participants(campaign_id):
                 })
             )
             db.session.add(job)
+            db.session.flush()  # Get job.id before setting campaign lock
+            
+            # Set campaign lock atomically (row is already locked)
+            campaign_locked.has_active_bulk_job = True
+            campaign_locked.active_bulk_job_id = job.id
+            campaign_locked.active_bulk_operation = 'remove'
+            
             db.session.commit()
             
             # Queue background task
