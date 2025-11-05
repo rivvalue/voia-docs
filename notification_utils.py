@@ -55,7 +55,7 @@ def notify(message, category='info', business_account_id=None, user_id=None, **m
             user_id=user_id,
             message=message[:500],  # Enforce length limit
             category=category,
-            metadata=json.dumps(metadata) if metadata else None,
+            meta_data=json.dumps(metadata) if metadata else None,
             unread=True,
             created_at=datetime.utcnow()
         )
