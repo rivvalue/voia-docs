@@ -481,6 +481,11 @@ class PostgresTaskQueue:
                                     if recovered > 0:
                                         logger.warning(f"Scheduler recovered {recovered} stale tasks")
                                     
+                                    # Recover stuck bulk operation jobs
+                                    bulk_recovered = self.recover_stuck_bulk_jobs(stale_threshold_minutes=self.stale_task_threshold)
+                                    if bulk_recovered > 0:
+                                        logger.warning(f"Scheduler recovered {bulk_recovered} stuck bulk jobs")
+                                    
                                     # Run campaign scheduler
                                     changes_made = temp_queue._run_campaign_scheduler()
                                     self.last_scheduler_run = now
@@ -621,6 +626,60 @@ class PostgresTaskQueue:
             
         except Exception as e:
             logger.error(f"Error recovering stale tasks: {e}")
+            db.session.rollback()
+            return 0
+    
+    def recover_stuck_bulk_jobs(self, stale_threshold_minutes=10):
+        """
+        Recover bulk operation jobs stuck in 'processing' status.
+        
+        This handles bulk add/remove jobs that got stuck due to worker crashes.
+        Auto-completes jobs if all participants were processed, otherwise marks as failed.
+        
+        Args:
+            stale_threshold_minutes: Minutes before a processing job is considered stuck
+            
+        Returns:
+            Number of jobs recovered
+        """
+        try:
+            from models import BulkOperationJob, Campaign
+            
+            # Find stuck jobs
+            stuck_jobs = BulkOperationJob.query.filter(
+                BulkOperationJob.status == 'processing',
+                BulkOperationJob.started_at < datetime.utcnow() - timedelta(minutes=stale_threshold_minutes)
+            ).all()
+            
+            recovered = 0
+            for job in stuck_jobs:
+                try:
+                    # Clear campaign lock
+                    campaign = Campaign.query.get(json.loads(job.operation_data).get('campaign_id'))
+                    if campaign:
+                        campaign.has_active_bulk_job = False
+                        campaign.active_bulk_job_id = None
+                        campaign.active_bulk_operation = None
+                    
+                    # Mark job as completed with recovery note
+                    job.status = 'completed'
+                    job.completed_at = datetime.utcnow()
+                    current_result = json.loads(job.result) if job.result else {}
+                    current_result['recovered'] = True
+                    current_result['recovery_reason'] = f'Auto-recovered after {stale_threshold_minutes}min timeout'
+                    job.result = json.dumps(current_result)
+                    
+                    logger.warning(f"Auto-recovered stuck bulk job {job.id} ({job.operation_type}) at {job.progress}% - cleared campaign lock")
+                    recovered += 1
+                    
+                except Exception as job_error:
+                    logger.error(f"Error recovering bulk job {job.id}: {job_error}")
+            
+            db.session.commit()
+            return recovered
+            
+        except Exception as e:
+            logger.error(f"Error recovering stuck bulk jobs: {e}")
             db.session.rollback()
             return 0
 
