@@ -33,15 +33,19 @@ class ReminderService:
     @staticmethod
     def get_primary_reminder_eligible_participants(campaign_id=None, limit=None):
         """
-        Find participants eligible for PRIMARY reminder emails (sent after delay_days).
+        Find participants eligible for PRIMARY (LAST CHANCE) reminder emails.
+        
+        NEW LOGIC: Sends X days BEFORE campaign end_date (not after invitation).
+        This creates urgency and provides a final push before the deadline.
         
         Eligibility criteria:
         1. Campaign has reminder_enabled=True
         2. Campaign is in 'active' status
         3. Participant status is 'invited' (not started or completed)
-        4. invited_at is older than campaign.reminder_delay_days
-        5. No survey response exists for this participant
-        6. No primary reminder has been sent yet (email_type='reminder_primary')
+        4. Current date >= (end_date - reminder_delay_days) [we're in the last chance window]
+        5. Participant was invited BEFORE the last chance date [they had time to see original invitation]
+        6. No survey response exists for this participant
+        7. No primary reminder has been sent yet (email_type='reminder_primary')
         
         Performance optimization:
         - Uses LEFT JOIN instead of NOT EXISTS subqueries
@@ -55,9 +59,10 @@ class ReminderService:
             limit: Optional limit for testing/batching
             
         Returns:
-            List of CampaignParticipant objects eligible for primary reminders
+            List of CampaignParticipant objects eligible for last chance reminders
         """
         now = datetime.utcnow()
+        today = now.date()
         
         # Base query with eager loading of relationships
         query = db.session.query(CampaignParticipant).join(
@@ -81,6 +86,7 @@ class ReminderService:
         filters = [
             Campaign.status == 'active',
             Campaign.reminder_enabled == True,
+            Campaign.end_date.isnot(None),  # Must have end date
             CampaignParticipant.status == 'invited',
             CampaignParticipant.invited_at.isnot(None),
             SurveyResponse.id.is_(None),  # No survey response exists
@@ -91,12 +97,22 @@ class ReminderService:
         if campaign_id:
             filters.append(Campaign.id == campaign_id)
         
-        # Add SQL-based time filter using PostgreSQL interval arithmetic
-        # Uses text() to construct: invited_at <= NOW() - INTERVAL 'X days'
-        # where X is the campaign's reminder_delay_days value
+        # NEW LOGIC: Last Chance reminder triggers X days BEFORE campaign end
+        # Condition 1: Current date is in the "last chance window"
+        # CURRENT_DATE >= (end_date - reminder_delay_days)
         filters.append(
-            text("campaign_participants.invited_at <= NOW() - campaigns.reminder_delay_days * INTERVAL '1 day'")
+            text("CURRENT_DATE >= campaigns.end_date - campaigns.reminder_delay_days * INTERVAL '1 day'")
         )
+        
+        # Condition 2: Participant was invited BEFORE the last chance window started
+        # This ensures they had time to receive and ignore the original invitation
+        # invited_at < (end_date - reminder_delay_days)
+        filters.append(
+            text("campaign_participants.invited_at::date < campaigns.end_date - campaigns.reminder_delay_days * INTERVAL '1 day'")
+        )
+        
+        # Condition 3: Campaign hasn't ended yet
+        filters.append(Campaign.end_date >= today)
         
         query = query.filter(and_(*filters))
         
