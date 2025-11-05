@@ -1647,9 +1647,10 @@ def bulk_remove_campaign_participants(campaign_id):
     """
     Bulk remove participants from campaign
     Only allowed for campaigns in draft or ready status
+    Uses background jobs for large batches (>100)
     """
     
-    MAX_BATCH_SIZE = 50
+    SYNC_BATCH_SIZE = 100
     
     try:
         logger.info(f"Bulk remove request received for campaign {campaign_id}")
@@ -1667,15 +1668,48 @@ def bulk_remove_campaign_participants(campaign_id):
         
         logger.info(f"Bulk remove data received: association_ids count={len(association_ids)}")
         
-        # Validate batch size
-        if len(association_ids) > MAX_BATCH_SIZE:
+        # Handle large batches via background job
+        if len(association_ids) > SYNC_BATCH_SIZE:
+            from models import BulkOperationJob
+            from task_queue import task_queue
+            
+            # Create job record
+            job_uuid = str(uuid.uuid4())
+            job = BulkOperationJob(
+                job_id=job_uuid,
+                business_account_id=current_account.id,
+                user_id=session.get('business_user_id'),
+                operation_type='bulk_participant_remove',
+                operation_data=json.dumps({
+                    'campaign_id': campaign_id,
+                    'association_count': len(association_ids)
+                })
+            )
+            db.session.add(job)
+            db.session.commit()
+            
+            # Queue background task
+            task_queue.add_task(
+                task_type='bulk_participant_remove',
+                task_data={
+                    'job_id': job.id,
+                    'campaign_id': campaign_id,
+                    'association_ids': association_ids,
+                    'business_account_id': current_account.id,
+                    'user_id': session.get('business_user_id')
+                },
+                business_account_id=current_account.id
+            )
+            
+            logger.info(f"Queued background job for removing {len(association_ids)} participants from campaign {campaign_id}")
+            
             return jsonify({
-                'success': False,
-                'error': 'Batch limit exceeded',
-                'message': f'Bulk removal limited to {MAX_BATCH_SIZE} participants. Please select fewer participants.',
-                'max_allowed': MAX_BATCH_SIZE,
-                'requested': len(association_ids)
-            }), 413
+                'success': True,
+                'async': True,
+                'job_id': job_uuid,
+                'message': f'Removing {len(association_ids)} participants in the background. You will be notified when complete.',
+                'count': len(association_ids)
+            }), 202
         
         if not association_ids:
             return jsonify({

@@ -431,6 +431,13 @@ class PostgresTaskQueue:
                 success = temp_queue._process_bulk_participant_add_task(task_data, worker_name)
                 return success
             
+            elif task_type == 'bulk_participant_remove':
+                # Process bulk participant removal task
+                from task_queue import TaskQueue
+                temp_queue = TaskQueue()
+                success = temp_queue._process_bulk_participant_remove_task(task_data, worker_name)
+                return success
+            
             else:
                 logger.error(f"Unknown task type: {task_type}")
                 return False

@@ -462,6 +462,134 @@ class TaskQueue:
             
             return False
     
+    def _process_bulk_participant_remove_task(self, task_data, worker_id):
+        """Process bulk participant removal task with batching and progress tracking"""
+        from models import BulkOperationJob
+        from notification_utils import notify
+        
+        job_id = task_data.get('job_id')
+        campaign_id = task_data.get('campaign_id')
+        association_ids = task_data.get('association_ids', [])
+        business_account_id = task_data.get('business_account_id')
+        user_id = task_data.get('user_id')
+        
+        if not all([job_id, campaign_id, association_ids, business_account_id]):
+            logger.error(f"Bulk participant remove task missing required data")
+            return False
+        
+        try:
+            # Get the job record
+            job = BulkOperationJob.query.get(job_id)
+            if not job:
+                logger.error(f"BulkOperationJob {job_id} not found")
+                return False
+            
+            # Update job status to processing
+            job.status = 'processing'
+            job.started_at = datetime.utcnow()
+            db.session.commit()
+            
+            # Get campaign
+            campaign = Campaign.query.filter_by(
+                id=campaign_id,
+                business_account_id=business_account_id
+            ).first()
+            
+            if not campaign:
+                logger.error(f"Campaign {campaign_id} not found")
+                job.status = 'failed'
+                job.completed_at = datetime.utcnow()
+                job.result = json.dumps({'error': 'Campaign not found'})
+                db.session.commit()
+                return False
+            
+            # Process participants in batches of 100
+            BATCH_SIZE = 100
+            total_count = len(association_ids)
+            removed_count = 0
+            error_count = 0
+            
+            for i in range(0, len(association_ids), BATCH_SIZE):
+                batch = association_ids[i:i + BATCH_SIZE]
+                
+                # Process batch
+                for association_id in batch:
+                    try:
+                        # Find and delete the association
+                        association = CampaignParticipant.query.filter_by(
+                            id=association_id,
+                            campaign_id=campaign_id,
+                            business_account_id=business_account_id
+                        ).first()
+                        
+                        if association:
+                            db.session.delete(association)
+                            removed_count += 1
+                        
+                    except Exception as e:
+                        logger.error(f"Error removing association {association_id}: {e}")
+                        error_count += 1
+                
+                # Commit batch
+                db.session.commit()
+                
+                # Update job progress
+                processed = min(i + BATCH_SIZE, total_count)
+                job.progress = int((processed / total_count) * 100)
+                db.session.commit()
+                
+                logger.info(f"Batch processed: {processed}/{total_count} participants removed")
+            
+            # Mark job as completed
+            job.status = 'completed'
+            job.completed_at = datetime.utcnow()
+            job.result = json.dumps({
+                'total': total_count,
+                'removed': removed_count,
+                'failed': error_count
+            })
+            db.session.commit()
+            
+            # Send notification
+            message = f"{removed_count} participants removed from campaign '{campaign.name}'"
+            if error_count > 0:
+                message += f" ({error_count} failed)"
+            
+            notify(
+                business_account_id=business_account_id,
+                user_id=user_id,
+                category='success' if error_count == 0 else 'warning',
+                message=message
+            )
+            
+            logger.info(f"Bulk participant remove completed: {removed_count} removed, {error_count} failed")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Bulk participant remove task error: {e}")
+            db.session.rollback()
+            
+            # Update job status
+            try:
+                job = BulkOperationJob.query.get(job_id)
+                if job:
+                    job.status = 'failed'
+                    job.completed_at = datetime.utcnow()
+                    job.result = json.dumps({'error': str(e)})
+                    db.session.commit()
+                    
+                    # Send error notification
+                    notify(
+                        business_account_id=business_account_id,
+                        user_id=user_id,
+                        category='error',
+                        message=f"Failed to remove participants from campaign: {str(e)}"
+                    )
+            except Exception as notify_error:
+                logger.error(f"Failed to send error notification: {notify_error}")
+            
+            return False
+    
     def _create_email_delivery_record(self, task_data):
         """Create EmailDelivery record for tracking"""
         try:
