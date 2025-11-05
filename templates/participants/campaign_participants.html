@@ -918,6 +918,13 @@ function submitBulkRemove() {
     }
     
     const btn = document.getElementById('confirmBulkRemoveBtn');
+    
+    // Prevent double-submission
+    if (btn.disabled) {
+        console.log('Button already disabled, preventing double-submit');
+        return;
+    }
+    
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Removing...';
     
@@ -947,10 +954,10 @@ function submitBulkRemove() {
             bootstrap.Modal.getInstance(document.getElementById('bulkRemoveModal')).hide();
             
             // Check if this is a synchronous or asynchronous operation
-            if (data.job_id) {
-                // Asynchronous operation - show "job started" message
-                // The progress indicator will handle the rest
-                showToast('info', `Bulk removal job started. Processing ${data.participant_count || selectedCampaignParticipants.size} participants...`);
+            if (data.async || data.job_id) {
+                // Asynchronous operation - show success message with count from response
+                const participantCount = data.count || selectedCampaignParticipants.size;
+                alert(`Bulk removal started! Removing ${participantCount} participants in the background. You will be notified when complete.`);
                 
                 // Reload to show progress indicator
                 window.location.reload();
@@ -960,7 +967,10 @@ function submitBulkRemove() {
                 window.location.reload();
             }
         } else {
-            alert(`Error: ${data.error}\n${data.message || data.details || ''}`);
+            // Show error message
+            const errorMsg = data.error || 'Unknown error';
+            const detailMsg = data.message || data.details || '';
+            alert(`Error: ${errorMsg}${detailMsg ? '\n' + detailMsg : ''}`);
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-trash me-1"></i>Remove Participants';
         }
