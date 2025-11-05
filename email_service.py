@@ -452,26 +452,18 @@ class EmailService:
                                    participant_name: str,
                                    campaign_name: str,
                                    survey_url: str,
-                                   intro_text: str,
-                                   closing_text: str,
-                                   footer_text: str,
                                    branding: Dict,
-                                   email_content: Dict,
                                    reminder_badge_text: str = "⏰ Friendly Reminder") -> str:
-        """Build reminder email HTML template.
+        """Build reminder email HTML template with standard non-customizable messaging.
         
         Shared helper used by both send_participant_reminder and preview_campaign_email
-        to ensure templates are identical.
+        to ensure templates are identical. Reminders use standard messaging, not customizable content.
         
         Args:
             participant_name: Name of participant
             campaign_name: Campaign name
             survey_url: Survey access URL
-            intro_text: Introduction text (variable-substituted)
-            closing_text: Closing text (variable-substituted)
-            footer_text: Footer text (variable-substituted)
             branding: Branding configuration dict
-            email_content: Email content dict with cta_text
             reminder_badge_text: Badge text (e.g., "⏰ Friendly Reminder" or "⏰ Midpoint Reminder")
             
         Returns:
@@ -589,8 +581,6 @@ class EmailService:
         
         <p>We wanted to remind you about an opportunity to share your feedback with us.</p>
         
-        <p>{intro_text}</p>
-        
         <div class="campaign-name">
             <strong>Campaign:</strong> {campaign_name}
         </div>
@@ -598,7 +588,7 @@ class EmailService:
         <p>If you haven't already completed the survey, please take a few moments to share your thoughts.</p>
         
         <div style="text-align: center;">
-            <a href="{survey_url}" class="cta-button">{email_content['cta_text']}</a>
+            <a href="{survey_url}" class="cta-button">Complete Survey</a>
         </div>
         
         <div class="security-note">
@@ -607,14 +597,8 @@ class EmailService:
         
         <p>Your input is valuable to us, and we appreciate you taking the time to participate.</p>
         
-        <p style="white-space: pre-line;">{closing_text}</p>
-        
         <p>Best regards,<br>
         The {branding['company_name']} Team</p>
-        
-        <div class="footer">
-            {footer_text}
-        </div>
     </div>
 </body>
 </html>
@@ -1088,34 +1072,16 @@ The {branding['company_name']} Team
             # Get branding configuration for this business account
             branding = self._get_branding_config(business_account_id)
             
-            # Get custom email content with 3-tier fallback (campaign → email_config → defaults)
-            email_content = self._get_email_content(business_account_id, campaign=campaign)
-            
             # Generate survey URL (using the correct 'survey' route)
             survey_url = url_for('survey', token=survey_token, _external=True)
             
-            # Template variables for substitution
-            template_vars = {
-                'participant_name': participant_name,
-                'campaign_name': campaign_name,
-                'business_account_name': business_account_name,
-                'survey_url': survey_url
-            }
-            
-            # Email subject with reminder indicator
-            subject = f"Reminder: {self._substitute_variables(email_content['subject'], template_vars)}"
-            
-            # Build text body with reminder-specific messaging
-            intro_text = self._substitute_variables(email_content['intro'], template_vars)
-            closing_text = self._substitute_variables(email_content['closing'], template_vars)
-            footer_text = self._substitute_variables(email_content['footer'], template_vars)
+            # Reminders use standard non-customizable messaging
+            subject = f"Reminder: {campaign_name} - Your Feedback is Valuable"
             
             text_body = f"""
 Hello {participant_name},
 
 We wanted to remind you about an opportunity to share your feedback with us.
-
-{intro_text}
 
 Campaign: {campaign_name}
 
@@ -1126,26 +1092,17 @@ This personalized link is secure and will remain active until the campaign ends.
 
 Your input is valuable to us, and we appreciate you taking the time to participate.
 
-{closing_text}
-
 Best regards,
 The {branding['company_name']} Team
 {branding['tagline']}
-
----
-{footer_text}
 """
             
-            # HTML body using shared template helper
+            # HTML body using shared template helper with standard content
             html_body = self._build_reminder_email_html(
                 participant_name=participant_name,
                 campaign_name=campaign_name,
                 survey_url=survey_url,
-                intro_text=intro_text,
-                closing_text=closing_text,
-                footer_text=footer_text,
                 branding=branding,
-                email_content=email_content,
                 reminder_badge_text="⏰ Friendly Reminder"
             )
             
@@ -1244,13 +1201,8 @@ The {branding['company_name']} Team
                 )
                 
             else:  # reminder_primary or reminder_midpoint
-                # Email subject with reminder indicator
-                subject = f"Reminder: {self._substitute_variables(email_content['subject'], template_vars)}"
-                
-                # Build text content
-                intro_text = self._substitute_variables(email_content['intro'], template_vars)
-                closing_text = self._substitute_variables(email_content['closing'], template_vars)
-                footer_text = self._substitute_variables(email_content['footer'], template_vars)
+                # Reminders use standard non-customizable messaging
+                subject = f"Reminder: {campaign.name} - Your Feedback is Valuable"
                 
                 # Determine reminder badge text
                 if email_type == 'reminder_midpoint':
@@ -1258,16 +1210,12 @@ The {branding['company_name']} Team
                 else:
                     reminder_badge_text = "⏰ Friendly Reminder"
                 
-                # HTML body using shared template helper
+                # HTML body using shared template helper with standard content
                 html_body = self._build_reminder_email_html(
                     participant_name=mock_participant_name,
                     campaign_name=campaign.name,
                     survey_url=survey_url,
-                    intro_text=intro_text,
-                    closing_text=closing_text,
-                    footer_text=footer_text,
                     branding=branding,
-                    email_content=email_content,
                     reminder_badge_text=reminder_badge_text
                 )
             
