@@ -402,11 +402,14 @@
         // Function to mark notification as read
         async function markAsRead(notificationId) {
             try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
                 await fetch(`/api/notifications/${notificationId}/read`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
-                    }
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken
+                    },
+                    credentials: 'same-origin'
                 });
                 await updateNotificationCount();
                 await loadNotifications();
@@ -420,12 +423,21 @@
             markAllReadBtn.addEventListener('click', async function(e) {
                 e.preventDefault();
                 try {
-                    await fetch('/api/notifications/mark-all-read', {
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+                    const response = await fetch('/api/notifications/mark-all-read', {
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/json'
-                        }
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken
+                        },
+                        credentials: 'same-origin'
                     });
+                    
+                    if (!response.ok) {
+                        console.error('Failed to mark all as read:', response.status, response.statusText);
+                        return;
+                    }
+                    
                     await updateNotificationCount();
                     await loadNotifications();
                 } catch (error) {
