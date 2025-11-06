@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <url>
+        <loc>None./</loc>
+        <lastmod>2025-11-06</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="None"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="Nonefr/"/>
+    </url>
+    <url>
+        <loc>Nonefeatures/</loc>
+        <lastmod>2025-11-06</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonefeatures/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="Nonefr/features/"/>
+    </url>
+    <url>
+        <loc>Nonelicenses/</loc>
+        <lastmod>2025-11-06</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonelicenses/"/>
+        <xhtml:link rel="alternate" hreflang="fr" href="Nonefr/licenses/"/>
+    </url>
+    <url>
+        <loc>Nonefr/</loc>
+        <lastmod>2025-11-06</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="fr" href="Nonefr/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="None"/>
+    </url>
+    <url>
+        <loc>Nonefr/features/</loc>
+        <lastmod>2025-11-06</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="fr" href="Nonefr/features/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonefeatures/"/>
+    </url>
+    <url>
+        <loc>Nonefr/licenses/</loc>
+        <lastmod>2025-11-06</lastmod>
+        <changefreq>daily</changefreq>
+        <xhtml:link rel="alternate" hreflang="fr" href="Nonefr/licenses/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="Nonelicenses/"/>
+    </url>
+</urlset>
