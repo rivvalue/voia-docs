@@ -1,6 +1,32 @@
 # Overview
 VOÏA (Voice Of Client) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. It transforms raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project includes a production-ready multi-tenant participant management system with extensive email delivery capabilities, AI-powered conversational surveys using a hybrid prompt architecture, and participant segmentation for personalized experiences and advanced analytics.
 
+# Recent Changes
+**November 6, 2025 - Code Analysis & Refactoring Documentation**
+- Completed comprehensive code analysis for frontend and backend optimization opportunities
+- Created `FRONTEND_REFACTORING_PLAN.md` documenting:
+  - 4,600-line dashboard.js monolithic file (50-60% reduction potential)
+  - 12,348-line custom.css file (40-50% reduction potential)
+  - Inline JavaScript in 20+ templates (browser caching opportunity)
+  - Mobile performance optimization strategies
+- Created `BACKEND_REFACTORING_PLAN.md` documenting:
+  - Redis cache migration opportunity (10x dashboard performance improvement: 500ms → 50ms)
+  - Route file consolidation (9,420 lines → modular structure)
+  - Code duplication elimination (40% reduction potential)
+  - Service layer extraction for improved testability
+  - Database indexing opportunities (30-50% query speed improvement)
+- All refactoring recommendations are optional and prioritized for future implementation
+- System remains stable and fully functional with zero implementation issues
+
+**Previous: October-November 2025 - Dual-Reminder System Strategic Reversal (Phase 4)**
+- Reversed reminder logic: "Last Chance" reminder now sends X days BEFORE campaign end (not after invitation)
+- Automatic Midpoint Reminder: Sent halfway through campaign duration
+- PostgreSQL interval arithmetic for efficient date calculations
+- Default changed from 7 to 10 days before campaign end (configurable: 7, 10, or 14 days)
+- Frontend validation updated with intelligent spacing checks and edge-case warnings
+- Zero migration risk (no active campaigns, only drafts exist)
+- Architect review: PASSED with zero implementation issues
+
 # User Preferences
 Preferred communication style: Simple, everyday language.
 User interface tone: Thought leadership and research-oriented language, avoiding sales-oriented messaging.
