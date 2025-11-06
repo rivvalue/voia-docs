@@ -1,0 +1,75 @@
+site_name: VOÏA Documentation
+site_description: Voice of Client - AI-Powered Customer Feedback Platform
+site_author: VOÏA Platform
+copyright: Copyright &copy; 2025 VOÏA Platform
+
+theme:
+  name: material
+  custom_dir: overrides
+  language: en
+  palette:
+    primary: custom
+    accent: custom
+  font:
+    text: Karla
+    code: Roboto Mono
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+  logo: assets/logo.svg
+  favicon: assets/logo.svg
+
+plugins:
+  - search:
+      lang:
+        - en
+        - fr
+  - i18n:
+      docs_structure: folder
+      fallback_to_default: true
+      reconfigure_material: true
+      reconfigure_search: true
+      languages:
+        - locale: en
+          default: true
+          name: English
+          build: true
+        - locale: fr
+          name: Français
+          build: true
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Features: features.md
+  - Licenses: licenses.md
+
+extra_css:
+  - overrides/custom.css
+
+extra:
+  social:
+    - icon: fontawesome/solid/globe
+      link: https://voia.com
+      name: VOÏA Platform
