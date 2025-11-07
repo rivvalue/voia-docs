@@ -9,6 +9,39 @@ import json
 from typing import Dict, Any, Optional, List
 from models import BusinessAccount, Campaign
 
+
+def _parse_json_list(value: Any) -> Optional[List]:
+    """
+    Safely parse a value that should be a list, handling JSON strings.
+    
+    SQLAlchemy may return JSON fields as strings that need parsing.
+    This helper ensures we always get a proper Python list.
+    
+    Args:
+        value: Could be a list, JSON string, or None
+        
+    Returns:
+        Parsed list or None if invalid
+    """
+    if value is None:
+        return None
+    
+    # Already a list - return copy to avoid mutation
+    if isinstance(value, list):
+        return list(value)
+    
+    # String - try to parse as JSON
+    if isinstance(value, str):
+        try:
+            parsed = json.loads(value)
+            if isinstance(parsed, list):
+                return parsed
+        except (json.JSONDecodeError, TypeError):
+            pass
+    
+    return None
+
+
 # Topic-to-Field Mapping for AI Response Validation and Analytics
 TOPIC_FIELD_MAP = {
     "NPS": ["nps_score", "nps_reasoning"],
@@ -181,9 +214,10 @@ class PromptTemplateService:
         # These are accessed 2+ times or critical for hybrid prompt mode
         
         # Campaign hot path attributes (8 attributes)
-        self._campaign_prioritized_topics = list(campaign.prioritized_topics) if campaign and campaign.prioritized_topics else None
+        # Use _parse_json_list for list fields to handle JSON strings from SQLAlchemy
+        self._campaign_prioritized_topics = _parse_json_list(campaign.prioritized_topics if campaign else None)
         self._campaign_product_description = campaign.product_description if campaign else None
-        self._campaign_survey_goals = list(campaign.survey_goals) if campaign and campaign.survey_goals else None
+        self._campaign_survey_goals = _parse_json_list(campaign.survey_goals if campaign else None)
         self._campaign_target_clients_description = campaign.target_clients_description if campaign else None
         self._campaign_max_questions = campaign.max_questions if campaign else None
         self._campaign_max_duration_seconds = campaign.max_duration_seconds if campaign else None
@@ -191,14 +225,15 @@ class PromptTemplateService:
         self._campaign_anonymize_responses = campaign.anonymize_responses if campaign else False
         
         # BusinessAccount hot path attributes (11 attributes)
+        # Use _parse_json_list for list fields to handle JSON strings from SQLAlchemy
         self._ba_name = business_account.name if business_account else None
         self._ba_account_type = business_account.account_type if business_account else None
         self._ba_target_clients_description = business_account.target_clients_description if business_account else None
         self._ba_product_description = business_account.product_description if business_account else None
         self._ba_industry = business_account.industry if business_account else None
         self._ba_company_description = business_account.company_description if business_account else None
-        self._ba_survey_goals = list(business_account.survey_goals) if business_account and business_account.survey_goals else None
-        self._ba_prioritized_topics = list(business_account.prioritized_topics) if business_account and business_account.prioritized_topics else None
+        self._ba_survey_goals = _parse_json_list(business_account.survey_goals if business_account else None)
+        self._ba_prioritized_topics = _parse_json_list(business_account.prioritized_topics if business_account else None)
         self._ba_conversation_tone = business_account.conversation_tone if business_account else None
         self._ba_max_questions = business_account.max_questions if business_account else None
         self._ba_max_duration_seconds = business_account.max_duration_seconds if business_account else None
