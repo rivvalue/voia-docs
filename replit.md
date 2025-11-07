@@ -2,7 +2,21 @@
 VOÏA (Voice Of Client) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. It transforms raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project includes a production-ready multi-tenant participant management system with extensive email delivery capabilities, AI-powered conversational surveys using a hybrid prompt architecture, and participant segmentation for personalized experiences and advanced analytics.
 
 # Recent Changes
-**November 6, 2025 - Code Analysis & Refactoring Documentation**
+**November 7, 2025 - CRITICAL FIX: SQLAlchemy Detached Instance + JSON Parsing Regression**
+- **Root Cause Identified:** PromptTemplateService stored ORM objects as instance attributes, causing "Instance not bound to Session" errors across HTTP requests
+- **Solution Implemented:** Hybrid Hot/Cold Path architecture (Solution 4)
+  - Hot path: 19 frequently-accessed attributes extracted as Python primitives at initialization (campaign + business account metadata)
+  - Cold path: 3 rarely-accessed attributes lazy-loaded on demand via fresh DB queries
+  - Performance improvement: 1 query at init vs 10-20 queries per request previously
+- **JSON Parsing Bug Fixed:** Added `_parse_json_list()` helper to handle SQLAlchemy JSON columns returning strings instead of lists
+  - Applied to 4 list-type fields: `prioritized_topics` and `survey_goals` (campaign + business account)
+  - Previous bug: `list("[\\"NPS\\"]")` created `['[', '"', 'N', 'P', 'S', ...]` instead of `["NPS"]`
+  - Custom survey topics now properly propagate to AI prompts in hybrid mode
+- **Impact:** Zero SQLAlchemy session errors, custom campaign configurations respected, both hybrid and legacy prompt modes fully functional
+- **Architect Review:** PASSED - No security issues, no regressions detected
+- **Files Modified:** `prompt_template_service.py` (refactored __init__, added JSON parsing, updated 25+ getters)
+
+**Previous: November 6, 2025 - Code Analysis & Refactoring Documentation**
 - Completed comprehensive code analysis for frontend and backend optimization opportunities
 - Created `FRONTEND_REFACTORING_PLAN.md` documenting:
   - 4,600-line dashboard.js monolithic file (50-60% reduction potential)
