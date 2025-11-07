@@ -30,6 +30,10 @@ class AIConversationalSurvey:
         self.nps_retry_count = 0
         self.nps_deferred = False
         
+        # CAMPAIGN-AWARE EXTRACTION: Track current topic being collected
+        self.current_topic = None  # Will be set when question is generated
+        self.current_expected_field = None  # Specific field expected for current question
+        
         # Initialize prompt template service for dynamic prompts with campaign-specific customization
         self.template_service = PromptTemplateService(business_account_id, campaign_id)
         
@@ -166,13 +170,38 @@ class AIConversationalSurvey:
         return self.template_service.generate_welcome_message(respondent_name)
     
     def _extract_survey_data_with_ai(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
-        """Extract structured survey data from natural language using OpenAI"""
+        """CAMPAIGN-AWARE: Extract structured survey data from natural language using OpenAI"""
         try:
             # Get list of already captured data to prevent overwrites
             locked_fields = [key for key, value in self.extracted_data.items() if value is not None]
             
             # Get dynamic company name from template service
             company_name = self.template_service.get_company_name()
+            
+            # CAMPAIGN-AWARE CONTEXT: Build survey config to understand campaign priorities
+            survey_config = self.template_service.build_survey_config_json(self.participant_data)
+            
+            # Build campaign-specific context section
+            campaign_context = ""
+            if self.current_topic and self.current_expected_field:
+                campaign_context = f"""
+CURRENT QUESTION CONTEXT:
+- Topic being collected: {self.current_topic}
+- Expected field: {self.current_expected_field}
+- If user provides a numeric rating, it should map to: {self.current_expected_field}
+"""
+            
+            # Build prioritized topics context
+            topics_context = ""
+            if survey_config.get('goals'):
+                topics_list = "\n".join([f"  {i+1}. {goal['topic']} → fields: {goal.get('fields', [])}" 
+                                        for i, goal in enumerate(survey_config['goals'][:8])])
+                topics_context = f"""
+CAMPAIGN PRIORITIZED TOPICS (in order):
+{topics_list}
+
+Use these field mappings when extracting data to ensure correct assignment.
+"""
             
             prompt = f"""Extract survey data from this customer response: "{user_input}"
 
@@ -181,11 +210,12 @@ Context of conversation:
 - Current extracted data: {json.dumps(self.extracted_data, indent=2)}
 - Conversation step: {self.step_count}
 - ALREADY CAPTURED (DO NOT RE-EXTRACT): {locked_fields}
-
+{campaign_context}{topics_context}
 CRITICAL INSTRUCTION: Only extract NEW information from this specific response. 
 DO NOT re-extract or change data that was already captured in previous responses.
 
 RATING EXTRACTION PRIORITY: If you see explicit ratings like "I rate them 3", "3 out of 5", "I'd give them a 4", extract these immediately.
+If a numeric rating is provided and we know the current expected field (see CURRENT QUESTION CONTEXT above), use that field assignment.
 
 Extract any of the following data present in the response:
 - Tenure with {company_name}: Look for duration mentions like "6 months", "2 years", "less than 6 months", etc.
@@ -263,16 +293,39 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             return self._extract_survey_data_fallback(user_input)
     
     def _extract_survey_data_fallback(self, user_input: str) -> Dict[str, Any]:
-        """Enhanced rule-based extraction with intelligent pattern matching"""
+        """CAMPAIGN-AWARE: Enhanced rule-based extraction with intelligent pattern matching"""
         extracted = {}
         text_lower = user_input.lower()
         
         # Extract NPS score - only if we're in the NPS collection step and don't have it yet
         import re
         
+        # CAMPAIGN-AWARE: If we know the expected field, use that for numeric extraction
+        if self.current_expected_field and re.search(r'\b[0-9]+\b', user_input):
+            print(f"CAMPAIGN-AWARE FALLBACK: Expected field is {self.current_expected_field}")
+            
+            # Extract numeric value
+            matches = re.findall(r'\b([0-9]+)\b', user_input)
+            if matches:
+                value = int(matches[-1])  # Take last match
+                
+                # Validate and assign based on expected field
+                if self.current_expected_field == 'nps_score' and 0 <= value <= 10:
+                    extracted['nps_score'] = value
+                    if value >= 9:
+                        extracted['nps_category'] = 'Promoter'
+                    elif value >= 7:
+                        extracted['nps_category'] = 'Passive'
+                    else:
+                        extracted['nps_category'] = 'Detractor'
+                    print(f"CAMPAIGN-AWARE FALLBACK: Captured NPS={value}")
+                elif self.current_expected_field in ['satisfaction_rating', 'service_rating', 'product_value_rating', 'pricing_rating', 'support_rating'] and 1 <= value <= 5:
+                    extracted[self.current_expected_field] = value
+                    print(f"CAMPAIGN-AWARE FALLBACK: Captured {self.current_expected_field}={value}")
+        
         # Extract NPS score ONLY during steps 1-3 (before satisfaction questions start at step 4)
         # This prevents "1" or "5" from satisfaction questions being misinterpreted as NPS
-        if not self.extracted_data.get('nps_score') and self.step_count <= 3 and re.search(r'\b([0-9]|10)\b', user_input):
+        if not extracted.get('nps_score') and not self.extracted_data.get('nps_score') and self.step_count <= 3 and re.search(r'\b([0-9]|10)\b', user_input):
             print(f"Attempting NPS extraction at step {self.step_count} for input: '{user_input}'")
             nps_patterns = [
                 r'(?:score|rating|give|rate).*?(10|[0-9])',  # Fixed: 10 before single digits
@@ -695,11 +748,48 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         else:
             return "Wrap up the conversation - you have enough information"
     
+    def _set_current_topic_from_priority(self, priority_string: str) -> None:
+        """CAMPAIGN-AWARE: Parse priority string and set current topic/expected field for extraction"""
+        # Map priority strings to expected fields
+        field_mapping = {
+            'tenure': ('Business Relationship Tenure', 'tenure_with_fc'),
+            'nps': ('NPS', 'nps_score'),
+            'nps score': ('NPS', 'nps_score'),
+            'reasoning': ('NPS Reasoning', 'nps_reasoning'),
+            'satisfaction': ('Overall Satisfaction', 'satisfaction_rating'),
+            'service': ('Professional Services Quality', 'service_rating'),
+            'professional': ('Professional Services Quality', 'service_rating'),
+            'product': ('Product Value', 'product_value_rating'),
+            'value': ('Product Value', 'product_value_rating'),
+            'pricing': ('Pricing Value', 'pricing_rating'),
+            'support': ('Support Quality', 'support_rating'),
+            'improvement': ('Improvement Suggestions', 'improvement_feedback'),
+            'wrap up': ('Completion', None)
+        }
+        
+        priority_lower = priority_string.lower()
+        
+        # Find matching topic/field
+        for keyword, (topic, field) in field_mapping.items():
+            if keyword in priority_lower:
+                self.current_topic = topic
+                self.current_expected_field = field
+                print(f"CAMPAIGN-AWARE EXTRACTION: Current topic={topic}, expected field={field}")
+                return
+        
+        # Default: no specific topic identified
+        self.current_topic = None
+        self.current_expected_field = None
+    
     def _generate_ai_question(self, user_input: str, context: Dict[str, Any]) -> Dict[str, Any]:
         """Generate next question using OpenAI with dynamic prompts"""
         try:
             # Format conversation history for context
             history_text = self._format_conversation_history()
+            
+            # CAMPAIGN-AWARE: Determine what topic/field should be collected next
+            next_priority = self._get_next_question_priority()
+            self._set_current_topic_from_priority(next_priority)
             
             # Generate dynamic system prompt using template service (with participant data for hybrid prompt)
             system_prompt = self.template_service.generate_system_prompt(
@@ -715,7 +805,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
 CUSTOMER'S LATEST RESPONSE: "{user_input}"
 
 NEXT LOGICAL QUESTION PRIORITY:
-{self._get_next_question_priority()}
+{next_priority}
 
 RESPONSE FORMAT - Return JSON:
 {{
