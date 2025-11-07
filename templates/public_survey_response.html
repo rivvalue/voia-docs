@@ -113,6 +113,14 @@
                     <span class="public-data-value">{{ response.pricing_rating }}/5</span>
                 </div>
                 {% endif %}
+                <div class="public-data-item">
+                    <span class="public-data-label">{{ _('Professional Services:') }}</span>
+                    <span class="public-data-value">{{ response.service_rating }}/5 {% if not response.service_rating %}N/A{% endif %}</span>
+                </div>
+                <div class="public-data-item">
+                    <span class="public-data-label">{{ _('Support Quality:') }}</span>
+                    <span class="public-data-value">{{ response.support_rating }}/5 {% if not response.support_rating %}N/A{% endif %}</span>
+                </div>
             </section>
 
             <!-- Sentiment Analysis -->
