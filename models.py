@@ -52,6 +52,10 @@ class SurveyResponse(db.Model):
     growth_range = db.Column(db.String(20))  # NPS range (e.g., "50-69")
     commercial_value = db.Column(db.Float)  # Commercial value of the client in dollars
     
+    # AI-generated summary and reasoning (for transparency and trust)
+    analysis_summary = db.Column(db.Text, nullable=True)  # 2-3 sentence plain-language summary of findings
+    analysis_reasoning = db.Column(db.Text, nullable=True)  # Explanation of why AI reached these conclusions
+    
     # Conversational transcript
     conversation_history = db.Column(db.Text, nullable=True)  # JSON string of conversation transcript
     
@@ -107,6 +111,8 @@ class SurveyResponse(db.Model):
             'growth_rate': self.growth_rate,
             'growth_range': self.growth_range,
             'commercial_value': self.commercial_value,
+            'analysis_summary': self.analysis_summary,
+            'analysis_reasoning': self.analysis_reasoning,
             'campaign_id': self.campaign_id,
             'campaign_participant_id': self.campaign_participant_id,
             'campaign_name': self.campaign.name if self.campaign else None,
