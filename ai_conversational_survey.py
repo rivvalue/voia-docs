@@ -756,13 +756,49 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         return all_collected
     
     def _get_next_question_priority(self) -> str:
-        """Determine what question should be asked next based on collected data"""
+        """CAMPAIGN-AWARE: Determine what question should be asked next based on campaign priorities"""
         data = self.extracted_data
-        
-        # Get dynamic company name from template service
         company_name = self.template_service.get_company_name()
         
-        # Check what we have and what we need - systematic collection of ALL ratings
+        # CAMPAIGN-AWARE: Check if campaign has custom prioritized topics
+        survey_config = self.template_service.build_survey_config_json(self.participant_data)
+        campaign_goals = survey_config.get('goals', [])
+        
+        # If campaign has custom goals, follow those priorities
+        if campaign_goals and len(campaign_goals) > 0:
+            print(f"CAMPAIGN-AWARE PRIORITY: Using campaign goals (count={len(campaign_goals)})")
+            
+            # Iterate through campaign goals in priority order
+            for goal in campaign_goals:
+                topic = goal.get('topic', '')
+                description = goal.get('description', '')
+                fields = goal.get('fields', [])
+                
+                # Check if any field for this topic is missing
+                for field in fields:
+                    if not data.get(field):
+                        # Special handling for NPS retry logic
+                        if field == 'nps_score' and not self.nps_deferred:
+                            if self.nps_retry_count >= 2:
+                                self.nps_deferred = True
+                                print(f"NPS DEFERRED: Failed to capture after {self.nps_retry_count} attempts")
+                                continue  # Skip to next topic
+                            else:
+                                self.nps_retry_count += 1
+                                print(f"NPS RETRY ATTEMPT {self.nps_retry_count}/2 (campaign-aware)")
+                                return f"Ask about {topic}: {description}"
+                        
+                        # Return this topic as next priority
+                        print(f"CAMPAIGN-AWARE PRIORITY: Next topic={topic}, field={field}")
+                        return f"Ask about {topic}: {description}"
+            
+            # All campaign goals collected
+            print("CAMPAIGN-AWARE PRIORITY: All campaign goals collected")
+            return "Wrap up the conversation - you have enough information"
+        
+        # FALLBACK: No campaign goals, use legacy hardcoded sequence
+        print("FALLBACK PRIORITY: Using legacy hardcoded sequence (no campaign goals)")
+        
         if not data.get('tenure_with_fc'):
             return f"Ask about business relationship tenure with {company_name} (how long working together)"
         elif not data.get('nps_score') and not self.nps_deferred:

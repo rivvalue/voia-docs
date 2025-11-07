@@ -1,60 +1,6 @@
 # Overview
 VOÏA (Voice Of Client) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. It transforms raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project includes a production-ready multi-tenant participant management system with extensive email delivery capabilities, AI-powered conversational surveys using a hybrid prompt architecture, and participant segmentation for personalized experiences and advanced analytics.
 
-# Recent Changes
-**November 7, 2025 - CRITICAL FIX: Campaign-Aware AI Extraction for Rating Field Disambiguation**
-- **Root Cause Identified:** AI extraction used static prompts without campaign context, causing NPS values (0-10) to be stored as satisfaction_rating (1-5) and vice versa when campaigns had custom prioritized topics
-- **Evidence:** Campaign 42 had satisfaction_rating=6 (impossible on 1-5 scale), proving field swap occurred between NPS and service ratings
-- **Solution Implemented:** Campaign-aware extraction with topic tracking
-  - Added `current_topic` and `current_expected_field` state tracking to AIConversationalSurvey class
-  - Created `_set_current_topic_from_priority()` to map question priorities to expected database fields
-  - Enhanced `_extract_survey_data_with_ai()` with CURRENT QUESTION CONTEXT and CAMPAIGN PRIORITIZED TOPICS sections in AI prompt
-  - Updated `_extract_survey_data_fallback()` to use `current_expected_field` for proper numeric value assignment with range validation
-  - Both AI and fallback extraction paths now respect campaign-specific topic ordering
-- **Impact:** Prevents rating field confusion across all campaigns with custom prioritized topics, graceful degradation when context missing
-- **Cost Impact:** ~30% increase in AI extraction input tokens (~$0.0002 per conversation) - approved as negligible
-- **Architect Review:** PASSED - Zero security issues, data integrity confirmed, token cost within approved limits
-- **Files Modified:** `ai_conversational_survey.py` (added topic tracking, updated extraction methods)
-
-**Previous: November 7, 2025 - CRITICAL FIX: SQLAlchemy Detached Instance + JSON Parsing Regression**
-- **Root Cause Identified:** PromptTemplateService stored ORM objects as instance attributes, causing "Instance not bound to Session" errors across HTTP requests
-- **Solution Implemented:** Hybrid Hot/Cold Path architecture (Solution 4)
-  - Hot path: 19 frequently-accessed attributes extracted as Python primitives at initialization (campaign + business account metadata)
-  - Cold path: 3 rarely-accessed attributes lazy-loaded on demand via fresh DB queries
-  - Performance improvement: 1 query at init vs 10-20 queries per request previously
-- **JSON Parsing Bug Fixed:** Added `_parse_json_list()` helper to handle SQLAlchemy JSON columns returning strings instead of lists
-  - Applied to 4 list-type fields: `prioritized_topics` and `survey_goals` (campaign + business account)
-  - Previous bug: `list("[\\"NPS\\"]")` created `['[', '"', 'N', 'P', 'S', ...]` instead of `["NPS"]`
-  - Custom survey topics now properly propagate to AI prompts in hybrid mode
-- **Impact:** Zero SQLAlchemy session errors, custom campaign configurations respected, both hybrid and legacy prompt modes fully functional
-- **Architect Review:** PASSED - No security issues, no regressions detected
-- **Files Modified:** `prompt_template_service.py` (refactored __init__, added JSON parsing, updated 25+ getters)
-
-**Previous: November 6, 2025 - Code Analysis & Refactoring Documentation**
-- Completed comprehensive code analysis for frontend and backend optimization opportunities
-- Created `FRONTEND_REFACTORING_PLAN.md` documenting:
-  - 4,600-line dashboard.js monolithic file (50-60% reduction potential)
-  - 12,348-line custom.css file (40-50% reduction potential)
-  - Inline JavaScript in 20+ templates (browser caching opportunity)
-  - Mobile performance optimization strategies
-- Created `BACKEND_REFACTORING_PLAN.md` documenting:
-  - Redis cache migration opportunity (10x dashboard performance improvement: 500ms → 50ms)
-  - Route file consolidation (9,420 lines → modular structure)
-  - Code duplication elimination (40% reduction potential)
-  - Service layer extraction for improved testability
-  - Database indexing opportunities (30-50% query speed improvement)
-- All refactoring recommendations are optional and prioritized for future implementation
-- System remains stable and fully functional with zero implementation issues
-
-**Previous: October-November 2025 - Dual-Reminder System Strategic Reversal (Phase 4)**
-- Reversed reminder logic: "Last Chance" reminder now sends X days BEFORE campaign end (not after invitation)
-- Automatic Midpoint Reminder: Sent halfway through campaign duration
-- PostgreSQL interval arithmetic for efficient date calculations
-- Default changed from 7 to 10 days before campaign end (configurable: 7, 10, or 14 days)
-- Frontend validation updated with intelligent spacing checks and edge-case warnings
-- Zero migration risk (no active campaigns, only drafts exist)
-- Architect review: PASSED with zero implementation issues
-
 # User Preferences
 Preferred communication style: Simple, everyday language.
 User interface tone: Thought leadership and research-oriented language, avoiding sales-oriented messaging.
@@ -64,13 +10,13 @@ Target market: French-speaking businesses and organizations.
 # System Architecture
 The system is a Flask web application with a multi-tiered architecture, using Jinja2, Bootstrap 5, custom CSS, vanilla JavaScript, and Chart.js for the frontend. The backend is Flask with SQLAlchemy ORM, designed for scalability. AI integration primarily uses the OpenAI API for NLP, sentiment analysis, and conversational surveys (VOÏA), supplemented by TextBlob.
 
-**UI/UX**: Features multi-step survey forms, interactive dashboards, chat-style interfaces for conversational surveys, and Rivvalue Inc. branding with a professional blue color scheme. Includes modern sidebar navigation, mobile responsiveness, accessibility features (ARIA, WCAG 2.1 AA), and a comprehensive breadcrumb system. Redesigned admin pages and the Survey Response page follow V2 patterns with bold red gradient headers and VOÏA brand color tokens. Demo platform pages are V2 compliant with zero inline styles and standardized patterns.
+**UI/UX**: Features multi-step survey forms, interactive dashboards, chat-style interfaces for conversational surveys, and Rivvalue Inc. branding with a professional blue color scheme. Includes modern sidebar navigation, mobile responsiveness, accessibility features, and a comprehensive breadcrumb system. Admin pages and the Survey Response page follow V2 patterns with bold red gradient headers and VOÏA brand color tokens.
 
 **Technical Implementations**:
 -   **Survey Collection**: Multi-step forms with dynamic follow-up questions and real-time validation.
 -   **AI Analysis Engine**: Sentiment analysis, key theme extraction, churn risk assessment, growth opportunity identification, and NPS-based growth factor analysis.
--   **Conversational Surveys (VOÏA)**: AI-powered (GPT-4o) natural language interface with advanced personalization and a hybrid prompt architecture for dynamic question generation and structured data extraction. Features role-based persona templates (5-tier system) that adapt AI tone and focus based on participant seniority, intelligent role mapping, anonymization guards, and multilingual support. Enhanced AI prompt personalization with a structured context block for full business metadata. Persistent conversation state storage ensures data recovery.
--   **Data Management**: Centralized data aggregation, NPS calculation, time-based filtering, optimized database queries, and separate tracking for Professional Services and Support Quality. Automated nightly reconciliation system for data consistency.
+-   **Conversational Surveys (VOÏA)**: AI-powered (GPT-4o) natural language interface with advanced personalization and a hybrid prompt architecture for dynamic question generation and structured data extraction. Features role-based persona templates (5-tier system), intelligent role mapping, anonymization guards, and multilingual support. Enhanced AI prompt personalization with a structured context block for full business metadata. Persistent conversation state storage ensures data recovery.
+-   **Data Management**: Centralized data aggregation, NPS calculation, time-based filtering, optimized database queries, and separate tracking for Professional Services and Support Quality. Automated nightly reconciliation system.
 -   **Authentication**: JWT token-based with email validation, admin roles, server-side token generation, and automatic invalidation.
 -   **Performance & Scalability**: PostgreSQL-backed persistent task queue, database indexing, connection pooling, asynchronous background tasks for AI, IP-based rate limiting, optimized dashboard queries, admin-configurable response caching, and frontend optimizations. Scaled for 100 concurrent users with Gunicorn and expanded SQLAlchemy connection pool. Environment-aware static file caching.
 -   **Audit Trail System**: Comprehensive audit logging with accurate timestamp preservation, integrated with a PostgreSQL task queue.
@@ -80,7 +26,7 @@ The system is a Flask web application with a multi-tiered architecture, using Ji
 -   **Participant Management Enhancements**: Individual editing with conditional email locking, deletion protection, tenure tracking, audit logging, and bulk edit functionality. Advanced multi-value filtering. Optimized participant list page load times. Implemented atomic row-level locking for bulk operations to prevent race conditions.
 -   **Manual Commercial Value Tracking**: Company-level commercial value system for account intelligence, stored on the Participant model, with CSV upload validation and automatic synchronization.
 -   **Email Delivery System**: Production-ready dual-mode email infrastructure (VOÏA-managed AWS SES or client-managed SMTP). Features encrypted password storage, connection testing, VOÏA-branded templates, background task processing, delivery tracking, configurable email content with 3-tier fallback, and automated reminder system. Includes comprehensive UI for configuration and multi-tenant isolation.
--   **Dual-Reminder System (Strategic Reversal)**: Enhanced automated reminder strategy with two-stage engagement: (1) Midpoint Reminder sent automatically halfway through campaign duration (e.g., Day 45 in a 90-day campaign), and (2) Last Chance Reminder sent X days BEFORE campaign closes (configurable: 7, 10, or 14 days; default 10). This reversal from the previous "days after invitation" model creates better spacing and urgency: midpoint catches participants who haven't started yet, while last-chance creates deadline pressure. Backend uses PostgreSQL interval arithmetic for efficient SQL-based date calculations. Frontend JavaScript displays both reminder dates with intelligent spacing validation and edge-case warnings.
+-   **Dual-Reminder System (Strategic Reversal)**: Enhanced automated reminder strategy with two-stage engagement: (1) Midpoint Reminder sent automatically halfway through campaign duration, and (2) Last Chance Reminder sent X days BEFORE campaign closes (configurable: 7, 10, or 14 days; default 10). Backend uses PostgreSQL interval arithmetic for efficient SQL-based date calculations. Frontend JavaScript displays both reminder dates with intelligent spacing validation and edge-case warnings.
 -   **Campaign Lifecycle Management**: Automated status transitions, multi-tenant scheduling, automatic KPI snapshot generation, and background task management with audit logging.
 -   **Hybrid Survey Customization**: Campaign-specific survey personalization with business account defaults.
 -   **License Management System**: Enterprise-ready license management with usage tracking and enforcement.
