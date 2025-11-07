@@ -23,6 +23,10 @@ class AIConversationalSurvey:
         self.step_count = 0
         self.is_complete = False
         
+        # Store IDs for conversation state persistence
+        self.business_account_id = business_account_id
+        self.campaign_id = campaign_id
+        
         # Store participant data for personalized prompts
         self.participant_data = participant_data
         
