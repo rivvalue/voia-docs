@@ -2,7 +2,21 @@
 VOÏA (Voice Of Client) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. It transforms raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project includes a production-ready multi-tenant participant management system with extensive email delivery capabilities, AI-powered conversational surveys using a hybrid prompt architecture, and participant segmentation for personalized experiences and advanced analytics.
 
 # Recent Changes
-**November 7, 2025 - CRITICAL FIX: SQLAlchemy Detached Instance + JSON Parsing Regression**
+**November 7, 2025 - CRITICAL FIX: Campaign-Aware AI Extraction for Rating Field Disambiguation**
+- **Root Cause Identified:** AI extraction used static prompts without campaign context, causing NPS values (0-10) to be stored as satisfaction_rating (1-5) and vice versa when campaigns had custom prioritized topics
+- **Evidence:** Campaign 42 had satisfaction_rating=6 (impossible on 1-5 scale), proving field swap occurred between NPS and service ratings
+- **Solution Implemented:** Campaign-aware extraction with topic tracking
+  - Added `current_topic` and `current_expected_field` state tracking to AIConversationalSurvey class
+  - Created `_set_current_topic_from_priority()` to map question priorities to expected database fields
+  - Enhanced `_extract_survey_data_with_ai()` with CURRENT QUESTION CONTEXT and CAMPAIGN PRIORITIZED TOPICS sections in AI prompt
+  - Updated `_extract_survey_data_fallback()` to use `current_expected_field` for proper numeric value assignment with range validation
+  - Both AI and fallback extraction paths now respect campaign-specific topic ordering
+- **Impact:** Prevents rating field confusion across all campaigns with custom prioritized topics, graceful degradation when context missing
+- **Cost Impact:** ~30% increase in AI extraction input tokens (~$0.0002 per conversation) - approved as negligible
+- **Architect Review:** PASSED - Zero security issues, data integrity confirmed, token cost within approved limits
+- **Files Modified:** `ai_conversational_survey.py` (added topic tracking, updated extraction methods)
+
+**Previous: November 7, 2025 - CRITICAL FIX: SQLAlchemy Detached Instance + JSON Parsing Regression**
 - **Root Cause Identified:** PromptTemplateService stored ORM objects as instance attributes, causing "Instance not bound to Session" errors across HTTP requests
 - **Solution Implemented:** Hybrid Hot/Cold Path architecture (Solution 4)
   - Hot path: 19 frequently-accessed attributes extracted as Python primitives at initialization (campaign + business account metadata)
