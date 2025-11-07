@@ -630,7 +630,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         return extracted
     
     def _check_completion_criteria(self) -> bool:
-        """Check if we have enough data to complete the survey - USER EXPERIENCE FIRST"""
+        """CAMPAIGN-AWARE: Check if we have enough data to complete the survey - USER EXPERIENCE FIRST"""
         # Core requirements (minimum viable data)
         has_nps = self.extracted_data.get('nps_score') is not None
         has_reasoning = self.extracted_data.get('nps_reasoning') is not None or self.extracted_data.get('compliment_feedback') is not None or self.extracted_data.get('complaint_feedback') is not None or self.extracted_data.get('additional_comments') is not None
@@ -644,6 +644,9 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         at_question_limit = self.step_count >= max_questions
         approaching_limit = self.step_count >= (max_questions - 1)  # Complete at limit-1 to avoid going over
         
+        # CAMPAIGN-AWARE: Check if campaign has prioritized topics that must be collected
+        has_campaign_priorities = self._check_campaign_priorities_collected()
+        
         # MINIMUM VIABLE DATA: NPS + some context is enough for valuable feedback
         has_minimal_core = has_nps and (has_tenure or has_reasoning)
         
@@ -651,7 +654,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         # Complete survey if ANY of these conditions are met:
         # 1. User shows frustration (immediate completion)
         # 2. We've reached or approaching the question limit
-        # 3. We have core NPS data + some context (good enough)
+        # 3. CAMPAIGN-AWARE: We have campaign priorities collected OR we have core NPS data + some context
         # 4. We have NPS deferred + some other meaningful data
         
         completion_reasons = []
@@ -660,9 +663,13 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             completion_reasons.append("USER_FRUSTRATED")
         if at_question_limit:
             completion_reasons.append("AT_QUESTION_LIMIT")
-        if approaching_limit and has_minimal_core:
-            completion_reasons.append("APPROACHING_LIMIT_WITH_CORE_DATA")
-        if has_minimal_core and self.step_count >= 3:  # Allow at least 3 questions for core data
+        if approaching_limit and (has_campaign_priorities or has_minimal_core):
+            completion_reasons.append("APPROACHING_LIMIT_WITH_DATA")
+        # CAMPAIGN-AWARE: If campaign has custom priorities, require those to be collected
+        # Otherwise fall back to minimal core data (legacy behavior)
+        if has_campaign_priorities:
+            completion_reasons.append("CAMPAIGN_PRIORITIES_COLLECTED")
+        elif has_minimal_core and self.step_count >= 5:  # Increased from 3 to 5 to allow more questions
             completion_reasons.append("HAS_MINIMAL_CORE_DATA")
         if self.nps_deferred and has_reasoning and self.step_count >= 2:
             completion_reasons.append("NPS_DEFERRED_WITH_FEEDBACK")
@@ -707,6 +714,46 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
                 return True
         
         return False
+    
+    def _check_campaign_priorities_collected(self) -> bool:
+        """CAMPAIGN-AWARE: Check if campaign's prioritized topics have been collected"""
+        # Get campaign's prioritized topics from survey config
+        survey_config = self.template_service.build_survey_config_json(self.participant_data)
+        
+        if not survey_config.get('goals'):
+            # No custom priorities - return False to use default minimal core logic
+            print("CAMPAIGN PRIORITIES: No custom goals defined, using default completion logic")
+            return False
+        
+        # Map goals to required fields
+        required_fields_map = {
+            'NPS': ['nps_score'],
+            'Overall Satisfaction': ['satisfaction_rating'],
+            'Professional Services Quality': ['service_rating'],
+            'Support Quality': ['support_rating'],
+            'Product Value': ['product_value_rating'],
+            'Pricing Value': ['pricing_rating'],
+            'Improvement Suggestions': ['improvement_feedback', 'complaint_feedback', 'additional_comments']
+        }
+        
+        # Get required fields from prioritized topics (top 5 only to avoid overloading users)
+        required_fields = []
+        for goal in survey_config['goals'][:5]:
+            topic = goal.get('topic', '')
+            if topic in required_fields_map:
+                required_fields.extend(required_fields_map[topic])
+        
+        if not required_fields:
+            print("CAMPAIGN PRIORITIES: No mappable fields found in goals")
+            return False
+        
+        # Check if all required fields have been collected
+        collected_fields = [field for field in required_fields if self.extracted_data.get(field) is not None]
+        all_collected = len(collected_fields) == len(required_fields)
+        
+        print(f"CAMPAIGN PRIORITIES: Required={required_fields}, Collected={collected_fields}, AllCollected={all_collected}")
+        
+        return all_collected
     
     def _get_next_question_priority(self) -> str:
         """Determine what question should be asked next based on collected data"""
