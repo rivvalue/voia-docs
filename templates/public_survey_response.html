@@ -115,11 +115,11 @@
                 {% endif %}
                 <div class="public-data-item">
                     <span class="public-data-label">{{ _('Professional Services:') }}</span>
-                    <span class="public-data-value">{{ response.service_rating }}/5 {% if not response.service_rating %}N/A{% endif %}</span>
+                    <span class="public-data-value">{% if response.service_rating %}{{ response.service_rating }}/5{% else %}N/A{% endif %}</span>
                 </div>
                 <div class="public-data-item">
                     <span class="public-data-label">{{ _('Support Quality:') }}</span>
-                    <span class="public-data-value">{{ response.support_rating }}/5 {% if not response.support_rating %}N/A{% endif %}</span>
+                    <span class="public-data-value">{% if response.support_rating %}{{ response.support_rating }}/5{% else %}N/A{% endif %}</span>
                 </div>
             </section>
 
@@ -217,16 +217,18 @@
             {% if response.conversation_history and response.conversation_history|length > 0 %}
             <div class="public-conversation" role="log" aria-label="{{ _('Conversation history') }}">
                 {% for message in response.conversation_history %}
-                <div class="public-message public-message-{{ message.role }}" role="article" aria-label="{{ _('AI message') if message.role == 'ai' else _('User message') }}">
-                    <div class="public-message-avatar public-avatar-{{ message.role }}" aria-hidden="true">
-                        {% if message.role == 'ai' %}
+                {% set msg_role = message.role if message.role else (message.sender if message.sender else 'user') %}
+                {% set msg_content = message.content if message.content else (message.message if message.message else '') %}
+                <div class="public-message public-message-{{ msg_role }}" role="article" aria-label="{{ _('AI message') if msg_role == 'ai' else _('User message') }}">
+                    <div class="public-message-avatar public-avatar-{{ msg_role }}" aria-hidden="true">
+                        {% if msg_role == 'ai' %}
                             {{ _('AI') }}
                         {% else %}
                             {{ response.respondent_name[0]|upper if response.respondent_name else 'U' }}
                         {% endif %}
                     </div>
                     <div class="public-message-content">
-                        <div class="message-text">{{ message.content }}</div>
+                        <div class="message-text">{{ msg_content }}</div>
                         {% if message.timestamp %}
                         <time class="public-message-timestamp" datetime="{{ message.timestamp }}">
                             {{ message.timestamp }}

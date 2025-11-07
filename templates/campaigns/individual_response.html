@@ -367,11 +367,11 @@
                 {% endif %}
                 <div class="data-item">
                     <span class="data-label">{{ _('Professional Services:') }}</span>
-                    <span class="data-value">{{ response.service_rating }}/5 {% if not response.service_rating %}N/A{% endif %}</span>
+                    <span class="data-value">{% if response.service_rating %}{{ response.service_rating }}/5{% else %}N/A{% endif %}</span>
                 </div>
                 <div class="data-item">
                     <span class="data-label">{{ _('Support Quality:') }}</span>
-                    <span class="data-value">{{ response.support_rating }}/5 {% if not response.support_rating %}N/A{% endif %}</span>
+                    <span class="data-value">{% if response.support_rating %}{{ response.support_rating }}/5{% else %}N/A{% endif %}</span>
                 </div>
             </div>
 
