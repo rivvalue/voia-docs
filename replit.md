@@ -14,7 +14,7 @@ The system is a Flask web application with a multi-tiered architecture, using Ji
 
 **Technical Implementations**:
 -   **Survey Collection**: Multi-step forms with dynamic follow-up questions and real-time validation.
--   **AI Analysis Engine**: Sentiment analysis, key theme extraction, churn risk assessment, growth opportunity identification, and NPS-based growth factor analysis.
+-   **AI Analysis Engine**: Sentiment analysis, key theme extraction, churn risk assessment, growth opportunity identification, and NPS-based growth factor analysis. Features AI-generated plain-language summaries and reasoning explanations for transparency and trust-building with end-users.
 -   **Conversational Surveys (VOÏA)**: AI-powered (GPT-4o) natural language interface with advanced personalization and a hybrid prompt architecture for dynamic question generation and structured data extraction. Features role-based persona templates (5-tier system), intelligent role mapping, anonymization guards, and multilingual support. Enhanced AI prompt personalization with a structured context block for full business metadata. Persistent conversation state storage ensures data recovery.
 -   **Data Management**: Centralized data aggregation, NPS calculation, time-based filtering, optimized database queries, and separate tracking for Professional Services and Support Quality. Automated nightly reconciliation system.
 -   **Authentication**: JWT token-based with email validation, admin roles, server-side token generation, and automatic invalidation.
