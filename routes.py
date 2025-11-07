@@ -293,6 +293,34 @@ def normalize_company_name(company_name):
     # Convert to title case for consistent display (first letter caps, rest lowercase)
     return company_name.strip().title()
 
+def map_tenure_years_to_category(tenure_years):
+    """
+    Convert numeric tenure_years (float) to categorical tenure string.
+    
+    Args:
+        tenure_years: Float representing years (e.g., 2.5)
+    
+    Returns:
+        str: Categorical tenure range (e.g., "2-3 years") or None
+    """
+    if tenure_years is None:
+        return None
+    
+    if tenure_years < 0.5:
+        return "Less than 6 months"
+    elif tenure_years < 1:
+        return "6 months - 1 year"
+    elif tenure_years < 2:
+        return "1-2 years"
+    elif tenure_years < 3:
+        return "2-3 years"
+    elif tenure_years < 5:
+        return "3-5 years"
+    elif tenure_years < 10:
+        return "5-10 years"
+    else:
+        return "More than 10 years"
+
 def ensure_trial_participant(email, name, company_name, campaign_id):
     """
     Ensure a trial participant exists and is associated with the campaign.
@@ -2658,20 +2686,54 @@ def start_conversation():
         company_name = data.get('company_name', '').strip()
         respondent_name = data.get('respondent_name', '').strip()
         respondent_email = data.get('respondent_email', '').strip()
-        tenure_with_fc = data.get('tenure_with_fc', '').strip()
         
-        if not company_name or not respondent_name or not respondent_email or not tenure_with_fc:
-            return jsonify({'error': 'All fields are required'}), 400
+        # Tenure is no longer required from form - will be looked up from participant data
+        if not company_name or not respondent_name or not respondent_email:
+            return jsonify({'error': 'Company name, name, and email are required'}), 400
         
         # Get business account ID and campaign ID from session for PromptTemplateService integration
         business_account_id = session.get('business_account_id')
         campaign_id = session.get('campaign_id')
+        participant_id = session.get('participant_id')
+        
+        # Look up participant data if participant_id is available
+        participant_data = None
+        tenure_with_fc = None
+        
+        if participant_id:
+            participant = Participant.query.get(participant_id)
+            if participant:
+                # Build participant_data dictionary with segmentation attributes
+                participant_data = {
+                    'name': participant.name,
+                    'email': participant.email,
+                    'company_name': participant.company_name,
+                    'role': participant.role,
+                    'region': participant.region,
+                    'customer_tier': participant.customer_tier,
+                    'language': participant.language
+                }
+                
+                # Map tenure_years to categorical string if available
+                if participant.tenure_years is not None:
+                    tenure_with_fc = map_tenure_years_to_category(participant.tenure_years)
+                    participant_data['tenure_with_fc'] = tenure_with_fc
+                    logger.info(f"Pre-populated tenure from participant: {participant.tenure_years} years → '{tenure_with_fc}'")
+                else:
+                    logger.info(f"Participant {participant_id} has no tenure_years - AI will ask during conversation")
         
         # Debug logging
-        logger.info(f"Starting conversation for {respondent_name} with tenure: {tenure_with_fc}, business_account_id: {business_account_id}, campaign_id: {campaign_id}")
+        logger.info(f"Starting conversation for {respondent_name}, business_account_id: {business_account_id}, campaign_id: {campaign_id}, participant_data: {bool(participant_data)}")
         
-        # Start conversation with AI, passing the tenure data, business_account_id, and campaign_id
-        conversation_response = start_ai_conversational_survey(company_name, respondent_name, tenure_with_fc, business_account_id=business_account_id, campaign_id=campaign_id)
+        # Start conversation with AI, passing tenure and participant_data
+        conversation_response = start_ai_conversational_survey(
+            company_name, 
+            respondent_name, 
+            tenure_with_fc, 
+            business_account_id=business_account_id, 
+            campaign_id=campaign_id,
+            participant_data=participant_data
+        )
         
         return jsonify({
             'conversation_id': conversation_response['conversation_id'],
