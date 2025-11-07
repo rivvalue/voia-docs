@@ -166,11 +166,10 @@ function startConversation() {
     const companyName = document.getElementById('companyName').value.trim();
     const respondentName = document.getElementById('respondentName').value.trim();
     const respondentEmail = document.getElementById('respondentEmail').value.trim();
-    const tenureWithFc = document.getElementById('tenureWithFc').value;
     
-    console.log('Form values:', {companyName, respondentName, respondentEmail, tenureWithFc});
+    console.log('Form values:', {companyName, respondentName, respondentEmail});
     
-    if (!companyName || !respondentName || !respondentEmail || !tenureWithFc) {
+    if (!companyName || !respondentName || !respondentEmail) {
         // Show error in UI instead of alert
         const errorDiv = document.createElement('div');
         errorDiv.className = 'alert alert-danger mt-3';
@@ -181,12 +180,11 @@ function startConversation() {
         return;
     }
     
-    // Store survey data
+    // Store survey data (tenure will be auto-populated from participant data or asked by AI)
     conversationState.surveyData = {
         company_name: companyName,
         respondent_name: respondentName,
-        respondent_email: respondentEmail,
-        tenure_with_fc: tenureWithFc
+        respondent_email: respondentEmail
     };
     
     // Show loading state
@@ -206,8 +204,7 @@ function startConversation() {
         body: JSON.stringify({
             company_name: companyName,
             respondent_name: respondentName,
-            respondent_email: respondentEmail,
-            tenure_with_fc: tenureWithFc
+            respondent_email: respondentEmail
         })
     })
     .then(response => response.json())

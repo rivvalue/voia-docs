@@ -97,26 +97,10 @@
                                    value="{{ participant_name }}" readonly>
                         </div>
                         
-                        <div class="mb-3">
+                        <div class="mb-4">
                             <label for="respondentEmail" class="form-label">{{ _('Email Address') }}</label>
                             <input type="email" class="form-control" id="respondentEmail" required 
                                    value="{{ email }}" readonly>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label for="tenureWithFc" class="form-label">
-                                {{ _('How long have you been working with') }} {{ branding.company_name if branding and branding.company_name else _('us') }}?
-                            </label>
-                            <select class="form-select" id="tenureWithFc" required>
-                                <option value="">{{ _('Select duration...') }}</option>
-                                <option value="Less than 6 months">{{ _('Less than 6 months') }}</option>
-                                <option value="6 months - 1 year">{{ _('6 months - 1 year') }}</option>
-                                <option value="1-2 years">{{ _('1-2 years') }}</option>
-                                <option value="2-3 years">{{ _('2-3 years') }}</option>
-                                <option value="3-5 years">{{ _('3-5 years') }}</option>
-                                <option value="5-10 years">{{ _('5-10 years') }}</option>
-                                <option value="More than 10 years">{{ _('More than 10 years') }}</option>
-                            </select>
                         </div>
                         
                         <button type="submit" class="btn btn-lg w-100 conv-btn-primary">
