@@ -1253,7 +1253,6 @@ def public_survey_response(response_id):
             if response.campaign and response.campaign.business_account_id == current_business_user.business_account_id:
                 # Business user owns this campaign - grant access
                 logger.info(f"Business user {current_business_user.email} granted access to response {response_id}")
-                response_data = response.to_dict()
                 
                 # Get business account branding
                 business_account_id = current_business_user.business_account_id
@@ -1274,7 +1273,7 @@ def public_survey_response(response_id):
                 campaign_name = response.campaign.name if response.campaign else 'Unknown Campaign'
                 
                 return render_template('public_survey_response.html', 
-                                     response=response_data,
+                                     response=response,
                                      branding=branding_context,
                                      branding_context=branding_context,
                                      is_business_authenticated=True,
@@ -1297,9 +1296,6 @@ def public_survey_response(response_id):
         # This is a trial response - allow public access
         logger.info(f"Public access granted to trial response {response_id}")
         
-        # Convert response to dict for template
-        response_data = response.to_dict()
-        
         # Get demo branding for public view (Archelo Group - ID 1)
         branding_context = get_branding_context(business_account_id=1)
         
@@ -1318,7 +1314,7 @@ def public_survey_response(response_id):
         campaign_name = 'Trial Survey'
         
         return render_template('public_survey_response.html', 
-                             response=response_data,
+                             response=response,
                              branding=branding_context,
                              branding_context=branding_context,
                              is_business_authenticated=False,
