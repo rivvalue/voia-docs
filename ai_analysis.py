@@ -54,6 +54,8 @@ def analyze_survey_response(response_id):
         response.growth_factor = growth_factor_data['growth_factor']
         response.growth_rate = growth_factor_data['growth_rate']
         response.growth_range = growth_factor_data['range']
+        response.analysis_summary = analysis_results.get('summary')
+        response.analysis_reasoning = analysis_results.get('reasoning')
         response.analyzed_at = datetime.utcnow()
         
         db.session.commit()
@@ -121,6 +123,13 @@ Provide a comprehensive JSON response with the following analysis:
    - Each factor: type, description, severity, action
    - Focus on business relationship threats
 
+6. EXECUTIVE SUMMARY & REASONING (for transparency and trust):
+   - summary: 2-3 sentence plain-language overview of key findings
+   - reasoning: 3-4 sentence explanation of WHY the AI reached these specific conclusions
+   - Connect the dots: feedback → sentiment → themes → risk assessment
+   - Write for non-technical business users in clear, everyday language
+   - Focus on building trust by explaining the analysis logic
+
 Return ONLY valid JSON in this exact format:
 {{
   "sentiment": {{"score": 0.0, "label": "neutral"}},
@@ -140,7 +149,9 @@ Return ONLY valid JSON in this exact format:
     "description": "string",
     "severity": "Low/Medium/High/Critical",
     "action": "string"
-  }}]
+  }}],
+  "summary": "2-3 sentence plain-language summary",
+  "reasoning": "3-4 sentence explanation of analysis logic"
 }}"""
 
         # Single OpenAI API call for all analysis
