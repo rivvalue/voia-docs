@@ -1,0 +1,15 @@
+﻿File,Complete Sentence/Label,New Sentence/Label
+templates/public_survey_response.html,Growth Opportunities,Client Development Insights
+templates/public_survey_response.html,Growth opportunities identified,Client Development Insights
+templates/campaign_insights.html,Growth Potential,Opportunity signals
+templates/campaign_insights.html,Revenue expansion opportunity,Client Development Insights
+templates/campaign_insights.html,NPS-Based Growth Factor Analysis,NPS-Based Opportunity Analysis
+templates/dashboard.html,Growth Potential,Client Development Insights
+templates/dashboard.html,Revenue expansion opportunity,Business development signal
+templates/dashboard.html,NPS-Based Growth Factor Analysis,NPS-Based Opportunity Analysis
+templates/campaigns/individual_response.html,Growth Opportunities:,Client Development Insights
+templates/demo_intro.html,Growth opportunities,Client Development Insights
+templates/index.html,"Choose between a classic survey or an AI-driven conversational flow, then explore the live dashboard with NPS scoring, sentiment, themes, and growth signals.","Choose between a classic survey or an AI-driven conversational flow, then explore the live dashboard with NPS scoring, sentiment, themes, and value signals.
+"
+templates/index.html,"It extracts structured insights — NPS, satisfaction, ratings, feedback, sentiment, churn and growth signals — in just minutes, without any manual work.","It extracts structured insights — NPS, satisfaction, ratings, feedback, sentiment, loyalty risks and value opportunities — in just minutes, without any manual work.
+"
