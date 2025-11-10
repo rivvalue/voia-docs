@@ -1,0 +1,34 @@
+﻿File,Complete Sentence/Label,New Sentence/Label
+templates/public_survey_response.html,Growth Opportunities,Client Development Insights
+templates/public_survey_response.html,Growth opportunities identified,Client Development Insights
+templates/campaign_insights.html,Growth Potential,Opportunity signals
+templates/campaign_insights.html,Revenue expansion opportunity,Client Development Insights
+templates/campaign_insights.html,NPS-Based Growth Factor Analysis,NPS-Based Opportunity Analysis
+templates/dashboard.html,Growth Potential,Client Development Insights
+templates/dashboard.html,Revenue expansion opportunity,Business development signal
+templates/dashboard.html,NPS-Based Growth Factor Analysis,NPS-Based Opportunity Analysis
+templates/campaigns/individual_response.html,Growth Opportunities:,Client Development Insights
+templates/demo_intro.html,Growth opportunities,Client Development Insights
+templates/index.html,"Choose between a classic survey or an AI-driven conversational flow, then explore the live dashboard with NPS scoring, sentiment, themes, and growth signals.","Choose between a classic survey or an AI-driven conversational flow, then explore the live dashboard with NPS scoring, sentiment, themes, and value signals.
+"
+templates/index.html,"It extracts structured insights — NPS, satisfaction, ratings, feedback, sentiment, churn and growth signals — in just minutes, without any manual work.","It extracts structured insights — NPS, satisfaction, ratings, feedback, sentiment, loyalty risks and value opportunities — in just minutes, without any manual work.
+"
+,,
+,,
+templates/campaign_insights.html,High Churn Risk Accounts,Accounts Needing Attention
+templates/campaign_insights.html,Companies with High or Critical churn risk level based on AI assessment,Companies likely in need of re-engagement
+templates/campaign_insights.html,Imminent churn risk (High/Critical),Urgent relationship risk
+templates/campaign_insights.html,Latest Churn Risk,Latest account risk level
+templates/campaign_insights.html,Churn Risk,Relationship Risk
+templates/dashboard.html,High Churn Risk Accounts,Accounts Needing Attention
+templates/dashboard.html,Companies with High or Critical churn risk level based on AI assessment,Companies likely in need of re-engagement
+templates/dashboard.html,Imminent churn risk (High/Critical),Urgent relationship risk
+templates/dashboard.html,Latest Churn Risk,Latest account risk level
+templates/dashboard.html,Churn Risk,Relationship Risk
+templates/campaigns/individual_response.html,Churn Risk:,Relationship Risk:
+templates/demo_intro.html,Churn risk flags,At-risk account signals
+templates/index.html,"It extracts structured insights — NPS, satisfaction, ratings, feedback, sentiment, churn and growth signals — in just minutes, without any manual work.","It extracts structured insights — NPS, satisfaction, ratings, feedback, sentiment, loyalty risks and value opportunities — in just minutes, without any manual work.
+"
+translations/en/LC_MESSAGES/messages.po,Imminent churn risk (High/Critical),Urgent relationship risk
+translations/en/LC_MESSAGES/messages.po,Companies with High or Critical churn risk level based on AI assessment,Companies likely in need of re-engagement
+translations/en/LC_MESSAGES/messages.po,Companies with High or Critical churn risk level,Companies likely in need of re-engagement
