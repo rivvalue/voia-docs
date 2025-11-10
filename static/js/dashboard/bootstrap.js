@@ -10,8 +10,8 @@
 // GLOBAL STATE VARIABLES (shared across all dashboard modules)
 // ============================================================================
 window.dashboardState = {
-    data: null,
-    charts: {},
+    data: null,           // Main dashboard data from /api/dashboard_data (legacy: dashboardData)
+    charts: {},           // Chart.js instances managed by charts module
     campaignData: null,
     availableCampaigns: [],
     selectedCampaignId: null,
@@ -19,6 +19,12 @@ window.dashboardState = {
     campaignsInitialized: false,
     isBusinessAuthenticated: window.isBusinessAuthenticated || false
 };
+
+// Backward compatibility alias for data → dashboardData
+Object.defineProperty(window.dashboardState, 'dashboardData', {
+    get() { return this.data; },
+    set(value) { this.data = value; }
+});
 
 // Initialize global translations object
 window.translations = window.translations || {};
@@ -124,33 +130,43 @@ function toCamelCase(str) {
 }
 
 /**
- * Get responsive chart options based on screen size
+ * Mobile detection helper
  */
-function getResponsiveChartOptions() {
-    const isMobile = window.innerWidth < 768;
-    const isSmallMobile = window.innerWidth < 480;
+function isMobile() {
+    return window.innerWidth <= 768;
+}
+
+/**
+ * Get responsive chart configuration based on screen size
+ * Used by chart modules for mobile-friendly visualizations
+ */
+function getMobileChartConfig() {
+    const isMob = isMobile();
+    const isSmallMobile = window.innerWidth <= 576;
     
     return {
-        isMobile: isMobile,
-        isSmallMobile: isSmallMobile,
-        responsive: true,
+        fontSize: isSmallMobile ? 12 : (isMob ? 14 : 16),
+        legendFontSize: isSmallMobile ? 11 : (isMob ? 13 : 14),
+        titleFontSize: isSmallMobile ? 14 : (isMob ? 16 : 18),
+        legendPosition: 'bottom',
+        legendPadding: isMob ? 15 : 20,
         maintainAspectRatio: false,
-        chartHeight: isSmallMobile ? '220px' : (isMobile ? '280px' : '320px'),
+        chartHeight: isSmallMobile ? '220px' : (isMob ? '280px' : '320px'),
         elements: {
             point: {
-                radius: isMobile ? 6 : 4,
-                hoverRadius: isMobile ? 8 : 6
+                radius: isMob ? 6 : 4,
+                hoverRadius: isMob ? 8 : 6
             },
             bar: {
-                borderWidth: isMobile ? 2 : 1
+                borderWidth: isMob ? 2 : 1
             }
         },
         layout: {
             padding: {
-                left: isMobile ? 10 : 20,
-                right: isMobile ? 10 : 20,
-                top: isMobile ? 15 : 20,
-                bottom: isMobile ? 15 : 20
+                left: isMob ? 10 : 20,
+                right: isMob ? 10 : 20,
+                top: isMob ? 15 : 20,
+                bottom: isMob ? 15 : 20
             }
         }
     };
@@ -212,5 +228,17 @@ function getResponsiveChartOptions() {
         window.dispatchEvent(new Event('translationsLoaded'));
     }
 })();
+
+// ============================================================================
+// MODULE EXPORTS - Shared utilities available to other dashboard modules
+// ============================================================================
+window.dashboardModules.bootstrap = {
+    utils: {
+        escapeHtml,
+        getMobileChartConfig,
+        isMobile,
+        toCamelCase
+    }
+};
 
 console.log('📦 Dashboard Bootstrap module loaded');
