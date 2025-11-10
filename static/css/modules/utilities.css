@@ -1,0 +1,172 @@
+/* Utility Classes Module
+ * Phase 2: Frontend Refactoring - Reusable utility classes
+ */
+
+/* Section Spacing Utility */
+.section-spacing {
+    margin-top: 0;
+    margin-bottom: 6rem;
+}
+
+@media (max-width: 992px) {
+    .section-spacing {
+        margin-bottom: 3rem;
+    }
+}
+
+/* Brand accent */
+.voia-red-accent {
+    color: var(--primary-red);
+}
+
+/* Text utilities */
+.text-red { color: var(--primary-red); }
+.text-gray { color: var(--medium-gray); }
+
+/* Spacing utilities */
+.m-xs { margin: var(--spacing-xs); }
+.m-sm { margin: var(--spacing-sm); }
+.m-md { margin: var(--spacing-md); }
+.p-xs { padding: var(--spacing-xs); }
+.p-sm { padding: var(--spacing-sm); }
+.p-md { padding: var(--spacing-md); }
+
+/* Shadow utilities */
+.shadow-sm { box-shadow: var(--shadow-sm); }
+.shadow { box-shadow: var(--shadow); }
+.shadow-lg { box-shadow: var(--shadow-lg); }
+
+/* Full utility classes from custom.css lines 115-800 would be extracted here */
+/* Global background and text colors */
+body {
+    background-color: var(--primary-white);
+    color: var(--primary-black);
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+    letter-spacing: var(--letter-spacing-normal);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Brand accent for VOÏA red Ï character */
+.voia-red-accent {
+    color: var(--primary-red);
+}
+
+/* Section Spacing Utility */
+.section-spacing {
+    margin-top: 0;
+    margin-bottom: 6rem;
+}
+
+@media (max-width: 992px) {
+    .section-spacing {
+        margin-bottom: 3rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .section-spacing {
+        margin-bottom: 2rem;
+    }
+}
+
+/* Typography Hierarchy - Headings use Montserrat */
+h1, .h1 {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-4xl);
+    font-weight: 700;
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+    margin-bottom: var(--spacing-lg);
+    color: var(--primary-black);
+}
+
+h2, .h2 {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-3xl);
+    font-weight: 600;
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--letter-spacing-tight);
+    margin-bottom: var(--spacing-md);
+    color: var(--primary-black);
+}
+
+h3, .h3 {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-2xl);
+    font-weight: 600;
+    line-height: var(--line-height-snug);
+    letter-spacing: var(--letter-spacing-normal);
+    margin-bottom: var(--spacing-md);
+    color: var(--primary-black);
+}
+
+h4, .h4 {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    line-height: var(--line-height-snug);
+    letter-spacing: var(--letter-spacing-normal);
+    margin-bottom: var(--spacing-sm);
+    color: var(--primary-black);
+}
+
+h5, .h5 {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    line-height: var(--line-height-normal);
+    letter-spacing: var(--letter-spacing-normal);
+    margin-bottom: var(--spacing-sm);
+    color: var(--primary-black);
+}
+
+h6, .h6 {
+    font-family: var(--font-family-headings);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    line-height: var(--line-height-normal);
+    letter-spacing: var(--letter-spacing-wide);
+    margin-bottom: var(--spacing-sm);
+    color: var(--primary-black);
+    text-transform: uppercase;
+}
+
+p, .text-body {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+    margin-bottom: var(--spacing-md);
+    color: var(--primary-black);
+}
+
+.text-large {
+    font-size: var(--font-size-lg);
+    line-height: var(--line-height-relaxed);
+}
+
+.text-small {
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-normal);
+}
+
+.text-xs {
+    font-size: var(--font-size-xs);
+    line-height: var(--line-height-normal);
+}
+
+.font-mono {
+    font-family: var(--font-family-mono);
+}
+
+.font-weight-light { font-weight: 300; }
+.font-weight-normal { font-weight: 400; }
+.font-weight-medium { font-weight: 500; }
+.font-weight-semibold { font-weight: 600; }
+.font-weight-bold { font-weight: 700; }
+
+.letter-spacing-tight { letter-spacing: var(--letter-spacing-tight); }
+.letter-spacing-normal { letter-spacing: var(--letter-spacing-normal); }
+.letter-spacing-wide { letter-spacing: var(--letter-spacing-wide); }
+

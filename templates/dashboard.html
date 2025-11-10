@@ -1100,11 +1100,19 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<!-- Phase 1: Load color override utility before dashboard.js -->
 {% if use_refactored_frontend %}
+<!-- Phase 2: Modular Dashboard JavaScript -->
+<!-- Load order: bootstrap → data-service → features → init -->
 <script src="{{ url_for('static', filename='js/utils/color-override.js') }}"></script>
-{% endif %}
-
-<!-- JavaScript disabled for company NPS table - using server-side rendering only -->
+<script src="{{ url_for('static', filename='js/dashboard/bootstrap.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard/data-service.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard/charts.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard/comparison.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard/account-intelligence.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard/kpi-overview.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard/dashboard-init.js') }}"></script>
+{% else %}
+<!-- Legacy: Monolithic Dashboard JavaScript -->
 <script src="{{ url_for('static', filename='js/dashboard.js') }}?v={{ range(1000, 9999) | random }}"></script>
+{% endif %}
 {% endblock %}
