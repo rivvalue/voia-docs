@@ -403,6 +403,15 @@ def inject_dev_features():
         'ENABLE_PROMPT_PREVIEW': os.getenv('ENABLE_PROMPT_PREVIEW') == 'true'
     }
 
+# Frontend refactoring feature flag (Phase 1 implementation)
+@app.context_processor
+def inject_frontend_refactoring_flag():
+    """Inject frontend refactoring toggle for incremental rollout with instant rollback"""
+    import os
+    return {
+        'use_refactored_frontend': os.getenv('USE_REFACTORED_FRONTEND', 'false').lower() == 'true'
+    }
+
 # Sentry Test Endpoint (Admin Only)
 @app.route('/business/admin/test-sentry-error')
 def test_sentry_error():

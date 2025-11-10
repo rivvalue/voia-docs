@@ -32,7 +32,8 @@ The system is a Flask web application with a multi-tiered architecture, using Ji
 -   **License Management System**: Enterprise-ready license management with usage tracking and enforcement.
 -   **Business Account User Management**: Multi-tenant user management with professional UI, license-aware counters, and comprehensive user workflows.
 -   **Onboarding System with Conditional Access**: Progressive, non-blocking onboarding for Core/Plus license holders with persistent warning banners and an onboarding progress dashboard.
--   **Feature Flag System**: Production-ready infrastructure for UI version toggling.
+-   **Feature Flag System**: Production-ready infrastructure for UI version toggling and frontend refactoring rollout.
+-   **Frontend Refactoring Toggle**: Environment variable-based instant rollback mechanism (`USE_REFACTORED_FRONTEND`) enabling safe incremental deployment of optimized frontend code with zero-downtime rollback capability.
 -   **Segmentation Analytics**: Comprehensive analytics system displaying NPS and satisfaction metrics segmented by participant attributes, including interactive Chart.js visualizations.
 -   **Demo Data Generation**: High-volume test data scripts for realistic test data generation.
 -   **JavaScript Translation Optimization**: Externalized translation payloads to cacheable static JSON files for mobile performance.
