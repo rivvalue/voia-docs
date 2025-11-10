@@ -169,14 +169,14 @@
             </section>
             {% endif %}
 
-            <!-- Growth Opportunities -->
+            <!-- Client Development Insights -->
             {% if response.growth_opportunities and response.growth_opportunities|length > 0 %}
             <section class="public-section" aria-labelledby="opportunities-heading">
                 <h5 class="public-section-title" id="opportunities-heading">
                     <i class="fas fa-chart-line" aria-hidden="true"></i>
-                    {{ _('Growth Opportunities') }}
+                    {{ _('Client Development Insights') }}
                 </h5>
-                <div class="public-opportunities-list" role="list" aria-label="{{ _('Growth opportunities identified') }}">
+                <div class="public-opportunities-list" role="list" aria-label="{{ _('Client Development Insights') }}">
                     {% for opportunity in response.growth_opportunities %}
                         <span class="public-opportunity-tag" role="listitem">{{ opportunity }}</span>
                     {% endfor %}

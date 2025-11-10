@@ -399,7 +399,7 @@
                 
                 {% if response.churn_risk_level %}
                 <div class="data-item">
-                    <span class="data-label">{{ _('Churn Risk:') }}</span>
+                    <span class="data-label">{{ _('Relationship Risk:') }}</span>
                     <span class="data-value">{{ response.churn_risk_level }} 
                         {% if response.churn_risk_score %}({{ "%.1f"|format(response.churn_risk_score * 10) }}%){% endif %}
                     </span>
@@ -419,7 +419,7 @@
 
                 {% if response.growth_opportunities %}
                 <div class="mb-3">
-                    <span class="data-label d-block mb-2">{{ _('Growth Opportunities:') }}</span>
+                    <span class="data-label d-block mb-2">{{ _('Client Development Insights') }}</span>
                     <div class="themes-list">
                         {% for opportunity in response.growth_opportunities %}
                         <span class="theme-tag" style="background-color: #d4edda; color: #155724;">{{ opportunity }}</span>

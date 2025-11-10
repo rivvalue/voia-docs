@@ -176,30 +176,30 @@
                     <div class="kpi-card kpi-danger">
                         <div class="kpi-value text-danger" id="highRiskCount">0</div>
                         <div class="kpi-label">
-                            {{ _('High Churn Risk Accounts') }}
+                            {{ _('Accounts Needing Attention') }}
                             <i class="fas fa-info-circle ms-1" data-bs-toggle="tooltip" data-bs-placement="top" 
-                               title="Companies with {{ _('High') }} or {{ _('Critical') }} churn risk level based on AI assessment" style="font-size: 0.8em; opacity: 0.7;"></i>
+                               title="Companies likely in need of re-engagement" style="font-size: 0.8em; opacity: 0.7;"></i>
                         </div>
-                        <div class="kpi-trend" id="highRiskTrend">{{ _('Imminent churn risk (High/Critical)') }}</div>
+                        <div class="kpi-trend" id="highRiskTrend">{{ _('Urgent relationship risk') }}</div>
                     </div>
                 </div>
                 <div class="col">
                     <div class="kpi-card kpi-success">
                         <div class="kpi-value text-success" id="growthPotential">0%</div>
-                        <div class="kpi-label">{{ _('Growth Potential') }}</div>
-                        <div class="kpi-trend" id="growthPotentialTrend">{{ _('Revenue expansion opportunity') }}</div>
+                        <div class="kpi-label">{{ _('Opportunity signals') }}</div>
+                        <div class="kpi-trend" id="growthPotentialTrend">{{ _('Client Development Insights') }}</div>
                     </div>
                 </div>
             </div>
 
-            <!-- {{ _('High Churn Risk Accounts') }} & {{ _('Key Themes') }} Summary -->
+            <!-- {{ _('Accounts Needing Attention') }} & {{ _('Key Themes') }} Summary -->
             <div class="row mb-4">
                 <div class="col-md-6">
                     <div class="chart-card">
                         <div class="card-header">
-                            <h5>{{ _('High Churn Risk Accounts') }}
+                            <h5>{{ _('Accounts Needing Attention') }}
                                 <i class="fas fa-info-circle ms-2" data-bs-toggle="tooltip" data-bs-placement="top" 
-                                   title="Companies with {{ _('High') }} or {{ _('Critical') }} churn risk level" style="font-size: 0.8em; opacity: 0.7;"></i>
+                                   title="Companies likely in need of re-engagement" style="font-size: 0.8em; opacity: 0.7;"></i>
                             </h5>
                         </div>
                         <div class="card-body" style="height: 550px; overflow-y: auto; padding: 1.5rem;">
@@ -357,7 +357,7 @@
         <div class="col-md-6">
             <div class="chart-card">
                 <div class="card-header">
-                    <h5>{{ _('NPS-Based Growth Factor Analysis') }}</h5>
+                    <h5>{{ _('NPS-Based Opportunity Analysis') }}</h5>
                 </div>
                 <div class="card-body">
                     <div class="chart-container">
@@ -439,7 +439,7 @@
                                             <th>{{ _('Distribution') }}</th>
                                             <th>{{ _('Risk Level') }}</th>
                                             <th>{{ _('Latest Response') }}</th>
-                                            <th>{{ _('Latest') }} {{ _('Churn Risk') }}</th>
+                                            <th>{{ _('Latest') }} {{ _('Relationship Risk') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="companyNpsTableServerSide" style="display: table-row-group !important; visibility: visible !important;">
@@ -520,7 +520,7 @@
                                             <th>{{ _('Distribution') }}</th>
                                             <th>{{ _('Risk Level') }}</th>
                                             <th>{{ _('Latest Response') }}</th>
-                                            <th>Latest {{ _('Churn Risk') }}</th>
+                                            <th>Latest {{ _('Relationship Risk') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tenureNpsTable">
@@ -604,7 +604,7 @@
                                             <th>{{ _('NPS Score') }}</th>
                                             <th>{{ _('Category') }}</th>
                                             <th>{{ _('Sentiment') }}</th>
-                                            <th>{{ _('Churn Risk') }}</th>
+                                            <th>{{ _('Relationship Risk') }}</th>
                                             <th>{{ _('Date') }}</th>
                                             <th>{{ _('Details') }}</th>
                                         </tr>

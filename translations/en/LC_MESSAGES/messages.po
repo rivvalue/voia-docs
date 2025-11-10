@@ -457,7 +457,7 @@ msgid "Critical"
 msgstr ""
 
 #: templates/campaign_insights.html:183 templates/dashboard.html:419
-msgid "Imminent churn risk (High/Critical)"
+msgid "Urgent relationship risk"
 msgstr ""
 
 #: templates/campaign_insights.html:189 templates/dashboard.html:425
@@ -1523,11 +1523,11 @@ msgid "Currently showing data from active campaign"
 msgstr ""
 
 #: templates/dashboard.html:417
-msgid "Companies with High or Critical churn risk level based on AI assessment"
+msgid "Companies likely in need of re-engagement"
 msgstr ""
 
 #: templates/dashboard.html:438
-msgid "Companies with High or Critical churn risk level"
+msgid "Companies likely in need of re-engagement"
 msgstr ""
 
 #: templates/dashboard.html:471
