@@ -1100,6 +1100,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<!-- Phase 1: Load color override utility before dashboard.js -->
+{% if use_refactored_frontend %}
+<script src="{{ url_for('static', filename='js/utils/color-override.js') }}"></script>
+{% endif %}
+
 <!-- JavaScript disabled for company NPS table - using server-side rendering only -->
 <script src="{{ url_for('static', filename='js/dashboard.js') }}?v={{ range(1000, 9999) | random }}"></script>
 {% endblock %}

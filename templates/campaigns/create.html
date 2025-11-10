@@ -4,6 +4,32 @@
 
 {% block page_class %}page-create-campaign{% endblock %}
 
+{% block head %}
+{% if use_refactored_frontend %}
+<!-- Phase 1: Frontend Refactoring - Complete localization for campaign-form.js -->
+<script>
+window.CampaignFormI18n = {
+    endDateAfterStart: "{{ _('End date must be after start date.') }}",
+    selectDates: "{{ _('Select campaign dates to see midpoint reminder timing') }}",
+    endDateMustBeAfter: "{{ _('End date must be after start date') }}",
+    midpointLabel: "{{ _('Midpoint:') }}",
+    lastChanceLabel: "{{ _('Last Chance:') }}",
+    warningLastChanceBefore: "{{ _('Last Chance reminder (day {lastChanceDay}) sends before or at midpoint (day {midpointDay}). Increase the offset to at least {minOffset} days.') }}",
+    warningTooClose: "{{ _('Last Chance reminder (day {lastChanceDay}) and midpoint (day {midpointDay}) are very close. Consider increasing spacing.') }}",
+    warningNotEnoughTime: "{{ _('Last Chance reminder only {reminderDelay} days before end - participants may not have time to respond.') }}",
+    emailPreviewTitle: "{{ _('Email Preview') }}",
+    invitationEmailTitle: "{{ _('Invitation Email Preview') }}",
+    lastChanceReminderTitle: "{{ _('Last Chance Reminder Preview') }}",
+    midpointReminderTitle: "{{ _('Midpoint Reminder Preview') }}",
+    loading: "{{ _('Loading...') }}",
+    loadingPreview: "{{ _('Loading preview...') }}",
+    errorLoadingPreview: "{{ _('Error loading preview') }}",
+    unableToLoadPreview: "{{ _('Unable to load email preview. Please try again.') }}"
+};
+</script>
+{% endif %}
+{% endblock %}
+
 {% block content %}
 {# Breadcrumb Navigation #}
 {% set breadcrumb_items = [
@@ -303,6 +329,22 @@ Thank you for your time and valuable insights!"></textarea>
     </div>
 </div>
 
+{% if use_refactored_frontend %}
+<!-- Phase 1: Frontend Refactoring - External JavaScript -->
+<script src="{{ url_for('static', filename='js/forms/campaign-form.js') }}"></script>
+<script>
+// Set default dates (start: today, end: 30 days from now)
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date();
+    const futureDate = new Date();
+    futureDate.setDate(today.getDate() + 30);
+    
+    document.getElementById('start_date').value = today.toISOString().split('T')[0];
+    document.getElementById('end_date').value = futureDate.toISOString().split('T')[0];
+});
+</script>
+{% else %}
+<!-- Legacy inline scripts (kept for rollback) -->
 <script>
 // Set default dates (start: today, end: 30 days from now)
 document.addEventListener('DOMContentLoaded', function() {
@@ -457,4 +499,5 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(updateMidpointReminderDisplay, 100);
 });
 </script>
+{% endif %}
 {% endblock %}

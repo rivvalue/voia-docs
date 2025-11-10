@@ -4,6 +4,32 @@
 
 {% block page_class %}page-edit-campaign{% endblock %}
 
+{% block head %}
+{% if use_refactored_frontend %}
+<!-- Phase 1: Frontend Refactoring - Localization for campaign-form.js -->
+<script>
+window.CampaignFormI18n = {
+    endDateAfterStart: "{{ _('End date must be after start date.') }}",
+    selectDates: "{{ _('Select campaign dates to see midpoint reminder timing') }}",
+    endDateMustBeAfter: "{{ _('End date must be after start date') }}",
+    midpointLabel: "{{ _('Midpoint:') }}",
+    lastChanceLabel: "{{ _('Last Chance:') }}",
+    warningLastChanceBefore: "{{ _('Last Chance reminder (day {lastChanceDay}) sends before or at midpoint (day {midpointDay}). Increase the offset to at least {minOffset} days.') }}",
+    warningTooClose: "{{ _('Last Chance reminder (day {lastChanceDay}) and midpoint (day {midpointDay}) are very close. Consider increasing spacing.') }}",
+    warningNotEnoughTime: "{{ _('Last Chance reminder only {reminderDelay} days before end - participants may not have time to respond.') }}",
+    emailPreviewTitle: "{{ _('Email Preview') }}",
+    invitationEmailTitle: "{{ _('Invitation Email Preview') }}",
+    lastChanceReminderTitle: "{{ _('Last Chance Reminder Preview') }}",
+    midpointReminderTitle: "{{ _('Midpoint Reminder Preview') }}",
+    loading: "{{ _('Loading...') }}",
+    loadingPreview: "{{ _('Loading preview...') }}",
+    errorLoadingPreview: "{{ _('Error loading preview') }}",
+    unableToLoadPreview: "{{ _('Unable to load email preview. Please try again.') }}"
+};
+</script>
+{% endif %}
+{% endblock %}
+
 {% block content %}
 {# Breadcrumb Navigation #}
 {% set breadcrumb_items = [
@@ -354,6 +380,17 @@ Thank you for your time and valuable insights!">{{ campaign.custom_closing_messa
     </div>
 </div>
 
+{% if use_refactored_frontend %}
+<!-- Phase 1: Frontend Refactoring - External JavaScript -->
+<script src="{{ url_for('static', filename='js/forms/campaign-form.js') }}"></script>
+<script>
+// Make previewEmail function available globally with campaign ID
+window.previewEmail = function(emailType) {
+    previewEmail(emailType, {{ campaign.id }});
+};
+</script>
+{% else %}
+<!-- Legacy inline scripts (kept for rollback) -->
 <script>
 // Date validation
 document.getElementById('end_date').addEventListener('change', function() {
@@ -580,4 +617,5 @@ function previewEmail(emailType) {
     });
 }
 </script>
+{% endif %}
 {% endblock %}

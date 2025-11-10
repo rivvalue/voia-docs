@@ -286,46 +286,14 @@ function getMobileChartConfig() {
     };
 }
 
-// Force yellow color override function
+// Color override function - now using shared utility from utils/color-override.js
+// Legacy wrapper maintained for backward compatibility
 function forceRemoveYellowColors() {
-    console.log('Running yellow color override...');
-    
-    // Target ALL possible warning elements on the entire page
-    const yellowSelectors = [
-        '.text-warning', '.bg-warning', '.border-warning', '.badge.bg-warning',
-        '.btn-warning', '.btn-outline-warning', '.alert-warning',
-        '.fa-exclamation-triangle', '.fas.fa-exclamation-triangle',
-        '[class*="warning"]'
-    ];
-    
-    yellowSelectors.forEach(selector => {
-        const elements = document.querySelectorAll(selector);
-        console.log(`Found ${elements.length} elements with selector ${selector}`);
-        elements.forEach(el => {
-            // Force inline styles that override everything
-            if (el.classList.contains('fa-exclamation-triangle') || el.classList.contains('fas')) {
-                el.style.setProperty('color', '#E13A44', 'important');
-                console.log('Fixed icon color');
-            } else if (el.classList.contains('bg-warning') || el.classList.contains('badge')) {
-                el.style.setProperty('background-color', '#BDBDBD', 'important');
-                el.style.setProperty('color', '#000000', 'important');
-                el.style.setProperty('border-color', '#BDBDBD', 'important');
-                console.log('Fixed badge/background color');
-            } else if (el.classList.contains('text-warning')) {
-                el.style.setProperty('color', '#E13A44', 'important');
-                console.log('Fixed text color');
-            } else if (el.classList.contains('border-warning')) {
-                el.style.setProperty('border-color', '#BDBDBD', 'important');
-                console.log('Fixed border color');
-            } else {
-                // Generic warning class
-                el.style.setProperty('color', '#E13A44', 'important');
-                el.style.setProperty('background-color', '#BDBDBD', 'important');
-                el.style.setProperty('border-color', '#BDBDBD', 'important');
-                console.log('Fixed generic warning');
-            }
-        });
-    });
+    if (typeof applyColorOverrides === 'function') {
+        applyColorOverrides(document, 0);
+    } else {
+        console.warn('Color override utility not loaded');
+    }
 }
 
 // ============================================================================
@@ -2486,43 +2454,10 @@ function populateAccountIntelligence() {
     
     container.innerHTML = legendHtml + accountsHtml;
     
-    // FORCE override any yellow colors by applying inline styles
-    setTimeout(() => {
-        // Override any warning icons or badges that might still be yellow
-        const warningElements = container.querySelectorAll('.text-warning, .bg-warning, .border-warning, .fa-exclamation-triangle, [class*="warning"]');
-        warningElements.forEach(el => {
-            if (el.classList.contains('fa-exclamation-triangle')) {
-                el.style.color = '#E13A44';
-            } else if (el.classList.contains('bg-warning')) {
-                el.style.backgroundColor = '#BDBDBD';
-                el.style.color = '#000000';
-            } else if (el.classList.contains('text-warning')) {
-                el.style.color = '#E13A44';
-            } else if (el.classList.contains('border-warning')) {
-                el.style.borderColor = '#BDBDBD';
-            }
-        });
-        
-        // Also check for any hardcoded yellow colors
-        const allElements = container.querySelectorAll('*');
-        allElements.forEach(el => {
-            const computedStyle = window.getComputedStyle(el);
-            const color = computedStyle.color;
-            const backgroundColor = computedStyle.backgroundColor;
-            const borderColor = computedStyle.borderColor;
-            
-            // If any yellow colors are detected, force change them
-            if (color.includes('rgb(255, 193, 7)') || color.includes('#ffc107') || color.includes('#FFC107')) {
-                el.style.color = '#E13A44';
-            }
-            if (backgroundColor.includes('rgb(255, 193, 7)') || backgroundColor.includes('#ffc107') || backgroundColor.includes('#FFC107')) {
-                el.style.backgroundColor = '#BDBDBD';
-            }
-            if (borderColor.includes('rgb(255, 193, 7)') || borderColor.includes('#ffc107') || borderColor.includes('#FFC107')) {
-                el.style.borderColor = '#BDBDBD';
-            }
-        });
-    }, 100);
+    // Apply color overrides using shared utility
+    if (typeof applyColorOverrides === 'function') {
+        applyColorOverrides(container, 100);
+    }
 }
 
 // Account Intelligence API-based pagination, search, and filtering
