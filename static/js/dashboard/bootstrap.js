@@ -229,6 +229,34 @@ function getMobileChartConfig() {
     }
 })();
 
+/**
+ * Format campaign status for display
+ */
+function formatCampaignStatus(status) {
+    if (!status) return 'Unknown';
+    const statusMap = {
+        'draft': 'Draft',
+        'ready': 'Ready',
+        'active': 'Active',
+        'completed': 'Completed',
+        'archived': 'Archived'
+    };
+    return statusMap[status] || status;
+}
+
+/**
+ * Format date string for display
+ */
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    } catch (error) {
+        return 'N/A';
+    }
+}
+
 // ============================================================================
 // MODULE EXPORTS - Shared utilities available to other dashboard modules
 // ============================================================================
@@ -237,7 +265,9 @@ window.dashboardModules.bootstrap = {
         escapeHtml,
         getMobileChartConfig,
         isMobile,
-        toCamelCase
+        toCamelCase,
+        formatCampaignStatus,
+        formatDate
     }
 };
 
