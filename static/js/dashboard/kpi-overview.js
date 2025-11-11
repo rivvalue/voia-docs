@@ -501,6 +501,16 @@
         setInterval(refreshData, 60 * 60 * 1000);
     }
     
+    /**
+     * Open KPI trends modal (for template onclick handlers)
+     */
+    function openTrendsModal() {
+        const translations = window.translations || {};
+        // This function needs access to KPI data that was loaded
+        // For now, show alert - full implementation would need modal charts
+        alert('KPI Trends modal - implementation in progress');
+    }
+    
     // Export public functions
     window.dashboardModules.kpiOverview = {
         loadDashboardData,
@@ -512,8 +522,12 @@
         exportUserData,
         redirectToBusinessLogin,
         businessLogout,
-        initializeAutoRefresh
+        initializeAutoRefresh,
+        openTrendsModal
     };
+    
+    // Expose openTrendsModal globally for template onclick handlers
+    window.openTrendsModal = openTrendsModal;
     
     console.log('📦 Dashboard KPI Overview module loaded');
     

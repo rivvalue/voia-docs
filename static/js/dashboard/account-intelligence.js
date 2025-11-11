@@ -10,7 +10,7 @@
     'use strict';
     
     // Import shared utilities from bootstrap
-    const { escapeHtml } = window.dashboardModules.bootstrap.utils;
+    const { escapeHtml, generatePaginationPages } = window.dashboardModules.bootstrap.utils;
     
     // Module-level state
     let accountIntelCurrentPage = 1;

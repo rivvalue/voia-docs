@@ -172,6 +172,39 @@ function getMobileChartConfig() {
     };
 }
 
+/**
+ * Generate smart pagination page numbers with ellipsis
+ * Used by multiple modules for pagination controls
+ */
+function generatePaginationPages(currentPage, totalPages) {
+    const pages = [];
+    const leftEdge = 1;
+    const leftCurrent = 2;
+    const rightCurrent = 2;
+    const rightEdge = 1;
+    
+    for (let i = 1; i <= totalPages; i++) {
+        // Show first page
+        if (i <= leftEdge) {
+            pages.push(i);
+        }
+        // Show pages around current page
+        else if (i >= currentPage - leftCurrent && i <= currentPage + rightCurrent) {
+            pages.push(i);
+        }
+        // Show last page
+        else if (i > totalPages - rightEdge) {
+            pages.push(i);
+        }
+        // Add ellipsis for gaps
+        else if (pages[pages.length - 1] !== null) {
+            pages.push(null); // null represents ellipsis
+        }
+    }
+    
+    return pages;
+}
+
 // ============================================================================
 // MODULE READINESS SYSTEM
 // ============================================================================
@@ -331,7 +364,8 @@ window.dashboardModules.bootstrap = {
         isMobile,
         toCamelCase,
         formatCampaignStatus,
-        formatDate
+        formatDate,
+        generatePaginationPages
     }
 };
 
