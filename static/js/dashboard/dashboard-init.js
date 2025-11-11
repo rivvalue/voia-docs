@@ -38,6 +38,9 @@
             // Load initial dashboard data
             await kpiOverview.loadDashboardData();
             
+            // Load KPI overview (executive summary)
+            await kpiOverview.loadKpiOverview();
+            
             // Initialize auto-refresh (1 hour interval)
             kpiOverview.initializeAutoRefresh();
             
@@ -151,6 +154,16 @@
         // Update the selected campaign info display
         if (defaultCampaign) {
             updateSelectedCampaignInfo();
+        }
+        
+        // Attach change event listener (only once)
+        if (!select.dataset.listenerAttached) {
+            select.addEventListener('change', () => {
+                console.log('📍 Campaign filter changed via dropdown');
+                applyCampaignFilter();
+            });
+            select.dataset.listenerAttached = 'true';
+            console.log('✅ Campaign filter change listener attached');
         }
         
         // Return whether a default campaign was set (used by initializeCampaigns)
@@ -280,6 +293,8 @@
         // Reload data using kpiOverview module
         if (window.dashboardModules.kpiOverview) {
             await window.dashboardModules.kpiOverview.loadDashboardData();
+            // Also refresh the executive summary KPI overview
+            await window.dashboardModules.kpiOverview.loadKpiOverview();
         }
         
         // Update global indicator
