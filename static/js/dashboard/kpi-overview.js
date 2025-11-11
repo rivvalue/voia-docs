@@ -147,8 +147,14 @@
             console.log('⏳ Loading deferred data (non-blocking)...');
             
             // Defer account intelligence (Analytics tab - not visible initially)
+            // IMPORTANT: Only load if a campaign is selected to prevent timeout on massive unfiltered queries
             if (window.dashboardModules.accountIntelligence?.loadAccountIntelligence) {
-                setTimeout(() => window.dashboardModules.accountIntelligence.loadAccountIntelligence(), 100);
+                const campaignFilter = document.getElementById('campaignFilter');
+                if (campaignFilter && campaignFilter.value) {
+                    setTimeout(() => window.dashboardModules.accountIntelligence.loadAccountIntelligence(), 100);
+                } else {
+                    console.log('⏭️ Skipping account intelligence load - no campaign selected (prevents timeout)');
+                }
             }
             
             // Defer KPI overview (Executive Summary section - below the fold initially)
