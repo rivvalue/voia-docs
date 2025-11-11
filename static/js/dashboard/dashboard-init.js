@@ -85,10 +85,11 @@
         }
         
         if (!defaultCampaign && availableCampaigns.length > 0) {
-            // First, look for active campaign
-            const activeCampaign = availableCampaigns.find(c => c.status === 'active');
+            // First, look for active campaign (case-insensitive comparison)
+            const activeCampaign = availableCampaigns.find(c => (c.status || '').toLowerCase() === 'active');
             if (activeCampaign) {
                 defaultCampaign = activeCampaign;
+                console.log('✅ Found active campaign:', activeCampaign.name, activeCampaign.id);
             } else {
                 // If no active campaign, get the most recent (by end_date or created_at)
                 const sortedCampaigns = [...availableCampaigns].sort((a, b) => {
@@ -97,7 +98,13 @@
                     return dateB - dateA; // Most recent first
                 });
                 defaultCampaign = sortedCampaigns[0];
+                console.log('✅ No active campaign, using most recent:', defaultCampaign.name, defaultCampaign.id);
             }
+        }
+        
+        // Validation: warn if campaigns exist but no default was set
+        if (availableCampaigns.length > 0 && !defaultCampaign) {
+            console.warn('⚠️ Campaigns available but no default selected!', availableCampaigns);
         }
         
         // Add campaign options
