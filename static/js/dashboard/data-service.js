@@ -25,8 +25,17 @@
             const response = await fetch('/api/campaigns/filter-options');
             if (response.ok) {
                 const data = await response.json();
-                state.availableCampaigns = data.campaigns;
-                return data.campaigns;
+                // API returns availableCampaigns (fallback to campaigns for backward compatibility)
+                const campaigns = data.availableCampaigns || data.campaigns;
+                
+                if (!campaigns) {
+                    console.error('API response missing campaigns data:', data);
+                    throw new Error('Invalid API response: missing campaign data');
+                }
+                
+                state.availableCampaigns = campaigns;
+                console.log('✅ Loaded campaigns:', campaigns.length, 'campaigns');
+                return campaigns;
             }
             throw new Error('Failed to load campaign options');
         } catch (error) {
