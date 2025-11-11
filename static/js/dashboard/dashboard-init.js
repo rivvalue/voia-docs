@@ -56,7 +56,7 @@
         const select = document.getElementById('campaignFilter');
         if (!select) return;
         
-        const availableCampaigns = state.campaignFilterOptions || [];
+        const availableCampaigns = state.availableCampaigns || [];
         
         // Clear existing options
         select.innerHTML = '';
