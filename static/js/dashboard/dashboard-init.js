@@ -13,6 +13,7 @@
     
     /**
      * Initialize campaigns - loads campaign options and dashboard data
+     * This is called when all critical modules are ready (dashboardReady event)
      */
     async function initializeCampaigns() {
         if (state.campaignsInitialized) {
@@ -20,42 +21,30 @@
             return;
         }
         state.campaignsInitialized = true;
-        console.log('🌍 Translations ready, initializing campaigns...');
+        console.log('🚀 All modules ready, initializing campaigns...');
         
-        // Resolve module references at call time (not module load time) to avoid race conditions
-        const dataService = window.dashboardModules?.dataService;
-        const kpiOverview = window.dashboardModules?.kpiOverview;
-        
-        if (!dataService) {
-            console.error('❌ dataService module not loaded yet - deferring initialization');
-            // Retry after modules finish loading
-            setTimeout(() => initializeCampaigns(), 50);
-            state.campaignsInitialized = false;
-            return;
-        }
+        // Resolve module references (guaranteed to be available after dashboardReady event)
+        const dataService = window.dashboardModules.dataService;
+        const kpiOverview = window.dashboardModules.kpiOverview;
         
         try {
-            console.log('✅ dataService available, proceeding with campaign load');
             // Load campaign filter options
             await dataService.fetchCampaignFilterOptions();
             
-            // Populate dropdown and update UI (returns true if default campaign was set)
-            const hasDefaultCampaign = populateCampaignFilterDropdown();
+            // Populate dropdown and update UI
+            populateCampaignFilterDropdown();
             updateGlobalCampaignIndicator();
             
-            // Load initial dashboard data using kpiOverview module
-            // Load regardless of whether campaign is selected (loads all data if no campaign)
-            if (kpiOverview) {
-                await kpiOverview.loadDashboardData();
-            }
+            // Load initial dashboard data
+            await kpiOverview.loadDashboardData();
             
             // Initialize auto-refresh (1 hour interval)
-            if (kpiOverview?.initializeAutoRefresh) {
-                kpiOverview.initializeAutoRefresh();
-            }
+            kpiOverview.initializeAutoRefresh();
+            
+            console.log('✅ Dashboard initialization complete');
             
         } catch (error) {
-            console.error('Campaign initialization failed:', error);
+            console.error('❌ Campaign initialization failed:', error);
         }
     }
     
@@ -297,8 +286,8 @@
         updateGlobalCampaignIndicator();
     }
     
-    // Register event listener for translations loaded
-    window.addEventListener('translationsLoaded', initializeCampaigns);
+    // Register event listener for dashboard ready (all critical modules loaded)
+    window.addEventListener('dashboardReady', initializeCampaigns);
     
     // Export public API
     window.dashboardModules.init = {

@@ -406,4 +406,9 @@
     
     console.log('📦 Dashboard Data Service module loaded');
     
+    // Mark module as ready in the readiness registry
+    if (window.moduleReadiness) {
+        window.moduleReadiness.markReady('dataService');
+    }
+    
 })();

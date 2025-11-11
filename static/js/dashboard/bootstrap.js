@@ -173,6 +173,44 @@ function getMobileChartConfig() {
 }
 
 // ============================================================================
+// MODULE READINESS SYSTEM
+// ============================================================================
+
+/**
+ * Module readiness registry - tracks when critical modules are loaded
+ */
+window.moduleReadiness = {
+    translations: false,
+    dataService: false,
+    kpiOverview: false,
+    
+    /**
+     * Mark a module as ready
+     */
+    markReady(moduleName) {
+        this[moduleName] = true;
+        console.log(`✅ Module ready: ${moduleName}`);
+        this.checkAllReady();
+    },
+    
+    /**
+     * Check if all critical modules are ready and fire event
+     */
+    checkAllReady() {
+        if (this.translations && this.dataService && this.kpiOverview) {
+            console.log('🚀 All critical modules ready, firing dashboardReady event');
+            window.dispatchEvent(new Event('dashboardReady'));
+        } else {
+            const pending = [];
+            if (!this.translations) pending.push('translations');
+            if (!this.dataService) pending.push('dataService');
+            if (!this.kpiOverview) pending.push('kpiOverview');
+            console.log(`⏳ Waiting for modules: ${pending.join(', ')}`);
+        }
+    }
+};
+
+// ============================================================================
 // TRANSLATION SYSTEM
 // ============================================================================
 
@@ -244,12 +282,14 @@ function getMobileChartConfig() {
             Object.assign(window.translations, fallbackTranslations);
         }
         
-        window.dispatchEvent(new Event('translationsLoaded'));
+        // Mark translations as ready
+        window.moduleReadiness.markReady('translations');
         
     } catch (error) {
         console.warn('⚠️ Failed to load dashboard translations, using fallbacks:', error);
         Object.assign(window.translations, fallbackTranslations);
-        window.dispatchEvent(new Event('translationsLoaded'));
+        // Still mark as ready even with fallbacks
+        window.moduleReadiness.markReady('translations');
     }
 })();
 

@@ -414,4 +414,9 @@
     
     console.log('📦 Dashboard KPI Overview module loaded');
     
+    // Mark module as ready in the readiness registry
+    if (window.moduleReadiness) {
+        window.moduleReadiness.markReady('kpiOverview');
+    }
+    
 })();
