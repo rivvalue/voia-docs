@@ -156,15 +156,17 @@
             updateSelectedCampaignInfo();
         }
         
-        // Attach change event listener (only once)
-        if (!select.dataset.listenerAttached) {
-            select.addEventListener('change', () => {
-                console.log('📍 Campaign filter changed via dropdown');
-                applyCampaignFilter();
-            });
-            select.dataset.listenerAttached = 'true';
-            console.log('✅ Campaign filter change listener attached');
-        }
+        // Attach change event listener (removes existing listeners first to prevent duplicates)
+        // Clone and replace the element to remove all existing event listeners
+        const newSelect = select.cloneNode(true);
+        select.parentNode.replaceChild(newSelect, select);
+        
+        // Now attach the new listener
+        newSelect.addEventListener('change', () => {
+            console.log('📍 Campaign filter changed via dropdown');
+            applyCampaignFilter();
+        });
+        console.log('✅ Campaign filter change listener attached');
         
         // Return whether a default campaign was set (used by initializeCampaigns)
         return !!defaultCampaign;

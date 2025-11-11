@@ -1,0 +1,41 @@
+
+﻿
+translation-loader.js:175 ✅ Translation loader initialized (locale: en)
+bootstrap.js:338 📦 Dashboard Bootstrap module loaded
+data-service.js:407 📦 Dashboard Data Service module loaded
+bootstrap.js:192 ✅ Module ready: dataService
+bootstrap.js:208 ⏳ Waiting for modules: translations, kpiOverview
+charts.js:658 📦 Dashboard Charts module loaded (complete implementation)
+comparison.js:538 📦 Dashboard Comparison module loaded
+account-intelligence.js:876 📦 Dashboard Account Intelligence module loaded
+survey-insights.js:459 📦 Dashboard Survey Insights module loaded
+kpi-overview.js:415 📦 Dashboard KPI Overview module loaded
+bootstrap.js:192 ✅ Module ready: kpiOverview
+bootstrap.js:208 ⏳ Waiting for modules: translations
+dashboard-init.js:302 📦 Dashboard Init module loaded
+bootstrap.js:279 ✅ Dashboard translations loaded successfully
+bootstrap.js:192 ✅ Module ready: translations
+bootstrap.js:201 🚀 All critical modules ready, firing dashboardReady event
+dashboard-init.js:24 🚀 All modules ready, initializing campaigns...
+data-service.js:37 ✅ Loaded campaigns: 8 campaigns
+dashboard-init.js:84 🔄 Restored campaign from session storage: 42
+dashboard-init.js:113 📋 Populating dropdown with 8 campaigns
+dashboard-init.js:114 📋 Default campaign: 
+Object
+dashboard-init.js:138 ✅ Selected campaign: Quick Validation of ArcheloFlow release V3.5 42
+kpi-overview.js:22 loadDashboardData called
+kpi-overview.js:42 🔍 Frontend Debug - Calling URL: /api/dashboard_data?campaign_id=42&_t=1762836739433
+kpi-overview.js:43 🔍 Frontend Debug - selectedCampaignId: 42
+kpi-overview.js:55 API response status: 200
+kpi-overview.js:62 Dashboard data received: 
+Array(14)
+kpi-overview.js:63 🔍 Frontend Debug - Raw API Response average_ratings: 
+Object
+kpi-overview.js:116 ⚡ populateDashboard called - OPTIMIZED PROGRESSIVE LOADING
+kpi-overview.js:187 ✅ Critical path complete - page interactive
+dashboard-init.js:44 ✅ Dashboard initialization complete
+kpi-overview.js:147 ⏳ Loading deferred data (non-blocking)...
+kpi-overview.js:184 ✅ Deferred data loading scheduled
+kpi-overview.js:194 📊 Loading KPI overview section
+kpi-overview.js:171 About to call loadCompanyNpsData...
+kpi-overview.js:179 About to call loadTenureNpsData...

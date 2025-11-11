@@ -188,11 +188,114 @@
     }
     
     /**
-     * Load KPI overview section
+     * Load KPI overview section - Executive Summary rendering
      */
-    function loadKpiOverview() {
-        console.log('📊 Loading KPI overview section');
-        // KPI overview rendering logic here (placeholder for future implementation)
+    async function loadKpiOverview() {
+        console.log('📊 Loading KPI overview data...');
+        const tbody = document.getElementById('kpiOverviewTableBody');
+        const loadingElement = document.getElementById('executiveSummaryLoading');
+        const contentElement = document.getElementById('executiveSummaryContent');
+        
+        if (!tbody) {
+            console.error('kpiOverviewTableBody element not found!');
+            return;
+        }
+        
+        // Show loading, hide content
+        if (loadingElement) loadingElement.classList.remove('d-none');
+        if (contentElement) contentElement.classList.add('d-none');
+        
+        try {
+            const { availableCampaigns } = window.dashboardState;
+            const campaigns = availableCampaigns || [];
+            const translations = window.translations || {};
+            
+            if (campaigns.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center text-muted">${translations.noCampaignDataAvailable || 'No campaign data available'}</td></tr>`;
+                if (loadingElement) loadingElement.classList.add('d-none');
+                if (contentElement) contentElement.classList.remove('d-none');
+                return;
+            }
+            
+            // Fetch KPI data for all campaigns in parallel
+            const fetchPromises = campaigns.map(campaign => 
+                fetch(`/api/campaigns/comparison?campaign1=${campaign.id}&campaign2=${campaign.id}`)
+            );
+            
+            const fetchResults = await Promise.allSettled(fetchPromises);
+            
+            // Process results with error handling
+            const jsonPromises = fetchResults.map(async (result, index) => {
+                const campaign = campaigns[index];
+                
+                if (result.status === 'rejected') {
+                    console.warn(`Network error for campaign ${campaign.name}:`, result.reason);
+                    return null;
+                }
+                
+                if (!result.value.ok) {
+                    console.warn(`HTTP error for campaign ${campaign.name}: ${result.value.status}`);
+                    return null;
+                }
+                
+                try {
+                    const data = await result.value.json();
+                    return {
+                        id: campaign.id,
+                        name: campaign.name,
+                        end_date: campaign.end_date,
+                        responses: data.campaign1?.total_responses || 0,
+                        nps_score: data.campaign1?.nps_score || 0,
+                        companies: data.campaign1?.companies_analyzed || 0,
+                        critical_risk: data.campaign1?.high_risk_accounts || 0,
+                        satisfaction: data.campaign1?.average_ratings?.satisfaction || 0,
+                        product_value: data.campaign1?.average_ratings?.product_value || 0,
+                        pricing: data.campaign1?.average_ratings?.pricing || 0,
+                        service: data.campaign1?.average_ratings?.service || 0
+                    };
+                } catch (e) {
+                    console.warn(`JSON parse error for campaign ${campaign.name}:`, e);
+                    return null;
+                }
+            });
+            
+            const kpiResults = await Promise.all(jsonPromises);
+            const kpiData = kpiResults.filter(row => row !== null);
+            
+            // Sort by end date (most recent first)
+            kpiData.sort((a, b) => new Date(b.end_date) - new Date(a.end_date));
+            
+            // Populate table
+            tbody.innerHTML = kpiData.map(row => {
+                const npsClass = row.nps_score >= 50 ? 'text-success' : (row.nps_score >= 0 ? 'text-warning' : 'text-danger');
+                return `
+                    <tr>
+                        <td><strong>${escapeHtml(row.name)}</strong></td>
+                        <td>${row.responses}</td>
+                        <td class="${npsClass}"><strong>${row.nps_score}</strong></td>
+                        <td>${row.companies}</td>
+                        <td>${row.critical_risk}</td>
+                        <td>${row.satisfaction.toFixed(1)}</td>
+                        <td>${row.product_value.toFixed(1)}</td>
+                        <td>${row.pricing.toFixed(1)}</td>
+                        <td>${row.service.toFixed(1)}</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            console.log('✅ KPI overview table populated with', kpiData.length, 'campaigns');
+            
+            // Hide loading, show content
+            if (loadingElement) loadingElement.classList.add('d-none');
+            if (contentElement) contentElement.classList.remove('d-none');
+            
+        } catch (error) {
+            console.error('Error loading KPI overview:', error);
+            tbody.innerHTML = `<tr><td colspan="9" class="text-center text-danger">${translations.errorLoadingKpiData || 'Error loading KPI data'}</td></tr>`;
+            
+            if (loadingElement) loadingElement.classList.add('d-none');
+            if (contentElement) contentElement.classList.remove('d-none');
+        }
     }
     
     /**
