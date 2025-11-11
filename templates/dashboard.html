@@ -1103,15 +1103,15 @@ document.addEventListener('DOMContentLoaded', function() {
 {% if use_refactored_frontend %}
 <!-- Phase 2: Modular Dashboard JavaScript -->
 <!-- Load order: bootstrap → data-service → features → init -->
-<script src="{{ url_for('static', filename='js/utils/color-override.js') }}"></script>
-<script src="{{ url_for('static', filename='js/dashboard/bootstrap.js') }}"></script>
-<script src="{{ url_for('static', filename='js/dashboard/data-service.js') }}"></script>
-<script src="{{ url_for('static', filename='js/dashboard/charts.js') }}"></script>
-<script src="{{ url_for('static', filename='js/dashboard/comparison.js') }}"></script>
-<script src="{{ url_for('static', filename='js/dashboard/account-intelligence.js') }}"></script>
-<script src="{{ url_for('static', filename='js/dashboard/survey-insights.js') }}"></script>
-<script src="{{ url_for('static', filename='js/dashboard/kpi-overview.js') }}"></script>
-<script src="{{ url_for('static', filename='js/dashboard/dashboard-init.js') }}"></script>
+<script src="{{ url_for('static', filename='js/utils/color-override.js') }}?v={{ range(1000, 9999) | random }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard/bootstrap.js') }}?v={{ range(1000, 9999) | random }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard/data-service.js') }}?v={{ range(1000, 9999) | random }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard/charts.js') }}?v={{ range(1000, 9999) | random }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard/comparison.js') }}?v={{ range(1000, 9999) | random }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard/account-intelligence.js') }}?v={{ range(1000, 9999) | random }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard/survey-insights.js') }}?v={{ range(1000, 9999) | random }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard/kpi-overview.js') }}?v={{ range(1000, 9999) | random }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard/dashboard-init.js') }}?v={{ range(1000, 9999) | random }}"></script>
 {% else %}
 <!-- Legacy: Monolithic Dashboard JavaScript -->
 <script src="{{ url_for('static', filename='js/dashboard.js') }}?v={{ range(1000, 9999) | random }}"></script>
