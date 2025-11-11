@@ -201,25 +201,49 @@ function getMobileChartConfig() {
     };
     
     try {
-        const dashboardTranslations = await window.translationLoader.load('dashboard');
-        Object.assign(window.translations, dashboardTranslations);
-        
-        // Create camelCase aliases for loaded keys
-        for (const [key, value] of Object.entries(dashboardTranslations)) {
-            const camelKey = toCamelCase(key);
-            if (camelKey && camelKey !== key) {
-                window.translations[camelKey] = value;
-            }
+        // Wait for translationLoader to be available (max 5 seconds)
+        if (!window.translationLoader) {
+            console.warn('⚠️ Translation loader not yet available, waiting...');
+            await new Promise((resolve) => {
+                const checkInterval = setInterval(() => {
+                    if (window.translationLoader) {
+                        clearInterval(checkInterval);
+                        resolve();
+                    }
+                }, 50);
+                // Timeout after 5 seconds
+                setTimeout(() => {
+                    clearInterval(checkInterval);
+                    resolve();
+                }, 5000);
+            });
         }
         
-        // Apply fallbacks for missing keys
-        for (const [key, value] of Object.entries(fallbackTranslations)) {
-            if (!window.translations[key]) {
-                window.translations[key] = value;
+        if (window.translationLoader) {
+            const dashboardTranslations = await window.translationLoader.load('dashboard');
+            Object.assign(window.translations, dashboardTranslations);
+            
+            // Create camelCase aliases for loaded keys
+            for (const [key, value] of Object.entries(dashboardTranslations)) {
+                const camelKey = toCamelCase(key);
+                if (camelKey && camelKey !== key) {
+                    window.translations[camelKey] = value;
+                }
             }
+            
+            // Apply fallbacks for missing keys
+            for (const [key, value] of Object.entries(fallbackTranslations)) {
+                if (!window.translations[key]) {
+                    window.translations[key] = value;
+                }
+            }
+            
+            console.log('✅ Dashboard translations loaded successfully');
+        } else {
+            console.warn('⚠️ Translation loader unavailable after timeout, using fallbacks only');
+            Object.assign(window.translations, fallbackTranslations);
         }
         
-        console.log('✅ Dashboard translations loaded successfully');
         window.dispatchEvent(new Event('translationsLoaded'));
         
     } catch (error) {
