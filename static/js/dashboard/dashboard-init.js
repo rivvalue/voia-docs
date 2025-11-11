@@ -107,6 +107,10 @@
             console.warn('⚠️ Campaigns available but no default selected!', availableCampaigns);
         }
         
+        // Debug logging
+        console.log('📋 Populating dropdown with', availableCampaigns.length, 'campaigns');
+        console.log('📋 Default campaign:', defaultCampaign);
+        
         // Add campaign options
         availableCampaigns.forEach(campaign => {
             const option = document.createElement('option');
@@ -129,6 +133,7 @@
             if (defaultCampaign && campaign.id === defaultCampaign.id) {
                 option.selected = true;
                 state.selectedCampaignId = campaign.id;
+                console.log('✅ Selected campaign:', campaign.name, campaign.id);
                 
                 // Save raw values to sessionStorage for global indicator
                 sessionStorage.setItem('selectedCampaignId', campaign.id);
