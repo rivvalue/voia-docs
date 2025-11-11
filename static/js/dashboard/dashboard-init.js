@@ -168,6 +168,17 @@
         });
         console.log('✅ Campaign filter change listener attached');
         
+        // Also attach clear button listener (only once)
+        const clearBtn = document.getElementById('clearCampaignFilterBtn');
+        if (clearBtn && !clearBtn.dataset.listenerAttached) {
+            clearBtn.addEventListener('click', () => {
+                console.log('📍 Clear campaign filter button clicked');
+                clearGlobalCampaignFilter();
+            });
+            clearBtn.dataset.listenerAttached = 'true';
+            console.log('✅ Clear button listener attached');
+        }
+        
         // Return whether a default campaign was set (used by initializeCampaigns)
         return !!defaultCampaign;
     }

@@ -302,11 +302,11 @@
                         </div>
                         <div class="col-12 col-md">
                             <div class="d-flex gap-2 align-items-center">
-                                <select class="form-select" id="campaignFilter" onchange="applyCampaignFilter()" style="max-width: 400px;">
+                                <select class="form-select" id="campaignFilter" style="max-width: 400px;">
                                     <option value="">{{ _('Select Campaign') }}</option>
                                     <!-- Will be populated by JavaScript -->
                                 </select>
-                                <button class="btn btn-outline-secondary btn-sm" onclick="clearCampaignFilter()" data-bs-toggle="tooltip" data-bs-title="{{ _('Clear Filter') }}">
+                                <button class="btn btn-outline-secondary btn-sm" id="clearCampaignFilterBtn" data-bs-toggle="tooltip" data-bs-title="{{ _('Clear Filter') }}">
                                     <i class="fas fa-times"></i>
                                 </button>
                             </div>
