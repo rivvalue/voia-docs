@@ -10,8 +10,6 @@
     'use strict';
     
     const state = window.dashboardState;
-    const dataService = window.dashboardModules.dataService;
-    const { escapeHtml, formatCampaignStatus, formatDate } = window.dashboardModules.bootstrap.utils;
     
     /**
      * Initialize campaigns - loads campaign options and dashboard data
@@ -24,7 +22,20 @@
         state.campaignsInitialized = true;
         console.log('🌍 Translations ready, initializing campaigns...');
         
+        // Resolve module references at call time (not module load time) to avoid race conditions
+        const dataService = window.dashboardModules?.dataService;
+        const kpiOverview = window.dashboardModules?.kpiOverview;
+        
+        if (!dataService) {
+            console.error('❌ dataService module not loaded yet - deferring initialization');
+            // Retry after modules finish loading
+            setTimeout(() => initializeCampaigns(), 50);
+            state.campaignsInitialized = false;
+            return;
+        }
+        
         try {
+            console.log('✅ dataService available, proceeding with campaign load');
             // Load campaign filter options
             await dataService.fetchCampaignFilterOptions();
             
@@ -34,13 +45,13 @@
             
             // Load initial dashboard data using kpiOverview module
             // Load regardless of whether campaign is selected (loads all data if no campaign)
-            if (window.dashboardModules.kpiOverview) {
-                await window.dashboardModules.kpiOverview.loadDashboardData();
+            if (kpiOverview) {
+                await kpiOverview.loadDashboardData();
             }
             
             // Initialize auto-refresh (1 hour interval)
-            if (window.dashboardModules.kpiOverview?.initializeAutoRefresh) {
-                window.dashboardModules.kpiOverview.initializeAutoRefresh();
+            if (kpiOverview?.initializeAutoRefresh) {
+                kpiOverview.initializeAutoRefresh();
             }
             
         } catch (error) {
@@ -52,6 +63,8 @@
      * Populate campaign filter dropdown
      */
     function populateCampaignFilterDropdown() {
+        // Resolve utils at runtime to avoid race conditions
+        const { escapeHtml, formatCampaignStatus, formatDate } = window.dashboardModules.bootstrap.utils;
         const translations = window.translations || {};
         const select = document.getElementById('campaignFilter');
         if (!select) return;
@@ -194,6 +207,8 @@
      * Update global campaign indicator
      */
     function updateGlobalCampaignIndicator() {
+        // Resolve utils at runtime to avoid race conditions
+        const { escapeHtml, formatDate } = window.dashboardModules.bootstrap.utils;
         const translations = window.translations || {};
         const indicator = document.getElementById('globalCampaignIndicator');
         if (!indicator) return; // Not on a page with the indicator
