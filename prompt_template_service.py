@@ -213,7 +213,7 @@ class PromptTemplateService:
         # === HOT PATH: Extract frequently-accessed attributes as primitives ===
         # These are accessed 2+ times or critical for hybrid prompt mode
         
-        # Campaign hot path attributes (8 attributes)
+        # Campaign hot path attributes (9 attributes)
         # Use _parse_json_list for list fields to handle JSON strings from SQLAlchemy
         self._campaign_prioritized_topics = _parse_json_list(campaign.prioritized_topics if campaign else None)
         self._campaign_product_description = campaign.product_description if campaign else None
@@ -223,6 +223,7 @@ class PromptTemplateService:
         self._campaign_max_duration_seconds = campaign.max_duration_seconds if campaign else None
         self._campaign_custom_end_message = campaign.custom_end_message if campaign else None
         self._campaign_anonymize_responses = campaign.anonymize_responses if campaign else False
+        self._campaign_language_code = campaign.language_code if campaign and hasattr(campaign, 'language_code') else 'en'
         
         # BusinessAccount hot path attributes (11 attributes)
         # Use _parse_json_list for list fields to handle JSON strings from SQLAlchemy
@@ -461,16 +462,14 @@ class PromptTemplateService:
         # Select role-based persona template
         persona_intro = self._select_persona_template(participant_data, anonymize)
         
-        # Get participant language for response
-        participant_language = 'en'  # Default to English
-        if participant_data and participant_data.get('language'):
-            participant_language = participant_data.get('language')
+        # Get campaign language from hot path attributes (prioritize campaign language over participant data)
+        campaign_language = self._campaign_language_code  # Already defaults to 'en' in __init__
         
-        # Language instruction based on participant preference
+        # Language instruction based on campaign language
         language_instruction = ""
-        if participant_language and participant_language != 'en':
-            language_map = {'fr': 'French', 'es': 'Spanish'}
-            language_name = language_map.get(participant_language, participant_language)
+        if campaign_language and campaign_language != 'en':
+            language_map = {'fr': 'French', 'es': 'Spanish', 'de': 'German'}
+            language_name = language_map.get(campaign_language, campaign_language.upper())
             language_instruction = f"\n\nIMPORTANT: Conduct this entire conversation in {language_name}. Ask questions and respond in {language_name}."
         
         # Build participant profile section
@@ -535,6 +534,14 @@ RESPONSE FORMAT: Return JSON with fields: message, message_type, step, topic, pr
         
         prioritized_topics = self._get_prioritized_topics()
         
+        # Language instruction based on campaign language
+        campaign_language = self._campaign_language_code
+        language_instruction = ""
+        if campaign_language and campaign_language != 'en':
+            language_map = {'fr': 'French', 'es': 'Spanish', 'de': 'German'}
+            language_name = language_map.get(campaign_language, campaign_language.upper())
+            language_instruction = f"\n\nIMPORTANT: Conduct this entire conversation in {language_name}. Ask questions and respond in {language_name}."
+        
         return f"""You are conducting a customer feedback survey about {company_name} (the supplier company). Focus on {company_name}'s service delivery, support quality, and business relationship aspects.
 
 BUSINESS CONTEXT:{business_context}
@@ -548,7 +555,7 @@ SURVEY DATA COLLECTED SO FAR:
 CONVERSATION STEP: {step_count}
 
 YOUR ROLE: You are a helpful customer feedback specialist having a natural, {tone} conversation. Your goal is to collect feedback about {company_name}:
-{prioritized_topics}
+{prioritized_topics}{language_instruction}
 
 GUIDELINES:
 - Keep the conversation natural and engaging
