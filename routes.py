@@ -180,7 +180,18 @@ def verify_survey_access(token):
     """
     Centralized token verification for survey access.
     Returns verification result with user data or error details.
+    
+    Language Strategy:
+    - Anonymous + campaign token: reset, use campaign.language_code
+    - Anonymous + simple token: reset, use "en"
+    - Dashboard user: preserve existing session['language'], restore on errors
     """
+    # Reset language for all survey token access (anonymous prevents contamination, dashboard gets temporary override)
+    # Dashboard routes will restore user language preference when navigating back from survey
+    is_dashboard_user = 'business_user_id' in session
+    if not is_dashboard_user:
+        session.pop('language', None)  # Only clear for anonymous to prevent cross-survey contamination
+    
     if not token:
         return {
             'valid': False,
@@ -201,17 +212,30 @@ def verify_survey_access(token):
             session['participant_id'] = verification.get('participant_id')
             session['business_account_id'] = verification.get('business_account_id')
             
-            # Set campaign language for Flask-Babel
+            # Set campaign language for Flask-Babel (temporarily for surveys, dashboard routes will restore user preference)
             campaign_id = verification.get('campaign_id')
             if campaign_id:
                 try:
                     from models import Campaign
                     campaign = Campaign.query.get(campaign_id)
-                    if campaign and campaign.language_code:
-                        session['language'] = campaign.language_code
-                        logger.info(f"Set survey language to {campaign.language_code} for campaign {campaign_id}")
+                    if campaign and hasattr(campaign, 'language_code') and campaign.language_code:
+                        # Validate language is supported
+                        supported_languages = ['en', 'fr']
+                        if campaign.language_code in supported_languages:
+                            session['language'] = campaign.language_code
+                            logger.info(f"Set survey language to {campaign.language_code} for campaign {campaign_id}")
+                        else:
+                            logger.warning(f"Unsupported campaign language '{campaign.language_code}', falling back to English")
+                            session['language'] = 'en'
+                    else:
+                        # Campaign exists but has no language - use English
+                        session['language'] = 'en'
                 except Exception as e:
                     logger.warning(f"Failed to load campaign language: {e}")
+                    session['language'] = 'en'
+            else:
+                # No campaign_id - use English
+                session['language'] = 'en'
             
             return {
                 'valid': True,
@@ -231,6 +255,8 @@ def verify_survey_access(token):
         email = fallback_verification.get('email')
         session['auth_token'] = token
         session['auth_email'] = email
+        # Simple token users use English
+        session['language'] = 'en'
         return {
             'valid': True,
             'authenticated': True,
@@ -262,10 +288,17 @@ def verify_survey_access(token):
         session['participant_id'] = participant.id
         session['business_account_id'] = uuid_participant.business_account_id
         
-        # Set campaign language for Flask-Babel
-        if campaign.language_code:
-            session['language'] = campaign.language_code
-            logger.info(f"Set survey language to {campaign.language_code} for campaign {campaign.id}")
+        # Set campaign language for Flask-Babel (with validation)
+        if hasattr(campaign, 'language_code') and campaign.language_code:
+            supported_languages = ['en', 'fr']
+            if campaign.language_code in supported_languages:
+                session['language'] = campaign.language_code
+                logger.info(f"Set survey language to {campaign.language_code} for campaign {campaign.id}")
+            else:
+                logger.warning(f"Unsupported campaign language '{campaign.language_code}', falling back to English")
+                session['language'] = 'en'
+        else:
+            session['language'] = 'en'  # Explicit default for campaigns without language
         
         # Update status if first access
         if uuid_participant.status == 'invited':

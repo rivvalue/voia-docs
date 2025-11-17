@@ -222,10 +222,16 @@ class EmailService:
         Returns:
             Dict with subject, intro, cta_text, closing, footer
         """
-        # Determine campaign language (default to 'en' if not specified)
-        campaign_language = 'en'
-        if campaign and hasattr(campaign, 'language_code'):
-            campaign_language = campaign.language_code or 'en'
+        # Determine campaign language with robust fallback
+        campaign_language = 'en'  # Safe default
+        if campaign and hasattr(campaign, 'language_code') and campaign.language_code:
+            # Validate language code is supported
+            supported_languages = ['en', 'fr']
+            if campaign.language_code in supported_languages:
+                campaign_language = campaign.language_code
+            else:
+                logger.warning(f"Unsupported campaign language '{campaign.language_code}', falling back to English")
+                campaign_language = 'en'
         
         # Default templates (tier 3) - language-aware
         if campaign_language == 'fr':
