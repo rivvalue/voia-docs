@@ -190,6 +190,9 @@ class Campaign(db.Model):
     end_date = db.Column(db.Date, nullable=False, index=True)
     status = db.Column(db.String(20), nullable=False, default='draft', index=True)  # draft, ready, active, completed
     
+    # Language configuration (en=English, fr=French)
+    language_code = db.Column(db.String(5), nullable=False, default='en', index=True)
+    
     # Client tracking (for future multi-client support)
     client_identifier = db.Column(db.String(200), nullable=False, default='archelo_group', index=True)
     
@@ -254,6 +257,7 @@ class Campaign(db.Model):
             'start_date': self.start_date.isoformat() if self.start_date else None,
             'end_date': self.end_date.isoformat() if self.end_date else None,
             'status': self.status,
+            'language_code': self.language_code,
             'client_identifier': self.client_identifier,
             'business_account_id': self.business_account_id,
             'business_account_name': self.business_account.name if self.business_account else None,

@@ -11,19 +11,86 @@ from cache_config import cache_config
 
 logger = logging.getLogger(__name__)
 
+# Feature flags for French language support
+USE_BILINGUAL_THEMES = os.getenv('USE_BILINGUAL_THEMES', 'true').lower() == 'true'
+
+# Cache for theme mappings loaded from JSON
+_theme_mappings_cache = None
+_theme_mappings_load_time = None
+THEME_MAPPINGS_TTL = 300  # 5 minutes cache
+
+def load_theme_mappings():
+    """Load theme mappings from JSON config file with caching and validation"""
+    global _theme_mappings_cache, _theme_mappings_load_time
+    
+    # Check cache validity
+    if _theme_mappings_cache is not None and _theme_mappings_load_time is not None:
+        if (datetime.utcnow() - _theme_mappings_load_time).total_seconds() < THEME_MAPPINGS_TTL:
+            return _theme_mappings_cache
+    
+    try:
+        config_path = os.path.join(os.path.dirname(__file__), 'config', 'theme_mappings.json')
+        
+        with open(config_path, 'r', encoding='utf-8') as f:
+            config = json.load(f)
+        
+        # Validate config structure
+        if 'mappings' not in config:
+            raise ValueError("Theme mappings config missing 'mappings' key")
+        
+        # Build flat lookup structure for efficient consolidation
+        mappings = config['mappings']
+        
+        # Cache the loaded mappings
+        _theme_mappings_cache = mappings
+        _theme_mappings_load_time = datetime.utcnow()
+        
+        logger.info(f"Loaded {len(mappings)} theme mappings from config (version: {config.get('version', 'unknown')})")
+        return mappings
+        
+    except FileNotFoundError:
+        logger.warning("Theme mappings config file not found, using legacy English-only mappings")
+        return None
+    except Exception as e:
+        logger.error(f"Error loading theme mappings config: {e}")
+        return None
+
 def consolidate_theme_name(theme_name):
-    """Consolidate similar theme names to reduce duplication"""
+    """
+    Consolidate similar theme names to reduce duplication.
+    Supports bilingual (French/English) theme normalization when USE_BILINGUAL_THEMES=true.
+    """
     if not theme_name:
         return 'unknown'
     
     # Convert to lowercase and strip whitespace
     normalized = theme_name.lower().strip()
     
-    # Remove common adjectives and determiners
+    # Remove common adjectives and determiners (works for both languages)
     normalized = re.sub(r'\b(customer|client|user|our|the|good|bad|great|poor)\s+', '', normalized)
+    normalized = re.sub(r'\b(le|la|les|un|une|des|mon|ma|mes|bon|mauvais)\s+', '', normalized)
     
-    # Define mapping for similar themes
-    theme_mappings = {
+    # Use bilingual mappings if feature flag enabled
+    if USE_BILINGUAL_THEMES:
+        mappings = load_theme_mappings()
+        
+        if mappings:
+            # Search through all canonical themes and their variations
+            for canonical_theme, language_variations in mappings.items():
+                # Check English variations
+                if 'en' in language_variations:
+                    for variation in language_variations['en']:
+                        if normalized == variation.lower() or variation.lower() in normalized:
+                            return canonical_theme
+                
+                # Check French variations
+                if 'fr' in language_variations:
+                    for variation in language_variations['fr']:
+                        if normalized == variation.lower() or variation.lower() in normalized:
+                            return canonical_theme
+    
+    # Legacy fallback: English-only hardcoded mappings
+    legacy_theme_mappings = {
         'service': ['service', 'services', 'customer service', 'client service', 'support service'],
         'support': ['support', 'customer support', 'tech support', 'technical support', 'help', 'assistance'],
         'product': ['product', 'products', 'offering', 'solution', 'solutions'],
@@ -36,8 +103,8 @@ def consolidate_theme_name(theme_name):
         'experience': ['experience', 'satisfaction', 'journey', 'interaction']
     }
     
-    # Find the canonical theme for this name
-    for canonical_theme, variations in theme_mappings.items():
+    # Find the canonical theme for this name using legacy mappings
+    for canonical_theme, variations in legacy_theme_mappings.items():
         if normalized in variations or any(variation in normalized for variation in variations):
             return canonical_theme
     

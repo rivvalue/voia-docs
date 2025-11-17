@@ -1,0 +1,287 @@
+{
+  "version": "1.0",
+  "last_updated": "2025-01-15",
+  "description": "Bilingual theme consolidation mappings for French and English customer feedback themes. These mappings ensure AI-extracted themes are consolidated properly regardless of language.",
+  "mappings": {
+    "service": {
+      "en": [
+        "service",
+        "services",
+        "customer service",
+        "client service",
+        "support service",
+        "customer support",
+        "client support"
+      ],
+      "fr": [
+        "service",
+        "services",
+        "service client",
+        "service clientèle",
+        "service à la clientèle",
+        "support client",
+        "assistance client",
+        "assistance clientèle"
+      ]
+    },
+    "support": {
+      "en": [
+        "support",
+        "tech support",
+        "technical support",
+        "help",
+        "assistance",
+        "help desk"
+      ],
+      "fr": [
+        "support",
+        "support technique",
+        "soutien technique",
+        "aide",
+        "assistance",
+        "assistance technique",
+        "soutien"
+      ]
+    },
+    "product": {
+      "en": [
+        "product",
+        "products",
+        "offering",
+        "offerings",
+        "solution",
+        "solutions"
+      ],
+      "fr": [
+        "produit",
+        "produits",
+        "offre",
+        "offres",
+        "solution",
+        "solutions"
+      ]
+    },
+    "pricing": {
+      "en": [
+        "pricing",
+        "price",
+        "prices",
+        "cost",
+        "costs",
+        "billing",
+        "payment",
+        "fee",
+        "fees"
+      ],
+      "fr": [
+        "prix",
+        "tarification",
+        "tarif",
+        "tarifs",
+        "coût",
+        "coûts",
+        "facturation",
+        "paiement",
+        "frais"
+      ]
+    },
+    "quality": {
+      "en": [
+        "quality",
+        "reliability",
+        "performance",
+        "effectiveness",
+        "dependability"
+      ],
+      "fr": [
+        "qualité",
+        "fiabilité",
+        "performance",
+        "efficacité",
+        "fiabilité"
+      ]
+    },
+    "features": {
+      "en": [
+        "features",
+        "feature",
+        "functionality",
+        "functionalities",
+        "capabilities",
+        "tools",
+        "options"
+      ],
+      "fr": [
+        "fonctionnalités",
+        "fonctionnalité",
+        "fonctions",
+        "fonction",
+        "caractéristiques",
+        "outils",
+        "options"
+      ]
+    },
+    "team": {
+      "en": [
+        "team",
+        "staff",
+        "personnel",
+        "employees",
+        "people",
+        "workforce"
+      ],
+      "fr": [
+        "équipe",
+        "personnel",
+        "staff",
+        "employés",
+        "gens",
+        "ressources humaines"
+      ]
+    },
+    "communication": {
+      "en": [
+        "communication",
+        "communications",
+        "response time",
+        "responsiveness",
+        "follow-up",
+        "feedback"
+      ],
+      "fr": [
+        "communication",
+        "communications",
+        "temps de réponse",
+        "réactivité",
+        "suivi",
+        "retour",
+        "rétroaction"
+      ]
+    },
+    "value": {
+      "en": [
+        "value",
+        "worth",
+        "roi",
+        "return on investment",
+        "benefit",
+        "benefits"
+      ],
+      "fr": [
+        "valeur",
+        "rapport qualité-prix",
+        "rendement",
+        "retour sur investissement",
+        "bénéfice",
+        "bénéfices",
+        "avantage",
+        "avantages"
+      ]
+    },
+    "experience": {
+      "en": [
+        "experience",
+        "satisfaction",
+        "journey",
+        "interaction",
+        "user experience",
+        "ux"
+      ],
+      "fr": [
+        "expérience",
+        "satisfaction",
+        "parcours",
+        "interaction",
+        "expérience utilisateur"
+      ]
+    },
+    "documentation": {
+      "en": [
+        "documentation",
+        "docs",
+        "manual",
+        "manuals",
+        "guide",
+        "guides",
+        "instructions"
+      ],
+      "fr": [
+        "documentation",
+        "manuel",
+        "manuels",
+        "guide",
+        "guides",
+        "instructions",
+        "mode d'emploi"
+      ]
+    },
+    "delivery": {
+      "en": [
+        "delivery",
+        "shipping",
+        "fulfillment",
+        "logistics",
+        "timeliness"
+      ],
+      "fr": [
+        "livraison",
+        "expédition",
+        "logistique",
+        "délai",
+        "délais",
+        "respect des délais"
+      ]
+    },
+    "onboarding": {
+      "en": [
+        "onboarding",
+        "implementation",
+        "setup",
+        "installation",
+        "training",
+        "getting started"
+      ],
+      "fr": [
+        "intégration",
+        "implantation",
+        "implémentation",
+        "installation",
+        "configuration",
+        "formation",
+        "démarrage"
+      ]
+    },
+    "innovation": {
+      "en": [
+        "innovation",
+        "improvements",
+        "updates",
+        "enhancements",
+        "new features"
+      ],
+      "fr": [
+        "innovation",
+        "améliorations",
+        "mises à jour",
+        "nouveautés",
+        "nouvelles fonctionnalités"
+      ]
+    },
+    "availability": {
+      "en": [
+        "availability",
+        "uptime",
+        "accessibility",
+        "access",
+        "reliability"
+      ],
+      "fr": [
+        "disponibilité",
+        "accessibilité",
+        "accès",
+        "fiabilité",
+        "temps de disponibilité"
+      ]
+    }
+  }
+}

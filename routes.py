@@ -2391,8 +2391,16 @@ def api_account_intelligence():
         has_risks = request.args.get('has_risks', '').strip().lower()
         min_responses = request.args.get('min_responses', type=int)
         
-        # Get campaign filter (for multi-tenant support)
+        # Get campaign filter (REQUIRED for Account Intelligence - prevents cross-campaign aggregation)
         campaign_id = request.args.get('campaign', type=int)
+        
+        # VALIDATION: Require campaign_id to prevent mixing French/English data
+        if not campaign_id:
+            return jsonify({
+                'success': False,
+                'error': 'Campaign selection required',
+                'message': 'Please select a campaign to view account intelligence data'
+            }), 400
         
         # Get dashboard data which includes account_intelligence
         dashboard_data = get_dashboard_data(campaign_id=campaign_id)
