@@ -201,6 +201,18 @@ def verify_survey_access(token):
             session['participant_id'] = verification.get('participant_id')
             session['business_account_id'] = verification.get('business_account_id')
             
+            # Set campaign language for Flask-Babel
+            campaign_id = verification.get('campaign_id')
+            if campaign_id:
+                try:
+                    from models import Campaign
+                    campaign = Campaign.query.get(campaign_id)
+                    if campaign and campaign.language_code:
+                        session['language'] = campaign.language_code
+                        logger.info(f"Set survey language to {campaign.language_code} for campaign {campaign_id}")
+                except Exception as e:
+                    logger.warning(f"Failed to load campaign language: {e}")
+            
             return {
                 'valid': True,
                 'authenticated': True,
@@ -249,6 +261,11 @@ def verify_survey_access(token):
         session['campaign_id'] = campaign.id
         session['participant_id'] = participant.id
         session['business_account_id'] = uuid_participant.business_account_id
+        
+        # Set campaign language for Flask-Babel
+        if campaign.language_code:
+            session['language'] = campaign.language_code
+            logger.info(f"Set survey language to {campaign.language_code} for campaign {campaign.id}")
         
         # Update status if first access
         if uuid_participant.status == 'invited':
