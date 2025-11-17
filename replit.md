@@ -1,6 +1,25 @@
 # Overview
 VOÏA (Voice Of Client) is a Flask-based system for comprehensive customer feedback collection and AI-powered analysis, specializing in Net Promoter Score (NPS) surveys. It transforms raw customer feedback into actionable insights, identifying sentiment, key themes, churn risk, and growth opportunities. VOÏA aims to provide businesses with a robust tool for understanding customer sentiment, improving services, and fostering organic growth through AI-driven analysis of customer interactions. The project includes a production-ready multi-tenant participant management system with extensive email delivery capabilities, AI-powered conversational surveys using a hybrid prompt architecture, and participant segmentation for personalized experiences and advanced analytics.
 
+# Recent Changes (November 17, 2025)
+
+**Phase 1: French Language Support Foundation (COMPLETE)**
+- **Database Schema**: Added `language_code` column to campaigns table (VARCHAR(5), CHECK constraint for 'en'/'fr', indexed) with backward-compatible default 'en'
+- **Campaign Model**: Updated Campaign model with language_code field, included in to_dict() serialization
+- **Bilingual Theme Mappings**: Created JSON configuration system (config/theme_mappings.json) with 15 canonical themes covering ~50-80 French/English variations
+- **Theme Consolidation**: Enhanced consolidate_theme_name() to load bilingual mappings from JSON with 5-minute cache, graceful fallback to legacy English-only mappings
+- **Feature Flags**: Implemented USE_BILINGUAL_THEMES environment variable (default: true) for instant rollback capability
+- **Data Isolation**: Added mandatory campaign_id validation to /api/account_intelligence endpoint preventing cross-language data contamination
+- **Response Tracking**: Added optional response_language field to survey_response table for analytics and segmentation
+- **Architect Status**: Foundation reviewed and approved - no blocking defects, security validated, performance acceptable
+
+**Pending Integration (Phases 2-5)**:
+- Campaign UI language selector in creation/edit forms
+- Email template rendering based on campaign language
+- Survey page language injection into Flask-Babel session
+- AI conversational prompt context for French/English responses
+- End-to-end testing in staging environment
+
 # Recent Changes (November 10, 2025)
 
 **Phase 3 Frontend Refactoring - Functional Migration (ALL SPRINTS COMPLETE)**
