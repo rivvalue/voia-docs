@@ -183,6 +183,12 @@ def create_campaign():
         campaign.status = 'draft'  # Initial status
         campaign.anonymize_responses = anonymize_responses
         
+        # Language configuration
+        language_code = request.form.get('language_code', 'en').strip().lower()
+        if language_code not in ['en', 'fr']:
+            language_code = 'en'  # Safe fallback
+        campaign.language_code = language_code
+        
         # Reminder settings with validation
         reminder_enabled = 'reminder_enabled' in request.form
         try:
@@ -415,6 +421,14 @@ def edit_draft_campaign(campaign_id):
         if campaign.reminder_delay_days != reminder_delay_days:
             changes['reminder_delay_days'] = {'old': campaign.reminder_delay_days, 'new': reminder_delay_days}
         
+        # Language configuration
+        language_code = request.form.get('language_code', 'en').strip().lower()
+        if language_code not in ['en', 'fr']:
+            language_code = 'en'  # Safe fallback
+        
+        if campaign.language_code != language_code:
+            changes['language_code'] = {'old': campaign.language_code, 'new': language_code}
+        
         # Update campaign
         campaign.name = name
         campaign.description = description or None
@@ -422,6 +436,7 @@ def edit_draft_campaign(campaign_id):
         campaign.end_date = end_date_obj
         campaign.reminder_enabled = reminder_enabled
         campaign.reminder_delay_days = reminder_delay_days
+        campaign.language_code = language_code
         
         # Custom email content
         use_custom_email_content = request.form.get('use_custom_email_content') == 'on'

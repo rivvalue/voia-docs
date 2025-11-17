@@ -134,6 +134,15 @@ window.CampaignFormI18n = {
                               placeholder={{ _('Optional description of campaign goals, focus areas, or target audience') }}>{{ campaign.description or '' }}</textarea>
                     <div class="form-text">{{ _('Optional details about this campaign\'s purpose and scope') }}</div>
                 </div>
+                
+                <div class="mb-3">
+                    <label for="language_code" class="form-label">{{ _('Campaign Language') }} <span class="text-danger">*</span></label>
+                    <select class="form-select" id="language_code" name="language_code" required>
+                        <option value="en" {% if campaign.language_code == 'en' %}selected{% endif %}>{{ _('English') }}</option>
+                        <option value="fr" {% if campaign.language_code == 'fr' %}selected{% endif %}>{{ _('French') }} / Français</option>
+                    </select>
+                    <div class="form-text">{{ _('Language for all campaign communications (emails, survey pages, AI conversations)') }}</div>
+                </div>
             </div>
 
             <!-- Schedule -->
