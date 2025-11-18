@@ -1313,7 +1313,7 @@ def email_preview(campaign_id):
             return jsonify({'error': 'Campaign not found'}), 404
         
         # Get email type from query parameter (default: invitation)
-        email_type = request.args.get('type', 'invitation')
+        email_type = request.args.get('email_type', 'invitation')
         
         # Validate email type
         valid_types = ['invitation', 'reminder_primary', 'reminder_midpoint']
