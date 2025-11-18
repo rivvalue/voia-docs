@@ -277,10 +277,11 @@ class EmailService:
             result = {k: None for k in defaults.keys()}
         
         # Try business account email config (tier 2)
+        # Only use if it has custom content - otherwise skip to language-aware tier 3 defaults
         if business_account_id:
             try:
                 email_config = EmailConfiguration.get_for_business_account(business_account_id)
-                if email_config:
+                if email_config and email_config.use_custom_content:
                     account_content = email_config.get_email_content()
                     # Fill in any None values from campaign tier
                     for key in result.keys():
