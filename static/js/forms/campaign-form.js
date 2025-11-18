@@ -251,7 +251,8 @@ function previewEmail(emailType, campaignId) {
         method: 'GET',
         headers: {
             'Accept': 'text/html'
-        }
+        },
+        cache: 'no-store'
     })
     .then(response => {
         if (!response.ok) {
