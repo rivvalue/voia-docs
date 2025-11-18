@@ -247,7 +247,6 @@
                     <div class="checkbox-item">
                         <input type="checkbox" id="goal_{{ loop.index }}" name="survey_goals" value="{{ goal }}" 
                                {% if campaign.survey_goals and goal in campaign.survey_goals %}checked{% endif %}
-                               {% if goal == 'NPS' %}checked{% endif %}
                                {% if is_readonly %}disabled{% endif %}>
                         <label for="goal_{{ loop.index }}" class="form-check-label">{{ goal }}</label>
                     </div>
@@ -323,7 +322,6 @@
                                 <div class="multi-select-item">
                                     <input type="checkbox" id="priority_{{ loop.index }}" name="prioritized_topics" value="{{ topic }}" 
                                            {% if campaign.prioritized_topics and topic in campaign.prioritized_topics %}checked{% endif %}
-                                           {% if topic in ['NPS Score', 'Product Quality', 'Support Experience'] %}checked{% endif %}
                                            {% if is_readonly %}disabled{% endif %}>
                                     <label for="priority_{{ loop.index }}" class="form-check-label">{{ topic }}</label>
                                 </div>
