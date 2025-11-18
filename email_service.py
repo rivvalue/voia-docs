@@ -1278,6 +1278,10 @@ The {branding['company_name']} Team
             
             # Build email based on type
             if email_type == 'invitation':
+                # Log invitation preview language detection
+                campaign_lang = campaign.language_code if hasattr(campaign, 'language_code') else 'unknown'
+                logger.info(f"📧 INVITATION PREVIEW: Campaign {campaign.id} language='{campaign_lang}', subject='{email_content['subject'][:50]}...'")
+                
                 # Email subject
                 subject = self._substitute_variables(email_content['subject'], template_vars)
                 
