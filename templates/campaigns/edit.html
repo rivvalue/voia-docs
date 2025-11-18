@@ -327,13 +327,13 @@ Thank you for your time and valuable insights!">{{ campaign.custom_closing_messa
                 </p>
                 
                 <div class="d-flex gap-2 flex-wrap">
-                    <button type="button" class="btn btn-outline-primary" onclick="previewEmail('invitation')">
+                    <button type="button" class="btn btn-outline-primary" onclick="previewEmail('invitation', {{ campaign.id }})">
                         <i class="fas fa-envelope me-2"></i>{{ _('Preview Invitation') }}
                     </button>
-                    <button type="button" class="btn btn-outline-danger" onclick="previewEmail('reminder_primary')">
+                    <button type="button" class="btn btn-outline-danger" onclick="previewEmail('reminder_primary', {{ campaign.id }})">
                         <i class="fas fa-bell me-2"></i>{{ _('Preview Last Chance Reminder') }}
                     </button>
-                    <button type="button" class="btn btn-outline-warning" onclick="previewEmail('reminder_midpoint')">
+                    <button type="button" class="btn btn-outline-warning" onclick="previewEmail('reminder_midpoint', {{ campaign.id }})">
                         <i class="fas fa-clock me-2"></i>{{ _('Preview Midpoint Reminder') }}
                     </button>
                 </div>
