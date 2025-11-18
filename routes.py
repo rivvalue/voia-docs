@@ -730,12 +730,17 @@ def survey():
                                      campaign_name=campaign_name,
                                      branding=branding)
         else:
-            # Get default branding for unauthenticated users
+            # Token verification failed - render error page
+            error_code = verification.get('error_code', 'invalid_token')
             branding = get_branding_context()
-            return render_template('survey_choice.html', 
-                                 authenticated=False, 
-                                 error=verification['error'], 
-                                 user_email=None,
+            return render_template('survey_unavailable.html',
+                                 error_code=error_code,
+                                 error_message=verification.get('error'),
+                                 campaign_name=verification.get('campaign_name'),
+                                 campaign_end_date=verification.get('campaign_end_date'),
+                                 campaign_start_date=verification.get('campaign_start_date'),
+                                 completed_at=verification.get('completed_at'),
+                                 show_contact_info=True,
                                  branding=branding)
     else:
         # Check if already authenticated via session
@@ -787,15 +792,18 @@ def survey_form():
                                  branding_context=branding_context,
                                  is_business_authenticated=is_business_authenticated)
         else:
-            # Get demo branding for unauthenticated trial users
+            # Token verification failed - render error page
+            error_code = verification.get('error_code', 'invalid_token')
             branding_context = get_branding_context(business_account_id=1)
-            return render_template('survey.html', 
-                                 authenticated=False, 
-                                 error=verification['error'], 
-                                 user_email=None,
-                                 branding=branding_context,
-                                 branding_context=branding_context,
-                                 is_business_authenticated=False)
+            return render_template('survey_unavailable.html',
+                                 error_code=error_code,
+                                 error_message=verification.get('error'),
+                                 campaign_name=verification.get('campaign_name'),
+                                 campaign_end_date=verification.get('campaign_end_date'),
+                                 campaign_start_date=verification.get('campaign_start_date'),
+                                 completed_at=verification.get('completed_at'),
+                                 show_contact_info=True,
+                                 branding=branding_context)
     else:
         # Check if already authenticated via session
         if session.get('auth_token'):
@@ -2659,16 +2667,18 @@ def conversational_survey():
                                      branding_context=branding_context,
                                      is_business_authenticated=False)
             else:
-                error_msg = verification.get('error', 'Invalid or expired token')
-                # Get demo branding for error cases
+                # Token verification failed - render error page
+                error_code = verification.get('error_code', 'invalid_token')
                 branding_context = get_branding_context(business_account_id=1)
-                return render_template('conversational_survey.html', 
-                                     authenticated=False, 
-                                     error=error_msg, 
-                                     user_email=None, 
-                                     branding=branding_context,
-                                     branding_context=branding_context,
-                                     is_business_authenticated=False)
+                return render_template('survey_unavailable.html',
+                                     error_code=error_code,
+                                     error_message=verification.get('error'),
+                                     campaign_name=verification.get('campaign_name'),
+                                     campaign_end_date=verification.get('campaign_end_date'),
+                                     campaign_start_date=verification.get('campaign_start_date'),
+                                     completed_at=verification.get('completed_at'),
+                                     show_contact_info=True,
+                                     branding=branding_context)
     else:
         # Check if already authenticated via session
         if session.get('auth_token'):

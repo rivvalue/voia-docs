@@ -7308,3 +7308,86 @@ msgstr "Télécharger le modèle de fichier CSV"
 #~ msgid "M"
 #~ msgstr ""
 
+
+# Survey Unavailable Error Page Translations (Added 2025)
+msgid "Survey Unavailable - VOÏA"
+msgstr "Enquête indisponible - VOÏA"
+
+msgid "This Campaign Has Ended"
+msgstr "Cette campagne est terminée"
+
+msgid "Response Already Submitted"
+msgstr "Réponse déjà soumise"
+
+msgid "Survey Link Expired"
+msgstr "Lien d'enquête expiré"
+
+msgid "Campaign Not Yet Started"
+msgstr "Campagne pas encore démarrée"
+
+msgid "Survey Unavailable"
+msgstr "Enquête indisponible"
+
+msgid "The \"{}\" feedback campaign closed on {}."
+msgstr "La campagne de retour d'expérience \"{}\" s'est clôturée le {}."
+
+msgid "requested"
+msgstr "demandée"
+
+msgid "a previous date"
+msgstr "une date antérieure"
+
+msgid "We sincerely appreciate your interest in providing feedback. Your willingness to share your thoughts means a lot to us, and we apologize for any inconvenience."
+msgstr "Nous apprécions sincèrement votre intérêt à fournir des commentaires. Votre volonté de partager vos réflexions compte beaucoup pour nous, et nous nous excusons pour tout inconvénient."
+
+msgid "Thank You!"
+msgstr "Merci !"
+
+msgid "You already submitted your feedback for this campaign."
+msgstr "Vous avez déjà soumis vos commentaires pour cette campagne."
+
+msgid "Your response was successfully recorded and is helping us improve our services. We appreciate your valuable input."
+msgstr "Votre réponse a été enregistrée avec succès et nous aide à améliorer nos services. Nous apprécions votre contribution précieuse."
+
+msgid "This survey link has expired."
+msgstr "Ce lien d'enquête a expiré."
+
+msgid "Survey links are valid for 72 hours after being generated. If you still wish to provide feedback, please contact {} for assistance."
+msgstr "Les liens d'enquête sont valables 72 heures après leur génération. Si vous souhaitez toujours fournir des commentaires, veuillez contacter {} pour obtenir de l'aide."
+
+msgid "the organization that sent you this survey"
+msgstr "l'organisation qui vous a envoyé cette enquête"
+
+msgid "This campaign is scheduled to begin soon."
+msgstr "Cette campagne devrait commencer bientôt."
+
+msgid "Start Date: {}"
+msgstr "Date de début : {}"
+
+msgid "Please check back on the start date to share your feedback. We look forward to hearing from you!"
+msgstr "Veuillez revenir à la date de début pour partager vos commentaires. Nous avons hâte de vous entendre !"
+
+msgid "This survey link is not valid."
+msgstr "Ce lien d'enquête n'est pas valide."
+
+msgid "The link you used may be incorrect or no longer active. Please contact {} for assistance."
+msgstr "Le lien que vous avez utilisé peut être incorrect ou n'est plus actif. Veuillez contacter {} pour obtenir de l'aide."
+
+msgid "Need Help?"
+msgstr "Besoin d'aide ?"
+
+msgid "For questions or to provide feedback through another channel:"
+msgstr "Pour toute question ou pour fournir des commentaires par un autre canal :"
+
+msgid "Contact:"
+msgstr "Contact :"
+
+msgid "the organization that invited you"
+msgstr "l'organisation qui vous a invité"
+
+msgid "Return to Website"
+msgstr "Retour au site Web"
+
+msgid "Voice Of Client"
+msgstr "Voix du client"
+

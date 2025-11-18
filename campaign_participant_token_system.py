@@ -41,9 +41,13 @@ def create_campaign_participant_token(association_id):
         # Validate campaign is active or ready to receive responses
         campaign = association.campaign
         if campaign.status not in ['ready', 'active']:
+            # Return structured error with code for frontend handling
+            error_code = 'campaign_completed' if campaign.status == 'completed' else 'campaign_not_started'
             return {
                 'success': False,
-                'error': f'Campaign is {campaign.status} and cannot accept responses'
+                'error': f'Campaign is {campaign.status} and cannot accept responses',
+                'error_code': error_code,
+                'campaign_status': campaign.status
             }
         
         # Use the same secret as Flask app - REQUIRED in production
@@ -126,11 +130,27 @@ def verify_campaign_participant_token(jwt_token):
         # Verify campaign status allows responses
         campaign = association.campaign
         if campaign.status not in ['ready', 'active']:
-            return {'valid': False, 'error': f'Campaign is {campaign.status} and cannot accept responses'}
+            # Return structured error with code for frontend handling
+            error_code = 'campaign_completed' if campaign.status == 'completed' else 'campaign_not_started'
+            return {
+                'valid': False,
+                'error': f'Campaign is {campaign.status} and cannot accept responses',
+                'error_code': error_code,
+                'campaign_status': campaign.status,
+                'campaign_name': campaign.name,
+                'campaign_end_date': campaign.end_date.strftime('%B %d, %Y') if campaign.end_date else None,
+                'campaign_start_date': campaign.start_date.strftime('%B %d, %Y') if campaign.start_date else None
+            }
         
         # Reject completed associations to prevent token reuse
         if association.status == 'completed':
-            return {'valid': False, 'error': 'Survey has already been completed for this campaign'}
+            return {
+                'valid': False,
+                'error': 'Survey has already been completed for this campaign',
+                'error_code': 'already_completed',
+                'campaign_name': campaign.name,
+                'completed_at': association.completed_at.strftime('%B %d, %Y') if association.completed_at else None
+            }
         
         # Update association status on first verification
         if association.status == 'invited':
@@ -151,13 +171,13 @@ def verify_campaign_participant_token(jwt_token):
         }
         
     except jwt.ExpiredSignatureError:
-        return {'valid': False, 'error': 'Token has expired'}
+        return {'valid': False, 'error': 'Token has expired', 'error_code': 'token_expired'}
     except jwt.InvalidTokenError as e:
         logger.exception(f"JWT decode failed: {e}")
-        return {'valid': False, 'error': 'Invalid token'}
+        return {'valid': False, 'error': 'Invalid token', 'error_code': 'invalid_token'}
     except Exception as e:
         logger.error(f"Error verifying campaign participant token: {e}")
-        return {'valid': False, 'error': 'Token verification failed'}
+        return {'valid': False, 'error': 'Token verification failed', 'error_code': 'invalid_token'}
 
 
 def generate_participant_survey_url(association_id, base_url="https://vocsa.replit.app"):

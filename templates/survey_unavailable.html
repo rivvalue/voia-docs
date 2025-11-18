@@ -1,0 +1,186 @@
+{% extends "base_minimal.html" %}
+
+{% block title %}{{ _('Survey Unavailable - VOÏA') }}{% endblock %}
+
+{% block page_class %}page-survey-unavailable{% endblock %}
+
+{% block content %}
+<!-- Language Selector (Fixed Position) -->
+<div style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
+    {% include 'components/language_selector.html' %}
+</div>
+
+<!-- V2 Header with Red Gradient -->
+<div style="background: linear-gradient(135deg, var(--primary-red, #E13A44) 0%, var(--red-hover, #C62D37) 100%); padding: 3rem 2rem; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    <div class="container">
+        <div class="text-center text-white">
+            {% if branding and branding.logo_url %}
+                <div class="mb-3">
+                    <img src="{{ branding.logo_url }}" alt="{{ branding.company_name }}" class="img-fluid" style="max-height: 80px; filter: brightness(0) invert(1);">
+                </div>
+            {% endif %}
+            
+            <div class="mb-3">
+                <i class="fas fa-exclamation-circle" style="font-size: 4rem; opacity: 0.9;" aria-hidden="true"></i>
+            </div>
+            
+            <h1 class="mb-2" style="font-size: 2rem; font-weight: 700;">
+                {% if error_code == 'campaign_completed' %}
+                    {{ _('This Campaign Has Ended') }}
+                {% elif error_code == 'already_completed' %}
+                    {{ _('Response Already Submitted') }}
+                {% elif error_code == 'token_expired' %}
+                    {{ _('Survey Link Expired') }}
+                {% elif error_code == 'campaign_not_started' %}
+                    {{ _('Campaign Not Yet Started') }}
+                {% else %}
+                    {{ _('Survey Unavailable') }}
+                {% endif %}
+            </h1>
+            
+            {% if campaign_name %}
+                <p class="mb-0" style="font-size: 1.1rem; opacity: 0.95;">
+                    <i class="fas fa-bullseye me-2" aria-hidden="true"></i>{{ campaign_name }}
+                </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <!-- Error-Specific Message -->
+                    {% if error_code == 'campaign_completed' %}
+                        <div class="text-center mb-4">
+                            <p class="lead mb-3">
+                                {{ _('The "{}" feedback campaign closed on {}.').format(campaign_name or _('requested'), campaign_end_date or _('a previous date')) }}
+                            </p>
+                            <p class="text-muted">
+                                {{ _('We sincerely appreciate your interest in providing feedback. Your willingness to share your thoughts means a lot to us, and we apologize for any inconvenience.') }}
+                            </p>
+                        </div>
+                    
+                    {% elif error_code == 'already_completed' %}
+                        <div class="text-center mb-4">
+                            <div class="alert alert-success" role="alert">
+                                <i class="fas fa-check-circle me-2"></i>
+                                <strong>{{ _('Thank You!') }}</strong>
+                            </div>
+                            <p class="lead mb-3">
+                                {{ _('You already submitted your feedback for this campaign.') }}
+                            </p>
+                            <p class="text-muted">
+                                {{ _('Your response was successfully recorded and is helping us improve our services. We appreciate your valuable input.') }}
+                            </p>
+                        </div>
+                    
+                    {% elif error_code == 'token_expired' %}
+                        <div class="text-center mb-4">
+                            <p class="lead mb-3">
+                                {{ _('This survey link has expired.') }}
+                            </p>
+                            <p class="text-muted">
+                                {{ _('Survey links are valid for 72 hours after being generated. If you still wish to provide feedback, please contact {} for assistance.').format(branding.company_name if branding and branding.company_name else _('the organization that sent you this survey')) }}
+                            </p>
+                        </div>
+                    
+                    {% elif error_code == 'campaign_not_started' %}
+                        <div class="text-center mb-4">
+                            <p class="lead mb-3">
+                                {{ _('This campaign is scheduled to begin soon.') }}
+                            </p>
+                            {% if campaign_start_date %}
+                                <div class="alert alert-info" role="alert">
+                                    <i class="fas fa-calendar-alt me-2"></i>
+                                    {{ _('Start Date: {}').format(campaign_start_date) }}
+                                </div>
+                            {% endif %}
+                            <p class="text-muted">
+                                {{ _('Please check back on the start date to share your feedback. We look forward to hearing from you!') }}
+                            </p>
+                        </div>
+                    
+                    {% else %}
+                        <!-- Generic error (invalid token, etc.) -->
+                        <div class="text-center mb-4">
+                            <p class="lead mb-3">
+                                {{ _('This survey link is not valid.') }}
+                            </p>
+                            <p class="text-muted">
+                                {{ _('The link you used may be incorrect or no longer active. Please contact {} for assistance.').format(branding.company_name if branding and branding.company_name else _('the organization that sent you this survey')) }}
+                            </p>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Contact Information (if available) -->
+                    {% if show_contact_info %}
+                        <div class="mt-4 pt-4 border-top">
+                            <h5 class="mb-3">
+                                <i class="fas fa-envelope me-2" style="color: var(--primary-red, #E13A44);" aria-hidden="true"></i>
+                                {{ _('Need Help?') }}
+                            </h5>
+                            <p class="mb-2">
+                                {{ _('For questions or to provide feedback through another channel:') }}
+                            </p>
+                            <p class="mb-0">
+                                <strong>{{ _('Contact:') }}</strong> 
+                                {% if branding and branding.company_name %}
+                                    {{ branding.company_name }}
+                                {% else %}
+                                    {{ _('the organization that invited you') }}
+                                {% endif %}
+                            </p>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Return Button -->
+                    <div class="text-center mt-4">
+                        {% if branding and branding.website_url %}
+                            <a href="{{ branding.website_url }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>{{ _('Return to Website') }}
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- VOÏA Attribution -->
+            <div class="text-center mt-4 text-muted" style="font-size: 0.9rem;">
+                <span>{{ _('Powered by') }}</span>
+                <span style="font-weight: 600; color: var(--text-primary, #333);">
+                    VO<span style="color: var(--primary-red, #E13A44);">Ï</span>A
+                </span>
+                <span style="opacity: 0.8;">{{ _('Voice Of Client') }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Mobile-responsive adjustments */
+@media (max-width: 768px) {
+    .page-survey-unavailable h1 {
+        font-size: 1.5rem !important;
+    }
+    
+    .page-survey-unavailable .lead {
+        font-size: 1rem !important;
+    }
+    
+    .page-survey-unavailable i.fa-exclamation-circle {
+        font-size: 3rem !important;
+    }
+}
+
+/* Accessibility: Focus states */
+.page-survey-unavailable a:focus,
+.page-survey-unavailable button:focus {
+    outline: 3px solid var(--primary-red, #E13A44);
+    outline-offset: 2px;
+}
+</style>
+{% endblock %}
