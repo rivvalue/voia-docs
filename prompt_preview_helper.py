@@ -17,8 +17,21 @@ def _apply_config_overrides(service: PromptTemplateService, overrides: Dict[str,
     Returns:
         The modified entity (for cleanup)
     """
+    # Reload ORM objects using IDs stored in service
+    # (service uses hot path primitives, doesn't store campaign/business_account objects)
+    from models import Campaign, BusinessAccount
+    
+    campaign = None
+    business_account = None
+    
+    if service.campaign_id:
+        campaign = Campaign.query.get(service.campaign_id)
+    
+    if service.business_account_id:
+        business_account = BusinessAccount.query.get(service.business_account_id)
+    
     # Determine which entity to override (campaign takes precedence)
-    target = service.campaign if service.campaign else service.business_account
+    target = campaign if campaign else business_account
     
     if not target:
         return None  # Demo mode, no overrides applicable
@@ -135,8 +148,8 @@ def build_preview_prompt(
         'metadata': {
             'business_account_id': business_account_id,
             'campaign_id': campaign_id,
-            'using_campaign_config': template_service.campaign is not None and template_service.has_campaign_customization(),
-            'using_business_config': template_service.business_account is not None,
+            'using_campaign_config': campaign_id is not None and template_service.has_campaign_customization(),
+            'using_business_config': business_account_id is not None,
             'fallback_to_demo': template_service.is_demo_mode
         }
     }
