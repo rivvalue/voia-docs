@@ -1305,6 +1305,11 @@ The {branding['company_name']} Team
                     supported_languages = ['en', 'fr']
                     if campaign.language_code in supported_languages:
                         campaign_language = campaign.language_code
+                        logger.info(f"📧 REMINDER PREVIEW: Detected campaign language '{campaign_language}' for campaign {campaign.id}")
+                    else:
+                        logger.warning(f"📧 REMINDER PREVIEW: Unsupported language '{campaign.language_code}', using English")
+                else:
+                    logger.info(f"📧 REMINDER PREVIEW: No language_code on campaign {campaign.id}, using English")
                 
                 # Language-aware reminder content
                 if campaign_language == 'fr':
