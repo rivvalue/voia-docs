@@ -590,9 +590,7 @@ function downloadExecutiveReport(campaignId, campaignName) {
             }
         } else {
             // No report exists, offer to generate one
-            if (confirm(`No executive report exists for "${campaignName}". Would you like to generate one now?`)) {
-                generateExecutiveReport(campaignId, campaignName);
-            }
+            showGenerateReportModal(campaignId, campaignName);
         }
     })
     .catch(error => {
@@ -642,10 +640,10 @@ function generateExecutiveReport(campaignId, campaignName) {
 function regenerateExecutiveReport(campaignId, campaignName) {
     console.log('{{ _('Start') }}ing executive report regeneration for campaign:', campaignId);
     
-    if (!confirm(`Regenerate executive report for "${campaignName}"?\n\nThis will replace the existing report with a new version containing the latest data and updated features.`)) {
-        return;
-    }
-    
+    showRegenerateReportModal(campaignId, campaignName);
+}
+
+function confirmRegenerateReport(campaignId, campaignName) {
     // Get CSRF token
     const csrfToken = document.querySelector('meta[name=csrf-token]');
     if (!csrfToken) {
@@ -1000,5 +998,87 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log(`✅ Scheduled ${reportButtons.length} executive report checks`);
     });
 });
+
+// Modal handlers
+function showGenerateReportModal(campaignId, campaignName) {
+    document.getElementById('generateReportCampaignName').textContent = campaignName;
+    document.getElementById('confirmGenerateReportBtn').onclick = function() {
+        bootstrap.Modal.getInstance(document.getElementById('generateReportModal')).hide();
+        generateExecutiveReport(campaignId, campaignName);
+    };
+    new bootstrap.Modal(document.getElementById('generateReportModal')).show();
+}
+
+function showRegenerateReportModal(campaignId, campaignName) {
+    document.getElementById('regenerateReportCampaignName').textContent = campaignName;
+    document.getElementById('confirmRegenerateReportBtn').onclick = function() {
+        bootstrap.Modal.getInstance(document.getElementById('regenerateReportModal')).hide();
+        confirmRegenerateReport(campaignId, campaignName);
+    };
+    new bootstrap.Modal(document.getElementById('regenerateReportModal')).show();
+}
 </script>
+
+<!-- Confirmation Modals -->
+
+<!-- Generate Executive Report Modal -->
+<div class="modal fade" id="generateReportModal" tabindex="-1" aria-labelledby="generateReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%); color: var(--primary-white);">
+                <h5 class="modal-title" id="generateReportModalLabel">
+                    <i class="fas fa-file-alt me-2"></i>{{ _('Generate Executive Report') }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>{{ _('No executive report exists for') }} "<strong><span id="generateReportCampaignName"></span></strong>".</p>
+                <p><strong>{{ _('Would you like to generate one now?') }}</strong></p>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    {{ _('The report will be generated in the background and will be ready for download in a few minutes.') }}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>{{ _('Cancel') }}
+                </button>
+                <button type="button" class="btn btn-primary" id="confirmGenerateReportBtn">
+                    <i class="fas fa-play me-2"></i>{{ _('Yes, Generate Report') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Regenerate Executive Report Modal -->
+<div class="modal fade" id="regenerateReportModal" tabindex="-1" aria-labelledby="regenerateReportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%); color: var(--primary-white);">
+                <h5 class="modal-title" id="regenerateReportModalLabel">
+                    <i class="fas fa-sync-alt me-2"></i>{{ _('Regenerate Executive Report') }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>{{ _('Regenerate executive report for') }} "<span id="regenerateReportCampaignName"></span>"?</strong></p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>{{ _('Note:') }}</strong> {{ _('This will replace the existing report with a new version containing the latest data and updated features.') }}
+                </div>
+                <p>{{ _('The updated report will be ready in a few minutes.') }}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>{{ _('Cancel') }}
+                </button>
+                <button type="button" class="btn btn-primary" id="confirmRegenerateReportBtn">
+                    <i class="fas fa-sync-alt me-2"></i>{{ _('Yes, Regenerate Report') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
