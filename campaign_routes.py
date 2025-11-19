@@ -750,10 +750,19 @@ def activate_campaign(campaign_id):
         
         # Check license limits before activation using new LicenseService
         from license_service import LicenseService
-        if not LicenseService.can_activate_campaign(current_account.id):
-            # Get license info for detailed error message
-            license_info = LicenseService.get_license_info(current_account.id)
-            flash(f'Cannot activate campaign. Your {license_info["license_type"]} license allows {license_info["campaigns_limit"]} campaigns per license period and you have already used {license_info["campaigns_used"]} campaigns. Please contact support to upgrade your license.', 'error')
+        try:
+            if not LicenseService.can_activate_campaign(current_account.id):
+                # Get license info for detailed error message
+                try:
+                    license_info = LicenseService.get_license_info(current_account.id)
+                    flash(f'Cannot activate campaign. Your {license_info["license_type"]} license allows {license_info["campaigns_limit"]} campaigns per license period and you have already used {license_info["campaigns_used"]} campaigns. Please contact support to upgrade your license.', 'error')
+                except Exception as info_error:
+                    logger.error(f"Failed to get license info for error message: {info_error}")
+                    flash('Cannot activate campaign. License limit reached. Please contact support to upgrade your license.', 'error')
+                return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
+        except Exception as license_error:
+            logger.error(f"License check failed during campaign activation: {license_error}")
+            flash('Cannot activate campaign due to a license system error. Please contact support for assistance.', 'error')
             return redirect(url_for('campaigns.view_campaign', campaign_id=campaign_id))
         
         # Activate campaign

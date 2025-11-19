@@ -220,9 +220,10 @@ class LicenseService:
             except Exception as fallback_error:
                 logger.error(f"Legacy fallback failed for campaign limit check: {fallback_error}")
             
-            # Default to allowing campaigns if all checks fail (fail-safe behavior)
-            logger.warning(f"All license checks failed for business_account_id {business_account_id}, defaulting to allow campaign")
-            return True
+            # FAIL CLOSED: Deny activation if license check fails (revenue protection)
+            # This prevents unlimited usage when the license system has errors
+            logger.error(f"❌ All license checks failed for business_account_id {business_account_id}, DENYING campaign activation for safety. Please contact support.")
+            return False
     
     @staticmethod
     def get_campaigns_used_in_current_period(business_account_id: int, period_start: Optional[date] = None, period_end: Optional[date] = None) -> int:
