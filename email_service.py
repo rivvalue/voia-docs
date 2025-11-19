@@ -321,7 +321,8 @@ class EmailService:
                                      closing_text: str,
                                      footer_text: str,
                                      branding: Dict,
-                                     email_content: Dict) -> str:
+                                     email_content: Dict,
+                                     language: str = 'en') -> str:
         """Build invitation email HTML template.
         
         Shared helper used by both send_participant_invitation and preview_campaign_email
@@ -336,6 +337,7 @@ class EmailService:
             footer_text: Footer text (variable-substituted)
             branding: Branding configuration dict
             email_content: Email content dict with cta_text
+            language: Language code ('en' or 'fr') for email content
             
         Returns:
             HTML string for invitation email
@@ -347,13 +349,33 @@ class EmailService:
             company_name = branding['company_name']
             logo_html = f'<img src="{logo_url}" alt="{company_name}" style="max-height: 60px; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;">'
         
+        # Language-specific content
+        if language == 'fr':
+            page_title = f"Invitation à l'enquête - {campaign_name}"
+            badge_text = "📋 Nouvelle invitation à l'enquête"
+            greeting = f"Bonjour {participant_name},"
+            campaign_label = "Campagne :"
+            security_label = "🔒 Note de sécurité :"
+            security_text = "Ce lien personnalisé est sécurisé et expirera dans 72 heures."
+            closing = "Cordialement,"
+            team_prefix = "L'équipe"
+        else:  # English
+            page_title = f"Survey Invitation - {campaign_name}"
+            badge_text = "📋 New Survey Invitation"
+            greeting = f"Hello {participant_name},"
+            campaign_label = "Campaign:"
+            security_label = "🔒 Security Note:"
+            security_text = "This personalized link is secure and will expire in 72 hours."
+            closing = "Best regards,"
+            team_prefix = "The"
+        
         return f"""
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Survey Invitation - {campaign_name}</title>
+    <title>{page_title}</title>
     <style>
         body {{
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -442,15 +464,15 @@ class EmailService:
         </div>
         
         <div style="background-color: #f0f8ff; padding: 15px; border-radius: 5px; border-left: 4px solid #4A90E2; margin-bottom: 20px;">
-            <strong>📋 New Survey Invitation</strong>
+            <strong>{badge_text}</strong>
         </div>
         
-        <h2>Hello {participant_name},</h2>
+        <h2>{greeting}</h2>
         
         <p>{intro_text}</p>
         
         <div class="campaign-name">
-            <strong>Campaign:</strong> {campaign_name}
+            <strong>{campaign_label}</strong> {campaign_name}
         </div>
         
         <div style="text-align: center;">
@@ -458,13 +480,13 @@ class EmailService:
         </div>
         
         <div class="security-note">
-            <strong>🔒 Security Note:</strong> This personalized link is secure and will expire in 72 hours.
+            <strong>{security_label}</strong> {security_text}
         </div>
         
         <p style="white-space: pre-line;">{closing_text}</p>
         
-        <p>Best regards,<br>
-        The {branding['company_name']} Team</p>
+        <p>{closing}<br>
+        {team_prefix} {branding['company_name']}</p>
         
         <div class="footer">
             {footer_text}
@@ -1000,6 +1022,15 @@ class EmailService:
         """
         
         try:
+            # Determine campaign language with robust fallback
+            campaign_language = 'en'  # Safe default
+            if campaign and hasattr(campaign, 'language_code') and campaign.language_code:
+                supported_languages = ['en', 'fr']
+                if campaign.language_code in supported_languages:
+                    campaign_language = campaign.language_code
+                else:
+                    logger.warning(f"Unsupported campaign language '{campaign.language_code}', falling back to English")
+            
             # Get branding configuration for this business account
             branding = self._get_branding_config(business_account_id)
             
@@ -1025,7 +1056,31 @@ class EmailService:
             closing_text = self._substitute_variables(email_content['closing'], template_vars)
             footer_text = self._substitute_variables(email_content['footer'], template_vars)
             
-            text_body = f"""
+            # Language-aware text body
+            if campaign_language == 'fr':
+                text_body = f"""
+Bonjour {participant_name},
+
+{intro_text}
+
+Campagne : {campaign_name}
+
+Veuillez cliquer sur le lien ci-dessous pour compléter votre enquête :
+{survey_url}
+
+Ce lien personnalisé est sécurisé et expirera dans 72 heures.
+
+{closing_text}
+
+Cordialement,
+L'équipe {branding['company_name']}
+{branding['tagline']}
+
+---
+{footer_text}
+"""
+            else:  # English
+                text_body = f"""
 Hello {participant_name},
 
 {intro_text}
@@ -1056,7 +1111,8 @@ The {branding['company_name']} Team
                 closing_text=closing_text,
                 footer_text=footer_text,
                 branding=branding,
-                email_content=email_content
+                email_content=email_content,
+                language=campaign_language  # Pass detected language
             )
             
             # Send the email
@@ -1279,9 +1335,17 @@ The {branding['company_name']} Team
             
             # Build email based on type
             if email_type == 'invitation':
-                # Log invitation preview language detection
-                campaign_lang = campaign.language_code if hasattr(campaign, 'language_code') else 'unknown'
-                logger.info(f"📧 INVITATION PREVIEW: Campaign {campaign.id} language='{campaign_lang}', subject='{email_content['subject'][:50]}...'")
+                # Determine campaign language with robust fallback
+                campaign_language = 'en'
+                if hasattr(campaign, 'language_code') and campaign.language_code:
+                    supported_languages = ['en', 'fr']
+                    if campaign.language_code in supported_languages:
+                        campaign_language = campaign.language_code
+                        logger.info(f"📧 INVITATION PREVIEW: Detected campaign language '{campaign_language}' for campaign {campaign.id}")
+                    else:
+                        logger.warning(f"📧 INVITATION PREVIEW: Unsupported language '{campaign.language_code}', using English")
+                else:
+                    logger.info(f"📧 INVITATION PREVIEW: No language_code on campaign {campaign.id}, using English")
                 
                 # Email subject
                 subject = self._substitute_variables(email_content['subject'], template_vars)
@@ -1300,7 +1364,8 @@ The {branding['company_name']} Team
                     closing_text=closing_text,
                     footer_text=footer_text,
                     branding=branding,
-                    email_content=email_content
+                    email_content=email_content,
+                    language=campaign_language  # Pass detected language
                 )
                 
             else:  # reminder_primary or reminder_midpoint
