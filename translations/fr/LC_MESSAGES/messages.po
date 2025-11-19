@@ -7391,3 +7391,88 @@ msgstr "Retour au site Web"
 msgid "Voice Of Client"
 msgstr "Voix du client"
 
+# Campaign Configuration Tab Translations
+msgid "Configuration"
+msgstr "Configuration"
+
+msgid "Campaign Language"
+msgstr "Langue de la campagne"
+
+msgid "French"
+msgstr "Français"
+
+msgid "English"
+msgstr "Anglais"
+
+msgid "Anonymization"
+msgstr "Anonymisation"
+
+msgid "Created On"
+msgstr "Créé le"
+
+msgid "Completed On"
+msgstr "Terminé le"
+
+msgid "Schedule & Audience"
+msgstr "Calendrier et audience"
+
+msgid "Sent after"
+msgstr "Envoyé après"
+
+msgid "Total Participants"
+msgstr "Total des participants"
+
+msgid "Survey Experience"
+msgstr "Expérience d'enquête"
+
+msgid "Max Questions"
+msgstr "Questions maximales"
+
+msgid "Default (8)"
+msgstr "Par défaut (8)"
+
+msgid "Max Duration"
+msgstr "Durée maximale"
+
+msgid "Default (2 min)"
+msgstr "Par défaut (2 min)"
+
+msgid "Follow-ups per Topic"
+msgstr "Relances par sujet"
+
+msgid "Default (2)"
+msgstr "Par défaut (2)"
+
+msgid "Product/Service"
+msgstr "Produit/Service"
+
+msgid "Prioritized Topics"
+msgstr "Sujets prioritaires"
+
+msgid "Communications"
+msgstr "Communications"
+
+msgid "Email Provider"
+msgstr "Fournisseur d'e-mail"
+
+msgid "Sender Name"
+msgstr "Nom de l'expéditeur"
+
+msgid "Sender Email"
+msgstr "E-mail de l'expéditeur"
+
+msgid "Custom Email Content"
+msgstr "Contenu d'e-mail personnalisé"
+
+msgid "Customized"
+msgstr "Personnalisé"
+
+msgid "Default Templates"
+msgstr "Modèles par défaut"
+
+msgid "Custom Subject"
+msgstr "Objet personnalisé"
+
+msgid "Not Available"
+msgstr "Non disponible"
+

@@ -205,6 +205,11 @@
                     <i class="fas fa-file-alt me-2"></i>{{ _('Transcript Analysis') }}
                 </button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="configuration-tab" data-bs-toggle="tab" data-bs-target="#configuration-pane" type="button" role="tab" aria-controls="configuration-pane" aria-selected="false">
+                    <i class="fas fa-cog me-2"></i>{{ _('Configuration') }}
+                </button>
+            </li>
             {% endif %}
         </ul>
 
@@ -621,6 +626,184 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Configuration Tab (Active/Completed Campaigns Only) -->
+            {% if campaign_config %}
+            <div class="tab-pane fade" id="configuration-pane" role="tabpanel" aria-labelledby="configuration-tab">
+                <div class="row">
+                    <!-- Overview Section -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>{{ _('Overview') }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm table-borderless">
+                                    <tr>
+                                        <th width="40%">{{ _('Campaign Language') }}</th>
+                                        <td>
+                                            {% if campaign_config.language_code == 'fr' %}
+                                                <span class="badge bg-info">🇫🇷 {{ _('French') }}</span>
+                                            {% else %}
+                                                <span class="badge bg-info">🇬🇧 {{ _('English') }}</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>{{ _('Anonymization') }}</th>
+                                        <td>
+                                            {% if campaign_config.anonymize_responses %}
+                                                <span class="badge bg-success"><i class="fas fa-check me-1"></i>{{ _('Enabled') }}</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary"><i class="fas fa-times me-1"></i>{{ _('Disabled') }}</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>{{ _('Created On') }}</th>
+                                        <td>{{ campaign_config.created_at.strftime('%d/%m/%Y %H:%M') if campaign_config.created_at else _('Not Available') }}</td>
+                                    </tr>
+                                    {% if campaign.status == 'completed' and campaign_config.completed_at %}
+                                    <tr>
+                                        <th>{{ _('Completed On') }}</th>
+                                        <td>{{ campaign_config.completed_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                                    </tr>
+                                    {% endif %}
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Schedule & Audience Section -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>{{ _('Schedule & Audience') }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm table-borderless">
+                                    <tr>
+                                        <th width="40%">{{ _('Start Date') }}</th>
+                                        <td><strong>{{ campaign_config.start_date }}</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <th>{{ _('End Date') }}</th>
+                                        <td><strong>{{ campaign_config.end_date }}</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <th>{{ _('Reminders') }}</th>
+                                        <td>
+                                            {% if campaign_config.reminder_enabled %}
+                                                <span class="badge bg-success"><i class="fas fa-check me-1"></i>{{ _('Enabled') }}</span>
+                                                <small class="text-muted d-block mt-1">{{ _('Sent after') }} {{ campaign_config.reminder_delay_days }} {{ _('days') }}</small>
+                                            {% else %}
+                                                <span class="badge bg-secondary"><i class="fas fa-times me-1"></i>{{ _('Disabled') }}</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>{{ _('Total Participants') }}</th>
+                                        <td><strong>{{ participant_stats.total }}</strong></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Survey Experience Section -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0"><i class="fas fa-comments me-2"></i>{{ _('Survey Experience') }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm table-borderless">
+                                    <tr>
+                                        <th width="40%">{{ _('Max Questions') }}</th>
+                                        <td>{{ campaign_config.max_questions or _('Default (8)') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>{{ _('Max Duration') }}</th>
+                                        <td>{{ (campaign_config.max_duration_seconds // 60) if campaign_config.max_duration_seconds else _('Default (2 min)') }} {{ _('minutes') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>{{ _('Follow-ups per Topic') }}</th>
+                                        <td>{{ campaign_config.max_follow_ups_per_topic or _('Default (2)') }}</td>
+                                    </tr>
+                                    {% if campaign_config.product_description %}
+                                    <tr>
+                                        <th>{{ _('Product/Service') }}</th>
+                                        <td><small>{{ campaign_config.product_description[:100] }}{% if campaign_config.product_description|length > 100 %}...{% endif %}</small></td>
+                                    </tr>
+                                    {% endif %}
+                                    {% if campaign_config.prioritized_topics %}
+                                    <tr>
+                                        <th>{{ _('Prioritized Topics') }}</th>
+                                        <td>
+                                            {% for topic in campaign_config.prioritized_topics %}
+                                                <span class="badge bg-info me-1 mb-1">{{ topic }}</span>
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Communications Section -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header bg-danger text-white">
+                                <h5 class="mb-0"><i class="fas fa-envelope me-2"></i>{{ _('Communications') }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm table-borderless">
+                                    <tr>
+                                        <th width="40%">{{ _('Email Provider') }}</th>
+                                        <td>
+                                            {% if campaign_config.email_provider == 'aws_ses' %}
+                                                <span class="badge bg-warning text-dark">AWS SES</span>
+                                            {% elif campaign_config.email_provider == 'smtp' %}
+                                                <span class="badge bg-info">SMTP</span>
+                                            {% else %}
+                                                <span class="badge bg-primary">VOÏA Managed</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>{{ _('Sender Name') }}</th>
+                                        <td>{{ campaign_config.sender_name or 'VOÏA Team' }}</td>
+                                    </tr>
+                                    {% if campaign_config.sender_email %}
+                                    <tr>
+                                        <th>{{ _('Sender Email') }}</th>
+                                        <td><small>{{ campaign_config.sender_email }}</small></td>
+                                    </tr>
+                                    {% endif %}
+                                    <tr>
+                                        <th>{{ _('Custom Email Content') }}</th>
+                                        <td>
+                                            {% if campaign_config.use_custom_email_content %}
+                                                <span class="badge bg-success"><i class="fas fa-check me-1"></i>{{ _('Customized') }}</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ _('Default Templates') }}</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% if campaign_config.use_custom_email_content and campaign_config.custom_subject_template %}
+                                    <tr>
+                                        <th>{{ _('Custom Subject') }}</th>
+                                        <td><small class="text-muted">{{ campaign_config.custom_subject_template[:60] }}...</small></td>
+                                    </tr>
+                                    {% endif %}
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
             {% endif %}
         </div>
     </div>

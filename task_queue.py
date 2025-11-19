@@ -223,6 +223,17 @@ class TaskQueue:
             db.session.commit()
             
             if email_type == 'participant_invitation':
+                # Fetch Campaign object for language-aware email content
+                campaign = None
+                campaign_id = task_data.get('campaign_id')
+                if campaign_id:
+                    from models import Campaign
+                    campaign = Campaign.query.get(campaign_id)
+                    if campaign:
+                        logger.debug(f"Fetched Campaign {campaign_id} with language: {campaign.language_code}")
+                    else:
+                        logger.warning(f"Campaign {campaign_id} not found for invitation email")
+                
                 # Send participant invitation email with delivery tracking
                 result = email_service.send_participant_invitation(
                     participant_email=task_data['participant_email'],
@@ -231,7 +242,8 @@ class TaskQueue:
                     survey_token=task_data['survey_token'],
                     business_account_name=task_data['business_account_name'],
                     email_delivery_id=email_delivery.id,
-                    business_account_id=task_data.get('business_account_id')
+                    business_account_id=task_data.get('business_account_id'),
+                    campaign=campaign
                 )
                 
                 return result['success']
@@ -301,6 +313,17 @@ class TaskQueue:
             # Get email_type from task_data (either 'reminder_primary' or 'reminder_midpoint')
             email_type = task_data.get('email_type', 'reminder_primary')
             
+            # Fetch Campaign object for language-aware email content
+            campaign = None
+            campaign_id = task_data.get('campaign_id')
+            if campaign_id:
+                from models import Campaign
+                campaign = Campaign.query.get(campaign_id)
+                if campaign:
+                    logger.debug(f"Fetched Campaign {campaign_id} with language: {campaign.language_code} for reminder email")
+                else:
+                    logger.warning(f"Campaign {campaign_id} not found for reminder email")
+            
             # Send the reminder email with the appropriate type
             result = email_service.send_participant_reminder(
                 participant_email=task_data['participant_email'],
@@ -310,7 +333,7 @@ class TaskQueue:
                 business_account_name=task_data['business_account_name'],
                 email_delivery_id=email_delivery_id,
                 business_account_id=task_data.get('business_account_id'),
-                campaign=None,  # Could optionally pass campaign object for custom content
+                campaign=campaign,
                 email_type=email_type  # Pass email_type to differentiate primary vs midpoint
             )
             

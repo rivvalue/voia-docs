@@ -304,10 +304,54 @@ def view_campaign(campaign_id):
         campaign_data = campaign.to_dict()
         campaign_data['engagement_metrics'] = campaign.get_engagement_metrics()
         
+        # Fetch campaign configuration data for readonly view (active/completed campaigns)
+        campaign_config = None
+        if campaign.status in ['active', 'completed']:
+            from models import EmailConfiguration
+            email_config = EmailConfiguration.get_for_business_account(current_account.id)
+            
+            campaign_config = {
+                # Overview section
+                'language_code': campaign.language_code,
+                'anonymize_responses': campaign.anonymize_responses,
+                'created_at': campaign.created_at,
+                'completed_at': campaign.completed_at if hasattr(campaign, 'completed_at') else None,
+                
+                # Schedule & Audience section
+                'reminder_enabled': campaign.reminder_enabled,
+                'reminder_delay_days': campaign.reminder_delay_days,
+                'start_date': campaign.start_date,
+                'end_date': campaign.end_date,
+                
+                # Survey Experience section
+                'product_description': campaign.product_description,
+                'target_clients_description': campaign.target_clients_description,
+                'survey_goals': campaign.survey_goals,
+                'max_questions': campaign.max_questions,
+                'max_duration_seconds': campaign.max_duration_seconds,
+                'max_follow_ups_per_topic': campaign.max_follow_ups_per_topic,
+                'prioritized_topics': campaign.prioritized_topics,
+                'optional_topics': campaign.optional_topics,
+                'custom_end_message': campaign.custom_end_message,
+                'custom_system_prompt': campaign.custom_system_prompt,
+                
+                # Communications section
+                'use_custom_email_content': campaign.use_custom_email_content,
+                'custom_subject_template': campaign.custom_subject_template if campaign.use_custom_email_content else None,
+                'custom_intro_message': campaign.custom_intro_message if campaign.use_custom_email_content else None,
+                'custom_cta_text': campaign.custom_cta_text if campaign.use_custom_email_content else None,
+                'custom_closing_message': campaign.custom_closing_message if campaign.use_custom_email_content else None,
+                'custom_footer_note': campaign.custom_footer_note if campaign.use_custom_email_content else None,
+                'email_provider': email_config.email_provider if email_config else 'voila_managed',
+                'sender_name': email_config.sender_name if email_config else 'VOÏA Team',
+                'sender_email': email_config.sender_email if email_config else None,
+            }
+        
         return render_template('campaigns/view.html',
                              campaign=campaign_data,
                              participant_stats=campaign_participant_stats,
-                             business_account=current_account.to_dict())
+                             business_account=current_account.to_dict(),
+                             campaign_config=campaign_config)
         
     except Exception as e:
         logger.error(f"Campaign view error: {e}")
