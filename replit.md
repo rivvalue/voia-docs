@@ -29,7 +29,7 @@ The system is a Flask web application with a multi-tiered architecture, using Ji
 -   **Dual-Reminder System**: Enhanced automated reminder strategy with two-stage engagement (Midpoint and Last Chance Reminders).
 -   **Campaign Lifecycle Management**: Automated status transitions, multi-tenant scheduling, automatic KPI snapshot generation, and background task management with audit logging.
 -   **Hybrid Survey Customization**: Campaign-specific survey personalization with business account defaults.
--   **License Management System**: Enterprise-ready license management with usage tracking and enforcement.
+-   **License Management System**: Enterprise-ready license management with usage tracking and enforcement. **Security fix (Nov 2025)**: Changed license enforcement from "fail open" to "fail closed" - system now denies campaign activation when license checks fail, protecting revenue and preventing unlimited usage during system errors.
 -   **Business Account User Management**: Multi-tenant user management with professional UI, license-aware counters, and comprehensive user workflows.
 -   **Onboarding System with Conditional Access**: Progressive, non-blocking onboarding for Core/Plus license holders with persistent warning banners and an onboarding progress dashboard.
 -   **Feature Flag System**: Production-ready infrastructure for UI version toggling and frontend refactoring rollout.
