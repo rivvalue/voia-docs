@@ -491,6 +491,39 @@ PARTICIPANT PROFILE:
         for goal in survey_config['goals']:
             goals_text += f"  {goal['priority']}. {goal['topic']}: {goal['description']}\n"
         
+        # Build context usage section
+        context_fields = []
+        if survey_config.get('context'):
+            if survey_config['context'].get('product_description'):
+                context_fields.append(f"- Product: {survey_config['context']['product_description']}")
+            if survey_config['context'].get('target_clients'):
+                context_fields.append(f"- Target clients: {survey_config['context']['target_clients']}")
+            if survey_config['context'].get('industry'):
+                context_fields.append(f"- Industry: {survey_config['context']['industry']}")
+        
+        # Add participant context if available
+        if survey_config.get('participant_profile'):
+            profile = survey_config['participant_profile']
+            if profile.get('role'):
+                context_fields.append(f"- Participant role: {profile['role']}")
+            if profile.get('customer_tier'):
+                context_fields.append(f"- Customer tier: {profile['customer_tier']}")
+        
+        context_usage_section = ""
+        if context_fields:
+            context_usage_section = f"""
+==========================
+CONTEXT USAGE
+==========================
+
+Use the following context to personalize examples or framing:
+- Company: {survey_config['company_name']}
+{chr(10).join(context_fields)}
+
+IMPORTANT: Use context for relevance, not verbosity. Never restate long descriptions.
+Respect the persona's focus areas when applying context.
+"""
+        
         return f"""SURVEY CONFIGURATION:
 {json.dumps(survey_config, indent=2)}
 {participant_section}
@@ -503,13 +536,29 @@ SURVEY DATA COLLECTED SO FAR:
 CONVERSATION STEP: {step_count} / {survey_config['max_questions']}
 
 {persona_intro}{language_instruction}
+{context_usage_section}
+==========================
+CONVERSATION FLOW
+==========================
 
-Your responsibilities:
-1. Follow SURVEY CONFIGURATION.goals priorities strictly - always work through topics in priority order
+At each step:
+1. Review SURVEY DATA COLLECTED SO FAR to identify missing fields
+2. Select the highest-priority goal with missing fields from SURVEY CONFIGURATION.goals
+3. Ask ONE clear question about the missing field
+4. After the response, extract data and move to the next priority
+5. Keep questions concise, professional, and natural
+
+==========================
+YOUR RESPONSIBILITIES
+==========================
+
+1. Follow SURVEY CONFIGURATION.goals priorities strictly - work through topics in priority order
 2. Ask ONE question at a time in a {survey_config['conversation_tone']} conversational style
-3. Select the highest-priority remaining topic from goals list - only ask about details that are still missing
+3. Before asking any question, check SURVEY DATA COLLECTED SO FAR - only ask for MISSING fields
 4. Stop when max_questions ({survey_config['max_questions']}) is reached
-5. Before asking any question, check if the data has already been collected. Only ask for missing fields.
+5. Use context to make questions relevant to the participant's situation
+6. Maintain natural conversation flow while respecting all structural constraints
+7. If a participant provides multiple pieces of information, acknowledge all but focus your next question on the current priority goal
 
 Be empathetic, adapt to user communication style, and keep the conversation natural while respecting all constraints.
 
