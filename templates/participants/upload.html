@@ -12,19 +12,6 @@
 ] %}
 {% include 'components/breadcrumb.html' %}
 
-<!-- Flash Messages -->
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show mb-4" role="alert" aria-live="assertive">
-                <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'info-circle' if category == 'info' else 'check-circle' }}" aria-hidden="true"></i>
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ _('Close') }}"></button>
-            </div>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
-
 <div class="settings-hub-container">
     <!-- Settings Hub v2 Header with Red Gradient -->
     <div class="settings-hub-header">
