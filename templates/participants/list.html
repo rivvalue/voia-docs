@@ -942,25 +942,36 @@ function attachDeleteListeners() {
             const participantId = this.getAttribute('data-participant-id');
             const participantNom = this.getAttribute('data-participant-name');
             
-            if (confirm(`Are you sure you want to delete participant "${participantNom}"?\n\nThis action cannot be undone. The participant can only be deleted if they have no survey history.`)) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = `/business/participants/${participantId}/delete`;
-                
-                const csrfToken = document.querySelector('meta[name="csrf-token"]');
-                if (csrfToken) {
-                    const csrfInput = document.createElement('input');
-                    csrfInput.type = 'hidden';
-                    csrfInput.name = 'csrf_token';
-                    csrfInput.value = csrfToken.getAttribute('content');
-                    form.appendChild(csrfInput);
-                }
-                
-                document.body.appendChild(form);
-                form.submit();
-            }
+            showDeleteParticipantModal(participantId, participantNom);
         });
     });
+}
+
+function confirmDeleteParticipant(participantId) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `/business/participants/${participantId}/delete`;
+    
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    if (csrfToken) {
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrf_token';
+        csrfInput.value = csrfToken.getAttribute('content');
+        form.appendChild(csrfInput);
+    }
+    
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function showDeleteParticipantModal(participantId, participantName) {
+    document.getElementById('deleteParticipantName').textContent = participantName;
+    document.getElementById('confirmDeleteParticipantBtn').onclick = function() {
+        bootstrap.Modal.getInstance(document.getElementById('deleteParticipantModal')).hide();
+        confirmDeleteParticipant(participantId);
+    };
+    new bootstrap.Modal(document.getElementById('deleteParticipantModal')).show();
 }
 
 // Intercept filter form submission
@@ -1333,4 +1344,44 @@ function submitBulkEdit() {
     });
 }
 </script>
+
+<!-- Delete Participant Modal -->
+<div class="modal fade" id="deleteParticipantModal" tabindex="-1" aria-labelledby="deleteParticipantModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteParticipantModalLabel">
+                    <i class="fas fa-trash-alt me-2"></i>{{ _('Delete Participant') }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>{{ _('Warning:') }}</strong> {{ _('This action cannot be undone!') }}
+                </div>
+                <p><strong>{{ _('Are you sure you want to delete participant') }} "<span id="deleteParticipantName"></span>"?</strong></p>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    {{ _('The participant can only be deleted if they have no survey history.') }}
+                </div>
+                <p>{{ _('This will permanently remove:') }}</p>
+                <ul class="mb-0">
+                    <li>{{ _('All participant information') }}</li>
+                    <li>{{ _('Campaign associations') }}</li>
+                    <li>{{ _('Contact details') }}</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>{{ _('Cancel') }}
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteParticipantBtn">
+                    <i class="fas fa-trash-alt me-2"></i>{{ _('Yes, Delete Participant') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

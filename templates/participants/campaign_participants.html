@@ -671,9 +671,14 @@
                                 <!-- Remove from Campaign -->
                                 {% if campaign.status in ['draft', 'ready'] %}
                                 <form method="POST" action="{{ url_for('participants.remove_campaign_participant', campaign_id=campaign.id, association_id=participant.association_id) }}" 
-                                      onsubmit="return confirm('Remove {{ participant.name }} from this campaign?')" class="d-inline">
+                                      class="d-inline" id="removeParticipantForm_{{ participant.association_id }}">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                                    <button type="submit" class="btn btn-outline-danger btn-sm" aria-label="{{ _('Remove {{ participant.name }} from campaign') }}">
+                                    <button type="button" class="btn btn-outline-danger btn-sm" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#removeParticipantModal"
+                                            data-participant-name="{{ participant.name }}"
+                                            data-association-id="{{ participant.association_id }}"
+                                            aria-label="{{ _('Remove {{ participant.name }} from campaign') }}">
                                         <i class="fas fa-times me-1" aria-hidden="true"></i>Remove
                                     </button>
                                 </form>
@@ -1194,4 +1199,48 @@ function submitBulkRemove() {
         </div>
     </div>
 </div>
+
+<!-- Remove Participant from Campaign Modal -->
+<div class="modal fade" id="removeParticipantModal" tabindex="-1" aria-labelledby="removeParticipantModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%); color: var(--primary-white);">
+                <h5 class="modal-title" id="removeParticipantModalLabel">
+                    <i class="fas fa-user-minus me-2"></i>{{ _('Remove Participant from Campaign') }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>{{ _('Are you sure you want to remove') }} <span id="removeParticipantName"></span> {{ _('from this campaign?') }}</strong></p>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    {{ _('This will remove the participant from the campaign but will not delete their account. They can be re-added later.') }}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>{{ _('Cancel') }}
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmRemoveParticipantBtn">
+                    <i class="fas fa-user-minus me-2"></i>{{ _('Yes, Remove Participant') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Handle remove participant modal
+document.getElementById('removeParticipantModal').addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    const participantName = button.getAttribute('data-participant-name');
+    const associationId = button.getAttribute('data-association-id');
+    
+    document.getElementById('removeParticipantName').textContent = participantName;
+    document.getElementById('confirmRemoveParticipantBtn').onclick = function() {
+        document.getElementById('removeParticipantForm_' + associationId).submit();
+    };
+});
+</script>
+
 {% endblock %}
