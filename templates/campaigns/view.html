@@ -555,16 +555,16 @@
                                         <i class="fas fa-edit me-2"></i>Edit Campaign
                                     </a>
                                     
-                                    <form method="POST" action="{{ url_for('campaigns.mark_ready', campaign_id=campaign.id) }}" class="d-flex flex-fill">
+                                    <form method="POST" action="{{ url_for('campaigns.mark_ready', campaign_id=campaign.id) }}" class="d-flex flex-fill" id="markReadyForm">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button type="submit" class="btn btn-success flex-fill"
+                                        <button type="button" class="btn btn-success flex-fill"
                                                 {% if not campaign.description or participant_stats.total == 0 %}disabled{% endif %}
-                                                onclick="return confirm('Mark this campaign as ready for activation? You will not be able to modify campaign details after this.');">
+                                                data-bs-toggle="modal" data-bs-target="#markReadyModal">
                                             <i class="fas fa-check me-2"></i>Mark as Ready
                                         </button>
                                     </form>
                                     
-                                    <button type="button" class="btn btn-outline-danger flex-fill" onclick="confirmDelete()">
+                                    <button type="button" class="btn btn-outline-danger flex-fill" data-bs-toggle="modal" data-bs-target="#deleteDraftModal">
                                         <i class="fas fa-trash-alt me-2"></i>Delete Draft
                                     </button>
                                 </div>
@@ -584,10 +584,10 @@
                             <!-- Ready State Actions -->
                             <div class="campaign-actions-content">
                                 <div class="campaign-actions-primary">
-                                    <form method="POST" action="{{ url_for('campaigns.activate_campaign', campaign_id=campaign.id) }}">
+                                    <form method="POST" action="{{ url_for('campaigns.activate_campaign', campaign_id=campaign.id) }}" id="activateCampaignForm">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <button type="submit" class="btn btn-primary"
-                                                onclick="return confirm('Activate this campaign? Participants will be notified and the campaign will begin collecting responses.');">
+                                        <button type="button" class="btn btn-primary"
+                                                data-bs-toggle="modal" data-bs-target="#activateCampaignModal">
                                             <i class="fas fa-play me-2"></i>Activate Campaign
                                         </button>
                                     </form>
@@ -609,20 +609,20 @@
                                 
                                 <div class="campaign-actions-actions">
                                     <div class="campaign-actions-primary">
-                                        <form method="POST" action="{{ url_for('campaigns.send_bulk_invitations', campaign_id=campaign.id) }}">
+                                        <form method="POST" action="{{ url_for('campaigns.send_bulk_invitations', campaign_id=campaign.id) }}" id="sendInvitationsForm">
                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                            <button type="submit" class="btn btn-primary"
-                                                    onclick="return confirm('Send email invitations to all participants who have not been invited yet?');">
+                                            <button type="button" class="btn btn-primary"
+                                                    data-bs-toggle="modal" data-bs-target="#sendInvitationsModal">
                                                 <i class="fas fa-envelope me-2"></i>Send Invitations
                                             </button>
                                         </form>
                                     </div>
                                     
                                     <div class="campaign-actions-secondary">
-                                        <form method="POST" action="{{ url_for('campaigns.complete_campaign', campaign_id=campaign.id) }}" class="d-inline">
+                                        <form method="POST" action="{{ url_for('campaigns.complete_campaign', campaign_id=campaign.id) }}" class="d-inline" id="completeCampaignForm">
                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                            <button type="submit" class="btn btn-secondary"
-                                                    onclick="return confirm('Complete this campaign early? This will stop response collection and mark the campaign as finished.');">
+                                            <button type="button" class="btn btn-secondary"
+                                                    data-bs-toggle="modal" data-bs-target="#completeCampaignModal">
                                                 <i class="fas fa-stop me-2"></i>Complete Campaign
                                             </button>
                                         </form>
@@ -1013,30 +1013,189 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 });
 
-// Delete draft campaign confirmation
-function confirmDelete() {
-    const participantCount = {{ participant_stats.total }};
-    let message = 'Are you sure you want to delete this draft campaign?';
+// Delete draft campaign handler
+function deleteDraft() {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{{ url_for("campaigns.delete_draft_campaign", campaign_id=campaign.id) }}';
     
-    if (participantCount > 0) {
-        message = `This campaign has ${participantCount} participant${participantCount > 1 ? 's' : ''} associated with it.\n\nAre you sure you want to delete this draft campaign? This action cannot be undone.`;
-    }
+    const csrfToken = document.createElement('input');
+    csrfToken.type = 'hidden';
+    csrfToken.name = 'csrf_token';
+    csrfToken.value = '{{ csrf_token() }}';
+    form.appendChild(csrfToken);
     
-    if (confirm(message)) {
-        // Create a form and submit it
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '{{ url_for("campaigns.delete_draft_campaign", campaign_id=campaign.id) }}';
-        
-        const csrfToken = document.createElement('input');
-        csrfToken.type = 'hidden';
-        csrfToken.name = 'csrf_token';
-        csrfToken.value = '{{ csrf_token() }}';
-        form.appendChild(csrfToken);
-        
-        document.body.appendChild(form);
-        form.submit();
-    }
+    document.body.appendChild(form);
+    form.submit();
 }
 </script>
+
+<!-- Confirmation Modals -->
+
+<!-- Mark as Ready Modal -->
+<div class="modal fade" id="markReadyModal" tabindex="-1" aria-labelledby="markReadyModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%); color: var(--primary-white);">
+                <h5 class="modal-title" id="markReadyModalLabel">
+                    <i class="fas fa-check-circle me-2"></i>{{ _('Mark Campaign as Ready') }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>{{ _('Important:') }}</strong> {{ _('Once marked as ready, you will not be able to modify campaign details.') }}
+                </div>
+                <p>{{ _('Are you sure you want to mark this campaign as ready for activation?') }}</p>
+                <ul class="mb-0">
+                    <li>{{ _('Campaign details will become locked') }}</li>
+                    <li>{{ _('The campaign will be ready to activate') }}</li>
+                    <li>{{ _('Participants can be added but settings cannot be changed') }}</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>{{ _('Cancel') }}
+                </button>
+                <button type="button" class="btn btn-success" onclick="document.getElementById('markReadyForm').submit();">
+                    <i class="fas fa-check me-2"></i>{{ _('Yes, Mark as Ready') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Activate Campaign Modal -->
+<div class="modal fade" id="activateCampaignModal" tabindex="-1" aria-labelledby="activateCampaignModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%); color: var(--primary-white);">
+                <h5 class="modal-title" id="activateCampaignModalLabel">
+                    <i class="fas fa-play-circle me-2"></i>{{ _('Activate Campaign') }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>{{ _('Are you sure you want to activate this campaign?') }}</strong></p>
+                <p>{{ _('When you activate this campaign:') }}</p>
+                <ul class="mb-0">
+                    <li>{{ _('Participants will be notified via email') }}</li>
+                    <li>{{ _('Response collection will begin immediately') }}</li>
+                    <li>{{ _('The campaign will run until the end date') }}</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>{{ _('Cancel') }}
+                </button>
+                <button type="button" class="btn btn-primary" onclick="document.getElementById('activateCampaignForm').submit();">
+                    <i class="fas fa-play me-2"></i>{{ _('Yes, Activate Campaign') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Send Invitations Modal -->
+<div class="modal fade" id="sendInvitationsModal" tabindex="-1" aria-labelledby="sendInvitationsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%); color: var(--primary-white);">
+                <h5 class="modal-title" id="sendInvitationsModalLabel">
+                    <i class="fas fa-envelope me-2"></i>{{ _('Send Email Invitations') }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>{{ _('Send email invitations to all uninvited participants?') }}</strong></p>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>{{ _('Note:') }}</strong> {{ _('Only participants who have not been invited yet will receive emails. Already invited participants will not receive duplicate emails.') }}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>{{ _('Cancel') }}
+                </button>
+                <button type="button" class="btn btn-primary" onclick="document.getElementById('sendInvitationsForm').submit();">
+                    <i class="fas fa-envelope me-2"></i>{{ _('Yes, Send Invitations') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Complete Campaign Modal -->
+<div class="modal fade" id="completeCampaignModal" tabindex="-1" aria-labelledby="completeCampaignModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%); color: var(--primary-white);">
+                <h5 class="modal-title" id="completeCampaignModalLabel">
+                    <i class="fas fa-stop-circle me-2"></i>{{ _('Complete Campaign Early') }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>{{ _('Warning:') }}</strong> {{ _('This action will stop response collection immediately.') }}
+                </div>
+                <p><strong>{{ _('Are you sure you want to complete this campaign early?') }}</strong></p>
+                <p>{{ _('Completing the campaign will:') }}</p>
+                <ul class="mb-0">
+                    <li>{{ _('Stop accepting new responses') }}</li>
+                    <li>{{ _('Mark the campaign as finished') }}</li>
+                    <li>{{ _('Preserve all collected data for analysis') }}</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>{{ _('Cancel') }}
+                </button>
+                <button type="button" class="btn btn-warning" onclick="document.getElementById('completeCampaignForm').submit();">
+                    <i class="fas fa-stop me-2"></i>{{ _('Yes, Complete Campaign') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Draft Campaign Modal -->
+<div class="modal fade" id="deleteDraftModal" tabindex="-1" aria-labelledby="deleteDraftModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteDraftModalLabel">
+                    <i class="fas fa-trash-alt me-2"></i>{{ _('Delete Draft Campaign') }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>{{ _('Warning:') }}</strong> {{ _('This action cannot be undone!') }}
+                </div>
+                {% if participant_stats.total > 0 %}
+                <p><strong>{{ _('This campaign has %(count)s participant%(plural)s associated with it.', count=participant_stats.total, plural='s' if participant_stats.total > 1 else '') }}</strong></p>
+                {% endif %}
+                <p>{{ _('Are you sure you want to delete this draft campaign?') }}</p>
+                <ul class="mb-0">
+                    <li>{{ _('All campaign configuration will be permanently deleted') }}</li>
+                    <li>{{ _('Participant associations will be removed') }}</li>
+                    <li>{{ _('This action cannot be reversed') }}</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>{{ _('Cancel') }}
+                </button>
+                <button type="button" class="btn btn-danger" onclick="deleteDraft();">
+                    <i class="fas fa-trash-alt me-2"></i>{{ _('Yes, Delete Draft') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
