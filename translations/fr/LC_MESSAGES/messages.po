@@ -7476,3 +7476,24 @@ msgstr "Objet personnalisé"
 msgid "Not Available"
 msgstr "Non disponible"
 
+msgid "days"
+msgstr "jours"
+
+msgid "minutes"
+msgstr "minutes"
+
+msgid "VOÏA Team"
+msgstr "Équipe VOÏA"
+
+msgid "VOÏA Managed"
+msgstr "Géré par VOÏA"
+
+msgid "Campaign Participants"
+msgstr "Participants de la campagne"
+
+msgid "Individual Responses"
+msgstr "Réponses individuelles"
+
+msgid "Reminders"
+msgstr "Rappels"
+
