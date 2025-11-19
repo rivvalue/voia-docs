@@ -1447,6 +1447,10 @@ def executive_summary():
     
     # Get current business user
     current_business_user = get_current_business_user()
+    if not current_business_user:
+        logger.error("executive_summary: current_business_user is None despite @require_business_auth")
+        return redirect(url_for('business_auth.login'))
+    
     business_user_name = f"{current_business_user.first_name} {current_business_user.last_name}"
     
     # Get branding context for authenticated business user
@@ -1476,6 +1480,10 @@ def campaign_insights():
     
     # Get current business user
     current_business_user = get_current_business_user()
+    if not current_business_user:
+        logger.error("campaign_insights: current_business_user is None despite @require_business_auth")
+        return redirect(url_for('business_auth.login'))
+    
     business_user_name = f"{current_business_user.first_name} {current_business_user.last_name}"
     
     # Get branding context for authenticated business user
