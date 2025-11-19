@@ -137,11 +137,15 @@
                             <form method="POST" 
                                   action="{{ url_for('business_auth.reset_user_password', user_id=user.id) }}" 
                                   style="display: inline;" 
-                                  onsubmit="return confirmPasswordReset('{{ user.get_full_name() }}')">
+                                  id="resetPasswordForm_{{ user.id }}">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                                <button type="submit" 
+                                <button type="button" 
                                         class="users-action-btn secondary" 
                                         title={{ _('Reset Password') }}
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#resetPasswordModal"
+                                        data-user-id="{{ user.id }}"
+                                        data-user-name="{{ user.get_full_name() }}"
                                         aria-label="Reset password for {{ user.get_full_name() }}">
                                     <i class="fas fa-key" aria-hidden="true"></i>
                                 </button>
@@ -149,19 +153,27 @@
                             <form method="POST" 
                                   action="{{ url_for('business_auth.toggle_user_status', user_id=user.id) }}" 
                                   style="display: inline;" 
-                                  onsubmit="return confirmToggleStatus('{{ user.get_full_name() }}', {{ user.is_active_user|tojson }})">
+                                  id="toggleStatusForm_{{ user.id }}">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                 {% if user.is_active_user %}
-                                <button type="submit" 
+                                <button type="button" 
                                         class="users-action-btn secondary" 
                                         title={{ _('Deactivate User') }}
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deactivateUserModal"
+                                        data-user-id="{{ user.id }}"
+                                        data-user-name="{{ user.get_full_name() }}"
                                         aria-label="Deactivate {{ user.get_full_name() }}">
                                     <i class="fas fa-user-times" aria-hidden="true"></i>
                                 </button>
                                 {% else %}
-                                <button type="submit" 
+                                <button type="button" 
                                         class="users-action-btn primary" 
                                         title={{ _('Activate User') }}
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#reactivateUserModal"
+                                        data-user-id="{{ user.id }}"
+                                        data-user-name="{{ user.get_full_name() }}"
                                         aria-label="Activate {{ user.get_full_name() }}">
                                     <i class="fas fa-user-check" aria-hidden="true"></i>
                                 </button>
@@ -358,21 +370,147 @@ function editUser(userId, firstName, lastName, email, role) {
     editModal.show();
 }
 
-function confirmToggleStatus(userName, isActive) {
-    const action = isActive ? 'deactivate' : 'activate';
-    const message = `Are you sure you want to ${action} ${userName}?`;
+// Modal handlers
+document.getElementById('deactivateUserModal').addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    const userId = button.getAttribute('data-user-id');
+    const userName = button.getAttribute('data-user-name');
     
-    if (action === 'deactivate') {
-        return confirm(message + '\n\nDeactivated users will not be able to log in.');
-    }
-    
-    return confirm(message);
-}
+    document.getElementById('deactivateUserName').textContent = userName;
+    document.getElementById('confirmDeactivateUserBtn').onclick = function() {
+        document.getElementById('toggleStatusForm_' + userId).submit();
+    };
+});
 
-function confirmPasswordReset(userName) {
-    const message = `Are you sure you want to reset the password for ${userName}?`;
-    return confirm(message + '\n\nThe user will receive a password reset email with instructions to set a new password.');
-}
+document.getElementById('reactivateUserModal').addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    const userId = button.getAttribute('data-user-id');
+    const userName = button.getAttribute('data-user-name');
+    
+    document.getElementById('reactivateUserName').textContent = userName;
+    document.getElementById('confirmReactivateUserBtn').onclick = function() {
+        document.getElementById('toggleStatusForm_' + userId).submit();
+    };
+});
+
+document.getElementById('resetPasswordModal').addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    const userId = button.getAttribute('data-user-id');
+    const userName = button.getAttribute('data-user-name');
+    
+    document.getElementById('resetPasswordUserName').textContent = userName;
+    document.getElementById('confirmResetPasswordBtn').onclick = function() {
+        document.getElementById('resetPasswordForm_' + userId).submit();
+    };
+});
 </script>
+
+<!-- User Action Confirmation Modals -->
+
+<!-- Deactivate User Modal -->
+<div class="modal fade" id="deactivateUserModal" tabindex="-1" aria-labelledby="deactivateUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%); color: var(--primary-white);">
+                <h5 class="modal-title" id="deactivateUserModalLabel">
+                    <i class="fas fa-user-times me-2"></i>{{ _('Deactivate User') }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>{{ _('Are you sure you want to deactivate') }} <span id="deactivateUserName"></span>?</strong></p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>{{ _('Important:') }}</strong> {{ _('Deactivated users will not be able to log in.') }}
+                </div>
+                <p>{{ _('When a user is deactivated:') }}</p>
+                <ul class="mb-0">
+                    <li>{{ _('They will be immediately logged out') }}</li>
+                    <li>{{ _('They cannot access the system') }}</li>
+                    <li>{{ _('Their account data is preserved') }}</li>
+                    <li>{{ _('You can reactivate them anytime') }}</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>{{ _('Cancel') }}
+                </button>
+                <button type="button" class="btn btn-warning" id="confirmDeactivateUserBtn">
+                    <i class="fas fa-user-times me-2"></i>{{ _('Yes, Deactivate User') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reactivate User Modal -->
+<div class="modal fade" id="reactivateUserModal" tabindex="-1" aria-labelledby="reactivateUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%); color: var(--primary-white);">
+                <h5 class="modal-title" id="reactivateUserModalLabel">
+                    <i class="fas fa-user-check me-2"></i>{{ _('Reactivate User') }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>{{ _('Are you sure you want to reactivate') }} <span id="reactivateUserName"></span>?</strong></p>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    {{ _('Reactivating a user will restore their full access to the system.') }}
+                </div>
+                <p>{{ _('When a user is reactivated:') }}</p>
+                <ul class="mb-0">
+                    <li>{{ _('They can log in immediately') }}</li>
+                    <li>{{ _('All permissions are restored') }}</li>
+                    <li>{{ _('Their previous data remains intact') }}</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>{{ _('Cancel') }}
+                </button>
+                <button type="button" class="btn btn-success" id="confirmReactivateUserBtn">
+                    <i class="fas fa-user-check me-2"></i>{{ _('Yes, Reactivate User') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reset Password Modal -->
+<div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary-red) 0%, var(--red-hover) 100%); color: var(--primary-white);">
+                <h5 class="modal-title" id="resetPasswordModalLabel">
+                    <i class="fas fa-key me-2"></i>{{ _('Reset Password') }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>{{ _('Are you sure you want to reset the password for') }} <span id="resetPasswordUserName"></span>?</strong></p>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>{{ _('Note:') }}</strong> {{ _('The user will receive a password reset email with instructions to set a new password.') }}
+                </div>
+                <p>{{ _('This action will:') }}</p>
+                <ul class="mb-0">
+                    <li>{{ _('Send a secure password reset link via email') }}</li>
+                    <li>{{ _('Invalidate their current password') }}</li>
+                    <li>{{ _('Allow them to set a new password') }}</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>{{ _('Cancel') }}
+                </button>
+                <button type="button" class="btn btn-primary" id="confirmResetPasswordBtn">
+                    <i class="fas fa-key me-2"></i>{{ _('Yes, Reset Password') }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
