@@ -1,0 +1,231 @@
+{#
+  Inheritance Toggle Macro
+  
+  Reusable component for campaign survey settings that can inherit from 
+  business account or be customized at campaign level.
+  
+  Usage:
+    {% from 'macros/inheritance_toggle.html' import inheritance_section %}
+    
+    {{ inheritance_section(
+        section_id='topics',
+        section_title='Survey Topics',
+        toggle_name='use_business_topics',
+        is_inheriting=campaign.use_business_topics,
+        inherited_content='<preview of business account values>',
+        custom_content='<editable campaign-specific controls>',
+        business_modal_id='topicsBusinessModal'
+    ) }}
+#}
+
+{% macro inheritance_section(section_id, section_title, toggle_name, is_inheriting, inherited_content, custom_content, business_modal_id='') %}
+<div class="inheritance-section mb-4" id="{{ section_id }}-section">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">
+            {{ section_title }}
+            <span class="inheritance-badge ms-2">
+                {% if is_inheriting %}
+                <span class="badge bg-secondary inheritance-badge-inherited">
+                    <i class="fas fa-link"></i> Inherited
+                </span>
+                {% else %}
+                <span class="badge bg-primary inheritance-badge-custom">
+                    <i class="fas fa-edit"></i> Customized for this campaign
+                </span>
+                {% endif %}
+            </span>
+        </h5>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <!-- Toggle Switch -->
+            <div class="form-check form-switch mb-3">
+                <input 
+                    class="form-check-input inheritance-toggle" 
+                    type="checkbox" 
+                    id="{{ section_id }}-toggle"
+                    name="{{ toggle_name }}"
+                    value="true"
+                    data-section="{{ section_id }}"
+                    {{ 'checked' if is_inheriting else '' }}
+                >
+                <label class="form-check-label fw-bold" for="{{ section_id }}-toggle">
+                    Use business account defaults
+                </label>
+            </div>
+            
+            <!-- Inherited Content (shown when toggle is ON) -->
+            <div class="inherited-content {{ 'd-none' if not is_inheriting else '' }}" id="{{ section_id }}-inherited">
+                <div class="alert alert-info mb-0">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            {{ inherited_content | safe }}
+                        </div>
+                        {% if business_modal_id %}
+                        <button type="button" class="btn btn-sm btn-outline-primary ms-3" data-bs-toggle="modal" data-bs-target="#{{ business_modal_id }}">
+                            <i class="fas fa-eye"></i> View business defaults
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Custom Content (shown when toggle is OFF) -->
+            <div class="custom-content {{ 'd-none' if is_inheriting else '' }}" id="{{ section_id }}-custom">
+                {{ custom_content | safe }}
+                
+                <!-- Revert Button -->
+                <div class="mt-3">
+                    <button type="button" class="btn btn-sm btn-outline-secondary revert-to-business" data-section="{{ section_id }}">
+                        <i class="fas fa-undo"></i> Revert to business defaults
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{# CSS Styles for Inheritance Toggle #}
+{% macro inheritance_styles() %}
+<style>
+.inheritance-section {
+    position: relative;
+}
+
+.inheritance-badge {
+    transition: all 0.3s ease;
+}
+
+.inheritance-badge-inherited {
+    background-color: #6c757d !important;
+}
+
+.inheritance-badge-custom {
+    background-color: #0d6efd !important;
+}
+
+.form-check-input.inheritance-toggle {
+    width: 3em;
+    height: 1.5em;
+    cursor: pointer;
+}
+
+.form-check-input.inheritance-toggle:checked {
+    background-color: #198754;
+    border-color: #198754;
+}
+
+.inherited-content {
+    transition: opacity 0.3s ease, max-height 0.3s ease;
+}
+
+.custom-content {
+    transition: opacity 0.3s ease, max-height 0.3s ease;
+}
+
+.custom-content.fade-in {
+    animation: fadeIn 0.4s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.inherited-content .alert-info {
+    background-color: #e7f3ff;
+    border-color: #b3d9ff;
+    color: #004085;
+}
+
+.revert-to-business {
+    transition: all 0.2s ease;
+}
+
+.revert-to-business:hover {
+    background-color: #6c757d;
+    color: white;
+    border-color: #6c757d;
+}
+</style>
+{% endmacro %}
+
+{# JavaScript for Inheritance Toggle Interactions #}
+{% macro inheritance_scripts() %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle toggle switches
+    document.querySelectorAll('.inheritance-toggle').forEach(toggle => {
+        toggle.addEventListener('change', function() {
+            const sectionId = this.dataset.section;
+            const inheritedContent = document.getElementById(`${sectionId}-inherited`);
+            const customContent = document.getElementById(`${sectionId}-custom`);
+            const badge = document.querySelector(`#${sectionId}-section .inheritance-badge`);
+            
+            if (this.checked) {
+                // Switch to inherited mode
+                inheritedContent.classList.remove('d-none');
+                customContent.classList.add('d-none');
+                
+                // Update badge
+                badge.innerHTML = '<span class="badge bg-secondary inheritance-badge-inherited"><i class="fas fa-link"></i> Inherited</span>';
+            } else {
+                // Switch to custom mode
+                inheritedContent.classList.add('d-none');
+                customContent.classList.remove('d-none');
+                customContent.classList.add('fade-in');
+                
+                // Update badge
+                badge.innerHTML = '<span class="badge bg-primary inheritance-badge-custom"><i class="fas fa-edit"></i> Customized for this campaign</span>';
+                
+                // Remove fade-in class after animation
+                setTimeout(() => {
+                    customContent.classList.remove('fade-in');
+                }, 400);
+            }
+        });
+    });
+    
+    // Handle revert buttons
+    document.querySelectorAll('.revert-to-business').forEach(button => {
+        button.addEventListener('click', function() {
+            const sectionId = this.dataset.section;
+            const toggle = document.getElementById(`${sectionId}-toggle`);
+            
+            // Confirm action
+            if (confirm('Are you sure you want to revert to business account defaults? This will discard your campaign-specific customizations.')) {
+                // Check the toggle to switch to inherited mode
+                toggle.checked = true;
+                toggle.dispatchEvent(new Event('change'));
+            }
+        });
+    });
+    
+    // Form submission: ensure hidden input for unchecked toggles
+    const form = document.querySelector('form[action*="survey-config/save"]');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // For each toggle, ensure we submit the value
+            document.querySelectorAll('.inheritance-toggle').forEach(toggle => {
+                if (!toggle.checked) {
+                    // Create hidden input for false value
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = toggle.name;
+                    hiddenInput.value = 'false';
+                    form.appendChild(hiddenInput);
+                }
+            });
+        });
+    }
+});
+</script>
+{% endmacro %}
