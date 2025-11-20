@@ -218,18 +218,30 @@
                 
                 <div class="mb-3">
                     <label for="product_description" class="form-label">{{ _('Product/Service Description') }}</label>
+                    {% if business_account.product_description and not campaign.product_description %}
+                    <div class="alert" style="background-color: rgba(13, 110, 253, 0.1); border-left: 4px solid #0d6efd; padding: 0.75rem; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>{{ _('Inherited from Business Account:') }}</strong> {{ business_account.product_description }}
+                    </div>
+                    {% endif %}
                     <textarea class="form-control" id="product_description" name="product_description" rows="3" 
-                              placeholder={{ _("Describe your main products or services (e.g., 'Cloud-based accounting software for small businesses')") }}
+                              placeholder={{ _("Leave blank to use business account default or provide campaign-specific description...") }}
                               {% if is_readonly %}disabled{% endif %}>{{ campaign.product_description or '' }}</textarea>
-                    <div class="form-text">{{ _('Help the AI understand what you offer to ask better questions') }}</div>
+                    <div class="form-text">{{ _('Override the business account default for this specific campaign (optional)') }}</div>
                 </div>
                 
                 <div class="mb-3">
                     <label for="target_clients_description" class="form-label">{{ _('Target Clients') }}</label>
+                    {% if business_account.target_clients_description and not campaign.target_clients_description %}
+                    <div class="alert" style="background-color: rgba(13, 110, 253, 0.1); border-left: 4px solid #0d6efd; padding: 0.75rem; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>{{ _('Inherited from Business Account:') }}</strong> {{ business_account.target_clients_description }}
+                    </div>
+                    {% endif %}
                     <textarea class="form-control" id="target_clients_description" name="target_clients_description" rows="2" 
-                              placeholder={{ _("Describe your ideal customers (e.g., 'Small business owners, CFOs, accounting firms')") }}
+                              placeholder={{ _("Leave blank to use business account default or describe campaign-specific target audience...") }}
                               {% if is_readonly %}disabled{% endif %}>{{ campaign.target_clients_description or '' }}</textarea>
-                    <div class="form-text">Who are you primarily serving? This helps tailor conversation tone and questions</div>
+                    <div class="form-text">{{ _('Override the business account default for this specific campaign (optional)') }}</div>
                 </div>
             </div>
 
@@ -239,15 +251,17 @@
                     <i class="fas fa-industry"></i>Industry-Specific Prompts
                 </h3>
                 <p class="section-description">
-                    Override your business account's industry setting for this campaign (optional). Leave blank to inherit from business account.
+                    Control how VOÏA focuses questions based on industry context. Campaigns inherit from business account by default.
                 </p>
                 
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
-                            <label for="industry" class="form-label">{{ _('Campaign Industry Override') }}</label>
-                            <select class="form-control" id="industry" name="industry" {% if is_readonly %}disabled{% endif %}>
-                                <option value="">{{ _('Use business account default') }}{% if campaign.business_account and campaign.business_account.industry %} ({{ campaign.business_account.industry }}){% endif %}</option>
+                            <label for="industry_select_campaign" class="form-label">{{ _('Campaign Industry Override') }}</label>
+                            <select class="form-control" id="industry_select_campaign" name="industry" 
+                                    {% if is_readonly %}disabled{% endif %}
+                                    onchange="updateCampaignTopicHintsDisplay()">
+                                <option value="">{{ _('Use business account default') }}{% if business_account.industry %} ({{ business_account.industry }}){% endif %}</option>
                                 {% if available_industries %}
                                     {% for industry_option in available_industries %}
                                         <option value="{{ industry_option }}" {% if campaign.industry == industry_option %}selected{% endif %}>
@@ -267,6 +281,44 @@
                                 <i class="fas fa-info-circle" style="color: var(--primary-red);"></i>
                                 {{ _('Most campaigns inherit the industry from the business account. Override only if this specific campaign targets a different industry segment.') }}
                             </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Effective Topic Hints Display -->
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6 class="form-label">
+                            <i class="fas fa-comments me-2"></i>
+                            {{ _('Effective VOÏA Conversation Focus Areas') }}
+                        </h6>
+                        <p class="form-text mb-2">
+                            {{ _('Based on the selected or inherited industry, VOÏA will emphasize these topics') }}
+                        </p>
+                        <div id="campaign_topic_hints_display" class="table-responsive">
+                            <!-- Topic hints will be populated here by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Advanced: Custom Topic Hints JSON Override (for power users) -->
+                <div class="advanced-section mt-4" style="border: 2px dashed var(--medium-gray); padding: 1.5rem; border-radius: var(--radius-md); background: rgba(189, 189, 189, 0.05);">
+                    <h6 class="advanced-toggle" onclick="document.getElementById('advanced_hints_content').classList.toggle('show')">
+                        <i class="fas fa-code me-2"></i>
+                        {{ _('Advanced: Custom Topic Hints (JSON)') }}
+                        <i class="fas fa-chevron-down ms-2"></i>
+                    </h6>
+                    <div id="advanced_hints_content" class="advanced-content">
+                        <p class="form-text mb-2">
+                            {{ _('For advanced users: Override topic hints using JSON format. This will override both platform defaults and business account settings for this campaign only.') }}
+                        </p>
+                        <textarea class="form-control" id="custom_topic_hints_json" name="custom_topic_hints_json" rows="6" 
+                                  style="font-family: 'Courier New', monospace; font-size: 0.85rem;"
+                                  placeholder='{"Product Quality": "your custom focus areas", "Support Experience": "custom keywords"}'
+                                  {% if is_readonly %}disabled{% endif %}>{{ campaign.custom_topic_hints_json or '' }}</textarea>
+                        <div class="form-text">
+                            <i class="fas fa-exclamation-triangle me-1" style="color: #ffc107;"></i>
+                            {{ _('Format: JSON object with topic names as keys and comma-separated keywords as values. Leave blank to use platform/business account defaults.') }}
                         </div>
                     </div>
                 </div>
@@ -578,6 +630,59 @@ function showPromptPreview() {
 </script>
 
 <script>
+// Industry Topic Hints Display for Campaign
+const CAMPAIGN_INDUSTRY_TOPIC_HINTS = {{ industry_topic_hints_json|safe }};
+const BUSINESS_ACCOUNT_INDUSTRY = "{{ business_account.industry or '' }}";
+
+function updateCampaignTopicHintsDisplay() {
+    const industrySelect = document.getElementById('industry_select_campaign');
+    const displayContainer = document.getElementById('campaign_topic_hints_display');
+    
+    if (!displayContainer || !CAMPAIGN_INDUSTRY_TOPIC_HINTS) {
+        return;
+    }
+    
+    // Determine effective industry: campaign override or business account default
+    const campaignIndustry = industrySelect ? industrySelect.value : '';
+    const effectiveIndustry = campaignIndustry || BUSINESS_ACCOUNT_INDUSTRY || 'Generic';
+    
+    if (!effectiveIndustry || !CAMPAIGN_INDUSTRY_TOPIC_HINTS[effectiveIndustry]) {
+        displayContainer.innerHTML = '<p class="text-muted">No industry hints available</p>';
+        return;
+    }
+    
+    const hints = CAMPAIGN_INDUSTRY_TOPIC_HINTS[effectiveIndustry];
+    const isInherited = !campaignIndustry && BUSINESS_ACCOUNT_INDUSTRY;
+    
+    let tableHTML = '';
+    if (isInherited) {
+        tableHTML += '<div class="alert alert-info mb-2" style="padding: 0.5rem; font-size: 0.875rem;">';
+        tableHTML += '<i class="fas fa-info-circle me-2"></i>';
+        tableHTML += 'Inherited from Business Account: <strong>' + effectiveIndustry + '</strong>';
+        tableHTML += '</div>';
+    }
+    
+    tableHTML += '<table class="table table-striped table-bordered table-sm" style="font-size: 0.875rem;">';
+    tableHTML += '<thead style="background-color: var(--primary-red); color: white;">';
+    tableHTML += '<tr><th style="width: 30%;">Survey Topic</th><th>VOÏA Focus Areas</th></tr>';
+    tableHTML += '</thead><tbody>';
+    
+    for (const [topic, hint] of Object.entries(hints)) {
+        tableHTML += '<tr>';
+        tableHTML += '<td style="font-weight: 600;">' + topic + '</td>';
+        tableHTML += '<td style="font-style: italic; color: var(--gray-dark);">' + hint + '</td>';
+        tableHTML += '</tr>';
+    }
+    
+    tableHTML += '</tbody></table>';
+    displayContainer.innerHTML = tableHTML;
+}
+
+// Initialize campaign topic hints display on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateCampaignTopicHintsDisplay();
+});
+
 // Toggle advanced section
 function toggleAdvanced() {
     const content = document.getElementById('advanced-content');

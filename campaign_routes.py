@@ -1228,13 +1228,15 @@ def survey_config(campaign_id):
             return redirect(url_for('campaigns.list_campaigns'))
         
         # Import industry topic hints config for industry verticalization (Phase 2)
-        from industry_topic_hints_config import get_available_industries
+        from industry_topic_hints_config import get_available_industries, INDUSTRY_TOPIC_HINTS
+        import json
         
         # Allow viewing for all statuses - template handles read-only mode for active/completed
         return render_template('campaigns/survey_config.html',
                              campaign=campaign.to_dict(),
                              business_account=current_account.to_dict(),
                              available_industries=get_available_industries(),
+                             industry_topic_hints_json=json.dumps(INDUSTRY_TOPIC_HINTS),
                              ENABLE_PROMPT_PREVIEW=os.getenv('ENABLE_PROMPT_PREVIEW') == 'true')
         
     except Exception as e:
