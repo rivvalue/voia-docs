@@ -23,7 +23,7 @@ INDUSTRY_TOPIC_HINTS = {
         "NPS Score": "recommendation likelihood, overall satisfaction, partnership value",
         "Pricing Value": "cost competitiveness, volume pricing, contract terms",
         "User Experience": "order process, communication, documentation quality",
-        "Feature Requests": "new capabilities, process improvements, technology upgrades",
+        "Satisfaction": "overall satisfaction rating, experience quality, expectations met",
         "Improvement Suggestions": "efficiency gains, quality enhancements, delivery optimization"
     },
     
@@ -34,7 +34,7 @@ INDUSTRY_TOPIC_HINTS = {
         "NPS Score": "recommendation to peers, overall satisfaction, trust in solution",
         "Pricing Value": "ROI, total cost of ownership, value for investment",
         "User Experience": "interface usability, workflow integration, ease of use, learning curve",
-        "Feature Requests": "clinical workflow needs, reporting capabilities, integration requirements",
+        "Satisfaction": "overall satisfaction rating, clinical value, expectations met",
         "Improvement Suggestions": "efficiency improvements, user interface enhancements, training resources"
     },
     
@@ -45,7 +45,7 @@ INDUSTRY_TOPIC_HINTS = {
         "NPS Score": "recommendation likelihood, overall satisfaction, product-market fit",
         "Pricing Value": "pricing competitiveness, feature value, subscription model",
         "User Experience": "interface design, ease of use, workflow efficiency, mobile experience",
-        "Feature Requests": "missing features, integrations, workflow improvements, scalability",
+        "Satisfaction": "overall satisfaction rating, product value, expectations met",
         "Improvement Suggestions": "performance optimization, UI/UX enhancements, feature prioritization"
     },
     
@@ -56,7 +56,7 @@ INDUSTRY_TOPIC_HINTS = {
         "NPS Score": "recommendation likelihood, trust level, relationship satisfaction",
         "Pricing Value": "fee structure, cost transparency, value for services",
         "User Experience": "platform usability, statement clarity, mobile banking, self-service tools",
-        "Feature Requests": "new financial products, digital capabilities, reporting tools, integration needs",
+        "Satisfaction": "overall satisfaction rating, service quality, expectations met",
         "Improvement Suggestions": "process streamlining, transparency, communication, digital experience"
     },
     
@@ -67,7 +67,7 @@ INDUSTRY_TOPIC_HINTS = {
         "NPS Score": "recommendation likelihood, overall satisfaction, partnership value",
         "Pricing Value": "pricing transparency, ROI, value delivered, cost-effectiveness",
         "User Experience": "engagement process, communication style, collaboration tools, reporting",
-        "Feature Requests": "service offerings, delivery methods, expertise areas, tools",
+        "Satisfaction": "overall satisfaction rating, value delivered, expectations met",
         "Improvement Suggestions": "process improvements, communication enhancements, delivery optimization"
     },
     
@@ -78,7 +78,7 @@ INDUSTRY_TOPIC_HINTS = {
         "NPS Score": "recommendation likelihood, shopping experience, loyalty",
         "Pricing Value": "price competitiveness, promotions, value for money, pricing transparency",
         "User Experience": "store layout, online ordering, mobile app, payment options, convenience",
-        "Feature Requests": "product requests, services, delivery options, store features",
+        "Satisfaction": "overall satisfaction rating, shopping experience, expectations met",
         "Improvement Suggestions": "shopping experience, product selection, convenience, service quality"
     },
     
@@ -89,7 +89,7 @@ INDUSTRY_TOPIC_HINTS = {
         "NPS Score": "recommendation likelihood, overall satisfaction, loyalty",
         "Pricing Value": "plan pricing, contract terms, hidden fees, value for features",
         "User Experience": "account portal, mobile app, self-service tools, billing clarity",
-        "Feature Requests": "plan options, coverage expansion, feature additions, bundle offerings",
+        "Satisfaction": "overall satisfaction rating, service quality, expectations met",
         "Improvement Suggestions": "network quality, billing transparency, support efficiency, pricing flexibility"
     },
     
@@ -100,7 +100,7 @@ INDUSTRY_TOPIC_HINTS = {
         "NPS Score": "recommendation to others, overall satisfaction, value received",
         "Pricing Value": "tuition value, financial aid, cost transparency, ROI on education",
         "User Experience": "platform usability, course navigation, mobile access, learning tools",
-        "Feature Requests": "course offerings, learning formats, technology tools, support services",
+        "Satisfaction": "overall satisfaction rating, learning value, expectations met",
         "Improvement Suggestions": "teaching methods, platform improvements, support enhancements, course content"
     },
     
@@ -111,7 +111,7 @@ INDUSTRY_TOPIC_HINTS = {
         "NPS Score": "recommendation likelihood, overall experience, return intent",
         "Pricing Value": "rate fairness, value for money, pricing transparency, package deals",
         "User Experience": "booking process, amenity access, mobile app, loyalty program",
-        "Feature Requests": "amenity additions, service offerings, facility improvements, dining options",
+        "Satisfaction": "overall satisfaction rating, stay experience, expectations met",
         "Improvement Suggestions": "service quality, facility updates, staff training, convenience features"
     },
     
@@ -122,7 +122,7 @@ INDUSTRY_TOPIC_HINTS = {
         "NPS Score": "recommendation likelihood, overall satisfaction, loyalty",
         "Pricing Value": "pricing fairness, value for money, cost transparency",
         "User Experience": "ease of use, convenience, accessibility, overall experience",
-        "Feature Requests": "desired features, improvements, additions, enhancements",
+        "Satisfaction": "overall satisfaction rating, experience quality, expectations met",
         "Improvement Suggestions": "general improvements, quality enhancements, service optimization"
     }
 }

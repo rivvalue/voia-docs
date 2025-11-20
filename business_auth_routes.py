@@ -4427,7 +4427,7 @@ def survey_config():
         topic_options = [
             'Product Quality', 'Support Experience', 'Service Rating', 
             'NPS Score', 'Pricing Value', 'User Experience',
-            'Feature Requests', 'Improvement Suggestions'
+            'Satisfaction', 'Improvement Suggestions'
         ]
         
         return render_template('business_auth/survey_config.html',
