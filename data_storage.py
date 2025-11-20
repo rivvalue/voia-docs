@@ -1219,7 +1219,7 @@ def get_company_trends():
 def calculate_segmentation_analytics(campaign_id):
     """
     Calculate NPS and satisfaction analytics segmented by participant attributes.
-    Returns analytics grouped by role, region, and customer_tier.
+    Returns analytics grouped by role, region, customer_tier, and client_industry.
     """
     try:
         from models import Participant, CampaignParticipant
@@ -1230,7 +1230,8 @@ def calculate_segmentation_analytics(campaign_id):
             SurveyResponse.satisfaction_rating,
             Participant.role,
             Participant.region,
-            Participant.customer_tier
+            Participant.customer_tier,
+            Participant.client_industry
         ).join(
             CampaignParticipant, 
             SurveyResponse.campaign_participant_id == CampaignParticipant.id
@@ -1249,6 +1250,7 @@ def calculate_segmentation_analytics(campaign_id):
         role_segments = {}
         region_segments = {}
         tier_segments = {}
+        industry_segments = {}
         
         # Process each response
         for response in segmentation_query:
@@ -1257,6 +1259,7 @@ def calculate_segmentation_analytics(campaign_id):
             role = response.role or 'Unspecified'
             region = response.region or 'Unspecified'
             tier = response.customer_tier or 'Unspecified'
+            industry = response.client_industry or 'Unspecified'
             
             # Collect by role
             if role not in role_segments:
@@ -1278,6 +1281,13 @@ def calculate_segmentation_analytics(campaign_id):
             tier_segments[tier]['nps_scores'].append(nps_score)
             if satisfaction:
                 tier_segments[tier]['satisfaction_scores'].append(satisfaction)
+            
+            # Collect by client industry
+            if industry not in industry_segments:
+                industry_segments[industry] = {'nps_scores': [], 'satisfaction_scores': []}
+            industry_segments[industry]['nps_scores'].append(nps_score)
+            if satisfaction:
+                industry_segments[industry]['satisfaction_scores'].append(satisfaction)
         
         # Helper function to calculate NPS metrics
         def calculate_nps_metrics(nps_scores):
@@ -1310,13 +1320,16 @@ def calculate_segmentation_analytics(campaign_id):
             'nps_by_role': {},
             'nps_by_region': {},
             'nps_by_tier': {},
+            'nps_by_industry': {},
             'satisfaction_by_role': {},
             'satisfaction_by_region': {},
             'satisfaction_by_tier': {},
+            'satisfaction_by_industry': {},
             'response_distribution': {
                 'by_role': {},
                 'by_region': {},
-                'by_tier': {}
+                'by_tier': {},
+                'by_industry': {}
             }
         }
         
@@ -1335,6 +1348,11 @@ def calculate_segmentation_analytics(campaign_id):
             analytics['nps_by_tier'][tier] = calculate_nps_metrics(data['nps_scores'])
             analytics['satisfaction_by_tier'][tier] = calculate_satisfaction_metrics(data['satisfaction_scores'])
             analytics['response_distribution']['by_tier'][tier] = len(data['nps_scores'])
+        
+        for industry, data in industry_segments.items():
+            analytics['nps_by_industry'][industry] = calculate_nps_metrics(data['nps_scores'])
+            analytics['satisfaction_by_industry'][industry] = calculate_satisfaction_metrics(data['satisfaction_scores'])
+            analytics['response_distribution']['by_industry'][industry] = len(data['nps_scores'])
         
         return analytics
         
@@ -1705,7 +1723,7 @@ def generate_campaign_kpi_snapshot(campaign_id):
         # Segmentation Analytics
         segmentation_analytics = calculate_segmentation_analytics(campaign_id)
         segmentation_analytics = serialize_for_json(segmentation_analytics)
-        segment_count = sum(len(segmentation_analytics.get(key, {})) for key in ['nps_by_role', 'nps_by_region', 'nps_by_tier'])
+        segment_count = sum(len(segmentation_analytics.get(key, {})) for key in ['nps_by_role', 'nps_by_region', 'nps_by_tier', 'nps_by_industry'])
         print(f"   ✅ Segmentation Analytics: {segment_count} segments")
         
         # ============================================================================
