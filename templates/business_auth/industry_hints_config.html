@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block title %}Industry Topic Hints - VOÏA{% endblock %}
+
+{% block page_class %}page-industry-hints-config{% endblock %}
+
+{% block content %}
+{# Breadcrumb Navigation #}
+{% set breadcrumb_items = [
+    {'label': 'Settings', 'url': url_for('business_auth.admin_panel')},
+    {'label': 'Industry Topic Hints', 'current': true}
+] %}
+{% include 'components/breadcrumb.html' %}
+<div class="settings-hub-container">
+    <!-- Header -->
+    <div class="settings-hub-header">
+        <div class="settings-hub-header-content">
+            <h1 class="settings-hub-title">
+                <i class="fas fa-industry me-2" aria-hidden="true"></i>
+                Industry Topic Hints Configuration
+            </h1>
+            <p class="settings-hub-subtitle">Manage platform-wide default hints for conversational survey questions by industry</p>
+        </div>
+    </div>
+
+    <!-- Platform Admin Badge -->
+    <div class="mb-4">
+        <span class="badge bg-danger" style="font-size: 14px; padding: 8px 16px;">
+            <i class="fas fa-shield-alt me-2"></i>Platform Administrator Only
+        </span>
+    </div>
+
+    <!-- Info Box -->
+    <div class="settings-card mb-4">
+        <h3 class="settings-section-title">
+            <i class="fas fa-info-circle text-primary me-2"></i>
+            About Industry Topic Hints
+        </h3>
+        <div class="alert alert-info mb-0">
+            <p class="mb-2"><strong>How Industry Hints Work:</strong></p>
+            <ul class="mb-0">
+                <li>These hints customize AI prompts to ask more relevant, industry-specific questions</li>
+                <li>Each industry has topic-specific keywords that guide GPT-4o question generation</li>
+                <li>Business accounts can override specific hints via their custom configuration</li>
+                <li>Campaigns inherit hints from their business account or use platform defaults</li>
+                <li><strong>Example:</strong> "Product Quality (focus on: defects, throughput, line reliability)"</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Configuration Form -->
+    <form method="POST" action="{{ url_for('business_auth.save_industry_hints_config') }}" id="industryHintsForm">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        
+        <!-- JSON Editor -->
+        <div class="settings-card mb-4">
+            <h3 class="settings-section-title">
+                <i class="fas fa-code me-2"></i>
+                Configuration (JSON Format)
+            </h3>
+            
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Important:</strong> This editor modifies the <code>industry_topic_hints_config.py</code> file directly.
+                Make sure your JSON is valid before saving. Changes apply immediately after save.
+            </div>
+            
+            <div class="settings-form-group">
+                <label class="settings-form-label" for="hints_json">Industry Topic Hints JSON</label>
+                <textarea class="form-control" 
+                          id="hints_json" 
+                          name="hints_json"
+                          rows="30"
+                          style="font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace; font-size: 13px;"
+                          required
+                          aria-required="true">{{ hints_json }}</textarea>
+                <div class="settings-help-text">
+                    <i class="fas fa-lightbulb me-1"></i>
+                    Each industry should have a dictionary of topics with comma-separated keywords
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="settings-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="{{ url_for('business_auth.admin_panel') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Back to Admin Panel
+                </a>
+                <div>
+                    <button type="button" class="btn btn-info me-2" onclick="validateJSON()">
+                        <i class="fas fa-check-circle me-2"></i>Validate JSON
+                    </button>
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to update the industry hints configuration? This will modify the configuration file.')">
+                        <i class="fas fa-save me-2"></i>Save Configuration
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Current Industries Preview -->
+    <div class="settings-card mt-4">
+        <h3 class="settings-section-title">
+            <i class="fas fa-list me-2"></i>
+            Current Industries
+        </h3>
+        <div id="industriesPreview" class="mb-0">
+            <!-- Will be populated by JavaScript -->
+        </div>
+    </div>
+</div>
+
+<script>
+// Validate JSON syntax
+function validateJSON() {
+    const textarea = document.getElementById('hints_json');
+    const jsonText = textarea.value;
+    
+    try {
+        const parsed = JSON.parse(jsonText);
+        
+        // Check structure
+        if (typeof parsed !== 'object' || Array.isArray(parsed)) {
+            alert('Error: Configuration must be a JSON object (dictionary), not an array or primitive.');
+            return false;
+        }
+        
+        // Check each industry
+        let invalidIndustries = [];
+        for (let [industry, topics] of Object.entries(parsed)) {
+            if (typeof topics !== 'object' || Array.isArray(topics)) {
+                invalidIndustries.push(industry);
+            }
+        }
+        
+        if (invalidIndustries.length > 0) {
+            alert(`Error: The following industries must have topic dictionaries:\n${invalidIndustries.join(', ')}`);
+            return false;
+        }
+        
+        alert(`✓ JSON is valid!\n\nIndustries configured: ${Object.keys(parsed).length}\nIndustries: ${Object.keys(parsed).join(', ')}`);
+        updateIndustriesPreview(parsed);
+        return true;
+    } catch (e) {
+        alert('JSON Syntax Error:\n\n' + e.message);
+        return false;
+    }
+}
+
+// Update industries preview
+function updateIndustriesPreview(data) {
+    const preview = document.getElementById('industriesPreview');
+    
+    let html = '<div class="row">';
+    let industries = Object.keys(data).sort();
+    
+    industries.forEach((industry, index) => {
+        const topics = Object.keys(data[industry]);
+        const topicCount = topics.length;
+        
+        html += `
+            <div class="col-md-6 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-industry me-2 text-primary"></i>
+                            ${industry}
+                        </h5>
+                        <p class="card-text text-muted mb-2">
+                            <i class="fas fa-tags me-1"></i>
+                            ${topicCount} topics configured
+                        </p>
+                        <small class="text-muted">${topics.join(', ')}</small>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    preview.innerHTML = html;
+}
+
+// Initialize preview on page load
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        const jsonText = document.getElementById('hints_json').value;
+        const parsed = JSON.parse(jsonText);
+        updateIndustriesPreview(parsed);
+    } catch (e) {
+        console.error('Failed to parse initial JSON:', e);
+    }
+});
+</script>
+
+<style>
+/* Code editor styling */
+#hints_json {
+    background-color: #f8f9fa;
+    border: 2px solid #dee2e6;
+    border-radius: 4px;
+    padding: 12px;
+    line-height: 1.5;
+}
+
+#hints_json:focus {
+    background-color: #fff;
+    border-color: var(--primary-red);
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.15);
+}
+
+/* Preview cards */
+#industriesPreview .card {
+    border-left: 4px solid var(--primary-red);
+    transition: transform 0.2s;
+}
+
+#industriesPreview .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+</style>
+{% endblock %}

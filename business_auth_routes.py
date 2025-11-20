@@ -3660,6 +3660,181 @@ def delete_platform_email_domain(config_id):
         return redirect(url_for('business_auth.platform_email_domains'))
 
 
+# ==== INDUSTRY TOPIC HINTS MANAGEMENT (Platform Admin Only) ====
+
+@business_auth_bp.route('/admin/industry-hints')
+@require_business_auth
+@require_platform_admin
+def industry_hints_config():
+    """Industry topic hints configuration page (Platform Admin Only)"""
+    try:
+        current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+        
+        # Load current configuration from the Python file
+        import industry_topic_hints_config
+        import json
+        
+        # Convert to pretty-printed JSON for editing
+        hints_json = json.dumps(industry_topic_hints_config.INDUSTRY_TOPIC_HINTS, indent=2, ensure_ascii=False)
+        
+        return render_template('business_auth/industry_hints_config.html',
+                             hints_json=hints_json,
+                             current_user=current_user)
+    
+    except Exception as e:
+        logger.error(f"Error loading industry hints configuration: {e}")
+        flash('Failed to load industry hints configuration.', 'error')
+        return redirect(url_for('business_auth.admin_panel'))
+
+
+@business_auth_bp.route('/admin/industry-hints/save', methods=['POST'])
+@require_business_auth
+@require_platform_admin
+def save_industry_hints_config():
+    """Save industry topic hints configuration (Platform Admin Only)"""
+    try:
+        current_user = BusinessAccountUser.query.get(session.get('business_user_id'))
+        if not current_user:
+            flash('User session invalid.', 'error')
+            return redirect(url_for('business_auth.login'))
+        
+        # Get JSON from form
+        hints_json = request.form.get('hints_json', '').strip()
+        
+        if not hints_json:
+            flash('Configuration data is required.', 'error')
+            return redirect(url_for('business_auth.industry_hints_config'))
+        
+        # Validate JSON
+        import json
+        try:
+            hints_data = json.loads(hints_json)
+        except json.JSONDecodeError as e:
+            flash(f'Invalid JSON format: {str(e)}', 'error')
+            return redirect(url_for('business_auth.industry_hints_config'))
+        
+        # Basic validation - ensure it's a dict with industry keys
+        if not isinstance(hints_data, dict):
+            flash('Configuration must be a JSON object (dictionary).', 'error')
+            return redirect(url_for('business_auth.industry_hints_config'))
+        
+        # Validate that each industry has topic hints
+        for industry, topics in hints_data.items():
+            if not isinstance(topics, dict):
+                flash(f'Industry "{industry}" must have a dictionary of topic hints.', 'error')
+                return redirect(url_for('business_auth.industry_hints_config'))
+        
+        # Write to file
+        config_content = f'''"""
+Industry-Specific Topic Hints Configuration
+
+This module defines platform-wide default hints for conversational survey questions,
+mapped by industry and survey topic. These hints customize AI prompts to ask more
+relevant, industry-specific questions.
+
+Architecture:
+- Platform admin maintains this file (default hints library)
+- BusinessAccount.industry_topic_hints JSON can override specific hints
+- Campaign inherits from BusinessAccount or uses platform defaults
+
+Usage in PromptTemplateService:
+- Inject hints into topic descriptions to guide GPT-4o question generation
+- Example: "Product Quality (focus on: defects, throughput, line reliability)"
+"""
+
+INDUSTRY_TOPIC_HINTS = {json.dumps(hints_data, indent=4, ensure_ascii=False)}
+
+
+def get_available_industries():
+    """
+    Get list of available industries for UI selection
+    
+    Returns:
+        list: Industry names sorted alphabetically, with Generic last
+    """
+    industries = sorted([k for k in INDUSTRY_TOPIC_HINTS.keys() if k != "Generic"])
+    industries.append("Generic")
+    return industries
+
+
+def get_industry_hints(industry):
+    """
+    Get topic hints for a specific industry
+    
+    Args:
+        industry (str): Industry name
+    
+    Returns:
+        dict: Topic hints mapping, or Generic hints if industry not found
+    """
+    return INDUSTRY_TOPIC_HINTS.get(industry, INDUSTRY_TOPIC_HINTS["Generic"])
+
+
+def get_topic_hint(industry, topic):
+    """
+    Get hint for a specific industry and topic
+    
+    Args:
+        industry (str): Industry name
+        topic (str): Survey topic name
+    
+    Returns:
+        str: Hint keywords or empty string if not found
+    """
+    hints = get_industry_hints(industry)
+    return hints.get(topic, "")
+
+
+def merge_custom_hints(industry, custom_hints):
+    """
+    Merge custom business account hints with platform defaults
+    
+    Args:
+        industry (str): Industry name
+        custom_hints (dict): Custom hints from BusinessAccount.industry_topic_hints
+    
+    Returns:
+        dict: Merged hints (custom overrides platform defaults)
+    """
+    platform_hints = get_industry_hints(industry).copy()
+    
+    if custom_hints and isinstance(custom_hints, dict):
+        platform_hints.update(custom_hints)
+    
+    return platform_hints
+'''
+        
+        # Write to file
+        with open('industry_topic_hints_config.py', 'w', encoding='utf-8') as f:
+            f.write(config_content)
+        
+        # Reload the module to apply changes immediately
+        import importlib
+        import industry_topic_hints_config
+        importlib.reload(industry_topic_hints_config)
+        
+        # Audit log
+        queue_audit_log(
+            business_account_id=current_user.business_account_id,
+            action_type='industry_hints_update',
+            resource_type='platform_config',
+            resource_id=None,
+            user_name=current_user.get_full_name(),
+            details={
+                'industries_count': len(hints_data),
+                'industries': list(hints_data.keys())
+            }
+        )
+        
+        flash('Industry topic hints configuration updated successfully.', 'success')
+        return redirect(url_for('business_auth.industry_hints_config'))
+    
+    except Exception as e:
+        logger.error(f"Error saving industry hints configuration: {e}")
+        flash(f'Failed to save configuration: {str(e)}', 'error')
+        return redirect(url_for('business_auth.industry_hints_config'))
+
+
 # ==== EMAIL DELIVERY CONFIGURATION ROUTES (Business Account) ====
 
 def _get_email_delivery_data(business_account_id):
