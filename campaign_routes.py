@@ -1234,8 +1234,8 @@ def survey_config(campaign_id):
         # Prepare business account defaults for inheritance preview
         business_defaults = {
             'topics': {
-                'prioritized': current_account.survey_prioritized_topics or [],
-                'optional': current_account.survey_optional_topics or []
+                'prioritized': current_account.prioritized_topics or [],
+                'optional': current_account.optional_topics or []
             },
             'controls': {
                 'max_questions': current_account.max_questions or 8,
