@@ -1559,6 +1559,7 @@ class Participant(db.Model):
     region = db.Column(db.String(100), nullable=True)  # e.g., "North America", "EMEA", "APAC"
     customer_tier = db.Column(db.String(50), nullable=True)  # e.g., "Enterprise", "SMB", "Startup"
     language = db.Column(db.String(10), nullable=True, default='en')  # ISO language code (en, es, fr, etc.)
+    client_industry = db.Column(db.String(120), nullable=True)  # e.g., "Healthcare", "EMS", "Software" - Industry sector of participant's company
     
     # Company-level financial data (manual input only, synced across all participants from same company)
     company_commercial_value = db.Column(db.Float, nullable=True)  # Estimated account value in USD
@@ -1596,6 +1597,7 @@ class Participant(db.Model):
             'region': self.region,
             'customer_tier': self.customer_tier,
             'language': self.language,
+            'client_industry': self.client_industry,
             'company_commercial_value': self.company_commercial_value,
             'tenure_years': self.tenure_years,
             'source': self.source,
