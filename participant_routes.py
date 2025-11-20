@@ -51,6 +51,7 @@ def get_filter_options(business_account_id):
     roles = set()
     regions = set()
     tiers = set()
+    industries = set()
     languages = set()
     tenure_ranges = set()
     
@@ -63,6 +64,8 @@ def get_filter_options(business_account_id):
             regions.add(row.region)
         if row.customer_tier:
             tiers.add(row.customer_tier)
+        if row.client_industry:
+            industries.add(row.client_industry)
         if row.language:
             languages.add(row.language)
         if row.tenure_years is not None:
@@ -73,6 +76,7 @@ def get_filter_options(business_account_id):
         'roles': sorted(list(roles)),
         'regions': sorted(list(regions)),
         'tiers': sorted(list(tiers)),
+        'industries': sorted(list(industries)),
         'languages': sorted(list(languages)),
         'tenure_ranges': sorted(list(tenure_ranges), key=lambda x: float(x) if x.replace('.', '', 1).isdigit() else 0)
     }
@@ -80,8 +84,8 @@ def get_filter_options(business_account_id):
 
 def apply_participant_filters(query, filter_companies=None, filter_roles=None, 
                              filter_regions=None, filter_tiers=None, 
-                             filter_languages=None, filter_tenure_ranges=None, 
-                             search_query=None):
+                             filter_industries=None, filter_languages=None, 
+                             filter_tenure_ranges=None, search_query=None):
     """
     Apply filters to a participant query
     Shared by both list_participants() and api_filter_participants()
@@ -95,6 +99,8 @@ def apply_participant_filters(query, filter_companies=None, filter_roles=None,
         query = query.filter(Participant.region.in_(filter_regions))
     if filter_tiers:
         query = query.filter(Participant.customer_tier.in_(filter_tiers))
+    if filter_industries:
+        query = query.filter(Participant.client_industry.in_(filter_industries))
     if filter_languages:
         query = query.filter(Participant.language.in_(filter_languages))
     if filter_tenure_ranges:
@@ -124,8 +130,9 @@ def apply_participant_filters(query, filter_companies=None, filter_roles=None,
 
 def calculate_participant_kpi_stats(business_account_id, filter_companies=None, 
                                    filter_roles=None, filter_regions=None, 
-                                   filter_tiers=None, filter_languages=None, 
-                                   filter_tenure_ranges=None, search_query=None):
+                                   filter_tiers=None, filter_industries=None, 
+                                   filter_languages=None, filter_tenure_ranges=None, 
+                                   search_query=None):
     """
     Calculate KPI stats for participants with optional filters
     Returns dict with total, completed, started, invited, created, active, companies counts
@@ -150,6 +157,7 @@ def calculate_participant_kpi_stats(business_account_id, filter_companies=None,
         filter_roles=filter_roles,
         filter_regions=filter_regions,
         filter_tiers=filter_tiers,
+        filter_industries=filter_industries,
         filter_languages=filter_languages,
         filter_tenure_ranges=filter_tenure_ranges,
         search_query=search_query
@@ -269,6 +277,7 @@ def api_filter_participants():
         filter_roles = request.args.getlist('filter_role') or None
         filter_regions = request.args.getlist('filter_region') or None
         filter_tiers = request.args.getlist('filter_tier') or None
+        filter_industries = request.args.getlist('filter_industry') or None
         filter_languages = request.args.getlist('filter_language') or None
         filter_tenure_ranges = request.args.getlist('filter_tenure') or None
         
@@ -280,6 +289,7 @@ def api_filter_participants():
             filter_roles=filter_roles,
             filter_regions=filter_regions,
             filter_tiers=filter_tiers,
+            filter_industries=filter_industries,
             filter_languages=filter_languages,
             filter_tenure_ranges=filter_tenure_ranges,
             search_query=search_query
@@ -292,6 +302,7 @@ def api_filter_participants():
             filter_roles=filter_roles,
             filter_regions=filter_regions,
             filter_tiers=filter_tiers,
+            filter_industries=filter_industries,
             filter_languages=filter_languages,
             filter_tenure_ranges=filter_tenure_ranges,
             search_query=search_query
@@ -1299,6 +1310,7 @@ def manage_campaign_participants(campaign_id: int):
             filter_roles = request.args.getlist('filter_role')
             filter_regions = request.args.getlist('filter_region')
             filter_tiers = request.args.getlist('filter_tier')
+            filter_industries = request.args.getlist('filter_industry')
             filter_languages = request.args.getlist('filter_language')
             filter_tenure_ranges = request.args.getlist('filter_tenure')
             
@@ -1367,6 +1379,22 @@ def manage_campaign_participants(campaign_id: int):
                 else:
                     available_query = available_query.filter(Participant.customer_tier.in_(filter_tiers))
             
+            # Client industry filter (support multiple industries)
+            if filter_industries:
+                if 'Unspecified' in filter_industries:
+                    other_industries = [i for i in filter_industries if i != 'Unspecified']
+                    if other_industries:
+                        available_query = available_query.filter(
+                            db.or_(
+                                Participant.client_industry.in_(other_industries),
+                                Participant.client_industry.is_(None)
+                            )
+                        )
+                    else:
+                        available_query = available_query.filter(Participant.client_industry.is_(None))
+                else:
+                    available_query = available_query.filter(Participant.client_industry.in_(filter_industries))
+            
             # Language filter (support multiple languages)
             if filter_languages:
                 if 'Unspecified' in filter_languages:
@@ -1422,6 +1450,7 @@ def manage_campaign_participants(campaign_id: int):
                 'roles': sorted(list(set([p.role for p in all_participants_for_filters if p.role]))) + ['Unspecified'],
                 'regions': sorted(list(set([p.region for p in all_participants_for_filters if p.region]))) + ['Unspecified'],
                 'tiers': sorted(list(set([p.customer_tier for p in all_participants_for_filters if p.customer_tier]))) + ['Unspecified'],
+                'industries': sorted(list(set([p.client_industry for p in all_participants_for_filters if p.client_industry]))) + ['Unspecified'],
                 'languages': sorted(list(set([p.language for p in all_participants_for_filters if p.language]))) + ['Unspecified'],
                 'tenure_ranges': ['0-1', '1-3', '3-5', '5+', 'Unspecified']
             }
@@ -1432,6 +1461,7 @@ def manage_campaign_participants(campaign_id: int):
                 'roles': filter_roles,
                 'regions': filter_regions,
                 'tiers': filter_tiers,
+                'industries': filter_industries,
                 'languages': filter_languages,
                 'tenure_ranges': filter_tenure_ranges
             }
