@@ -4423,9 +4423,11 @@ def survey_config():
             'professional', 'warm', 'casual', 'formal'
         ]
         
+        # Topic options must match industry_topic_hints_config.py exactly (8 topics)
         topic_options = [
-            'NPS', 'Satisfaction', 'Product Quality', 'Service Rating', 
-            'Support Experience', 'Pricing Value', 'Improvement Suggestions'
+            'Product Quality', 'Support Experience', 'Service Rating', 
+            'NPS Score', 'Pricing Value', 'User Experience',
+            'Feature Requests', 'Improvement Suggestions'
         ]
         
         return render_template('business_auth/survey_config.html',
