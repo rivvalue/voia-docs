@@ -414,6 +414,18 @@ function populateCampaignFilterDropdown() {
         // Load dashboard data for default campaign
         loadDashboardData();
     }
+    
+    // Attach change event listener to campaign filter
+    // Remove existing listener first to prevent duplicates
+    const newSelect = select.cloneNode(true);
+    select.parentNode.replaceChild(newSelect, select);
+    
+    // Attach the event listener
+    newSelect.addEventListener('change', () => {
+        console.log('📍 Campaign filter changed via dropdown');
+        applyCampaignFilter();
+    });
+    console.log('✅ Campaign filter change listener attached');
 }
 
 // Apply campaign filter to analytics
