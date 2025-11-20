@@ -6792,7 +6792,55 @@ msgstr "T3 : Libre-service ou petit client"
 msgid "Customer segment for tier-based analysis"
 msgstr "Segment client pour l'analyse par catégorie"
 
-#: templates/participants/create.html:155 templates/participants/edit.html:203
+#: templates/participants/create.html:158 templates/participants/edit.html:191
+msgid "Client Industry"
+msgstr "Industrie du client"
+
+#: templates/participants/create.html:163 templates/participants/edit.html:196
+msgid "Select industry (optional)"
+msgstr "Sélectionnez une industrie (optionnel)"
+
+#: templates/participants/create.html:164 templates/participants/edit.html:197
+msgid "EMS (Electronic Manufacturing Services)"
+msgstr "EMS (Services de fabrication électronique)"
+
+#: templates/participants/create.html:165 templates/participants/edit.html:198
+msgid "Healthcare"
+msgstr "Santé"
+
+#: templates/participants/create.html:166 templates/participants/edit.html:199
+msgid "Software/Technology"
+msgstr "Logiciels/Technologie"
+
+#: templates/participants/create.html:167 templates/participants/edit.html:200
+msgid "Financial Services"
+msgstr "Services financiers"
+
+#: templates/participants/create.html:168 templates/participants/edit.html:201
+msgid "Retail/E-commerce"
+msgstr "Commerce de détail/E-commerce"
+
+#: templates/participants/create.html:169 templates/participants/edit.html:202
+msgid "Manufacturing (General)"
+msgstr "Fabrication (général)"
+
+#: templates/participants/create.html:170 templates/participants/edit.html:203
+msgid "Professional Services"
+msgstr "Services professionnels"
+
+#: templates/participants/create.html:171 templates/participants/edit.html:204
+msgid "Telecommunications"
+msgstr "Télécommunications"
+
+#: templates/participants/create.html:172 templates/participants/edit.html:205
+msgid "Education"
+msgstr "Éducation"
+
+#: templates/participants/create.html:175 templates/participants/edit.html:208
+msgid "Client's industry for industry-based insights"
+msgstr "Industrie du client pour des analyses sectorielles"
+
+#: templates/participants/create.html:183 templates/participants/edit.html:216
 msgid "Preferred Language"
 msgstr "Langue préférée"
 
