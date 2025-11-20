@@ -847,13 +847,32 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
         if target_clients:
             context['target_clients'] = target_clients
         
-        # Industry (business account - cached primitive)
-        if self._ba_industry:
-            context['industry'] = self._ba_industry
+        # Industry (uses effective industry with campaign override support)
+        effective_industry = self.get_effective_industry()
+        if effective_industry:
+            context['industry'] = effective_industry
+        
+        # Build goals with industry-specific hints integrated
+        goals = self._build_prioritized_topics_with_fields()
+        
+        # Get industry topic hints and merge them into goal objects
+        topic_hints = self.get_topic_hints_for_industry()
+        if topic_hints:
+            for goal in goals:
+                topic_name = goal.get('topic', '')
+                # Look for matching hint (case-insensitive partial match)
+                matching_hint = None
+                for hint_topic, hint_keywords in topic_hints.items():
+                    if hint_topic.lower() in topic_name.lower() or topic_name.lower() in hint_topic.lower():
+                        matching_hint = hint_keywords
+                        break
+                
+                if matching_hint:
+                    goal['industry_hint'] = matching_hint
         
         # Build survey configuration
         config = {
-            "goals": self._build_prioritized_topics_with_fields(),
+            "goals": goals,
             "max_questions": self.get_max_questions(),
             "max_duration_seconds": self.get_max_duration_seconds(),
             "conversation_tone": self.get_conversation_tone(),
