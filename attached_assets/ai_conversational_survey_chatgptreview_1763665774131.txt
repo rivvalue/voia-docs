@@ -1,0 +1,331 @@
+Short answer: it works, but it’s not “optimal” yet. It’s doing a lot of things well, but you’re paying extra latency/cost, carrying some complexity debt, and there are a few subtle bugs and edge-case limitations.
+
+I’ll break it down into:
+	1.	✅ What’s strong
+	2.	⚠️ Key limitations / risks
+	3.	💡 Concrete improvements (quick wins + “v2” ideas)
+
+⸻
+
+1. What’s already strong
+	•	Clear separation of 3 phases
+	•	Start → start_ai_conversational_survey
+	•	Turn-by-turn → process_ai_conversation_response
+	•	Finalize → finalize_ai_conversational_survey
+That’s a clean API surface.
+	•	Dual extraction approach
+	•	Primary: GPT with response_format={"type": "json_object"} (👍)
+	•	Fallback: custom regex + keyword rules (non-trivial and thoughtful).
+	•	NPS logic & protection against overwrites
+	•	locked_fields in _extract_survey_data_with_ai and the “DATA PROTECTION” logic are smart: they prevent GPT from “changing its mind”.
+	•	NPS classification into Promoter/Passive/Detractor is consistent in multiple paths.
+	•	Campaign-aware priorities
+	•	Using PromptTemplateService.build_survey_config_json + goals list is good architecture: you can have per-campaign priorities without rewriting the engine.
+	•	Persistence strategy
+	•	In-memory global + DB persistence + recovery is pragmatic for a first version.
+
+So: the fundamentals are solid.
+
+⸻
+
+2. Key limitations / issues
+
+A. Two OpenAI calls per user message
+
+Current per-turn flow:
+	1.	_extract_survey_data_with_ai ➜ GPT call
+	2.	_generate_ai_question ➜ GPT call (or fallback)
+
+This doubles:
+	•	Latency for respondents
+	•	OpenAI cost for you
+
+Both calls use overlapping context (current response + extracted data + campaign config). This is probably your single biggest inefficiency.
+
+⸻
+
+B. Global ai_conversation_instances and scaling
+
+You have:
+
+ai_conversation_instances = {}
+
+And you treat it as a sort of per-process session store.
+
+Limitations:
+	•	Not thread-/process-safe: in a multi-worker WSGI or async environment, you can get races or “missing instance” surprises beyond what you already try to fix.
+	•	Memory leak risk: no TTL / cleanup; if many conversations are started, the dict just grows.
+	•	Unpredictable behavior across deploys: new pods/workers won’t share this memory, so you rely on DB recovery often anyway.
+
+You’re already using DB as the real source of truth. At this point:
+	•	the in-memory dict is a cache, but:
+	•	no explicit TTL
+	•	no protection against stale state if DB is updated in another process
+
+⸻
+
+C. Some brittle / duplicated logic around priorities & extraction
+	•	_get_next_question_priority returns a string like "Ask about NPS: ..."
+	•	_set_current_topic_from_priority then parses that string with substring matching:
+
+field_mapping = {
+    'tenure': ('Business Relationship Tenure', 'tenure_with_fc'),
+    'nps': ('NPS', 'nps_score'),
+    ...
+}
+
+This is brittle:
+	•	If the template changes the wording (“Ask about Net Promoter Score…”), your parsing breaks.
+	•	You’re mixing semantic text with control logic.
+
+Also, build_survey_config_json is called multiple times per turn:
+	•	in _extract_survey_data_with_ai
+	•	in _check_campaign_priorities_collected
+	•	in _get_next_question_priority
+
+So you pay extra CPU & complexity every turn.
+
+⸻
+
+D. Bugs / gotchas in fallback question generation
+
+In _generate_fallback_question, some strings interpolate {company_name} but are not f-strings, e.g.:
+
+'message': "How long have you been working with {company_name}?"
+
+This will literally show {company_name} to the user.
+
+You have this pattern in several places (tenure, satisfaction, NPS messages). That’s a direct UX bug.
+
+⸻
+
+E. NPS extraction inconsistencies
+
+You’ve done a lot of work to avoid “1” from “1 to 10” being misread as NPS, but:
+	•	_extract_survey_data_with_ai (GPT) is fine.
+	•	_extract_survey_data_fallback uses advanced patterns → good.
+	•	_extract_missing_data_from_history (used at finalize) is much more naïve:
+
+numbers = re.findall(r'\b([0-9]|10)\b', message)
+for num_str in numbers:
+    num = int(num_str)
+    if 0 <= num <= 10:
+        self.extracted_data['nps_score'] = num
+        ...
+        break
+
+This can again pick the first “1” in “on a scale of 1 to 10, I’d say 8”.
+
+So finalization may override a good NPS with a bad heuristic if earlier path failed.
+
+⸻
+
+F. Language / locale limitations
+
+Rule-based extraction is heavily English-centric:
+	•	Keywords: “very satisfied”, “average service”, “expensive”, “cheap”, etc.
+	•	Regex patterns assume English grammar.
+
+If respondents answer in French (which will happen in Québec), the GPT extractor will likely do fine, but the fallback and some keyword-based logic won’t:
+	•	Satisfaction detection
+	•	Pricing sentiment
+	•	Tenure phrases
+
+This reduces robustness for French campaigns when the model falls back or when you rely on keyword logic in finalization.
+
+⸻
+
+G. Logging & PII
+
+You have many print()s that log:
+	•	Full user inputs
+	•	Extracted data
+	•	Internal step counts, etc.
+
+In production, this means:
+	•	Sensitive feedback is written to logs (NPS reasoning, complaints, etc.)
+	•	Harder to manage log volume / severity
+
+Better to:
+	•	Use logging with levels
+	•	Mask or truncate PII / long free-text
+	•	Make debug logging opt-in
+
+⸻
+
+H. Conversation roles & prompts
+
+You’re putting everything into a single user message, even when you conceptually have a “system prompt”:
+
+system_prompt = self.template_service.generate_system_prompt(...)
+full_prompt = f"""{system_prompt}
+
+CUSTOMER'S LATEST RESPONSE: "{user_input}"
+
+NEXT LOGICAL QUESTION PRIORITY:
+{next_priority}
+...
+
+then:
+
+messages=[{"role": "user", "content": full_prompt}]
+
+Limitations:
+	•	You’re not using the system vs user separation, which is where OpenAI models pay particular attention to instructions.
+	•	Makes prompt injection slightly easier: user text is in the same “bucket” as instructions.
+
+⸻
+
+I. Tight coupling & size of the class
+
+AIConversationalSurvey currently owns:
+	•	OpenAI client lifetime
+	•	Conversation state
+	•	Extraction logic (prompt + regex)
+	•	Question planning
+	•	UX completion logic
+	•	DB persistence helpers (indirectly via global helpers)
+
+This makes:
+	•	Testing harder (unit tests on each behavior are more complicated)
+	•	Changes risky (e.g. changing NPS logic touches multiple places)
+	•	Harder to onboard other devs / contribute
+
+⸻
+
+3. How to make it better (prioritized)
+
+3.1. Quick wins (no major refactor)
+	1.	Fix the f-string bugs
+In _generate_fallback_question, make sure all {company_name} strings are prefixed with f:
+
+'message': f"How long have you been working with {company_name}?"
+
+
+	2.	Unify NPS extraction logic across all paths
+	•	Reuse the same pattern logic you have in _extract_survey_data_fallback inside _extract_missing_data_from_history and _extract_nps_from_history, or simply call that fallback on the whole history instead of re-implementing regex.
+	3.	Cache the campaign survey_config per instance
+Add e.g.:
+
+self._survey_config = None
+
+def get_survey_config(self):
+    if self._survey_config is None:
+        self._survey_config = self.template_service.build_survey_config_json(self.participant_data)
+    return self._survey_config
+
+Then use self.get_survey_config() everywhere instead of repeated calls.
+
+	4.	Use proper system/user roles
+For extraction:
+
+response = self.openai_client.chat.completions.create(
+    model=conversation_model,
+    messages=[
+        {"role": "system", "content": "You are an assistant that extracts structured survey data as JSON."},
+        {"role": "user", "content": prompt_body}
+    ],
+    response_format={"type": "json_object"},
+    ...
+)
+
+Similarly for question generation, keep system prompt separate.
+
+	5.	Switch print() to logging & mask text
+Replace prints with logger.debug / info and only log:
+	•	step_count
+	•	which fields were updated
+	•	truncated text (user_input[:100] + "...")
+	6.	Guard against runaway ai_conversation_instances
+	•	On finalize and/or after timeouts, ensure you remove entries from the dict.
+	•	Optionally track a simple timestamp and clear old conversations periodically.
+
+⸻
+
+3.2. Bigger improvements (v2 / v3 ideas)
+
+A. Single OpenAI call per turn (extraction + next question)
+Change your target structure so the model returns something like:
+
+{
+  "extracted_data_delta": {
+    "nps_score": 8,
+    "nps_category": "Passive",
+    ...
+  },
+  "next_message": {
+    "message": "...",
+    "message_type": "ai_question",
+    "step": "nps_reasoning",
+    "progress": 40,
+    "is_complete": false
+  },
+  "control": {
+    "current_topic": "NPS",
+    "expected_field": "nps_score"
+  }
+}
+
+Then:
+	•	Update extracted_data with the delta, respecting your “no overwrite” rule.
+	•	Use next_message directly to display the next question.
+	•	Optionally keep _extract_survey_data_fallback only for offline/edge recovery or as a post-processing check.
+
+This will:
+	•	Halve latency and cost,
+	•	Simplify the flow (no more two GPT prompts per turn),
+	•	Make your logic around “priority string → topic → field” more explicit, since you can ask the model to output current_topic / expected_field directly instead of parsing strings.
+
+B. Replace “priority strings” with structured planning
+Instead of:
+	•	_get_next_question_priority returning "Ask about NPS: ...",
+	•	_set_current_topic_from_priority parsing it,
+
+Have _get_next_question_priority return a dict:
+
+{
+  "topic": "NPS",
+  "expected_field": "nps_score",
+  "prompt_hint": "0-10 likelihood to recommend {company_name}"
+}
+
+Then:
+	•	Pass that object into the question-generation prompt as JSON → less brittle.
+	•	Set self.current_topic / self.current_expected_field based on this dict directly.
+
+C. Extractor / Planner / Renderer as separate components
+For maintainability:
+	•	SurveyState dataclass (conversation_history, extracted_data, step_count, flags)
+	•	Extractor (GPT + regex fallback)
+	•	QuestionPlanner (NPS retries, campaign goals, completion checks)
+	•	PromptRenderer (system/user prompts using PromptTemplateService)
+
+AIConversationalSurvey then simply orchestrates:
+
+delta = extractor.extract(user_input, state, campaign_config)
+state.apply_delta(delta)
+plan  = planner.next_step(state, campaign_config, user_input)
+question = renderer.render_question(plan, state, campaign_config)
+
+This will massively simplify testing and evolution.
+
+D. Better multilingual support
+If VOÏA is officially bilingual:
+	•	Extend keyword lists to include French equivalents for:
+	•	satisfaction, pricing sentiment, support sentiment, tenure phrases;
+	•	Or: rely more on GPT structure and demote fallback to a rare edge case instead of “co-primary” logic.
+
+⸻
+
+Summary
+	•	Not optimal yet, but the design is solid and already quite sophisticated.
+	•	Biggest current issues:
+	•	2 GPT calls per turn (cost/latency)
+	•	brittle string parsing for priorities
+	•	a few UX bugs (missing f-strings, NPS history fallback)
+	•	English-only keyword logic for a bilingual use case
+	•	heavy logging of PII via print
+
+If you want, next step I can:
+	•	Propose an updated JSON schema for a single-call per turn flow, and
+	•	Sketch a refactored “Extractor + Planner + Renderer” architecture that still fits your existing DB + API endpoints.
