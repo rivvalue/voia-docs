@@ -1,9 +1,24 @@
 import os
 import json
 import uuid
+import logging
 from typing import Dict, Any, List, Optional
 from openai import OpenAI
 from prompt_template_service import PromptTemplateService
+
+# Configure logger with PII masking
+logger = logging.getLogger(__name__)
+
+def _mask_pii(text, max_length=100):
+    """Mask PII and truncate text for logging"""
+    if not text:
+        return text
+    if isinstance(text, dict):
+        return {k: _mask_pii(v) if k not in ['conversation_id', 'step_count'] else v for k, v in list(text.items())[:5]}
+    text_str = str(text)
+    if len(text_str) > max_length:
+        return text_str[:max_length] + "... [truncated]"
+    return text_str
 
 def normalize_company_name(company_name):
     """Normalize company name for case-insensitive comparison"""
@@ -43,10 +58,9 @@ class AIConversationalSurvey:
         
         # Debug logging for template mode
         template_info = self.template_service.get_template_info()
-        print(f"TEMPLATE DEBUG: Initialized with business_account_id={business_account_id}, campaign_id={campaign_id}")
-        print(f"TEMPLATE DEBUG: Mode={template_info['is_demo_mode']}, Company={template_info['company_name']}, Product={template_info['product_name']}")
-        print(f"TEMPLATE DEBUG: Tone={template_info['conversation_tone']}, MaxQuestions={template_info['max_questions']}")
-        print(f"TEMPLATE DEBUG: Participant data available: {bool(participant_data)}")
+        logger.debug(f"Template initialized: business_account_id={business_account_id}, campaign_id={campaign_id}")
+        logger.debug(f"Template mode: {template_info['is_demo_mode']}, max_questions={template_info['max_questions']}")
+        logger.debug(f"Participant data available: {bool(participant_data)}")
         
     def start_conversation(self, company_name: str, respondent_name: str) -> Dict[str, Any]:
         """Start a new AI-powered conversational survey"""
@@ -54,7 +68,7 @@ class AIConversationalSurvey:
         # The extracted_data might already be set by start_ai_conversational_survey
         existing_extracted_data = self.extracted_data.copy() if hasattr(self, 'extracted_data') and self.extracted_data else {}
         
-        print(f"CRITICAL DEBUG: Pre-conversation extracted_data: {existing_extracted_data}")
+        logger.debug(f"Pre-conversation extracted_data fields: {list(existing_extracted_data.keys())}")
         
         self.survey_data = {
             'company_name': company_name,
@@ -67,7 +81,7 @@ class AIConversationalSurvey:
         self.extracted_data = self.survey_data['extracted_data']
         
         # Debug logging
-        print(f"STARTUP DEBUG: After initialization, extracted_data: {self.extracted_data}")
+        logger.debug(f"Conversation started with {len(self.extracted_data)} pre-populated fields")
         
         welcome_message = self._generate_welcome_message(company_name, respondent_name)
         
@@ -107,28 +121,22 @@ class AIConversationalSurvey:
                 if self.extracted_data.get(key) is None:
                     newly_extracted[key] = value
                     self.extracted_data[key] = value
-                    print(f"LOCKED DATA: {key} = {value} (first time captured)")
+                    logger.debug(f"Locked field: {key} (first capture)")
                 else:
                     # Data already exists, don't overwrite - log the attempt
-                    existing_value = self.extracted_data.get(key)
-                    print(f"DATA PROTECTION: Prevented overwrite of {key}. Keeping existing: {existing_value}, AI suggested: {value}")
+                    logger.debug(f"Data protection: prevented overwrite of {key}")
         
         self.survey_data['extracted_data'] = self.extracted_data
         
         # Increment step count BEFORE generating next question
         self.step_count += 1
         
-        print(f"Step {self.step_count}: Extracted data: {newly_extracted}")
-        print(f"Total extracted so far: {self.extracted_data}")
-        
-        # Debug print
-        print(f"Step {self.step_count}: User said: '{user_input}'")
-        print(f"Extracted data: {extracted}")
-        print(f"Full extracted data: {self.extracted_data}")
+        logger.debug(f"Step {self.step_count}: New fields={list(newly_extracted.keys())}, Total fields={len(self.extracted_data)}")
+        logger.debug(f"User input: {_mask_pii(user_input)}")
         
         # ANTI-LOOP PROTECTION: Prevent infinite loops but allow service questions
         if self.template_service.should_force_completion(self.step_count):
-            print(f"LOOP PROTECTION: Forcing completion after {self.step_count} steps (max: {self.template_service.get_max_questions()})")
+            logger.info(f"Loop protection: forcing completion at step {self.step_count}")
             self.is_complete = True
             return {
                 'message': self.template_service.get_completion_message(),
@@ -161,8 +169,7 @@ class AIConversationalSurvey:
             })
         
         # Debug logging
-        print(f"Step {self.step_count}: Extracted data: {self.extracted_data}")
-        print(f"Next question: {next_question.get('message', '')}")
+        logger.debug(f"Step {self.step_count}: Total extracted fields: {len(self.extracted_data)}")
         
         # Add extracted_data to response for frontend state sync
         next_question['extracted_data'] = self.extracted_data
@@ -292,7 +299,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             return extracted
             
         except Exception as e:
-            print(f"AI extraction error: {e}")
+            logger.warning(f"AI extraction error, using fallback: {str(e)[:50]}")
             # Use robust fallback extraction
             return self._extract_survey_data_fallback(user_input)
     
@@ -306,7 +313,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         
         # CAMPAIGN-AWARE: If we know the expected field, use that for numeric extraction
         if self.current_expected_field and re.search(r'\b[0-9]+\b', user_input):
-            print(f"CAMPAIGN-AWARE FALLBACK: Expected field is {self.current_expected_field}")
+            logger.debug(f"Campaign-aware fallback: expected field is {self.current_expected_field}")
             
             # Extract numeric value
             matches = re.findall(r'\b([0-9]+)\b', user_input)
@@ -322,15 +329,15 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
                         extracted['nps_category'] = 'Passive'
                     else:
                         extracted['nps_category'] = 'Detractor'
-                    print(f"CAMPAIGN-AWARE FALLBACK: Captured NPS={value}")
+                    logger.debug(f"Fallback captured NPS={value}")
                 elif self.current_expected_field in ['satisfaction_rating', 'service_rating', 'product_value_rating', 'pricing_rating', 'support_rating'] and 1 <= value <= 5:
                     extracted[self.current_expected_field] = value
-                    print(f"CAMPAIGN-AWARE FALLBACK: Captured {self.current_expected_field}={value}")
+                    logger.debug(f"Fallback captured {self.current_expected_field}={value}")
         
         # Extract NPS score ONLY during steps 1-3 (before satisfaction questions start at step 4)
         # This prevents "1" or "5" from satisfaction questions being misinterpreted as NPS
         if not extracted.get('nps_score') and not self.extracted_data.get('nps_score') and self.step_count <= 3 and re.search(r'\b([0-9]|10)\b', user_input):
-            print(f"Attempting NPS extraction at step {self.step_count} for input: '{user_input}'")
+            logger.debug(f"Attempting NPS extraction at step {self.step_count}")
             nps_patterns = [
                 r'(?:score|rating|give|rate).*?(10|[0-9])',  # Fixed: 10 before single digits
                 r'^(10|[0-9])(?:\s|$|/|,|\.)',
@@ -357,7 +364,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
                             extracted['nps_category'] = 'Passive'
                         else:
                             extracted['nps_category'] = 'Detractor'
-                        print(f"FIRST TIME NPS CAPTURE (FALLBACK): {score} - LOCKED")
+                        logger.debug(f"NPS captured via fallback: {score}")
                         break
                 if 'nps_score' in extracted:
                     break
@@ -365,7 +372,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         # CRITICAL FIX: Extract explicit numeric ratings for all categories 
         # Patterns like "I rate them 3", "service is 4", "I'd give them a 2"
         if re.search(r'\b[1-5]\b', user_input):
-            print(f"Attempting explicit rating extraction for input: '{user_input}'")
+            logger.debug(f"Attempting explicit rating extraction")
             
             # Generic rating patterns - catch "I rate X" statements
             generic_rating_patterns = [
@@ -425,7 +432,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
                     rating = int(match)
                     if 1 <= rating <= 5 and not self.extracted_data.get('service_rating'):
                         extracted['service_rating'] = rating
-                        print(f"SERVICE RATING CAPTURED (EXPLICIT): {rating} - LOCKED")
+                        logger.debug(f"Service rating captured: {rating}")
                         break
                 if 'service_rating' in extracted:
                     break
@@ -439,7 +446,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
                         rating = int(match)
                         if 1 <= rating <= 5 and not self.extracted_data.get('satisfaction_rating'):
                             extracted['satisfaction_rating'] = rating
-                            print(f"SATISFACTION RATING CAPTURED (EXPLICIT): {rating} - LOCKED")
+                            logger.debug(f"Satisfaction rating captured: {rating}")
                             break
                     if 'satisfaction_rating' in extracted:
                         break
@@ -453,7 +460,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
                         rating = int(match)
                         if 1 <= rating <= 5 and not self.extracted_data.get('product_value_rating'):
                             extracted['product_value_rating'] = rating
-                            print(f"PRODUCT VALUE RATING CAPTURED (EXPLICIT): {rating} - LOCKED")
+                            logger.debug(f"Product value rating captured: {rating}")
                             break
                     if 'product_value_rating' in extracted:
                         break
@@ -467,7 +474,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
                         rating = int(match)
                         if 1 <= rating <= 5 and not self.extracted_data.get('pricing_rating'):
                             extracted['pricing_rating'] = rating
-                            print(f"PRICING RATING CAPTURED (EXPLICIT): {rating} - LOCKED")
+                            logger.debug(f"Pricing rating captured: {rating}")
                             break
                     if 'pricing_rating' in extracted:
                         break
@@ -481,7 +488,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
                         rating = int(match)
                         if 1 <= rating <= 5 and not self.extracted_data.get('support_rating'):
                             extracted['support_rating'] = rating
-                            print(f"SUPPORT RATING CAPTURED (EXPLICIT): {rating} - LOCKED")
+                            logger.debug(f"Support rating captured: {rating}")
                             break
                     if 'support_rating' in extracted:
                         break
@@ -499,16 +506,16 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
                             if self.step_count <= 4:  # Early in survey - likely satisfaction
                                 if not self.extracted_data.get('satisfaction_rating'):
                                     extracted['satisfaction_rating'] = rating
-                                    print(f"SATISFACTION RATING INFERRED (GENERIC): {rating} - LOCKED")
+                                    logger.debug(f"Satisfaction rating inferred: {rating}")
                             elif 'service' in text_lower or 'professional' in text_lower:
                                 if not self.extracted_data.get('service_rating'):
                                     extracted['service_rating'] = rating
-                                    print(f"SERVICE RATING INFERRED (GENERIC): {rating} - LOCKED")
+                                    logger.debug(f"Service rating inferred: {rating}")
                             else:
                                 # Default assignment to missing category
                                 if not self.extracted_data.get('service_rating'):
                                     extracted['service_rating'] = rating
-                                    print(f"SERVICE RATING CAPTURED (DEFAULT): {rating} - LOCKED")
+                                    logger.debug(f"Service rating captured (default): {rating}")
                             break
                     if any(extracted.get(key) for key in ['service_rating', 'satisfaction_rating', 'product_value_rating', 'pricing_rating', 'support_rating']):
                         break
@@ -676,9 +683,9 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         
         completion_ready = len(completion_reasons) > 0
         
-        print(f"UX-FIRST COMPLETION CHECK: NPS={has_nps}, Tenure={has_tenure}, Reasoning={has_reasoning}, Frustrated={user_frustrated}, Steps={self.step_count}/{max_questions}, Ready={completion_ready}")
+        logger.debug(f"COMPLETION CHECK: NPS={has_nps}, Tenure={has_tenure}, Reasoning={has_reasoning}, Frustrated={user_frustrated}, Steps={self.step_count}/{max_questions}, Ready={completion_ready}")
         if completion_reasons:
-            print(f"COMPLETION REASONS: {', '.join(completion_reasons)}")
+            logger.info(f"REASONS: {', '.join(completion_reasons)}")
         
         return completion_ready
     
@@ -701,7 +708,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         for message in recent_messages:
             message_text = message['message'].lower()
             if any(keyword in message_text for keyword in frustration_keywords):
-                print(f"FRUSTRATION DETECTED: '{message['message']}'")
+                logger.debug(f"DETECTED: '{message['message']}'")
                 return True
         
         # Check for pattern of very short responses after longer ones (user giving up)
@@ -710,7 +717,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             if (len(last_two[0]['message']) > 20 and 
                 len(last_two[1]['message']) <= 5 and
                 last_two[1]['message'].lower().strip() in ['ok', 'fine', 'sure', 'yes', 'no', 'done']):
-                print(f"FRUSTRATION PATTERN: Long response followed by short dismissive response")
+                logger.debug(f"PATTERN: Long response followed by short dismissive response")
                 return True
         
         return False
@@ -722,7 +729,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         
         if not survey_config.get('goals'):
             # No custom priorities - return False to use default minimal core logic
-            print("CAMPAIGN PRIORITIES: No custom goals defined, using default completion logic")
+            logger.debug("CAMPAIGN PRIORITIES: No custom goals defined, using default completion logic")
             return False
         
         # Map goals to required fields
@@ -744,14 +751,14 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
                 required_fields.extend(required_fields_map[topic])
         
         if not required_fields:
-            print("CAMPAIGN PRIORITIES: No mappable fields found in goals")
+            logger.debug("CAMPAIGN PRIORITIES: No mappable fields found in goals")
             return False
         
         # Check if all required fields have been collected
         collected_fields = [field for field in required_fields if self.extracted_data.get(field) is not None]
         all_collected = len(collected_fields) == len(required_fields)
         
-        print(f"CAMPAIGN PRIORITIES: Required={required_fields}, Collected={collected_fields}, AllCollected={all_collected}")
+        logger.debug(f"CAMPAIGN PRIORITIES: Required={required_fields}, Collected={collected_fields}, AllCollected={all_collected}")
         
         return all_collected
     
@@ -766,7 +773,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         
         # If campaign has custom goals, follow those priorities
         if campaign_goals and len(campaign_goals) > 0:
-            print(f"CAMPAIGN-AWARE PRIORITY: Using campaign goals (count={len(campaign_goals)})")
+            logger.debug(f"PRIORITY: Using campaign goals (count={len(campaign_goals)})")
             
             # Iterate through campaign goals in priority order
             for goal in campaign_goals:
@@ -781,23 +788,23 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
                         if field == 'nps_score' and not self.nps_deferred:
                             if self.nps_retry_count >= 2:
                                 self.nps_deferred = True
-                                print(f"NPS DEFERRED: Failed to capture after {self.nps_retry_count} attempts")
+                                logger.debug(f"NPS DEFERRED: Failed to capture after {self.nps_retry_count} attempts")
                                 continue  # Skip to next topic
                             else:
                                 self.nps_retry_count += 1
-                                print(f"NPS RETRY ATTEMPT {self.nps_retry_count}/2 (campaign-aware)")
+                                logger.debug(f"NPS RETRY ATTEMPT {self.nps_retry_count}/2 (campaign-aware)")
                                 return f"Ask about {topic}: {description}"
                         
                         # Return this topic as next priority
-                        print(f"CAMPAIGN-AWARE PRIORITY: Next topic={topic}, field={field}")
+                        logger.debug(f"PRIORITY: Next topic={topic}, field={field}")
                         return f"Ask about {topic}: {description}"
             
             # All campaign goals collected
-            print("CAMPAIGN-AWARE PRIORITY: All campaign goals collected")
+            logger.debug("CAMPAIGN-AWARE PRIORITY: All campaign goals collected")
             return "Wrap up the conversation - you have enough information"
         
         # FALLBACK: No campaign goals, use legacy hardcoded sequence
-        print("FALLBACK PRIORITY: Using legacy hardcoded sequence (no campaign goals)")
+        logger.debug("FALLBACK PRIORITY: Using legacy hardcoded sequence (no campaign goals)")
         
         if not data.get('tenure_with_fc'):
             return f"Ask about business relationship tenure with {company_name} (how long working together)"
@@ -805,7 +812,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             # NPS retry logic - track attempts and defer after 2 failed attempts
             if self.nps_retry_count >= 2:
                 self.nps_deferred = True
-                print(f"NPS DEFERRED: Failed to capture after {self.nps_retry_count} attempts")
+                logger.debug(f"NPS DEFERRED: Failed to capture after {self.nps_retry_count} attempts")
                 # Move to next topic instead of retrying NPS
                 if not data.get('nps_reasoning') and not data.get('improvement_feedback'):
                     return f"Let's move on - what do you think about your overall experience with {company_name}?"
@@ -818,7 +825,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             else:
                 # Track retry attempt
                 self.nps_retry_count += 1
-                print(f"NPS RETRY ATTEMPT {self.nps_retry_count}/2")
+                logger.debug(f"NPS RETRY ATTEMPT {self.nps_retry_count}/2")
                 return f"Ask for NPS score (0-10 likelihood to recommend {company_name})"
         elif not data.get('nps_reasoning') and not data.get('improvement_feedback'):
             return f"Ask WHY they gave that NPS score - what's their reasoning about {company_name}"
@@ -861,7 +868,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             if keyword in priority_lower:
                 self.current_topic = topic
                 self.current_expected_field = field
-                print(f"CAMPAIGN-AWARE EXTRACTION: Current topic={topic}, expected field={field}")
+                logger.debug(f"EXTRACTION: Current topic={topic}, expected field={field}")
                 return
         
         # Default: no specific topic identified
@@ -932,7 +939,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
             return result
             
         except Exception as e:
-            print(f"AI question generation error: {e}")
+            logger.debug(f"AI question generation error: {e}")
             return self._generate_fallback_question(user_input, context)
     
     def _format_conversation_history(self) -> str:
@@ -954,10 +961,10 @@ Be conversational, empathetic, and adaptive to their communication style."""
         # Get dynamic company name from template service instead of hardcoded values
         company_name = self.template_service.get_company_name()
         
-        print(f"Fallback generation - Step: {self.step_count}, Extracted: {extracted}")
-        print(f"Current extracted data: {self.extracted_data}")
-        print(f"Tenure from extracted_data: {self.extracted_data.get('tenure_with_fc')}")
-        print(f"NPS from extracted_data: {self.extracted_data.get('nps_score')}")
+        logger.debug(f"Fallback generation - Step: {self.step_count}, Extracted: {extracted}")
+        logger.debug(f"Current extracted data: {self.extracted_data}")
+        logger.debug(f"Tenure from extracted_data: {self.extracted_data.get('tenure_with_fc')}")
+        logger.debug(f"NPS from extracted_data: {self.extracted_data.get('nps_score')}")
         
         # FIXED: Special case handling without step manipulation
         if (self.extracted_data.get('tenure_with_fc') is not None and 
@@ -1360,7 +1367,7 @@ def start_ai_conversational_survey(company_name: str, respondent_name: str, tenu
     # If tenure data is provided from the form, pre-populate it
     if tenure_with_fc:
         ai_survey.extracted_data['tenure_with_fc'] = tenure_with_fc
-        print(f"Pre-populated tenure from form: {tenure_with_fc}")
+        logger.debug(f"Pre-populated tenure from form: {tenure_with_fc}")
     
     result = ai_survey.start_conversation(company_name, respondent_name)
     result['conversation_id'] = conversation_id
@@ -1376,26 +1383,26 @@ def process_ai_conversation_response(user_input: str, context: Dict[str, Any]) -
     """Process user's conversational response with AI"""
     conversation_id = context.get('conversation_id')
     
-    print(f"DEBUG: Processing conversation_id: {conversation_id}")
-    print(f"DEBUG: Available instances: {list(ai_conversation_instances.keys())}")
-    print(f"DEBUG: Context keys: {list(context.keys())}")
+    logger.debug(f" Processing conversation_id: {conversation_id}")
+    logger.debug(f" Available instances: {list(ai_conversation_instances.keys())}")
+    logger.debug(f" Context keys: {list(context.keys())}")
     
     if conversation_id and conversation_id in ai_conversation_instances:
         ai_survey = ai_conversation_instances[conversation_id]
-        print(f"DEBUG: Found existing instance with step {ai_survey.step_count}, extracted data: {ai_survey.extracted_data}")
+        logger.debug(f" Found existing instance with step {ai_survey.step_count}, extracted data: {ai_survey.extracted_data}")
         response = ai_survey.process_user_response(user_input, context)
         
         save_conversation_state(conversation_id, ai_survey)
         
         return response
     else:
-        print(f"WARNING: No instance found for conversation_id {conversation_id}, attempting database recovery")
-        print(f"AVAILABLE INSTANCES: {ai_conversation_instances}")
+        logger.warning(f" No instance found for conversation_id {conversation_id}, attempting database recovery")
+        logger.debug(f"INSTANCES: {ai_conversation_instances}")
         
         persisted_state = load_conversation_state(conversation_id)
         
         if persisted_state:
-            print(f"DATABASE RECOVERY: Found persisted state, step {persisted_state['step_count']}")
+            logger.info(f"RECOVERY: Found persisted state, step {persisted_state['step_count']}")
             business_account_id = persisted_state['business_account_id']
             campaign_id = persisted_state['campaign_id']
             participant_data = persisted_state['participant_data']
@@ -1409,7 +1416,7 @@ def process_ai_conversation_response(user_input: str, context: Dict[str, Any]) -
             ai_conversation_instances[conversation_id] = ai_survey
             
         else:
-            print(f"FALLBACK: No database state, recreating from client context")
+            logger.debug(f"No database state, recreating from client context")
             business_account_id = context.get('business_account_id')
             campaign_id = context.get('campaign_id')
             participant_data = context.get('participant_data')
@@ -1428,7 +1435,7 @@ def process_ai_conversation_response(user_input: str, context: Dict[str, Any]) -
             ai_survey.extracted_data = ai_survey.survey_data['extracted_data']
             ai_survey.step_count = context.get('step_count', len(context.get('conversation_history', [])) // 2)
             
-            print(f"FALLBACK: Recreated instance with step {ai_survey.step_count}, extracted data: {ai_survey.extracted_data}")
+            logger.debug(f"Recreated instance with step {ai_survey.step_count}, extracted data: {ai_survey.extracted_data}")
             
             if conversation_id:
                 ai_conversation_instances[conversation_id] = ai_survey
@@ -1443,20 +1450,20 @@ def finalize_ai_conversational_survey(context: Dict[str, Any]) -> Dict[str, Any]
     """Finalize and convert AI conversational survey to structured format"""
     conversation_id = context.get('conversation_id')
     
-    print(f"Finalizing conversation {conversation_id}")
-    print(f"Available instances: {list(ai_conversation_instances.keys())}")
+    logger.debug(f"Finalizing conversation {conversation_id}")
+    logger.debug(f"Available instances: {list(ai_conversation_instances.keys())}")
     
     ai_survey = None
     
     if conversation_id and conversation_id in ai_conversation_instances:
         ai_survey = ai_conversation_instances[conversation_id]
-        print(f"Found in-memory AI survey instance with extracted data: {ai_survey.extracted_data}")
+        logger.debug(f"Found in-memory AI survey instance with extracted data: {ai_survey.extracted_data}")
     else:
-        print("No in-memory instance found - attempting database recovery")
+        logger.debug("No in-memory instance found - attempting database recovery")
         persisted_state = load_conversation_state(conversation_id)
         
         if persisted_state:
-            print(f"DATABASE RECOVERY (finalize): Found persisted state, step {persisted_state['step_count']}")
+            logger.info(f"RECOVERY (finalize): Found persisted state, step {persisted_state['step_count']}")
             business_account_id = persisted_state['business_account_id']
             campaign_id = persisted_state['campaign_id']
             participant_data = persisted_state['participant_data']
@@ -1467,10 +1474,10 @@ def finalize_ai_conversational_survey(context: Dict[str, Any]) -> Dict[str, Any]
             ai_survey.survey_data = persisted_state['survey_data']
             ai_survey.step_count = persisted_state['step_count']
         else:
-            print("FALLBACK (finalize): No database state, using client context")
+            logger.debug("FALLBACK (finalize): No database state, using client context")
     
     if ai_survey:
-        print(f"Using AI survey instance with extracted data: {ai_survey.extracted_data}")
+        logger.debug(f"Using AI survey instance with extracted data: {ai_survey.extracted_data}")
         
         finalization_context = {
             'company_name': ai_survey.survey_data.get('company_name'),
@@ -1479,7 +1486,7 @@ def finalize_ai_conversational_survey(context: Dict[str, Any]) -> Dict[str, Any]
         }
         
         result = ai_survey.finalize_survey(finalization_context)
-        print(f"Finalized result: {result}")
+        logger.debug(f"Finalized result: {result}")
         
         if conversation_id in ai_conversation_instances:
             del ai_conversation_instances[conversation_id]
@@ -1488,12 +1495,12 @@ def finalize_ai_conversational_survey(context: Dict[str, Any]) -> Dict[str, Any]
         
         return result
     else:
-        print("CLIENT FALLBACK: No instance or database state found - using context")
+        logger.debug("CLIENT FALLBACK: No instance or database state found - using context")
         survey_data = context.get('survey_data', {})
         extracted_data = survey_data.get('extracted_data', {})
         
-        print(f"Fallback survey_data: {survey_data}")
-        print(f"Fallback extracted_data: {extracted_data}")
+        logger.debug(f"Fallback survey_data: {survey_data}")
+        logger.debug(f"Fallback extracted_data: {extracted_data}")
         
         raw_company_name = context.get('company_name') or survey_data.get('company_name')
         return {
