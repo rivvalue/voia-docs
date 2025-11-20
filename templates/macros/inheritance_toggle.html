@@ -1,24 +1,27 @@
 {#
-  Inheritance Toggle Macro
+  Inheritance Toggle Macro - Call-Block Version
   
   Reusable component for campaign survey settings that can inherit from 
   business account or be customized at campaign level.
   
   Usage:
-    {% from 'macros/inheritance_toggle.html' import inheritance_section %}
+    {% from 'macros/inheritance_toggle.html' import inheritance_section_start, inheritance_section_inherited, inheritance_section_custom, inheritance_section_end %}
     
-    {{ inheritance_section(
+    {{ inheritance_section_start(
         section_id='topics',
         section_title='Survey Topics',
         toggle_name='use_business_topics',
-        is_inheriting=campaign.use_business_topics,
-        inherited_content='<preview of business account values>',
-        custom_content='<editable campaign-specific controls>',
-        business_modal_id='topicsBusinessModal'
+        is_inheriting=campaign.use_business_topics
     ) }}
+    
+    {{ inheritance_section_inherited() }}
+        <p>Preview of business account values here</p>
+    {{ inheritance_section_custom() }}
+        <input type="text" name="..." value="{{ campaign.field }}">
+    {{ inheritance_section_end() }}
 #}
 
-{% macro inheritance_section(section_id, section_title, toggle_name, is_inheriting, inherited_content, custom_content, business_modal_id='') %}
+{% macro inheritance_section_start(section_id, section_title, toggle_name, is_inheriting) %}
 <div class="inheritance-section mb-4" id="{{ section_id }}-section">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h5 class="mb-0">
@@ -58,26 +61,23 @@
             <!-- Inherited Content (shown when toggle is ON) -->
             <div class="inherited-content {{ 'd-none' if not is_inheriting else '' }}" id="{{ section_id }}-inherited">
                 <div class="alert alert-info mb-0">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div class="flex-grow-1">
-                            {{ inherited_content | safe }}
-                        </div>
-                        {% if business_modal_id %}
-                        <button type="button" class="btn btn-sm btn-outline-primary ms-3" data-bs-toggle="modal" data-bs-target="#{{ business_modal_id }}">
-                            <i class="fas fa-eye"></i> View business defaults
-                        </button>
-                        {% endif %}
-                    </div>
+{% endmacro %}
+
+{% macro inheritance_section_inherited() %}
+{% endmacro %}
+
+{% macro inheritance_section_custom() %}
                 </div>
             </div>
             
             <!-- Custom Content (shown when toggle is OFF) -->
             <div class="custom-content {{ 'd-none' if is_inheriting else '' }}" id="{{ section_id }}-custom">
-                {{ custom_content | safe }}
-                
+{% endmacro %}
+
+{% macro inheritance_section_end() %}
                 <!-- Revert Button -->
                 <div class="mt-3">
-                    <button type="button" class="btn btn-sm btn-outline-secondary revert-to-business" data-section="{{ section_id }}">
+                    <button type="button" class="btn btn-sm btn-outline-secondary revert-to-business" data-section="inherit-section">
                         <i class="fas fa-undo"></i> Revert to business defaults
                     </button>
                 </div>
@@ -170,6 +170,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const customContent = document.getElementById(`${sectionId}-custom`);
             const badge = document.querySelector(`#${sectionId}-section .inheritance-badge`);
             
+            // Update hidden input value (if using hidden input pattern)
+            const hiddenInputId = this.dataset.hiddenInput;
+            if (hiddenInputId) {
+                const hiddenInput = document.getElementById(hiddenInputId);
+                if (hiddenInput) {
+                    hiddenInput.value = this.checked ? 'true' : 'false';
+                }
+            }
+            
             if (this.checked) {
                 // Switch to inherited mode
                 inheritedContent.classList.remove('d-none');
@@ -197,7 +206,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle revert buttons
     document.querySelectorAll('.revert-to-business').forEach(button => {
         button.addEventListener('click', function() {
-            const sectionId = this.dataset.section;
+            const section = this.closest('.inheritance-section');
+            const sectionId = section.id.replace('-section', '');
             const toggle = document.getElementById(`${sectionId}-toggle`);
             
             // Confirm action
@@ -208,24 +218,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
-    // Form submission: ensure hidden input for unchecked toggles
-    const form = document.querySelector('form[action*="survey-config/save"]');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            // For each toggle, ensure we submit the value
-            document.querySelectorAll('.inheritance-toggle').forEach(toggle => {
-                if (!toggle.checked) {
-                    // Create hidden input for false value
-                    const hiddenInput = document.createElement('input');
-                    hiddenInput.type = 'hidden';
-                    hiddenInput.name = toggle.name;
-                    hiddenInput.value = 'false';
-                    form.appendChild(hiddenInput);
-                }
-            });
-        });
-    }
 });
 </script>
 {% endmacro %}

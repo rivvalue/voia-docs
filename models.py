@@ -297,7 +297,11 @@ class Campaign(db.Model):
             'custom_cta_text': self.custom_cta_text,
             'custom_closing_message': self.custom_closing_message,
             'custom_footer_note': self.custom_footer_note,
-            'has_campaign_customization': self.product_description is not None or self.target_clients_description is not None
+            'has_campaign_customization': self.product_description is not None or self.target_clients_description is not None,
+            # Inheritance flags for survey settings
+            'use_business_topics': self.use_business_topics,
+            'use_business_controls': self.use_business_controls,
+            'use_business_product_focus': self.use_business_product_focus
         }
         
         # OPTIMIZATION: Only include response_count if explicitly requested or pre-computed
