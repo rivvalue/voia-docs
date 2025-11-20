@@ -995,7 +995,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
             # First question: Ask for tenure with {company_name} ONLY if we don't have it
             if self.extracted_data.get('tenure_with_fc') is None:
                 return {
-                    'message': "How long have you been working with {company_name}? Please choose from: Less than 6 months, 6 months - 1 year, 1-2 years, 2-3 years, 3-5 years, 5-10 years, or More than 10 years.",
+                    'message': f"How long have you been working with {company_name}? Please choose from: Less than 6 months, 6 months - 1 year, 1-2 years, 2-3 years, 3-5 years, 5-10 years, or More than 10 years.",
                     'message_type': 'ai_question',
                     'step': 'tenure_collection',
                     'progress': 15,
@@ -1005,7 +1005,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 # We already have tenure, skip to NPS question
                 # Don't manipulate step count - let natural progression continue
                 return {
-                    'message': "On a scale of 0-10, how likely are you to recommend {company_name} to a friend or colleague?",
+                    'message': f"On a scale of 0-10, how likely are you to recommend {company_name} to a friend or colleague?",
                     'message_type': 'ai_question',
                     'step': 'nps_collection',
                     'progress': 25,
@@ -1016,7 +1016,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
             # Second question: Ask for NPS about {company_name} (the supplier) ONLY if we don't have it
             if self.extracted_data.get('nps_score') is None:
                 return {
-                    'message': "On a scale of 0-10, how likely are you to recommend {company_name} to a friend or colleague?",
+                    'message': f"On a scale of 0-10, how likely are you to recommend {company_name} to a friend or colleague?",
                     'message_type': 'ai_question',
                     'step': 'nps_collection',
                     'progress': 25,
@@ -1060,7 +1060,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 # This response is the user's answer to the NPS reasoning question
                 # Move to satisfaction question
                 return {
-                    'message': "How would you describe your overall satisfaction with {company_name}'s service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
+                    'message': f"How would you describe your overall satisfaction with {company_name}'s service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
                     'message_type': 'ai_question',
                     'step': 'satisfaction',
                     'progress': 40,
@@ -1070,7 +1070,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
         elif self.step_count == 4:
             # Fourth question: Overall satisfaction rating
             return {
-                'message': "How would you describe your overall satisfaction with {company_name}'s service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
+                'message': f"How would you describe your overall satisfaction with {company_name}'s service? Very satisfied, satisfied, neutral, dissatisfied, or very dissatisfied?",
                 'message_type': 'ai_question',
                 'step': 'satisfaction',
                 'progress': 45,
@@ -1080,7 +1080,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
         elif self.step_count == 5:
             # Fifth question: Professional services quality rating
             return {
-                'message': "How would you rate the quality of {company_name}'s professional services? Excellent, good, average, poor, or very poor?",
+                'message': f"How would you rate the quality of {company_name}'s professional services? Excellent, good, average, poor, or very poor?",
                 'message_type': 'ai_question',
                 'step': 'service_quality',
                 'progress': 50,
@@ -1090,7 +1090,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
         elif self.step_count == 6:
             # Sixth question: Product value rating
             return {
-                'message': "How would you rate the value and quality of {company_name}'s products or solutions? Excellent, good, average, poor, or very poor?",
+                'message': f"How would you rate the value and quality of {company_name}'s products or solutions? Excellent, good, average, poor, or very poor?",
                 'message_type': 'ai_question',
                 'step': 'product_value',
                 'progress': 55,
@@ -1100,7 +1100,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
         elif self.step_count == 7:
             # Seventh question: Pricing appreciation rating
             return {
-                'message': "How do you feel about {company_name}'s pricing? Do you find it excellent value, good value, fair, expensive, or very expensive?",
+                'message': f"How do you feel about {company_name}'s pricing? Do you find it excellent value, good value, fair, expensive, or very expensive?",
                 'message_type': 'ai_question',
                 'step': 'pricing_value',
                 'progress': 65,
@@ -1110,7 +1110,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
         elif self.step_count == 8:
             # Eighth question: Support services rating
             return {
-                'message': "How would you rate {company_name}'s support and customer service? Excellent, good, average, poor, or very poor?",
+                'message': f"How would you rate {company_name}'s support and customer service? Excellent, good, average, poor, or very poor?",
                 'message_type': 'ai_question',
                 'step': 'support_quality',
                 'progress': 75,
@@ -1121,7 +1121,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
             # Ninth question: Improvement suggestions
             if extracted.get('nps_score', 0) < 7:
                 return {
-                    'message': "What specific changes would make the biggest difference in improving your experience with {company_name}?",
+                    'message': f"What specific changes would make the biggest difference in improving your experience with {company_name}?",
                     'message_type': 'ai_question',
                     'step': 'improvement',
                     'progress': 85,
@@ -1129,7 +1129,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 }
             else:
                 return {
-                    'message': "Is there anything {company_name} could do even better to enhance your experience?",
+                    'message': f"Is there anything {company_name} could do even better to enhance your experience?",
                     'message_type': 'ai_question',
                     'step': 'improvement',
                     'progress': 85,
@@ -1139,7 +1139,7 @@ Be conversational, empathetic, and adaptive to their communication style."""
         # Step 10 or higher: Complete the survey
         else:
             return {
-                'message': "Thank you so much for sharing your valuable feedback about {company_name}! Your insights help improve their service for everyone.",
+                'message': f"Thank you so much for sharing your valuable feedback about {company_name}! Your insights help improve their service for everyone.",
                 'message_type': 'conclusion',
                 'step': 'conclusion',
                 'progress': 100,
