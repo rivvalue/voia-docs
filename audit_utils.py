@@ -33,6 +33,8 @@ ACTION_DESCRIPTIONS = {
     'email_config_saved': 'Email settings updated',
     'email_config_tested': 'Email configuration tested',
     'account_settings_updated': 'Account settings updated',
+    'survey_config_updated': 'Survey configuration updated',
+    'industry_hints_update': 'Industry topic hints updated',
     'user_added': 'New user added to account',
     'user_removed': 'User removed from account',
     'scheduler_run': 'Campaign scheduler executed',

@@ -4674,6 +4674,21 @@ def save_survey_config():
                 flash(error, 'error')
             return redirect(url_for('business_auth.survey_config'))
         
+        # Capture BEFORE values for audit trail
+        before_values = {
+            'industry': current_account.industry,
+            'company_description': current_account.company_description,
+            'product_description': current_account.product_description,
+            'target_clients_description': current_account.target_clients_description,
+            'conversation_tone': current_account.conversation_tone,
+            'custom_end_message': current_account.custom_end_message,
+            'max_questions': current_account.max_questions,
+            'max_duration_seconds': current_account.max_duration_seconds,
+            'max_follow_ups_per_topic': current_account.max_follow_ups_per_topic,
+            'prioritized_topics': current_account.prioritized_topics,
+            'optional_topics': current_account.optional_topics
+        }
+        
         # Update business account with survey customization fields
         current_account.industry = industry if industry else None
         current_account.company_description = company_description if company_description else None
@@ -4691,13 +4706,49 @@ def save_survey_config():
         current_account.prioritized_topics = prioritized_topics if prioritized_topics else None
         current_account.optional_topics = optional_topics if optional_topics else None
         
+        # Capture AFTER values for audit trail
+        after_values = {
+            'industry': current_account.industry,
+            'company_description': current_account.company_description,
+            'product_description': current_account.product_description,
+            'target_clients_description': current_account.target_clients_description,
+            'conversation_tone': current_account.conversation_tone,
+            'custom_end_message': current_account.custom_end_message,
+            'max_questions': current_account.max_questions,
+            'max_duration_seconds': current_account.max_duration_seconds,
+            'max_follow_ups_per_topic': current_account.max_follow_ups_per_topic,
+            'prioritized_topics': current_account.prioritized_topics,
+            'optional_topics': current_account.optional_topics
+        }
+        
+        # Identify changed fields
+        changed_fields = []
+        for field in before_values.keys():
+            if before_values[field] != after_values[field]:
+                changed_fields.append(field)
+        
         # Update timestamp
         current_account.updated_at = datetime.utcnow()
         
         # Save to database
         db.session.commit()
         
-        logger.info(f"Survey configuration updated for business account: {current_account.name}")
+        # Audit log with before/after values
+        queue_audit_log(
+            business_account_id=current_account.id,
+            action_type='survey_config_updated',
+            resource_type='business_account',
+            resource_id=current_account.id,
+            resource_name=current_account.name,
+            details={
+                'fields_changed': changed_fields,
+                'changes_count': len(changed_fields),
+                'before': before_values,
+                'after': after_values
+            }
+        )
+        
+        logger.info(f"Survey configuration updated for business account: {current_account.name} - {len(changed_fields)} fields changed")
         flash('Survey configuration saved successfully! Your changes will be reflected in new survey sessions.', 'success')
         return redirect(url_for('business_auth.survey_config'))
         
