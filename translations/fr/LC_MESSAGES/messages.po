@@ -826,6 +826,14 @@ msgstr "Distribution géographique de la satisfaction client\""
 msgid "NPS by Customer Tier"
 msgstr "NPS par ancienneté client"
 
+#: templates/campaign_insights.html:695
+msgid "NPS by Client Industry"
+msgstr "NPS par industrie du client"
+
+#: templates/campaign_insights.html:696
+msgid "Customer satisfaction across different industry sectors"
+msgstr "Satisfaction client à travers différents secteurs d'activité"
+
 #: templates/campaign_insights.html:678
 msgid "Customer satisfaction across different tier levels"
 msgstr "Satisfaction client selon les différents niveaux\""
