@@ -1000,7 +1000,7 @@ function renderSegmentationInsights(data) {
     renderSegmentationChart('npsByTierChart', 'tier', segmentationData.nps_by_tier || {}, 'Customer Tier');
     
     // Render NPS by Client Industry Chart
-    renderSegmentationChart('npsByClientIndustryChart', 'client_industry', segmentationData.nps_by_client_industry || {}, 'Client Industry');
+    renderSegmentationChart('npsByClientIndustryChart', 'client_industry', segmentationData.nps_by_industry || {}, 'Client Industry');
     
     // Render Segmentation Table
     renderSegmentationTable(segmentationData);
