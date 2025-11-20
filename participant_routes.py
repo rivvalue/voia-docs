@@ -40,6 +40,7 @@ def get_filter_options(business_account_id):
         Participant.role,
         Participant.region,
         Participant.customer_tier,
+        Participant.client_industry,
         Participant.language,
         Participant.tenure_years
     ).filter(
