@@ -52,7 +52,7 @@ allowed_origins = ['*'] if app_env == 'demo' else [os.environ.get('ALLOWED_ORIGI
 CORS(app, 
      origins=allowed_origins,
      methods=['GET', 'POST', 'OPTIONS'],
-     allow_headers=['Content-Type', 'Authorization', 'Accept'],
+     allow_headers=['Content-Type', 'Authorization', 'Accept', 'X-CSRFToken'],
      supports_credentials=True)
 
 # Disable template caching for development
