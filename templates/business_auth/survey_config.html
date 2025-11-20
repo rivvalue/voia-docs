@@ -130,52 +130,6 @@
             </div>
         </div>
 
-        <!-- Survey Goals Section -->
-        <div class="survey-config-form-section">
-            <h3 class="survey-config-section-title">
-                <i class="fas fa-bullseye" aria-hidden="true"></i>
-                Survey Goals
-            </h3>
-            <p class="survey-config-section-subtitle">{{ _('What do you want to learn from your survey participants?') }}</p>
-            
-            <div class="survey-config-form-group">
-                <label class="survey-config-form-label">{{ _('Primary Survey Goals (select all that apply)') }}</label>
-                <div class="survey-config-checkbox-group">
-                    {% set current_goals = business_account.survey_goals or [] %}
-                    <div class="survey-config-form-check">
-                        <input class="survey-config-form-check-input" type="checkbox" id="goal_nps" name="survey_goals" value="NPS" 
-                               {% if 'NPS' in current_goals %}checked{% endif %}>
-                        <label class="survey-config-form-check-label" for="goal_nps">{{ _('Net Promoter Score') }}</label>
-                    </div>
-                    <div class="survey-config-form-check">
-                        <input class="survey-config-form-check-input" type="checkbox" id="goal_satisfaction" name="survey_goals" value="Satisfaction" 
-                               {% if 'Satisfaction' in current_goals %}checked{% endif %}>
-                        <label class="survey-config-form-check-label" for="goal_satisfaction">{{ _('Overall Satisfaction') }}</label>
-                    </div>
-                    <div class="survey-config-form-check">
-                        <input class="survey-config-form-check-input" type="checkbox" id="goal_product" name="survey_goals" value="Product Feedback" 
-                               {% if 'Product Feedback' in current_goals %}checked{% endif %}>
-                        <label class="survey-config-form-check-label" for="goal_product">{{ _('Product Feedback') }}</label>
-                    </div>
-                    <div class="survey-config-form-check">
-                        <input class="survey-config-form-check-input" type="checkbox" id="goal_support" name="survey_goals" value="Support Quality" 
-                               {% if 'Support Quality' in current_goals %}checked{% endif %}>
-                        <label class="survey-config-form-check-label" for="goal_support">{{ _('Support Quality') }}</label>
-                    </div>
-                    <div class="survey-config-form-check">
-                        <input class="survey-config-form-check-input" type="checkbox" id="goal_pricing" name="survey_goals" value="Pricing Perception" 
-                               {% if 'Pricing Perception' in current_goals %}checked{% endif %}>
-                        <label class="survey-config-form-check-label" for="goal_pricing">{{ _('Pricing Perception') }}</label>
-                    </div>
-                    <div class="survey-config-form-check">
-                        <input class="survey-config-form-check-input" type="checkbox" id="goal_custom" name="survey_goals" value="Custom" 
-                               {% if 'Custom' in current_goals %}checked{% endif %}>
-                        <label class="survey-config-form-check-label" for="goal_custom">{{ _('Custom Research') }}</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Survey Flow Controls Section -->
         <div class="survey-config-form-section">
             <h3 class="survey-config-section-title">

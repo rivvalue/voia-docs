@@ -233,28 +233,6 @@
                 </div>
             </div>
 
-            <!-- Survey Goals Section -->
-            <div class="form-section">
-                <h3 class="section-title">
-                    <i class="fas fa-target"></i>Survey Goals
-                </h3>
-                <p class="section-description">
-                    Select the key objectives for this campaign. The AI will prioritize these areas during conversations.
-                </p>
-                
-                <div class="checkbox-group">
-                    {% for goal in ['NPS', 'Product Quality', 'Support Experience', 'Pricing Perception', 'Service Quality', 'User Experience', 'Feature Requests', 'Overall Satisfaction'] %}
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="goal_{{ loop.index }}" name="survey_goals" value="{{ goal }}" 
-                               {% if campaign.survey_goals and goal in campaign.survey_goals %}checked{% endif %}
-                               {% if is_readonly %}disabled{% endif %}>
-                        <label for="goal_{{ loop.index }}" class="form-check-label">{{ goal }}</label>
-                    </div>
-                    {% endfor %}
-                </div>
-                <div class="form-text mt-2">{{ _('NPS is recommended for all campaigns to track customer loyalty') }}</div>
-            </div>
-
             <!-- Survey Controls Section -->
             <div class="form-section">
                 <h3 class="section-title">
@@ -507,8 +485,6 @@ function showPromptPreview() {
         max_follow_ups_per_topic: parseInt(document.getElementById('max_follow_ups_per_topic')?.value) || 2,
         
         // Checkbox arrays
-        survey_goals: Array.from(document.querySelectorAll('input[name="survey_goals"]:checked'))
-            .map(el => el.value),
         prioritized_topics: Array.from(document.querySelectorAll('input[name="prioritized_topics"]:checked'))
             .map(el => el.value)
     };

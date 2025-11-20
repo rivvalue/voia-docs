@@ -1269,10 +1269,6 @@ def save_survey_config(campaign_id):
         campaign.product_description = request.form.get('product_description', '').strip() or None
         campaign.target_clients_description = request.form.get('target_clients_description', '').strip() or None
         
-        # Survey Goals (multi-select checkboxes)
-        survey_goals = request.form.getlist('survey_goals')
-        campaign.survey_goals = survey_goals if survey_goals else None
-        
         # Survey Controls - validate numeric ranges
         try:
             max_questions = int(request.form.get('max_questions', 8))
@@ -1323,7 +1319,6 @@ def save_survey_config(campaign_id):
                 details={
                     'has_product_description': bool(campaign.product_description),
                     'has_target_clients': bool(campaign.target_clients_description),
-                    'survey_goals_count': len(campaign.survey_goals) if campaign.survey_goals else 0,
                     'max_questions': campaign.max_questions,
                     'max_duration_seconds': campaign.max_duration_seconds,
                     'prioritized_topics_count': len(campaign.prioritized_topics) if campaign.prioritized_topics else 0,

@@ -213,11 +213,10 @@ class PromptTemplateService:
         # === HOT PATH: Extract frequently-accessed attributes as primitives ===
         # These are accessed 2+ times or critical for hybrid prompt mode
         
-        # Campaign hot path attributes (9 attributes)
+        # Campaign hot path attributes (8 attributes - removed survey_goals)
         # Use _parse_json_list for list fields to handle JSON strings from SQLAlchemy
         self._campaign_prioritized_topics = _parse_json_list(campaign.prioritized_topics if campaign else None)
         self._campaign_product_description = campaign.product_description if campaign else None
-        self._campaign_survey_goals = _parse_json_list(campaign.survey_goals if campaign else None)
         self._campaign_target_clients_description = campaign.target_clients_description if campaign else None
         self._campaign_max_questions = campaign.max_questions if campaign else None
         self._campaign_max_duration_seconds = campaign.max_duration_seconds if campaign else None
@@ -225,7 +224,7 @@ class PromptTemplateService:
         self._campaign_anonymize_responses = campaign.anonymize_responses if campaign else False
         self._campaign_language_code = campaign.language_code if campaign and hasattr(campaign, 'language_code') else 'en'
         
-        # BusinessAccount hot path attributes (11 attributes)
+        # BusinessAccount hot path attributes (10 attributes - removed survey_goals)
         # Use _parse_json_list for list fields to handle JSON strings from SQLAlchemy
         self._ba_name = business_account.name if business_account else None
         self._ba_account_type = business_account.account_type if business_account else None
@@ -233,7 +232,6 @@ class PromptTemplateService:
         self._ba_product_description = business_account.product_description if business_account else None
         self._ba_industry = business_account.industry if business_account else None
         self._ba_company_description = business_account.company_description if business_account else None
-        self._ba_survey_goals = _parse_json_list(business_account.survey_goals if business_account else None)
         self._ba_prioritized_topics = _parse_json_list(business_account.prioritized_topics if business_account else None)
         self._ba_conversation_tone = business_account.conversation_tone if business_account else None
         self._ba_max_questions = business_account.max_questions if business_account else None
@@ -251,7 +249,6 @@ class PromptTemplateService:
         return bool(
             self._campaign_product_description or
             self._campaign_target_clients_description or
-            self._campaign_survey_goals or
             (self._campaign_max_questions and self._campaign_max_questions != 8) or
             (self._campaign_max_duration_seconds and self._campaign_max_duration_seconds != 120) or
             self._campaign_prioritized_topics or
@@ -341,31 +338,6 @@ class PromptTemplateService:
             return self._ba_conversation_tone
         
         return "professional"  # Default
-    
-    def get_survey_goals(self) -> list:
-        """Get survey goals/objectives (HOT PATH - uses cached primitives)"""
-        if self.is_demo_mode:
-            return [
-                "Understand customer satisfaction with Archelo Group",
-                "Identify areas for service improvement",
-                "Measure likelihood to recommend our solutions"
-            ]
-        
-        # Check campaign survey goals first (cached primitive)
-        if self._campaign_survey_goals:
-            return self._campaign_survey_goals
-        
-        # Fall back to business account survey goals (cached primitive)
-        if self._ba_survey_goals:
-            return self._ba_survey_goals
-        
-        # Generate goals based on company info
-        company_name = self.get_company_name()
-        return [
-            f"Understand customer satisfaction with {company_name}",
-            "Identify areas for service improvement",
-            f"Measure likelihood to recommend {company_name}"
-        ]
     
     def get_max_questions(self) -> int:
         """Get maximum questions limit (HOT PATH - uses cached primitives)"""
@@ -808,7 +780,6 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
             'company_name': self.get_company_name(),
             'product_name': self.get_product_name(),
             'conversation_tone': self.get_conversation_tone(),
-            'survey_goals': self.get_survey_goals(),
             'max_questions': self.get_max_questions(),
             'max_duration_seconds': self.get_max_duration_seconds(),
             'completion_message': self.get_completion_message(),
@@ -888,7 +859,6 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
                     'name': campaign.name,
                     'status': campaign.status,
                     'has_product_description': bool(self._campaign_product_description),
-                    'has_custom_goals': bool(self._campaign_survey_goals),
                     'has_custom_end_message': bool(self._campaign_custom_end_message),
                     'has_prioritized_topics': bool(self._campaign_prioritized_topics)
                 }

@@ -55,7 +55,7 @@ def _apply_config_overrides(service: PromptTemplateService, overrides: Dict[str,
             setattr(target, field, int(overrides[field]))
     
     # Apply array field overrides (stored as JSON in database)
-    array_fields = ['survey_goals', 'prioritized_topics', 'optional_topics']
+    array_fields = ['prioritized_topics', 'optional_topics']
     
     for field in array_fields:
         if field in overrides and isinstance(overrides[field], list):

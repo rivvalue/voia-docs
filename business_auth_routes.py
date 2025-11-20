@@ -4466,7 +4466,6 @@ def save_survey_config():
         max_follow_ups_per_topic = request.form.get('max_follow_ups_per_topic', type=int)
         
         # Multi-select fields
-        survey_goals = request.form.getlist('survey_goals')
         prioritized_topics = request.form.getlist('prioritized_topics')
         optional_topics = request.form.getlist('optional_topics')
         
@@ -4510,7 +4509,6 @@ def save_survey_config():
         current_account.max_follow_ups_per_topic = max_follow_ups_per_topic if max_follow_ups_per_topic is not None else 2
         
         # JSON fields
-        current_account.survey_goals = survey_goals if survey_goals else None
         current_account.prioritized_topics = prioritized_topics if prioritized_topics else None
         current_account.optional_topics = optional_topics if optional_topics else None
         
