@@ -521,10 +521,13 @@ PARTICIPANT PROFILE:
 - Company: {profile.get('company')}
 """
         
-        # Build goals section with field mappings
+        # Build goals section with field mappings and industry hints
         goals_text = ""
         for goal in survey_config['goals']:
-            goals_text += f"  {goal['priority']}. {goal['topic']}: {goal['description']}\n"
+            hint_info = ""
+            if goal.get('industry_hint'):
+                hint_info = f" [Industry focus: {goal['industry_hint']}]"
+            goals_text += f"  {goal['priority']}. {goal['topic']}: {goal['description']}{hint_info}\n"
         
         # Build context usage section
         context_fields = []
@@ -587,13 +590,23 @@ At each step:
 YOUR RESPONSIBILITIES
 ==========================
 
-1. Follow SURVEY CONFIGURATION.goals priorities strictly - work through topics in priority order
+1. Follow SURVEY CONFIGURATION goals (topics) in priority order - complete each topic before moving to the next
 2. Ask ONE question at a time in a {survey_config['conversation_tone']} conversational style
 3. Before asking any question, check SURVEY DATA COLLECTED SO FAR - only ask for MISSING fields
 4. Stop when max_questions ({survey_config['max_questions']}) is reached
 5. Use context to make questions relevant to the participant's situation
 6. Maintain natural conversation flow while respecting all structural constraints
 7. If a participant provides multiple pieces of information, acknowledge all but focus your next question on the current priority goal
+
+==========================
+INDUSTRY-SPECIFIC VOCABULARY
+==========================
+
+When forming a question for a topic with an [Industry focus] hint:
+- Use the industry-specific keywords and focus areas to choose vocabulary and examples relevant to the participant's operational reality
+- Adapt your phrasing to match their industry context (e.g., "line reliability" for EMS, "workflow accuracy" for Healthcare)
+- Do NOT change or rename the topic itself - only adapt the question phrasing and examples
+- This helps participants recognize familiar concepts and provide more specific, valuable feedback
 
 Be empathetic, adapt to user communication style, and keep the conversation natural while respecting all constraints.
 
