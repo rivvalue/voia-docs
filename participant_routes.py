@@ -369,6 +369,15 @@ def create_participant():
         region = request.form.get('region', '').strip() or None
         customer_tier = request.form.get('customer_tier', '').strip() or None
         language = request.form.get('language', '').strip() or 'en'
+        client_industry = request.form.get('client_industry', '').strip() or None
+        
+        # Validate client_industry if provided
+        if client_industry:
+            from industry_topic_hints_config import INDUSTRY_TOPIC_HINTS
+            valid_industries = list(INDUSTRY_TOPIC_HINTS.keys())
+            if client_industry not in valid_industries:
+                flash(f'Invalid client industry. Must be one of: {", ".join(valid_industries)}', 'error')
+                return redirect(url_for('participants.create_participant'))
         
         # Parse commercial_value (optional, company-level)
         commercial_value = None
@@ -421,6 +430,7 @@ def create_participant():
         participant.region = region
         participant.customer_tier = customer_tier
         participant.language = language
+        participant.client_industry = client_industry
         participant.company_commercial_value = commercial_value
         participant.tenure_years = tenure_years
         participant.source = 'admin_single'  # Track that this was admin-created via single form
@@ -524,6 +534,15 @@ def edit_participant(participant_id):
         region = request.form.get('region', '').strip() or None
         customer_tier = request.form.get('customer_tier', '').strip() or None
         language = request.form.get('language', '').strip() or 'en'
+        client_industry = request.form.get('client_industry', '').strip() or None
+        
+        # Validate client_industry if provided
+        if client_industry:
+            from industry_topic_hints_config import INDUSTRY_TOPIC_HINTS
+            valid_industries = list(INDUSTRY_TOPIC_HINTS.keys())
+            if client_industry not in valid_industries:
+                flash(f'Invalid client industry. Must be one of: {", ".join(valid_industries)}', 'error')
+                return redirect(url_for('participants.edit_participant', participant_id=participant_id))
         
         # Parse commercial_value (optional, company-level)
         commercial_value = None
@@ -588,6 +607,8 @@ def edit_participant(participant_id):
             changes['customer_tier'] = {'old': participant.customer_tier, 'new': customer_tier}
         if participant.language != language:
             changes['language'] = {'old': participant.language, 'new': language}
+        if participant.client_industry != client_industry:
+            changes['client_industry'] = {'old': participant.client_industry, 'new': client_industry}
         if participant.company_commercial_value != commercial_value:
             changes['company_commercial_value'] = {'old': participant.company_commercial_value, 'new': commercial_value}
         if participant.tenure_years != tenure_years:
@@ -601,6 +622,7 @@ def edit_participant(participant_id):
         participant.region = region
         participant.customer_tier = customer_tier
         participant.language = language
+        participant.client_industry = client_industry
         participant.company_commercial_value = commercial_value
         participant.tenure_years = tenure_years
         
@@ -755,6 +777,16 @@ def upload_participants():
                 region = row.get('region', '').strip() or None
                 customer_tier = row.get('customer_tier', '').strip() or None
                 language = row.get('language', '').strip() or 'en'
+                client_industry = row.get('client_industry', '').strip() or None
+                
+                # Validate client_industry if provided
+                if client_industry:
+                    from industry_topic_hints_config import INDUSTRY_TOPIC_HINTS
+                    valid_industries = list(INDUSTRY_TOPIC_HINTS.keys())
+                    if client_industry not in valid_industries:
+                        errors.append(f"Row {row_num}: Invalid client industry '{client_industry}'. Must be one of: {', '.join(valid_industries)}")
+                        error_count += 1
+                        continue
                 
                 # Parse commercial_value (optional, company-level)
                 commercial_value = None
@@ -807,6 +839,7 @@ def upload_participants():
                 participant.region = region
                 participant.customer_tier = customer_tier
                 participant.language = language
+                participant.client_industry = client_industry
                 participant.company_commercial_value = commercial_value
                 participant.tenure_years = tenure_years
                 participant.source = 'admin_bulk'  # Track that this was admin-created via bulk upload
