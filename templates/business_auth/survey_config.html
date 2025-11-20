@@ -38,24 +38,6 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="survey-config-form-group">
-                        <label class="survey-config-form-label" for="industry">{{ _('Industry') }}</label>
-                        <select class="survey-config-form-control" 
-                                id="industry" 
-                                name="industry"
-                                aria-describedby="industry_help">
-                            <option value="">{{ _('Select your industry') }}</option>
-                            {% for industry in industry_options %}
-                                <option value="{{ industry }}" {% if business_account.industry == industry %}selected{% endif %}>
-                                    {{ industry }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                        <div class="survey-config-help-text" id="industry_help">{{ _('This helps tailor survey questions to your industry context') }}</div>
-                    </div>
-                </div>
-                
-                <div class="col-md-6">
-                    <div class="survey-config-form-group">
                         <label class="survey-config-form-label" for="conversation_tone">{{ _('Conversation Tone') }}</label>
                         <select class="survey-config-form-control" 
                                 id="conversation_tone" 
@@ -141,11 +123,12 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="survey-config-form-group">
-                        <label class="survey-config-form-label" for="industry">{{ _('Industry') }}</label>
+                        <label class="survey-config-form-label" for="industry_select">{{ _('Industry') }}</label>
                         <select class="survey-config-form-control" 
-                                id="industry" 
+                                id="industry_select" 
                                 name="industry"
-                                aria-describedby="industry_help">
+                                aria-describedby="industry_help"
+                                onchange="updateTopicHintsDisplay(this.value)">
                             {% for industry_option in available_industries %}
                                 <option value="{{ industry_option }}" {% if business_account.industry == industry_option %}selected{% endif %}>
                                     {{ industry_option }}
@@ -165,8 +148,24 @@
                             {{ _('How Industry Prompts Work') }}
                         </h6>
                         <p style="font-size: 0.875rem; margin-bottom: 0;">
-                            {{ _('Based on your industry, the AI will emphasize relevant topics. For example, Healthcare focuses on "workflow reliability, data accuracy" while EMS emphasizes "defects, throughput, line reliability".') }}
+                            {{ _('The AI will emphasize industry-specific topics during conversations. See the focus areas below.') }}
                         </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Topic Hints Display Table -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <h6 class="survey-config-form-label">
+                        <i class="fas fa-comments me-2"></i>
+                        {{ _('VOÏA Conversation Focus Areas') }}
+                    </h6>
+                    <p class="survey-config-help-text mb-3">
+                        {{ _('When discussing each topic, VOÏA will emphasize the following areas based on your industry') }}
+                    </p>
+                    <div id="topic_hints_display" class="table-responsive">
+                        <!-- Topic hints will be populated here by JavaScript -->
                     </div>
                 </div>
             </div>
@@ -515,6 +514,43 @@ function showPromptPreview() {
         });
 }
 {% endif %}
+
+// Industry Topic Hints Display
+const INDUSTRY_TOPIC_HINTS = {{ industry_topic_hints_json|safe }};
+
+function updateTopicHintsDisplay(industry) {
+    const displayContainer = document.getElementById('topic_hints_display');
+    if (!displayContainer || !industry || !INDUSTRY_TOPIC_HINTS[industry]) {
+        if (displayContainer) {
+            displayContainer.innerHTML = '<p class="text-muted">{{ _("Select an industry to see focus areas") }}</p>';
+        }
+        return;
+    }
+    
+    const hints = INDUSTRY_TOPIC_HINTS[industry];
+    let tableHTML = '<table class="table table-striped table-bordered" style="font-size: 0.9rem;">';
+    tableHTML += '<thead style="background-color: var(--primary-red); color: white;">';
+    tableHTML += '<tr><th style="width: 30%;">{{ _("Survey Topic") }}</th><th>{{ _("VOÏA Focus Areas") }}</th></tr>';
+    tableHTML += '</thead><tbody>';
+    
+    for (const [topic, hint] of Object.entries(hints)) {
+        tableHTML += '<tr>';
+        tableHTML += '<td style="font-weight: 600; color: var(--primary-black);">' + topic + '</td>';
+        tableHTML += '<td style="color: var(--gray-dark); font-style: italic;">' + hint + '</td>';
+        tableHTML += '</tr>';
+    }
+    
+    tableHTML += '</tbody></table>';
+    displayContainer.innerHTML = tableHTML;
+}
+
+// Initialize topic hints display on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const industrySelect = document.getElementById('industry_select');
+    if (industrySelect && industrySelect.value) {
+        updateTopicHintsDisplay(industrySelect.value);
+    }
+});
 
 // Character counter functionality
 function updateCharacterCounter(textareaId, counterId, maxLength) {
