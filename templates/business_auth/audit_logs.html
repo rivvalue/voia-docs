@@ -111,6 +111,7 @@
                             <th scope="col">{{ _('Activity') }}</th>
                             <th scope="col">{{ _('Description') }}</th>
                             <th scope="col">{{ _('Resource') }}</th>
+                            <th scope="col" style="width: 60px;">{{ _('Details') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -137,7 +138,7 @@
                                 {% elif 'logout' in log.action_type %}{% set action_class = 'logout' %}
                                 {% elif 'campaign' in log.action_type %}{% set action_class = 'campaign' %}
                                 {% elif 'participant' in log.action_type %}{% set action_class = 'participants' %}
-                                {% elif 'email' in log.action_type %}{% set action_class = 'email' %}
+                                {% elif 'email' in log.action_type or 'config' in log.action_type %}{% set action_class = 'email' %}
                                 {% endif %}
                                 
                                 <span class="audit-action-badge {{ action_class }}" 
@@ -158,7 +159,100 @@
                                     </div>
                                 {% endif %}
                             </td>
+                            <td class="text-center">
+                                {% if log.details %}
+                                    <button class="btn btn-sm btn-outline-secondary" 
+                                            onclick="toggleDetails('log-{{ log.id }}')"
+                                            title="View change details"
+                                            aria-label="View change details">
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
                         </tr>
+                        {% if log.details %}
+                        <tr id="log-{{ log.id }}-details" class="audit-details-row" style="display: none;">
+                            <td colspan="6">
+                                <div class="audit-details-content">
+                                    {% set details = log.details %}
+                                    
+                                    {# Show before/after comparison if available #}
+                                    {% if details.before and details.after %}
+                                        <h5 class="mb-3"><i class="fas fa-exchange-alt me-2"></i>Change Details</h5>
+                                        
+                                        {% if details.fields_changed %}
+                                            <p class="text-muted mb-3">
+                                                <strong>{{ details.changes_count or details.fields_changed|length }} fields changed:</strong> 
+                                                {{ details.fields_changed | join(', ') }}
+                                            </p>
+                                        {% endif %}
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="card border-danger">
+                                                    <div class="card-header bg-light">
+                                                        <strong><i class="fas fa-arrow-left me-2"></i>Before</strong>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <table class="table table-sm table-borderless mb-0">
+                                                            {% for field in details.fields_changed %}
+                                                                {% if details.before[field] is not none %}
+                                                                <tr>
+                                                                    <td class="text-muted" style="width: 40%;">{{ field | replace('_', ' ') | title }}:</td>
+                                                                    <td><code>{{ details.before[field] }}</code></td>
+                                                                </tr>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card border-success">
+                                                    <div class="card-header bg-light">
+                                                        <strong><i class="fas fa-arrow-right me-2"></i>After</strong>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <table class="table table-sm table-borderless mb-0">
+                                                            {% for field in details.fields_changed %}
+                                                                {% if details.after[field] is not none %}
+                                                                <tr>
+                                                                    <td class="text-muted" style="width: 40%;">{{ field | replace('_', ' ') | title }}:</td>
+                                                                    <td><code>{{ details.after[field] }}</code></td>
+                                                                </tr>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        {# Show other details as key-value pairs #}
+                                        <h5 class="mb-3"><i class="fas fa-info-circle me-2"></i>Additional Details</h5>
+                                        <table class="table table-sm table-bordered">
+                                            {% for key, value in details.items() %}
+                                                {% if key not in ['before', 'after', 'fields_changed', 'changes_count'] %}
+                                                <tr>
+                                                    <td class="text-muted" style="width: 30%;">{{ key | replace('_', ' ') | title }}</td>
+                                                    <td>
+                                                        {% if value is iterable and value is not string %}
+                                                            <code>{{ value | join(', ') }}</code>
+                                                        {% else %}
+                                                            <code>{{ value }}</code>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </table>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endif %}
                         {% endfor %}
                     </tbody>
                 </table>
@@ -210,6 +304,47 @@
     {% endif %}
 </div>
 
+<style>
+/* Audit details expandable row */
+.audit-details-row {
+    background-color: #f8f9fa;
+}
+
+.audit-details-content {
+    padding: 20px;
+    border-left: 4px solid var(--primary-red);
+    background: white;
+    border-radius: 4px;
+}
+
+.audit-details-content h5 {
+    color: var(--primary-red);
+    font-weight: 600;
+}
+
+.audit-details-content .card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.audit-details-content .card-header {
+    font-weight: 600;
+}
+
+.audit-details-content code {
+    background: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: #333;
+    font-size: 13px;
+}
+
+/* Rotate chevron when expanded */
+.details-btn-expanded i {
+    transform: rotate(180deg);
+    transition: transform 0.2s;
+}
+</style>
+
 <script>
 // Convert UTC timestamps to user's local timezone
 document.addEventListener('DOMContentLoaded', function() {
@@ -233,6 +368,25 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Toggle details row
+function toggleDetails(logId) {
+    const detailsRow = document.getElementById(logId + '-details');
+    const button = event.currentTarget;
+    const icon = button.querySelector('i');
+    
+    if (detailsRow.style.display === 'none') {
+        detailsRow.style.display = 'table-row';
+        icon.classList.remove('fa-chevron-down');
+        icon.classList.add('fa-chevron-up');
+        button.classList.add('details-btn-expanded');
+    } else {
+        detailsRow.style.display = 'none';
+        icon.classList.remove('fa-chevron-up');
+        icon.classList.add('fa-chevron-down');
+        button.classList.remove('details-btn-expanded');
+    }
+}
 
 // Refresh data function
 function refreshData() {
