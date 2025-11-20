@@ -261,12 +261,12 @@
                 <i class="fas fa-list-ol" aria-hidden="true"></i>
                 Topic Priorities
             </h3>
-            <p class="survey-config-section-subtitle">{{ _('Control which topics the survey covers first and which are optional if time runs out') }}</p>
+            <p class="survey-config-section-subtitle">{{ _('Select topics to prioritize - VOÏA will cover all areas for comprehensive insights, asking about your priorities first') }}</p>
             
             <div class="row">
                 <div class="col-md-6">
                     <div class="survey-config-form-group">
-                        <label class="survey-config-form-label">{{ _('Prioritized Topics (covered first)') }}</label>
+                        <label class="survey-config-form-label">{{ _('Select Topics to Prioritize') }}</label>
                         <div class="survey-config-checkbox-group">
                             {% set current_priorities = business_account.prioritized_topics or [] %}
                             {% for topic in topic_options %}
@@ -281,7 +281,7 @@
                             </div>
                             {% endfor %}
                         </div>
-                        <div class="survey-config-help-text">{{ _('These topics will always be covered, in order of importance') }}</div>
+                        <div class="survey-config-help-text">{{ _('Your selected topics are asked first for most relevant insights') }}</div>
                     </div>
                 </div>
                 
