@@ -1307,49 +1307,36 @@ def save_survey_config(campaign_id):
         # Industry Override (Phase 2: Topic Hints verticalization)
         campaign.industry = request.form.get('industry', '').strip() or None
         
-        # Survey Controls section - only save if not inheriting
-        if campaign.use_business_controls:
-            # Reset overrides when inheriting
-            campaign.max_questions = None
-            campaign.max_duration_seconds = None
-            campaign.max_follow_ups_per_topic = None
-        else:
-            # Save campaign-specific customizations
-            try:
-                max_questions = int(request.form.get('max_questions', 8))
-                if not (3 <= max_questions <= 15):
-                    flash('Le nombre maximal de questions doit être compris entre 3 et 15.', 'error')
-                    return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
-                campaign.max_questions = max_questions
-                
-                max_duration = int(request.form.get('max_duration_seconds', 120))
-                if not (60 <= max_duration <= 300):
-                    flash('La durée maximale doit être comprise entre 60 et 300 secondes.', 'error')
-                    return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
-                campaign.max_duration_seconds = max_duration
-                
-                max_follow_ups = int(request.form.get('max_follow_ups_per_topic', 2))
-                if not (1 <= max_follow_ups <= 3):
-                    flash('Le nombre maximal de relances par sujet doit être compris entre 1 et 3.', 'error')
-                    return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
-                campaign.max_follow_ups_per_topic = max_follow_ups
-                
-            except ValueError:
-                flash('Valeurs numériques invalides dans les contrôles de l’enquête.', 'error')
+        # Survey Controls - only save if not inheriting
+        try:
+            max_questions = int(request.form.get('max_questions', 8))
+            if not (3 <= max_questions <= 15):
+                flash('Le nombre maximal de questions doit être compris entre 3 et 15.', 'error')
                 return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
-        
-        # Topic Prioritization section - only save if not inheriting
-        if campaign.use_business_topics:
-            # Reset overrides when inheriting
-            campaign.prioritized_topics = None
-            campaign.optional_topics = None
-        else:
-            # Save campaign-specific customizations
-            prioritized_topics = [topic.strip() for topic in request.form.getlist('prioritized_topics') if topic.strip()]
-            campaign.prioritized_topics = prioritized_topics if prioritized_topics else None
+            campaign.max_questions = max_questions
             
-            optional_topics = [topic.strip() for topic in request.form.getlist('optional_topics') if topic.strip()]
-            campaign.optional_topics = optional_topics if optional_topics else None
+            max_duration = int(request.form.get('max_duration_seconds', 120))
+            if not (60 <= max_duration <= 300):
+                flash('La durée maximale doit être comprise entre 60 et 300 secondes.', 'error')
+                return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
+            campaign.max_duration_seconds = max_duration
+            
+            max_follow_ups = int(request.form.get('max_follow_ups_per_topic', 2))
+            if not (1 <= max_follow_ups <= 3):
+                flash('Le nombre maximal de relances par sujet doit être compris entre 1 et 3.', 'error')
+                return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
+            campaign.max_follow_ups_per_topic = max_follow_ups
+            
+        except ValueError:
+            flash('Valeurs numériques invalides dans les contrôles de l’enquête.', 'error')
+            return redirect(url_for('campaigns.survey_config', campaign_id=campaign_id))
+        
+        # Topic Prioritization - handle multi-select lists
+        prioritized_topics = [topic.strip() for topic in request.form.getlist('prioritized_topics') if topic.strip()]
+        campaign.prioritized_topics = prioritized_topics if prioritized_topics else None
+        
+        optional_topics = [topic.strip() for topic in request.form.getlist('optional_topics') if topic.strip()]
+        campaign.optional_topics = optional_topics if optional_topics else None
         
         # Customization section
         campaign.custom_end_message = request.form.get('custom_end_message', '').strip() or None
