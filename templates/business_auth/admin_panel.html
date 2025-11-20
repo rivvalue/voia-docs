@@ -486,6 +486,11 @@
                                         <i class="fas fa-tachometer-alt me-2 text-primary"></i>License Dashboard
                                     </a>
                                 </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('business_auth.industry_hints_config') }}" title="Configure industry-specific topic hints for AI surveys">
+                                        <i class="fas fa-industry me-2 text-danger"></i>Industry Hints
+                                    </a>
+                                </li>
                                 {% endif %}
                                 <li>
                                     <a class="dropdown-item" href="{{ url_for('business_auth.audit_logs') }}" title="{{ _('View account activity trail') }}">
