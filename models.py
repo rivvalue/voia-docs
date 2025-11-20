@@ -221,6 +221,11 @@ class Campaign(db.Model):
     # Industry-specific prompt verticalization (Phase 2: Topic Hints)
     industry = db.Column(db.String(100), nullable=True, index=True)  # Override BusinessAccount industry if set
     
+    # Inheritance flags for survey settings (default: inherit from business account)
+    use_business_topics = db.Column(db.Boolean, nullable=False, default=True)
+    use_business_controls = db.Column(db.Boolean, nullable=False, default=True)
+    use_business_product_focus = db.Column(db.Boolean, nullable=False, default=True)
+    
     # Campaign-specific email content customization (hybrid: campaign overrides → account defaults → hardcoded)
     use_custom_email_content = db.Column(db.Boolean, nullable=False, default=False)
     custom_subject_template = db.Column(db.String(500), nullable=True)
