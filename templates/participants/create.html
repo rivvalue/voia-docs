@@ -152,6 +152,31 @@
                 
                 <div class="col-md-6">
                     <div class="participant-form-group">
+                        <label class="participant-form-label" for="client_industry">{{ _('Client Industry') }}</label>
+                        <select class="participant-form-control" 
+                                id="client_industry" 
+                                name="client_industry"
+                                aria-describedby="client_industry_help">
+                            <option value="">{{ _('Select industry (optional)') }}</option>
+                            <option value="EMS (Electronic Manufacturing Services)">{{ _('EMS (Electronic Manufacturing Services)') }}</option>
+                            <option value="Healthcare">{{ _('Healthcare') }}</option>
+                            <option value="Software/Technology">{{ _('Software/Technology') }}</option>
+                            <option value="Financial Services">{{ _('Financial Services') }}</option>
+                            <option value="Retail/E-commerce">{{ _('Retail/E-commerce') }}</option>
+                            <option value="Manufacturing (General)">{{ _('Manufacturing (General)') }}</option>
+                            <option value="Professional Services">{{ _('Professional Services') }}</option>
+                            <option value="Telecommunications">{{ _('Telecommunications') }}</option>
+                            <option value="Education">{{ _('Education') }}</option>
+                            <option value="Other">{{ _('Other') }}</option>
+                        </select>
+                        <div class="participant-help-text" id="client_industry_help">{{ _('Client\'s industry for industry-based insights') }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="participant-form-group">
                         <label class="participant-form-label" for="language">{{ _('Preferred Language') }}</label>
                         <select class="participant-form-control" 
                                 id="language" 
