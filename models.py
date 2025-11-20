@@ -218,6 +218,9 @@ class Campaign(db.Model):
     custom_end_message = db.Column(db.Text, nullable=True)
     custom_system_prompt = db.Column(db.Text, nullable=True)
     
+    # Industry-specific prompt verticalization (Phase 2: Topic Hints)
+    industry = db.Column(db.String(100), nullable=True, index=True)  # Override BusinessAccount industry if set
+    
     # Campaign-specific email content customization (hybrid: campaign overrides → account defaults → hardcoded)
     use_custom_email_content = db.Column(db.Boolean, nullable=False, default=False)
     custom_subject_template = db.Column(db.String(500), nullable=True)
@@ -796,7 +799,10 @@ class BusinessAccount(db.Model):
     product_description = db.Column(db.Text, nullable=True)  # "Our flagship product ArcheloFlow helps..."
     target_clients_description = db.Column(db.Text, nullable=True)  # "Small business owners, CFOs..."
     conversation_tone = db.Column(db.String(50), nullable=True, default='professional')  # professional, warm, casual, formal
-    survey_goals = db.Column(db.JSON, nullable=True)  # ["NPS", "Product", "Support", "Pricing"]
+    survey_goals = db.Column(db.JSON, nullable=True)  # ["NPS", "Product", "Support", "Pricing"] - DEPRECATED Phase 1
+    
+    # Industry-specific prompt verticalization (Phase 2: Topic Hints)
+    industry_topic_hints = db.Column(db.JSON, nullable=True)  # Custom topic hints override platform defaults: {"Product Quality": "custom keywords"}
     
     # Survey Control Parameters
     max_questions = db.Column(db.Integer, nullable=True, default=8)  # Absolute hard stop (3-15 range)

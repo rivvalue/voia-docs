@@ -213,7 +213,7 @@ class PromptTemplateService:
         # === HOT PATH: Extract frequently-accessed attributes as primitives ===
         # These are accessed 2+ times or critical for hybrid prompt mode
         
-        # Campaign hot path attributes (8 attributes - removed survey_goals)
+        # Campaign hot path attributes (9 attributes - added industry, removed survey_goals)
         # Use _parse_json_list for list fields to handle JSON strings from SQLAlchemy
         self._campaign_prioritized_topics = _parse_json_list(campaign.prioritized_topics if campaign else None)
         self._campaign_product_description = campaign.product_description if campaign else None
@@ -223,8 +223,9 @@ class PromptTemplateService:
         self._campaign_custom_end_message = campaign.custom_end_message if campaign else None
         self._campaign_anonymize_responses = campaign.anonymize_responses if campaign else False
         self._campaign_language_code = campaign.language_code if campaign and hasattr(campaign, 'language_code') else 'en'
+        self._campaign_industry = campaign.industry if campaign and hasattr(campaign, 'industry') else None
         
-        # BusinessAccount hot path attributes (10 attributes - removed survey_goals)
+        # BusinessAccount hot path attributes (11 attributes - added industry_topic_hints, removed survey_goals)
         # Use _parse_json_list for list fields to handle JSON strings from SQLAlchemy
         self._ba_name = business_account.name if business_account else None
         self._ba_account_type = business_account.account_type if business_account else None
@@ -237,6 +238,20 @@ class PromptTemplateService:
         self._ba_max_questions = business_account.max_questions if business_account else None
         self._ba_max_duration_seconds = business_account.max_duration_seconds if business_account else None
         self._ba_custom_end_message = business_account.custom_end_message if business_account else None
+        
+        # Industry topic hints for prompt verticalization (Phase 2)
+        # Parse JSON dict for custom topic hint overrides
+        self._ba_industry_topic_hints = None
+        if business_account and hasattr(business_account, 'industry_topic_hints') and business_account.industry_topic_hints:
+            if isinstance(business_account.industry_topic_hints, dict):
+                self._ba_industry_topic_hints = business_account.industry_topic_hints
+            elif isinstance(business_account.industry_topic_hints, str):
+                try:
+                    parsed = json.loads(business_account.industry_topic_hints)
+                    if isinstance(parsed, dict):
+                        self._ba_industry_topic_hints = parsed
+                except (json.JSONDecodeError, TypeError):
+                    pass
         
         # Determine demo mode based on extracted primitives
         self.is_demo_mode = not (
@@ -338,6 +353,54 @@ class PromptTemplateService:
             return self._ba_conversation_tone
         
         return "professional"  # Default
+    
+    def get_effective_industry(self) -> Optional[str]:
+        """Get effective industry for topic hints (HOT PATH - uses cached primitives)
+        
+        Priority: Campaign.industry > BusinessAccount.industry > "Generic" fallback
+        
+        Demo mode campaigns can have specific industries set for testing purposes.
+        
+        Returns:
+            Industry name (never None, defaults to "Generic")
+        """
+        # Campaign industry override takes precedence (cached primitive)
+        # Works for both demo and production campaigns
+        if self._campaign_industry:
+            return self._campaign_industry
+        
+        # Fall back to business account industry (cached primitive)
+        # Demo accounts can have industries set for testing
+        if self._ba_industry:
+            return self._ba_industry
+        
+        # Final fallback to Generic for accounts with no industry specified
+        return "Generic"
+    
+    def get_topic_hints_for_industry(self) -> Dict[str, str]:
+        """Get merged topic hints combining platform defaults with custom overrides
+        
+        Architecture:
+        - Platform defaults from industry_topic_hints_config.py
+        - Custom overrides from BusinessAccount.industry_topic_hints JSON
+        - Merged result: custom overrides take precedence
+        
+        Returns:
+            Dict mapping topic names to hint keywords (e.g., {"Product Quality": "defects, throughput"})
+        """
+        from industry_topic_hints_config import get_industry_hints, merge_custom_hints
+        
+        industry = self.get_effective_industry()
+        
+        # Get platform defaults for this industry
+        platform_hints = get_industry_hints(industry)
+        
+        # If no custom hints, return platform defaults
+        if not self._ba_industry_topic_hints:
+            return platform_hints
+        
+        # Merge custom hints with platform defaults (custom overrides platform)
+        return merge_custom_hints(industry, self._ba_industry_topic_hints)
     
     def get_max_questions(self) -> int:
         """Get maximum questions limit (HOT PATH - uses cached primitives)"""
@@ -624,8 +687,11 @@ GUIDELINES:
 RESPONSE FORMAT: Return only the next question or response. No system messages or explanations."""
     
     def _get_prioritized_topics(self) -> str:
-        """Get prioritized survey topics - campaign data takes precedence"""
+        """Get prioritized survey topics with industry-specific hints injected - campaign data takes precedence"""
         company_name = self.get_company_name()
+        
+        # Phase 2: Get industry topic hints for prompt verticalization
+        topic_hints = self.get_topic_hints_for_industry()
         
         base_topics = [
             f"1. Business relationship tenure - How long working with {company_name}",
@@ -644,7 +710,9 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
         if not self.is_demo_mode and self._campaign_prioritized_topics:
             custom_topics = []
             for i, topic in enumerate(self._campaign_prioritized_topics[:5], 1):
-                custom_topics.append(f"{i}. {topic}")
+                # Inject industry hints if available for this topic
+                topic_with_hint = self._inject_topic_hint(topic, topic_hints)
+                custom_topics.append(f"{i}. {topic_with_hint}")
             
             # Merge with base topics, prioritizing custom ones
             remaining_base = base_topics[len(custom_topics):]
@@ -655,7 +723,9 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
         if not self.is_demo_mode and self._ba_prioritized_topics:
             custom_topics = []
             for i, topic in enumerate(self._ba_prioritized_topics[:5], 1):
-                custom_topics.append(f"{i}. {topic}")
+                # Inject industry hints if available for this topic
+                topic_with_hint = self._inject_topic_hint(topic, topic_hints)
+                custom_topics.append(f"{i}. {topic_with_hint}")
             
             # Merge with base topics, prioritizing custom ones
             remaining_base = base_topics[len(custom_topics):]
@@ -663,6 +733,26 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
             return "\n".join(all_topics[:10])  # Max 10 topics
         
         return "\n".join(base_topics)
+    
+    def _inject_topic_hint(self, topic: str, topic_hints: Dict[str, str]) -> str:
+        """Inject industry-specific hint keywords into topic description
+        
+        Args:
+            topic: Original topic name (e.g., "Product Quality")
+            topic_hints: Dict mapping topics to hint keywords
+        
+        Returns:
+            Topic with hint injected if available (e.g., "Product Quality (focus on: defects, throughput)")
+            or original topic if no hint available
+        """
+        # Check if we have a hint for this topic
+        hint = topic_hints.get(topic, "")
+        
+        if hint:
+            # Inject hint in parentheses with "focus on:" prefix
+            return f"{topic} (focus on: {hint})"
+        
+        return topic
     
     def get_completion_message(self) -> str:
         """Get survey completion message - campaign data takes precedence"""

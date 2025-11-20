@@ -130,6 +130,48 @@
             </div>
         </div>
 
+        <!-- Industry-Specific Prompt Verticalization Section (Phase 2) -->
+        <div class="survey-config-form-section">
+            <h3 class="survey-config-section-title">
+                <i class="fas fa-industry" aria-hidden="true"></i>
+                Industry-Specific AI Prompts
+            </h3>
+            <p class="survey-config-section-subtitle">{{ _('Customize survey questions to focus on industry-specific topics and terminology') }}</p>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="survey-config-form-group">
+                        <label class="survey-config-form-label" for="industry">{{ _('Industry') }}</label>
+                        <select class="survey-config-form-control" 
+                                id="industry" 
+                                name="industry"
+                                aria-describedby="industry_help">
+                            {% for industry_option in available_industries %}
+                                <option value="{{ industry_option }}" {% if business_account.industry == industry_option %}selected{% endif %}>
+                                    {{ industry_option }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div class="survey-config-help-text" id="industry_help">
+                            {{ _('Select your industry to automatically adjust AI question focus areas') }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="alert survey-config-info-box" style="background-color: rgba(225, 58, 68, 0.05); border-left: 4px solid var(--primary-red); padding: 1rem; margin-top: 2rem;">
+                        <h6 style="margin-bottom: 0.5rem; font-weight: 600;">
+                            <i class="fas fa-lightbulb" style="color: var(--primary-red);"></i>
+                            {{ _('How Industry Prompts Work') }}
+                        </h6>
+                        <p style="font-size: 0.875rem; margin-bottom: 0;">
+                            {{ _('Based on your industry, the AI will emphasize relevant topics. For example, Healthcare focuses on "workflow reliability, data accuracy" while EMS emphasizes "defects, throughput, line reliability".') }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Survey Flow Controls Section -->
         <div class="survey-config-form-section">
             <h3 class="survey-config-section-title">

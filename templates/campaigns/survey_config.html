@@ -233,6 +233,45 @@
                 </div>
             </div>
 
+            <!-- Industry Override Section (Phase 2) -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    <i class="fas fa-industry"></i>Industry-Specific Prompts
+                </h3>
+                <p class="section-description">
+                    Override your business account's industry setting for this campaign (optional). Leave blank to inherit from business account.
+                </p>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="industry" class="form-label">{{ _('Campaign Industry Override') }}</label>
+                            <select class="form-control" id="industry" name="industry" {% if is_readonly %}disabled{% endif %}>
+                                <option value="">{{ _('Use business account default') }}{% if campaign.business_account and campaign.business_account.industry %} ({{ campaign.business_account.industry }}){% endif %}</option>
+                                {% if available_industries %}
+                                    {% for industry_option in available_industries %}
+                                        <option value="{{ industry_option }}" {% if campaign.industry == industry_option %}selected{% endif %}>
+                                            {{ industry_option }}
+                                        </option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                            <div class="form-text">
+                                {{ _('Select a different industry for campaign-specific AI question focus') }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="alert" style="background-color: rgba(225, 58, 68, 0.05); border-left: 4px solid var(--primary-red); padding: 1rem; margin-top: 2.2rem;">
+                            <p style="font-size: 0.875rem; margin-bottom: 0;">
+                                <i class="fas fa-info-circle" style="color: var(--primary-red);"></i>
+                                {{ _('Most campaigns inherit the industry from the business account. Override only if this specific campaign targets a different industry segment.') }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Survey Controls Section -->
             <div class="form-section">
                 <h3 class="section-title">

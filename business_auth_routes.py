@@ -4412,11 +4412,11 @@ def survey_config():
         
         # Allow demo accounts to access survey customization for testing
         
+        # Import industry topic hints config for industry verticalization (Phase 2)
+        from industry_topic_hints_config import get_available_industries
+        
         # Define available options for dropdowns
-        industry_options = [
-            'Healthcare', 'SaaS', 'Retail', 'Professional Services', 
-            'Restaurant', 'Manufacturing', 'Education', 'Finance', 'Other'
-        ]
+        available_industries = get_available_industries()  # Phase 2: Platform-managed industry list
         
         tone_options = [
             'professional', 'warm', 'casual', 'formal'
@@ -4429,7 +4429,7 @@ def survey_config():
         
         return render_template('business_auth/survey_config.html',
                              business_account=current_account,
-                             industry_options=industry_options,
+                             available_industries=available_industries,
                              tone_options=tone_options,
                              topic_options=topic_options,
                              ENABLE_PROMPT_PREVIEW=os.getenv('ENABLE_PROMPT_PREVIEW') == 'true')
