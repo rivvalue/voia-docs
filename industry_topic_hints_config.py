@@ -26,7 +26,6 @@ INDUSTRY_TOPIC_HINTS = {
         "Satisfaction": "overall satisfaction rating, experience quality, expectations met",
         "Improvement Suggestions": "efficiency gains, quality enhancements, delivery optimization"
     },
-    
     "Healthcare": {
         "Product Quality": "workflow reliability, data accuracy, patient safety, regulatory compliance, system uptime",
         "Support Experience": "clinical support, issue resolution, training resources, technical responsiveness",
@@ -37,7 +36,6 @@ INDUSTRY_TOPIC_HINTS = {
         "Satisfaction": "overall satisfaction rating, clinical value, expectations met",
         "Improvement Suggestions": "efficiency improvements, user interface enhancements, training resources"
     },
-    
     "Software": {
         "Product Quality": "bug frequency, performance, reliability, feature completeness, stability",
         "Support Experience": "technical support quality, documentation, response time, issue resolution",
@@ -48,7 +46,6 @@ INDUSTRY_TOPIC_HINTS = {
         "Satisfaction": "overall satisfaction rating, product value, expectations met",
         "Improvement Suggestions": "performance optimization, UI/UX enhancements, feature prioritization"
     },
-    
     "Financial Services": {
         "Product Quality": "accuracy, security, compliance, transaction reliability, data integrity",
         "Support Experience": "account support, dispute resolution, regulatory guidance, responsiveness",
@@ -59,7 +56,6 @@ INDUSTRY_TOPIC_HINTS = {
         "Satisfaction": "overall satisfaction rating, service quality, expectations met",
         "Improvement Suggestions": "process streamlining, transparency, communication, digital experience"
     },
-    
     "Professional Services": {
         "Product Quality": "deliverable quality, expertise, methodology, timeliness, results achieved",
         "Support Experience": "responsiveness, communication, flexibility, problem-solving",
@@ -70,7 +66,6 @@ INDUSTRY_TOPIC_HINTS = {
         "Satisfaction": "overall satisfaction rating, value delivered, expectations met",
         "Improvement Suggestions": "process improvements, communication enhancements, delivery optimization"
     },
-    
     "Retail": {
         "Product Quality": "product quality, inventory availability, freshness, selection, brand variety",
         "Support Experience": "customer service, returns process, issue resolution, store staff helpfulness",
@@ -81,7 +76,6 @@ INDUSTRY_TOPIC_HINTS = {
         "Satisfaction": "overall satisfaction rating, shopping experience, expectations met",
         "Improvement Suggestions": "shopping experience, product selection, convenience, service quality"
     },
-    
     "Telecommunications": {
         "Product Quality": "network reliability, call quality, data speed, coverage, service uptime",
         "Support Experience": "technical support, billing support, issue resolution, wait times",
@@ -92,7 +86,6 @@ INDUSTRY_TOPIC_HINTS = {
         "Satisfaction": "overall satisfaction rating, service quality, expectations met",
         "Improvement Suggestions": "network quality, billing transparency, support efficiency, pricing flexibility"
     },
-    
     "Education": {
         "Product Quality": "content quality, curriculum relevance, learning outcomes, resource availability",
         "Support Experience": "instructor support, technical assistance, administrative help, responsiveness",
@@ -103,7 +96,6 @@ INDUSTRY_TOPIC_HINTS = {
         "Satisfaction": "overall satisfaction rating, learning value, expectations met",
         "Improvement Suggestions": "teaching methods, platform improvements, support enhancements, course content"
     },
-    
     "Hospitality": {
         "Product Quality": "cleanliness, amenities, room quality, facility maintenance, comfort",
         "Support Experience": "staff friendliness, concierge service, issue resolution, responsiveness",
@@ -114,7 +106,6 @@ INDUSTRY_TOPIC_HINTS = {
         "Satisfaction": "overall satisfaction rating, stay experience, expectations met",
         "Improvement Suggestions": "service quality, facility updates, staff training, convenience features"
     },
-    
     "Generic": {
         "Product Quality": "quality, reliability, performance, features, value delivered",
         "Support Experience": "customer service, responsiveness, problem resolution, support quality",
@@ -124,6 +115,16 @@ INDUSTRY_TOPIC_HINTS = {
         "User Experience": "ease of use, convenience, accessibility, overall experience",
         "Satisfaction": "overall satisfaction rating, experience quality, expectations met",
         "Improvement Suggestions": "general improvements, quality enhancements, service optimization"
+    },
+    "Events and Tradeshows": {
+        "Product Quality": "registration systems, badging reliability, mobile app performance, lead capture accuracy, floorplan tools",
+        "Support Experience": "onsite assistance, responsiveness, issue resolution, AV and booth support",
+        "Service Rating": "event execution, logistics coordination, exhibitor services, setup/teardown management",
+        "NPS Score": "likelihood to recommend the event, exhibitor success, attendee experience",
+        "Pricing Value": "ROI for exhibitors, value for participation, traffic generated vs cost",
+        "User Experience": "ease of registration, app usability, navigation, session booking, signage clarity",
+        "Satisfaction": "overall event satisfaction, exhibitor and attendee experience, expectations met",
+        "Improvement Suggestions": "better communication, smoother logistics, app enhancements, clearer guidelines"
     }
 }
 
