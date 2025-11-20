@@ -45,6 +45,12 @@ class AIConversationalSurvey:
         # Store participant data for personalized prompts
         self.participant_data = participant_data
         
+        # CRITICAL FIX: Pre-populate tenure from participant_data if available
+        # This ensures tenure is always loaded into extracted_data, not just when passed as parameter
+        if participant_data and participant_data.get('tenure_with_fc'):
+            self.extracted_data['tenure_with_fc'] = participant_data['tenure_with_fc']
+            logger.debug(f"Pre-populated tenure from participant_data: {participant_data['tenure_with_fc']}")
+        
         # NPS retry tracking to prevent infinite loops
         self.nps_retry_count = 0
         self.nps_deferred = False
