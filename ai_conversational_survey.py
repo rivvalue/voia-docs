@@ -1206,26 +1206,44 @@ Be conversational, empathetic, and adaptive to their communication style."""
         """Extract missing survey data from conversation history as fallback"""
         conversation_text = ' '.join([msg.get('message', '') for msg in self.conversation_history if msg.get('sender') == 'User'])
         
-        # Try to extract NPS score using simple pattern matching
+        # Try to extract NPS score using sophisticated pattern matching (reused from fallback)
         import re
         
-        # Look for numbers 0-10 in user responses
+        # Use sophisticated NPS patterns that avoid "1 from '1 to 10'" false matches
+        nps_patterns = [
+            r'(?:score|rating|give|rate).*?(10|[0-9])',  # 10 before single digits
+            r'^(10|[0-9])(?:\s|$|/|,|\.)',
+            r'(10|[0-9])\s*(?:out of 10|/10)',
+            r'(?:i.*d.*say|i.*d.*give|i.*d.*rate).*?(10|[0-9])',
+            r'(?:probably|maybe|around|about).*?(10|[0-9])',
+            r'\b(10|[0-9])\b(?!\d)',
+            r'(10|[0-9])',
+            r'(?:is|was|would be|rating|score).*?(10|[0-9])',
+            r'(10|[0-9])(?:\s*(?:stars?|points?|rating))?'
+        ]
+        
+        # Look for NPS in user responses
         for msg in self.conversation_history:
             if msg.get('sender') == 'User':
                 message = msg.get('message', '')
-                # Look for standalone numbers 0-10
-                numbers = re.findall(r'\b([0-9]|10)\b', message)
-                for num_str in numbers:
-                    num = int(num_str)
-                    if 0 <= num <= 10:
-                        self.extracted_data['nps_score'] = num
-                        if num >= 9:
-                            self.extracted_data['nps_category'] = 'Promoter'
-                        elif num >= 7:
-                            self.extracted_data['nps_category'] = 'Passive'
-                        else:
-                            self.extracted_data['nps_category'] = 'Detractor'
-                        break
+                for pattern in nps_patterns:
+                    matches = re.findall(pattern, message, re.IGNORECASE)
+                    if matches:
+                        # Use LAST match to handle "scale of 1 to 10, I give it 7" → extracts 7, not 1
+                        match = matches[-1]
+                        score = int(match)
+                        if 0 <= score <= 10:
+                            self.extracted_data['nps_score'] = score
+                            if score >= 9:
+                                self.extracted_data['nps_category'] = 'Promoter'
+                            elif score >= 7:
+                                self.extracted_data['nps_category'] = 'Passive'
+                            else:
+                                self.extracted_data['nps_category'] = 'Detractor'
+                            logger.debug(f"NPS extracted from history: {score}")
+                            break
+                if 'nps_score' in self.extracted_data:
+                    break
         
         # Extract satisfaction keywords
         text_lower = conversation_text.lower()
@@ -1242,18 +1260,34 @@ Be conversational, empathetic, and adaptive to their communication style."""
                 self.extracted_data['satisfaction_rating'] = 1
     
     def _extract_nps_from_history(self):
-        """Extract NPS score from conversation history using pattern matching"""
+        """Extract NPS score from conversation history using sophisticated pattern matching"""
         import re
+        
+        # Use sophisticated NPS patterns that avoid "1 from '1 to 10'" false matches
+        nps_patterns = [
+            r'(?:score|rating|give|rate).*?(10|[0-9])',  # 10 before single digits
+            r'^(10|[0-9])(?:\s|$|/|,|\.)',
+            r'(10|[0-9])\s*(?:out of 10|/10)',
+            r'(?:i.*d.*say|i.*d.*give|i.*d.*rate).*?(10|[0-9])',
+            r'(?:probably|maybe|around|about).*?(10|[0-9])',
+            r'\b(10|[0-9])\b(?!\d)',
+            r'(10|[0-9])',
+            r'(?:is|was|would be|rating|score).*?(10|[0-9])',
+            r'(10|[0-9])(?:\s*(?:stars?|points?|rating))?'
+        ]
         
         for msg in self.conversation_history:
             if msg.get('sender') == 'User':
                 message = msg.get('message', '')
-                # Look for numbers 0-10 in context of recommendation
-                numbers = re.findall(r'\b([0-9]|10)\b', message)
-                for num_str in numbers:
-                    num = int(num_str)
-                    if 0 <= num <= 10:
-                        return num
+                for pattern in nps_patterns:
+                    matches = re.findall(pattern, message, re.IGNORECASE)
+                    if matches:
+                        # Use LAST match to handle "scale of 1 to 10, I give it 7" → extracts 7, not 1
+                        match = matches[-1]
+                        score = int(match)
+                        if 0 <= score <= 10:
+                            logger.debug(f"NPS extracted from history via finalize: {score}")
+                            return score
         return None
 
 
