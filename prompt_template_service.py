@@ -729,7 +729,7 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
         # Check campaign prioritized topics first (cached primitive)
         if not self.is_demo_mode and self._campaign_prioritized_topics:
             custom_topics = []
-            for i, topic in enumerate(self._campaign_prioritized_topics[:5], 1):
+            for i, topic in enumerate(self._campaign_prioritized_topics[:10], 1):
                 # Inject industry hints if available for this topic
                 topic_with_hint = self._inject_topic_hint(topic, topic_hints)
                 custom_topics.append(f"{i}. {topic_with_hint}")
@@ -742,7 +742,7 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
         # Fall back to business account prioritized topics (cached primitive)
         if not self.is_demo_mode and self._ba_prioritized_topics:
             custom_topics = []
-            for i, topic in enumerate(self._ba_prioritized_topics[:5], 1):
+            for i, topic in enumerate(self._ba_prioritized_topics[:10], 1):
                 # Inject industry hints if available for this topic
                 topic_with_hint = self._inject_topic_hint(topic, topic_hints)
                 custom_topics.append(f"{i}. {topic_with_hint}")
@@ -812,7 +812,7 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
         if not self.is_demo_mode and self._campaign_prioritized_topics:
             # Map custom topics to field mappings where possible
             custom_topics = []
-            for topic_name in self._campaign_prioritized_topics[:5]:
+            for topic_name in self._campaign_prioritized_topics[:10]:
                 # Try to find matching base topic for field mapping
                 matched = next((t for t in base_topics_map if topic_name.lower() in t["topic"].lower() or t["topic"].lower() in topic_name.lower()), None)
                 if matched:
