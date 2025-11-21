@@ -139,6 +139,35 @@ ROLE_METADATA = {
 }
 
 
+def filter_goals_by_role(campaign_priorities: List[str], role_tier: str) -> List[str]:
+    """
+    Filter campaign priority topics by role-based exclusions
+    
+    Args:
+        campaign_priorities: Ordered list of topics from campaign configuration
+        role_tier: Persona tier (c_level, manager, end_user, etc.)
+    
+    Returns:
+        Filtered list maintaining campaign priority order, excluding role-inappropriate topics
+    
+    Example:
+        campaign_priorities = ["NPS", "Product Value", "Pricing Value", "Support Quality"]
+        role_tier = "end_user"
+        returns: ["NPS", "Product Value", "Support Quality"]  # Pricing excluded
+    """
+    if not campaign_priorities:
+        return []
+    
+    # Get excluded topics for this role tier
+    role_metadata = ROLE_METADATA.get(role_tier, ROLE_METADATA['default'])
+    excluded_topics = role_metadata['excluded_topics']
+    
+    # Filter out excluded topics while maintaining campaign priority order
+    filtered_topics = [topic for topic in campaign_priorities if topic not in excluded_topics]
+    
+    return filtered_topics
+
+
 def _map_role_to_tier(role_string: Optional[str]) -> str:
     """
     Map participant role to persona tier with normalized matching
@@ -891,6 +920,24 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
         
         # Build goals with industry-specific hints integrated
         goals = self._build_prioritized_topics_with_fields()
+        
+        # Apply role-based goal filtering if participant data is provided
+        if participant_data:
+            participant_role = participant_data.get('role')
+            role_tier = _map_role_to_tier(participant_role)
+            
+            # Extract topic names from goals for filtering
+            goal_topics = [goal.get('topic', '') for goal in goals]
+            
+            # Filter topics based on role exclusions
+            filtered_topics = filter_goals_by_role(goal_topics, role_tier)
+            
+            # Keep only goals whose topics are in the filtered list, maintaining priority order
+            goals = [goal for goal in goals if goal.get('topic', '') in filtered_topics]
+            
+            # Re-assign priority numbers after filtering
+            for i, goal in enumerate(goals, 1):
+                goal['priority'] = i
         
         # Get industry topic hints and merge them into goal objects
         topic_hints = self.get_topic_hints_for_industry()
