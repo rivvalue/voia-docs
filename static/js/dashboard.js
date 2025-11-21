@@ -205,6 +205,7 @@ window.addEventListener('translationsLoaded', initializeCampaigns);
         failedToLoadCampaignOptions: 'Failed to load campaign options',
         // No data messages
         noCampaignDataAvailable: 'No campaign data available',
+        noCampaignsAvailable: 'No campaigns available',
         noTenureDataAvailable: 'No tenure data available yet',
         noCompanyDataAvailable: 'No company data available yet',
         // Other
@@ -341,11 +342,35 @@ function populateCampaignFilterDropdown() {
     // Clear existing options
     select.innerHTML = '';
     
+    // Handle zero campaigns - show empty state
+    if (!availableCampaigns || availableCampaigns.length === 0) {
+        console.log('⚠️ No campaigns available - showing empty state');
+        select.disabled = true;
+        const emptyOption = document.createElement('option');
+        emptyOption.textContent = translations.noCampaignsAvailable || 'No campaigns available';
+        emptyOption.disabled = true;
+        select.appendChild(emptyOption);
+        
+        // Hide campaign filter section and show empty state message
+        const filterSection = select.closest('.border.rounded');
+        if (filterSection) {
+            filterSection.style.display = 'none';
+        }
+        return;
+    }
+    
+    // Enable select and ensure filter section is visible
+    select.disabled = false;
+    const filterSection = select.closest('.border.rounded');
+    if (filterSection) {
+        filterSection.style.display = '';
+    }
+    
     // Check for campaign_id URL parameter first
     const urlParams = new URLSearchParams(window.location.search);
     const urlCampaignId = urlParams.get('campaign_id');
     
-    // Find default campaign: URL param > session storage > active campaign > most recent
+    // Find default campaign: URL param > session storage > active > completed > most recent
     let defaultCampaign = null;
     
     if (urlCampaignId) {
@@ -354,7 +379,7 @@ function populateCampaignFilterDropdown() {
         console.log('📌 Using campaign from URL parameter:', urlCampaignId, defaultCampaign);
     }
     
-    // Check session storage if no URL param
+    // Check session storage if no URL param (respects user's last selection)
     if (!defaultCampaign) {
         const storedCampaignId = sessionStorage.getItem('selectedCampaignId');
         if (storedCampaignId) {
@@ -365,19 +390,34 @@ function populateCampaignFilterDropdown() {
         }
     }
     
+    // Smart default selection if no URL param or session storage
     if (!defaultCampaign) {
-        // First, look for active campaign
+        // Priority 1: Active campaigns
         const activeCampaign = availableCampaigns.find(c => c.status === 'active');
         if (activeCampaign) {
             defaultCampaign = activeCampaign;
+            console.log('✅ Selected active campaign:', activeCampaign.name);
         } else {
-            // If no active campaign, get the most recent (by end_date or created_at)
-            const sortedCampaigns = [...availableCampaigns].sort((a, b) => {
-                const dateA = new Date(a.end_date || a.created_at);
-                const dateB = new Date(b.end_date || b.created_at);
-                return dateB - dateA; // Most recent first
-            });
-            defaultCampaign = sortedCampaigns[0];
+            // Priority 2: Completed campaigns (most recent)
+            const completedCampaigns = availableCampaigns.filter(c => c.status === 'completed');
+            if (completedCampaigns.length > 0) {
+                const sortedCompleted = [...completedCampaigns].sort((a, b) => {
+                    const dateA = new Date(a.end_date || a.created_at);
+                    const dateB = new Date(b.end_date || b.created_at);
+                    return dateB - dateA; // Most recent first
+                });
+                defaultCampaign = sortedCompleted[0];
+                console.log('✅ Selected most recent completed campaign:', defaultCampaign.name);
+            } else {
+                // Priority 3: Any campaign (most recent by created_at)
+                const sortedCampaigns = [...availableCampaigns].sort((a, b) => {
+                    const dateA = new Date(a.created_at);
+                    const dateB = new Date(b.created_at);
+                    return dateB - dateA; // Most recent first
+                });
+                defaultCampaign = sortedCampaigns[0];
+                console.log('✅ Selected most recently created campaign:', defaultCampaign.name);
+            }
         }
     }
     
