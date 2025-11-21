@@ -274,10 +274,10 @@
                                 <div class="form-text">{{ _('Number of users that can access the account') }}</div>
                             </div>
                             <div class="col-md-6">
-                                <label for="max_campaigns" class="form-label">Maximum {{ _('Campaigns') }}</label>
-                                <input type="number" class="form-control" id="max_campaigns" name="max_campaigns" 
-                                       min="1" value="{{ current_license.max_campaigns if current_license and current_license.type == 'pro' else 100 }}">
-                                <div class="form-text">{{ _('Number of campaigns per month') }}</div>
+                                <label for="max_campaigns_per_year" class="form-label">Maximum {{ _('Campaigns') }} per Year</label>
+                                <input type="number" class="form-control" id="max_campaigns_per_year" name="max_campaigns_per_year" 
+                                       min="1" max="1000" value="{{ current_license.max_campaigns_per_year if current_license and current_license.type == 'pro' else 12 }}">
+                                <div class="form-text">{{ _('Number of campaigns allowed per year') }}</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="max_participants_per_campaign" class="form-label">{{ _('Target Responses per Campaign') }}</label>
@@ -353,9 +353,9 @@
                                     <td style="color: var(--primary-red); font-weight: 600;" id="newMax{{ _('Users') }}">-</td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Max {{ _('Campaigns') }}</strong></td>
-                                    <td class="text-muted">{{ current_license.max_campaigns if current_license else 'N/A' }}</td>
-                                    <td style="color: var(--primary-red); font-weight: 600;" id="newMax{{ _('Campaigns') }}">-</td>
+                                    <td><strong>Max {{ _('Campaigns') }} per Year</strong></td>
+                                    <td class="text-muted">{{ current_license.max_campaigns_per_year if current_license else 'N/A' }}</td>
+                                    <td style="color: var(--primary-red); font-weight: 600;" id="newMaxCampaigns">-</td>
                                 </tr>
                                 <tr>
                                     <td><strong>{{ _('Target Responses per Campaign') }}</strong></td>
@@ -524,12 +524,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (licenseType === 'pro') {
             document.getElementById('newMax{{ _('Users') }}').textContent = document.getElementById('max_users').value || 'Custom';
-            document.getElementById('newMax{{ _('Campaigns') }}').textContent = document.getElementById('max_campaigns').value || 'Custom';
+            document.getElementById('newMaxCampaigns').textContent = document.getElementById('max_campaigns_per_year').value || 'Custom';
             document.getElementById('newMaxParticipants').textContent = document.getElementById('max_participants_per_campaign').value || 'Custom';
             document.getElementById('newMaxInvitations').textContent = document.getElementById('max_invitations_per_campaign').value || 'Custom';
         } else {
             document.getElementById('newMax{{ _('Users') }}').textContent = limits.users.toLocaleString();
-            document.getElementById('newMax{{ _('Campaigns') }}').textContent = limits.campaigns.toLocaleString();
+            document.getElementById('newMaxCampaigns').textContent = limits.campaigns.toLocaleString();
             document.getElementById('newMaxParticipants').textContent = limits.participants.toLocaleString();
             document.getElementById('newMaxInvitations').textContent = limits.invitations.toLocaleString();
         }
@@ -547,11 +547,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 isDowngrade = true;
             }
         } else {
-            const max{{ _('Users') }} = parseInt(document.getElementById('max_users').value) || 0;
-            const max{{ _('Campaigns') }} = parseInt(document.getElementById('max_campaigns').value) || 0;
+            const maxUsers = parseInt(document.getElementById('max_users').value) || 0;
+            const maxCampaigns = parseInt(document.getElementById('max_campaigns_per_year').value) || 0;
             
-            if (currentUsage.users > max{{ _('Users') }} ||
-                currentUsage.campaigns > max{{ _('Campaigns') }}) {
+            if (currentUsage.users > maxUsers ||
+                currentUsage.campaigns > maxCampaigns) {
                 isDowngrade = true;
             }
         }
@@ -565,7 +565,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Update Pro limits when changed
-    ['max_users', 'max_campaigns', 'max_participants_per_campaign', 'max_invitations_per_campaign'].forEach(fieldId => {
+    ['max_users', 'max_campaigns_per_year', 'max_participants_per_campaign', 'max_invitations_per_campaign'].forEach(fieldId => {
         const field = document.getElementById(fieldId);
         if (field) {
             field.addEventListener('input', function() {
