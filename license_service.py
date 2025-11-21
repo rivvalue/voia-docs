@@ -955,6 +955,7 @@ class LicenseService:
                 max_campaigns_per_year=license_config['max_campaigns_per_year'],
                 max_users=license_config['max_users'],
                 max_participants_per_campaign=license_config['max_participants_per_campaign'],
+                max_invitations_per_campaign=license_config['max_invitations_per_campaign'],
                 created_by=created_by,
                 notes=f"Created from {template.display_name} template"
             )
