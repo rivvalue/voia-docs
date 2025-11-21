@@ -286,6 +286,7 @@ class Campaign(db.Model):
             'optional_topics': self.optional_topics,
             'custom_end_message': self.custom_end_message,
             'custom_system_prompt': self.custom_system_prompt,
+            'industry': self.industry,
             'anonymize_responses': self.anonymize_responses,
             # Reminder configuration
             'reminder_enabled': self.reminder_enabled,
