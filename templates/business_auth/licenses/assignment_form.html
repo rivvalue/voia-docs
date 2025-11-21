@@ -350,7 +350,7 @@
                                 <tr>
                                     <td><strong>Max {{ _('Users') }}</strong></td>
                                     <td class="text-muted">{{ current_license.max_users if current_license else 'N/A' }}</td>
-                                    <td style="color: var(--primary-red); font-weight: 600;" id="newMax{{ _('Users') }}">-</td>
+                                    <td style="color: var(--primary-red); font-weight: 600;" id="newMaxUsers">-</td>
                                 </tr>
                                 <tr>
                                     <td><strong>Max {{ _('Campaigns') }} per Year</strong></td>
@@ -523,12 +523,12 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('newLicenseType').textContent = licenseType.charAt(0).toUpperCase() + licenseType.slice(1);
         
         if (licenseType === 'pro') {
-            document.getElementById('newMax{{ _('Users') }}').textContent = document.getElementById('max_users').value || 'Custom';
+            document.getElementById('newMaxUsers').textContent = document.getElementById('max_users').value || 'Custom';
             document.getElementById('newMaxCampaigns').textContent = document.getElementById('max_campaigns_per_year').value || 'Custom';
             document.getElementById('newMaxParticipants').textContent = document.getElementById('max_participants_per_campaign').value || 'Custom';
             document.getElementById('newMaxInvitations').textContent = document.getElementById('max_invitations_per_campaign').value || 'Custom';
         } else {
-            document.getElementById('newMax{{ _('Users') }}').textContent = limits.users.toLocaleString();
+            document.getElementById('newMaxUsers').textContent = limits.users.toLocaleString();
             document.getElementById('newMaxCampaigns').textContent = limits.campaigns.toLocaleString();
             document.getElementById('newMaxParticipants').textContent = limits.participants.toLocaleString();
             document.getElementById('newMaxInvitations').textContent = limits.invitations.toLocaleString();

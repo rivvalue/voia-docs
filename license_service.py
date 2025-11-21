@@ -964,13 +964,15 @@ class LicenseService:
             db.session.add(license_record)
             db.session.commit()
             
-            # CRITICAL: Invalidate license cache so UI reflects new limits immediately
+            # CRITICAL: Invalidate business-specific cached data so UI reflects new limits immediately
             if CACHE_AVAILABLE and cache:
                 try:
-                    cache.clear()
-                    logger.info(f"Cleared license cache after applying template for business_account_id {business_account_id}")
+                    # Invalidate dashboard data cache for this business account
+                    from data_storage import get_dashboard_data_cached
+                    cache.delete_memoized(get_dashboard_data_cached, business_account_id=business_account_id)
+                    logger.info(f"Invalidated dashboard cache for business_account_id {business_account_id} after license update")
                 except Exception as cache_error:
-                    logger.warning(f"Failed to clear cache after license update: {cache_error}")
+                    logger.warning(f"Failed to invalidate cache after license update: {cache_error}")
             
             logger.info(f"Successfully applied {license_type} template to business_account_id {business_account_id}, "
                        f"license_id {license_record.id}, expires {expiration_date}")
