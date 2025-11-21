@@ -56,28 +56,16 @@ TOPIC_FIELD_MAP = {
 }
 
 # Universal Guidelines Template (Parameterized)
-# Parameters: {company_name}, {language}, {tone}, {max_questions}
+# Parameters: {tone}, {max_questions}
+# Note: Context fields are built dynamically in prompt generation to avoid "Not specified" placeholders
 UNIVERSAL_GUIDELINES = """
-==========================
-CONTEXT USAGE
-==========================
-
-Use the following context to personalize examples or framing:
-- Company: {company_name}
-- Industry: {industry}
-- Participant role: {participant_role}
-- Customer tier: {customer_tier}
-
-IMPORTANT: Use context for relevance, not verbosity. Never restate long descriptions.
-Respect the persona's focus areas when applying context.
-
 ==========================
 CONVERSATION FLOW
 ==========================
 
 At each step:
 1. Review SURVEY DATA COLLECTED SO FAR to identify missing fields
-2. Select the highest-priority goal with missing fields from SURVEY CONFIGURATION.goals
+2. Select the highest-priority goal with missing fields from the SURVEY GOALS section below
 3. Ask ONE clear question about the missing field
 4. After the response, extract data and move to the next priority
 5. Keep questions concise, {tone}, and natural
@@ -86,11 +74,11 @@ At each step:
 YOUR RESPONSIBILITIES
 ==========================
 
-1. Follow SURVEY CONFIGURATION goals (topics) in priority order - complete each topic before moving to the next
+1. Follow SURVEY GOALS in priority order - complete each topic before moving to the next
 2. Ask ONE question at a time in a {tone} conversational style
 3. Before asking any question, check SURVEY DATA COLLECTED SO FAR - only ask for MISSING fields
 4. Stop when max_questions ({max_questions}) is reached
-5. Use context to make questions relevant to the participant's situation
+5. Use context provided above to make questions relevant to the participant's situation
 6. Maintain natural conversation flow while respecting all structural constraints
 7. If a participant provides multiple pieces of information, acknowledge all but focus your next question on the current priority goal
 
@@ -541,7 +529,7 @@ class PromptTemplateService:
             return self._generate_legacy_prompt(extracted_data, step_count, conversation_history)
     
     def _generate_hybrid_prompt(self, extracted_data: Dict[str, Any], step_count: int, conversation_history: str, participant_data: Optional[Dict[str, Any]] = None) -> str:
-        """Generate hybrid prompt with universal parameterized sections"""
+        """Generate hybrid prompt with universal parameterized sections and explicit goal enumeration"""
         survey_config = self.build_survey_config_json(participant_data)
         
         # Get universal parameters
@@ -553,16 +541,6 @@ class PromptTemplateService:
         # Get participant role label for context
         anonymize = self._campaign_anonymize_responses
         role_label = self._select_persona_template(participant_data, anonymize)
-        
-        # Extract context fields for universal guidelines
-        industry = survey_config.get('context', {}).get('industry', 'Not specified')
-        participant_role = 'Not specified'
-        customer_tier = 'Not specified'
-        
-        if survey_config.get('participant_profile'):
-            profile = survey_config['participant_profile']
-            participant_role = profile.get('role', 'Not specified')
-            customer_tier = profile.get('customer_tier', 'Not specified')
         
         # Universal opening statement
         universal_opening = f"""You are VOÏA, an AI-powered customer feedback specialist conducting a survey for {company_name}.
@@ -579,12 +557,61 @@ You are speaking with a {role_label} at {company_name}."""
         # Universal tone instruction
         tone_instruction = f"\n\nUse {conversation_tone} tone throughout the conversation."
         
-        # Format universal guidelines with parameters
+        # Build dynamic context usage section (only include available fields)
+        context_fields = [f"- Company: {company_name}"]
+        
+        if survey_config.get('context'):
+            context = survey_config['context']
+            if context.get('industry'):
+                context_fields.append(f"- Industry: {context['industry']}")
+            if context.get('product_description'):
+                context_fields.append(f"- Product: {context['product_description']}")
+            if context.get('target_clients'):
+                context_fields.append(f"- Target clients: {context['target_clients']}")
+        
+        if survey_config.get('participant_profile'):
+            profile = survey_config['participant_profile']
+            if profile.get('role'):
+                context_fields.append(f"- Participant role: {profile['role']}")
+            if profile.get('customer_tier'):
+                context_fields.append(f"- Customer tier: {profile['customer_tier']}")
+        
+        context_usage_section = f"""
+==========================
+CONTEXT USAGE
+==========================
+
+Use the following context to personalize examples or framing:
+{chr(10).join(context_fields)}
+
+IMPORTANT: Use context for relevance, not verbosity. Never restate long descriptions.
+"""
+        
+        # Build explicit SURVEY GOALS section with descriptions, field mappings, and industry hints
+        goals_section = """
+==========================
+SURVEY GOALS
+==========================
+
+Complete these goals in priority order. For each goal, collect the specified fields:
+
+"""
+        for goal in survey_config['goals']:
+            # Build field list
+            fields_list = ", ".join(goal['fields'])
+            
+            # Add industry hint if present
+            hint_info = ""
+            if goal.get('industry_hint'):
+                hint_info = f"\n     [Industry focus: {goal['industry_hint']}]"
+            
+            goals_section += f"""  {goal['priority']}. {goal['topic']}: {goal['description']}
+     Fields to collect: {fields_list}{hint_info}
+
+"""
+        
+        # Format universal guidelines with parameters (only tone and max_questions)
         guidelines_formatted = UNIVERSAL_GUIDELINES.format(
-            company_name=company_name,
-            industry=industry,
-            participant_role=participant_role,
-            customer_tier=customer_tier,
             tone=conversation_tone,
             max_questions=max_questions
         )
@@ -601,7 +628,7 @@ SURVEY DATA COLLECTED SO FAR:
 CONVERSATION STEP: {step_count} / {max_questions}
 
 {universal_opening}{language_instruction}{tone_instruction}
-{guidelines_formatted}"""
+{context_usage_section}{goals_section}{guidelines_formatted}"""
     
     def _generate_legacy_prompt(self, extracted_data: Dict[str, Any], step_count: int, conversation_history: str) -> str:
         """Generate legacy system prompt (current implementation)"""
