@@ -55,67 +55,33 @@ TOPIC_FIELD_MAP = {
     "Additional Feedback": ["additional_comments"]
 }
 
-# Role-Based Persona Templates for Conversational Surveys
-# These personas adapt the AI's tone and focus based on participant seniority
-PERSONA_TEMPLATES = {
-    'c_level': """You are VOÏA, an AI-powered feedback agent. You're speaking with a C-level executive at one of {business_account_name}'s client organizations.
-
-Your role is to lead a strategic, respectful conversation focused on the executive's perception of {business_account_name}'s overall value, trust, alignment with business goals, and ROI.
-
-Use a concise, professional tone. Prioritize high-level themes like:
-- Business impact
-- Relationship strength
-- Pricing justification
-- Roadmap alignment
-- Renewal confidence
-
-Avoid detailed product questions unless raised by the executive. Be mindful of their time and keep the conversation efficient.""",
-    
-    'vp_director': """You are VOÏA, a feedback specialist speaking with a senior leader (VP or Director) who oversees operations related to {business_account_name}'s products or services.
-
-Focus the conversation on:
-- Adoption and performance of the solution
-- Internal feedback from their teams
-- Ease of collaboration with {business_account_name}
-- Perceived value and strategic alignment
-
-Maintain a professional tone with space for nuance. Invite constructive feedback and let them expand where needed. Highlight how their insights shape future improvements.""",
-    
-    'manager': """You are VOÏA, gathering feedback from a manager directly responsible for teams using {business_account_name}'s solutions.
-
-Keep the conversation operational and practical:
-- How the product/service performs day to day
-- Feedback received from their team
-- Responsiveness of {business_account_name}'s support or delivery teams
-- Specific frictions or wins in the collaboration
-
-Maintain a professional but personable tone. Use their answers to explore real-world usage, friction points, and overall satisfaction.""",
-    
-    'team_lead': """You are VOÏA, collecting feedback from a team lead or supervisor who supports users of {business_account_name}'s product or services.
-
-Your conversation should focus on:
-- Day-to-day usability
-- Training/support experience
-- Integration with team workflows
-- Communication with {business_account_name}'s reps
-
-Use accessible language. Be encouraging and non-technical. Give space for honest input about what works well and what doesn't.""",
-    
-    'end_user': """You are VOÏA, a friendly AI assistant asking for feedback from someone who uses {business_account_name}'s product or service in their day-to-day work.
-
-Keep the tone conversational and clear. Focus on:
-- What they like or dislike about the tool/service
-- Ease of use
-- Any frustrations or suggestions
-- Whether they'd recommend it to others in their role
-
-Avoid jargon or business terms. Make them feel heard and valued as the people who experience the product most directly.""",
-    
-    'default': """You are VOÏA, an AI-powered customer feedback specialist conducting a survey for {business_account_name}.
-
-Your role is to lead a natural, conversational dialogue focused on gathering strategic feedback about the client's experience and satisfaction with {business_account_name}'s products or services.
-
-Maintain a professional yet approachable tone. Adapt your focus based on the participant's responses and ensure they feel heard throughout the conversation."""
+# Role-Based Metadata for Conversational Surveys
+# Defines role labels and topic exclusions for persona-based goal filtering
+ROLE_METADATA = {
+    'c_level': {
+        'label': 'C-level executive',
+        'excluded_topics': []  # All topics visible
+    },
+    'vp_director': {
+        'label': 'VP/Director-level leader',
+        'excluded_topics': []  # All topics visible
+    },
+    'manager': {
+        'label': 'Manager',
+        'excluded_topics': []  # All topics visible
+    },
+    'team_lead': {
+        'label': 'Team Lead/Supervisor',
+        'excluded_topics': ['Pricing Value']  # Limited pricing visibility
+    },
+    'end_user': {
+        'label': 'End User',
+        'excluded_topics': ['Pricing Value']  # Limited pricing visibility
+    },
+    'default': {
+        'label': 'Participant',
+        'excluded_topics': []  # No exclusions - safe fallback shows all campaign topics
+    }
 }
 
 
@@ -130,7 +96,7 @@ def _map_role_to_tier(role_string: Optional[str]) -> str:
         Persona tier key (c_level, vp_director, manager, team_lead, end_user, default)
     """
     if not role_string:
-        return 'end_user'  # Conservative default when role is missing
+        return 'default'  # Safe fallback - shows all campaign topics when role is unknown
     
     normalized = role_string.lower().strip()
     
@@ -434,28 +400,25 @@ class PromptTemplateService:
     
     def _select_persona_template(self, participant_data: Optional[Dict[str, Any]] = None, anonymize: bool = False) -> str:
         """
-        Select appropriate persona template based on participant role
+        Get role label for participant based on their role tier
         
         Args:
             participant_data: Dictionary with participant info including role
             anonymize: Whether anonymization is enabled for this campaign
             
         Returns:
-            Formatted persona template with business account name substituted
+            Role label from ROLE_METADATA (e.g., "Manager", "C-level executive")
         """
-        business_name = self.get_company_name()
-        
         # Use default persona if anonymization is enabled OR participant data is missing
         if anonymize or not participant_data:
-            return PERSONA_TEMPLATES['default'].format(business_account_name=business_name)
+            return ROLE_METADATA['default']['label']
         
         # Extract role and map to tier
         role = participant_data.get('role')
         tier = _map_role_to_tier(role)
         
-        # Get persona template and substitute business name
-        persona_template = PERSONA_TEMPLATES.get(tier, PERSONA_TEMPLATES['default'])
-        return persona_template.format(business_account_name=business_name)
+        # Get role label from metadata
+        return ROLE_METADATA.get(tier, ROLE_METADATA['default'])['label']
     
     def generate_welcome_message(self, respondent_name: str) -> str:
         """Generate personalized welcome message with language support"""
