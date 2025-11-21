@@ -964,6 +964,14 @@ class LicenseService:
             db.session.add(license_record)
             db.session.commit()
             
+            # CRITICAL: Invalidate license cache so UI reflects new limits immediately
+            if CACHE_AVAILABLE and cache:
+                try:
+                    cache.clear()
+                    logger.info(f"Cleared license cache after applying template for business_account_id {business_account_id}")
+                except Exception as cache_error:
+                    logger.warning(f"Failed to clear cache after license update: {cache_error}")
+            
             logger.info(f"Successfully applied {license_type} template to business_account_id {business_account_id}, "
                        f"license_id {license_record.id}, expires {expiration_date}")
             
