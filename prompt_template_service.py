@@ -541,129 +541,67 @@ class PromptTemplateService:
             return self._generate_legacy_prompt(extracted_data, step_count, conversation_history)
     
     def _generate_hybrid_prompt(self, extracted_data: Dict[str, Any], step_count: int, conversation_history: str, participant_data: Optional[Dict[str, Any]] = None) -> str:
-        """Generate hybrid prompt with structured JSON configuration and conversation guidance"""
+        """Generate hybrid prompt with universal parameterized sections"""
         survey_config = self.build_survey_config_json(participant_data)
         
-        # Check if anonymization is enabled for this campaign (uses cached primitive)
+        # Get universal parameters
+        company_name = survey_config['company_name']
+        conversation_tone = survey_config['conversation_tone'] or 'professional'
+        max_questions = survey_config['max_questions']
+        campaign_language = self._campaign_language_code or 'en'
+        
+        # Get participant role label for context
         anonymize = self._campaign_anonymize_responses
+        role_label = self._select_persona_template(participant_data, anonymize)
         
-        # Select role-based persona template
-        persona_intro = self._select_persona_template(participant_data, anonymize)
+        # Extract context fields for universal guidelines
+        industry = survey_config.get('context', {}).get('industry', 'Not specified')
+        participant_role = 'Not specified'
+        customer_tier = 'Not specified'
         
-        # Get campaign language from hot path attributes (prioritize campaign language over participant data)
-        campaign_language = self._campaign_language_code  # Already defaults to 'en' in __init__
+        if survey_config.get('participant_profile'):
+            profile = survey_config['participant_profile']
+            participant_role = profile.get('role', 'Not specified')
+            customer_tier = profile.get('customer_tier', 'Not specified')
         
-        # Language instruction based on campaign language
+        # Universal opening statement
+        universal_opening = f"""You are VOÏA, an AI-powered customer feedback specialist conducting a survey for {company_name}.
+
+You are speaking with a {role_label} at {company_name}."""
+        
+        # Universal language instruction
         language_instruction = ""
         if campaign_language and campaign_language != 'en':
             language_map = {'fr': 'French', 'es': 'Spanish', 'de': 'German'}
             language_name = language_map.get(campaign_language, campaign_language.upper())
             language_instruction = f"\n\nIMPORTANT: Conduct this entire conversation in {language_name}. Ask questions and respond in {language_name}."
         
-        # Build participant profile section
-        participant_section = ""
-        if survey_config.get("participant_profile"):
-            profile = survey_config["participant_profile"]
-            participant_section = f"""
-PARTICIPANT PROFILE:
-- Name: {profile.get('name')}
-- Role: {profile.get('role') or 'Not specified'}
-- Region: {profile.get('region') or 'Not specified'}
-- Customer Tier: {profile.get('customer_tier') or 'Not specified'}
-- Language: {profile.get('language', 'en')}
-- Company: {profile.get('company')}
-"""
+        # Universal tone instruction
+        tone_instruction = f"\n\nUse {conversation_tone} tone throughout the conversation."
         
-        # Build goals section with field mappings and industry hints
-        goals_text = ""
-        for goal in survey_config['goals']:
-            hint_info = ""
-            if goal.get('industry_hint'):
-                hint_info = f" [Industry focus: {goal['industry_hint']}]"
-            goals_text += f"  {goal['priority']}. {goal['topic']}: {goal['description']}{hint_info}\n"
-        
-        # Build context usage section
-        context_fields = []
-        if survey_config.get('context'):
-            if survey_config['context'].get('product_description'):
-                context_fields.append(f"- Product: {survey_config['context']['product_description']}")
-            if survey_config['context'].get('target_clients'):
-                context_fields.append(f"- Target clients: {survey_config['context']['target_clients']}")
-            if survey_config['context'].get('industry'):
-                context_fields.append(f"- Industry: {survey_config['context']['industry']}")
-        
-        # Add participant context if available
-        if survey_config.get('participant_profile'):
-            profile = survey_config['participant_profile']
-            if profile.get('role'):
-                context_fields.append(f"- Participant role: {profile['role']}")
-            if profile.get('customer_tier'):
-                context_fields.append(f"- Customer tier: {profile['customer_tier']}")
-        
-        context_usage_section = ""
-        if context_fields:
-            context_usage_section = f"""
-==========================
-CONTEXT USAGE
-==========================
-
-Use the following context to personalize examples or framing:
-- Company: {survey_config['company_name']}
-{chr(10).join(context_fields)}
-
-IMPORTANT: Use context for relevance, not verbosity. Never restate long descriptions.
-Respect the persona's focus areas when applying context.
-"""
+        # Format universal guidelines with parameters
+        guidelines_formatted = UNIVERSAL_GUIDELINES.format(
+            company_name=company_name,
+            industry=industry,
+            participant_role=participant_role,
+            customer_tier=customer_tier,
+            tone=conversation_tone,
+            max_questions=max_questions
+        )
         
         return f"""SURVEY CONFIGURATION:
 {json.dumps(survey_config, indent=2)}
-{participant_section}
+
 CONVERSATION HISTORY:
 {conversation_history}
 
 SURVEY DATA COLLECTED SO FAR:
 {json.dumps(extracted_data, indent=2)}
 
-CONVERSATION STEP: {step_count} / {survey_config['max_questions']}
+CONVERSATION STEP: {step_count} / {max_questions}
 
-{persona_intro}{language_instruction}
-{context_usage_section}
-==========================
-CONVERSATION FLOW
-==========================
-
-At each step:
-1. Review SURVEY DATA COLLECTED SO FAR to identify missing fields
-2. Select the highest-priority goal with missing fields from SURVEY CONFIGURATION.goals
-3. Ask ONE clear question about the missing field
-4. After the response, extract data and move to the next priority
-5. Keep questions concise, professional, and natural
-
-==========================
-YOUR RESPONSIBILITIES
-==========================
-
-1. Follow SURVEY CONFIGURATION goals (topics) in priority order - complete each topic before moving to the next
-2. Ask ONE question at a time in a {survey_config['conversation_tone']} conversational style
-3. Before asking any question, check SURVEY DATA COLLECTED SO FAR - only ask for MISSING fields
-4. Stop when max_questions ({survey_config['max_questions']}) is reached
-5. Use context to make questions relevant to the participant's situation
-6. Maintain natural conversation flow while respecting all structural constraints
-7. If a participant provides multiple pieces of information, acknowledge all but focus your next question on the current priority goal
-
-==========================
-INDUSTRY-SPECIFIC VOCABULARY
-==========================
-
-When forming a question for a topic with an [Industry focus] hint:
-- Use the industry-specific keywords and focus areas to choose vocabulary and examples relevant to the participant's operational reality
-- Adapt your phrasing to match their industry context (e.g., "line reliability" for EMS, "workflow accuracy" for Healthcare)
-- Do NOT change or rename the topic itself - only adapt the question phrasing and examples
-- This helps participants recognize familiar concepts and provide more specific, valuable feedback
-
-Be empathetic, adapt to user communication style, and keep the conversation natural while respecting all constraints.
-
-RESPONSE FORMAT: Return JSON with fields: message, message_type, step, topic, progress, is_complete"""
+{universal_opening}{language_instruction}{tone_instruction}
+{guidelines_formatted}"""
     
     def _generate_legacy_prompt(self, extracted_data: Dict[str, Any], step_count: int, conversation_history: str) -> str:
         """Generate legacy system prompt (current implementation)"""
