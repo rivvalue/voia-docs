@@ -458,9 +458,10 @@ class PromptTemplateService:
         return persona_template.format(business_account_name=business_name)
     
     def generate_welcome_message(self, respondent_name: str) -> str:
-        """Generate personalized welcome message"""
+        """Generate personalized welcome message with language support"""
         company_name = self.get_company_name()
         product_name = self.get_product_name()
+        campaign_language = self._campaign_language_code
         
         if self.is_demo_mode:
             # Use original hardcoded message for demo mode
@@ -471,9 +472,15 @@ class PromptTemplateService:
         if self._ba_company_description:
             company_description = f"\n\n{self._ba_company_description}"
         
-        survey_purpose = f"This short conversation will help us understand what's working, what's not, and how to improve your experience with {product_name}."
-        
-        return f"Hi {respondent_name}, we'd love to hear from you.{company_description}\n\n{survey_purpose}\n\nOn a scale of 0-10, how likely are you to recommend {company_name} to a friend or colleague?"
+        # LANGUAGE-AWARE: Generate message in campaign language
+        if campaign_language == 'fr':
+            # French welcome message
+            survey_purpose = f"Cette courte conversation nous aidera à comprendre ce qui fonctionne bien, ce qui pourrait être amélioré, et comment optimiser votre expérience avec {product_name}."
+            return f"Bonjour {respondent_name}, nous aimerions connaître votre avis.{company_description}\n\n{survey_purpose}\n\nSur une échelle de 0 à 10, quelle est la probabilité que vous recommandiez {company_name} à un ami ou collègue?"
+        else:
+            # English welcome message (default)
+            survey_purpose = f"This short conversation will help us understand what's working, what's not, and how to improve your experience with {product_name}."
+            return f"Hi {respondent_name}, we'd love to hear from you.{company_description}\n\n{survey_purpose}\n\nOn a scale of 0-10, how likely are you to recommend {company_name} to a friend or colleague?"
     
     def generate_system_prompt(self, extracted_data: Dict[str, Any], step_count: int, conversation_history: str, participant_data: Optional[Dict[str, Any]] = None) -> str:
         """Generate system prompt for OpenAI conversation with hybrid prompt support"""
