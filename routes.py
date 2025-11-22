@@ -1052,12 +1052,14 @@ def submit_survey():
         response_data = anonymize_response_data(campaign, response_data)
         
         # Check for existing response to update instead of creating duplicate
+        # CRITICAL FIX: Scope lookup to campaign_id to prevent cross-campaign data corruption
         existing_response = SurveyResponse.query.filter_by(
-            respondent_email=authenticated_email
-        ).first()
+            respondent_email=authenticated_email,
+            campaign_id=campaign_id
+        ).first() if campaign_id else None
         
         if existing_response:
-            # Update existing response (preserve campaign if no active campaign)
+            # Update existing response within same campaign
             existing_response.company_name = response_data['company_name']
             existing_response.respondent_name = response_data['respondent_name']
             existing_response.tenure_with_fc = data.get('tenure_with_fc')
@@ -2928,12 +2930,14 @@ def finalize_conversation():
         response_data = anonymize_response_data(campaign, response_data)
         
         # Check for existing response to update instead of creating duplicate
+        # CRITICAL FIX: Scope lookup to campaign_id to prevent cross-campaign data corruption
         existing_response = SurveyResponse.query.filter_by(
-            respondent_email=authenticated_email
-        ).first()
+            respondent_email=authenticated_email,
+            campaign_id=campaign_id
+        ).first() if campaign_id else None
         
         if existing_response:
-            # Update existing response with potentially anonymized data
+            # Update existing response within same campaign
             existing_response.company_name = response_data['company_name']
             existing_response.respondent_name = response_data['respondent_name']
             existing_response.tenure_with_fc = structured_data.get('tenure_with_fc')
