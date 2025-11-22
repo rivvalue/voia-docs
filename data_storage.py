@@ -1224,12 +1224,23 @@ def calculate_segmentation_analytics(campaign_id, business_account_id=None):
     
     Args:
         campaign_id: Campaign ID to filter responses
-        business_account_id: Business account ID to filter participants (for multi-tenant isolation)
+        business_account_id: Business account ID to enforce multi-tenant isolation
     """
     try:
-        from models import Participant, CampaignParticipant
+        from models import Participant, CampaignParticipant, Campaign
+        from sqlalchemy.orm import aliased
         
-        # Join SurveyResponse -> CampaignParticipant -> Participant to get segmentation attributes
+        # SECURITY FIX: Use LEFT OUTER JOIN to include responses without participant records
+        # Filter by SurveyResponse.business_account_id (via Campaign) instead of Participant
+        # This ensures historical responses without participant data are included
+        
+        # Get business_account_id from Campaign if not provided
+        if campaign_id and not business_account_id:
+            campaign = Campaign.query.get(campaign_id)
+            if campaign:
+                business_account_id = campaign.business_account_id
+        
+        # Build query with LEFT OUTER JOINs to preserve responses without participant data
         segmentation_query = db.session.query(
             SurveyResponse.nps_score,
             SurveyResponse.satisfaction_rating,
@@ -1237,21 +1248,24 @@ def calculate_segmentation_analytics(campaign_id, business_account_id=None):
             Participant.region,
             Participant.customer_tier,
             Participant.client_industry
-        ).join(
+        ).outerjoin(
             CampaignParticipant, 
             SurveyResponse.campaign_participant_id == CampaignParticipant.id
-        ).join(
+        ).outerjoin(
             Participant,
             CampaignParticipant.participant_id == Participant.id
+        ).join(
+            Campaign,
+            SurveyResponse.campaign_id == Campaign.id
         ).filter(
             SurveyResponse.campaign_id == campaign_id,
             SurveyResponse.nps_score.isnot(None)
         )
         
-        # SECURITY: Filter by business account to prevent cross-tenant data leakage
+        # SECURITY: Filter by business account through Campaign to prevent cross-tenant data leakage
         if business_account_id:
             segmentation_query = segmentation_query.filter(
-                Participant.business_account_id == business_account_id
+                Campaign.business_account_id == business_account_id
             )
         
         segmentation_query = segmentation_query.all()

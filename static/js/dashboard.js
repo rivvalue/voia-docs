@@ -492,66 +492,8 @@ async function applyCampaignFilter() {
     // Update global campaign indicator if on filtered pages
     updateGlobalCampaignIndicator();
     
-    // SECURITY FIX: Clear ALL cached data and UI elements BEFORE loading new data to prevent cross-tenant data flash
-    console.log('🔒 Clearing ALL cached dashboard data and UI to prevent cross-tenant exposure');
-    dashboardData = null;
-    
-    // Clear KPI cards immediately with loading placeholders
-    const kpiElements = {
-        'totalResponsesValue': '...',
-        'totalCompaniesValue': '...',
-        'avgNpsValue': '...',
-        'totalPromotersValue': '...',
-        'totalDetractorsValue': '...',
-        'avgSatisfactionValue': '...',
-        'avgProductValueValue': '...',
-        'avgSupportQualityValue': '...',
-        'avgProfessionalServicesValue': '...'
-    };
-    
-    for (const [elementId, placeholderValue] of Object.entries(kpiElements)) {
-        const element = document.getElementById(elementId);
-        if (element) {
-            element.textContent = placeholderValue;
-        }
-    }
-    
-    // Clear chart canvases (they'll be recreated when data loads)
-    const chartIds = ['npsChart', 'sentimentChart', 'ratingsChart', 'tenureChart', 'growthFactorChart', 'themesChart'];
-    for (const chartId of chartIds) {
-        const chartElement = document.getElementById(chartId);
-        if (chartElement) {
-            const ctx = chartElement.getContext('2d');
-            ctx.clearRect(0, 0, chartElement.width, chartElement.height);
-        }
-    }
-    
-    // Clear Survey Insights table rows immediately with loading indicators
-    const companyNpsTableBody = document.querySelector('#companyNpsTable tbody');
-    const tenureNpsTableBody = document.querySelector('#tenureNpsTable tbody');
-    const accountIntelligenceTableBody = document.querySelector('#accountIntelligenceTable tbody');
-    const surveyResponsesTableBody = document.querySelector('#surveyResponsesTable tbody');
-    
-    if (companyNpsTableBody) {
-        companyNpsTableBody.innerHTML = `<tr><td colspan="7" class="text-center"><div class="spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Loading...</span></div> ${translations.loading || 'Loading...'}</td></tr>`;
-    }
-    if (tenureNpsTableBody) {
-        tenureNpsTableBody.innerHTML = `<tr><td colspan="7" class="text-center"><div class="spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Loading...</span></div> ${translations.loading || 'Loading...'}</td></tr>`;
-    }
-    if (accountIntelligenceTableBody) {
-        accountIntelligenceTableBody.innerHTML = `<tr><td colspan="6" class="text-center"><div class="spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Loading...</span></div> ${translations.loading || 'Loading...'}</td></tr>`;
-    }
-    if (surveyResponsesTableBody) {
-        surveyResponsesTableBody.innerHTML = `<tr><td colspan="8" class="text-center"><div class="spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Loading...</span></div> ${translations.loading || 'Loading...'}</td></tr>`;
-    }
-    
-    // Clear segmentation analytics section
-    const segmentationContainer = document.getElementById('segmentationAnalyticsContent');
-    if (segmentationContainer) {
-        segmentationContainer.innerHTML = `<div class="text-center p-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">${translations.loading || 'Loading...'}</p></div>`;
-    }
-    
     // Reload dashboard data with campaign filter
+    // NOTE: UI clearing now happens inside loadDashboardData() for all code paths
     console.log('📡 Loading dashboard data for campaign:', selectedCampaignId);
     await loadDashboardData();
     
@@ -1427,6 +1369,63 @@ function loadCompanyNpsDataDirect() {
 
 function loadDashboardData() {
     console.log('loadDashboardData called');
+    
+    // SECURITY FIX: Clear ALL stale UI elements FIRST to prevent cross-tenant data flash
+    // This runs for ALL code paths (initial load, refreshData, applyCampaignFilter, etc.)
+    console.log('🔒 Clearing ALL stale dashboard UI to prevent cross-tenant exposure');
+    
+    // Clear cached dashboard data
+    dashboardData = null;
+    
+    // Clear KPI cards immediately with loading placeholders
+    const kpiElements = {
+        'totalResponsesValue': '...',
+        'totalCompaniesValue': '...',
+        'avgNpsValue': '...',
+        'totalPromotersValue': '...',
+        'totalDetractorsValue': '...',
+        'avgSatisfactionValue': '...',
+        'avgProductValueValue': '...',
+        'avgSupportQualityValue': '...',
+        'avgProfessionalServicesValue': '...'
+    };
+    
+    for (const [elementId, placeholderValue] of Object.entries(kpiElements)) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.textContent = placeholderValue;
+        }
+    }
+    
+    // Clear chart canvases
+    const chartIds = ['npsChart', 'sentimentChart', 'ratingsChart', 'tenureChart', 'growthFactorChart', 'themesChart'];
+    for (const chartId of chartIds) {
+        const chartElement = document.getElementById(chartId);
+        if (chartElement) {
+            const ctx = chartElement.getContext('2d');
+            ctx.clearRect(0, 0, chartElement.width, chartElement.height);
+        }
+    }
+    
+    // Clear Survey Insights tables with loading indicators
+    const loadingHtml = `<tr><td colspan="7" class="text-center"><div class="spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Loading...</span></div> ${translations.loading || 'Loading...'}</td></tr>`;
+    const companyNpsTableBody = document.querySelector('#companyNpsTable tbody');
+    const tenureNpsTableBody = document.querySelector('#tenureNpsTable tbody');
+    const accountIntelligenceTableBody = document.querySelector('#accountIntelligenceTable tbody');
+    const surveyResponsesTableBody = document.querySelector('#surveyResponsesTable tbody');
+    
+    if (companyNpsTableBody) companyNpsTableBody.innerHTML = loadingHtml;
+    if (tenureNpsTableBody) tenureNpsTableBody.innerHTML = loadingHtml;
+    if (accountIntelligenceTableBody) accountIntelligenceTableBody.innerHTML = `<tr><td colspan="6" class="text-center"><div class="spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Loading...</span></div> ${translations.loading || 'Loading...'}</td></tr>`;
+    if (surveyResponsesTableBody) surveyResponsesTableBody.innerHTML = `<tr><td colspan="8" class="text-center"><div class="spinner-border spinner-border-sm text-primary" role="status"><span class="visually-hidden">Loading...</span></div> ${translations.loading || 'Loading...'}</td></tr>`;
+    
+    // Clear segmentation analytics
+    const segmentationContainer = document.getElementById('segmentationAnalyticsContent');
+    if (segmentationContainer) {
+        segmentationContainer.innerHTML = `<div class="text-center p-4"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div><p class="mt-2">${translations.loading || 'Loading...'}</p></div>`;
+    }
+    
+    // Now proceed with normal loading flow
     const loadingElement = document.getElementById('loadingIndicator');
     const contentElement = document.getElementById('dashboardContent');
     
