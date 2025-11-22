@@ -690,14 +690,22 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         max_questions = self.template_service.get_max_questions()
         at_question_limit = self.step_count >= max_questions
         
-        # CRITICAL: Check if ALL campaign goals are satisfied
-        has_campaign_priorities = self._check_campaign_priorities_collected()
+        # CRITICAL: Check if ALL campaign goals are satisfied (or no goals defined)
+        survey_config = self.template_service.build_survey_config_json(self.participant_data)
+        has_campaign_goals = survey_config.get('goals') and len(survey_config.get('goals', [])) > 0
+        
+        if has_campaign_goals:
+            # Campaign has goals - enforce completion of ALL goals
+            has_campaign_priorities = self._check_campaign_priorities_collected()
+        else:
+            # Campaign has no custom goals - allow completion at question limit
+            has_campaign_priorities = False
         
         # BACKEND-CONTROLLED COMPLETION LOGIC:
         # Complete survey ONLY if:
         # 1. User shows frustration (emergency exit - respect user experience)
         # 2. We've reached the hard question limit
-        # 3. ALL campaign goals have been collected (primary trigger)
+        # 3. ALL campaign goals have been collected (if campaign has goals)
         
         completion_reasons = []
         
@@ -707,13 +715,13 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         if at_question_limit:
             completion_reasons.append("AT_QUESTION_LIMIT")
             logger.warning(f"⚠️ Question limit ({max_questions}) reached")
-        if has_campaign_priorities:
+        if has_campaign_goals and has_campaign_priorities:
             completion_reasons.append("ALL_CAMPAIGN_GOALS_COLLECTED")
             logger.info(f"✅ All campaign goals collected at step {self.step_count}")
         
         completion_ready = len(completion_reasons) > 0
         
-        logger.debug(f"BACKEND COMPLETION CHECK: Frustrated={user_frustrated}, AtLimit={at_question_limit}, AllGoals={has_campaign_priorities}, Steps={self.step_count}/{max_questions}, Ready={completion_ready}")
+        logger.debug(f"BACKEND COMPLETION CHECK: Frustrated={user_frustrated}, AtLimit={at_question_limit}, HasGoals={has_campaign_goals}, AllGoals={has_campaign_priorities}, Steps={self.step_count}/{max_questions}, Ready={completion_ready}")
         if completion_reasons:
             logger.info(f"COMPLETION REASONS: {', '.join(completion_reasons)}")
         
@@ -752,10 +760,10 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         
         return False
     
-    def _get_feedback_field_for_topic(self) -> str:
+    def _get_feedback_field_for_topic(self):
         """
         Map current topic to appropriate feedback field for backend-controlled completion
-        Returns the unique feedback field name based on current question topic
+        Returns the unique feedback field name based on current question topic, or None if no topic set
         """
         if not self.current_topic:
             return None
