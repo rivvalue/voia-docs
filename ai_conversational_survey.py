@@ -2,6 +2,7 @@ import os
 import json
 import uuid
 import logging
+from datetime import datetime
 from typing import Dict, Any, List, Optional
 from openai import OpenAI
 from prompt_template_service import PromptTemplateService
@@ -1229,7 +1230,8 @@ RESPONSE FORMAT - Return JSON:
             'improvement_feedback': extracted.get('improvement_feedback'),
             'recommendation_reason': extracted.get('nps_reasoning'),
             'additional_comments': combined_feedback,
-            'conversation_history': json.dumps(self.conversation_history)
+            'conversation_history': json.dumps(self.conversation_history),
+            'ai_prompts_log': json.dumps(self.ai_prompts_log) if self.ai_prompts_log else None
         }
     
     def _extract_missing_data_from_history(self):
