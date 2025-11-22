@@ -1502,9 +1502,46 @@ def campaign_insights():
                          business_account_id=business_account_id,
                          branding_context=branding_context)
 
+@app.route('/api/dashboard_data_demo')
+def dashboard_data_demo():
+    """Public demo endpoint - always returns Archelo Group demo data"""
+    try:
+        from models import Campaign
+        from data_storage import get_dashboard_data_cached
+        
+        # Always use demo account for public access
+        target_business_account_id = 1
+        campaign_id = request.args.get('campaign_id', type=int)
+        
+        # Default to active demo campaign if none specified
+        if campaign_id is None:
+            active_campaign = Campaign.query.filter_by(
+                business_account_id=1,
+                status='active'
+            ).order_by(Campaign.id.desc()).first()
+            if active_campaign:
+                campaign_id = active_campaign.id
+        
+        if campaign_id is not None:
+            data = get_dashboard_data_cached(campaign_id=campaign_id, business_account_id=1)
+        else:
+            data = {
+                'total_responses': 0,
+                'nps_score': 0,
+                'recent_responses': 0,
+                'sentiment_distribution': [],
+                'nps_distribution': [],
+                'top_themes': []
+            }
+        
+        return jsonify(data)
+    except Exception as e:
+        logger.error(f"Error fetching demo dashboard data: {e}")
+        return jsonify({'error': 'Failed to fetch dashboard data'}), 500
+
 @app.route('/api/dashboard_data')
 def dashboard_data():
-    """API endpoint for dashboard data with optional campaign filtering"""
+    """API endpoint for authenticated dashboard data - requires business login"""
     try:
         # Import models to avoid circular imports
         from models import Campaign
