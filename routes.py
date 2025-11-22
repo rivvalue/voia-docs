@@ -1520,10 +1520,12 @@ def dashboard_data():
             # Business user: scope to their account
             target_business_account_id = current_account.id
             account_context = f"business account {current_account.name}"
+            logger.info(f"✅ Authenticated request - Business Account: {current_account.name} (ID: {target_business_account_id})")
         else:
             # Public user: scope to demo account (Archelo Group - ID 1)
             target_business_account_id = 1
             account_context = "demo account"
+            logger.info(f"⚠️ Unauthenticated request - Defaulting to demo account (ID: 1)")
         
         # If campaign_id provided, validate it belongs to target business account
         if campaign_id:
