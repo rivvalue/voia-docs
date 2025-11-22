@@ -709,11 +709,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Force remove yellow colors immediately
     forceRemoveYellowColors();
     
-    // Immediate fallback for company NPS data
-    setTimeout(function() {
-        console.log('Fallback: Loading company NPS data directly');
-        loadCompanyNpsDataDirect();
-    }, 1000);
+    // REMOVED (Nov 22, 2025): Fallback that caused cross-tenant data flash
+    // This loaded demo data before campaign filter was applied
+    // loadCompanyNpsDataDirect() is now only called from populateDashboard() with proper campaign context
     
     // Setup tab event listeners
     setupTabEventListeners();
