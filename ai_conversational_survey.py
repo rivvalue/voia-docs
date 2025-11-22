@@ -245,25 +245,25 @@ YOUR TASK (COMPLETE BOTH IN ONE RESPONSE):
 1. Extract any relevant data from the user's response
 2. Generate the next conversational question based on missing goals
 
-Return JSON with this EXACT format:
+Return JSON with this EXACT format (match campaign goal field names exactly):
 {{
     "extracted_data": {{
         "nps_score": number or null,
-        "nps_category": string or null,
+        "nps_reasoning": string or null,
+        "tenure_with_fc": string or null,
         "satisfaction_rating": number or null,
         "service_rating": number or null,
         "product_value_rating": number or null,
         "pricing_rating": number or null,
         "support_rating": number or null,
+        "improvement_feedback": string or null,
+        "additional_comments": string or null,
         "product_quality_feedback": string or null,
         "support_experience_feedback": string or null,
         "service_rating_feedback": string or null,
         "user_experience_feedback": string or null,
         "feature_requests": string or null,
-        "general_feedback": string or null,
-        "nps_reasoning": string or null,
-        "improvement_feedback": string or null,
-        "additional_comments": string or null
+        "general_feedback": string or null
     }},
     "next_question": {{
         "message": "Your next question in {campaign_language}",
