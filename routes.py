@@ -1051,15 +1051,23 @@ def submit_survey():
         # Apply anonymization if campaign requires it
         response_data = anonymize_response_data(campaign, response_data)
         
-        # Check for existing response to update instead of creating duplicate
-        # CRITICAL FIX: Scope lookup to campaign_id to prevent cross-campaign data corruption
-        existing_response = SurveyResponse.query.filter_by(
-            respondent_email=authenticated_email,
-            campaign_id=campaign_id
-        ).first() if campaign_id else None
+        # CRITICAL FIX: Smart lookup to prevent cross-campaign corruption while preserving analytics
+        # Priority: campaign_participant_id (durable invite ID) > (email, campaign_id) for legacy
+        existing_response = None
+        if association_id:
+            # New system: Use campaign_participant_id (one response per invitation)
+            existing_response = SurveyResponse.query.filter_by(
+                campaign_participant_id=association_id
+            ).first()
+        elif campaign_id:
+            # Legacy system: Use (email, campaign_id) to prevent cross-campaign corruption
+            existing_response = SurveyResponse.query.filter_by(
+                respondent_email=authenticated_email,
+                campaign_id=campaign_id
+            ).first()
         
         if existing_response:
-            # Update existing response within same campaign
+            # Update existing response (maintains one-row-per-campaign for analytics)
             existing_response.company_name = response_data['company_name']
             existing_response.respondent_name = response_data['respondent_name']
             existing_response.tenure_with_fc = data.get('tenure_with_fc')
@@ -1072,18 +1080,12 @@ def submit_survey():
             existing_response.improvement_feedback = data.get('improvement_feedback')
             existing_response.recommendation_reason = data.get('recommendation_reason')
             existing_response.additional_comments = data.get('additional_comments')
-            # Update campaign if there's an active one, otherwise preserve existing
-            if campaign_id:
-                existing_response.campaign_id = campaign_id
-            # Update association if available (new system)
             if association_id:
                 existing_response.campaign_participant_id = association_id
-            # Track when response was last updated
             existing_response.updated_at = datetime.utcnow()
-
             response = existing_response
         else:
-            # Create new survey response with potentially anonymized data
+            # Create new response
             response = SurveyResponse(
                 company_name=response_data['company_name'],
                 respondent_name=response_data['respondent_name'],
@@ -1099,7 +1101,7 @@ def submit_survey():
                 recommendation_reason=data.get('recommendation_reason'),
                 additional_comments=data.get('additional_comments'),
                 campaign_id=campaign_id,
-                campaign_participant_id=association_id  # Link to campaign-participant association
+                campaign_participant_id=association_id
             )
             
             # Ensure trial participant exists and is associated with campaign
@@ -2929,15 +2931,23 @@ def finalize_conversation():
         # Apply anonymization if campaign requires it
         response_data = anonymize_response_data(campaign, response_data)
         
-        # Check for existing response to update instead of creating duplicate
-        # CRITICAL FIX: Scope lookup to campaign_id to prevent cross-campaign data corruption
-        existing_response = SurveyResponse.query.filter_by(
-            respondent_email=authenticated_email,
-            campaign_id=campaign_id
-        ).first() if campaign_id else None
+        # CRITICAL FIX: Smart lookup to prevent cross-campaign corruption while preserving analytics
+        # Priority: campaign_participant_id (durable invite ID) > (email, campaign_id) for legacy
+        existing_response = None
+        if association_id:
+            # New system: Use campaign_participant_id (one response per invitation)
+            existing_response = SurveyResponse.query.filter_by(
+                campaign_participant_id=association_id
+            ).first()
+        elif campaign_id:
+            # Legacy system: Use (email, campaign_id) to prevent cross-campaign corruption
+            existing_response = SurveyResponse.query.filter_by(
+                respondent_email=authenticated_email,
+                campaign_id=campaign_id
+            ).first()
         
         if existing_response:
-            # Update existing response within same campaign
+            # Update existing response (maintains one-row-per-campaign for analytics)
             existing_response.company_name = response_data['company_name']
             existing_response.respondent_name = response_data['respondent_name']
             existing_response.tenure_with_fc = structured_data.get('tenure_with_fc')
