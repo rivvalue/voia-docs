@@ -2549,15 +2549,14 @@ def api_account_intelligence():
         logger.info(f"📊 /api/account_intelligence called - campaign_id: {campaign_id}, page: {page}")
         
         # SECURITY: Determine target business account to enforce multi-tenant isolation
+        # CRITICAL FIX (Nov 22, 2025): Remove demo fallback to prevent cross-tenant data flash
         current_account = get_current_business_account()
-        if current_account:
-            target_business_account_id = current_account.id
-            account_context = f"business account {current_account.name}"
-            logger.info(f"✅ /api/account_intelligence - Authenticated user: {current_account.name} (ID: {target_business_account_id})")
-        else:
-            target_business_account_id = 1
-            account_context = "demo account"
-            logger.warning(f"⚠️ /api/account_intelligence - UNAUTHENTICATED REQUEST - Defaulting to demo account (ID: 1)")
+        if not current_account:
+            # Return error instead of defaulting to demo account
+            return jsonify({'error': 'Authentication required'}), 401
+        
+        target_business_account_id = current_account.id
+        account_context = f"business account {current_account.name}"
         
         # SECURITY: If no campaign specified, default to active campaign for target business account
         if campaign_id is None:
