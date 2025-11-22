@@ -210,6 +210,7 @@ class AIConversationalSurvey:
         """PERFORMANCE OPTIMIZATION: Single API call for extraction + next question
         
         This reduces API calls from 2 to 1 per user response, cutting rate limit pressure in half
+        Uses system/user message structure for strong language enforcement
         """
         try:
             # Get context
@@ -225,16 +226,28 @@ class AIConversationalSurvey:
             history_text = self._format_conversation_history()
             
             # Generate hybrid prompt from template service (correct signature)
-            hybrid_prompt = self.template_service._generate_hybrid_prompt(
+            system_prompt = self.template_service._generate_hybrid_prompt(
                 extracted_data=self.extracted_data,
                 step_count=self.step_count,
                 conversation_history=history_text,
                 participant_data=self.participant_data
             )
             
-            prompt = f"""{hybrid_prompt}
-
-CURRENT STATE:
+            # Build language-specific final instructions
+            if campaign_language == 'fr':
+                language_instruction = """
+LANGUE REQUISE: FRANÇAIS
+Votre question suivante DOIT être en français. N'utilisez JAMAIS l'anglais dans votre réponse."""
+            elif campaign_language == 'es':
+                language_instruction = """
+IDIOMA REQUERIDO: ESPAÑOL
+Su próxima pregunta DEBE estar en español. NUNCA use inglés en su respuesta."""
+            else:
+                language_instruction = """
+REQUIRED LANGUAGE: ENGLISH
+Your next question MUST be in English."""
+            
+            user_prompt = f"""CURRENT STATE:
 - Step: {self.step_count}
 - Missing campaign goals: {missing_goals_text}
 - Already collected data: {list(self.extracted_data.keys())}
@@ -266,7 +279,7 @@ Return JSON with this EXACT format (match campaign goal field names exactly):
         "general_feedback": string or null
     }},
     "next_question": {{
-        "message": "Your next question in {campaign_language}",
+        "message": "Your next question here",
         "message_type": "ai_question",
         "step": "descriptive_step_name",
         "progress": number,
@@ -274,7 +287,9 @@ Return JSON with this EXACT format (match campaign goal field names exactly):
     }}
 }}
 
-CRITICAL: Keep is_complete=false. Backend controls survey completion, not you."""
+CRITICAL RULES:
+- Keep is_complete=false. Backend controls survey completion, not you.
+{language_instruction}"""
 
             # Model selection via environment variable
             conversation_model = os.environ.get('AI_CONVERSATION_MODEL', 'gpt-4o')
@@ -283,13 +298,19 @@ CRITICAL: Keep is_complete=false. Backend controls survey completion, not you.""
             self.ai_prompts_log.append({
                 'step': self.step_count,
                 'type': 'combined_extraction_and_question',
-                'prompt': prompt,
+                'system_prompt': system_prompt,
+                'user_prompt': user_prompt,
+                'language': campaign_language,
                 'timestamp': 'now'
             })
             
+            # CRITICAL: Use system/user message structure for proper language enforcement
             response = self.openai_client.chat.completions.create(
                 model=conversation_model,
-                messages=[{"role": "user", "content": prompt}],
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ],
                 response_format={"type": "json_object"},
                 max_tokens=800,
                 temperature=0.7
