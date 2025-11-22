@@ -1227,12 +1227,7 @@ def calculate_segmentation_analytics(campaign_id, business_account_id=None):
         business_account_id: Business account ID to enforce multi-tenant isolation
     """
     try:
-        from models import Participant, CampaignParticipant, Campaign
-        from sqlalchemy.orm import aliased
-        
-        # SECURITY FIX: Use LEFT OUTER JOIN to include responses without participant records
-        # Filter by SurveyResponse.business_account_id (via Campaign) instead of Participant
-        # This ensures historical responses without participant data are included
+        from models import Participant, CampaignParticipants, Campaign
         
         # Get business_account_id from Campaign if not provided
         if campaign_id and not business_account_id:
@@ -1241,6 +1236,7 @@ def calculate_segmentation_analytics(campaign_id, business_account_id=None):
                 business_account_id = campaign.business_account_id
         
         # Build query with LEFT OUTER JOINs to preserve responses without participant data
+        # Note: Table name is campaign_participants (plural), model is CampaignParticipants
         segmentation_query = db.session.query(
             SurveyResponse.nps_score,
             SurveyResponse.satisfaction_rating,
@@ -1249,11 +1245,11 @@ def calculate_segmentation_analytics(campaign_id, business_account_id=None):
             Participant.customer_tier,
             Participant.client_industry
         ).outerjoin(
-            CampaignParticipant, 
-            SurveyResponse.campaign_participant_id == CampaignParticipant.id
+            CampaignParticipants, 
+            SurveyResponse.campaign_participant_id == CampaignParticipants.id
         ).outerjoin(
             Participant,
-            CampaignParticipant.participant_id == Participant.id
+            CampaignParticipants.participant_id == Participant.id
         ).join(
             Campaign,
             SurveyResponse.campaign_id == Campaign.id
@@ -1268,9 +1264,12 @@ def calculate_segmentation_analytics(campaign_id, business_account_id=None):
                 Campaign.business_account_id == business_account_id
             )
         
-        segmentation_query = segmentation_query.all()
+        print(f"DEBUG: Executing segmentation query for campaign {campaign_id}, business_account {business_account_id}")
+        segmentation_results = segmentation_query.all()
+        print(f"DEBUG: Segmentation query returned {len(segmentation_results)} rows")
         
-        if not segmentation_query:
+        if not segmentation_results:
+            print(f"DEBUG: No segmentation data for campaign {campaign_id}")
             return {}
         
         # Initialize segment collectors
@@ -1280,7 +1279,7 @@ def calculate_segmentation_analytics(campaign_id, business_account_id=None):
         industry_segments = {}
         
         # Process each response
-        for response in segmentation_query:
+        for response in segmentation_results:
             nps_score = response.nps_score
             satisfaction = response.satisfaction_rating
             role = response.role or 'Unspecified'
