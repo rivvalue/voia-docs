@@ -368,6 +368,13 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
     # COMPILE FINAL RESPONSE
     # ============================================================================
     
+    # Import segmentation analytics function
+    from data_storage import calculate_segmentation_analytics, get_company_nps_data, get_tenure_nps_data
+    
+    # Calculate segmentation analytics (DEBUG)
+    segmentation_data = calculate_segmentation_analytics(campaign_id) if campaign_id else {}
+    print(f"🔍 OPTIMIZER DEBUG - Campaign {campaign_id}: Segmentation keys = {list(segmentation_data.keys())}")
+    
     return {
         'total_responses': total_responses,
         'nps_score': round(nps_score, 1),
@@ -409,5 +416,8 @@ def get_optimized_dashboard_data(campaign_id=None, business_account_id=None):
                 }
                 for row in growth_factor_distribution
             ]
-        }
+        },
+        'company_nps_data': get_company_nps_data(),
+        'tenure_nps_data': get_tenure_nps_data(),
+        'segmentation_analytics': segmentation_data
     }
