@@ -906,15 +906,7 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             # Get campaign language for language-aware final instructions
             campaign_language = self.template_service._campaign_language_code or 'en'
             
-            # Create language-aware final instructions (CRITICAL FIX: prevents English override)
-            if campaign_language == 'fr':
-                final_instructions = """Soyez conversationnel, empathique et adaptez-vous à leur style de communication."""
-            elif campaign_language == 'es':
-                final_instructions = """Sea conversacional, empático y adaptativo a su estilo de comunicación."""
-            else:
-                final_instructions = """Be conversational, empathetic, and adaptive to their communication style."""
-            
-            # Build user prompt with customer response and next priority
+            # Build user prompt WITHOUT language-specific instructions (they're in system prompt)
             user_prompt = f"""CUSTOMER'S LATEST RESPONSE: "{user_input}"
 
 NEXT LOGICAL QUESTION PRIORITY:
@@ -927,9 +919,7 @@ RESPONSE FORMAT - Return JSON:
     "step": "descriptive_step_name",
     "progress": 0-100,
     "is_complete": true/false
-}}
-
-{final_instructions}"""
+}}"""
             
             # Log full prompt for debugging (language issues, prompt effectiveness, etc.)
             self.ai_prompts_log.append({
@@ -1556,6 +1546,9 @@ def finalize_ai_conversational_survey(context: Dict[str, Any]) -> Dict[str, Any]
         
         result = ai_survey.finalize_survey(finalization_context)
         logger.debug(f"Finalized result: {result}")
+        
+        # CRITICAL: Inject server-controlled ai_prompts_log for debugging (don't trust client data)
+        result['ai_prompts_log'] = json.dumps(ai_survey.ai_prompts_log) if ai_survey.ai_prompts_log else None
         
         if conversation_id in ai_conversation_instances:
             del ai_conversation_instances[conversation_id]

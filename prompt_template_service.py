@@ -547,11 +547,33 @@ class PromptTemplateService:
 
 You are speaking with a {role_label} at {company_name}."""
         
-        # Universal language instruction
+        # Universal language instruction with comprehensive language mapping
         language_instruction = ""
         if campaign_language and campaign_language != 'en':
-            language_map = {'fr': 'French', 'es': 'Spanish', 'de': 'German'}
-            language_name = language_map.get(campaign_language, campaign_language.upper())
+            # Comprehensive language mapping for all supported locales
+            language_map = {
+                'fr': 'French',
+                'es': 'Spanish',
+                'de': 'German',
+                'pt': 'Portuguese',
+                'it': 'Italian',
+                'nl': 'Dutch',
+                'pl': 'Polish',
+                'ru': 'Russian',
+                'zh': 'Chinese',
+                'ja': 'Japanese',
+                'ko': 'Korean',
+                'ar': 'Arabic'
+            }
+            language_name = language_map.get(campaign_language)
+            
+            if not language_name:
+                # Log unsupported language and default to campaign code
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning(f"Unsupported campaign language code: {campaign_language}. Using code directly.")
+                language_name = campaign_language.upper()
+            
             language_instruction = f"\n\nIMPORTANT: Conduct this entire conversation in {language_name}. Ask questions and respond in {language_name}."
         
         # Universal tone instruction
