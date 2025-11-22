@@ -664,55 +664,43 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         return extracted
     
     def _check_completion_criteria(self) -> bool:
-        """CAMPAIGN-AWARE: Check if we have enough data to complete the survey - USER EXPERIENCE FIRST"""
-        # Core requirements (minimum viable data)
-        has_nps = self.extracted_data.get('nps_score') is not None
-        has_reasoning = self.extracted_data.get('nps_reasoning') is not None or self.extracted_data.get('compliment_feedback') is not None or self.extracted_data.get('complaint_feedback') is not None or self.extracted_data.get('additional_comments') is not None
-        has_tenure = self.extracted_data.get('tenure_with_fc') is not None
-        
-        # Check for user frustration signals
+        """
+        CRITICAL FIX: Backend-controlled completion - ONLY complete when campaign goals are satisfied
+        OpenAI cannot decide completion - backend enforces this strictly
+        """
+        # Check for user frustration signals (emergency exit)
         user_frustrated = self._detect_user_frustration()
         
-        # Question limit enforcement - respect configured limits STRICTLY
+        # Question limit enforcement - hard cap
         max_questions = self.template_service.get_max_questions()
         at_question_limit = self.step_count >= max_questions
-        approaching_limit = self.step_count >= (max_questions - 1)  # Complete at limit-1 to avoid going over
         
-        # CAMPAIGN-AWARE: Check if campaign has prioritized topics that must be collected
+        # CRITICAL: Check if ALL campaign goals are satisfied
         has_campaign_priorities = self._check_campaign_priorities_collected()
         
-        # MINIMUM VIABLE DATA: NPS + some context is enough for valuable feedback
-        has_minimal_core = has_nps and (has_tenure or has_reasoning)
-        
-        # USER-FIRST COMPLETION LOGIC: Prioritize user experience over perfect data collection
-        # Complete survey if ANY of these conditions are met:
-        # 1. User shows frustration (immediate completion)
-        # 2. We've reached or approaching the question limit
-        # 3. CAMPAIGN-AWARE: We have campaign priorities collected OR we have core NPS data + some context
-        # 4. We have NPS deferred + some other meaningful data
+        # BACKEND-CONTROLLED COMPLETION LOGIC:
+        # Complete survey ONLY if:
+        # 1. User shows frustration (emergency exit - respect user experience)
+        # 2. We've reached the hard question limit
+        # 3. ALL campaign goals have been collected (primary trigger)
         
         completion_reasons = []
         
         if user_frustrated:
             completion_reasons.append("USER_FRUSTRATED")
+            logger.warning(f"⚠️ User frustration detected at step {self.step_count} - allowing early exit")
         if at_question_limit:
             completion_reasons.append("AT_QUESTION_LIMIT")
-        if approaching_limit and (has_campaign_priorities or has_minimal_core):
-            completion_reasons.append("APPROACHING_LIMIT_WITH_DATA")
-        # CAMPAIGN-AWARE: If campaign has custom priorities, require those to be collected
-        # Otherwise fall back to minimal core data (legacy behavior)
+            logger.warning(f"⚠️ Question limit ({max_questions}) reached")
         if has_campaign_priorities:
-            completion_reasons.append("CAMPAIGN_PRIORITIES_COLLECTED")
-        elif has_minimal_core and self.step_count >= 5:  # Increased from 3 to 5 to allow more questions
-            completion_reasons.append("HAS_MINIMAL_CORE_DATA")
-        if self.nps_deferred and has_reasoning and self.step_count >= 2:
-            completion_reasons.append("NPS_DEFERRED_WITH_FEEDBACK")
+            completion_reasons.append("ALL_CAMPAIGN_GOALS_COLLECTED")
+            logger.info(f"✅ All campaign goals collected at step {self.step_count}")
         
         completion_ready = len(completion_reasons) > 0
         
-        logger.debug(f"COMPLETION CHECK: NPS={has_nps}, Tenure={has_tenure}, Reasoning={has_reasoning}, Frustrated={user_frustrated}, Steps={self.step_count}/{max_questions}, Ready={completion_ready}")
+        logger.debug(f"BACKEND COMPLETION CHECK: Frustrated={user_frustrated}, AtLimit={at_question_limit}, AllGoals={has_campaign_priorities}, Steps={self.step_count}/{max_questions}, Ready={completion_ready}")
         if completion_reasons:
-            logger.info(f"REASONS: {', '.join(completion_reasons)}")
+            logger.info(f"COMPLETION REASONS: {', '.join(completion_reasons)}")
         
         return completion_ready
     
