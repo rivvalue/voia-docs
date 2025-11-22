@@ -636,20 +636,35 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
                     extracted['tenure_with_fc'] = tenure_option
                     break
         
-        # Extract improvement suggestions
+        # CRITICAL FIX: Map feedback to topic-specific fields based on current context
+        # This ensures unique fields per topic for backend-controlled completion
+        
+        # Determine which feedback field to use based on current topic
+        feedback_field = self._get_feedback_field_for_topic()
+        
+        # Extract improvement suggestions (topic-aware)
         improvement_indicators = ['improve', 'better', 'fix', 'change', 'enhance', 'upgrade', 'should', 'could', 'need to', 'would like']
         if any(indicator in text_lower for indicator in improvement_indicators):
-            extracted['improvement_feedback'] = user_input
+            if feedback_field:
+                extracted[feedback_field] = user_input
+            else:
+                extracted['improvement_feedback'] = user_input  # Fallback
         
-        # Extract compliments
+        # Extract compliments (topic-aware)
         positive_indicators = ['love', 'great', 'excellent', 'amazing', 'wonderful', 'fantastic', 'good job', 'well done', 'appreciate']
         if any(indicator in text_lower for indicator in positive_indicators):
-            extracted['compliment_feedback'] = user_input
+            if feedback_field:
+                extracted[feedback_field] = user_input
+            else:
+                extracted['compliment_feedback'] = user_input  # Fallback
         
-        # Extract complaints
+        # Extract complaints (topic-aware)
         negative_indicators = ['problem', 'issue', 'difficult', 'hard', 'confusing', 'slow', 'expensive', 'bad', 'worst', 'hate']
         if any(indicator in text_lower for indicator in negative_indicators):
-            extracted['complaint_feedback'] = user_input
+            if feedback_field:
+                extracted[feedback_field] = user_input
+            else:
+                extracted['complaint_feedback'] = user_input  # Fallback
         
         # Store reasoning if it seems like reasoning OR if it's any substantive response
         reasoning_indicators = ['because', 'since', 'due to', 'reason', 'why', 'that\'s why', 'good', 'bad', 'great', 'poor', 'like', 'dislike', 'satisfied', 'happy', 'disappointed']
@@ -736,6 +751,33 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
                 return True
         
         return False
+    
+    def _get_feedback_field_for_topic(self) -> str:
+        """
+        Map current topic to appropriate feedback field for backend-controlled completion
+        Returns the unique feedback field name based on current question topic
+        """
+        if not self.current_topic:
+            return None
+        
+        topic_lower = self.current_topic.lower()
+        
+        # Map topics to unique feedback fields
+        if 'product quality' in topic_lower:
+            return 'product_quality_feedback'
+        elif 'support experience' in topic_lower or 'support quality' in topic_lower:
+            return 'support_experience_feedback'
+        elif 'service rating' in topic_lower or 'service quality' in topic_lower:
+            return 'service_rating_feedback'
+        elif 'user experience' in topic_lower or 'ux' in topic_lower or 'usability' in topic_lower:
+            return 'user_experience_feedback'
+        elif 'feature' in topic_lower:
+            return 'feature_requests'
+        elif 'improvement' in topic_lower:
+            return 'improvement_feedback'
+        else:
+            # For any other topic, use general_feedback
+            return 'general_feedback'
     
     def _check_campaign_priorities_collected(self) -> bool:
         """
