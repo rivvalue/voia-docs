@@ -59,6 +59,9 @@ class SurveyResponse(db.Model):
     # Conversational transcript
     conversation_history = db.Column(db.Text, nullable=True)  # JSON string of conversation transcript
     
+    # AI prompts debugging log (JSON array of all prompts sent to OpenAI during conversation)
+    ai_prompts_log = db.Column(db.Text, nullable=True)  # For debugging language issues and prompt effectiveness
+    
     # Full-text search vector (automatically maintained by PostgreSQL trigger)
     conversation_search = db.Column(TSVECTOR, nullable=True)
     
