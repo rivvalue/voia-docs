@@ -224,11 +224,12 @@ class AIConversationalSurvey:
             # Build conversation history for context
             history_text = self._format_conversation_history()
             
-            # Generate hybrid prompt from template service
+            # Generate hybrid prompt from template service (correct signature)
             hybrid_prompt = self.template_service._generate_hybrid_prompt(
-                company_name=company_name,
-                participant_data=self.participant_data,
-                conversation_history=history_text
+                extracted_data=self.extracted_data,
+                step_count=self.step_count,
+                conversation_history=history_text,
+                participant_data=self.participant_data
             )
             
             prompt = f"""{hybrid_prompt}
