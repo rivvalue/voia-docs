@@ -38,6 +38,14 @@ class SurveyResponse(db.Model):
     recommendation_reason = db.Column(db.Text)
     additional_comments = db.Column(db.Text)
     
+    # New unique feedback fields for topic-specific responses (backend-controlled completion)
+    product_quality_feedback = db.Column(db.Text, nullable=True)
+    support_experience_feedback = db.Column(db.Text, nullable=True)
+    service_rating_feedback = db.Column(db.Text, nullable=True)
+    user_experience_feedback = db.Column(db.Text, nullable=True)
+    feature_requests = db.Column(db.Text, nullable=True)
+    general_feedback = db.Column(db.Text, nullable=True)
+    
     # AI Analysis results
     sentiment_score = db.Column(db.Float)
     sentiment_label = db.Column(db.String(50))
@@ -102,6 +110,12 @@ class SurveyResponse(db.Model):
             'improvement_feedback': self.improvement_feedback,
             'recommendation_reason': self.recommendation_reason,
             'additional_comments': self.additional_comments,
+            'product_quality_feedback': self.product_quality_feedback,
+            'support_experience_feedback': self.support_experience_feedback,
+            'service_rating_feedback': self.service_rating_feedback,
+            'user_experience_feedback': self.user_experience_feedback,
+            'feature_requests': self.feature_requests,
+            'general_feedback': self.general_feedback,
             'sentiment_score': self.sentiment_score,
             'sentiment_label': self.sentiment_label,
             'key_themes': json.loads(self.key_themes) if self.key_themes else [],
