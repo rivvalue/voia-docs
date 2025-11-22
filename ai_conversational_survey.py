@@ -253,8 +253,14 @@ Extract any of the following data present in the response:
 - Service quality rating (1-5): Service/professional ratings like "service is 4", "I rate their service 3" (1-5 only)  
 - Product value rating (1-5): Product/solution ratings like "product is 2", "I rate the value 4" (1-5 only)
 - Pricing rating (1-5): Pricing ratings like "price is fair, 3", "I rate pricing 2" (1-5 only)
-- Support rating (1-5): Support ryouatings like "support gets a 4", customer service numbers (1-5 only)
-- Improvement suggestions: Any feedback about what could be better
+- Support rating (1-5): Support ratings like "support gets a 4", customer service numbers (1-5 only)
+- Improvement suggestions: General feedback about what could be better
+- Product quality feedback: Specific feedback about product quality, reliability, performance
+- Support experience feedback: Specific feedback about support experience, responsiveness
+- Service rating feedback: Specific feedback about service quality, delivery
+- User experience feedback: Specific feedback about UX, ease of use, interface
+- Feature requests: Requests for new features or capabilities
+- General feedback: Any other topic-specific feedback
 - Compliments: What they liked or appreciated  
 - Complaints: What they didn't like or found problematic
 - Reasons: Why they gave their rating or recommendation
