@@ -1560,6 +1560,14 @@ function populateDashboard() {
             loadTenureNpsData();
         }, 300);
         
+        // Defer segmentation insights (Segmentation tab - not visible initially)
+        setTimeout(() => {
+            console.log('About to call renderSegmentationInsights...');
+            if (typeof renderSegmentationInsights === 'function') {
+                renderSegmentationInsights(dashboardData);
+            }
+        }, 350);
+        
         console.log('✅ Deferred data loading scheduled');
     });
     
