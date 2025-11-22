@@ -1514,18 +1514,16 @@ def dashboard_data():
         # Get campaign filter parameter
         campaign_id = request.args.get('campaign_id', type=int)
         
-        # Determine target business account: authenticated users see their data, public users see demo data
+        # SECURITY FIX (Nov 22, 2025): Remove demo fallback to prevent cross-tenant data flash
+        # Campaign Insights page is protected by @require_business_auth, so users MUST be authenticated
         current_account = get_current_business_account()
-        if current_account:
-            # Business user: scope to their account
-            target_business_account_id = current_account.id
-            account_context = f"business account {current_account.name}"
-            logger.info(f"✅ Authenticated request - Business Account: {current_account.name} (ID: {target_business_account_id})")
-        else:
-            # Public user: scope to demo account (Archelo Group - ID 1)
-            target_business_account_id = 1
-            account_context = "demo account"
-            logger.info(f"⚠️ Unauthenticated request - Defaulting to demo account (ID: 1)")
+        if not current_account:
+            # Return error instead of defaulting to demo account
+            return jsonify({'error': 'Authentication required'}), 401
+        
+        target_business_account_id = current_account.id
+        account_context = f"business account {current_account.name}"
+        logger.info(f"✅ Authenticated request - Business Account: {current_account.name} (ID: {target_business_account_id})")
         
         # If campaign_id provided, validate it belongs to target business account
         if campaign_id:
