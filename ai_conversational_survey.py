@@ -735,12 +735,17 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         # Check recent user messages for frustration signals
         recent_messages = [msg for msg in self.conversation_history[-3:] if msg['sender'] == 'User']
         
+        # CRITICAL: Only detect SURVEY frustration, not product feedback frustration
+        # Use specific phrases to avoid false positives like "not enough support" → "enough"
         frustration_keywords = [
-            'repeating', 'repeat', 'over and over', 'again', 'already told you',
-            'already answered', 'already said', 'done', 'enough', 'stop',
-            'frustrated', 'annoying', 'irritating', 'waste of time',
-            'same question', 'asked this already', 'keep asking',
-            'how many times', 'told you already', 'finished', 'complete'
+            'repeating yourself', 'repeating the same', 'keep repeating', 
+            'over and over', 'already told you', 'already answered',
+            'already said that', "i'm done", 'done with this', "that's enough",
+            'enough questions', 'stop asking', 'frustrated with this survey',
+            'annoying survey', 'irritating questions', 'waste of my time',
+            'same question again', 'asked this already', 'keep asking the same',
+            'how many times do i', 'told you this already', 
+            'i want to finish', 'let me finish', 'can we finish'
         ]
         
         for message in recent_messages:
