@@ -857,7 +857,14 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
                     custom_topics.append({"topic": topic_name, "description": topic_name, "fields": ["improvement_feedback"]})
             
             # Merge with base topics
-            used_base_topics = [t for t in base_topics_map if not any(ct["topic"].lower() in t["topic"].lower() for ct in custom_topics)]
+            # CRITICAL FIX: Filter bi-directionally to prevent duplicates (e.g., "NPS" and "NPS Score")
+            used_base_topics = [
+                t for t in base_topics_map 
+                if not any(
+                    ct["topic"].lower() in t["topic"].lower() or t["topic"].lower() in ct["topic"].lower() 
+                    for ct in custom_topics
+                )
+            ]
             all_topics = custom_topics + used_base_topics[:10 - len(custom_topics)]
         else:
             all_topics = base_topics_map[:10]
@@ -873,6 +880,7 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
         company_name = self.get_company_name()
         
         # Build participant profile if data provided
+        # CRITICAL FIX: Do NOT include participant language - campaign language always takes precedence
         participant_profile = None
         if participant_data:
             participant_profile = {
@@ -881,8 +889,7 @@ RESPONSE FORMAT: Return only the next question or response. No system messages o
                 "company": participant_data.get("company_name"),
                 "role": participant_data.get("role"),
                 "region": participant_data.get("region"),
-                "customer_tier": participant_data.get("customer_tier"),
-                "language": participant_data.get("language", "en")
+                "customer_tier": participant_data.get("customer_tier")
             }
         
         # Build context block with campaign overrides (uses cached primitives)
