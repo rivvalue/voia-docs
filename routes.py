@@ -1599,14 +1599,12 @@ def survey_responses():
         from models import SurveyResponse, Campaign
         from business_auth_routes import get_current_business_account
         
-        # Determine target business account: authenticated users see their data, public users see demo data
+        # SECURITY FIX (Nov 22, 2025): Campaign Insights requires authentication
         current_account = get_current_business_account()
-        if current_account:
-            # Business user: scope to their account
-            target_business_account_id = current_account.id
-        else:
-            # Public user: scope to demo account (Archelo Group - ID 1)
-            target_business_account_id = 1
+        if not current_account:
+            return jsonify({'error': 'Authentication required', 'success': False}), 401
+        
+        target_business_account_id = current_account.id
         
         page = request.args.get('page', 1, type=int)
         per_page = min(request.args.get('per_page', 10, type=int), 100)  # Max 100 per page
@@ -2141,14 +2139,13 @@ def api_company_nps():
         
         logger.info(f"📊 /api/company_nps called - campaign_id: {campaign_id}, page: {page}, search: '{search_query}'")
         
-        # SECURITY: Determine target business account to enforce multi-tenant isolation
+        # SECURITY FIX (Nov 22, 2025): Campaign Insights requires authentication
         current_account = get_current_business_account()
-        if current_account:
-            target_business_account_id = current_account.id
-            account_context = f"business account {current_account.name}"
-        else:
-            target_business_account_id = 1
-            account_context = "demo account"
+        if not current_account:
+            return jsonify({'error': 'Authentication required', 'success': False}), 401
+        
+        target_business_account_id = current_account.id
+        account_context = f"business account {current_account.name}"
         
         # SECURITY: If no campaign specified, default to active campaign for target business account
         if campaign_id is None:
@@ -2355,14 +2352,13 @@ def api_tenure_nps():
         
         logger.info(f"📊 /api/tenure_nps called - campaign_id: {campaign_id}, page: {page}")
         
-        # SECURITY: Determine target business account to enforce multi-tenant isolation
+        # SECURITY FIX (Nov 22, 2025): Campaign Insights requires authentication
         current_account = get_current_business_account()
-        if current_account:
-            target_business_account_id = current_account.id
-            account_context = f"business account {current_account.name}"
-        else:
-            target_business_account_id = 1
-            account_context = "demo account"
+        if not current_account:
+            return jsonify({'error': 'Authentication required', 'success': False}), 401
+        
+        target_business_account_id = current_account.id
+        account_context = f"business account {current_account.name}"
         
         # SECURITY: If no campaign specified, default to active campaign for target business account
         if campaign_id is None:
