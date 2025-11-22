@@ -1513,24 +1513,19 @@ def dashboard_data():
         
         # Get campaign filter parameter
         campaign_id = request.args.get('campaign_id', type=int)
-        allow_demo = request.args.get('allow_demo', 'false').lower() == 'true'
         
-        # SECURITY FIX (Nov 22, 2025): Only allow demo fallback when explicitly requested
+        # Determine target business account: authenticated users see their data, public users see demo data
         current_account = get_current_business_account()
-        if not current_account:
-            if allow_demo:
-                # Dashboard page for unauthenticated users - use demo account
-                target_business_account_id = 1
-                account_context = "demo account"
-                logger.info(f"⚠️ Unauthenticated request with allow_demo=true - Defaulting to demo account (ID: 1)")
-            else:
-                # Campaign Insights or authenticated-only page - require login
-                return jsonify({'error': 'Authentication required'}), 401
-        else:
-            # Authenticated user - use their account
+        if current_account:
+            # Business user: scope to their account
             target_business_account_id = current_account.id
             account_context = f"business account {current_account.name}"
             logger.info(f"✅ Authenticated request - Business Account: {current_account.name} (ID: {target_business_account_id})")
+        else:
+            # Public user: scope to demo account (Archelo Group - ID 1)
+            target_business_account_id = 1
+            account_context = "demo account"
+            logger.info(f"⚠️ Unauthenticated request - Defaulting to demo account (ID: 1)")
         
         # If campaign_id provided, validate it belongs to target business account
         if campaign_id:
@@ -1603,12 +1598,14 @@ def survey_responses():
         from models import SurveyResponse, Campaign
         from business_auth_routes import get_current_business_account
         
-        # SECURITY FIX (Nov 22, 2025): Campaign Insights requires authentication
+        # Determine target business account: authenticated users see their data, public users see demo data
         current_account = get_current_business_account()
-        if not current_account:
-            return jsonify({'error': 'Authentication required', 'success': False}), 401
-        
-        target_business_account_id = current_account.id
+        if current_account:
+            # Business user: scope to their account
+            target_business_account_id = current_account.id
+        else:
+            # Public user: scope to demo account (Archelo Group - ID 1)
+            target_business_account_id = 1
         
         page = request.args.get('page', 1, type=int)
         per_page = min(request.args.get('per_page', 10, type=int), 100)  # Max 100 per page
@@ -2143,13 +2140,14 @@ def api_company_nps():
         
         logger.info(f"📊 /api/company_nps called - campaign_id: {campaign_id}, page: {page}, search: '{search_query}'")
         
-        # SECURITY FIX (Nov 22, 2025): Campaign Insights requires authentication
+        # SECURITY: Determine target business account to enforce multi-tenant isolation
         current_account = get_current_business_account()
-        if not current_account:
-            return jsonify({'error': 'Authentication required', 'success': False}), 401
-        
-        target_business_account_id = current_account.id
-        account_context = f"business account {current_account.name}"
+        if current_account:
+            target_business_account_id = current_account.id
+            account_context = f"business account {current_account.name}"
+        else:
+            target_business_account_id = 1
+            account_context = "demo account"
         
         # SECURITY: If no campaign specified, default to active campaign for target business account
         if campaign_id is None:
@@ -2356,13 +2354,14 @@ def api_tenure_nps():
         
         logger.info(f"📊 /api/tenure_nps called - campaign_id: {campaign_id}, page: {page}")
         
-        # SECURITY FIX (Nov 22, 2025): Campaign Insights requires authentication
+        # SECURITY: Determine target business account to enforce multi-tenant isolation
         current_account = get_current_business_account()
-        if not current_account:
-            return jsonify({'error': 'Authentication required', 'success': False}), 401
-        
-        target_business_account_id = current_account.id
-        account_context = f"business account {current_account.name}"
+        if current_account:
+            target_business_account_id = current_account.id
+            account_context = f"business account {current_account.name}"
+        else:
+            target_business_account_id = 1
+            account_context = "demo account"
         
         # SECURITY: If no campaign specified, default to active campaign for target business account
         if campaign_id is None:
@@ -2550,14 +2549,13 @@ def api_account_intelligence():
         logger.info(f"📊 /api/account_intelligence called - campaign_id: {campaign_id}, page: {page}")
         
         # SECURITY: Determine target business account to enforce multi-tenant isolation
-        # CRITICAL FIX (Nov 22, 2025): Remove demo fallback to prevent cross-tenant data flash
         current_account = get_current_business_account()
-        if not current_account:
-            # Return error instead of defaulting to demo account
-            return jsonify({'error': 'Authentication required'}), 401
-        
-        target_business_account_id = current_account.id
-        account_context = f"business account {current_account.name}"
+        if current_account:
+            target_business_account_id = current_account.id
+            account_context = f"business account {current_account.name}"
+        else:
+            target_business_account_id = 1
+            account_context = "demo account"
         
         # SECURITY: If no campaign specified, default to active campaign for target business account
         if campaign_id is None:

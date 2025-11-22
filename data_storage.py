@@ -180,8 +180,6 @@ def get_dashboard_data_cached(campaign_id=None, business_account_id=None):
     
     Phase 2: 2-hour cache TTL for 10x performance improvement on repeat visits.
     SECURITY: Cache key MUST include business_account_id to prevent cross-tenant data leakage.
-    CRITICAL FIX (Nov 22, 2025): Bypass cache for authenticated users (business_account_id != 1)
-    to prevent demo data flash before real data loads due to auth cookie timing issues.
     """
     import time
     start_time = time.time()
@@ -189,30 +187,6 @@ def get_dashboard_data_cached(campaign_id=None, business_account_id=None):
     # Generate TENANT-SCOPED cache key for multi-tenant security
     cache_key = f"dashboard_data_campaign{campaign_id}_tenant{business_account_id}"
     logger.info(f"🔍 DEBUG: Dashboard cache request | Campaign: {campaign_id} | Business Account: {business_account_id} | Cache Key: {cache_key}")
-    
-    # BYPASS CACHE for authenticated business users to prevent stale/demo data flash
-    # Demo account (ID=1) still benefits from caching for performance
-    if business_account_id and business_account_id != 1:
-        logger.info(f"⚡ CACHE BYPASS for authenticated user (Business Account ID: {business_account_id})")
-        # Skip cache.memoize decorator - call underlying function directly
-        use_optimized = os.environ.get('USE_OPTIMIZED_DASHBOARD', 'true').lower() == 'true'
-        if use_optimized:
-            try:
-                from dashboard_query_optimizer import get_optimized_dashboard_data
-                logger.info(f"✅ Using OPTIMIZED dashboard queries (NO CACHE)")
-                result = get_optimized_dashboard_data(campaign_id, business_account_id)
-                execution_time = (time.time() - start_time) * 1000
-                logger.info(f"⏱️ Dashboard data generated (UNCACHED) | Time: {execution_time:.0f}ms")
-                return result
-            except Exception as e:
-                logger.warning(f"⚠️ Optimized queries FAILED, falling back to original: {e}")
-        
-        # Fallback to original implementation (uncached)
-        logger.info(f"⏪ Using ORIGINAL dashboard queries (NO CACHE)")
-        result = get_dashboard_data(campaign_id, business_account_id)
-        execution_time = (time.time() - start_time) * 1000
-        logger.info(f"⏱️ Dashboard data generated (UNCACHED) | Time: {execution_time:.0f}ms | Key: {cache_key}")
-        return result
     
     # Check if we should use optimized queries
     use_optimized = os.environ.get('USE_OPTIMIZED_DASHBOARD', 'true').lower() == 'true'

@@ -116,33 +116,21 @@ function initializeCampaigns() {
     campaignsInitialized = true;
     console.log('🌍 Translations ready, initializing campaigns...');
     
-    // CRITICAL FIX (Nov 22, 2025): For authenticated business users, add a small delay
-    // to ensure session cookies are fully established before first API request.
-    // This prevents "demo data flash" where unauthenticated request defaults to demo account.
-    const isBusinessAuth = window.isBusinessAuthenticated === true;
-    const authDelay = isBusinessAuth ? 150 : 0; // 150ms delay for authenticated users
-    
-    if (isBusinessAuth) {
-        console.log('🔐 Business authenticated - adding 150ms delay for session cookie establishment');
-    }
-    
     // Load campaign filter options first, then initial dashboard data
-    setTimeout(() => {
-        loadCampaignFilterOptions().then(() => {
-            // Update global campaign indicator after filter is populated
-            updateGlobalCampaignIndicator();
-            
-            // Only load dashboard data if no default campaign was auto-selected
-            if (!selectedCampaignId) {
-                loadDashboardData().catch(error => {
-                    console.error('Initial dashboard load failed:', error);
-                });
-            }
-        });
+    loadCampaignFilterOptions().then(() => {
+        // Update global campaign indicator after filter is populated
+        updateGlobalCampaignIndicator();
         
-        // Load campaign comparison options
-        loadComparisonCampaignOptions();
-    }, authDelay);
+        // Only load dashboard data if no default campaign was auto-selected
+        if (!selectedCampaignId) {
+            loadDashboardData().catch(error => {
+                console.error('Initial dashboard load failed:', error);
+            });
+        }
+    });
+    
+    // Load campaign comparison options
+    loadComparisonCampaignOptions();
 }
 
 // ============================================================================
@@ -709,9 +697,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Force remove yellow colors immediately
     forceRemoveYellowColors();
     
-    // REMOVED (Nov 22, 2025): Fallback that caused cross-tenant data flash
-    // This loaded demo data before campaign filter was applied
-    // loadCompanyNpsDataDirect() is now only called from populateDashboard() with proper campaign context
+    // Immediate fallback for company NPS data
+    setTimeout(function() {
+        console.log('Fallback: Loading company NPS data directly');
+        loadCompanyNpsDataDirect();
+    }, 1000);
     
     // Setup tab event listeners
     setupTabEventListeners();
@@ -1448,11 +1438,6 @@ function loadDashboardData() {
     
     if (selectedCampaignId) {
         urlParams.append('campaign_id', selectedCampaignId);
-    }
-    
-    // Allow demo fallback for unauthenticated users on Dashboard page only
-    if (!window.isBusinessAuthenticated) {
-        urlParams.append('allow_demo', 'true');
     }
     
     // Add cache-busting timestamp
