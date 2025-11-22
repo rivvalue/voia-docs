@@ -905,6 +905,26 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             # For any other topic, use general_feedback
             return 'general_feedback'
     
+    def _get_missing_goals(self) -> list:
+        """Get list of missing campaign goal topics"""
+        survey_config = self.template_service.build_survey_config_json(self.participant_data)
+        
+        if not survey_config.get('goals'):
+            return []
+        
+        missing_goals = []
+        for goal in survey_config['goals']:
+            topic = goal.get('topic', '')
+            fields = goal.get('fields', [])
+            
+            # Check if at least one field from this goal is collected
+            goal_satisfied = any(self.extracted_data.get(field) is not None for field in fields)
+            
+            if not goal_satisfied:
+                missing_goals.append(topic)
+        
+        return missing_goals
+    
     def _check_campaign_priorities_collected(self) -> bool:
         """
         CRITICAL FIX: Backend-controlled completion - check if ALL campaign goals are satisfied
@@ -918,19 +938,8 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             logger.debug("CAMPAIGN PRIORITIES: No custom goals defined, using default completion logic")
             return False
         
-        # CRITICAL: Check if ALL fields for ALL goals are collected
-        # Don't use hardcoded map - use the actual fields from goals
-        missing_goals = []
-        for goal in survey_config['goals']:
-            topic = goal.get('topic', '')
-            fields = goal.get('fields', [])
-            
-            # Check if at least one field from this goal is collected
-            goal_satisfied = any(self.extracted_data.get(field) is not None for field in fields)
-            
-            if not goal_satisfied:
-                missing_goals.append(topic)
-        
+        # Use helper method to get missing goals
+        missing_goals = self._get_missing_goals()
         all_collected = len(missing_goals) == 0
         
         logger.info(f"BACKEND COMPLETION CHECK: {len(survey_config['goals'])} goals total, {len(missing_goals)} missing")
