@@ -1227,7 +1227,7 @@ def calculate_segmentation_analytics(campaign_id, business_account_id=None):
         business_account_id: Business account ID to enforce multi-tenant isolation
     """
     try:
-        from models import Participant, CampaignParticipants, Campaign
+        from models import Participant, CampaignParticipant, Campaign
         
         # Get business_account_id from Campaign if not provided
         if campaign_id and not business_account_id:
@@ -1245,11 +1245,11 @@ def calculate_segmentation_analytics(campaign_id, business_account_id=None):
             Participant.customer_tier,
             Participant.client_industry
         ).outerjoin(
-            CampaignParticipants, 
-            SurveyResponse.campaign_participant_id == CampaignParticipants.id
+            CampaignParticipant, 
+            SurveyResponse.campaign_participant_id == CampaignParticipant.id
         ).outerjoin(
             Participant,
-            CampaignParticipants.participant_id == Participant.id
+            CampaignParticipant.participant_id == Participant.id
         ).join(
             Campaign,
             SurveyResponse.campaign_id == Campaign.id
