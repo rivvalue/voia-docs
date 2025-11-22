@@ -649,8 +649,10 @@ SURVEY DATA COLLECTED SO FAR:
 
 CONVERSATION STEP: {step_count} / {max_questions}
 
-{universal_opening}{language_instruction}{tone_instruction}
-{context_usage_section}{goals_section}{guidelines_formatted}"""
+{universal_opening}{tone_instruction}
+{context_usage_section}{goals_section}{guidelines_formatted}
+
+{language_instruction}"""
     
     def _generate_legacy_prompt(self, extracted_data: Dict[str, Any], step_count: int, conversation_history: str) -> str:
         """Generate legacy system prompt (current implementation)"""
