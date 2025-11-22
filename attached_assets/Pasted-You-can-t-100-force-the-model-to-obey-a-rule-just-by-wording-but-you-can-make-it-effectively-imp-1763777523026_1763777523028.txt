@@ -1,0 +1,201 @@
+You can’t 100% “force” the model to obey a rule just by wording, but you can make it effectively impossible for the survey to stop early by:
+	1.	Taking the “stop / continue” decision away from the model
+	2.	Tightening the prompt logic so it behaves correctly
+
+Let’s do both.
+
+⸻
+
+1. Backend: you decide when the survey ends, not the model
+
+Right now you’re asking the model to output is_complete, and you sort of trust it.
+
+Instead, flip the logic:
+	•	The model’s job:
+👉 Ask the next question and extract data. That’s it.
+	•	Your backend’s job:
+👉 Check if all goals are satisfied; if yes, stop calling OpenAI.
+
+Step 1 — Treat is_complete from the model as advisory only
+
+Even if the model sends:
+
+"is_complete": true
+
+you ignore it and compute completion yourself.
+
+Step 2 — Compute “all goals answered” in Python
+
+You already have:
+	•	survey_config["goals"] – list of topics and fields
+	•	self.extracted_data – dict of captured answers
+
+Do something like:
+
+def all_goals_completed(goals, extracted_data):
+    for goal in goals:
+        for field in goal["fields"]:
+            value = extracted_data.get(field)
+            if value in (None, "", []):
+                return False
+    return True
+
+Then in your conversation loop:
+
+if all_goals_completed(survey_config["goals"], self.extracted_data):
+    # do NOT call OpenAI again
+    # finalize: save to DB, return closing message, etc.
+    return {
+        "message": "Merci beaucoup pour vos réponses, elles vont nous aider à améliorer votre expérience.",
+        "is_complete": True,
+        "extracted_data": self.extracted_data,
+    }
+else:
+    # call OpenAI to generate the next question
+    ...
+
+Result:
+The survey literally cannot stop until you see that all fields for all goals are filled.
+
+This is the real enforcement.
+
+⸻
+
+2. Prompt: tell the model it is not allowed to end
+
+Now, you still want the model to behave coherently. Update your system message so that:
+	•	It never decides on its own to end the survey.
+	•	It always assumes there is a “next topic” until you stop calling it.
+
+a) Add a clear “completion logic” block
+
+In your system prompt, add:
+
+COMPLETION RULES
+----------------
+- You are NOT allowed to decide when the survey ends.
+- The backend system decides when to stop calling you.
+- Therefore, you MUST always set "is_complete": false.
+- You MUST always return a next question unless the backend has indicated the survey is over (which it will do by not calling you again).
+- Do NOT write closing or farewell messages such as "merci pour votre temps" or "cela conclut le questionnaire".
+- Your only role is:
+  1) Use SURVEY DATA COLLECTED SO FAR and SURVEY GOALS to select the next topic with missing fields.
+  2) Ask ONE new question about that topic.
+
+And in the JSON you ask it to return:
+
+{
+  "message": "...",
+  "message_type": "question",
+  "step": 3,
+  "topic": "Product Quality",
+  "progress": 30,
+  "is_complete": false
+}
+
+The key part is:
+
+“You MUST always set "is_complete": false.”
+
+Since you are enforcing completion in the backend, it’s safe to hard-code that rule.
+
+⸻
+
+3. Make “all goals must be answered” explicit
+
+You can also state this very clearly in the instructions:
+
+GOAL COVERAGE REQUIREMENT
+-------------------------
+- You MUST treat every goal in SURVEY GOALS as mandatory.
+- For EACH goal, you MUST ensure that all its fields have been collected at least once.
+- When choosing the next question:
+  - Always pick the highest-priority goal with at least one missing field.
+- Never assume the survey is finished while there is any goal with missing fields.
+
+Combined with your backend completion check, this gives you:
+	•	Model thinks: “I must always find a next goal with missing fields.”
+	•	Backend guarantees: no more calls once all fields are filled.
+
+⸻
+
+4. Clean up your goal fields (important!)
+
+To make “all goals have answers” actually measurable, each topic must have its own field name.
+
+Bad (current):
+
+{
+  "topic": "Product Quality",
+  "fields": ["improvement_feedback"]
+},
+{
+  "topic": "Support Experience",
+  "fields": ["improvement_feedback"]
+}
+
+Good:
+
+{
+  "topic": "Product Quality",
+  "fields": ["product_quality_feedback"]
+},
+{
+  "topic": "Support Experience",
+  "fields": ["support_experience_feedback"]
+},
+{
+  "topic": "Service Rating",
+  "fields": ["service_rating_feedback"]
+},
+{
+  "topic": "User Experience",
+  "fields": ["user_experience_feedback"]
+},
+{
+  "topic": "Feature Requests",
+  "fields": ["feature_requests"]
+},
+{
+  "topic": "Improvement Suggestions",
+  "fields": ["improvement_suggestions"]
+}
+
+Otherwise, your backend can’t actually tell whether all goals are answered – it just sees one generic improvement_feedback.
+
+⸻
+
+5. If you want a soft “survey end” message
+
+You have two options:
+	1.	Backend sends it, not the model
+When all_goals_completed(...) is True, you just return a final “merci” message from Python.
+	2.	Or: pass a flag only at the very end:
+	•	When backend sees all goals filled, it calls OpenAI one last time with:
+
+COMPLETION_PERMISSION: true
+
+
+	•	And:
+
+When COMPLETION_PERMISSION is true, you may set "is_complete": true and return a short closing message instead of a new question.
+
+
+	•	All previous calls have COMPLETION_PERMISSION: false, and the model must keep is_complete: false.
+
+But the simplest + safest: don’t let the model close; just stop calling it.
+
+⸻
+
+TL;DR
+
+To enforce “survey must not stop until all goals have answers”:
+	1.	Backend enforcement (critical)
+	•	Compute all_goals_completed in Python from goals + extracted_data.
+	•	Stop calling OpenAI only when that is True (or when you hit max_questions / timeout).
+	2.	Prompt discipline (supporting)
+	•	Tell the model it must always set is_complete: false and never send closing messages.
+	•	Make “each goal is mandatory” explicit.
+	•	Give each goal its own field name so your backend can actually verify completion.
+
+If you want, next step I can draft a full updated system prompt that includes these rules and your goals, ready to paste into your code.

@@ -156,8 +156,10 @@ class AIConversationalSurvey:
                 'is_complete': True
             }
         
+        # CRITICAL FIX: Backend controls completion, NOT OpenAI
         # Check if we have enough data to complete
         if self._check_completion_criteria():
+            # Don't call OpenAI - backend decides survey is complete
             next_question = {
                 'message': self.template_service.get_completion_message(),
                 'message_type': 'completion',
@@ -166,9 +168,15 @@ class AIConversationalSurvey:
                 'is_complete': True
             }
             self.is_complete = True
+            logger.info(f"✅ BACKEND COMPLETION: Survey ended by VOÏA at step {self.step_count}")
         else:
             # Generate next AI question using updated data
             next_question = self._generate_ai_question(user_input, context)
+            
+            # CRITICAL: Override OpenAI's is_complete decision - backend decides
+            if next_question.get('is_complete'):
+                logger.warning(f"⚠️ OpenAI tried to end survey at step {self.step_count} - OVERRIDDEN by backend")
+                next_question['is_complete'] = False  # Force continue
         
         # Add AI response to conversation history
         if not next_question.get('is_complete', False):
@@ -736,7 +744,10 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         return False
     
     def _check_campaign_priorities_collected(self) -> bool:
-        """CAMPAIGN-AWARE: Check if campaign's prioritized topics have been collected"""
+        """
+        CRITICAL FIX: Backend-controlled completion - check if ALL campaign goals are satisfied
+        This prevents OpenAI from deciding to end the survey prematurely
+        """
         # Get campaign's prioritized topics from survey config
         survey_config = self.template_service.build_survey_config_json(self.participant_data)
         
@@ -745,33 +756,24 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
             logger.debug("CAMPAIGN PRIORITIES: No custom goals defined, using default completion logic")
             return False
         
-        # Map goals to required fields
-        required_fields_map = {
-            'NPS': ['nps_score'],
-            'Overall Satisfaction': ['satisfaction_rating'],
-            'Professional Services Quality': ['service_rating'],
-            'Support Quality': ['support_rating'],
-            'Product Value': ['product_value_rating'],
-            'Pricing Value': ['pricing_rating'],
-            'Improvement Suggestions': ['improvement_feedback', 'complaint_feedback', 'additional_comments']
-        }
-        
-        # Get required fields from prioritized topics (top 5 only to avoid overloading users)
-        required_fields = []
-        for goal in survey_config['goals'][:5]:
+        # CRITICAL: Check if ALL fields for ALL goals are collected
+        # Don't use hardcoded map - use the actual fields from goals
+        missing_goals = []
+        for goal in survey_config['goals']:
             topic = goal.get('topic', '')
-            if topic in required_fields_map:
-                required_fields.extend(required_fields_map[topic])
+            fields = goal.get('fields', [])
+            
+            # Check if at least one field from this goal is collected
+            goal_satisfied = any(self.extracted_data.get(field) is not None for field in fields)
+            
+            if not goal_satisfied:
+                missing_goals.append(topic)
         
-        if not required_fields:
-            logger.debug("CAMPAIGN PRIORITIES: No mappable fields found in goals")
-            return False
+        all_collected = len(missing_goals) == 0
         
-        # Check if all required fields have been collected
-        collected_fields = [field for field in required_fields if self.extracted_data.get(field) is not None]
-        all_collected = len(collected_fields) == len(required_fields)
-        
-        logger.debug(f"CAMPAIGN PRIORITIES: Required={required_fields}, Collected={collected_fields}, AllCollected={all_collected}")
+        logger.info(f"BACKEND COMPLETION CHECK: {len(survey_config['goals'])} goals total, {len(missing_goals)} missing")
+        if missing_goals:
+            logger.info(f"MISSING GOALS: {missing_goals[:3]}...")  # Show first 3
         
         return all_collected
     

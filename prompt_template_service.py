@@ -60,6 +60,17 @@ TOPIC_FIELD_MAP = {
 # Note: Context fields are built dynamically in prompt generation to avoid "Not specified" placeholders
 UNIVERSAL_GUIDELINES = """
 ==========================
+COMPLETION RULES (CRITICAL)
+==========================
+
+YOU ARE NOT ALLOWED TO DECIDE WHEN THE SURVEY ENDS.
+- The backend system controls completion by checking if all goals are satisfied
+- You MUST ALWAYS set "is_complete": false in your response
+- DO NOT write closing/farewell messages like "merci pour votre temps" or "cela conclut le questionnaire"
+- The backend will stop calling you when all goals are complete - you will never see that happen
+- Your ONLY role: ask the next question based on missing fields
+
+==========================
 CONVERSATION FLOW
 ==========================
 
@@ -77,10 +88,19 @@ YOUR RESPONSIBILITIES
 1. Follow SURVEY GOALS in priority order - complete each topic before moving to the next
 2. Ask ONE question at a time in a {tone} conversational style
 3. Before asking any question, check SURVEY DATA COLLECTED SO FAR - only ask for MISSING fields
-4. Stop when max_questions ({max_questions}) is reached
+4. NEVER decide to end the survey - always return "is_complete": false
 5. Use context provided above to make questions relevant to the participant's situation
 6. Maintain natural conversation flow while respecting all structural constraints
 7. If a participant provides multiple pieces of information, acknowledge all but focus your next question on the current priority goal
+
+==========================
+GOAL COVERAGE REQUIREMENT
+==========================
+
+- You MUST treat every goal in SURVEY GOALS as mandatory
+- For EACH goal, you MUST ensure that all its fields have been collected at least once
+- When choosing the next question: Always pick the highest-priority goal with at least one missing field
+- Never assume the survey is finished while there is any goal with missing fields
 
 ==========================
 INDUSTRY-SPECIFIC VOCABULARY
@@ -95,6 +115,7 @@ When forming a question for a topic with an [Industry focus] hint:
 Be empathetic, adapt to user communication style, and keep the conversation natural while respecting all constraints.
 
 RESPONSE FORMAT: Return JSON with fields: message, message_type, step, topic, progress, is_complete
+CRITICAL: "is_complete" MUST ALWAYS BE false
 """
 
 # Role-Based Metadata for Conversational Surveys
