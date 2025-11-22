@@ -2553,9 +2553,11 @@ def api_account_intelligence():
         if current_account:
             target_business_account_id = current_account.id
             account_context = f"business account {current_account.name}"
+            logger.info(f"✅ /api/account_intelligence - Authenticated user: {current_account.name} (ID: {target_business_account_id})")
         else:
             target_business_account_id = 1
             account_context = "demo account"
+            logger.warning(f"⚠️ /api/account_intelligence - UNAUTHENTICATED REQUEST - Defaulting to demo account (ID: 1)")
         
         # SECURITY: If no campaign specified, default to active campaign for target business account
         if campaign_id is None:
