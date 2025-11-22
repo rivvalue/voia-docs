@@ -1150,7 +1150,7 @@ RESPONSE FORMAT - Return JSON:
                     'is_complete': False
                 }
 
-        if self.step_count == 2:
+        elif self.step_count == 2:
             # Second question: Ask for NPS about {company_name} (the supplier) ONLY if we don't have it
             if self.extracted_data.get('nps_score') is None:
                 return {
@@ -1160,11 +1160,44 @@ RESPONSE FORMAT - Return JSON:
                     'progress': 25,
                     'is_complete': False
                 }
+            # If we have NPS but no reasoning, ask for reasoning
+            elif not self.extracted_data.get('nps_reasoning'):
+                score = self.extracted_data.get('nps_score')
+                if score >= 9:
+                    return {
+                        'message': self._get_translated_message('nps_promoter', company_name=company_name, score=score),
+                        'message_type': 'ai_question',
+                        'step': 'nps_reasoning',
+                        'progress': 40,
+                        'is_complete': False
+                    }
+                elif score >= 7:
+                    return {
+                        'message': self._get_translated_message('nps_passive', company_name=company_name, score=score),
+                        'message_type': 'ai_question',
+                        'step': 'nps_reasoning',
+                        'progress': 40,
+                        'is_complete': False
+                    }
+                else:
+                    return {
+                        'message': self._get_translated_message('nps_detractor', company_name=company_name, score=score),
+                        'message_type': 'ai_question',
+                        'step': 'nps_reasoning',
+                        'progress': 40,
+                        'is_complete': False
+                    }
             else:
-                # We already have NPS score from previous data, go to step 3 logic
-                pass  # Fall through to step 3 logic
+                # Move to satisfaction question
+                return {
+                    'message': self._get_translated_message('satisfaction_question', company_name=company_name),
+                    'message_type': 'ai_question',
+                    'step': 'satisfaction',
+                    'progress': 45,
+                    'is_complete': False
+                }
         
-        if self.step_count == 3:
+        elif self.step_count == 3:
             # Check if we just got NPS score and need to ask reasoning question
             if extracted.get('nps_score') is not None or self.extracted_data.get('nps_score') is not None:
                 # We just got the NPS score, ask for reasoning
