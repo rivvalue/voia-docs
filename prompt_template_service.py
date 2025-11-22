@@ -43,6 +43,7 @@ def _parse_json_list(value: Any) -> Optional[List]:
 
 
 # Topic-to-Field Mapping for AI Response Validation and Analytics
+# CRITICAL: Each topic MUST have unique fields to enable backend-controlled survey completion
 TOPIC_FIELD_MAP = {
     "NPS": ["nps_score", "nps_reasoning"],
     "Business Relationship Tenure": ["tenure_with_fc"],
@@ -52,7 +53,14 @@ TOPIC_FIELD_MAP = {
     "Pricing Value": ["pricing_rating"],
     "Support Quality": ["support_rating"],
     "Improvement Suggestions": ["improvement_feedback"],
-    "Additional Feedback": ["additional_comments"]
+    "Additional Feedback": ["additional_comments"],
+    # New unique fields for common campaign topics
+    "Product Quality": ["product_quality_feedback"],
+    "Support Experience": ["support_experience_feedback"],
+    "Service Rating": ["service_rating_feedback"],
+    "User Experience": ["user_experience_feedback"],
+    "Feature Requests": ["feature_requests"],
+    "General Feedback": ["general_feedback"]
 }
 
 # Universal Guidelines Template (Parameterized)
