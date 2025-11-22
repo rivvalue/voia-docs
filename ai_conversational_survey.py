@@ -504,7 +504,8 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
                         break
             
             # Generic patterns as final fallback (infer from context)
-            if not any(extracted.get(key) for key in ['service_rating', 'satisfaction_rating', 'product_value_rating', 'pricing_rating', 'support_rating']):
+            # CRITICAL FIX: Don't infer 1-5 ratings if we just extracted an NPS score (prevents "4" NPS from being misread as satisfaction)
+            if not any(extracted.get(key) for key in ['service_rating', 'satisfaction_rating', 'product_value_rating', 'pricing_rating', 'support_rating']) and not extracted.get('nps_score'):
                 for pattern in generic_rating_patterns:
                     matches = re.findall(pattern, user_input, re.IGNORECASE)
                     if matches:  # Use LAST match
@@ -641,8 +642,10 @@ IMPORTANT: If data was already captured (listed in ALREADY CAPTURED above), retu
         if any(indicator in text_lower for indicator in reasoning_indicators) or len(user_input.strip()) > 5:
             extracted['nps_reasoning'] = user_input
         
-        # Always store as additional comments for context
-        extracted['additional_comments'] = user_input
+        # CRITICAL FIX: Only store as additional_comments if it's substantive text (not just numbers)
+        # Don't store simple numeric answers like "4", "7", "3" as comments
+        if len(user_input.strip()) > 2 and not user_input.strip().isdigit():
+            extracted['additional_comments'] = user_input
         
         return extracted
     
